@@ -1,0 +1,174 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_project/Pages/MoonPage.dart';
+import 'package:flutter_project/Pages/NewHonooPage.dart';
+import 'package:flutter_project/Pages/PlaceholderPage.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../Controller/DeviceController.dart';
+import '../Utility/Utility.dart';
+import 'package:sizer/sizer.dart';
+
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF000026),
+      body: Column(
+        children: [
+          SizedBox(
+            height: 60,
+            child: Center( 
+              child:Text(
+                Utility().appName,
+                style: GoogleFonts.arvo(
+                  color: const Color(0xFF9E172F),
+                  fontSize: 40,
+                  fontWeight: FontWeight.w400,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: SizedBox( 
+                width: 100.w,
+                child: Row(
+                  children: [
+                    Expanded(child: Container()),
+                    Container(
+                      constraints: DeviceController().isPhone() ? BoxConstraints(maxWidth: 100.w) : BoxConstraints(maxWidth: 50.w),
+                      child:Column(
+                        children: [
+                          SizedBox(
+                            height: 60,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                IconButton(icon: SvgPicture.asset(
+                                  "assets/icons/luna.svg",
+                                  semanticsLabel: 'Moon',
+                                ),
+                                iconSize: 60,
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const MoonPage()),
+                                  );
+                                }),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            Utility().textHome1,
+                            style: GoogleFonts.arvo(
+                              color: const Color(0xFFFFFFFF),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const Padding(padding: EdgeInsets.all(15.0)),
+                          Text(
+                            Utility().textHome2,
+                            style: GoogleFonts.arvo(
+                              color: const Color(0xFFFFFFFF),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w200,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(child: Container()),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 70,
+
+            child:Stack(
+              children: [
+                Positioned(
+                  bottom: 50,
+                  child: SizedBox(
+                    height: 10,
+                    width: MediaQuery.of(context).size.width,
+                    child: Container(color: const Color(0xFF101044),)
+                  ),
+                ),
+                Positioned(
+                  bottom: 10,
+                  left: MediaQuery.of(context).size.width/2 + 80,
+                  child: IconButton(icon: SvgPicture.asset(
+                    "assets/icons/bottle.svg",
+                    semanticsLabel: 'Bottiglia',
+                  ),
+                  iconSize: 70,
+                  splashRadius: 40,
+                  //splashColor: Colors.transparent, // set splash color to transparent
+                  //highlightColor: Colors.transparent, // set highlight color to transparent
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const NewHonooPage()),
+                    );
+                  }),
+                ),
+                Positioned(
+                  bottom: 30,
+                  child: SizedBox(
+                    height: 20,
+                    width: MediaQuery.of(context).size.width,
+                    child: Container(color: const Color(0xFF20205A),)
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  child: SizedBox(
+                    height: 30,
+                    width: MediaQuery.of(context).size.width,
+                    child: Container(color: const Color(0xFF444D88),)
+                  ),
+                ),
+                Positioned(
+                  bottom: -20,
+                  left: MediaQuery.of(context).size.width/2 - 40,
+                  child: IconButton(icon: SvgPicture.asset(
+                    "assets/icons/scrigno.svg",
+                    semanticsLabel: 'Scrigno',
+                  ),
+                  iconSize: 70,
+                  splashRadius: 40,
+                  //splashColor: Colors.transparent, // set splash color to transparent
+                  //highlightColor: Colors.transparent, // set highlight color to transparent
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const PlaceholderPage()),
+                    );
+                  }),
+                ),
+              ],
+            )
+          ),
+        ],
+      ),
+    );
+  }
+}
