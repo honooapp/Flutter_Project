@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project/Pages/HomePage.dart';
 import 'package:sizer/sizer.dart';
-
-import 'Pages/PlaceholderPage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +17,7 @@ class MyApp extends StatelessWidget {
         return const SafeArea(
           child: MaterialApp(
                   title: 'honoo',
-                  home: PlaceholderPage(),
+                  home: HomePage(),
                 ),
         );
       },

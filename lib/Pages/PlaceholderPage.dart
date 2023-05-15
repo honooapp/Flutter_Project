@@ -3,6 +3,7 @@ import 'package:flutter_project/Controller/DeviceController.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../Utility/HonooColors.dart';
 import '../Utility/Utility.dart';
 import 'HomePage.dart';
 
@@ -35,10 +36,10 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                     height: 60,
                     child: Text(
                       Utility().appName,
-                      style: GoogleFonts.arvo(
-                        color: Color(0xFF9E172F),
+                      style: GoogleFonts.libreFranklin(
+                        color: HonooColor.secondary,
                         fontSize: 40,
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.w600,
                       ),
                       textAlign: TextAlign.center,
                     ),

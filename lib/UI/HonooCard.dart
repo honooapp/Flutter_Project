@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project/Utility/HonooColors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
@@ -14,10 +15,10 @@ class HonooCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: const Color(0xFF20205A),
+      color: honoo.type == HonooType.moon ? HonooColor.tertiary : honoo.type == HonooType.answer ? HonooColor.secondary : honoo.type == HonooType.personal ? HonooColor.background : HonooColor.background,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.0),
+        borderRadius: BorderRadius.circular(5),
       ),
       child: Column(
         children: [
@@ -25,11 +26,20 @@ class HonooCard extends StatelessWidget {
             padding: const EdgeInsets.all(15.0),
             child: Container(
               decoration: BoxDecoration(
+                color: honoo.type == HonooType.moon ? HonooColor.tertiary : honoo.type == HonooType.answer ? HonooColor.secondary : honoo.type == HonooType.personal ? HonooColor.background : HonooColor.tertiary,
                 border: Border.all(
-                  color: const Color(0xFFFFFFFF),
+                  color: Colors.transparent,
                   width: 1.0,
                 ),
-                borderRadius: BorderRadius.circular(20)
+                borderRadius: BorderRadius.circular(5),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    spreadRadius: 2,
+                    blurRadius: 7,
+                    offset: const Offset(7, 3), // changes the position of the shadow
+                  ),
+                ],
               ),
               child: SizedBox(
                 width: 100.w,
@@ -39,7 +49,7 @@ class HonooCard extends StatelessWidget {
                     honoo.text,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.arvo(
-                      color: const Color(0xFFFFFFFF),
+                      color: honoo.type == HonooType.moon ? HonooColor.onTertiary : honoo.type == HonooType.answer ? HonooColor.onBackground : honoo.type == HonooType.personal ? HonooColor.onBackground : HonooColor.onBackground,
                       fontSize: 18,
                       fontWeight: FontWeight.w200,
                     ),
@@ -51,7 +61,7 @@ class HonooCard extends StatelessWidget {
           Expanded(child:Padding(
             padding: const EdgeInsets.only(bottom: 15.0, left: 15.0, right: 15.0),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(20.0),
+                borderRadius: BorderRadius.circular(5.0),
                 child: Container(
                   width: 100.w,
                   decoration: BoxDecoration(

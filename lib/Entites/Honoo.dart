@@ -5,8 +5,10 @@ class Honoo {
   String _created_at;
   String _updated_at;
   String _author;
+  HonooType _type;
 
-  Honoo(this._id, this._text, this._image, this._created_at, this._updated_at, this._author);
+
+  Honoo(this._id, this._text, this._image, this._created_at, this._updated_at, this._author, this._type);
 
   String get updated_at => _updated_at;
 
@@ -43,4 +45,12 @@ class Honoo {
   set author(String value) {
     _author = value;
   }
+
+  HonooType get type => _type;
+
+  set type(HonooType value) {
+    _type = value;
+  }
 }
+
+enum HonooType { personal, moon, answer }

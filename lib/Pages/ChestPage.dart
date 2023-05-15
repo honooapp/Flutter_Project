@@ -8,27 +8,94 @@ import 'package:carousel_slider/carousel_slider.dart';
 
 
 import '../Controller/DeviceController.dart';
+import '../Entites/Honoo.dart';
 import '../Utility/Utility.dart';
 import 'package:sizer/sizer.dart';
 
 import 'HomePage.dart';
 
 
-class MoonPage extends StatefulWidget {
-  const MoonPage({super.key});
+class ChestPage extends StatefulWidget {
+  const ChestPage({super.key});
 
 
   @override
-  State<MoonPage> createState() => _MoonPageState();
+  State<ChestPage> createState() => _ChestPageState();
 }
 
-class _MoonPageState extends State<MoonPage> {
+class _ChestPageState extends State<ChestPage> {
 
   @override
   Widget build(BuildContext context) {
 
+    List<List<List<Honoo>>> honooList = HonooController().getChestHonoo();
+    
+    List<List<Honoo>> personalHonoo = honooList[0];
+    List<List<Honoo>> answerHonoo = honooList[1];
+
+    List<CarouselSlider> personalHonooSliders = [];
+    List<CarouselSlider> answerHonooSliders = [];
+    for (int i = 0; i < personalHonoo.length; i++) {
+      List<Widget> personalHonooCards = [];
+      for (int j = 0; j < personalHonoo[i].length; j++) {
+        personalHonooCards.add(HonooCard(honoo: personalHonoo[i][j]));
+      }
+      personalHonooSliders.add(CarouselSlider(
+        options: CarouselOptions(
+          height: 70.h,
+          aspectRatio: 9/16,
+          enlargeCenterPage: true,
+          enableInfiniteScroll: false,
+          scrollDirection: Axis.vertical,
+        ),
+        items: personalHonooCards,
+      ));
+    }
+    for (int i = 0; i < answerHonoo.length; i++) {
+      List<Widget> answerHonooCards = [];
+      for (int j = 0; j < answerHonoo[i].length; j++) {
+        answerHonooCards.add(HonooCard(honoo: answerHonoo[i][j]));
+      }
+      answerHonooSliders.add(CarouselSlider(
+        options: CarouselOptions(
+          height: 70.h,
+          aspectRatio: 9/16,
+          enlargeCenterPage: true,
+          enableInfiniteScroll: false,
+          scrollDirection: Axis.vertical,
+        ),
+        items: answerHonooCards,
+      ));
+    }
+    List<Widget> honooCards = [];
+    honooCards.insertAll(0, personalHonooSliders);
+    honooCards.insert(honooCards.length, Card(
+      child: Container(
+        width: 100.w,
+        height: 70.h,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                Utility().chestText,
+                style: GoogleFonts.arvo(
+                  color: HonooColor.onTertiary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w400,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    ));
+    honooCards.insertAll(honooCards.length, answerHonooSliders);
+
+
     return Scaffold(
-      backgroundColor: HonooColor.tertiary,
+      backgroundColor: const Color.fromARGB(255, 214, 214, 214),
       body: Column(
         children: [
           SizedBox(
@@ -55,18 +122,13 @@ class _MoonPageState extends State<MoonPage> {
                     Expanded(
                       child: CarouselSlider(
                         options: CarouselOptions(
+                          initialPage: personalHonoo.length,
                           height: 70.h,
                           aspectRatio: 9/16,
                           enlargeCenterPage: true,
                           enableInfiniteScroll: false,
                         ),
-                        items: HonooController().getMoonHonoo().map((i) {
-                          return Builder(
-                            builder: (BuildContext context) {
-                              return HonooCard(honoo: i);
-                            },
-                          );
-                        }).toList(),
+                        items: honooCards,
                       ),
                     ),
                     SizedBox(

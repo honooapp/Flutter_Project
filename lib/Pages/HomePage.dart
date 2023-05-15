@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project/Controller/Nim.dart';
 import 'package:flutter_project/Pages/MoonPage.dart';
 import 'package:flutter_project/Pages/NewHonooPage.dart';
-import 'package:flutter_project/Pages/PlaceholderPage.dart';
+import 'package:flutter_project/Pages/NimPage.dart';
+import 'package:flutter_project/Utility/HonooColors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../Controller/DeviceController.dart';
 import '../Utility/Utility.dart';
 import 'package:sizer/sizer.dart';
+
+import 'ChestPage.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -24,7 +28,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: const Color(0xFF000026),
+      backgroundColor: HonooColor.background,
       body: Column(
         children: [
           SizedBox(
@@ -32,10 +36,10 @@ class _HomePageState extends State<HomePage> {
             child: Center( 
               child:Text(
                 Utility().appName,
-                style: GoogleFonts.arvo(
-                  color: const Color(0xFF9E172F),
-                  fontSize: 40,
-                  fontWeight: FontWeight.w400,
+                style: GoogleFonts.libreFranklin(
+                  color: HonooColor.secondary,
+                  fontSize: 30,
+                  fontWeight: FontWeight.w600,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -58,7 +62,7 @@ class _HomePageState extends State<HomePage> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 IconButton(icon: SvgPicture.asset(
-                                  "assets/icons/luna.svg",
+                                  "assets/icons/moon.svg",
                                   semanticsLabel: 'Moon',
                                 ),
                                 iconSize: 60,
@@ -74,9 +78,9 @@ class _HomePageState extends State<HomePage> {
                           Text(
                             Utility().textHome1,
                             style: GoogleFonts.arvo(
-                              color: const Color(0xFFFFFFFF),
+                              color: HonooColor.onBackground,
                               fontSize: 18,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w700,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -84,9 +88,9 @@ class _HomePageState extends State<HomePage> {
                           Text(
                             Utility().textHome2,
                             style: GoogleFonts.arvo(
-                              color: const Color(0xFFFFFFFF),
+                              color: HonooColor.onBackground,
                               fontSize: 18,
-                              fontWeight: FontWeight.w200,
+                              fontWeight: FontWeight.w400,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -109,7 +113,7 @@ class _HomePageState extends State<HomePage> {
                   child: SizedBox(
                     height: 10,
                     width: MediaQuery.of(context).size.width,
-                    child: Container(color: const Color(0xFF101044),)
+                    child: Container(color: HonooColor.wave1,)
                   ),
                 ),
                 Positioned(
@@ -135,7 +139,7 @@ class _HomePageState extends State<HomePage> {
                   child: SizedBox(
                     height: 20,
                     width: MediaQuery.of(context).size.width,
-                    child: Container(color: const Color(0xFF20205A),)
+                    child: Container(color: HonooColor.wave2,)
                   ),
                 ),
                 Positioned(
@@ -143,15 +147,15 @@ class _HomePageState extends State<HomePage> {
                   child: SizedBox(
                     height: 30,
                     width: MediaQuery.of(context).size.width,
-                    child: Container(color: const Color(0xFF444D88),)
+                    child: Container(color: HonooColor.wave3,)
                   ),
                 ),
                 Positioned(
                   bottom: -20,
                   left: MediaQuery.of(context).size.width/2 - 40,
                   child: IconButton(icon: SvgPicture.asset(
-                    "assets/icons/scrigno.svg",
-                    semanticsLabel: 'Scrigno',
+                    "assets/icons/chest.svg",
+                    semanticsLabel: 'Chest',
                   ),
                   iconSize: 70,
                   splashRadius: 40,
@@ -160,7 +164,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const PlaceholderPage()),
+                      MaterialPageRoute(builder: (context) => const ChestPage()),
                     );
                   }),
                 ),

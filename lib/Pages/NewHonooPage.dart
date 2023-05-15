@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project/Utility/HonooColors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -25,7 +26,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: const Color(0xFF000026),
+      backgroundColor: HonooColor.background,
       body: Column(
         children: [
           SizedBox(
@@ -33,10 +34,10 @@ class _NewHonooPageState extends State<NewHonooPage> {
             child: Center( 
               child:Text(
                 Utility().appName,
-                style: GoogleFonts.arvo(
-                  color: const Color(0xFF9E172F),
-                  fontSize: 40,
-                  fontWeight: FontWeight.w400,
+                style: GoogleFonts.libreFranklin(
+                  color: HonooColor.secondary,
+                  fontSize: 30,
+                  fontWeight: FontWeight.w600,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -58,18 +59,35 @@ class _NewHonooPageState extends State<NewHonooPage> {
                     SizedBox(
                       height: 60,
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           IconButton(icon: SvgPicture.asset(
                             "assets/icons/home.svg",
                             semanticsLabel: 'Home',
                           ),
                           iconSize: 60,
+                          splashRadius: 25,
                           onPressed: () {
+                            /*
                             Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) => const HomePage()),
                             );
+                            */
+                            Navigator.pop(context);
+                          }),
+                          Padding(padding: EdgeInsets.only(left: 20.w),),
+                          IconButton(icon: SvgPicture.asset(
+                            "assets/icons/ok.svg",
+                            semanticsLabel: 'Home',
+                          ),
+                          iconSize: 60,
+                          splashRadius: 25,
+                          onPressed: () {
+                            /*Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const HomePage()),
+                            );*/
                           }),
                         ],
                       ),
