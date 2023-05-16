@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/Entites/Honoo.dart';
+import 'package:honoo/Entites/Honoo.dart';
 
 class HonooController {
   static final HonooController _instance = HonooController._internal();

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/Pages/HomePage.dart';
+import 'package:honoo/Pages/HomePage.dart';
 import 'package:sizer/sizer.dart';
 
 void main() {

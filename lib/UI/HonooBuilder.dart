@@ -56,7 +56,7 @@ class _HonooBuilderState extends State<HonooBuilder> {
                           textAlign: TextAlign.center,
                           maxLines: null,
                           inputFormatters: [
-                            LineLengthLimitingTextInputFormatter(maxLineLength: 27, maxLines: 5),
+                            LineLengthLimitingTextInputFormatter(maxLineLength: 31, maxLines: 5),
                           ],
                           decoration: const InputDecoration(
                             hintText: 'Scrivi qui in tuo testo',

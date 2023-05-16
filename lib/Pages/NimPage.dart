@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/Controller/NimController.dart';
+import 'package:honoo/Controller/NimController.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -41,7 +41,7 @@ class _NimPageState extends State<NimPage> {
                 style: GoogleFonts.libreFranklin(
                   color: HonooColor.secondary,
                   fontSize: 30,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
                 textAlign: TextAlign.center,
               ),

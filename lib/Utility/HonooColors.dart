@@ -12,5 +12,4 @@ class HonooColor {
   static const Color onSecondary = Color(0xFF010E22);
   static const Color onTertiary = Color(0xFF010E22);
   static const Color onBackground = Color(0xFFFFFFFF);
-
 }
