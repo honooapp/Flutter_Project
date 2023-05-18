@@ -43,9 +43,9 @@ class NimController {
     return balanced == 0;
   }
 
-  void remove(List<List<int>> board, int row, List<int> positions) {
+  void remove(List<List<int>> _board, int row, List<int> positions) {
     for (var position in positions) {
-      board[row][position] = 0;
+      _board[row][position] = 0;
     }
   }
 
@@ -69,7 +69,12 @@ class NimController {
   }
 
   void aiMove() {
-    List<List<int>> tempList = List.from(board);
+    List<int> tmp0 = List.from(board[0]);
+    List<int> tmp1 = List.from(board[1]);
+    List<int> tmp2 = List.from(board[2]);
+    List<int> tmp3 = List.from(board[3]);
+    List<List<int>> tempList = [tmp0, tmp1, tmp2, tmp3];
+    //List<List<int>> tempList = List.from(board);
     bool foundBalanced = false;
     int rowTraversed = 0;
 
@@ -95,29 +100,28 @@ class NimController {
 
           if (tempList[row].reduce((value, element) => value + element) > 0) {
             for (int v = 0; v < tempList[row].reduce((value, element) => value + element); v++) {
-              remove(tempList, row, [tempList[3].indexOf(1)]);
+              remove(tempList, row, [tempList[row].indexOf(1)]);
               amount += 1;
 
               if (isBalanced(tempList)) {
                 foundBalanced = true;
-                String aiMoveMessage =
-                    'AI removed: $amount From row: $rowTraversed';
+                String aiMoveMessage = 'AI removed: $amount From row: $rowTraversed';
                 aiHistory.add(aiMoveMessage);
                 board = List.from(tempList);
-                break;
+                return;
               }
 
               if (tempList[row].reduce((value, element) => value + element) == 0) {
-                tempList = List.from(board);
+                List<int> tmp0 = List.from(board[0]);
+                List<int> tmp1 = List.from(board[1]);
+                List<int> tmp2 = List.from(board[2]);
+                List<int> tmp3 = List.from(board[3]);
+                tempList = [tmp0, tmp1, tmp2, tmp3];
+                //tempList = List.from(board);
               }
             }
+            amount = 0;
           }
-
-          if (foundBalanced) {
-            break;
-          }
-
-          amount = 0;
         }
       }
 

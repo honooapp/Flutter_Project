@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:honoo/Controller/Nim.dart';
+import 'package:honoo/IsolaDelleStorie/Pages/Isola.dart';
 import 'package:honoo/Pages/MoonPage.dart';
 import 'package:honoo/Pages/NewHonooPage.dart';
 import 'package:honoo/Pages/NimPage.dart';
@@ -104,8 +105,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           SizedBox(
-            height: 70,
-
+            height: 105,
             child:Stack(
               children: [
                 Positioned(
@@ -165,6 +165,26 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const ChestPage()),
+                    );
+                  }),
+                ),
+                Positioned(
+                  bottom: -16,
+                  left: MediaQuery.of(context).size.width/2 - 200,
+                  child: IconButton(icon: SvgPicture.asset(
+                    width: 200,
+                    height: 200,
+                    "assets/icons/island.svg",
+                    semanticsLabel: 'Chest',
+                  ),
+                  iconSize: 180,
+                  splashRadius: 100,
+                  //splashColor: Colors.transparent, // set splash color to transparent
+                  //highlightColor: Colors.transparent, // set highlight color to transparent
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Isola()),
                     );
                   }),
                 ),
