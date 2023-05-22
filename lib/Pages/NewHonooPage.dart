@@ -47,7 +47,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
             children: [
               Expanded(child: Container()),
               Container(
-                constraints: DeviceController().isPhone() ? BoxConstraints(maxWidth: 100.w, maxHeight: 100.h -60) : BoxConstraints(maxWidth: 50.w, maxHeight: 100.h - 60),
+                constraints: DeviceController().isPhone() ? BoxConstraints(maxWidth: 100.w, maxHeight: 100.h -120) : BoxConstraints(maxWidth: 50.w, maxHeight: 100.h - 120),
                 child:Column(
                   children: [
                     Expanded(

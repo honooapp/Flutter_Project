@@ -150,6 +150,27 @@ class _HomePageState extends State<HomePage> {
                     child: Container(color: HonooColor.wave3,)
                   ),
                 ),
+                
+                Positioned(
+                  bottom: -16,
+                  left: MediaQuery.of(context).size.width/2 - 200,
+                  child: IconButton(icon: SvgPicture.asset(
+                    width: 180,
+                    height: 180,
+                    "assets/icons/island.svg",
+                    semanticsLabel: 'Chest',
+                  ),
+                  iconSize: 180,
+                  splashRadius: 1,
+                  //splashColor: Colors.transparent, // set splash color to transparent
+                  //highlightColor: Colors.transparent, // set highlight color to transparent
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Isola()),
+                    );
+                  }),
+                ),
                 Positioned(
                   bottom: -20,
                   left: MediaQuery.of(context).size.width/2 - 40,
@@ -165,26 +186,6 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const ChestPage()),
-                    );
-                  }),
-                ),
-                Positioned(
-                  bottom: -16,
-                  left: MediaQuery.of(context).size.width/2 - 200,
-                  child: IconButton(icon: SvgPicture.asset(
-                    width: 200,
-                    height: 200,
-                    "assets/icons/island.svg",
-                    semanticsLabel: 'Chest',
-                  ),
-                  iconSize: 180,
-                  splashRadius: 100,
-                  //splashColor: Colors.transparent, // set splash color to transparent
-                  //highlightColor: Colors.transparent, // set highlight color to transparent
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Isola()),
                     );
                   }),
                 ),

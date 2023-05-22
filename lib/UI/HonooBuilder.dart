@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
@@ -21,6 +22,8 @@ class _HonooBuilderState extends State<HonooBuilder> {
 
   XFile? image;
   TextEditingController _textFieldController = TextEditingController();
+  ImageProvider? imageProvider;
+
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +115,7 @@ class _HonooBuilderState extends State<HonooBuilder> {
                   ) : BoxDecoration(
                     image: DecorationImage(
                       fit: BoxFit.cover,
-                      image: FileImage(File(image!.path)),
+                      image: imageProvider!,
                     ),
                   ),
                   width: 100.w,
@@ -162,6 +165,11 @@ class _HonooBuilderState extends State<HonooBuilder> {
                               if (image != null) {
                                 setState(() {
                                   this.image = image;
+                                  if (kIsWeb) {
+                                    imageProvider = NetworkImage(image.path);
+                                  } else {
+                                    imageProvider = FileImage(File(image.path));
+                                  }
                                 });
                               }
                             },
@@ -178,12 +186,13 @@ class _HonooBuilderState extends State<HonooBuilder> {
                           iconSize: 30,
                           icon: const Icon(
                             Icons.delete,
-                            color: Color(0xFFFFFFFF),
+                            color: HonooColor.onBackground,
                           ),
                           onPressed: () {
                             setState(() {
                               //destroy image
                               image = null;
+                              imageProvider = null;
                             });
                           },
                         ),
@@ -194,7 +203,6 @@ class _HonooBuilderState extends State<HonooBuilder> {
               ),
             ),
           ),
-
         ],
       ),
     );

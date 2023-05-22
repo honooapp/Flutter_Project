@@ -8,27 +8,40 @@ import 'package:carousel_slider/carousel_slider.dart';
 
 
 import '../Controller/DeviceController.dart';
+import '../Entites/Honoo.dart';
 import '../Utility/Utility.dart';
 import 'package:sizer/sizer.dart';
 
-import 'HomePage.dart';
 
-
-class MoonPage extends StatefulWidget {
-  const MoonPage({super.key});
-
-
+class ConversationPage extends StatefulWidget {
+  const ConversationPage({super.key, required this.honoo});
+  
+  final Honoo honoo;
+  
   @override
-  State<MoonPage> createState() => _MoonPageState();
+  State<ConversationPage> createState() => _ConversationPageState();
 }
 
-class _MoonPageState extends State<MoonPage> {
+class _ConversationPageState extends State<ConversationPage> {
+
+  CarouselController carouselController = CarouselController();
+
+  List<Widget> honooCards = [];
+
+  void buildHonooHistoryCards() {
+    HonooController().getHonooHistory(widget.honoo).forEach((element) {
+      honooCards.add(HonooCard(honoo: element));
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
 
+    buildHonooHistoryCards();
+
     return Scaffold(
-      backgroundColor: HonooColor.tertiary,
+      backgroundColor: HonooColor.background,
       body: Column(
         children: [
           SizedBox(
@@ -49,24 +62,20 @@ class _MoonPageState extends State<MoonPage> {
             children: [
               Expanded(child: Container()),
               Container(
-                constraints: DeviceController().isPhone() ? BoxConstraints(maxWidth: 100.w, maxHeight: 100.h -120) : BoxConstraints(maxWidth: 50.w, maxHeight: 100.h - 120),
+                constraints: DeviceController().isPhone() ? BoxConstraints(maxWidth: 85.w, maxHeight: 100.h -120) : BoxConstraints(maxWidth: 50.w, maxHeight: 100.h - 120),
                 child:Column(
                   children: [
                     Expanded(
                       child: CarouselSlider(
+                        carouselController: carouselController,
                         options: CarouselOptions(
-                          height: 70.h,
+                          scrollDirection: Axis.vertical,
+                          height: 100.h,
                           aspectRatio: 9/16,
                           enlargeCenterPage: true,
                           enableInfiniteScroll: false,
                         ),
-                        items: HonooController().getMoonHonoo().map((i) {
-                          return Builder(
-                            builder: (BuildContext context) {
-                              return HonooCard(honoo: i);
-                            },
-                          );
-                        }).toList(),
+                        items: honooCards,
                       ),
                     ),
                     SizedBox(
@@ -75,7 +84,7 @@ class _MoonPageState extends State<MoonPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           IconButton(icon: SvgPicture.asset(
-                            color: HonooColor.onTertiary,
+                            color: HonooColor.onBackground,
                             "assets/icons/home.svg",
                             semanticsLabel: 'Home',
                           ),
@@ -86,8 +95,8 @@ class _MoonPageState extends State<MoonPage> {
                           }),
                           Padding(padding: EdgeInsets.only(left: 5.w)),
                           IconButton(icon: SvgPicture.asset(
-                            "assets/icons/heart.svg",
-                            semanticsLabel: 'Heart',
+                            "assets/icons/broken_heart.svg",
+                            semanticsLabel: 'Broken heart',
                           ),
                           iconSize: 60,
                           splashRadius: 25,
@@ -96,7 +105,7 @@ class _MoonPageState extends State<MoonPage> {
                           }),
                           Padding(padding: EdgeInsets.only(left: 5.w)),
                           IconButton(icon: SvgPicture.asset(
-                            color: HonooColor.onTertiary,
+                            color: HonooColor.onBackground,
                             "assets/icons/reply.svg",
                             semanticsLabel: 'Reply',
                           ),
