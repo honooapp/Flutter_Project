@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:honoo/Controller/Nim.dart';
-import 'package:honoo/IsolaDelleStorie/Pages/Isola.dart';
+import 'package:honoo/IsolaDelleStorie/Pages/IslandPage.dart';
 import 'package:honoo/Pages/MoonPage.dart';
 import 'package:honoo/Pages/NewHonooPage.dart';
 import 'package:honoo/Pages/NimPage.dart';
@@ -167,7 +167,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const Isola()),
+                      MaterialPageRoute(builder: (context) => const IslandPage()),
                     );
                   }),
                 ),
