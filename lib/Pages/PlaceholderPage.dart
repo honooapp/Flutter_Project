@@ -22,7 +22,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: Color(0xFF000026),
+      backgroundColor: const Color(0xFF000026),
       body: Row(
         children: [
           Expanded(child: Container()),
@@ -72,7 +72,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => HomePage()),
+                            MaterialPageRoute(builder: (context) => const HomePage()),
                           );
                         }),
                       ],

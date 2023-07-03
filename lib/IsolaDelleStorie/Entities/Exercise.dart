@@ -2,9 +2,9 @@ class Exercise {
   String _exerciseTitle;
   String _exerciseDescription;
   String _exerciseImage;
-  bool _hasSubMenu;
+  int _parentId;
 
-  Exercise(this._exerciseTitle, this._exerciseDescription, this._exerciseImage, this._hasSubMenu);
+  Exercise(this._parentId, this._exerciseTitle, this._exerciseDescription, this._exerciseImage);
 
   String get exerciseDescription => _exerciseDescription;
 
@@ -24,11 +24,10 @@ class Exercise {
     _exerciseImage = value;
   }
 
+  int get parentId => _parentId;
 
-  bool get hasSubMenu => _hasSubMenu;
-
-  set hasSubMenu(bool value) {
-    _hasSubMenu = value;
+  set parentId (int value) {
+    _parentId = value;
   }
 
 }

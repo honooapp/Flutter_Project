@@ -1,5 +1,4 @@
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 
 class LineLengthLimitingTextInputFormatter extends TextInputFormatter {
   final int maxLineLength;

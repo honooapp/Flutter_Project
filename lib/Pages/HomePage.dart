@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:honoo/Controller/Nim.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/IslandPage.dart';
 import 'package:honoo/Pages/MoonPage.dart';
 import 'package:honoo/Pages/NewHonooPage.dart';
-import 'package:honoo/Pages/NimPage.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -157,7 +155,7 @@ class _HomePageState extends State<HomePage> {
                   child: IconButton(icon: SvgPicture.asset(
                     width: 180,
                     height: 180,
-                    "assets/icons/island.svg",
+                    "assets/icons/isoladellestorie/island.svg",
                     semanticsLabel: 'Chest',
                   ),
                   iconSize: 180,

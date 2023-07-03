@@ -60,8 +60,8 @@ class NimGame {
   void logLastMove(String target) {
     if (target == 'ai') {
       if (aiMovesHistory.isNotEmpty) {
-        print('\033[1;32;40m' + aiMovesHistory.last);
-        print('\033[1;37;40m');
+        print('033[1;32;40m${aiMovesHistory.last}');
+        print('033[1;37;40m');
       }
     } else {
       if (playerMovesHistory.isNotEmpty) {

@@ -9,7 +9,6 @@ import '../UI/HonooBuilder.dart';
 import '../Utility/Utility.dart';
 import 'package:sizer/sizer.dart';
 
-import 'HomePage.dart';
 
 
 class NewHonooPage extends StatefulWidget {

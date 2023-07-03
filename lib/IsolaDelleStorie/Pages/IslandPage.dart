@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:honoo/IsolaDelleStorie/Controller/ExerciseController.dart';
+import 'package:honoo/IsolaDelleStorie/Pages/ExercisePage.dart';
 import 'package:honoo/IsolaDelleStorie/Utility/IsolaDelleStorieContentManager.dart';
-import 'package:honoo/Pages/MoonPage.dart';
-import 'package:honoo/Pages/NewHonooPage.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -25,7 +25,7 @@ class _IslandPageState extends State<IslandPage> {
 
     List<Widget> island = [
 
-      Container(
+      SizedBox(
         width: 95.w,
         height: 400,
         child: SvgPicture.asset(
@@ -45,6 +45,10 @@ class _IslandPageState extends State<IslandPage> {
         iconSize: 40,
         splashRadius: 30,
         onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ExercisePage(exercise: ExerciseController().getExercise1(),)),
+          );
         }),
       ),
       Positioned(
@@ -60,6 +64,10 @@ class _IslandPageState extends State<IslandPage> {
         iconSize: 40,
         splashRadius: 30,
         onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ExercisePage(exercise: ExerciseController().getExercise2(),)),
+          );
         }),
       ),
       Positioned(
@@ -75,6 +83,10 @@ class _IslandPageState extends State<IslandPage> {
         iconSize: 40,
         splashRadius: 30,
         onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ExercisePage(exercise: ExerciseController().getExercise3(),)),
+          );
         }),
       ),
       Positioned(
@@ -90,6 +102,10 @@ class _IslandPageState extends State<IslandPage> {
         iconSize: 40,
         splashRadius: 30,
         onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ExercisePage(exercise: ExerciseController().getExercise4(),)),
+          );
         }),
       ),
       Positioned(
@@ -105,6 +121,10 @@ class _IslandPageState extends State<IslandPage> {
         iconSize: 40,
         splashRadius: 30,
         onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ExercisePage(exercise: ExerciseController().getExercise5(),)),
+          );
         }),
       ),
       Positioned(
@@ -120,6 +140,10 @@ class _IslandPageState extends State<IslandPage> {
         iconSize: 40,
         splashRadius: 30,
         onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ExercisePage(exercise: ExerciseController().getExercise6(),)),
+          );
         }),
       ),
       Positioned(
@@ -135,6 +159,10 @@ class _IslandPageState extends State<IslandPage> {
         iconSize: 40,
         splashRadius: 30,
         onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ExercisePage(exercise: ExerciseController().getExercise7(),)),
+          );
         }),
       ),
       Positioned(
@@ -150,6 +178,10 @@ class _IslandPageState extends State<IslandPage> {
         iconSize: 40,
         splashRadius: 30,
         onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ExercisePage(exercise: ExerciseController().getExercise8(),)),
+          );
         }),
       ),
       Positioned(
@@ -165,6 +197,10 @@ class _IslandPageState extends State<IslandPage> {
         iconSize: 40,
         splashRadius: 30,
         onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ExercisePage(exercise: ExerciseController().getExercise9(),)),
+          );
         }),
       ),
 

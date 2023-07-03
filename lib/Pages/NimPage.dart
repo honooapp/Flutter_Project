@@ -21,7 +21,7 @@ class NimPage extends StatefulWidget {
 
 class _NimPageState extends State<NimPage> {
 
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   TextEditingController removeTextController = TextEditingController();
 
   @override
@@ -86,14 +86,13 @@ class _NimPageState extends State<NimPage> {
                               _controller.text = NimController().drawGame();
                             });
                           },
-                          child: const Text("Gioca"),
                           style: ElevatedButton.styleFrom(
-                            primary: const Color(0xFF9E172F),
-                            onPrimary: const Color(0xFF000026),
+                            foregroundColor: const Color(0xFF000026), backgroundColor: const Color(0xFF9E172F),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20.0),
                             ),
                           ),
+                          child: const Text("Gioca"),
                         ),
                         //reset button
                         Padding(
@@ -105,14 +104,13 @@ class _NimPageState extends State<NimPage> {
                                 _controller.text = "";
                               });
                             },
-                            child: const Text("Reset"),
                             style: ElevatedButton.styleFrom(
-                              primary: const Color(0xFF9E172F),
-                              onPrimary: const Color(0xFF000026),
+                              foregroundColor: const Color(0xFF000026), backgroundColor: const Color(0xFF9E172F),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20.0),
                               ),
                             ),
+                            child: const Text("Reset"),
                           ),
                         ),
                         //input to insert the number of matches to remove
@@ -149,14 +147,13 @@ class _NimPageState extends State<NimPage> {
                                 _controller.text = NimController().drawGame();
                               });
                             },
-                            child: const Text("Togli"),
                             style: ElevatedButton.styleFrom(
-                              primary: const Color(0xFF9E172F),
-                              onPrimary: const Color(0xFF000026),
+                              foregroundColor: const Color(0xFF000026), backgroundColor: const Color(0xFF9E172F),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20.0),
                               ),
                             ),
+                            child: const Text("Togli"),
                           ),
                       ],
                     ),
@@ -173,7 +170,7 @@ class _NimPageState extends State<NimPage> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => HomePage()),
+                              MaterialPageRoute(builder: (context) => const HomePage()),
                             );
                           }),
                         ],

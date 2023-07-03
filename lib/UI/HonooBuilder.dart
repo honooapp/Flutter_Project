@@ -7,7 +7,6 @@ import 'package:sizer/sizer.dart';
 import 'package:image_picker/image_picker.dart';
 
 
-import '../Entites/Honoo.dart';
 import '../Utility/HonooColors.dart';
 import '../Utility/LineLengthLimitingTextInputFormatter.dart';
 
@@ -21,7 +20,7 @@ class HonooBuilder extends StatefulWidget {
 class _HonooBuilderState extends State<HonooBuilder> {
 
   XFile? image;
-  TextEditingController _textFieldController = TextEditingController();
+  final TextEditingController _textFieldController = TextEditingController();
   ImageProvider? imageProvider;
 
 
@@ -107,7 +106,7 @@ class _HonooBuilderState extends State<HonooBuilder> {
                 child: Container(
                   decoration: image == null ? BoxDecoration(
                     border: Border.all(
-                      color: Color.fromARGB(0, 255, 255, 255),
+                      color: const Color.fromARGB(0, 255, 255, 255),
                       width: 1.0,
                     ),
                     color: HonooColor.tertiary,
@@ -143,8 +142,8 @@ class _HonooBuilderState extends State<HonooBuilder> {
                               color: HonooColor.primary,
                             ),
                             onPressed: () async {
-                              final ImagePicker _picker = ImagePicker();
-                              final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+                              final ImagePicker picker = ImagePicker();
+                              final XFile? image = await picker.pickImage(source: ImageSource.camera);
                               if (image != null) {
                                 setState(() {
                                   this.image = image;
@@ -160,8 +159,8 @@ class _HonooBuilderState extends State<HonooBuilder> {
                               color: HonooColor.primary,
                             ),
                             onPressed: () async {
-                              final ImagePicker _picker = ImagePicker();
-                              final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+                              final ImagePicker picker = ImagePicker();
+                              final XFile? image = await picker.pickImage(source: ImageSource.gallery);
                               if (image != null) {
                                 setState(() {
                                   this.image = image;

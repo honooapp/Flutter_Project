@@ -68,6 +68,8 @@ flutter:
   assets:
     - assets/google_fonts/
     - assets/icons/
+    - assets/icons/isoladellestorie/
+    - assets/icons/isoladellestorie/backgrounds/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -37,7 +37,7 @@ class _ChestPageState extends State<ChestPage> {
 
   Future<void> captureAndShare() async {
     try {
-      RenderRepaintBoundary? boundary = globalKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;;
+      RenderRepaintBoundary? boundary = globalKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
       ui.Image image = await boundary!.toImage(pixelRatio: 1.0);
       ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       Uint8List pngBytes = byteData!.buffer.asUint8List();
@@ -94,7 +94,7 @@ class _ChestPageState extends State<ChestPage> {
 
     Card mainCard = Card(
       color: HonooColor.background,
-      child: Container(
+      child: SizedBox(
         width: 100.w,
         height: 70.h,
         child: Center(
@@ -172,7 +172,7 @@ class _ChestPageState extends State<ChestPage> {
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          Padding(padding: EdgeInsets.only(top: 20),),
+                          const Padding(padding: EdgeInsets.only(top: 20),),
                           SvgPicture.asset(
                             'assets/icons/honoo_chest_blue.svg',
                             semanticsLabel: 'Icon',
@@ -291,7 +291,7 @@ class _ChestPageState extends State<ChestPage> {
                         width: 200,
                         height: 200,
                         color: Colors.blue,
-                        child: Text(
+                        child: const Text(
                           'Capture this widget',
                           style: TextStyle(color: Colors.white),
                         ),

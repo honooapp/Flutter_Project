@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:honoo/IsolaDelleStorie/Controller/ExerciseController.dart';
 import 'package:honoo/Pages/HomePage.dart';
 import 'package:sizer/sizer.dart';
 
@@ -12,6 +13,9 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
+    ExerciseController().init();
+
     return Sizer(
       builder: (context, orientation, deviceType) {
         return const SafeArea(

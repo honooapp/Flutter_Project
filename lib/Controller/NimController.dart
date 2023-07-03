@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
 
 class NimController {
   static final NimController _instance = NimController._internal();
@@ -43,9 +42,9 @@ class NimController {
     return balanced == 0;
   }
 
-  void remove(List<List<int>> _board, int row, List<int> positions) {
+  void remove(List<List<int>> board, int row, List<int> positions) {
     for (var position in positions) {
-      _board[row][position] = 0;
+      board[row][position] = 0;
     }
   }
 
