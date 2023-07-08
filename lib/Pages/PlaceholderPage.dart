@@ -22,7 +22,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: const Color(0xFF000026),
+      backgroundColor: HonooColor.background,
       body: Row(
         children: [
           Expanded(child: Container()),
@@ -34,14 +34,16 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                 children: <Widget>[
                   SizedBox(
                     height: 60,
-                    child: Text(
-                      Utility().appName,
-                      style: GoogleFonts.libreFranklin(
-                        color: HonooColor.secondary,
-                        fontSize: 40,
-                        fontWeight: FontWeight.w600,
+                    child: Center( 
+                      child:Text(
+                        Utility().appName,
+                        style: GoogleFonts.libreFranklin(
+                          color: HonooColor.secondary,
+                          fontSize: 30,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
                   Expanded(
@@ -51,7 +53,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                         child: Text(
                           Utility().text1,
                           style: GoogleFonts.arvo(
-                            color: const Color(0xFFFFFFFF),
+                            color: HonooColor.onBackground,
                             fontSize: 18,
                             fontWeight: FontWeight.w200,
                           ),

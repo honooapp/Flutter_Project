@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/IslandPage.dart';
 import 'package:honoo/Pages/MoonPage.dart';
 import 'package:honoo/Pages/NewHonooPage.dart';
+import 'package:honoo/Pages/PlaceholderPage.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -30,20 +31,26 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: HonooColor.background,
       body: Column(
         children: [
-          SizedBox(
-            height: 60,
-            child: Center( 
-              child:Text(
-                Utility().appName,
-                style: GoogleFonts.libreFranklin(
-                  color: HonooColor.secondary,
-                  fontSize: 30,
-                  fontWeight: FontWeight.w500,
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: SizedBox(
+              height: 60,
+              child: Center( 
+                child:Text(
+                  Utility().appName,
+                  style: GoogleFonts.libreFranklin(
+                    color: HonooColor.secondary,
+                    fontSize: 30,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
               ),
             ),
           ),
+          
           Expanded(
             child: SingleChildScrollView(
               child: SizedBox( 
@@ -153,10 +160,11 @@ class _HomePageState extends State<HomePage> {
                   bottom: -16,
                   left: MediaQuery.of(context).size.width/2 - 200,
                   child: IconButton(icon: SvgPicture.asset(
+                    color: HonooColor.onBackground,
                     width: 180,
                     height: 180,
                     "assets/icons/isoladellestorie/island.svg",
-                    semanticsLabel: 'Chest',
+                    semanticsLabel: 'Island',
                   ),
                   iconSize: 180,
                   splashRadius: 1,

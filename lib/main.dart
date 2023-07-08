@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:honoo/IsolaDelleStorie/Controller/ExerciseController.dart';
 import 'package:honoo/Pages/HomePage.dart';
+import 'package:honoo/Pages/PlaceholderPage.dart';
 import 'package:sizer/sizer.dart';
 
 void main() {
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
         return const SafeArea(
           child: MaterialApp(
                   title: 'honoo',
-                  home: HomePage(),
+                  home: PlaceholderPage(),
                 ),
         );
       },

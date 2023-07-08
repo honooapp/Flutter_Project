@@ -285,18 +285,6 @@ class _ChestPageState extends State<ChestPage> {
                         items: honooCards,
                       ),
                     ),
-                    RepaintBoundary(
-                      key: globalKey,
-                      child: Container(
-                        width: 200,
-                        height: 200,
-                        color: Colors.blue,
-                        child: const Text(
-                          'Capture this widget',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
                     SizedBox(
                       height: 60,
                       child: Row(

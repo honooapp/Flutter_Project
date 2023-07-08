@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:honoo/IsolaDelleStorie/Controller/ExerciseController.dart';
 import 'package:honoo/IsolaDelleStorie/Entities/Exercise.dart';
 import 'package:honoo/IsolaDelleStorie/Utility/IsolaDelleStorieContentManager.dart';
+import 'package:honoo/Utility/FormattedText.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -378,7 +379,8 @@ class _ExercisePageState extends State<ExercisePage> {
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   child: SingleChildScrollView(
-                                    child:IsolaDelleStoreContentManager.getRichText(widget.exercise.exerciseDescription),
+                                    //child:IsolaDelleStoreContentManager.getRichText(widget.exercise.exerciseDescription),
+                                    child:FormattedText(inputText: widget.exercise.exerciseDescription),
                                   ),
                                 ),
                               ),
@@ -396,7 +398,7 @@ class _ExercisePageState extends State<ExercisePage> {
                   ),
                   SizedBox(height: 16.0),
                   // Circular Buttons
-                  subExercises.isNotEmpty ?
+                  subExercises.isNotEmpty && uiVisible ?
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: subExercises,

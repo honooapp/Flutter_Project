@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:honoo/IsolaDelleStorie/Controller/ExerciseController.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/ExercisePage.dart';
@@ -19,6 +21,8 @@ class IslandPage extends StatefulWidget {
 }
 
 class _IslandPageState extends State<IslandPage> {
+
+  bool infoVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -206,6 +210,45 @@ class _IslandPageState extends State<IslandPage> {
 
     ];
 
+    Positioned info = Positioned(
+      top: 5.h,
+      height: 70.h,
+      left: 10.w,
+      right: 10.w,
+      child:Visibility(
+        visible: infoVisible,
+          child: Column(
+            children:[
+              Expanded(
+                child: Container(
+                  child: Center(
+                    child: Container(
+                      child: ClipRect( 
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: Container(
+                            width: 80.w,
+                            padding: EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: SingleChildScrollView(
+                              physics: const BouncingScrollPhysics(),
+                              child:IsolaDelleStoreContentManager.getRichText(IsolaDelleStoreContentManager.e_0_0),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+        ),
+      ), 
+    );
+
     return Scaffold(
       backgroundColor: HonooColor.background,
       body: Column(
@@ -224,32 +267,37 @@ class _IslandPageState extends State<IslandPage> {
               ),
             ),
           ),
-          Expanded(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: SizedBox( 
-                width: 100.w,
-                child: Row(
-                  children: [
-                    Expanded(child: Container()),
-                    Container(
-                      constraints: DeviceController().isPhone() ? BoxConstraints(maxWidth: 100.w) : BoxConstraints(maxWidth: 50.w),
-                      child:Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Padding(padding: EdgeInsets.only(top: 5.h)),
-                          IsolaDelleStoreContentManager.getRichText(IsolaDelleStoreContentManager.homeDescription),
-                          Padding(padding: EdgeInsets.only(top: 5.h)),
-                          Stack(
-                            children: island,
+            Expanded(
+            child: Stack(
+              children: [
+                SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: SizedBox( 
+                    width: 100.w,
+                    child: Row(
+                      children: [
+                        Expanded(child: Container()),
+                        Container(
+                          constraints: DeviceController().isPhone() ? BoxConstraints(maxWidth: 100.w) : BoxConstraints(maxWidth: 50.w),
+                          child:Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Padding(padding: EdgeInsets.only(top: 5.h)),
+                              IsolaDelleStoreContentManager.getRichText(IsolaDelleStoreContentManager.homeDescription),
+                              Padding(padding: EdgeInsets.only(top: 5.h)),
+                              Stack(
+                                children: island,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                        Expanded(child: Container()),
+                      ],
                     ),
-                    Expanded(child: Container()),
-                  ],
+                  ),
                 ),
-              ),
+                info,
+              ],
             ),
           ),
           SizedBox(
@@ -266,7 +314,7 @@ class _IslandPageState extends State<IslandPage> {
                 onPressed: () {
                   Navigator.pop(context);
                 }),
-                Padding(padding: EdgeInsets.only(left: 5.w)),
+                Padding(padding: EdgeInsets.only(left: 1.w)),
                 IconButton(icon: SvgPicture.asset(
                   "assets/icons/isoladellestorie/gomitolo.svg",
                   semanticsLabel: 'Gomitolo',
@@ -276,7 +324,7 @@ class _IslandPageState extends State<IslandPage> {
                 onPressed: () {
                   
                 }),
-                Padding(padding: EdgeInsets.only(left: 5.w)),
+                Padding(padding: EdgeInsets.only(left: 1.w)),
                 IconButton(icon: SvgPicture.asset(
                   "assets/icons/isoladellestorie/garbuglio.svg",
                   semanticsLabel: 'Garbuglio',
@@ -286,7 +334,7 @@ class _IslandPageState extends State<IslandPage> {
                 onPressed: () {
 
                 }),
-                Padding(padding: EdgeInsets.only(left: 5.w)),
+                Padding(padding: EdgeInsets.only(left: 1.w)),
                 IconButton(icon: SvgPicture.asset(
                   "assets/icons/isoladellestorie/conchiglia.svg",
                   semanticsLabel: 'Conghiglia',
@@ -295,6 +343,18 @@ class _IslandPageState extends State<IslandPage> {
                 splashRadius: 30,
                 onPressed: () {
                   
+                }),
+                Padding(padding: EdgeInsets.only(left: 1.w)),
+                IconButton(icon: SvgPicture.asset(
+                  "assets/icons/info.svg",
+                  semanticsLabel: 'Info',
+                ),
+                iconSize: 60,
+                splashRadius: 30,
+                onPressed: () {
+                  setState(() {
+                    infoVisible = !infoVisible;
+                  });
                 }),
               ],
             ),
