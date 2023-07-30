@@ -7,8 +7,10 @@ import 'HonooColors.dart';
 
 class FormattedText extends StatelessWidget {
   final String inputText;
+  final Color color;
+  final double fontSize;
 
-  const FormattedText({required this.inputText});
+  const FormattedText({required this.inputText, required this.color, required this.fontSize});
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +27,9 @@ class FormattedText extends StatelessWidget {
 
         if (text != null && tag != null) {
           if (tag == 'b') {
-            textSpans.add(TextSpan(text: text, style: GoogleFonts.arvo(color: HonooColor.onBackground,fontSize: 18,fontWeight: FontWeight.w700,)));
+            textSpans.add(TextSpan(text: text, style: GoogleFonts.arvo(color: color,fontSize: fontSize,fontWeight: FontWeight.w700,)));
           } else if (tag == 'i') {
-            textSpans.add(TextSpan(text: text, style: GoogleFonts.arvo(color: HonooColor.onBackground,fontSize: 18,fontWeight: FontWeight.w400,fontStyle: FontStyle.italic,)));
+            textSpans.add(TextSpan(text: text, style: GoogleFonts.arvo(color: color,fontSize: fontSize,fontWeight: FontWeight.w400,fontStyle: FontStyle.italic,)));
           } else if (tag == 'l') {
             textSpans.add(_buildHyperlinkSpan(text, context));
           }
@@ -36,7 +38,7 @@ class FormattedText extends StatelessWidget {
         return '';
       },
       onNonMatch: (String text) {
-        textSpans.add(TextSpan(text: text, style: GoogleFonts.arvo(color: HonooColor.onBackground,fontSize: 18,fontWeight: FontWeight.w400,)));
+        textSpans.add(TextSpan(text: text, style: GoogleFonts.arvo(color: color,fontSize: fontSize,fontWeight: FontWeight.w400,)));
         return '';
       },
     );

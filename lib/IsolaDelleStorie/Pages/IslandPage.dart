@@ -11,6 +11,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../Controller/DeviceController.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../Pages/ComingSoonPage.dart';
+import '../../Utility/Utility.dart';
+
 
 class IslandPage extends StatefulWidget {
   const IslandPage({super.key});
@@ -322,7 +325,10 @@ class _IslandPageState extends State<IslandPage> {
                 iconSize: 60,
                 splashRadius: 30,
                 onPressed: () {
-                  
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ComingSoonPage(header: Utility().honooHinooHeader, quote: Utility().shakespeare, bibliography:  Utility().bibliography, )),
+                  );
                 }),
                 Padding(padding: EdgeInsets.only(left: 1.w)),
                 IconButton(icon: SvgPicture.asset(
@@ -332,7 +338,10 @@ class _IslandPageState extends State<IslandPage> {
                 iconSize: 60,
                 splashRadius: 30,
                 onPressed: () {
-
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ComingSoonPage(header: Utility().honooHinooHeader, quote: Utility().shakespeare, bibliography:  Utility().bibliography, )),
+                  );
                 }),
                 Padding(padding: EdgeInsets.only(left: 1.w)),
                 IconButton(icon: SvgPicture.asset(
@@ -342,7 +351,10 @@ class _IslandPageState extends State<IslandPage> {
                 iconSize: 60,
                 splashRadius: 30,
                 onPressed: () {
-                  
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ComingSoonPage(header: Utility().othersHonooHinooHeader, quote: Utility().shakespeare, bibliography:  Utility().bibliography, )),
+                  );
                 }),
                 Padding(padding: EdgeInsets.only(left: 1.w)),
                 IconButton(icon: SvgPicture.asset(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:honoo/IsolaDelleStorie/Utility/IsolaDelleStorieContentManager.dart';
+import 'package:honoo/IsolaDelleStorie/Utility/NotionAPI.dart';
 
 import '../../Utility/HonooColors.dart';
 import '../Entities/Exercise.dart';
@@ -53,6 +55,7 @@ class ExerciseController {
 
   Exercise getExercise1() {
     return Exercise(
+      "1",
       1,
       IsolaDelleStoreContentManager.e_1_0_title,
       IsolaDelleStoreContentManager.e_1_0,
@@ -62,6 +65,7 @@ class ExerciseController {
 
   Exercise getExercise2() {
     return Exercise(
+      "2",
       2,
       IsolaDelleStoreContentManager.e_2_0_title,
       IsolaDelleStoreContentManager.e_2_0,
@@ -71,6 +75,7 @@ class ExerciseController {
 
   Exercise getExercise2_1() {
     return Exercise(
+      "2.1",
       2,
       IsolaDelleStoreContentManager.e_2_1_title,
       IsolaDelleStoreContentManager.e_2_1,
@@ -80,6 +85,7 @@ class ExerciseController {
 
   Exercise getExercise2_2() {
     return Exercise(
+      "2.2",
       2,
       IsolaDelleStoreContentManager.e_2_2_title,
       IsolaDelleStoreContentManager.e_2_2,
@@ -89,6 +95,7 @@ class ExerciseController {
 
   Exercise getExercise2_3() {
     return Exercise(
+      "2.3",
       2,
       IsolaDelleStoreContentManager.e_2_3_title,
       IsolaDelleStoreContentManager.e_2_3,
@@ -98,6 +105,7 @@ class ExerciseController {
 
   Exercise getExercise2_4() {
     return Exercise(
+      "2.4",
       2,
       IsolaDelleStoreContentManager.e_2_4_title,
       IsolaDelleStoreContentManager.e_2_4,
@@ -107,6 +115,7 @@ class ExerciseController {
 
   Exercise getExercise2_5() {
     return Exercise(
+      "2.5",
       2,
       IsolaDelleStoreContentManager.e_2_5_title,
       IsolaDelleStoreContentManager.e_2_5,
@@ -116,6 +125,7 @@ class ExerciseController {
 
   Exercise getExercise2_6() {
     return Exercise(
+      "2.6",
       2,
       IsolaDelleStoreContentManager.e_2_6_title,
       IsolaDelleStoreContentManager.e_2_6,
@@ -125,6 +135,7 @@ class ExerciseController {
 
   Exercise getExercise3() {
     return Exercise(
+      "3",
       3,
       IsolaDelleStoreContentManager.e_3_0_title,
       IsolaDelleStoreContentManager.e_3_0,
@@ -134,6 +145,7 @@ class ExerciseController {
 
   Exercise getExercise3_1() {
     return Exercise(
+      "3.1",
       3,
       IsolaDelleStoreContentManager.e_3_1_title,
       IsolaDelleStoreContentManager.e_3_1,
@@ -143,6 +155,7 @@ class ExerciseController {
 
   Exercise getExercise3_2() {
     return Exercise(
+      "3.2",
       3,
       IsolaDelleStoreContentManager.e_3_2_title,
       IsolaDelleStoreContentManager.e_3_2,
@@ -152,6 +165,7 @@ class ExerciseController {
 
   Exercise getExercise3_3() {
     return Exercise(
+      "3.3",
       3,
       IsolaDelleStoreContentManager.e_3_3_title,
       IsolaDelleStoreContentManager.e_3_3,
@@ -161,6 +175,7 @@ class ExerciseController {
 
   Exercise getExercise3_4() {
     return Exercise(
+      "3.4",
       3,
       IsolaDelleStoreContentManager.e_3_4_title,
       IsolaDelleStoreContentManager.e_3_4,
@@ -170,6 +185,7 @@ class ExerciseController {
 
   Exercise getExercise3_5() {
     return Exercise(
+      "3.5",
       3,
       IsolaDelleStoreContentManager.e_3_5_title,
       IsolaDelleStoreContentManager.e_3_5,
@@ -179,6 +195,7 @@ class ExerciseController {
 
   Exercise getExercise4() {
     return Exercise(
+      "4",
       4,
       IsolaDelleStoreContentManager.e_4_0_title,
       IsolaDelleStoreContentManager.e_4_0,
@@ -188,6 +205,7 @@ class ExerciseController {
 
   Exercise getExercise4_1() {
     return Exercise(
+      "4.1",
       4,
       IsolaDelleStoreContentManager.e_4_1_title,
       IsolaDelleStoreContentManager.e_4_1,
@@ -197,6 +215,7 @@ class ExerciseController {
 
   Exercise getExercise4_2() {
     return Exercise(
+      "4.2",
       4,
       IsolaDelleStoreContentManager.e_4_2_title,
       IsolaDelleStoreContentManager.e_4_2,
@@ -206,6 +225,7 @@ class ExerciseController {
 
   Exercise getExercise4_3() {
     return Exercise(
+      "4.3",
       4,
       IsolaDelleStoreContentManager.e_4_3_title,
       IsolaDelleStoreContentManager.e_4_3,
@@ -215,6 +235,7 @@ class ExerciseController {
 
   Exercise getExercise5() {
     return Exercise(
+      "5",
       5,
       IsolaDelleStoreContentManager.e_5_0_title,
       IsolaDelleStoreContentManager.e_5_0,
@@ -224,6 +245,7 @@ class ExerciseController {
 
   Exercise getExercise5_1() {
     return Exercise(
+      "5.1",
       5,
       IsolaDelleStoreContentManager.e_5_1_title,
       IsolaDelleStoreContentManager.e_5_1,
@@ -233,6 +255,7 @@ class ExerciseController {
 
   Exercise getExercise5_2() {
     return Exercise(
+      "5.2",
       5,
       IsolaDelleStoreContentManager.e_5_2_title,
       IsolaDelleStoreContentManager.e_5_2,
@@ -242,6 +265,7 @@ class ExerciseController {
 
   Exercise getExercise5_3() {
     return Exercise(
+      "5.3",
       5,
       IsolaDelleStoreContentManager.e_5_3_title,
       IsolaDelleStoreContentManager.e_5_3,
@@ -251,6 +275,7 @@ class ExerciseController {
 
   Exercise getExercise5_4() {
     return Exercise(
+      "5.4",
       5,
       IsolaDelleStoreContentManager.e_5_4_title,
       IsolaDelleStoreContentManager.e_5_4,
@@ -260,6 +285,7 @@ class ExerciseController {
 
   Exercise getExercise6() {
     return Exercise(
+      "6",
       6,
       IsolaDelleStoreContentManager.e_6_0_title,
       IsolaDelleStoreContentManager.e_6_0,
@@ -269,6 +295,7 @@ class ExerciseController {
 
   Exercise getExercise6_1() {
     return Exercise(
+      "6.1",
       6,
       IsolaDelleStoreContentManager.e_6_1_title,
       IsolaDelleStoreContentManager.e_6_1,
@@ -278,6 +305,7 @@ class ExerciseController {
 
   Exercise getExercise7() {
     return Exercise(
+      "7",
       7,
       IsolaDelleStoreContentManager.e_7_0_title,
       IsolaDelleStoreContentManager.e_7_0,
@@ -287,6 +315,7 @@ class ExerciseController {
 
   Exercise getExercise7_1() {
     return Exercise(
+      "7.1",
       7,
       IsolaDelleStoreContentManager.e_7_1_title,
       IsolaDelleStoreContentManager.e_7_1,
@@ -296,6 +325,7 @@ class ExerciseController {
 
   Exercise getExercise7_2() {
     return Exercise(
+      "7.2",
       7,
       IsolaDelleStoreContentManager.e_7_2_title,
       IsolaDelleStoreContentManager.e_7_2,
@@ -305,6 +335,7 @@ class ExerciseController {
 
   Exercise getExercise7_3() {
     return Exercise(
+      "7.3",
       7,
       IsolaDelleStoreContentManager.e_7_3_title,
       IsolaDelleStoreContentManager.e_7_3,
@@ -314,6 +345,7 @@ class ExerciseController {
 
   Exercise getExercise8() {
     return Exercise(
+      "8",
       8,
       IsolaDelleStoreContentManager.e_8_0_title,
       IsolaDelleStoreContentManager.e_8_0,
@@ -323,6 +355,7 @@ class ExerciseController {
 
   Exercise getExercise8_1() {
     return Exercise(
+      "8.1",
       8,
       IsolaDelleStoreContentManager.e_8_1_title,
       IsolaDelleStoreContentManager.e_8_1,
@@ -332,6 +365,7 @@ class ExerciseController {
 
   Exercise getExercise8_2() {
     return Exercise(
+      "8.2",
       8,
       IsolaDelleStoreContentManager.e_8_2_title,
       IsolaDelleStoreContentManager.e_8_2,
@@ -341,6 +375,7 @@ class ExerciseController {
 
   Exercise getExercise8_3() {
     return Exercise(
+      "8.3",
       8,
       IsolaDelleStoreContentManager.e_8_3_title,
       IsolaDelleStoreContentManager.e_8_3,
@@ -350,6 +385,7 @@ class ExerciseController {
 
   Exercise getExercise9() {
     return Exercise(
+      "9",
       9,
       IsolaDelleStoreContentManager.e_9_0_title,
       IsolaDelleStoreContentManager.e_9_0,
@@ -359,6 +395,7 @@ class ExerciseController {
 
   Exercise getExercise9_1() {
     return Exercise(
+      "9.1",
       9,
       IsolaDelleStoreContentManager.e_9_1_title,
       IsolaDelleStoreContentManager.e_9_1,
@@ -368,6 +405,7 @@ class ExerciseController {
 
   Exercise getExercise9_2() {
     return Exercise(
+      "9.2",
       9,
       IsolaDelleStoreContentManager.e_9_2_title,
       IsolaDelleStoreContentManager.e_9_2,
@@ -377,6 +415,7 @@ class ExerciseController {
 
   Exercise getExercise9_3() {
     return Exercise(
+      "9.3",
       9,
       IsolaDelleStoreContentManager.e_9_3_title,
       IsolaDelleStoreContentManager.e_9_3,
@@ -386,6 +425,7 @@ class ExerciseController {
 
   Exercise getExercise9_4() {
     return Exercise(
+      "9.4",
       9,
       IsolaDelleStoreContentManager.e_9_4_title,
       IsolaDelleStoreContentManager.e_9_4,
@@ -393,7 +433,7 @@ class ExerciseController {
     );
   }
 
-  List<Widget> getExerciseButtons (Exercise exercise, Function handleButtonPressed) {
+  List<Widget> getExerciseButtons (Exercise exercise, Function handleButtonPressed, BuildContext context ) {
     final int numberOfExercises = listOfNumberOfExercises[exercise.parentId-1];
     List<Widget> ret = [];
     switch (exercise.parentId) {
@@ -426,11 +466,60 @@ class ExerciseController {
         }
       break;
       default:
+    }
+    /*
+    switch (exercise.id) {
+      case "3.1": //1 - 144
+        ret.add(
+          RawMaterialButton(
+            onPressed: () => (){
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: Text('Number Popup'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '123', // Replace this with the number you want to display
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 20),
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: IconButton(
+                          icon: Icon(Icons.close),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+            shape: CircleBorder(),
+            fillColor: HonooColor.wave4,
+            constraints: BoxConstraints.tight(Size(40, 40)),
+            child: SvgPicture.asset(
+              "assets/icons/dice.svg",
+              semanticsLabel: 'Dice',
+            ),
+          ),
+        );
+      break;
+      case "2.4": //2 - 12
+      break;
+      case "5.1": //1 - 10
+      break;
+      default:
 
     }
+    */
     return ret;
   }
 
-
+  List<Exercise> getAllExercises () {
+    return [];
+  }
 
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/IslandPage.dart';
+import 'package:honoo/Pages/ComingSoonPage.dart';
 import 'package:honoo/Pages/MoonPage.dart';
 import 'package:honoo/Pages/NewHonooPage.dart';
 import 'package:honoo/Pages/PlaceholderPage.dart';
@@ -75,7 +76,8 @@ class _HomePageState extends State<HomePage> {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => const MoonPage()),
+                                    //MaterialPageRoute(builder: (context) => const MoonPage()),
+                                    MaterialPageRoute(builder: (context) => ComingSoonPage(header: Utility().readMoonHeader, quote: Utility().shakespeare, bibliography:  Utility().bibliography, )),
                                   );
                                 }),
                               ],
@@ -126,7 +128,7 @@ class _HomePageState extends State<HomePage> {
                   left: MediaQuery.of(context).size.width/2 + 80,
                   child: IconButton(icon: SvgPicture.asset(
                     "assets/icons/bottle.svg",
-                    semanticsLabel: 'Bottiglia',
+                    semanticsLabel: 'Bottle',
                   ),
                   iconSize: 70,
                   splashRadius: 40,
@@ -191,7 +193,9 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const ChestPage()),
+                      //MaterialPageRoute(builder: (context) => const ChestPage()),
+                      MaterialPageRoute(builder: (context) => ComingSoonPage(header: Utility().chestHeaderTemporary, quote: Utility().shakespeare, bibliography:  Utility().bibliography, )),
+
                     );
                   }),
                 ),

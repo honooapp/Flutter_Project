@@ -44,7 +44,7 @@ class _ExercisePageState extends State<ExercisePage> {
     }
   };
 
-    List<Widget> subExercises = ExerciseController().getExerciseButtons(widget.exercise, handleButtonPressed);
+    List<Widget> subExercises = ExerciseController().getExerciseButtons(widget.exercise, handleButtonPressed, context);
 
     List<Widget> mainPath = [
       Center(
@@ -380,7 +380,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                   ),
                                   child: SingleChildScrollView(
                                     //child:IsolaDelleStoreContentManager.getRichText(widget.exercise.exerciseDescription),
-                                    child:FormattedText(inputText: widget.exercise.exerciseDescription),
+                                    child:FormattedText(inputText: widget.exercise.exerciseDescription, color: HonooColor.onBackground, fontSize: 18,),
                                   ),
                                 ),
                               ),
