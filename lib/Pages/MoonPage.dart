@@ -83,6 +83,7 @@ class _MoonPageState extends State<MoonPage> {
                           onPressed: () {
                             Navigator.pop(context);
                           }),
+                          /*
                           Padding(padding: EdgeInsets.only(left: 5.w)),
                           IconButton(icon: SvgPicture.asset(
                             "assets/icons/heart.svg",
@@ -104,6 +105,7 @@ class _MoonPageState extends State<MoonPage> {
                           onPressed: () {
                             //TODO: reply
                           }),
+                          */
                         ],
                       ),
                     ),

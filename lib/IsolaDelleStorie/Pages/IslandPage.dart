@@ -12,6 +12,8 @@ import '../../Controller/DeviceController.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../Pages/ComingSoonPage.dart';
+import '../../Pages/MoonPage.dart';
+import '../../Pages/NewHonooPage.dart';
 import '../../Utility/Utility.dart';
 
 
@@ -256,17 +258,23 @@ class _IslandPageState extends State<IslandPage> {
       backgroundColor: HonooColor.background,
       body: Column(
         children: [
-          SizedBox(
-            height: 60,
-            child: Center( 
-              child:Text(
-                IsolaDelleStoreContentManager.homeTitle,
-                style: GoogleFonts.libreFranklin(
-                  color: HonooColor.secondary,
-                  fontSize: 30,
-                  fontWeight: FontWeight.w500,
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: SizedBox(
+              height: 60,
+              child: Center( 
+                child:Text(
+                  Utility().appName,
+                  style: GoogleFonts.libreFranklin(
+                    color: HonooColor.secondary,
+                    fontSize: 30,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
               ),
             ),
           ),
@@ -285,9 +293,28 @@ class _IslandPageState extends State<IslandPage> {
                           child:Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Padding(padding: EdgeInsets.only(top: 5.h)),
+                              Padding(padding: EdgeInsets.only(top: 2.h)),
                               IsolaDelleStoreContentManager.getRichText(IsolaDelleStoreContentManager.homeDescription),
-                              Padding(padding: EdgeInsets.only(top: 5.h)),
+                              SizedBox(
+                                height: 60,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(icon: SvgPicture.asset(
+                                      "assets/icons/moon.svg",
+                                      semanticsLabel: 'Moon',
+                                    ),
+                                    iconSize: 60,
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => const MoonPage()),
+                                        //MaterialPageRoute(builder: (context) => ComingSoonPage(header: Utility().readMoonHeader, quote: Utility().shakespeare, bibliography:  Utility().bibliography, )),
+                                      );
+                                    }),
+                                  ],
+                                ),
+                              ),
                               Stack(
                                 children: island,
                               ),
@@ -303,6 +330,110 @@ class _IslandPageState extends State<IslandPage> {
               ],
             ),
           ),
+          SizedBox(
+            height: 105,
+            child:Stack(
+              children: [
+                Positioned(
+                  bottom: 50,
+                  child: SizedBox(
+                    height: 10,
+                    width: MediaQuery.of(context).size.width,
+                    child: Container(color: HonooColor.wave1,)
+                  ),
+                ),
+                Positioned(
+                  bottom: 10,
+                  left: MediaQuery.of(context).size.width/2 + 80,
+                  child: IconButton(icon: SvgPicture.asset(
+                    "assets/icons/bottle.svg",
+                    semanticsLabel: 'Bottle',
+                  ),
+                  iconSize: 70,
+                  splashRadius: 40,
+                  //splashColor: Colors.transparent, // set splash color to transparent
+                  //highlightColor: Colors.transparent, // set highlight color to transparent
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const NewHonooPage()),
+                    );
+                  }),
+                ),
+                Positioned(
+                  bottom: 30,
+                  child: SizedBox(
+                    height: 20,
+                    width: MediaQuery.of(context).size.width,
+                    child: Container(color: HonooColor.wave2,)
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  child: SizedBox(
+                    height: 30,
+                    width: MediaQuery.of(context).size.width,
+                    child: Container(color: HonooColor.wave3,)
+                  ),
+                ),
+                
+                Positioned(
+                  bottom: 0,
+                  left: MediaQuery.of(context).size.width/2 - 200,
+                  child: IconButton(icon: SvgPicture.asset(
+                    color: HonooColor.onBackground,
+                    width: 40,
+                    height: 40,
+                    "assets/icons/home.svg",
+                    semanticsLabel: 'Home',
+                  ),
+                  iconSize: 40,
+                  splashRadius: 1,
+                  //splashColor: Colors.transparent, // set splash color to transparent
+                  //highlightColor: Colors.transparent, // set highlight color to transparent
+                  onPressed: () {
+                    Navigator.pop(context);
+                  }),
+                ),
+                Positioned(
+                  bottom: -20,
+                  left: MediaQuery.of(context).size.width/2 - 40,
+                  child: IconButton(icon: SvgPicture.asset(
+                    "assets/icons/chest.svg",
+                    semanticsLabel: 'Chest',
+                  ),
+                  iconSize: 70,
+                  splashRadius: 40,
+                  //splashColor: Colors.transparent, // set splash color to transparent
+                  //highlightColor: Colors.transparent, // set highlight color to transparent
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      //MaterialPageRoute(builder: (context) => const ChestPage()),
+                      MaterialPageRoute(builder: (context) => ComingSoonPage(header: Utility().chestHeaderTemporary, quote: Utility().shakespeare, bibliography:  Utility().bibliography, )),
+
+                    );
+                  }),
+                ),
+                Positioned(
+                  bottom: -15,
+                  left: MediaQuery.of(context).size.width/2 + 130,
+                  child: IconButton(icon: SvgPicture.asset(
+                    "assets/icons/honoo_logo.svg",
+                    semanticsLabel: 'Logo',
+                  ),
+                  iconSize: 70,
+                  splashRadius: 30,
+                  onPressed: () {
+                    setState(() {
+                      infoVisible = !infoVisible;
+                    });
+                  }),
+                ),
+              ],
+            )
+          ),
+          /*
           SizedBox(
             height: 60,
             child: Row(
@@ -371,6 +502,7 @@ class _IslandPageState extends State<IslandPage> {
               ],
             ),
           ),
+          */
         ],
       ),
     );

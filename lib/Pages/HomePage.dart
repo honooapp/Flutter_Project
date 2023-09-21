@@ -76,8 +76,8 @@ class _HomePageState extends State<HomePage> {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    //MaterialPageRoute(builder: (context) => const MoonPage()),
-                                    MaterialPageRoute(builder: (context) => ComingSoonPage(header: Utility().readMoonHeader, quote: Utility().shakespeare, bibliography:  Utility().bibliography, )),
+                                    MaterialPageRoute(builder: (context) => const MoonPage()),
+                                    //MaterialPageRoute(builder: (context) => ComingSoonPage(header: Utility().readMoonHeader, quote: Utility().shakespeare, bibliography:  Utility().bibliography, )),
                                   );
                                 }),
                               ],
