@@ -37,7 +37,7 @@ class _HomePageState extends State<HomePage> {
               Navigator.pop(context);
             },
             child: SizedBox(
-              height: 60,
+              height: 50,
               child: Center( 
                 child:Text(
                   Utility().appName,
@@ -51,7 +51,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          
           Expanded(
             child: SingleChildScrollView(
               child: SizedBox( 
@@ -63,6 +62,68 @@ class _HomePageState extends State<HomePage> {
                       constraints: DeviceController().isPhone() ? BoxConstraints(maxWidth: 100.w) : BoxConstraints(maxWidth: 50.w),
                       child:Column(
                         children: [
+                          const Padding(padding: EdgeInsets.all(10.0)),
+                          SizedBox(
+                            height: 80.h,
+                            child:Stack(
+                              children: [                                
+                                Positioned(
+                                  top: 0,
+                                  right: MediaQuery.of(context).size.width/2 - 200,
+                                  child: SizedBox(
+                                    height: 60,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        IconButton(icon: SvgPicture.asset(
+                                          "assets/icons/moon.svg",
+                                          semanticsLabel: 'Moon',
+                                        ),
+                                        iconSize: 60,
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(builder: (context) => const MoonPage()),
+                                            //MaterialPageRoute(builder: (context) => ComingSoonPage(header: Utility().readMoonHeader, quote: Utility().shakespeare, bibliography:  Utility().bibliography, )),
+                                          );
+                                        }),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Positioned.fill(
+                                  top: 0,
+                                  child: Align(
+                                    alignment: Alignment.topCenter, 
+                                    child: SingleChildScrollView(child:Column(
+                                    children: [
+                                      Text(
+                                        Utility().textHome1,
+                                        style: GoogleFonts.arvo(
+                                          color: HonooColor.onBackground,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const Padding(padding: EdgeInsets.all(10.0)),
+                                      Text(
+                                        Utility().textHome2,
+                                        style: GoogleFonts.arvo(
+                                          color: HonooColor.onBackground,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  )
+                                ),),),
+                              ],
+                            )
+                          ),
+
+                          /*
                           SizedBox(
                             height: 60,
                             child: Row(
@@ -92,7 +153,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          const Padding(padding: EdgeInsets.all(15.0)),
+                          const Padding(padding: EdgeInsets.all(10.0)),
                           Text(
                             Utility().textHome2,
                             style: GoogleFonts.arvo(
@@ -102,6 +163,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             textAlign: TextAlign.center,
                           ),
+                          */
                         ],
                       ),
                     ),

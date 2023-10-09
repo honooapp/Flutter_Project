@@ -278,7 +278,7 @@ class _IslandPageState extends State<IslandPage> {
               ),
             ),
           ),
-            Expanded(
+          Expanded(
             child: Stack(
               children: [
                 SingleChildScrollView(
