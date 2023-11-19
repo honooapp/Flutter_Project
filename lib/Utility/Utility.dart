@@ -11,7 +11,7 @@ class Utility {
   Utility._internal();
 
   final String appName = 'honoo';
-  final String text1 = """Io lo scrivo sempre così:\nsenza virgolette\ne iniziale minuscola.\nE lo pronuncio "onù",\nsenza aspirazione iniziale.\n\nhonoo\nè un progetto multimediale,\narticolato in\n\nperformance\ne laboratori tealtrali\n\nesplorazioni lunari\n\ne\nviaggi sull'Isola delle Storie.\n\nNon ci sono profili utenti\nin honoo.\nE non ci sono i "mi piace".\nMa se trovi un honoo\nche ti piace,\npuoi salvarlo nel tuo cuore\ne,\nse ne hai voglia,\npuoi anche fare\nqualcosa in più.\n\nO molto di più.\n\nSe è come penso,\nl'ultima volta\nche ci siamo visti\n\navevi gli occhi chiusi\ne hai fatto la scelta giusta.\n\nMi chiamo\nVenceslao Cembalo\ne se telefoni al\n3274920811,\npuoi sentire\nun’altra volta\nla mia voce\ne continuare il viaggio.\n\n Se le cose\nstanno\ndiversamente,\nclicca sull’icona della\nhome\nin basso a sinistra.'\n\nIn alto\nal centro\ndi ogni schermata\nc'è il logo\nhonoo\nse ci clicchi sopra,\ntorni qui\na questa pagina.\n""";
+  final String text1 = """Io lo scrivo sempre così:\nsenza virgolette\ne iniziale minuscola.\nE lo pronuncio "onù",\nsenza aspirazione iniziale.\n\nhonoo\nè un progetto multimediale,\narticolato in\n\nperformance\ne laboratori teatrali\n\nesplorazioni lunari\n\ne\nviaggi sull'Isola delle Storie.\n\nNon ci sono profili utenti\nin honoo.\nE non ci sono i "mi piace".\nMa se trovi un honoo\nche ti piace,\npuoi salvarlo nel tuo cuore\ne,\nse ne hai voglia,\npuoi anche fare\nqualcosa in più.\n\nO molto di più.\n\nSe è come penso,\nl'ultima volta\nche ci siamo visti\n\navevi gli occhi chiusi\ne hai fatto la scelta giusta.\n\nMi chiamo\nVenceslao Cembalo\ne se telefoni al\n3274920811,\npuoi sentire\nun’altra volta\nla mia voce\ne continuare il viaggio.\n\n Se le cose\nstanno\ndiversamente,\nclicca sull’icona della\nhome\nin basso a sinistra.\n\nIn alto\nal centro\ndi ogni schermata\nc'è il logo\nhonoo:\nse ci clicchi sopra,\ntorni qui\na questa pagina.\n""";
   final String textHome1 = 'Ti regaliamo la Luna.\nPer sempre.';
   final String textHome2 = 'Niente è per sempre,\ne nessuno può regalarti la Luna.\n\nÈ vero,\nma non per i poeti.\n\nVuoi essere un poeta di honoo?\n\nClicca sulla Bottiglia\ne componi il tuo honoo.\n\nOppure clicca sulla Luna\ne guarda gli honoo degli altri.\n\nO clicca sull’Isola\ne inizia il viaggio\nverso le tue storie.';
   final String chestHeader = 'Il tuo Cuore custodisce';
@@ -22,6 +22,8 @@ class Utility {
   final String answerHonooHeader = 'Fra poco\npotrai rispondere\ncon un tuo <b>honoo<b>\nagli <b>honoo<b> degli altri.';
   final String readMoonHeader = 'Fra poco qui\npotrai vedere\ngli <b>honoo<b> degli altri.'; //ok
   final String sendMoonHeader = 'Fra poco\npotrai spedire\nquesto <b>honoo<b>\nsulla Luna.';
+  final String replyMoonHeader = 'Se per te guardare\nnon è abbastanza,\nfra poco\npotrai fare di più.\nO molto di più.\n';
+  final String heartMoonHeader = 'Fra poco\npotrai salvare\nnel tuo Cuore\nquello che ti piace.\n';
   final String chestRightHeader = 'Fra poco qui\npotrai vedere\ngli <b>honoo<b> che hai salvato\ne\ngli <b>honoo<b> che hai ricevuto.';
   final String answerHonooHeader2 = 'Fra poco\npotrai rispondere\na questo <b>honoo<b>\ncon un tuo <b>honoo<b>.';
   final String honooConversationHeader = 'Fra poco qui\npotrai accedere,\nscrollando in verticale,\nalla cronologia\ndi conversazioni fra <b>honoo<b>.';

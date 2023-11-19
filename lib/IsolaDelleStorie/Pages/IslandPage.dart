@@ -216,8 +216,8 @@ class _IslandPageState extends State<IslandPage> {
     ];
 
     Positioned info = Positioned(
-      top: 5.h,
-      height: 70.h,
+      top: 0,
+      height: 80.h,
       left: 10.w,
       right: 10.w,
       child:Visibility(
@@ -293,27 +293,44 @@ class _IslandPageState extends State<IslandPage> {
                           child:Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Padding(padding: EdgeInsets.only(top: 2.h)),
-                              IsolaDelleStoreContentManager.getRichText(IsolaDelleStoreContentManager.homeDescription),
+                              const Padding(padding: EdgeInsets.only(top:5)),
                               SizedBox(
-                                height: 60,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    IconButton(icon: SvgPicture.asset(
-                                      "assets/icons/moon.svg",
-                                      semanticsLabel: 'Moon',
+                                height: 70,
+                                child:Stack(
+                                  children: [                                
+                                    Positioned(
+                                      top: 0,
+                                      right: MediaQuery.of(context).size.width/2 - 200,
+                                      child: SizedBox(
+                                        height: 60,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            IconButton(icon: SvgPicture.asset(
+                                              "assets/icons/moon.svg",
+                                              semanticsLabel: 'Moon',
+                                            ),
+                                            iconSize: 60,
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(builder: (context) => const MoonPage()),
+                                                //MaterialPageRoute(builder: (context) => ComingSoonPage(header: Utility().readMoonHeader, quote: Utility().shakespeare, bibliography:  Utility().bibliography, )),
+                                              );
+                                            }),
+                                          ],
+                                        ),
+                                      ),
                                     ),
-                                    iconSize: 60,
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => const MoonPage()),
-                                        //MaterialPageRoute(builder: (context) => ComingSoonPage(header: Utility().readMoonHeader, quote: Utility().shakespeare, bibliography:  Utility().bibliography, )),
-                                      );
-                                    }),
+                                    Positioned.fill(
+                                      top: 0,
+                                      child: Align(
+                                        alignment: Alignment.topCenter, 
+                                        child: IsolaDelleStoreContentManager.getRichText(IsolaDelleStoreContentManager.homeDescription),
+                                      ),
+                                    ),
                                   ],
-                                ),
+                                )
                               ),
                               Stack(
                                 children: island,
@@ -331,7 +348,7 @@ class _IslandPageState extends State<IslandPage> {
             ),
           ),
           SizedBox(
-            height: 105,
+            height: 80,
             child:Stack(
               children: [
                 Positioned(
@@ -344,7 +361,7 @@ class _IslandPageState extends State<IslandPage> {
                 ),
                 Positioned(
                   bottom: 10,
-                  left: MediaQuery.of(context).size.width/2 + 80,
+                  left: MediaQuery.of(context).size.width/2 + 60,
                   child: IconButton(icon: SvgPicture.asset(
                     "assets/icons/bottle.svg",
                     semanticsLabel: 'Bottle',
@@ -379,7 +396,7 @@ class _IslandPageState extends State<IslandPage> {
                 
                 Positioned(
                   bottom: 0,
-                  left: MediaQuery.of(context).size.width/2 - 200,
+                  left: MediaQuery.of(context).size.width/2 - 190,
                   child: IconButton(icon: SvgPicture.asset(
                     color: HonooColor.onBackground,
                     width: 40,
@@ -417,7 +434,7 @@ class _IslandPageState extends State<IslandPage> {
                 ),
                 Positioned(
                   bottom: -15,
-                  left: MediaQuery.of(context).size.width/2 + 130,
+                  left: MediaQuery.of(context).size.width/2 + 110,
                   child: IconButton(icon: SvgPicture.asset(
                     "assets/icons/honoo_logo.svg",
                     semanticsLabel: 'Logo',

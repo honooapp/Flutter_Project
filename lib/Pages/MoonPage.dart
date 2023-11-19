@@ -11,6 +11,8 @@ import '../Controller/DeviceController.dart';
 import '../Utility/Utility.dart';
 import 'package:sizer/sizer.dart';
 
+import 'ComingSoonPage.dart';
+
 
 
 class MoonPage extends StatefulWidget {
@@ -48,65 +50,68 @@ class _MoonPageState extends State<MoonPage> {
             children: [
               Expanded(child: Container()),
               Container(
-                constraints: DeviceController().isPhone() ? BoxConstraints(maxWidth: 100.w, maxHeight: 100.h -120) : BoxConstraints(maxWidth: 50.w, maxHeight: 100.h - 120),
+                constraints: DeviceController().isPhone() ? BoxConstraints(maxWidth: 100.w, maxHeight: 100.h - 60) : BoxConstraints(maxWidth: 50.w, maxHeight: 100.h - 60),
                 child:Column(
                   children: [
-                    Expanded(
-                      child: CarouselSlider(
-                        options: CarouselOptions(
-                          height: 70.h,
-                          aspectRatio: 9/16,
-                          enlargeCenterPage: true,
-                          enableInfiniteScroll: false,
-                        ),
-                        items: HonooController().getMoonHonoo().map((i) {
-                          return Builder(
-                            builder: (BuildContext context) {
-                              return HonooCard(honoo: i);
-                            },
-                          );
-                        }).toList(),
+                    CarouselSlider(
+                      options: CarouselOptions(
+                        height: 70.h,
+                        aspectRatio: 9/16,
+                        enlargeCenterPage: true,
+                        enableInfiniteScroll: false,
                       ),
+                      items: HonooController().getMoonHonoo().map((i) {
+                        return Builder(
+                          builder: (BuildContext context) {
+                            return HonooCard(honoo: i);
+                          },
+                        );
+                      }).toList(),
                     ),
-                    SizedBox(
-                      height: 60,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(icon: SvgPicture.asset(
-                            color: HonooColor.onTertiary,
-                            "assets/icons/home.svg",
-                            semanticsLabel: 'Home',
+                    Expanded(
+                      child: Align(
+                        alignment: FractionalOffset.bottomCenter,
+                        child: SizedBox(
+                          height: 60,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(icon: SvgPicture.asset(
+                                "assets/icons/heart.svg",
+                                semanticsLabel: 'Heart',
+                              ),
+                              iconSize: 60,
+                              splashRadius: 25,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => ComingSoonPage(header: Utility().heartMoonHeader, quote: Utility().shakespeare, bibliography:  Utility().bibliography, )),
+                                );
+                              }),
+                              IconButton(icon: SvgPicture.asset(
+                                "assets/icons/home_onTertiary.svg",
+                                semanticsLabel: 'Home',
+                              ),
+                              iconSize: 60,
+                              splashRadius: 25,
+                              onPressed: () {
+                                Navigator.pop(context);
+                              }),
+                              IconButton(icon: SvgPicture.asset(
+                                "assets/icons/reply.svg",
+                                semanticsLabel: 'Reply',
+                              ),
+                              iconSize: 60,
+                              splashRadius: 25,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => ComingSoonPage(header: Utility().replyMoonHeader, quote: Utility().shakespeare, bibliography:  Utility().bibliography, )),
+                                );
+                              }),
+                            ],
                           ),
-                          iconSize: 60,
-                          splashRadius: 25,
-                          onPressed: () {
-                            Navigator.pop(context);
-                          }),
-                          /*
-                          Padding(padding: EdgeInsets.only(left: 5.w)),
-                          IconButton(icon: SvgPicture.asset(
-                            "assets/icons/heart.svg",
-                            semanticsLabel: 'Heart',
-                          ),
-                          iconSize: 60,
-                          splashRadius: 25,
-                          onPressed: () {
-                            //TODO: Add to favorites
-                          }),
-                          Padding(padding: EdgeInsets.only(left: 5.w)),
-                          IconButton(icon: SvgPicture.asset(
-                            color: HonooColor.onTertiary,
-                            "assets/icons/reply.svg",
-                            semanticsLabel: 'Reply',
-                          ),
-                          iconSize: 60,
-                          splashRadius: 25,
-                          onPressed: () {
-                            //TODO: reply
-                          }),
-                          */
-                        ],
+                        ),
                       ),
                     ),
                   ],

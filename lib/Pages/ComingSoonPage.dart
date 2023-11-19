@@ -54,31 +54,30 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
                       ),
                     ),
                   ),
+                  Padding( padding: EdgeInsets.all(5.0),),
+                  FormattedText(inputText: widget.header, color: HonooColor.onBackground, fontSize:18,),
                   Padding( padding: EdgeInsets.all(30.0),),
-                  FormattedText(inputText: widget.header, color: HonooColor.onBackground, fontSize:24,),
-                  Padding( padding: EdgeInsets.all(50.0),),
                   SizedBox(
-                    height: 20.h,
                     width: 80.w,
                     child: Text(
                       widget.quote,
                       style: GoogleFonts.libreFranklin(
                         color: HonooColor.wave4,
-                        fontSize: 20,
+                        fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
                       textAlign: TextAlign.left,
                     ),
                   ),
-                  Padding( padding: EdgeInsets.all(32.0),),
+                  Padding( padding: EdgeInsets.all(10.0),),
                   SizedBox(
-                    height: 10.h,
+                    height: 20.h,
                     width: 80.w,
                     child: Text(
                       widget.bibliography,
                       style: GoogleFonts.libreFranklin(
                         color: HonooColor.wave4,
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
                       textAlign: TextAlign.left,
@@ -88,7 +87,7 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
                   SizedBox(
                     height: 60,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         IconButton(icon: SvgPicture.asset(
                           "assets/icons/home.svg",

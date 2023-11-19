@@ -62,7 +62,6 @@ class _HomePageState extends State<HomePage> {
                       constraints: DeviceController().isPhone() ? BoxConstraints(maxWidth: 100.w) : BoxConstraints(maxWidth: 50.w),
                       child:Column(
                         children: [
-                          const Padding(padding: EdgeInsets.all(10.0)),
                           SizedBox(
                             height: 80.h,
                             child:Stack(

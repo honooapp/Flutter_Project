@@ -38,9 +38,10 @@ class _HonooBuilderState extends State<HonooBuilder> {
             padding: const EdgeInsets.all(15.0),
             child: Container(
               decoration: BoxDecoration(
+                color: HonooColor.tertiary,
                 border: Border.all(
-                  color: HonooColor.tertiary,
-                  width: 1.0,
+                  //color: HonooColor.wave3,
+                  //width: 1.0,
                 ),
                 borderRadius: BorderRadius.circular(5)
               ),
@@ -64,13 +65,13 @@ class _HonooBuilderState extends State<HonooBuilder> {
                             hintText: 'Scrivi qui in tuo testo',
                             border: InputBorder.none,
                             hintStyle: TextStyle(
-                              color: Color(0x88FFFFFF),
+                              color: HonooColor.wave3,
                               fontSize: 18,
                               fontWeight: FontWeight.w400,
                             ),
                           ),
                           style: GoogleFonts.arvo(
-                            color: HonooColor.tertiary,
+                            color: HonooColor.onTertiary,
                             fontSize: 18,
                             fontWeight: FontWeight.w400,
                           ),
@@ -87,7 +88,7 @@ class _HonooBuilderState extends State<HonooBuilder> {
                         child: Text(
                           '${144-_textFieldController.text.length}',
                           style: GoogleFonts.arvo(
-                            color: HonooColor.tertiary,
+                            color: HonooColor.onTertiary,
                             fontSize: 11,
                             fontWeight: FontWeight.w400,
                           ),

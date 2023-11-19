@@ -43,7 +43,7 @@ class HonooCard extends StatelessWidget {
               ),
               child: SizedBox(
                 width: 100.w,
-                height: 25.h,
+                height: 30.h,
                 child: Center(
                   child:Text(
                     honoo.text,
