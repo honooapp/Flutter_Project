@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:honoo/IsolaDelleStorie/Controller/ExerciseController.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/ExercisePage.dart';
 import 'package:honoo/IsolaDelleStorie/Utility/IsolaDelleStorieContentManager.dart';
+import 'package:honoo/Utility/FormattedText.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -27,7 +28,7 @@ class IslandPage extends StatefulWidget {
 
 class _IslandPageState extends State<IslandPage> {
 
-  bool infoVisible = false;
+  bool infoVisible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +213,6 @@ class _IslandPageState extends State<IslandPage> {
           );
         }),
       ),
-
     ];
 
     Positioned info = Positioned(
@@ -220,40 +220,73 @@ class _IslandPageState extends State<IslandPage> {
       height: 80.h,
       left: 10.w,
       right: 10.w,
-      child:Visibility(
-        visible: infoVisible,
-          child: Column(
-            children:[
-              Expanded(
-                child: Container(
-                  child: Center(
-                    child: Container(
-                      child: ClipRect( 
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                          child: Container(
-                            width: 80.w,
-                            padding: EdgeInsets.all(16.0),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.3),
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            child: SingleChildScrollView(
-                              physics: const BouncingScrollPhysics(),
-                              child:IsolaDelleStoreContentManager.getRichText(IsolaDelleStoreContentManager.e_0_0),
-                            ),
-                          ),
-                        ),
+      child: Stack(
+        children: [
+          Visibility(
+            visible: infoVisible,
+            child: Container(
+              child: ClipRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    width: 80.w,
+                    padding: EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: const SingleChildScrollView(
+                      physics: BouncingScrollPhysics(),
+                      child: FormattedText(
+                        inputText: IsolaDelleStoreContentManager.e_0_0,
+                        color: HonooColor.onBackground,
+                        fontSize: 18,
                       ),
                     ),
                   ),
                 ),
               ),
-            ],
-        ),
-      ), 
+            ),
+          ),
+          Positioned(
+            top: 0,
+            right: 0,
+            child: Visibility(
+              visible: infoVisible,
+              child: IconButton(
+                icon: Icon(Icons.close),
+                color: HonooColor.onBackground,
+                iconSize: 40,
+                onPressed: () {
+                  setState(() {
+                    infoVisible = !infoVisible;
+                  });
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
 
+
+    Positioned RulesButton = Positioned(
+      bottom: -15,
+      left: MediaQuery.of(context).size.width/2 + 110,
+      child: IconButton(icon: SvgPicture.asset(
+        "assets/icons/honoo_logo.svg",
+        semanticsLabel: 'Logo',
+      ),
+      iconSize: 70,
+      splashRadius: 30,
+      onPressed: () {
+        setState(() {
+          infoVisible = !infoVisible;
+        });
+      }),
+    );
+
+    
     return Scaffold(
       backgroundColor: HonooColor.background,
       body: Column(
@@ -432,21 +465,7 @@ class _IslandPageState extends State<IslandPage> {
                     );
                   }),
                 ),
-                Positioned(
-                  bottom: -15,
-                  left: MediaQuery.of(context).size.width/2 + 110,
-                  child: IconButton(icon: SvgPicture.asset(
-                    "assets/icons/honoo_logo.svg",
-                    semanticsLabel: 'Logo',
-                  ),
-                  iconSize: 70,
-                  splashRadius: 30,
-                  onPressed: () {
-                    setState(() {
-                      infoVisible = !infoVisible;
-                    });
-                  }),
-                ),
+                RulesButton,
               ],
             )
           ),

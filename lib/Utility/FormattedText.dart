@@ -31,7 +31,8 @@ class FormattedText extends StatelessWidget {
           } else if (tag == 'i') {
             textSpans.add(TextSpan(text: text, style: GoogleFonts.arvo(color: color,fontSize: fontSize,fontWeight: FontWeight.w400,fontStyle: FontStyle.italic,)));
           } else if (tag == 'l') {
-            textSpans.add(_buildHyperlinkSpan(text, context));
+            final strings = text.split("||");
+            textSpans.add(_buildHyperlinkSpan(strings[0], strings[1], context));
           }
         }
 
@@ -46,13 +47,13 @@ class FormattedText extends StatelessWidget {
     return RichText(text: TextSpan(children: textSpans), textAlign: TextAlign.center,);
   }
 
-  TextSpan _buildHyperlinkSpan(String text, BuildContext context) {
+  TextSpan _buildHyperlinkSpan(String text, String link, BuildContext context) {
     return TextSpan(
       text: text,
       style: GoogleFonts.arvo(color: HonooColor.onBackground,fontSize: 18,fontWeight: FontWeight.w700, decoration: TextDecoration.underline),
       recognizer: TapGestureRecognizer()
         ..onTap = () async {
-          final Uri url = Uri.parse('https://$text');
+          final Uri url = Uri.parse('https://$link');
           if (!await launchUrl(url)) {
                 throw Exception('Could not launch $url');
           }

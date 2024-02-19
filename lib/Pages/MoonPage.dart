@@ -77,6 +77,15 @@ class _MoonPageState extends State<MoonPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               IconButton(icon: SvgPicture.asset(
+                                "assets/icons/home_onTertiary.svg",
+                                semanticsLabel: 'Home',
+                              ),
+                              iconSize: 60,
+                              splashRadius: 25,
+                              onPressed: () {
+                                Navigator.pop(context);
+                              }),
+                              IconButton(icon: SvgPicture.asset(
                                 "assets/icons/heart.svg",
                                 semanticsLabel: 'Heart',
                               ),
@@ -87,15 +96,6 @@ class _MoonPageState extends State<MoonPage> {
                                   context,
                                   MaterialPageRoute(builder: (context) => ComingSoonPage(header: Utility().heartMoonHeader, quote: Utility().shakespeare, bibliography:  Utility().bibliography, )),
                                 );
-                              }),
-                              IconButton(icon: SvgPicture.asset(
-                                "assets/icons/home_onTertiary.svg",
-                                semanticsLabel: 'Home',
-                              ),
-                              iconSize: 60,
-                              splashRadius: 25,
-                              onPressed: () {
-                                Navigator.pop(context);
                               }),
                               IconButton(icon: SvgPicture.asset(
                                 "assets/icons/reply.svg",
