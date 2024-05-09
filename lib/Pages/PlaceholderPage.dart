@@ -34,7 +34,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                 children: <Widget>[
                   SizedBox(
                     height: 60,
-                    child: Center( 
+                    child: Center(
                       child:Text(
                         Utility().appName,
                         style: GoogleFonts.libreFranklin(
@@ -46,18 +46,109 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                       ),
                     ),
                   ),
+                  // Expanded(
+                  //   child: SingleChildScrollView(
+                  //     child: SizedBox(
+                  //       width: MediaQuery.of(context).size.width,
+                  //       child: Text(
+                  //         Utility().text1,
+                  //         style: GoogleFonts.arvo(
+                  //           color: HonooColor.onBackground,
+                  //           fontSize: 18,
+                  //           fontWeight: FontWeight.w200,
+                  //         ),
+                  //         textAlign: TextAlign.center,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   Expanded(
                     child: SingleChildScrollView(
-                      child: SizedBox( 
+                      child: SizedBox(
                         width: MediaQuery.of(context).size.width,
-                        child: Text(
-                          Utility().text1,
-                          style: GoogleFonts.arvo(
-                            color: HonooColor.onBackground,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w200,
-                          ),
+                        child: RichText(
                           textAlign: TextAlign.center,
+                          text: TextSpan(
+                            style: GoogleFonts.arvo(
+                              color: HonooColor.onBackground,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w200,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: Utility().text1_first, // text
+                              ),
+                              WidgetSpan(
+                                child: Padding(
+                                  padding: EdgeInsets.only(bottom: 3),
+                                  child: Image.asset(
+                                    "assets/icons/performance.png",
+                                    height: 70,
+                                  ),
+                                ),
+                                alignment: PlaceholderAlignment.middle,
+                              ),
+                              // WidgetSpan(
+                              //   child: Image.asset(
+                              //     "assets/icons/performance.png",
+                              //     height: 70,
+                              //   ),
+                              //   alignment: PlaceholderAlignment.middle,
+                              // ),
+                              TextSpan(
+                                text: Utility().text1_second, // text
+                              ),
+                              WidgetSpan(
+                                child: Padding(
+                                  padding: EdgeInsets.only(bottom: 3),
+                                  child: Image.asset(
+                                    "assets/icons/luna.png",
+                                    height: 70,
+                                  ),
+                                ),
+                                alignment: PlaceholderAlignment.middle,
+                              ),
+                              TextSpan(
+                                text: Utility().text1_third, // text
+                              ),
+                              WidgetSpan(
+                                child: Padding(
+                                  padding: EdgeInsets.only(bottom: 3),
+                                  child: Image.asset(
+                                    "assets/icons/isola.png",
+                                    height: 70,
+                                  ),
+                                ),
+                                alignment: PlaceholderAlignment.middle,
+                              ),
+                              TextSpan(
+                                text: Utility().text1_fourth, // text
+                              ),
+                              WidgetSpan(
+                                child: Padding(
+                                  padding: EdgeInsets.only(bottom: 3),
+                                  child: Image.asset(
+                                    "assets/icons/performance.png",
+                                    height: 70,
+                                  ),
+                                ),
+                                alignment: PlaceholderAlignment.middle,
+                              ),
+                              TextSpan(
+                                text: Utility().text1_fifth, // text
+                              ),
+                              WidgetSpan(
+                                child: Image.asset(
+                                  "assets/icons/logo_honoo.png",
+                                  height: 45,
+                                ),
+                                alignment: PlaceholderAlignment.middle,
+                              ),
+                              TextSpan(
+                                text: Utility().text1_six, // text
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
