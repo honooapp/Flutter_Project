@@ -138,12 +138,24 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                                 text: Utility().text1_fifth, // text
                               ),
                               WidgetSpan(
-                                child: Image.asset(
-                                  "assets/icons/logo_honoo.png",
-                                  height: 45,
+                                child: Text(
+                                  Utility().appName,
+                                  style: GoogleFonts.libreFranklin(
+                                    color: HonooColor.secondary,
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
                                 alignment: PlaceholderAlignment.middle,
                               ),
+                              // WidgetSpan(
+                              //   child: Image.asset(
+                              //     "assets/icons/logo_honoo.png",
+                              //     height: 45,
+                              //   ),
+                              //   alignment: PlaceholderAlignment.middle,
+                              // ),
                               TextSpan(
                                 text: Utility().text1_six, // text
                               ),
