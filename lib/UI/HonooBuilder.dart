@@ -84,12 +84,12 @@ class _HonooBuilderState extends State<HonooBuilder> {
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
+                        padding: const EdgeInsets.only(bottom: 12.0),
                         child: Text(
                           '${144-_textFieldController.text.length}',
                           style: GoogleFonts.arvo(
                             color: HonooColor.onTertiary,
-                            fontSize: 11,
+                            fontSize: 9,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
@@ -119,7 +119,8 @@ class _HonooBuilderState extends State<HonooBuilder> {
                     ),
                   ),
                   width: 100.w,
-                  child: image == null ? 
+                  // height: 80.h,
+                  child: image == null ?
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -136,23 +137,23 @@ class _HonooBuilderState extends State<HonooBuilder> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          IconButton(
-                            iconSize: 50,
-                            icon: const Icon(
-                              Icons.camera_alt,
-                              color: HonooColor.primary,
-                            ),
-                            onPressed: () async {
-                              final ImagePicker picker = ImagePicker();
-                              final XFile? image = await picker.pickImage(source: ImageSource.camera);
-                              if (image != null) {
-                                setState(() {
-                                  this.image = image;
-                                });
-                              }
-                            },
-                          ),
-                          const Padding(padding: EdgeInsets.only(right: 20)),
+                          // IconButton(
+                          //   iconSize: 50,
+                          //   icon: const Icon(
+                          //     Icons.camera_alt,
+                          //     color: HonooColor.primary,
+                          //   ),
+                          //   onPressed: () async {
+                          //     final ImagePicker picker = ImagePicker();
+                          //     final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                          //     if (image != null) {
+                          //       setState(() {
+                          //         this.image = image;
+                          //       });
+                          //     }
+                          //   },
+                          // ),
+                          // const Padding(padding: EdgeInsets.only(right: 20)),
                           IconButton(
                             iconSize: 50,
                             icon: const Icon(
@@ -177,7 +178,7 @@ class _HonooBuilderState extends State<HonooBuilder> {
                         ],
                       ),
                     ],
-                  ) : 
+                  ) :
                   Container(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
