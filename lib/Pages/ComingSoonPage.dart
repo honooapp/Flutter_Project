@@ -42,7 +42,7 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
                 children: <Widget>[
                   SizedBox(
                     height: 60,
-                    child: Center( 
+                    child: Center(
                       child:Text(
                         Utility().appName,
                         style: GoogleFonts.libreFranklin(
@@ -63,7 +63,7 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
                       widget.quote,
                       style: GoogleFonts.libreFranklin(
                         color: HonooColor.wave4,
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.w500,
                       ),
                       textAlign: TextAlign.left,

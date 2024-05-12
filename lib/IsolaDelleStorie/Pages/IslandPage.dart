@@ -286,7 +286,7 @@ class _IslandPageState extends State<IslandPage> {
       }),
     );
 
-    
+
     return Scaffold(
       backgroundColor: HonooColor.background,
       body: Column(
@@ -298,7 +298,7 @@ class _IslandPageState extends State<IslandPage> {
             },
             child: SizedBox(
               height: 60,
-              child: Center( 
+              child: Center(
                 child:Text(
                   Utility().appName,
                   style: GoogleFonts.libreFranklin(
@@ -316,7 +316,7 @@ class _IslandPageState extends State<IslandPage> {
               children: [
                 SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
-                  child: SizedBox( 
+                  child: SizedBox(
                     width: 100.w,
                     child: Row(
                       children: [
@@ -330,7 +330,7 @@ class _IslandPageState extends State<IslandPage> {
                               SizedBox(
                                 height: 70,
                                 child:Stack(
-                                  children: [                                
+                                  children: [
                                     Positioned(
                                       top: 0,
                                       right: MediaQuery.of(context).size.width/2 - 200,
@@ -358,7 +358,7 @@ class _IslandPageState extends State<IslandPage> {
                                     Positioned.fill(
                                       top: 0,
                                       child: Align(
-                                        alignment: Alignment.topCenter, 
+                                        alignment: Alignment.topCenter,
                                         child: IsolaDelleStoreContentManager.getRichText(IsolaDelleStoreContentManager.homeDescription),
                                       ),
                                     ),
@@ -426,7 +426,7 @@ class _IslandPageState extends State<IslandPage> {
                     child: Container(color: HonooColor.wave3,)
                   ),
                 ),
-                
+
                 Positioned(
                   bottom: 0,
                   left: MediaQuery.of(context).size.width/2 - 190,
