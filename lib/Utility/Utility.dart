@@ -26,6 +26,7 @@ class Utility {
   final String chestSubHeader3 = 'gli honoo\nche hai ricevuto';
   final String heartHeader = 'Fra poco\npotrai salvare \nnel tuo Cuore\ngli <b>honoo<b> che vuoi.';
   final String answerHonooHeader = 'Fra poco\npotrai rispondere\ncon un tuo <b>honoo<b>\nagli <b>honoo<b> degli altri.';
+  final String honooInsertTemporary = 'Fra poco qui\npotrai spedire\nil tuo <b>honoo<b>\nsulla Luna.'; //ok
   final String readMoonHeader = 'Fra poco qui\npotrai vedere\ngli <b>honoo<b> degli altri.'; //ok
   final String sendMoonHeader = 'Fra poco\npotrai spedire\nquesto <b>honoo<b>\nsulla Luna.';
   final String replyMoonHeader = 'Se per te guardare\nnon è abbastanza,\nfra poco\npotrai fare di più.\nO molto di più.\n';

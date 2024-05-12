@@ -8,6 +8,7 @@ import '../Controller/DeviceController.dart';
 import '../UI/HonooBuilder.dart';
 import '../Utility/Utility.dart';
 import 'package:sizer/sizer.dart';
+import '../../Pages/ComingSoonPage.dart';
 
 
 
@@ -30,7 +31,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
         children: [
           SizedBox(
             height: 60,
-            child: Center( 
+            child: Center(
               child:Text(
                 Utility().appName,
                 style: GoogleFonts.libreFranklin(
@@ -83,11 +84,18 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           iconSize: 60,
                           splashRadius: 25,
                           onPressed: () {
-                            /*Navigator.push(
+                // would be nice to connect drive directly, follow below
+                // https://stackoverflow.com/questions/65784077/how-do-i-upload-a-file-to-google-drive-using-flutter
+                            Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const HomePage()),
-                            );*/
-                          }),
+                              MaterialPageRoute(
+                                builder: (context) => ComingSoonPage(
+                                  header: Utility().honooInsertTemporary,
+                                  quote: Utility().shakespeare, bibliography:  Utility().bibliography,
+                                )
+                              ),
+                            );
+                          })
                         ],
                       ),
                     ),
