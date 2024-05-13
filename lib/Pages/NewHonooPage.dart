@@ -10,6 +10,49 @@ import '../Utility/Utility.dart';
 import 'package:sizer/sizer.dart';
 import '../../Pages/ComingSoonPage.dart';
 
+// import 'dart:async';
+// // import 'package:flutter/material.dart';
+// import 'package:googleapis/drive/v3.dart' as drive;
+// import 'package:googleapis_auth/auth_browser.dart';
+// import 'package:http/http.dart' as http;
+
+// class DriveUploader extends StatefulWidget {
+//   @override
+//   _DriveUploaderState createState() => _DriveUploaderState();
+// }
+
+// class _DriveUploaderState extends State<DriveUploader> {
+//   final ClientId clientId = ClientId("Your-Client-Id", null); // No secret for web apps
+
+//   Future<void> uploadFileToDrive() async {
+//     var scopes = [drive.DriveApi.driveFileScope];
+//     try {
+//       var authClient = await obtainAccessCredentialsViaUserConsent(
+//         clientId,
+//         scopes,
+//         http.Client(),
+//         (url) {
+//           // Prompt user to navigate to the URL
+//           print('Please go to the following URL and grant access:');
+//           print(url);
+//         }
+//       );
+//       var driveApi = drive.DriveApi(authClient);
+//       var fileToUpload = drive.File();
+//       fileToUpload.name = 'Uploaded_by_Flutter_Web.txt';
+//       var result = await driveApi.files.create(
+//         fileToUpload,
+//         uploadMedia: drive.Media(
+//           Stream.value("Hello from Flutter!".codeUnits).asBroadcastStream(),
+//           "Hello from Flutter!".length
+//         ),
+//       );
+//       print('Uploaded file ID: ${result.id}');
+//       authClient.close();
+//     } catch (e) {
+//       print('Error in uploading to Google Drive: $e');
+//     }
+//   }
 
 
 class NewHonooPage extends StatefulWidget {
@@ -84,8 +127,12 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           iconSize: 60,
                           splashRadius: 25,
                           onPressed: () {
-                // would be nice to connect drive directly, follow below
+                            // authenticateAndUpload();
+                // would be nice to connect googledrive directly
+                // HonooBuilder() must set a property or return user input to be sent to drive
+                // follow below to connect drive
                 // https://stackoverflow.com/questions/65784077/how-do-i-upload-a-file-to-google-drive-using-flutter
+
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -95,6 +142,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                                 )
                               ),
                             );
+
                           })
                         ],
                       ),

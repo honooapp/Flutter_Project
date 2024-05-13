@@ -35,6 +35,7 @@ class Utility {
   final String answerHonooHeader2 = 'Fra poco\npotrai rispondere\na questo <b>honoo<b>\ncon un tuo <b>honoo<b>.';
   final String honooConversationHeader = 'Fra poco qui\npotrai accedere,\nscrollando in verticale,\nalla cronologia\ndi conversazioni fra <b>honoo<b>.';
   final String yourHonooHeader = 'Fra poco qui\npotrai trovare\nuna copia\ndi tutti gli <b>honoo<b> scritti da te.';
+  final String dadoTemporary = 'Fra poco\npotrai trovare qui\nil tuo esagramma\nscelto a caso.'; //ok
   final String chestHeaderTemporary = 'Fra poco qui\npotrai vedere\ngli <b>honoo<b> che hai scritto,\nche hai salvato dalla Luna,\nche hai ricevuto.'; //ok
   final String honooHinooHeader = 'Fra poco qui\npotrai accedere\nai format\nper scrivere\ni tuoi <b>honoo<b> e i tuoi <b>hinoo<b>.'; //ok
   final String othersHonooHinooHeader = 'Fra poco qui\npotrai vedere\ngli <b>honoo<b> e gli <b>hinoo<b>\ndegli altri.'; //ok

@@ -14,6 +14,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../Controller/DeviceController.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../Pages/ComingSoonPage.dart';
+import '../../Utility/Utility.dart';
+
 
 class ExercisePage extends StatefulWidget {
   ExercisePage({super.key, required this.exercise});
@@ -347,7 +350,7 @@ class _ExercisePageState extends State<ExercisePage> {
                     visible: uiVisible,
                     child: SizedBox(
                       height: 60,
-                      child: Center( 
+                      child: Center(
                         child:Text(
                           widget.exercise.exerciseTitle,
                           style: GoogleFonts.libreFranklin(
@@ -368,7 +371,7 @@ class _ExercisePageState extends State<ExercisePage> {
                       child: Container(
                         child: Center(
                           child: Container(
-                            child: ClipRect( 
+                            child: ClipRect(
                               child: BackdropFilter(
                                 filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                                 child: Container(
@@ -378,10 +381,49 @@ class _ExercisePageState extends State<ExercisePage> {
                                     color: Colors.white.withOpacity(0.3),
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
-                                  child: SingleChildScrollView(
-                                    //child:IsolaDelleStoreContentManager.getRichText(widget.exercise.exerciseDescription),
-                                    child:FormattedText(inputText: widget.exercise.exerciseDescription, color: HonooColor.onBackground, fontSize: 18,),
+                                  child:
+                                  // SingleChildScrollView(
+                                  //   //child:IsolaDelleStoreContentManager.getRichText(widget.exercise.exerciseDescription),
+                                  //   child:FormattedText(inputText: widget.exercise.exerciseDescription, color: HonooColor.onBackground, fontSize: 18,),
+                                  // ),
+                                  ListView(
+                                    children: [
+                                        FormattedText(
+                                          inputText: widget.exercise.exerciseDescription,
+                                          color: HonooColor.onBackground,
+                                          fontSize: 18,
+                                        ),
+                                        if (widget.exercise.exerciseIcon != null)
+                                          SizedBox(height: 10),
+                                          IconButton(icon: SvgPicture.asset(
+                                            color: HonooColor.onBackground,
+                                            widget.exercise.exerciseIcon ?? "",
+                                            semanticsLabel: widget.exercise.exerciseIconName,
+                                          ),
+                                          iconSize: 70,
+                                          splashRadius: 40,
+                                          onPressed: () {
+                                            if (widget.exercise.exerciseIconName == "Dado") {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(builder: (context) => ComingSoonPage(
+                                                  header: Utility().dadoTemporary,
+                                                  quote: Utility().shakespeare,
+                                                  bibliography:  Utility().bibliography,
+                                                )),
+                                              );
+                                            }
+                                          }),
+                                        if (widget.exercise.exerciseDescriptionMore != null)
+                                          SizedBox(height: 10),
+                                          FormattedText(
+                                            inputText: widget.exercise.exerciseDescriptionMore ?? "",
+                                            color: HonooColor.onBackground,
+                                            fontSize: 18,
+                                          ),
+                                      ],
                                   ),
+
                                 ),
                               ),
                             ),

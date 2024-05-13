@@ -168,8 +168,11 @@ class ExerciseController {
       "3.3",
       3,
       IsolaDelleStoreContentManager.e_3_3_title,
-      IsolaDelleStoreContentManager.e_3_3,
+      IsolaDelleStoreContentManager.e_3_3_first,
       'assets/icons/isoladellestorie/backgrounds/3pozzooracolo.png',
+      exerciseDescriptionMore: IsolaDelleStoreContentManager.e_3_3_second,
+      exerciseIcon: 'assets/icons/dado.svg',
+      exerciseIconName: 'Dado'
     );
   }
 

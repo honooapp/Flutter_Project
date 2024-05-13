@@ -62,7 +62,7 @@ class _HonooBuilderState extends State<HonooBuilder> {
                             LineLengthLimitingTextInputFormatter(maxLineLength: 31, maxLines: 5),
                           ],
                           decoration: const InputDecoration(
-                            hintText: 'Scrivi qui in tuo testo',
+                            hintText: 'Scrivi qui il tuo testo',
                             border: InputBorder.none,
                             hintStyle: TextStyle(
                               color: HonooColor.wave3,
