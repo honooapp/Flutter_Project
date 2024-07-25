@@ -145,21 +145,27 @@ class ExerciseController {
 
   Exercise getExercise3_1() {
     return Exercise(
-      "3.1",
+      "3.3",
       3,
       IsolaDelleStoreContentManager.e_3_1_title,
-      IsolaDelleStoreContentManager.e_3_1,
+      IsolaDelleStoreContentManager.e_3_1_first,
       'assets/icons/isoladellestorie/backgrounds/3pozzooracolo.png',
+      exerciseDescriptionMore: IsolaDelleStoreContentManager.e_3_1_second,
+      exerciseIcon: 'assets/icons/dado.svg',
+      exerciseIconName: 'Dado'
     );
   }
 
   Exercise getExercise3_2() {
     return Exercise(
-      "3.2",
+      "3.3",
       3,
       IsolaDelleStoreContentManager.e_3_2_title,
-      IsolaDelleStoreContentManager.e_3_2,
+      IsolaDelleStoreContentManager.e_3_2_first,
       'assets/icons/isoladellestorie/backgrounds/3pozzooracolo.png',
+      exerciseDescriptionMore: IsolaDelleStoreContentManager.e_3_2_second,
+      exerciseIcon: 'assets/icons/dado.svg',
+      exerciseIconName: 'Dado'
     );
   }
 
@@ -248,31 +254,40 @@ class ExerciseController {
 
   Exercise getExercise5_1() {
     return Exercise(
-      "5.1",
-      5,
+      "3.3",
+      3,
       IsolaDelleStoreContentManager.e_5_1_title,
-      IsolaDelleStoreContentManager.e_5_1,
+      IsolaDelleStoreContentManager.e_5_1_first,
       'assets/icons/isoladellestorie/backgrounds/5primoanello.png',
+      exerciseDescriptionMore: IsolaDelleStoreContentManager.e_5_1_second,
+      exerciseIcon: 'assets/icons/dado.svg',
+      exerciseIconName: 'Dado'
     );
   }
 
   Exercise getExercise5_2() {
     return Exercise(
-      "5.2",
-      5,
+      "3.3",
+      3,
       IsolaDelleStoreContentManager.e_5_2_title,
-      IsolaDelleStoreContentManager.e_5_2,
+      IsolaDelleStoreContentManager.e_5_2_first,
       'assets/icons/isoladellestorie/backgrounds/5primoanello.png',
+      exerciseDescriptionMore: IsolaDelleStoreContentManager.e_5_2_second,
+      exerciseIcon: 'assets/icons/dado.svg',
+      exerciseIconName: 'Dado'
     );
   }
 
   Exercise getExercise5_3() {
     return Exercise(
-      "5.3",
-      5,
+      "3.3",
+      3,
       IsolaDelleStoreContentManager.e_5_3_title,
-      IsolaDelleStoreContentManager.e_5_3,
+      IsolaDelleStoreContentManager.e_5_3_first,
       'assets/icons/isoladellestorie/backgrounds/5primoanello.png',
+      exerciseDescriptionMore: IsolaDelleStoreContentManager.e_5_3_second,
+      exerciseIcon: 'assets/icons/dado.svg',
+      exerciseIconName: 'Dado'
     );
   }
 
