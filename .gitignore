@@ -46,3 +46,5 @@ app.*.map.json
 # custom
 flutter
 flutter.working.backup
+
+pubspec.lock
