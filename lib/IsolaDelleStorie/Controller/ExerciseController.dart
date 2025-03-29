@@ -21,12 +21,14 @@ class ExerciseController {
 
   void init () {
     methodMap = {
+      "1.1": getExercise1_1,
       "2.1": getExercise2_1,
       "2.2": getExercise2_2,
       "2.3": getExercise2_3,
       "2.4": getExercise2_4,
       "2.5": getExercise2_5,
       "2.6": getExercise2_6,
+      "2.7": getExercise2_7,
       "3.1": getExercise3_1,
       "3.2": getExercise3_2,
       "3.3": getExercise3_3,
@@ -59,6 +61,16 @@ class ExerciseController {
       1,
       IsolaDelleStoreContentManager.e_1_0_title,
       IsolaDelleStoreContentManager.e_1_0,
+      'assets/icons/isoladellestorie/backgrounds/1grottarondini.png',
+    );
+  }
+
+  Exercise getExercise1_1() {
+    return Exercise(
+      "1.1",
+      1,
+      IsolaDelleStoreContentManager.e_1_1_title,
+      IsolaDelleStoreContentManager.e_1_1,
       'assets/icons/isoladellestorie/backgrounds/1grottarondini.png',
     );
   }
@@ -129,6 +141,16 @@ class ExerciseController {
       2,
       IsolaDelleStoreContentManager.e_2_6_title,
       IsolaDelleStoreContentManager.e_2_6,
+      'assets/icons/isoladellestorie/backgrounds/2radurabacche.png',
+    );
+  }
+
+  Exercise getExercise2_7() {
+    return Exercise(
+      "2.7",
+      2,
+      IsolaDelleStoreContentManager.e_2_7_title,
+      IsolaDelleStoreContentManager.e_2_7,
       'assets/icons/isoladellestorie/backgrounds/2radurabacche.png',
     );
   }
