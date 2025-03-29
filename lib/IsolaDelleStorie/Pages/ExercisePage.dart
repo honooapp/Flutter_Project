@@ -6,12 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:honoo/IsolaDelleStorie/Controller/ExerciseController.dart';
 import 'package:honoo/IsolaDelleStorie/Entities/Exercise.dart';
-import 'package:honoo/IsolaDelleStorie/Utility/IsolaDelleStorieContentManager.dart';
 import 'package:honoo/Utility/FormattedText.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../Controller/DeviceController.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../Pages/ComingSoonPage.dart';
@@ -21,7 +19,7 @@ import '../../Utility/Utility.dart';
 class ExercisePage extends StatefulWidget {
   ExercisePage({super.key, required this.exercise});
 
-  Exercise exercise;
+  Exercise  exercise;
 
 
   @override
@@ -387,6 +385,8 @@ class _ExercisePageState extends State<ExercisePage> {
                                   //   child:FormattedText(inputText: widget.exercise.exerciseDescription, color: HonooColor.onBackground, fontSize: 18,),
                                   // ),
                                   ListView(
+                                    //padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.width/2), //per versione telefono
+                                    padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height > MediaQuery.of(context).size.width ? MediaQuery.of(context).size.width/4 : MediaQuery.of(context).size.height/4 ),
                                     children: [
                                         FormattedText(
                                           inputText: widget.exercise.exerciseDescription,
@@ -394,7 +394,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                           fontSize: 18,
                                         ),
                                         if (widget.exercise.exerciseIcon != null)
-                                          SizedBox(height: 10),
+                                          //SizedBox(height: 10),
                                           IconButton(icon: SvgPicture.asset(
                                             color: HonooColor.onBackground,
                                             widget.exercise.exerciseIcon ?? "",
@@ -415,7 +415,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                             }
                                           }),
                                         if (widget.exercise.exerciseDescriptionMore != null)
-                                          SizedBox(height: 10),
+                                         // SizedBox(height: 10),
                                           FormattedText(
                                             inputText: widget.exercise.exerciseDescriptionMore ?? "",
                                             color: HonooColor.onBackground,
@@ -445,7 +445,7 @@ class _ExercisePageState extends State<ExercisePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: subExercises,
                   ) : Container(),
-                  Padding( padding: EdgeInsets.all(8.0),),
+                  Padding( padding: EdgeInsets.all(16.0),),
                   Stack(
                     children: mainPath,
                   ),

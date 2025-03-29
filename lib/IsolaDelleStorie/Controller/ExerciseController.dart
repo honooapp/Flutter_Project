@@ -15,7 +15,7 @@ class ExerciseController {
 
   ExerciseController._internal();
 
-  List<int> listOfNumberOfExercises = [0,6,5,3,4,1,3,3,4];
+  List<int> listOfNumberOfSubExercises = [1,7,5,3,4,1,3,3,4]; //inizia da 0
 
   Map<String, Function> methodMap = {};
 
@@ -167,7 +167,7 @@ class ExerciseController {
 
   Exercise getExercise3_1() {
     return Exercise(
-      "3.3",
+      "3.1",
       3,
       IsolaDelleStoreContentManager.e_3_1_title,
       IsolaDelleStoreContentManager.e_3_1_first,
@@ -180,7 +180,7 @@ class ExerciseController {
 
   Exercise getExercise3_2() {
     return Exercise(
-      "3.3",
+      "3.2",
       3,
       IsolaDelleStoreContentManager.e_3_2_title,
       IsolaDelleStoreContentManager.e_3_2_first,
@@ -474,9 +474,10 @@ class ExerciseController {
   }
 
   List<Widget> getExerciseButtons (Exercise exercise, Function handleButtonPressed, BuildContext context ) {
-    final int numberOfExercises = listOfNumberOfExercises[exercise.parentId-1];
+    final int numberOfExercises = listOfNumberOfSubExercises[exercise.parentId-1];
     List<Widget> ret = [];
     switch (exercise.parentId) {
+      case 1:
       case 2:
       case 3:
       case 4:
