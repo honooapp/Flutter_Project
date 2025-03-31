@@ -70,6 +70,7 @@ flutter:
   assets:
     - assets/google_fonts/
     - assets/icons/
+    - assets/
     - assets/icons/isoladellestorie/
     - assets/icons/isoladellestorie/backgrounds/
 

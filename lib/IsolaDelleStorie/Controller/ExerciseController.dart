@@ -276,8 +276,8 @@ class ExerciseController {
 
   Exercise getExercise5_1() {
     return Exercise(
-      "3.3",
-      3,
+      "5.1",
+      5,
       IsolaDelleStoreContentManager.e_5_1_title,
       IsolaDelleStoreContentManager.e_5_1_first,
       'assets/icons/isoladellestorie/backgrounds/5primoanello.png',
@@ -289,8 +289,8 @@ class ExerciseController {
 
   Exercise getExercise5_2() {
     return Exercise(
-      "3.3",
-      3,
+      "5.2",
+      5,
       IsolaDelleStoreContentManager.e_5_2_title,
       IsolaDelleStoreContentManager.e_5_2_first,
       'assets/icons/isoladellestorie/backgrounds/5primoanello.png',
@@ -302,8 +302,8 @@ class ExerciseController {
 
   Exercise getExercise5_3() {
     return Exercise(
-      "3.3",
-      3,
+      "5.3",
+      5,
       IsolaDelleStoreContentManager.e_5_3_title,
       IsolaDelleStoreContentManager.e_5_3_first,
       'assets/icons/isoladellestorie/backgrounds/5primoanello.png',
