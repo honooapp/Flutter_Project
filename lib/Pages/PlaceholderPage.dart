@@ -20,12 +20,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   @override
   Widget build(BuildContext context) {
     final isPhone = DeviceController().isPhone();
-    final maxWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final maxWidth = MediaQuery.of(context).size.width;
 
-    // Questo è il contenuto da mostrare sempre
+    // Contenuto principale, usato in entrambi i layout
     final Widget content = Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -61,8 +58,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                       WidgetSpan(
                         child: Padding(
                           padding: EdgeInsets.only(bottom: 3),
-                          child: Image.asset(
-                              "assets/icons/performance.png", height: 70),
+                          child: Image.asset("assets/icons/performance.png", height: 70),
                         ),
                         alignment: PlaceholderAlignment.middle,
                       ),
@@ -70,8 +66,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                       WidgetSpan(
                         child: Padding(
                           padding: EdgeInsets.only(bottom: 3),
-                          child: Image.asset(
-                              "assets/icons/luna.png", height: 70),
+                          child: Image.asset("assets/icons/luna.png", height: 70),
                         ),
                         alignment: PlaceholderAlignment.middle,
                       ),
@@ -79,8 +74,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                       WidgetSpan(
                         child: Padding(
                           padding: EdgeInsets.only(bottom: 3),
-                          child: Image.asset(
-                              "assets/icons/isola.png", height: 70),
+                          child: Image.asset("assets/icons/isola.png", height: 70),
                         ),
                         alignment: PlaceholderAlignment.middle,
                       ),
@@ -88,8 +82,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                       WidgetSpan(
                         child: Padding(
                           padding: EdgeInsets.only(bottom: 3),
-                          child: Image.asset(
-                              "assets/icons/performance.png", height: 70),
+                          child: Image.asset("assets/icons/performance.png", height: 70),
                         ),
                         alignment: PlaceholderAlignment.middle,
                       ),
@@ -137,30 +130,33 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
       ),
     );
 
-    return Background(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Row(
-          children: [
-            Expanded(child: Container()),
-            isPhone
-                ? Container(
+    // Questo è il corpo della pagina
+    final Widget pageBody = Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Row(
+        children: [
+          Expanded(child: Container()),
+          isPhone
+              ? Container(
+            color: HonooColor.background,
+            constraints: BoxConstraints(maxWidth: maxWidth),
+            child: content,
+          )
+              : Opacity(
+            opacity: 0.7,
+            child: Container(
               color: HonooColor.background,
-              constraints: BoxConstraints(maxWidth: maxWidth),
+              constraints: BoxConstraints(maxWidth: maxWidth * 0.5),
               child: content,
-            )
-                : Opacity(
-              opacity: 0.7,
-              child: Container(
-                color: HonooColor.background,
-                constraints: BoxConstraints(maxWidth: maxWidth * 0.5),
-                child: content,
-              ),
             ),
-            Expanded(child: Container()),
-          ],
-        ),
+          ),
+          Expanded(child: Container()),
+        ],
       ),
     );
+
+    // Ritorna il widget con o senza Background
+    return isPhone ? pageBody : Background(child: pageBody);
   }
+
 }

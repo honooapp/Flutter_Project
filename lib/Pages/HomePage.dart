@@ -3,7 +3,6 @@ import 'package:honoo/IsolaDelleStorie/Pages/IslandPage.dart';
 import 'package:honoo/Pages/ComingSoonPage.dart';
 import 'package:honoo/Pages/MoonPage.dart';
 import 'package:honoo/Pages/NewHonooPage.dart';
-import 'package:honoo/Pages/PlaceholderPage.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';

@@ -7,7 +7,7 @@ class Background extends StatelessWidget {
   const Background({
     super.key,
     required this.child,
-    this.imagePath = "assets/sirenaepalombaro.jpg",
+    this.imagePath = "assets/background.png",
   });
 
   @override
