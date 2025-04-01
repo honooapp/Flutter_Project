@@ -43,6 +43,7 @@ dependencies:
   share_plus: ^7.0.1
   url_launcher: ^6.1.11
   flutter_dotenv: ^5.1.0
+  flutter_launcher_icons: ^0.13.1 # o l'ultima disponibile
 
 dev_dependencies:
   flutter_test:
@@ -55,6 +56,10 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/favicon/honoO_512X512.png" # <-- la tua icona
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -70,6 +75,7 @@ flutter:
   assets:
     - assets/google_fonts/
     - assets/icons/
+    - assets/
     - assets/icons/isoladellestorie/
     - assets/icons/isoladellestorie/backgrounds/
 

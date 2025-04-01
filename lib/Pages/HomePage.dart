@@ -3,7 +3,6 @@ import 'package:honoo/IsolaDelleStorie/Pages/IslandPage.dart';
 import 'package:honoo/Pages/ComingSoonPage.dart';
 import 'package:honoo/Pages/MoonPage.dart';
 import 'package:honoo/Pages/NewHonooPage.dart';
-import 'package:honoo/Pages/PlaceholderPage.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -27,18 +26,19 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      backgroundColor: HonooColor.background,
+    backgroundColor: HonooColor.background,
       body: Column(
         children: [
-          GestureDetector(
+          Opacity(
+          opacity:0.5,
+          child: GestureDetector(
             onTap: () {
               Navigator.pop(context);
             },
             child: SizedBox(
               height: 50,
-              child: Center( 
+              child: Center(
                 child:Text(
                   Utility().appName,
                   style: GoogleFonts.libreFranklin(
@@ -51,9 +51,10 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
+    ),
           Expanded(
             child: SingleChildScrollView(
-              child: SizedBox( 
+              child: SizedBox(
                 width: 100.w,
                 child: Row(
                   children: [
@@ -65,7 +66,7 @@ class _HomePageState extends State<HomePage> {
                           SizedBox(
                             height: 80.h,
                             child:Stack(
-                              children: [                                
+                              children: [
                                 Positioned(
                                   top: 0,
                                   right: MediaQuery.of(context).size.width/2 - 200,
@@ -93,8 +94,9 @@ class _HomePageState extends State<HomePage> {
                                 Positioned.fill(
                                   top: 0,
                                   child: Align(
-                                    alignment: Alignment.topCenter, 
-                                    child: SingleChildScrollView(child:Column(
+                                    alignment: Alignment.topCenter,
+                                    child: SingleChildScrollView(child:
+                                    Column(
                                     children: [
                                       Text(
                                         Utility().textHome1,
@@ -218,7 +220,7 @@ class _HomePageState extends State<HomePage> {
                     child: Container(color: HonooColor.wave3,)
                   ),
                 ),
-                
+
                 Positioned(
                   bottom: -16,
                   left: MediaQuery.of(context).size.width/2 - 200,
@@ -266,5 +268,6 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+
   }
 }

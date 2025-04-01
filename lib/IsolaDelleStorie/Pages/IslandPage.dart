@@ -241,6 +241,7 @@ class _IslandPageState extends State<IslandPage> {
                         inputText: IsolaDelleStoreContentManager.e_0_0,
                         color: HonooColor.onBackground,
                         fontSize: 18,
+
                       ),
                     ),
                   ),

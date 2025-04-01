@@ -18,7 +18,7 @@ class Utility {
   final String text1_fourth = """\n\nNon ci sono profili utenti\nin honoo.\nE non ci sono i "mi piace".\nMa se trovi un honoo\nche ti piace,\npuoi salvarlo nel tuo cuore\ne,\nse ne hai voglia,\npuoi anche fare\nqualcosa in più.\n\nO molto di più.\n\nSe è come penso,\nl'ultima volta\nche ci siamo visti\n\n""";
   final String text1_fifth = """\n\navevi gli occhi chiusi\ne hai fatto la scelta giusta.\n\nMi chiamo\nVenceslao Cembalo\ne se telefoni al\n3274920811,\npuoi sentire\nun’altra volta\nla mia voce\ne continuare il viaggio.\n\n Se le cose\nstanno\ndiversamente,\nclicca sull’icona della\nhome\nin basso a sinistra.\n\nIn alto\nal centro\ndi ogni schermata\nc'è il logo\n\n""";
   final String text1_six = """\n\nse ci clicchi sopra,\ntorni qui\na questa pagina.\n\nTi consiglio\ndi visualizzare il sito\nda cellulare,\nperché\nnon è stata ancora\nottimizzata\nla visualizzazione\nda monitor di computer.\n""";
-  final String textHome1 = 'Ti regaliamo la Luna.\nPer sempre-.';
+  final String textHome1 = 'Ti regaliamo la Luna.\nPer sempre.';
   final String textHome2 = 'Niente è per sempre,\ne nessuno può regalarti la Luna.\n\nÈ vero,\nma non per i poeti.\n\nVuoi essere un poeta di honoo?\n\nClicca sulla Bottiglia\ne componi il tuo honoo.\n\nOppure clicca sulla Luna\ne guarda gli honoo degli altri.\n\nO clicca sull’Isola\ne inizia il viaggio\nverso le tue storie.';
   final String chestHeader = 'Il tuo Cuore custodisce';
   final String chestSubHeader1 = 'gli honoo\nsalvati dalla luna';
@@ -36,6 +36,8 @@ class Utility {
   final String honooConversationHeader = 'Fra poco qui\npotrai accedere,\nscrollando in verticale,\nalla cronologia\ndi conversazioni fra <b>honoo<b>.';
   final String yourHonooHeader = 'Fra poco qui\npotrai trovare\nuna copia\ndi tutti gli <b>honoo<b> scritti da te.';
   final String dadoTemporary = 'Fra poco\npotrai trovare qui\nil tuo esagramma\nscelto a caso.'; //ok
+  final String dadoTemporaryM = 'Fra poco\npotrai trovare qui\nla tua missione\nscelta a caso.'; //missione
+  final String dadoTemporaryL = 'Fra poco\npotrai trovare qui\nla tua lettera\nscelta a caso.'; //lettera
   final String chestHeaderTemporary = 'Fra poco qui\npotrai vedere\ngli <b>honoo<b> che hai scritto,\nche hai salvato dalla Luna,\nche hai ricevuto.'; //ok
   final String honooHinooHeader = 'Fra poco qui\npotrai accedere\nai format\nper scrivere\ni tuoi <b>honoo<b> e i tuoi <b>hinoo<b>.'; //ok
   final String othersHonooHinooHeader = 'Fra poco qui\npotrai vedere\ngli <b>honoo<b> e gli <b>hinoo<b>\ndegli altri.'; //ok

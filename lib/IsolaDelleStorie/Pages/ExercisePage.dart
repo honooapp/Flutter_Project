@@ -14,6 +14,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../Pages/ComingSoonPage.dart';
 import '../../Utility/Utility.dart';
+import '../Utility/IsolaDelleStorieContentManager.dart';
 
 
 class ExercisePage extends StatefulWidget {
@@ -402,18 +403,30 @@ class _ExercisePageState extends State<ExercisePage> {
                                           ),
                                           iconSize: 70,
                                           splashRadius: 40,
-                                          onPressed: () {
-                                            if (widget.exercise.exerciseIconName == "Dado") {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(builder: (context) => ComingSoonPage(
-                                                  header: Utility().dadoTemporary,
-                                                  quote: Utility().shakespeare,
-                                                  bibliography:  Utility().bibliography,
-                                                )),
-                                              );
-                                            }
-                                          }),
+                                              onPressed: () {
+                                                if (widget.exercise.exerciseIconName == "Dado") {
+                                                  String header;
+
+                                                  if (widget.exercise.exerciseTitle == IsolaDelleStoreContentManager.e_3_1_title) {
+                                                    header = Utility().dadoTemporaryM;
+                                                  } else if (widget.exercise.exerciseTitle == IsolaDelleStoreContentManager.e_5_3_title) {
+                                                    header = Utility().dadoTemporaryL;
+                                                  } else {
+                                                    header = Utility().dadoTemporary;
+                                                  }
+
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => ComingSoonPage(
+                                                        header: header,
+                                                        quote: Utility().shakespeare,
+                                                        bibliography: Utility().bibliography,
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              }),
                                         if (widget.exercise.exerciseDescriptionMore != null)
                                          // SizedBox(height: 10),
                                           FormattedText(
