@@ -8,5 +8,11 @@
     "description": "A new Flutter project.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
-    "icons": []
+    "icons": [
+        {
+            "src": "honoo_48x48.png",
+            "sizes": "48x48",
+            "type": "image/png"
+        }
+    ]
 }
