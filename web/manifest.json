@@ -5,14 +5,14 @@
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Apri gli occhi: c’è l’Isola davanti a te.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
         {
-            "src": "icons/honoo_icon-48.png",
-            "sizes": "48x48",
-            "type": "image/png"
+            "src": "favicon.ico",
+            "sizes": "48x48 32x32 16x16",
+            "type": "image/x-icon"
         },
         {
             "src": "icons/honoo_icon-192.png",

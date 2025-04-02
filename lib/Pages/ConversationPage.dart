@@ -1,4 +1,4 @@
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
 import 'package:honoo/Controller/HonooController.dart';
 import 'package:honoo/UI/HonooCard.dart';
@@ -24,7 +24,7 @@ class ConversationPage extends StatefulWidget {
 
 class _ConversationPageState extends State<ConversationPage> {
 
-  CarouselController carouselController = CarouselController();
+  cs.CarouselController carouselController = cs.CarouselController();
 
   List<Widget> honooCards = [];
 
@@ -66,9 +66,9 @@ class _ConversationPageState extends State<ConversationPage> {
                 child:Column(
                   children: [
                     Expanded(
-                      child: CarouselSlider(
+                      child: cs.CarouselSlider(
                         carouselController: carouselController,
-                        options: CarouselOptions(
+                        options: cs.CarouselOptions(
                           scrollDirection: Axis.vertical,
                           height: 100.h,
                           aspectRatio: 9/16,

@@ -9,7 +9,7 @@ import 'package:honoo/UI/HonooCard.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'dart:ui' as ui;
 import 'package:share_plus/share_plus.dart';
 import 'package:sizer/sizer.dart';
@@ -29,7 +29,7 @@ class ChestPage extends StatefulWidget {
 
 class _ChestPageState extends State<ChestPage> {
 
-  CarouselController carouselController = CarouselController();
+  cs.CarouselController carouselController = cs.CarouselController();
   List<Honoo> allHonooList = [];
   int currentCaruselIndex = 0;
   bool isFirstBuild = true;
@@ -268,9 +268,9 @@ class _ChestPageState extends State<ChestPage> {
                 child:Column(
                   children: [
                     Expanded(
-                      child: CarouselSlider(
+                      child: cs.CarouselSlider(
                         carouselController: carouselController,
-                        options: CarouselOptions(
+                        options: cs.CarouselOptions(
                           initialPage: personalHonoo.length,
                           height: 70.h,
                           aspectRatio: 9/16,
