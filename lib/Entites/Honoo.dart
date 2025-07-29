@@ -4,11 +4,15 @@ class Honoo {
   String _image;
   String _created_at;
   String _updated_at;
-  String _author;
+  String _userTag;
   HonooType _type;
+  String? _replyTo;
+  String? _recipientTag;
 
 
-  Honoo(this._id, this._text, this._image, this._created_at, this._updated_at, this._author, this._type);
+
+  Honoo(this._id, this._text, this._image, this._created_at, this._updated_at, this._userTag, this._type,
+      [this._replyTo, this._recipientTag]);
 
   String get updated_at => _updated_at;
 
@@ -40,17 +44,76 @@ class Honoo {
     _id = value;
   }
 
-  String get author => _author;
+  String get userTag => _userTag;
+  set userTag(String value) => _userTag = value;
 
-  set author(String value) {
-    _author = value;
-  }
 
   HonooType get type => _type;
 
   set type(HonooType value) {
     _type = value;
   }
+
+  String? get replyTo => _replyTo;
+  set replyTo(String? value) => _replyTo = value;
+
+  String? get recipientTag => _recipientTag;
+  set recipientTag(String? value) => _recipientTag = value;
+
+
+  factory Honoo.fromMap(Map<String, dynamic> map) {
+    return Honoo(
+      0, // ID locale, opzionale se gestito da Supabase
+      map['text'],
+      map['image_url'],
+      map['created_at'],
+      map['updated_at'] ?? '',
+      map['user_tag'] ?? '',
+      _mapDestinationToHonooType(map['destination']),
+      map['reply_to'],
+      map['recipient_tag'],
+
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'text': _text,
+      'image_url': _image,
+      'created_at': _created_at,
+      'updated_at': _updated_at,
+      'user_tag': _userTag,
+      'destination': _mapHonooTypeToDestination(_type),
+      'reply_to': _replyTo,
+      'recipient_tag': _recipientTag,
+
+    };
+  }
+
+  static HonooType _mapDestinationToHonooType(String destination) {
+    switch (destination) {
+      case 'moon':
+        return HonooType.moon;
+      case 'chest':
+        return HonooType.personal;
+      case 'reply':
+        return HonooType.answer;
+      default:
+        return HonooType.personal;
+    }
+  }
+
+  static String _mapHonooTypeToDestination(HonooType type) {
+    switch (type) {
+      case HonooType.moon:
+        return 'moon';
+      case HonooType.personal:
+        return 'chest';
+      case HonooType.answer:
+        return 'reply';
+    }
+  }
+
 }
 
 enum HonooType { personal, moon, answer }
