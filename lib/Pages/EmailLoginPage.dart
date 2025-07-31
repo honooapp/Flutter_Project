@@ -4,7 +4,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'EmailVerifyPage.dart';
 
 class EmailLoginPage extends StatefulWidget {
-  const EmailLoginPage({super.key});
+  final String? pendingHonooText;
+  final String? pendingImageUrl;
+
+  const EmailLoginPage({super.key, this.pendingHonooText, this.pendingImageUrl});
 
   @override
   State<EmailLoginPage> createState() => _EmailLoginPageState();
@@ -24,7 +27,11 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => EmailVerifyPage(email: email),
+            builder: (context) => EmailVerifyPage(
+              email: email,
+              pendingHonooText: widget.pendingHonooText,
+              pendingImageUrl: widget.pendingImageUrl,
+            ),
           ),
         );
       }

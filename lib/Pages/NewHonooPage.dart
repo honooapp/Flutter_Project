@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../Controller/DeviceController.dart';
 import '../Entites/Honoo.dart';
@@ -10,6 +11,8 @@ import '../Utility/Utility.dart';
 import 'package:sizer/sizer.dart';
 import '../../Pages/ComingSoonPage.dart';
 import 'package:honoo/Services/HonooService.dart';
+
+import 'EmailLoginPage.dart';
 
 
 class NewHonooPage extends StatefulWidget {
@@ -32,35 +35,46 @@ class _NewHonooPageState extends State<NewHonooPage> {
   }
 
   Future<void> _submitHonoo() async {
+    final user = Supabase.instance.client.auth.currentUser;
+
+    if (user == null) {
+      // 👣 Utente non loggato → vai al login e poi torna qui
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EmailLoginPage(
+            pendingHonooText: _text,
+            pendingImageUrl: _imageUrl,
+          ),
+        ),
+      );
+      return;
+    }
+
+    // 👤 Utente loggato → crea e salva l'honoo
     final newHonoo = Honoo(
       0,
       _text,
       _imageUrl,
       DateTime.now().toIso8601String(),
       DateTime.now().toIso8601String(),
-      'anonimo', // oppure un userTag locale
-      _selectedType,
+      user.id,
+      HonooType.personal, // salviamo nello scrigno
+      null,
+      null,
     );
 
     try {
       await HonooService.publishHonoo(newHonoo);
 
-      // Navigazione temporanea (mock)
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ComingSoonPage(
-            header: Utility().honooInsertTemporary,
-            quote: Utility().shakespeare,
-            bibliography: Utility().bibliography,
-          ),
-        ),
-      );
+      // ✅ Vai subito allo scrigno
+      Navigator.pushReplacementNamed(context, '/chest'); // oppure: MaterialPageRoute(builder: (_) => ChestPage())
     } catch (e) {
       print("Errore durante il salvataggio dell'honoo: $e");
-      // potresti mostrare un alert qui
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {

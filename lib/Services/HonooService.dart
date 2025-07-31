@@ -17,16 +17,17 @@ class HonooService {
   }
 
   /// Recupera tutti gli honoo scritti da un utente (es. per lo scrigno)
-  static Future<List<Honoo>> fetchUserHonoo(String userTag, String destination) async {
+  static Future<List<Honoo>> fetchUserHonoo(String userId, String destination) async {
     final response = await _client
         .from('honoo')
         .select()
-        .eq('user_tag', userTag)
         .eq('destination', destination)
+        .eq('user_id', userId)
         .order('created_at', ascending: false);
 
     return (response as List).map((e) => Honoo.fromMap(e)).toList();
   }
+
 
   /// Recupera tutte le risposte ricevute da un utente
   static Future<List<Honoo>> fetchRepliesForUser(String recipientTag) async {

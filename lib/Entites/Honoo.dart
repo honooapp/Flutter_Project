@@ -4,14 +4,14 @@ class Honoo {
   String _image;
   String _created_at;
   String _updated_at;
-  String _userTag;
+  String _user_id;
   HonooType _type;
   String? _replyTo;
   String? _recipientTag;
 
 
 
-  Honoo(this._id, this._text, this._image, this._created_at, this._updated_at, this._userTag, this._type,
+  Honoo(this._id, this._text, this._image, this._created_at, this._updated_at, this._user_id, this._type,
       [this._replyTo, this._recipientTag]);
 
   String get updated_at => _updated_at;
@@ -44,8 +44,8 @@ class Honoo {
     _id = value;
   }
 
-  String get userTag => _userTag;
-  set userTag(String value) => _userTag = value;
+  String get user_id => _user_id;
+  set user_id(String value) => _user_id = value;
 
 
   HonooType get type => _type;
@@ -68,7 +68,7 @@ class Honoo {
       map['image_url'],
       map['created_at'],
       map['updated_at'] ?? '',
-      map['user_tag'] ?? '',
+      map['user_id'] ?? '',
       _mapDestinationToHonooType(map['destination']),
       map['reply_to'],
       map['recipient_tag'],
@@ -82,7 +82,7 @@ class Honoo {
       'image_url': _image,
       'created_at': _created_at,
       'updated_at': _updated_at,
-      'user_tag': _userTag,
+      'user_id': _user_id,
       'destination': _mapHonooTypeToDestination(_type),
       'reply_to': _replyTo,
       'recipient_tag': _recipientTag,

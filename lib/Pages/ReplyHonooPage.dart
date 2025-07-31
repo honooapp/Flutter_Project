@@ -4,6 +4,7 @@ import 'package:honoo/UI/HonooBuilder.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../Entites/Honoo.dart';
 
@@ -42,10 +43,10 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
         _imageUrl ?? '',        // image
         now,                    // created_at
         now,                    // updated_at
-        'anonimo',              // userTag (anonimo o dinamico)
+        Supabase.instance.client.auth.currentUser!.id,
         HonooType.answer,       // destination: reply
         widget.originalHonoo.id.toString(), // replyTo
-        widget.originalHonoo.userTag        // recipientTag
+        widget.originalHonoo.recipientTag
     );
 
 

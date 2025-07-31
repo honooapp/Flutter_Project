@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../Controller/DeviceController.dart';
 // MOCK: HonooController().getChestHonoo() era usato per simulare i dati locali
@@ -29,7 +30,8 @@ class _ChestPageState extends State<ChestPage> {
   List<Honoo> _receivedHonoo = [];
   bool _isLoading = true;
 
-  final String _userTag = 'anonimo'; // da sostituire se si vuole rendere dinamico
+  final userId = Supabase.instance.client.auth.currentUser!.id;
+
 
   @override
   void initState() {
@@ -39,8 +41,8 @@ class _ChestPageState extends State<ChestPage> {
 
   Future<void> _loadChestHonoo() async {
     try {
-      final personal = await HonooService.fetchUserHonoo(_userTag, 'chest');
-      final received = await HonooService.fetchRepliesForUser(_userTag);
+      final personal = await HonooService.fetchUserHonoo(userId, 'chest');
+      final received = await HonooService.fetchRepliesForUser(userId);
       setState(() {
         _personalHonoo = personal;
         _receivedHonoo = received;

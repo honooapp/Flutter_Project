@@ -1,10 +1,20 @@
-// EmailVerifyPage.dart
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../Entites/Honoo.dart';
+import '../Services/HonooService.dart';
+import 'package:honoo/Pages/ChestPage.dart';
 
 class EmailVerifyPage extends StatefulWidget {
   final String email;
-  const EmailVerifyPage({super.key, required this.email});
+  final String? pendingHonooText;
+  final String? pendingImageUrl;
+
+  const EmailVerifyPage({
+    super.key,
+    required this.email,
+    this.pendingHonooText,
+    this.pendingImageUrl,
+  });
 
   @override
   State<EmailVerifyPage> createState() => _EmailVerifyPageState();
@@ -24,12 +34,33 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
         email: widget.email,
         token: code,
       );
-      if (response.user != null) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Accesso completato!')),
+
+      final user = response.user;
+
+      if (user != null) {
+        // ✅ Salva l’honoo solo se esiste del contenuto pending
+        if (widget.pendingHonooText != null && widget.pendingImageUrl != null) {
+          final honoo = Honoo(
+            0,
+            widget.pendingHonooText!,
+            widget.pendingImageUrl!,
+            DateTime.now().toIso8601String(),
+            DateTime.now().toIso8601String(),
+            user.id,
+            HonooType.personal, // Scrigno
+            null,
+            null,
           );
-          Navigator.popUntil(context, (route) => route.isFirst);
+
+          await HonooService.publishHonoo(honoo);
+        }
+
+        if (context.mounted) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const ChestPage()),
+                (route) => false,
+          );
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
