@@ -52,6 +52,7 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
             null,
           );
 
+          print('🟨 Honoo.toMap: ${honoo.toMap()}');
           await HonooService.publishHonoo(honoo);
         }
 

@@ -81,7 +81,6 @@ class Honoo {
       'text': _text,
       'image_url': _image,
       'created_at': _created_at,
-      'updated_at': _updated_at,
       'user_id': _user_id,
       'destination': _mapHonooTypeToDestination(_type),
       'reply_to': _replyTo,
