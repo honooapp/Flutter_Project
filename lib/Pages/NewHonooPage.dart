@@ -76,83 +76,102 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isPhone = DeviceController().isPhone();
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: HonooColor.background,
-      body: Column(
-        children: [
-          SizedBox(
-            height: 60,
-            child: Center(
-              child: Text(
-                Utility().appName,
-                style: GoogleFonts.libreFranklin(
-                  color: HonooColor.secondary,
-                  fontSize: 30,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-          Row(
-            children: [
-              Expanded(child: Container()),
-              Container(
-                constraints: DeviceController().isPhone()
-                    ? BoxConstraints(maxWidth: 100.w, maxHeight: 100.h - 60)
-                    : BoxConstraints(maxWidth: 50.w, maxHeight: 100.h - 60),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 70.h,
-                        // MOCK: prima versione statica
-                        // child: const HonooBuilder(),
+      body: SafeArea( // <-- gestisce padding di sistema e notch
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // Spazio verticale disponibile dentro SafeArea
+            final double availH = constraints.maxHeight;
 
-                        // REALE: builder con callback
-                        child: HonooBuilder(
-                          onHonooChanged: _onHonooChanged,
-                        ),
+            // Altezza del titolo (fissa) e del footer (fissa)
+            const double titleH = 60;
+            const double footerH = 60;
+
+            // Altezza residua per il blocco centrale (HonooBuilder)
+            final double centerH = (availH - titleH - footerH).clamp(0.0, double.infinity);
+
+            // Larghezza massima del blocco centrale
+            final double maxW = isPhone ? size.width * 0.96 : size.width * 0.5;
+
+            return Column(
+              children: [
+                // HEADER
+                SizedBox(
+                  height: titleH,
+                  child: Center(
+                    child: Text(
+                      Utility().appName,
+                      style: GoogleFonts.libreFranklin(
+                        color: HonooColor.secondary,
+                        fontSize: 30,
+                        fontWeight: FontWeight.w500,
                       ),
+                      textAlign: TextAlign.center,
                     ),
-                    SizedBox(
-                      height: 60,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                              icon: SvgPicture.asset(
-                                "assets/icons/home.svg",
-                                semanticsLabel: 'Home',
-                              ),
-                              iconSize: 60,
-                              splashRadius: 25,
-                              onPressed: () {
-                                Navigator.pop(context);
-                              }),
-                          Padding(padding: EdgeInsets.only(left: 20.w)),
-                          IconButton(
-                              icon: SvgPicture.asset(
-                                "assets/icons/ok.svg",
-                                semanticsLabel: 'Home',
-                              ),
-                              iconSize: 60,
-                              splashRadius: 25,
-                              onPressed: () {
+                  ),
+                ),
 
-                                // REALE: invio a Supabase
-                                _submitHonoo();
-                              }),
+                // CENTRO: contenitore del builder, centrato e con vincoli puliti
+                Expanded(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: maxW,
+                        // diamo un'altezza finita al builder: occupa tutto il centro
+                        maxHeight: centerH,
+                      ),
+                      child: Column(
+                        children: [
+                          // HonooBuilder prende TUTTA l’altezza residua del centro
+                          Expanded(
+                            child: HonooBuilder(
+                              onHonooChanged: _onHonooChanged,
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-              Expanded(child: Container()),
-            ],
-          ),
-        ],
+
+                // FOOTER (bottoni)
+                SizedBox(
+                  height: footerH,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: SvgPicture.asset(
+                          "assets/icons/home.svg",
+                          semanticsLabel: 'Home',
+                        ),
+                        iconSize: 60,
+                        splashRadius: 25,
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      const SizedBox(width: 32), // spaziatura orizzontale
+                      IconButton(
+                        icon: SvgPicture.asset(
+                          "assets/icons/ok.svg",
+                          semanticsLabel: 'OK',
+                        ),
+                        iconSize: 60,
+                        splashRadius: 25,
+                        onPressed: _submitHonoo,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
