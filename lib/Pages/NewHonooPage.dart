@@ -9,9 +9,7 @@ import '../Entites/Honoo.dart';
 import '../UI/HonooBuilder.dart';
 import '../Utility/Utility.dart';
 import 'package:sizer/sizer.dart';
-import '../../Pages/ComingSoonPage.dart';
 import 'package:honoo/Services/HonooService.dart';
-
 import 'EmailLoginPage.dart';
 
 
@@ -49,28 +47,28 @@ class _NewHonooPageState extends State<NewHonooPage> {
         ),
       );
       return;
-    }
+    } else {
+      // 👤 Utente loggato → crea e salva l'honoo
+      final newHonoo = Honoo(
+        0,
+        _text,
+        _imageUrl,
+        DateTime.now().toIso8601String(),
+        DateTime.now().toIso8601String(),
+        user.id,
+        HonooType.personal, // salviamo nello scrigno
+        null,
+        null,
+      );
 
-    // 👤 Utente loggato → crea e salva l'honoo
-    final newHonoo = Honoo(
-      0,
-      _text,
-      _imageUrl,
-      DateTime.now().toIso8601String(),
-      DateTime.now().toIso8601String(),
-      user.id,
-      HonooType.personal, // salviamo nello scrigno
-      null,
-      null,
-    );
+      try {
+        await HonooService.publishHonoo(newHonoo);
 
-    try {
-      await HonooService.publishHonoo(newHonoo);
-
-      // ✅ Vai subito allo scrigno
-      Navigator.pushReplacementNamed(context, '/chest'); // oppure: MaterialPageRoute(builder: (_) => ChestPage())
-    } catch (e) {
-      print("Errore durante il salvataggio dell'honoo: $e");
+        // ✅ Vai subito allo scrigno
+        Navigator.pushReplacementNamed(context, '/chest');
+      } catch (e) {
+        print("Errore durante il salvataggio dell'honoo: $e");
+      }
     }
   }
 
@@ -141,17 +139,6 @@ class _NewHonooPageState extends State<NewHonooPage> {
                               iconSize: 60,
                               splashRadius: 25,
                               onPressed: () {
-                                // MOCK: logica temporanea
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) => ComingSoonPage(
-                                //       header: Utility().honooInsertTemporary,
-                                //       quote: Utility().shakespeare,
-                                //       bibliography: Utility().bibliography,
-                                //     ),
-                                //   ),
-                                // );
 
                                 // REALE: invio a Supabase
                                 _submitHonoo();
@@ -170,3 +157,4 @@ class _NewHonooPageState extends State<NewHonooPage> {
     );
   }
 }
+

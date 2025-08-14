@@ -2,106 +2,96 @@ import 'package:flutter/material.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
-
-
 import '../Entites/Honoo.dart';
 
 class HonooCard extends StatelessWidget {
-
   final Honoo honoo;
 
   const HonooCard({super.key, required this.honoo});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: honoo.type == HonooType.moon ? HonooColor.tertiary : honoo.type == HonooType.answer ? HonooColor.secondary : honoo.type == HonooType.personal ? HonooColor.background : HonooColor.background,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child:
-        // Padding(
-        // padding: const EdgeInsets.only(left: 38.0, right: 38.0),
-        // child:
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: honoo.type == HonooType.moon ? HonooColor.tertiary : honoo.type == HonooType.answer ? HonooColor.secondary : honoo.type == HonooType.personal ? HonooColor.background : HonooColor.tertiary,
-                    border: Border.all(
-                      color: Colors.transparent,
-                      width: 1.0,
-                    ),
-                    borderRadius: BorderRadius.circular(5),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        spreadRadius: 2,
-                        blurRadius: 7,
-                        offset: const Offset(7, 3), // changes the position of the shadow
-                      ),
-                    ],
-                  ),
-                  child: SizedBox(
-                    width: 100.w,
-                    height: 30.h,
-                    child: Center(
-                      child:Text(
-                        honoo.text,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.arvo(
-                          color: honoo.type == HonooType.moon ? HonooColor.onTertiary : honoo.type == HonooType.answer ? HonooColor.onBackground : honoo.type == HonooType.personal ? HonooColor.onBackground : HonooColor.onBackground,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w200,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              // Expanded(child:Padding(
-              //   padding: const EdgeInsets.only(bottom: 15.0, left: 15.0, right: 15.0),
-              //     child: ClipRRect(
-              //       borderRadius: BorderRadius.circular(5.0),
-              //       child: Container(
-              //         width: 100.w,
-              //         decoration: BoxDecoration(
-              //           image: DecorationImage(
-              //             fit: BoxFit.cover,
-              //             image: NetworkImage(honoo.image),
-              //           ),
-              //         ),
-              //       ),
-              //     ),
-              //   ),
-              // ),
+    final isPhone = MediaQuery.of(context).size.shortestSide < 600;
+    final maxWidth = MediaQuery.of(context).size.width;
+    final double cardWidth = isPhone ? maxWidth * 0.9 : maxWidth * 0.5;
+    return Center(
+      child: SizedBox(
+        width: cardWidth,
+        child: AspectRatio(
+          aspectRatio: 1 / 2.2,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final double width = constraints.maxWidth;
+              final double imageSize = width;
+              final double frameHeight = imageSize / 2;
 
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 15.0, left: 15.0, right: 15.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(5.0),
-                    child: AspectRatio(
-                      aspectRatio: 1, // Ensures the widget is always a square
+              // Sfondo dinamico
+              final Color backgroundColor =
+              honoo.type == HonooType.moon
+                  ? HonooColor.tertiary
+                  : honoo.type == HonooType.answer
+                  ? HonooColor.secondary
+                  : HonooColor.background;
+
+              return Card(
+                color: backgroundColor,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Box testo
+                    SizedBox(
+                      width: width / 2,
+                      height: frameHeight,
                       child: Container(
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: NetworkImage(honoo.image),
+                          color: Colors.white,
+                          border: Border.all(color: Colors.black12),
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(
+                            honoo.text,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.arvo(
+                              fontSize: 12.sp,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-              ),
 
-            ],
+                    // Immagine quadrata
+                    SizedBox(
+                      width: imageSize,
+                      height: imageSize,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(5),
+                        child: Image.network(
+                          honoo.image,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
-        // ),
+        ),
+      ),
     );
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Entites/Honoo.dart';
 import '../Services/HonooService.dart';
-import 'package:honoo/Pages/ChestPage.dart';
+import 'ChestPage.dart';
 
 class EmailVerifyPage extends StatefulWidget {
   final String email;
@@ -24,21 +24,19 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
   final TextEditingController _codeController = TextEditingController();
   bool _isVerifying = false;
 
-  Future<void> _verifyCode() async {
-    setState(() => _isVerifying = true);
-    final code = _codeController.text.trim();
+  @override
+  void initState() {
+    super.initState();
 
-    try {
-      final response = await Supabase.instance.client.auth.verifyOTP(
-        type: OtpType.email,
-        email: widget.email,
-        token: code,
-      );
+    // 🎯 Ascolta magic link
+    Supabase.instance.client.auth.onAuthStateChange.listen((data) async {
+      final event = data.event;
+      final session = data.session;
 
-      final user = response.user;
+      if (event == AuthChangeEvent.signedIn && session != null) {
+        print('✅ Login completato con magic link');
 
-      if (user != null) {
-        // ✅ Salva l’honoo solo se esiste del contenuto pending
+        // Se c'è un honoo in sospeso, salvalo
         if (widget.pendingHonooText != null && widget.pendingImageUrl != null) {
           final honoo = Honoo(
             0,
@@ -46,7 +44,7 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
             widget.pendingImageUrl!,
             DateTime.now().toIso8601String(),
             DateTime.now().toIso8601String(),
-            user.id,
+            session.user.id,
             HonooType.personal, // Scrigno
             null,
             null,
@@ -63,6 +61,26 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
                 (route) => false,
           );
         }
+      }
+    });
+  }
+
+  Future<void> _verifyCode() async {
+    setState(() => _isVerifying = true);
+    final code = _codeController.text.trim();
+
+    try {
+      final response = await Supabase.instance.client.auth.verifyOTP(
+        type: OtpType.email,
+        email: widget.email,
+        token: code,
+      );
+
+      final user = response.user;
+
+      if (user != null) {
+        print('✅ Codice OTP verificato');
+        // Non serve navigare: se il login riesce, onAuthStateChange lo intercetta
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Codice non valido.')),
@@ -85,7 +103,12 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text('Abbiamo inviato un codice a: ${widget.email}'),
+            Text(
+              'Ti abbiamo inviato una mail.\n'
+                  'Se è la prima volta, inserisci il codice.\n'
+                  'Se sei già registrato, clicca sul link.',
+              style: const TextStyle(fontSize: 16),
+            ),
             const SizedBox(height: 20),
             TextField(
               controller: _codeController,
