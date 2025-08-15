@@ -1,3 +1,4 @@
+// HonooBuilder.dart — SOLO fix anti-salto responsive (eps + rimozione floor)
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -119,24 +120,20 @@ class _HonooBuilderState extends State<HonooBuilder> {
         }
 
         // Parametri di layout
-        const double gap = 9.0; // spazio tra box testo e immagine (lasciato com'era)
-        const double eps = 2.0; // cuscinetto anti-rounding
-        const double counterLift =
-        22.0; // quanto “sale” il contatore sopra il bordo bianco
+        const double gap = 9.0;   // spazio tra box testo e immagine (lasciato com'era)
+        const double eps = 0.5;   // cuscinetto più piccolo → transizione fluida
+        const double counterLift = 22.0;
 
         // Altezza totale = image/2 + gap + image = 1.5*image + gap
         // Vincolo in altezza → image <= (availH - gap - eps) / 1.5
         final double maxByH = (availH - gap - eps) / 1.5;
 
         // Lato del quadrato immagine limitato da larghezza e altezza
-        double imageSize = math.min(availW, maxByH);
+        final double imageSize = math.min(availW, maxByH);
 
-        // Arrotonda verso il basso per evitare sforamenti di 1–2 px
-        imageSize = imageSize.isFinite ? imageSize.floorToDouble() : 0.0;
-
-        final double textHeight = (imageSize / 2).floorToDouble();
-        final double totalHeight =
-        (textHeight + gap + imageSize).floorToDouble();
+        // ❌ niente floorToDouble() → niente “salti” durante il resize
+        final double textHeight = imageSize / 2;
+        final double totalHeight = textHeight + gap + imageSize;
 
         // helper per il colore in base ai caratteri residui
         Color _counterColor(int remaining) {
@@ -146,40 +143,19 @@ class _HonooBuilderState extends State<HonooBuilder> {
 
         final GlobalKey _imageBoundaryKey = GlobalKey(); // per catturare la cornice
 
-        double _ivMinScale = 1.0;    // min scale calcolato a runtime in base al box
-        double _ivMaxScale = 5.0;    // quanto vuoi permettere di zoommare
-
-        Future<Uint8List?> _captureCroppedSquarePng() async {
-          try {
-            final boundary = _imageBoundaryKey.currentContext?.findRenderObject()
-            as RenderRepaintBoundary?;
-            if (boundary == null) return null;
-
-            // Pixel ratio alto per buona qualità (usa devicePixelRatio)
-            final pixelRatio = ui.window.devicePixelRatio;
-            final ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
-            final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-            return byteData?.buffer.asUint8List();
-          } catch (_) {
-            return null;
-          }
-        }
-
-
         // UI
         return Center(
           child: Card(
             color: HonooColor.background,
             elevation: 0,
             margin: EdgeInsets.zero,
-            clipBehavior: Clip
-                .none, // ⬅️ lascia “uscire” il contatore fuori dalla cornice bianca
+            clipBehavior: Clip.none, // lascia “uscire” il contatore
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5),
             ),
             child: SizedBox(
-              width: imageSize, // larghezza blocco = lato del quadrato
-              height: totalHeight, // 1.5 × lato + gap
+              width: imageSize,      // larghezza blocco = lato del quadrato
+              height: totalHeight,   // 1.5 × lato + gap
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -188,13 +164,12 @@ class _HonooBuilderState extends State<HonooBuilder> {
                     width: imageSize,
                     height: textHeight,
                     child: Stack(
-                      clipBehavior: Clip
-                          .none, // consente al contatore di “uscire” sopra al box
+                      clipBehavior: Clip.none,
                       children: [
-                        // ✅ Contatore in alto a destra, FUORI dal box bianco
+                        // ✅ Contatore in alto a destra, fuori dal box bianco
                         Positioned(
                           right: 5,
-                          top: -counterLift, // negativo => fuori dalla cornice
+                          top: -counterLift,
                           child: ValueListenableBuilder<TextEditingValue>(
                             valueListenable: _textCtrl,
                             builder: (context, value, _) {
@@ -239,25 +214,22 @@ class _HonooBuilderState extends State<HonooBuilder> {
 
                                 return TextField(
                                   controller: _textCtrl,
-                                  textAlign: TextAlign.center, // centro orizzontale
-                                  textAlignVertical: TextAlignVertical
-                                      .center, // centro verticale
-                                  expands:
-                                  true, // riempie tutto il box bianco
+                                  textAlign: TextAlign.center,                 // centro orizzontale
+                                  textAlignVertical: TextAlignVertical.center, // centro verticale
+                                  expands: true,   // riempie tutto il box bianco
                                   minLines: null,
                                   maxLines: null,
                                   keyboardType: TextInputType.multiline,
                                   inputFormatters: const [
                                     VisibleSpaceFormatter(
-                                      maxLines: _maxLines, // 5
+                                      maxLines: _maxLines,   // 5
                                       maxLineLength: _perLine, // 31
                                     ),
                                   ],
                                   decoration: InputDecoration(
                                     hintText: hint, // scompare appena scrivi
                                     hintStyle: GoogleFonts.libreFranklin(
-                                      color: HonooColor.onTertiary
-                                          .withOpacity(0.6),
+                                      color: HonooColor.onTertiary.withOpacity(0.6),
                                       fontSize: 18,
                                       height: 1.2,
                                     ),
@@ -289,13 +261,15 @@ class _HonooBuilderState extends State<HonooBuilder> {
                     child: GestureDetector(
                       onTap: () async {
                         final picker = ImagePicker();
-                        final selected = await picker.pickImage(source: ImageSource.gallery);
+                        final selected =
+                        await picker.pickImage(source: ImageSource.gallery);
                         if (selected != null) {
                           setState(() {
                             image = selected;
                             imageProvider = kIsWeb
                                 ? NetworkImage(image!.path)
-                                : FileImage(File(image!.path)) as ImageProvider<Object>;
+                                : FileImage(File(image!.path))
+                            as ImageProvider<Object>;
                           });
                           _emitChange();
                         }
@@ -329,31 +303,30 @@ class _HonooBuilderState extends State<HonooBuilder> {
                               final w = ivConstraints.maxWidth;
                               final h = ivConstraints.maxHeight;
 
-                              // Calcola minScale per coprire sempre la cornice (cover)
-                              // assumendo che l’immagine abbia un layout “intrinseco” ≈ al box.
-                              // InteractiveViewer parte da scale=1.0 sul child, quindi minScale = 1.0 copre sempre.
-                              _ivMinScale = 1.0;
+                              // Copertura garantita a scala 1.0
+                              const _ivMinScale = 1.0;
+                              const _ivMaxScale = 5.0;
 
                               return Stack(
                                 children: [
-                                  // Catturiamo esattamente la cornice (per eventuale "conferma")
+                                  // Catturiamo esattamente la cornice
                                   RepaintBoundary(
                                     key: _imageBoundaryKey,
-                                    child: ClipRect( // importantissimo per ritaglio pulito
+                                    child: ClipRect(
                                       child: InteractiveViewer(
                                         panEnabled: true,
                                         scaleEnabled: true,
                                         minScale: _ivMinScale,
                                         maxScale: _ivMaxScale,
-                                        boundaryMargin: const EdgeInsets.all(200), // consente panning oltre i bordi
+                                        boundaryMargin:
+                                        const EdgeInsets.all(200),
                                         child: SizedBox(
                                           width: w,
                                           height: h,
                                           child: FittedBox(
-                                            fit: BoxFit.cover, // copre sempre il riquadro
+                                            fit: BoxFit.cover,
                                             child: Image(
                                               image: imageProvider!,
-                                              // Manteniamo alta risoluzione “fonte” nel FittedBox
                                             ),
                                           ),
                                         ),

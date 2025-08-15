@@ -41,13 +41,21 @@ class _ChestPageState extends State<ChestPage> {
 
   Future<void> _loadChestHonoo() async {
     try {
+      // Recupero degli honoo personali e ricevuti
       final personal = await HonooService.fetchUserHonoo(userId, 'chest');
       final received = await HonooService.fetchRepliesForUser(userId);
+
+      // Controllo dati ricevuti
+      if (personal.isEmpty && received.isEmpty) {
+        print("Nessun honoo trovato nella chest.");
+      }
+
       setState(() {
         _personalHonoo = personal;
         _receivedHonoo = received;
         _isLoading = false;
       });
+
     } catch (e) {
       print("Errore caricamento honoo da Supabase: $e");
       setState(() {
@@ -55,6 +63,7 @@ class _ChestPageState extends State<ChestPage> {
       });
     }
   }
+
 
   Widget get moreButton => IconButton(
     icon: SvgPicture.asset(
