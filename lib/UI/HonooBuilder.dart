@@ -3,11 +3,13 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../Utility/HonooColors.dart';
+import 'dart:ui' as ui;
 
 /// Formatter che impedisce di superare lo spazio visibile:
 /// - maxLines righe
@@ -72,7 +74,7 @@ class _HonooBuilderState extends State<HonooBuilder> {
 
   static const int _perLine = 31;
   static const int _maxLines = 5;
-  static const int _capacity = _perLine * _maxLines; // 155
+  static const int _capacity = 144; // 144
 
   void _emitChange() {
     final cb = widget.onHonooChanged;
@@ -108,7 +110,8 @@ class _HonooBuilderState extends State<HonooBuilder> {
             ? constraints.maxHeight
             : media.size.height;
 
-        final double availH = (rawH - media.padding.vertical - media.viewInsets.bottom)
+        final double availH =
+        (rawH - media.padding.vertical - media.viewInsets.bottom)
             .clamp(0.0, double.infinity);
 
         if (availW <= 0 || availH <= 0) {
@@ -116,9 +119,10 @@ class _HonooBuilderState extends State<HonooBuilder> {
         }
 
         // Parametri di layout
-        const double gap = 9.0;    // spazio tra box testo e immagine
-        const double eps = 2.0;    // cuscinetto anti-rounding
-        const double counterLift = 12.0; // quanto “sale” il contatore sopra il bordo bianco
+        const double gap = 9.0; // spazio tra box testo e immagine (lasciato com'era)
+        const double eps = 2.0; // cuscinetto anti-rounding
+        const double counterLift =
+        22.0; // quanto “sale” il contatore sopra il bordo bianco
 
         // Altezza totale = image/2 + gap + image = 1.5*image + gap
         // Vincolo in altezza → image <= (availH - gap - eps) / 1.5
@@ -131,7 +135,36 @@ class _HonooBuilderState extends State<HonooBuilder> {
         imageSize = imageSize.isFinite ? imageSize.floorToDouble() : 0.0;
 
         final double textHeight = (imageSize / 2).floorToDouble();
-        final double totalHeight = (textHeight + gap + imageSize).floorToDouble();
+        final double totalHeight =
+        (textHeight + gap + imageSize).floorToDouble();
+
+        // helper per il colore in base ai caratteri residui
+        Color _counterColor(int remaining) {
+          if (remaining <= 12) return HonooColor.secondary; // rosso
+          return HonooColor.onBackground; // bianco
+        }
+
+        final GlobalKey _imageBoundaryKey = GlobalKey(); // per catturare la cornice
+
+        double _ivMinScale = 1.0;    // min scale calcolato a runtime in base al box
+        double _ivMaxScale = 5.0;    // quanto vuoi permettere di zoommare
+
+        Future<Uint8List?> _captureCroppedSquarePng() async {
+          try {
+            final boundary = _imageBoundaryKey.currentContext?.findRenderObject()
+            as RenderRepaintBoundary?;
+            if (boundary == null) return null;
+
+            // Pixel ratio alto per buona qualità (usa devicePixelRatio)
+            final pixelRatio = ui.window.devicePixelRatio;
+            final ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
+            final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+            return byteData?.buffer.asUint8List();
+          } catch (_) {
+            return null;
+          }
+        }
+
 
         // UI
         return Center(
@@ -139,13 +172,14 @@ class _HonooBuilderState extends State<HonooBuilder> {
             color: HonooColor.background,
             elevation: 0,
             margin: EdgeInsets.zero,
-            clipBehavior: Clip.hardEdge,
+            clipBehavior: Clip
+                .none, // ⬅️ lascia “uscire” il contatore fuori dalla cornice bianca
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5),
             ),
             child: SizedBox(
-              width: imageSize,     // larghezza blocco = lato del quadrato
-              height: totalHeight,  // 1.5 × lato + gap
+              width: imageSize, // larghezza blocco = lato del quadrato
+              height: totalHeight, // 1.5 × lato + gap
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -154,27 +188,28 @@ class _HonooBuilderState extends State<HonooBuilder> {
                     width: imageSize,
                     height: textHeight,
                     child: Stack(
-                      clipBehavior: Clip.none, // consente al contatore di “uscire” sopra al box
+                      clipBehavior: Clip
+                          .none, // consente al contatore di “uscire” sopra al box
                       children: [
-                        // Contatore in alto a destra, FUORI dal box bianco
+                        // ✅ Contatore in alto a destra, FUORI dal box bianco
                         Positioned(
-                          right: 0,
-                          top: -counterLift, // spostato verso l’alto
-                          child: SizedBox(
-                            child: ValueListenableBuilder<TextEditingValue>(
-                              valueListenable: _textCtrl,
-                              builder: (context, value, _) {
-                                final rem = (_capacity - value.text.length)
-                                    .clamp(0, _capacity);
-                                return Text(
-                                  '$rem',
-                                  style: GoogleFonts.arvo(
-                                    color: HonooColor.onBackground,
-                                    fontSize: 10,
-                                  ),
-                                );
-                              },
-                            ),
+                          right: 5,
+                          top: -counterLift, // negativo => fuori dalla cornice
+                          child: ValueListenableBuilder<TextEditingValue>(
+                            valueListenable: _textCtrl,
+                            builder: (context, value, _) {
+                              final int remaining =
+                              (_capacity - value.text.length)
+                                  .clamp(0, _capacity);
+                              return Text(
+                                '$remaining',
+                                style: GoogleFonts.libreFranklin(
+                                  color: _counterColor(remaining),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              );
+                            },
                           ),
                         ),
 
@@ -194,53 +229,49 @@ class _HonooBuilderState extends State<HonooBuilder> {
                                 ),
                               ],
                             ),
-                            child: Center( // centro perfetto (orizzontale + verticale)
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  maxWidth: imageSize,
-                                  maxHeight: textHeight,
-                                ),
-                                child: ValueListenableBuilder<TextEditingValue>(
-                                  valueListenable: _textCtrl,
-                                  builder: (context, value, _) {
-                                    // Hint visibile solo quando vuoto
-                                    final String? hint = value.text.isEmpty
-                                        ? 'Scrivi qui il tuo testo'
-                                        : null;
+                            // TextField che RIEMPIE il box e centra verticalmente hint+testo
+                            child: ValueListenableBuilder<TextEditingValue>(
+                              valueListenable: _textCtrl,
+                              builder: (context, value, _) {
+                                final String? hint = value.text.isEmpty
+                                    ? 'Scrivi qui il tuo testo'
+                                    : null;
 
-                                    return TextField(
-                                      controller: _textCtrl,
-                                      textAlign: TextAlign.center,                 // centro orizzontale
-                                      textAlignVertical: TextAlignVertical.center, // centro verticale
-                                      minLines: _maxLines,
-                                      maxLines: _maxLines,
-                                      keyboardType: TextInputType.multiline,
-                                      inputFormatters: const [
-                                        VisibleSpaceFormatter(
-                                          maxLines: _maxLines,
-                                          maxLineLength: _perLine,
-                                        ),
-                                      ],
-                                      decoration: InputDecoration(
-                                        hintText: hint,
-                                        hintStyle: GoogleFonts.arvo(
-                                          color: HonooColor.onTertiary.withOpacity(0.6),
-                                          fontSize: 18,
-                                          height: 1.2,
-                                        ),
-                                        border: InputBorder.none,
-                                        isCollapsed: true,
-                                        contentPadding: EdgeInsets.zero,
-                                      ),
-                                      style: GoogleFonts.arvo(
-                                        color: HonooColor.onTertiary,
-                                        fontSize: 18,
-                                        height: 1.4,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
+                                return TextField(
+                                  controller: _textCtrl,
+                                  textAlign: TextAlign.center, // centro orizzontale
+                                  textAlignVertical: TextAlignVertical
+                                      .center, // centro verticale
+                                  expands:
+                                  true, // riempie tutto il box bianco
+                                  minLines: null,
+                                  maxLines: null,
+                                  keyboardType: TextInputType.multiline,
+                                  inputFormatters: const [
+                                    VisibleSpaceFormatter(
+                                      maxLines: _maxLines, // 5
+                                      maxLineLength: _perLine, // 31
+                                    ),
+                                  ],
+                                  decoration: InputDecoration(
+                                    hintText: hint, // scompare appena scrivi
+                                    hintStyle: GoogleFonts.libreFranklin(
+                                      color: HonooColor.onTertiary
+                                          .withOpacity(0.6),
+                                      fontSize: 18,
+                                      height: 1.2,
+                                    ),
+                                    border: InputBorder.none,
+                                    isCollapsed: true,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                  style: GoogleFonts.arvo(
+                                    color: HonooColor.onTertiary,
+                                    fontSize: 18,
+                                    height: 1.4,
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ),
@@ -258,9 +289,7 @@ class _HonooBuilderState extends State<HonooBuilder> {
                     child: GestureDetector(
                       onTap: () async {
                         final picker = ImagePicker();
-                        final selected = await picker.pickImage(
-                          source: ImageSource.gallery,
-                        );
+                        final selected = await picker.pickImage(source: ImageSource.gallery);
                         if (selected != null) {
                           setState(() {
                             image = selected;
@@ -273,24 +302,16 @@ class _HonooBuilderState extends State<HonooBuilder> {
                       },
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(5),
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: HonooColor.tertiary,
-                            image: imageProvider != null
-                                ? DecorationImage(
-                              image: imageProvider!,
-                              fit: BoxFit.cover,
-                            )
-                                : null,
-                          ),
-                          child: imageProvider == null
+                        child: Container(
+                          color: HonooColor.tertiary,
+                          child: (imageProvider == null)
                               ? Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
                                 'Carica qui la tua immagine',
                                 textAlign: TextAlign.center,
-                                style: GoogleFonts.arvo(
+                                style: GoogleFonts.libreFranklin(
                                   color: HonooColor.onSecondary,
                                   fontSize: 18,
                                 ),
@@ -303,19 +324,45 @@ class _HonooBuilderState extends State<HonooBuilder> {
                               ),
                             ],
                           )
-                              : Align(
-                            alignment: Alignment.bottomCenter,
-                            child: IconButton(
-                              icon: const Icon(Icons.delete),
-                              color: HonooColor.onBackground,
-                              onPressed: () {
-                                setState(() {
-                                  image = null;
-                                  imageProvider = null;
-                                });
-                                _emitChange();
-                              },
-                            ),
+                              : LayoutBuilder(
+                            builder: (context, ivConstraints) {
+                              final w = ivConstraints.maxWidth;
+                              final h = ivConstraints.maxHeight;
+
+                              // Calcola minScale per coprire sempre la cornice (cover)
+                              // assumendo che l’immagine abbia un layout “intrinseco” ≈ al box.
+                              // InteractiveViewer parte da scale=1.0 sul child, quindi minScale = 1.0 copre sempre.
+                              _ivMinScale = 1.0;
+
+                              return Stack(
+                                children: [
+                                  // Catturiamo esattamente la cornice (per eventuale "conferma")
+                                  RepaintBoundary(
+                                    key: _imageBoundaryKey,
+                                    child: ClipRect( // importantissimo per ritaglio pulito
+                                      child: InteractiveViewer(
+                                        panEnabled: true,
+                                        scaleEnabled: true,
+                                        minScale: _ivMinScale,
+                                        maxScale: _ivMaxScale,
+                                        boundaryMargin: const EdgeInsets.all(200), // consente panning oltre i bordi
+                                        child: SizedBox(
+                                          width: w,
+                                          height: h,
+                                          child: FittedBox(
+                                            fit: BoxFit.cover, // copre sempre il riquadro
+                                            child: Image(
+                                              image: imageProvider!,
+                                              // Manteniamo alta risoluzione “fonte” nel FittedBox
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
                           ),
                         ),
                       ),
