@@ -257,7 +257,8 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                       context,
                       //MaterialPageRoute(builder: (context) => const ChestPage()),
-                      MaterialPageRoute(builder: (context) => ComingSoonPage(header: Utility().chestHeaderTemporary, quote: Utility().shakespeare, bibliography:  Utility().bibliography, )),
+                      MaterialPageRoute(builder: (context) => ChestPage()),
+                    //ComingSoonPage(header: Utility().chestHeaderTemporary, quote: Utility().shakespeare, bibliography:  Utility().bibliography, )),
 
                     );
                   }),

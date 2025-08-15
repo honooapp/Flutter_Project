@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Entites/Honoo.dart';
@@ -23,19 +24,19 @@ class EmailVerifyPage extends StatefulWidget {
 class _EmailVerifyPageState extends State<EmailVerifyPage> {
   final TextEditingController _codeController = TextEditingController();
   bool _isVerifying = false;
+  StreamSubscription<AuthState>? _authSub;
 
   @override
   void initState() {
     super.initState();
 
-    // 🎯 Ascolta magic link
-    Supabase.instance.client.auth.onAuthStateChange.listen((data) async {
+    // 🎯 Ascolta magic link / cambi di stato
+    _authSub = Supabase.instance.client.auth.onAuthStateChange.listen((data) async {
       final event = data.event;
       final session = data.session;
 
       if (event == AuthChangeEvent.signedIn && session != null) {
-        print('✅ Login completato con magic link');
-
+        // ✅ Login completato (magic link o OTP)
         // Se c'è un honoo in sospeso, salvalo
         if (widget.pendingHonooText != null && widget.pendingImageUrl != null) {
           final honoo = Honoo(
@@ -50,19 +51,26 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
             null,
           );
 
-          print('🟨 Honoo.toMap: ${honoo.toMap()}');
+          // Debug facoltativo:
+          // print('🟨 Honoo.toMap: ${honoo.toMap()}');
           await HonooService.publishHonoo(honoo);
         }
 
-        if (context.mounted) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (_) => const ChestPage()),
-                (route) => false,
-          );
-        }
+        if (!mounted) return;
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const ChestPage()),
+              (route) => false,
+        );
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _authSub?.cancel();
+    _codeController.dispose();
+    super.dispose();
   }
 
   Future<void> _verifyCode() async {
@@ -76,22 +84,20 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
         token: code,
       );
 
-      final user = response.user;
-
-      if (user != null) {
-        print('✅ Codice OTP verificato');
-        // Non serve navigare: se il login riesce, onAuthStateChange lo intercetta
-      } else {
+      // Se la verifica va a buon fine, onAuthStateChange scatterà.
+      if (response.user == null && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Codice non valido.')),
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Errore: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Errore verifica: $e')),
+        );
+      }
     } finally {
-      setState(() => _isVerifying = false);
+      if (mounted) setState(() => _isVerifying = false);
     }
   }
 
@@ -103,11 +109,10 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text(
+            const Text(
               'Ti abbiamo inviato una mail.\n'
-                  'Se è la prima volta, inserisci il codice.\n'
-                  'Se sei già registrato, clicca sul link.',
-              style: const TextStyle(fontSize: 16),
+                  'Inserisci il codice.\n',
+              style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 20),
             TextField(

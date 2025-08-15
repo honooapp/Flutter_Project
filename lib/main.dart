@@ -7,6 +7,8 @@ import 'package:sizer/sizer.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'Pages/AuthGate.dart';
+
 
 
 void main() async {
@@ -15,6 +17,7 @@ void main() async {
   await Supabase.initialize(
     url: 'https://mulardcrjecwmohlheuz.supabase.co',       // 🔁 Sostituisci con il tuo URL
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11bGFyZGNyamVjd21vaGxoZXV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MDgxNDYsImV4cCI6MjA2OTM4NDE0Nn0.wt0CJD8XHkGoX2qLlmQgwG6RHLUfxx6JKO9EMnpTAsc', // 🔁 Chiave anonima
+
   );
 
   // Notion config (puoi lasciare hardcoded o usare dotenv se preferisci)
@@ -38,7 +41,7 @@ class MyApp extends StatelessWidget {
         return const SafeArea(
           child: MaterialApp(
                   title: 'honoo',
-                  home: PlaceholderPage(),
+                  home: AuthGate(),
                 ),
         );
       },

@@ -73,7 +73,7 @@ class _HonooBuilderState extends State<HonooBuilder> {
   ImageProvider<Object>? imageProvider;
   final TextEditingController _textCtrl = TextEditingController();
 
-  static const int _perLine = 31;
+  static const int _perLine = 32;
   static const int _maxLines = 5;
   static const int _capacity = 144; // 144
 

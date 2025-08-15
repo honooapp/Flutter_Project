@@ -1,5 +1,6 @@
 // EmailLoginPage.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'EmailVerifyPage.dart';
 
@@ -22,25 +23,29 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
     final email = _emailController.text.trim();
 
     try {
-      await Supabase.instance.client.auth.signInWithOtp(email: email);
-      if (context.mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => EmailVerifyPage(
-              email: email,
-              pendingHonooText: widget.pendingHonooText,
-              pendingImageUrl: widget.pendingImageUrl,
-            ),
+      await Supabase.instance.client.auth.signInWithOtp(
+        email: email,
+
+      );
+
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EmailVerifyPage(
+            email: email,
+            pendingHonooText: widget.pendingHonooText,
+            pendingImageUrl: widget.pendingImageUrl,
           ),
-        );
-      }
+        ),
+      );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Errore: $e')),
+        SnackBar(content: Text('Errore invio OTP: $e')),
       );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
