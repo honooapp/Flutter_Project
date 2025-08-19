@@ -8,6 +8,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'Pages/AuthGate.dart';
+import 'Pages/ChestPage.dart';
 
 
 
@@ -38,11 +39,15 @@ class MyApp extends StatelessWidget {
 
     return Sizer(
       builder: (context, orientation, deviceType) {
-        return const SafeArea(
+        return SafeArea(
           child: MaterialApp(
                   title: 'honoo',
                   home: AuthGate(),
-                ),
+          // 🔑 routes nominate (qui puoi aggiungerne altre in futuro)
+          routes: {
+            '/chest': (context) => const ChestPage(),
+          },
+          ),
         );
       },
     );

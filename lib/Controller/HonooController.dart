@@ -1,54 +1,116 @@
-import 'package:honoo/Entites/Honoo.dart';
+import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../Entites/Honoo.dart';
+import '../Services/HonooService.dart';
+
+/// Repository + cache in memoria (niente mock)
 class HonooController {
   static final HonooController _instance = HonooController._internal();
-
-  factory HonooController() {
-    return _instance;
-  }
-
+  factory HonooController() => _instance;
   HonooController._internal();
 
-  List<Honoo> getMoonHonoo () {
-    List<Honoo> honoo = [];
-    honoo.add(Honoo(0,'Ricambio\nil tuo sorriso malizioso.\nLe nostre arie da reduci\nnon ci incantano.' , 'https://i.imgur.com/o0uGbQr.png', '', '', '', HonooType.moon));
-    honoo.add(Honoo(0,'Solo una foto,\nnessuna domanda.\nMa so che ricordi\nla vecchia risposta.\n' , 'https://i.imgur.com/F2Udf4s.png', '', '', '', HonooType.moon));
-    honoo.add(Honoo(0,'Papà,\nma tu mi vuoi bene?\n' , 'https://i.imgur.com/0yMYcNp.png', '', '', '', HonooType.moon));
-    honoo.add(Honoo(0,'Gli abissi degli altri\nsembrano sempre\no\nfrivoli\no\nincomprensibili.\n' , 'https://i.imgur.com/IzA73qo.png', '', '', '', HonooType.moon));
-    return honoo;
+  // Cache
+  final List<Honoo> _personal = [];
+  final ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
+  final ValueNotifier<int> version = ValueNotifier<int>(0);
+
+  String get _uid => Supabase.instance.client.auth.currentUser!.id;
+
+  List<Honoo> get personal => List.unmodifiable(_personal);
+
+  /// Carica dallo scrigno (destination='chest') – niente mock
+  Future<void> loadChest() async {
+    isLoading.value = true;
+    try {
+      final chest = await HonooService.fetchUserHonoo(_uid, 'chest');
+
+      // Popola cache iniziale
+      _personal
+        ..clear()
+        ..addAll(chest);
+
+      // === Calcolo hasReplies con una query IN (...) su reply_to ===
+      // prendo tutti gli uuid (dbId) disponibili
+      final ids = _personal.map((h) => h.dbId).whereType<String>().toList();
+      if (ids.isNotEmpty) {
+        final client = Supabase.instance.client;
+        final rows = await client
+            .from('honoo')
+            .select('reply_to')
+            .in_('reply_to', ids);
+
+        // reply_to presenti → esistono risposte
+        final repliedParents = <String>{};
+        for (final row in (rows as List)) {
+          final p = row['reply_to']?.toString();
+          if (p != null) repliedParents.add(p);
+        }
+
+        // marca i tuoi honoo personali che hanno risposte
+        for (var i = 0; i < _personal.length; i++) {
+          final h = _personal[i];
+          final has = h.dbId != null && repliedParents.contains(h.dbId);
+          if (has != h.hasReplies) {
+            _personal[i] = h.copyWith(hasReplies: has);
+          }
+        }
+      }
+
+      // NB: isFromMoonSaved resta quello che arriva da DB (o false se non hai colonna)
+      version.value++;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  List<List<Honoo>> getChestHonoo () {
-    List<Honoo> personalHonoo = getPersonalHonoo();
-    List<Honoo> answerHonoo = getAnswerHonoo();
-    return [personalHonoo, answerHonoo];
+
+  /// History (thread) per un honoo: include il padre e le sue reply
+  Future<List<Honoo>> getHonooHistory(Honoo honoo) async {
+    final id = honoo.dbId;
+    if (id == null) {
+      // se non hai l'uuid (dbId), ritorna almeno la card corrente
+      return [honoo];
+    }
+
+    final client = Supabase.instance.client;
+
+    // Prendiamo l'honoo originale + tutte le reply collegate
+    // or('id.eq.<id>,reply_to.eq.<id>')
+    final rows = await client
+        .from('honoo')
+        .select('id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id')
+        .or('id.eq.$id,reply_to.eq.$id')
+        .order('created_at', ascending: true);
+
+    final List<Honoo> thread = (rows as List)
+        .map((m) => Honoo.fromMap(m as Map<String, dynamic>))
+        .toList();
+
+    // opzionale: marca il primo come personal/moon e le altre come answer se necessario
+    return thread;
   }
 
-  List<Honoo> getPersonalHonoo() {
-    List<Honoo> personalHonoo = [
-      Honoo(0,'Ricambio\nil tuo sorriso malizioso.\nLe nostre arie da reduci\nnon ci incantano.' , 'https://previews.123rf.com/images/zhannagazova/zhannagazova1909/zhannagazova190900039/130260967-gravel-texture-and-strip-grass-as-background.jpg', '', '', '', HonooType.personal),
-      Honoo(0,'Ricambio\nil tuo sorriso malizioso.\nLe nostre arie da reduci\nnon ci incantano.' , 'https://previews.123rf.com/images/zhannagazova/zhannagazova1909/zhannagazova190900039/130260967-gravel-texture-and-strip-grass-as-background.jpg', '', '', '', HonooType.personal),
-    ];
-    return personalHonoo;
+  /// (Esempio) Spedisci sulla Luna: aggiorna a 'moon' su DB, poi cache
+  Future<void> sendToMoon(Honoo h) async {
+    final id = h.dbId;
+    if (id == null) return;
+    // TODO: implementa un update a DB (HonooService.updateDestination)
+    // await HonooService.updateDestination(id, 'moon');
+
+    final idx = _personal.indexWhere((x) => x.dbId == id);
+    if (idx >= 0) {
+      _personal[idx] = _personal[idx].copyWith(type: HonooType.moon);
+      version.value++;
+    }
   }
 
-  List<Honoo> getAnswerHonoo() {
-    List<Honoo> answerHonoo = [
-      Honoo(0,'Ricambio\nil tuo sorriso malizioso.\nLe nostre arie da reduci\nnon ci incantano.', 'https://previews.123rf.com/images/zhannagazova/zhannagazova1909/zhannagazova190900039/130260967-gravel-texture-and-strip-grass-as-background.jpg', '', '', '', HonooType.moon),
-      Honoo(0,'Ricambio\nil tuo sorriso malizioso.\nLe nostre arie da reduci\nnon ci incantano.', 'https://previews.123rf.com/images/zhannagazova/zhannagazova1909/zhannagazova190900039/130260967-gravel-texture-and-strip-grass-as-background.jpg', '', '', '', HonooType.answer),
-      Honoo(0,'Ricambio\nil tuo sorriso malizioso.\nLe nostre arie da reduci\nnon ci incantano.', 'https://previews.123rf.com/images/zhannagazova/zhannagazova1909/zhannagazova190900039/130260967-gravel-texture-and-strip-grass-as-background.jpg', '', '', '', HonooType.answer),
-    ];
-    return answerHonoo;
+  /// (Esempio) Cancella su DB, poi da cache
+  Future<void> deleteHonoo(Honoo h) async {
+    final id = h.dbId;
+    if (id == null) return;
+    // TODO: await HonooService.deleteHonoo(id);
+    _personal.removeWhere((x) => x.dbId == id);
+    version.value++;
   }
-
-  List<Honoo> getHonooHistory(Honoo honoo) {
-    //TODO: retrieve honoo history from db for user
-    List<Honoo> honooHistory = [];
-    honooHistory.add(Honoo(0,'Ricambio\nil tuo sorriso malizioso.\nLe nostre arie da reduci\nnon ci incantano.', 'https://previews.123rf.com/images/zhannagazova/zhannagazova1909/zhannagazova190900039/130260967-gravel-texture-and-strip-grass-as-background.jpg', '', '', '', HonooType.personal));
-    honooHistory.add(Honoo(0,'Ricambio\nil tuo sorriso malizioso.\nLe nostre arie da reduci\nnon ci incantano.', 'https://previews.123rf.com/images/zhannagazova/zhannagazova1909/zhannagazova190900039/130260967-gravel-texture-and-strip-grass-as-background.jpg', '', '', '', HonooType.answer));
-    honooHistory.add(Honoo(0,'Ricambio\nil tuo sorriso malizioso.\nLe nostre arie da reduci\nnon ci incantano.', 'https://previews.123rf.com/images/zhannagazova/zhannagazova1909/zhannagazova190900039/130260967-gravel-texture-and-strip-grass-as-background.jpg', '', '', '', HonooType.personal));
-    honooHistory.add(Honoo(0,'Ricambio\nil tuo sorriso malizioso.\nLe nostre arie da reduci\nnon ci incantano.', 'https://previews.123rf.com/images/zhannagazova/zhannagazova1909/zhannagazova190900039/130260967-gravel-texture-and-strip-grass-as-background.jpg', '', '', '', HonooType.answer));
-    return honooHistory;
-  }
-
 }

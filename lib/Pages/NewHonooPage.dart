@@ -64,14 +64,20 @@ class _NewHonooPageState extends State<NewHonooPage> {
       try {
         await HonooService.publishHonoo(newHonoo);
 
+        if (!mounted) return; // evita usare context se la pagina è stata smontata
         // ✅ Vai subito allo scrigno
         Navigator.pushReplacementNamed(context, '/chest');
-      } catch (e) {
-        print("Errore durante il salvataggio dell'honoo: $e");
+      } catch (e, st) {
+        debugPrint('publishHonoo failed: $e\n$st'); // stampa il messaggio reale
+        if (mounted) {
+          final msg = e.toString();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Errore: $msg')),
+          );
+        }
       }
     }
   }
-
 
 
   @override

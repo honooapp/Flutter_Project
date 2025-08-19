@@ -43,6 +43,6 @@ class HonooService {
 
   /// Pubblica un nuovo honoo su Supabase
   static Future<void> publishHonoo(Honoo honoo) async {
-    await _client.from('honoo').insert(honoo.toMap());
+    await _client.from('honoo').insert(honoo.toInsertMap());
   }
 }

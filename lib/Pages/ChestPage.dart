@@ -2,19 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../Controller/DeviceController.dart';
-// MOCK: HonooController().getChestHonoo() era usato per simulare i dati locali
-// Ora i dati reali vengono caricati da Supabase attraverso HonooService.fetchUserHonoo(...)
 import '../Controller/HonooController.dart';
-
 import '../Entites/Honoo.dart';
-import '../Services/HonooService.dart';
 import '../UI/HonooCard.dart';
 import '../Utility/HonooColors.dart';
 import '../Utility/Utility.dart';
-import 'ComingSoonPage.dart';
 
 class ChestPage extends StatefulWidget {
   const ChestPage({super.key});
@@ -24,153 +18,194 @@ class ChestPage extends StatefulWidget {
 }
 
 class _ChestPageState extends State<ChestPage> {
-  int currentCarouselIndex = 0;
+  final _pageCtrl = PageController();
+  final HonooController ctrl = HonooController();
 
-  List<Honoo> _personalHonoo = [];
-  List<Honoo> _receivedHonoo = [];
-  bool _isLoading = true;
-
-  final userId = Supabase.instance.client.auth.currentUser!.id;
-
+  int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _loadChestHonoo();
+    ctrl.loadChest(); // carica dallo scrigno (DB), niente mock
   }
 
-  Future<void> _loadChestHonoo() async {
-    try {
-      // Recupero degli honoo personali e ricevuti
-      final personal = await HonooService.fetchUserHonoo(userId, 'chest');
-      final received = await HonooService.fetchRepliesForUser(userId);
-
-      // Controllo dati ricevuti
-      if (personal.isEmpty && received.isEmpty) {
-        print("Nessun honoo trovato nella chest.");
-      }
-
-      setState(() {
-        _personalHonoo = personal;
-        _receivedHonoo = received;
-        _isLoading = false;
-      });
-
-    } catch (e) {
-      print("Errore caricamento honoo da Supabase: $e");
-      setState(() {
-        _isLoading = false;
-      });
-    }
+  @override
+  void dispose() {
+    _pageCtrl.dispose();
+    super.dispose();
   }
 
+  // Helper per footer dinamico
+  bool _isPersonal(Honoo h) => h.type == HonooType.personal;
+  bool _hasReplies(Honoo h) => h.hasReplies == true;
+  bool _isFromMoonSaved(Honoo h) => h.isFromMoonSaved == true;
 
-  Widget get moreButton => IconButton(
-    icon: SvgPicture.asset(
-      "assets/icons/reply.svg",
-      semanticsLabel: 'Reply',
-    ),
-    iconSize: 60,
-    splashRadius: 25,
-    onPressed: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ComingSoonPage(
-            header: "Honoo ricevuti",
-            quote: "Un giorno anche tu riceverai un honoo.",
-            bibliography: "",
+  Widget _footerFor(Honoo? current) {
+    if (current == null) {
+      return SizedBox(
+        height: 60,
+        child: Center(
+          child: IconButton(
+            icon: SvgPicture.asset("assets/icons/home.svg", semanticsLabel: 'Home'),
+            iconSize: 60,
+            splashRadius: 25,
+            onPressed: () => Navigator.pop(context),
           ),
         ),
       );
-    },
-  );
+    }
+
+    final actions = <Widget>[
+      IconButton(
+        icon: SvgPicture.asset("assets/icons/home.svg", semanticsLabel: 'Home'),
+        iconSize: 60,
+        splashRadius: 25,
+        onPressed: () => Navigator.pop(context),
+      ),
+      SizedBox(width: 5.w),
+    ];
+
+    if (_isPersonal(current) && !_hasReplies(current) && !_isFromMoonSaved(current)) {
+      // Spedisci sulla Luna (tua bozza -> aggiornerai il service)
+      actions.add(IconButton(
+        icon: const Icon(Icons.rocket_launch_outlined),
+        iconSize: 32,
+        splashRadius: 25,
+        color: Colors.white,
+        tooltip: 'Spedisci sulla Luna',
+        onPressed: () => ctrl.sendToMoon(current),
+      ));
+    } else if (_hasReplies(current) && !_isFromMoonSaved(current)) {
+      // Vedi risposte
+      actions.add(IconButton(
+        icon: SvgPicture.asset("assets/icons/reply.svg", semanticsLabel: 'Reply'),
+        iconSize: 60,
+        splashRadius: 25,
+        tooltip: 'Vedi risposte',
+        onPressed: () {
+          // TODO: apri ConversationPage con questo honoo
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Vedi risposte — coming soon')),
+          );
+        },
+      ));
+    } else if (_isFromMoonSaved(current)) {
+      // Rispondi a honoo salvato dalla Luna
+      actions.add(IconButton(
+        icon: SvgPicture.asset("assets/icons/reply.svg", semanticsLabel: 'Rispondi'),
+        iconSize: 60,
+        splashRadius: 25,
+        color: Colors.white,
+        tooltip: 'Rispondi',
+        onPressed: () {
+          // TODO: apri composer risposta
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Rispondi — coming soon')),
+          );
+        },
+      ));
+    }
+
+    // Cancella sempre
+    actions.addAll([
+      SizedBox(width: 5.w),
+      IconButton(
+        icon: const Icon(Icons.delete_outline),
+        iconSize: 32,
+        splashRadius: 25,
+        color: Colors.white,
+        tooltip: 'Cancella',
+        onPressed: () => ctrl.deleteHonoo(current),
+      ),
+    ]);
+
+    return SizedBox(
+      height: 60,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: actions,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final isPhone = DeviceController().isPhone();
+    final size = MediaQuery.of(context).size;
+
+    const titleH = 60.0;
+    const footerH = 60.0;
+
     return Scaffold(
       backgroundColor: HonooColor.background,
-      body: Column(
-        children: [
-          SizedBox(
-            height: 60,
-            child: Center(
-              child: Text(
-                Utility().appName,
-                style: GoogleFonts.libreFranklin(
-                  color: HonooColor.secondary,
-                  fontSize: 30,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-          Row(
-            children: [
-              Expanded(child: Container()),
-              Container(
-                constraints: DeviceController().isPhone()
-                    ? BoxConstraints(maxWidth: 100.w, maxHeight: 100.h - 60)
-                    : BoxConstraints(maxWidth: 50.w, maxHeight: 100.h - 60),
-                child: Column(
+      body: SafeArea(
+        child: AnimatedBuilder(
+          animation: Listenable.merge([ctrl.isLoading, ctrl.version]),
+          builder: (context, _) {
+            final personal = ctrl.personal;
+            final Honoo? current = personal.isEmpty ? null : personal[_currentIndex];
+
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                final availH = constraints.maxHeight;
+                final centerH = (availH - titleH - footerH).clamp(0.0, double.infinity);
+                final maxW = isPhone ? size.width * 0.96 : size.width * 0.5;
+
+                return Column(
                   children: [
-                    Expanded(
-                      child: PageView.builder(
-                        itemCount: _personalHonoo.length,
-                        onPageChanged: (index) {
-                          setState(() {
-                            currentCarouselIndex = index;
-                          });
-                        },
-                        itemBuilder: (context, index) {
-                          return HonooCard(honoo: _personalHonoo[index]);
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: Align(
-                        alignment: FractionalOffset.bottomCenter,
-                        child: SizedBox(
-                          height: 60,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              IconButton(
-                                icon: SvgPicture.asset(
-                                  "assets/icons/home.svg",
-                                  semanticsLabel: 'Home',
-                                ),
-                                iconSize: 60,
-                                splashRadius: 25,
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                              ),
-                              currentCarouselIndex >= _personalHonoo.length - 1
-                                  ? Padding(padding: EdgeInsets.only(left: 5.w))
-                                  : Container(),
-                              currentCarouselIndex >= _personalHonoo.length - 1
-                                  ? moreButton
-                                  : Container(),
-                              currentCarouselIndex < _personalHonoo.length - 1
-                                  ? Padding(padding: EdgeInsets.only(left: 5.w))
-                                  : Container(),
-                              currentCarouselIndex < _personalHonoo.length - 1
-                                  ? Container()
-                                  : Container(),
-                            ],
+                    // HEADER
+                    SizedBox(
+                      height: titleH,
+                      child: Center(
+                        child: Text(
+                          Utility().appName,
+                          style: GoogleFonts.libreFranklin(
+                            color: HonooColor.secondary,
+                            fontSize: 30,
+                            fontWeight: FontWeight.w500,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
+
+                    // CENTRO: carosello
+                    Expanded(
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: maxW, maxHeight: centerH),
+                          child: ctrl.isLoading.value
+                              ? const Center(child: CircularProgressIndicator())
+                              : (personal.isEmpty
+                              ? Center(
+                            child: Text(
+                              'Nessun honoo nello scrigno',
+                              style: GoogleFonts.libreFranklin(
+                                color: HonooColor.onBackground,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          )
+                              : PageView.builder(
+                            controller: _pageCtrl,
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: personal.length,
+                            onPageChanged: (i) => setState(() => _currentIndex = i),
+                            itemBuilder: (context, index) => HonooCard(honoo: personal[index]),
+                          )),
+                        ),
+                      ),
+                    ),
+
+                    // FOOTER dinamico
+                    _footerFor(current),
                   ],
-                ),
-              ),
-              Expanded(child: Container()),
-            ],
-          ),
-        ],
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

@@ -1,53 +1,72 @@
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
-import 'package:honoo/Controller/HonooController.dart';
-import 'package:honoo/UI/HonooCard.dart';
-import 'package:honoo/Utility/HonooColors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-
-import '../Controller/DeviceController.dart';
-import '../Entites/Honoo.dart';
-import '../Utility/Utility.dart';
 import 'package:sizer/sizer.dart';
 
+import 'package:honoo/Controller/DeviceController.dart';
+import 'package:honoo/Controller/HonooController.dart';
+import 'package:honoo/Entites/Honoo.dart';
+import 'package:honoo/UI/HonooCard.dart';
+import 'package:honoo/Utility/HonooColors.dart';
+import 'package:honoo/Utility/Utility.dart';
 
 class ConversationPage extends StatefulWidget {
   const ConversationPage({super.key, required this.honoo});
-  
+
   final Honoo honoo;
-  
+
   @override
   State<ConversationPage> createState() => _ConversationPageState();
 }
 
 class _ConversationPageState extends State<ConversationPage> {
+  final cs.CarouselController _carouselController = cs.CarouselController();
 
-  cs.CarouselController carouselController = cs.CarouselController();
+  bool _isLoading = true;
+  List<Honoo> _thread = []; // padre + reply in ordine cronologico
 
-  List<Widget> honooCards = [];
-
-  void buildHonooHistoryCards() {
-    HonooController().getHonooHistory(widget.honoo).forEach((element) {
-      honooCards.add(HonooCard(honoo: element));
-    });
+  @override
+  void initState() {
+    super.initState();
+    _loadHistory();
   }
 
+  Future<void> _loadHistory() async {
+    try {
+      final list = await HonooController().getHonooHistory(widget.honoo);
+      if (!mounted) return;
+      setState(() {
+        _thread = list;
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('getHonooHistory error: $e');
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Errore nel caricamento conversazione: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final isPhone = DeviceController().isPhone();
 
-    buildHonooHistoryCards();
+    final constraints = isPhone
+        ? BoxConstraints(maxWidth: 85.w, maxHeight: 100.h - 120)
+        : BoxConstraints(maxWidth: 50.w, maxHeight: 100.h - 120);
 
     return Scaffold(
       backgroundColor: HonooColor.background,
       body: Column(
         children: [
+          // HEADER
           SizedBox(
             height: 60,
-            child: Center( 
-              child:Text(
+            child: Center(
+              child: Text(
                 Utility().appName,
                 style: GoogleFonts.libreFranklin(
                   color: HonooColor.secondary,
@@ -58,69 +77,92 @@ class _ConversationPageState extends State<ConversationPage> {
               ),
             ),
           ),
+
+          // CONTENUTO
           Row(
             children: [
-              Expanded(child: Container()),
+              const Expanded(child: SizedBox()),
               Container(
-                constraints: DeviceController().isPhone() ? BoxConstraints(maxWidth: 85.w, maxHeight: 100.h -120) : BoxConstraints(maxWidth: 50.w, maxHeight: 100.h - 120),
-                child:Column(
+                constraints: constraints,
+                child: Column(
                   children: [
                     Expanded(
-                      child: cs.CarouselSlider(
-                        carouselController: carouselController,
+                      child: _isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : (_thread.isEmpty
+                          ? Center(
+                        child: Text(
+                          'Nessuna conversazione',
+                          style: GoogleFonts.libreFranklin(
+                            color: HonooColor.onBackground,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      )
+                          : cs.CarouselSlider(
+                        carouselController: _carouselController,
                         options: cs.CarouselOptions(
                           scrollDirection: Axis.vertical,
                           height: 100.h,
-                          aspectRatio: 9/16,
+                          aspectRatio: 9 / 16,
                           enlargeCenterPage: true,
                           enableInfiniteScroll: false,
                         ),
-                        items: honooCards,
-                      ),
+                        items: _thread
+                            .map((h) => HonooCard(honoo: h))
+                            .toList(),
+                      )),
                     ),
+
+                    // FOOTER
                     SizedBox(
                       height: 60,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          IconButton(icon: SvgPicture.asset(
-                            color: HonooColor.onBackground,
-                            "assets/icons/home.svg",
-                            semanticsLabel: 'Home',
+                          IconButton(
+                            icon: SvgPicture.asset(
+                              "assets/icons/home.svg",
+                              color: HonooColor.onBackground,
+                              semanticsLabel: 'Home',
+                            ),
+                            iconSize: 60,
+                            splashRadius: 25,
+                            onPressed: () => Navigator.pop(context),
                           ),
-                          iconSize: 60,
-                          splashRadius: 25,
-                          onPressed: () {
-                            Navigator.pop(context);
-                          }),
-                          Padding(padding: EdgeInsets.only(left: 5.w)),
-                          IconButton(icon: SvgPicture.asset(
-                            "assets/icons/broken_heart.svg",
-                            semanticsLabel: 'Broken heart',
+                          SizedBox(width: 5.w),
+                          IconButton(
+                            icon: SvgPicture.asset(
+                              "assets/icons/broken_heart.svg",
+                              semanticsLabel: 'Broken heart',
+                            ),
+                            iconSize: 60,
+                            splashRadius: 25,
+                            onPressed: () {
+                              // TODO: azione "broken heart" (se prevista)
+                            },
                           ),
-                          iconSize: 60,
-                          splashRadius: 25,
-                          onPressed: () {
-                            //TODO: Add to favorites
-                          }),
-                          Padding(padding: EdgeInsets.only(left: 5.w)),
-                          IconButton(icon: SvgPicture.asset(
-                            color: HonooColor.onBackground,
-                            "assets/icons/reply.svg",
-                            semanticsLabel: 'Reply',
+                          SizedBox(width: 5.w),
+                          IconButton(
+                            icon: SvgPicture.asset(
+                              "assets/icons/reply.svg",
+                              color: HonooColor.onBackground,
+                              semanticsLabel: 'Reply',
+                            ),
+                            iconSize: 60,
+                            splashRadius: 25,
+                            onPressed: () {
+                              // TODO: apri composer risposta partendo da widget.honoo o dall'elemento corrente del carosello
+                            },
                           ),
-                          iconSize: 60,
-                          splashRadius: 25,
-                          onPressed: () {
-                            //TODO: reply
-                          }),
                         ],
                       ),
                     ),
                   ],
                 ),
               ),
-              Expanded(child: Container()),
+              const Expanded(child: SizedBox()),
             ],
           ),
         ],
