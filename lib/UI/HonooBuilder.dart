@@ -72,6 +72,9 @@ class _HonooBuilderState extends State<HonooBuilder> {
   static const int _maxLines = 5;
   static const int _capacity = 144;
 
+  static const double counterLift = 22.0;           // usata nel Positioned(top: -counterLift)
+  final GlobalKey _imageBoundaryKey = GlobalKey();  // usata nel RepaintBoundary
+
   @override
   void initState() {
     super.initState();
