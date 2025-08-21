@@ -1,20 +1,17 @@
-// HonooBuilder.dart — SOLO fix anti-salto responsive (eps + rimozione floor)
-import 'dart:io';
+// lib/UI/HonooBuilder.dart
 import 'dart:math' as math;
+import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../Utility/HonooColors.dart';
 import 'dart:ui' as ui;
 
-/// Formatter che impedisce di superare lo spazio visibile:
-/// - maxLines righe
-/// - maxLineLength caratteri per riga
+/// Limita testo a X righe e Y caratteri per riga
 class VisibleSpaceFormatter extends TextInputFormatter {
   final int maxLines;
   final int maxLineLength;
@@ -30,25 +27,15 @@ class VisibleSpaceFormatter extends TextInputFormatter {
       TextEditingValue newValue,
       ) {
     final rawLines = newValue.text.split('\n');
-
-    // Taglia numero righe
     final lines = rawLines.take(maxLines).toList();
-
-    // Taglia ogni riga alla lunghezza max
-    for (int i = 0; i < lines.length; i++) {
-      final l = lines[i];
-      if (l.length > maxLineLength) {
-        lines[i] = l.substring(0, maxLineLength);
+    for (var i = 0; i < lines.length; i++) {
+      if (lines[i].length > maxLineLength) {
+        lines[i] = lines[i].substring(0, maxLineLength);
       }
     }
-
     final clipped = lines.join('\n');
+    if (clipped == newValue.text) return newValue;
 
-    if (clipped == newValue.text) {
-      return newValue; // nessuna modifica → non toccare il cursore
-    }
-
-    // Ricompatta la selection
     final base = newValue.selection.baseOffset;
     final newOffset = math.min(clipped.length, math.max(0, base));
     return TextEditingValue(
@@ -60,7 +47,7 @@ class VisibleSpaceFormatter extends TextInputFormatter {
 }
 
 class HonooBuilder extends StatefulWidget {
-  final void Function(String text, String imagePath)? onHonooChanged;
+  final void Function(String text, String imageUrl)? onHonooChanged;
 
   const HonooBuilder({super.key, this.onHonooChanged});
 
@@ -69,19 +56,21 @@ class HonooBuilder extends StatefulWidget {
 }
 
 class _HonooBuilderState extends State<HonooBuilder> {
-  XFile? image;
-  ImageProvider<Object>? imageProvider;
   final TextEditingController _textCtrl = TextEditingController();
 
+  // Anteprima immagine
+  ImageProvider? imageProvider;
+
+  // URL pubblica finale caricata su Supabase (non-null per il callback)
+  String _publicImageUrl = '';
+
+  // Bucket pubblico su Supabase
+  static const String _bucketName = 'honoo-images';
+
+  // Limiti testo
   static const int _perLine = 32;
   static const int _maxLines = 5;
-  static const int _capacity = 144; // 144
-
-  void _emitChange() {
-    final cb = widget.onHonooChanged;
-    if (cb == null) return;
-    cb(_textCtrl.text, image?.path ?? '');
-  }
+  static const int _capacity = 144;
 
   @override
   void initState() {
@@ -96,20 +85,78 @@ class _HonooBuilderState extends State<HonooBuilder> {
     super.dispose();
   }
 
+  void _emitChange() {
+    widget.onHonooChanged?.call(_textCtrl.text, _publicImageUrl);
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    try {
+      final picker = ImagePicker();
+      final XFile? selected = await picker.pickImage(source: ImageSource.gallery);
+      if (selected == null) return;
+
+      // 1) Bytes per anteprima e upload (Web/iOS/Android)
+      final Uint8List bytes = await selected.readAsBytes();
+
+      // 2) Anteprima immediata (nessun blob:)
+      setState(() {
+        imageProvider = MemoryImage(bytes);
+      });
+
+      // 3) Upload su Supabase Storage (bucket pubblico)
+      final client = Supabase.instance.client;
+      final sanitized = _sanitizeFileName(selected.name);
+      final filename = '${DateTime.now().millisecondsSinceEpoch}_$sanitized';
+      final storagePath = 'uploads/$filename';
+
+      await client.storage.from(_bucketName).uploadBinary(
+        storagePath,
+        bytes,
+        fileOptions: FileOptions(
+          upsert: false,
+          contentType: _guessContentType(selected.name),
+        ),
+      );
+
+      // 4) Public URL HTTPS
+      final publicUrl = client.storage.from(_bucketName).getPublicUrl(storagePath);
+
+      // 5) Notifica il parent SOLO con URL pubblica https
+      setState(() => _publicImageUrl = publicUrl);
+      _emitChange();
+    } catch (e) {
+      debugPrint('Errore selezione/upload immagine: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Errore immagine: $e')),
+      );
+    }
+  }
+
+  String _guessContentType(String name) {
+    final ext = name.toLowerCase();
+    if (ext.endsWith('.png')) return 'image/png';
+    if (ext.endsWith('.webp')) return 'image/webp';
+    if (ext.endsWith('.gif')) return 'image/gif';
+    return 'image/jpeg';
+  }
+
+  String _sanitizeFileName(String name) {
+    // rimuove spazi e caratteri strani dal nome file
+    return name.replaceAll(RegExp(r'[^a-zA-Z0-9\.\-_]'), '_');
+  }
+
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Spazio disponibile (live), togliendo safe area + tastiera
-        final double availW = constraints.maxWidth.isFinite
-            ? constraints.maxWidth
-            : media.size.width;
+        final double availW =
+        constraints.maxWidth.isFinite ? constraints.maxWidth : media.size.width;
 
-        final double rawH = constraints.maxHeight.isFinite
-            ? constraints.maxHeight
-            : media.size.height;
+        final double rawH =
+        constraints.maxHeight.isFinite ? constraints.maxHeight : media.size.height;
 
         final double availH =
         (rawH - media.padding.vertical - media.viewInsets.bottom)
@@ -119,19 +166,12 @@ class _HonooBuilderState extends State<HonooBuilder> {
           return const SizedBox.shrink();
         }
 
-        // Parametri di layout
-        const double gap = 9.0;   // spazio tra box testo e immagine (lasciato com'era)
-        const double eps = 0.5;   // cuscinetto più piccolo → transizione fluida
-        const double counterLift = 22.0;
+        // layout: text box alto metà dell’immagine, sotto immagine quadrata
+        const double gap = 9.0;
+        const double eps = 0.5;
 
-        // Altezza totale = image/2 + gap + image = 1.5*image + gap
-        // Vincolo in altezza → image <= (availH - gap - eps) / 1.5
         final double maxByH = (availH - gap - eps) / 1.5;
-
-        // Lato del quadrato immagine limitato da larghezza e altezza
         final double imageSize = math.min(availW, maxByH);
-
-        // ❌ niente floorToDouble() → niente “salti” durante il resize
         final double textHeight = imageSize / 2;
         final double totalHeight = textHeight + gap + imageSize;
 
@@ -141,32 +181,29 @@ class _HonooBuilderState extends State<HonooBuilder> {
           return HonooColor.onBackground; // bianco
         }
 
-        final GlobalKey _imageBoundaryKey = GlobalKey(); // per catturare la cornice
-
-        // UI
         return Center(
           child: Card(
             color: HonooColor.background,
             elevation: 0,
             margin: EdgeInsets.zero,
-            clipBehavior: Clip.none, // lascia “uscire” il contatore
+            clipBehavior: Clip.none,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5),
             ),
             child: SizedBox(
-              width: imageSize,      // larghezza blocco = lato del quadrato
-              height: totalHeight,   // 1.5 × lato + gap
+              width: imageSize,
+              height: totalHeight,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // ======== SEZIONE TESTO ========
+                  // ======== BOX TESTO ========
                   SizedBox(
                     width: imageSize,
                     height: textHeight,
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        // ✅ Contatore in alto a destra, fuori dal box bianco
+                        // Contatore in alto a destra
                         Positioned(
                           right: 5,
                           top: -counterLift,
@@ -187,8 +224,7 @@ class _HonooBuilderState extends State<HonooBuilder> {
                             },
                           ),
                         ),
-
-                        // Box di testo (bianco)
+                        // Area di testo
                         Positioned.fill(
                           child: Container(
                             padding: const EdgeInsets.all(8),
@@ -204,7 +240,6 @@ class _HonooBuilderState extends State<HonooBuilder> {
                                 ),
                               ],
                             ),
-                            // TextField che RIEMPIE il box e centra verticalmente hint+testo
                             child: ValueListenableBuilder<TextEditingValue>(
                               valueListenable: _textCtrl,
                               builder: (context, value, _) {
@@ -214,20 +249,20 @@ class _HonooBuilderState extends State<HonooBuilder> {
 
                                 return TextField(
                                   controller: _textCtrl,
-                                  textAlign: TextAlign.center,                 // centro orizzontale
-                                  textAlignVertical: TextAlignVertical.center, // centro verticale
-                                  expands: true,   // riempie tutto il box bianco
+                                  textAlign: TextAlign.center,
+                                  textAlignVertical: TextAlignVertical.center,
+                                  expands: true,
                                   minLines: null,
                                   maxLines: null,
                                   keyboardType: TextInputType.multiline,
                                   inputFormatters: const [
                                     VisibleSpaceFormatter(
-                                      maxLines: _maxLines,   // 5
-                                      maxLineLength: _perLine, // 31
+                                      maxLines: _maxLines,
+                                      maxLineLength: _perLine,
                                     ),
                                   ],
                                   decoration: InputDecoration(
-                                    hintText: hint, // scompare appena scrivi
+                                    hintText: hint,
                                     hintStyle: GoogleFonts.libreFranklin(
                                       color: HonooColor.onTertiary.withOpacity(0.6),
                                       fontSize: 18,
@@ -251,29 +286,14 @@ class _HonooBuilderState extends State<HonooBuilder> {
                     ),
                   ),
 
-                  // GAP tra i due box
                   const SizedBox(height: gap),
 
-                  // ======== SEZIONE IMMAGINE (quadrata) ========
+                  // ======== BOX IMMAGINE (quadrata) ========
                   SizedBox(
                     width: imageSize,
                     height: imageSize,
                     child: GestureDetector(
-                      onTap: () async {
-                        final picker = ImagePicker();
-                        final selected =
-                        await picker.pickImage(source: ImageSource.gallery);
-                        if (selected != null) {
-                          setState(() {
-                            image = selected;
-                            imageProvider = kIsWeb
-                                ? NetworkImage(image!.path)
-                                : FileImage(File(image!.path))
-                            as ImageProvider<Object>;
-                          });
-                          _emitChange();
-                        }
-                      },
+                      onTap: _pickAndUploadImage,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(5),
                         child: Container(

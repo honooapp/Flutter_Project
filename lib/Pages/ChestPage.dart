@@ -7,8 +7,12 @@ import '../Controller/DeviceController.dart';
 import '../Controller/HonooController.dart';
 import '../Entites/Honoo.dart';
 import '../UI/HonooCard.dart';
+import '../UI/HonooThreadView.dart';
 import '../Utility/HonooColors.dart';
 import '../Utility/Utility.dart';
+import 'dart:math' as math;
+import 'package:carousel_slider/carousel_slider.dart' as cs;
+
 
 class ChestPage extends StatefulWidget {
   const ChestPage({super.key});
@@ -26,7 +30,7 @@ class _ChestPageState extends State<ChestPage> {
   @override
   void initState() {
     super.initState();
-    ctrl.loadChest(); // carica dallo scrigno (DB), niente mock
+    ctrl.loadChest(); // carica dallo scrigno (DB)
   }
 
   @override
@@ -35,7 +39,7 @@ class _ChestPageState extends State<ChestPage> {
     super.dispose();
   }
 
-  // Helper per footer dinamico
+  // --- helper menu dinamico
   bool _isPersonal(Honoo h) => h.type == HonooType.personal;
   bool _hasReplies(Honoo h) => h.hasReplies == true;
   bool _isFromMoonSaved(Honoo h) => h.isFromMoonSaved == true;
@@ -60,62 +64,77 @@ class _ChestPageState extends State<ChestPage> {
         icon: SvgPicture.asset("assets/icons/home.svg", semanticsLabel: 'Home'),
         iconSize: 60,
         splashRadius: 25,
+        color: HonooColor.onBackground,
         onPressed: () => Navigator.pop(context),
       ),
       SizedBox(width: 5.w),
     ];
 
     if (_isPersonal(current) && !_hasReplies(current) && !_isFromMoonSaved(current)) {
-      // Spedisci sulla Luna (tua bozza -> aggiornerai il service)
-      actions.add(IconButton(
-        icon: const Icon(Icons.rocket_launch_outlined),
-        iconSize: 32,
-        splashRadius: 25,
-        color: Colors.white,
-        tooltip: 'Spedisci sulla Luna',
-        onPressed: () => ctrl.sendToMoon(current),
-      ));
+      // Spedisci sulla Luna
+      actions.add(
+        IconButton(
+          icon: const Icon(Icons.rocket_launch_outlined),
+          iconSize: 32,
+          splashRadius: 25,
+          color: HonooColor.onBackground,
+          tooltip: 'Spedisci sulla Luna',
+          onPressed: () async {
+            final ok = await ctrl.sendToMoon(current);
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(ok ? 'Spedito sulla Luna ✨' : 'Errore nella spedizione.'),
+              ),
+            );
+
+            // opzionale: se rimuovi l’item, scorri alla pagina precedente se serve
+            if (ok && _currentIndex >= ctrl.personal.length && _currentIndex > 0) {
+              setState(() => _currentIndex = ctrl.personal.length - 1);
+            }
+          },
+        ),
+      );
     } else if (_hasReplies(current) && !_isFromMoonSaved(current)) {
-      // Vedi risposte
-      actions.add(IconButton(
-        icon: SvgPicture.asset("assets/icons/reply.svg", semanticsLabel: 'Reply'),
-        iconSize: 60,
-        splashRadius: 25,
-        tooltip: 'Vedi risposte',
-        onPressed: () {
-          // TODO: apri ConversationPage con questo honoo
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Vedi risposte — coming soon')),
-          );
-        },
-      ));
+      // Vedi risposte (apri thread, ma qui il thread è già verticale nella pagina)
+      actions.add(
+        IconButton(
+          icon: SvgPicture.asset("assets/icons/reply.svg", semanticsLabel: 'Reply'),
+          iconSize: 60,
+          splashRadius: 25,
+          tooltip: 'Vedi risposte',
+          onPressed: () {
+            // opzionale: potresti scrollare subito in alto nel verticale
+            // (vedi HonooThreadView per gestire animateToPage)
+          },
+        ),
+      );
     } else if (_isFromMoonSaved(current)) {
       // Rispondi a honoo salvato dalla Luna
-      actions.add(IconButton(
-        icon: SvgPicture.asset("assets/icons/reply.svg", semanticsLabel: 'Rispondi'),
-        iconSize: 60,
-        splashRadius: 25,
-        color: Colors.white,
-        tooltip: 'Rispondi',
-        onPressed: () {
-          // TODO: apri composer risposta
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Rispondi — coming soon')),
-          );
-        },
-      ));
+      actions.add(
+        IconButton(
+          icon: SvgPicture.asset("assets/icons/reply.svg", semanticsLabel: 'Rispondi'),
+          iconSize: 60,
+          splashRadius: 25,
+          color: HonooColor.onBackground,
+          tooltip: 'Rispondi',
+          onPressed: () {
+            // TODO: apri composer risposta (NewHonooPage) con replyTo=current.dbId
+          },
+        ),
+      );
     }
 
-    // Cancella sempre
+    // Cancella (sempre)
     actions.addAll([
       SizedBox(width: 5.w),
       IconButton(
         icon: const Icon(Icons.delete_outline),
         iconSize: 32,
         splashRadius: 25,
-        color: Colors.white,
+        color: HonooColor.onBackground,
         tooltip: 'Cancella',
-        onPressed: () => ctrl.deleteHonoo(current),
+        onPressed: () => ctrl.deleteHonoo(current), // collega al tuo service
       ),
     ]);
 
@@ -142,7 +161,7 @@ class _ChestPageState extends State<ChestPage> {
         child: AnimatedBuilder(
           animation: Listenable.merge([ctrl.isLoading, ctrl.version]),
           builder: (context, _) {
-            final personal = ctrl.personal;
+            final personal = ctrl.personal; // include anche quelli salvati dalla luna (flag)
             final Honoo? current = personal.isEmpty ? null : personal[_currentIndex];
 
             return LayoutBuilder(
@@ -169,7 +188,7 @@ class _ChestPageState extends State<ChestPage> {
                       ),
                     ),
 
-                    // CENTRO: carosello
+                    // --- CENTRO: carosello orizzontale senza peek + gutter esterno + gutter interno ---
                     Expanded(
                       child: Center(
                         child: ConstrainedBox(
@@ -187,18 +206,36 @@ class _ChestPageState extends State<ChestPage> {
                               ),
                             ),
                           )
-                              : PageView.builder(
-                            controller: _pageCtrl,
-                            physics: const BouncingScrollPhysics(),
-                            itemCount: personal.length,
-                            onPageChanged: (i) => setState(() => _currentIndex = i),
-                            itemBuilder: (context, index) => HonooCard(honoo: personal[index]),
+                              : Padding(
+                            // GUTTER ESTERNO: distanzia il carosello dal bordo schermo
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: cs.CarouselSlider.builder(
+                              itemCount: personal.length,
+                              options: cs.CarouselOptions(
+                                height: centerH,
+                                viewportFraction: 1.0,                  // nessun peek
+                                enableInfiniteScroll: false,
+                                padEnds: true,                          // margine primo/ultimo
+                                enlargeCenterPage: false,               // no enlarge orizzontale
+                                scrollPhysics: const BouncingScrollPhysics(),
+                                onPageChanged: (i, _) => setState(() => _currentIndex = i),
+                              ),
+                              itemBuilder: (context, index, realIdx) {
+                                return Padding(
+                                  // GUTTER INTERNO: margine garantito per ogni pagina
+                                  // (anche se il carosello è strettissimo)
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  child: HonooThreadView(root: personal[index]),
+                                );
+                              },
+                            ),
                           )),
                         ),
                       ),
                     ),
 
-                    // FOOTER dinamico
+
+                    // FOOTER dinamico in base all'honoo corrente
                     _footerFor(current),
                   ],
                 );

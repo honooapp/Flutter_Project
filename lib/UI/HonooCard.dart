@@ -15,7 +15,6 @@ class HonooCard extends StatelessWidget {
     final media = MediaQuery.of(context);
 
     Color cardBg;
-
     switch (honoo.type) {
       case HonooType.moon:
         cardBg = HonooColor.tertiary;
@@ -24,63 +23,50 @@ class HonooCard extends StatelessWidget {
         cardBg = HonooColor.secondary;
         break;
       case HonooType.personal:
-        cardBg = HonooColor.background;
-        break;
       default:
         cardBg = HonooColor.background;
+        break;
     }
-
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Vincoli disponibili (live)
-        final double availW = constraints.maxWidth.isFinite
-            ? constraints.maxWidth
-            : media.size.width;
-
-        final double rawH = constraints.maxHeight.isFinite
-            ? constraints.maxHeight
-            : media.size.height;
-
-        // Nessuna tastiera qui, ma rispettiamo le safe areas
-        final double availH =
-        (rawH - media.padding.vertical).clamp(0.0, double.infinity);
+        final double availW =
+        constraints.maxWidth.isFinite ? constraints.maxWidth : media.size.width;
+        final double rawH =
+        constraints.maxHeight.isFinite ? constraints.maxHeight : media.size.height;
+        final double availH = (rawH - media.padding.vertical).clamp(0.0, double.infinity);
 
         if (availW <= 0 || availH <= 0) {
           return const SizedBox.shrink();
         }
 
-        // Parametri layout (identici al builder)
-        const double gap = 9.0;   // spazio tra box testo e immagine
-        const double eps = 0.5;   // cuscinetto anti-rounding ridotto
-
-        // Altezza totale = (image/2) + gap + image = 1.5*image + gap
-        // Vincolo per altezza → image <= (availH - gap - eps) / 1.5
+        // Parametri layout
+        const double gap = 9.0; // spazio tra box testo e immagine
+        const double eps = 0.5; // cuscinetto anti-rounding
         final double maxByH = (availH - gap - eps) / 1.5;
-
-        // Lato del quadrato immagine limitato da larghezza e altezza
         final double imageSize = math.min(availW, maxByH);
-
-        // Dimensioni derivate (no floor → transizione fluida)
         final double textHeight = imageSize / 2;
         final double totalHeight = textHeight + gap + imageSize;
+
+        final String imageUrl = honoo.image.toString();
+        final bool hasImage = imageUrl.isNotEmpty;
 
         return Center(
           child: Card(
             color: cardBg,
             elevation: 0,
             margin: EdgeInsets.zero,
-            clipBehavior: Clip.none, // per coerenza con il builder
+            clipBehavior: Clip.none,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5),
             ),
             child: SizedBox(
-              width: imageSize,     // larghezza blocco = lato del quadrato
-              height: totalHeight,  // 1.5 × lato + gap
+              width: imageSize,
+              height: totalHeight,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // ======== SEZIONE TESTO (stesso look del builder) ========
+                  // ======== BOX TESTO ========
                   SizedBox(
                     width: imageSize,
                     height: textHeight,
@@ -100,7 +86,7 @@ class HonooCard extends StatelessWidget {
                       ),
                       child: Center(
                         child: Text(
-                          honoo.text ?? '',
+                          honoo.text, // se non-nullable nel modello
                           textAlign: TextAlign.center,
                           style: GoogleFonts.libreFranklin(
                             color: HonooColor.onTertiary,
@@ -108,7 +94,7 @@ class HonooCard extends StatelessWidget {
                             height: 1.4,
                             fontWeight: FontWeight.w400,
                           ),
-                          maxLines: 5, // come nel builder (limite logico)
+                          maxLines: 5,
                           overflow: TextOverflow.visible,
                         ),
                       ),
@@ -117,43 +103,49 @@ class HonooCard extends StatelessWidget {
 
                   const SizedBox(height: gap),
 
-                  // ======== SEZIONE IMMAGINE (quadrata) ========
+                  // ======== BOX IMMAGINE (stesso stile del box testo) ========
                   SizedBox(
                     width: imageSize,
                     height: imageSize,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(5),
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: HonooColor.tertiary,
-                          image: (honoo.image != null && honoo.image.toString().isNotEmpty)
-                              ? DecorationImage(
-                            image: NetworkImage(honoo.image),
-                            fit: BoxFit.cover,
-                          )
-                              : null,
-                        ),
-                        child: (honoo.image == null || honoo.image.toString().isEmpty)
-                            ? Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Carica qui la tua immagine',
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.libreFranklin(
-                                color: HonooColor.onSecondary,
-                                fontSize: 18,
-                              ),
-                            ),
-                            const SizedBox(height: 22),
-                            const Icon(
-                              Icons.photo,
-                              size: 48,
-                              color: HonooColor.primary,
-                            ),
-                          ],
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: HonooColor.tertiary,
+                        border: Border.all(color: Colors.black12),
+                        borderRadius: BorderRadius.circular(5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                        image: hasImage
+                            ? DecorationImage(
+                          image: NetworkImage(imageUrl),
+                          fit: BoxFit.cover,
                         )
-                            : const SizedBox.shrink(),
+                            : null,
+                      ),
+                      child: hasImage
+                          ? const SizedBox.shrink()
+                          : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Carica qui la tua immagine',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.libreFranklin(
+                              color: HonooColor.onSecondary,
+                              fontSize: 18,
+                            ),
+                          ),
+                          const SizedBox(height: 22),
+                          const Icon(
+                            Icons.photo,
+                            size: 48,
+                            color: HonooColor.primary,
+                          ),
+                        ],
                       ),
                     ),
                   ),

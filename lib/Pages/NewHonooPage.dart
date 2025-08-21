@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -6,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../Controller/DeviceController.dart';
 import '../Entites/Honoo.dart';
+import '../Services/HonooImageUploader.dart';
 import '../UI/HonooBuilder.dart';
 import '../Utility/Utility.dart';
 import 'package:sizer/sizer.dart';
@@ -36,7 +38,6 @@ class _NewHonooPageState extends State<NewHonooPage> {
     final user = Supabase.instance.client.auth.currentUser;
 
     if (user == null) {
-      // 👣 Utente non loggato → vai al login e poi torna qui
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -47,38 +48,74 @@ class _NewHonooPageState extends State<NewHonooPage> {
         ),
       );
       return;
-    } else {
-      // 👤 Utente loggato → crea e salva l'honoo
-      final newHonoo = Honoo(
-        0,
-        _text,
-        _imageUrl,
-        DateTime.now().toIso8601String(),
-        DateTime.now().toIso8601String(),
-        user.id,
-        HonooType.personal, // salviamo nello scrigno
-        null,
-        null,
-      );
+    }
 
-      try {
-        await HonooService.publishHonoo(newHonoo);
+    // Risolve in URL pubblica (web: rifiuta blob; mobile: da path fa upload)
+    final String? finalImageUrl = await _resolveFinalImageUrl(_imageUrl);
 
-        if (!mounted) return; // evita usare context se la pagina è stata smontata
-        // ✅ Vai subito allo scrigno
-        Navigator.pushReplacementNamed(context, '/chest');
-      } catch (e, st) {
-        debugPrint('publishHonoo failed: $e\n$st'); // stampa il messaggio reale
-        if (mounted) {
-          final msg = e.toString();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Errore: $msg')),
-          );
-        }
+    // 👮‍♀️ Guardia: immagine OBBLIGATORIA
+    if (finalImageUrl == null || finalImageUrl.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Devi caricare un’immagine (URL pubblico).')),
+        );
+      }
+      return;
+    }
+
+    final newHonoo = Honoo(
+      0,
+      _text,
+      finalImageUrl, // ✅ ora è sempre una https pubblica
+      DateTime.now().toIso8601String(),
+      DateTime.now().toIso8601String(),
+      user.id,
+      HonooType.personal,
+      null,
+      null,
+    );
+
+    try {
+      await HonooService.publishHonoo(newHonoo);
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/chest');
+    } catch (e, st) {
+      debugPrint('publishHonoo failed: $e\n$st');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Errore: $e')),
+        );
       }
     }
   }
 
+  /// Normalizza l'immagine per il salvataggio:
+  /// - se è HTTPS pubblico, la usa così com'è
+  /// - se è path locale (mobile), la carica su Supabase e ritorna la public URL
+  /// - se è blob: (web), non è utilizzabile qui → ritorna null con avviso
+  Future<String?> _resolveFinalImageUrl(String raw) async {
+    final s = (raw).trim();
+    if (s.isEmpty) return null;
+
+    // già una URL http/https → usala
+    if (s.startsWith('http://') || s.startsWith('https://')) {
+      return s;
+    }
+
+    // blob: su Web non è caricabile da qui (servono i bytes a monte)
+    if (kIsWeb && s.startsWith('blob:')) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Immagine locale (blob) non caricabile dal browser.')),
+        );
+      }
+      return null;
+    }
+
+    // Mobile: path locale → carica su Storage e ottieni public URL
+    final uploaded = await HonooImageUploader.uploadImageFromPath(s);
+    return uploaded; // può essere null in caso di errore
+  }
 
   @override
   Widget build(BuildContext context) {
