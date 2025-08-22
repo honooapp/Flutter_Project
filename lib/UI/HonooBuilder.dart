@@ -98,20 +98,30 @@ class _HonooBuilderState extends State<HonooBuilder> {
       final XFile? selected = await picker.pickImage(source: ImageSource.gallery);
       if (selected == null) return;
 
-      // 1) Bytes per anteprima e upload (Web/iOS/Android)
-      final Uint8List bytes = await selected.readAsBytes();
+      // 0) Guardia autenticazione
+      final client = Supabase.instance.client;
+      final session = client.auth.currentSession;
+      if (session == null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Devi essere loggato per caricare immagini.')),
+        );
+        return;
+      }
+      final uid = session.user.id;
 
-      // 2) Anteprima immediata (nessun blob:)
+      // 1) Anteprima locale immediata (no blob:)
+      final Uint8List bytes = await selected.readAsBytes();
       setState(() {
         imageProvider = MemoryImage(bytes);
       });
 
-      // 3) Upload su Supabase Storage (bucket pubblico)
-      final client = Supabase.instance.client;
+      // 2) Path per‑utente: "<uid>/uploads/<file>"
       final sanitized = _sanitizeFileName(selected.name);
       final filename = '${DateTime.now().millisecondsSinceEpoch}_$sanitized';
-      final storagePath = 'uploads/$filename';
+      final storagePath = '$uid/uploads/$filename';
 
+      // 3) Upload con content-type
       await client.storage.from(_bucketName).uploadBinary(
         storagePath,
         bytes,
@@ -121,11 +131,15 @@ class _HonooBuilderState extends State<HonooBuilder> {
         ),
       );
 
-      // 4) Public URL HTTPS
+      // 4) URL pubblica HTTPS
       final publicUrl = client.storage.from(_bucketName).getPublicUrl(storagePath);
 
-      // 5) Notifica il parent SOLO con URL pubblica https
-      setState(() => _publicImageUrl = publicUrl);
+      // 5) Salvo e notifico il parent con URL https
+      setState(() {
+        _publicImageUrl = publicUrl;
+        // opzionale: verifica CDN
+        // imageProvider = NetworkImage(_publicImageUrl);
+      });
       _emitChange();
     } catch (e) {
       debugPrint('Errore selezione/upload immagine: $e');
