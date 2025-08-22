@@ -88,7 +88,7 @@ class HonooCard extends StatelessWidget {
                         child: Text(
                           honoo.text, // se non-nullable nel modello
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.libreFranklin(
+                          style: GoogleFonts.arvo(
                             color: HonooColor.onTertiary,
                             fontSize: 18,
                             height: 1.4,

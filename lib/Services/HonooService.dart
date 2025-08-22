@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Entites/Honoo.dart';
 
@@ -57,15 +58,38 @@ class HonooService {
 
   /// Duplica un honoo dello scrigno pubblicandolo sulla Luna (nuova INSERT).
   /// Non tocca l'originale in 'chest'.
-  static Future<void> duplicateToMoon(Honoo h) async {
+  static Future<bool> duplicateToMoon(Honoo h) async {
+    final session = _client.auth.currentSession;
+    if (session == null) {
+      throw Exception('Nessuna sessione attiva');
+    }
+    final uid = session.user.id;
+
+    // esiste già?
+    final existing = await _client
+        .from('honoo')
+        .select('id')
+        .eq('user_id', uid)
+        .eq('destination', 'moon')
+        .eq('text', h.text)
+        .eq('image_url', (h.image.isEmpty) ? null : h.image)
+        .limit(1);
+
+    if (existing != null && existing.isNotEmpty) {
+      // già presente
+      return false;
+    }
+
+    // inserisci
     final payload = <String, dynamic>{
       'text': h.text,
       'image_url': (h.image.isEmpty) ? null : h.image,
       'destination': 'moon',
       'reply_to': null,
       'recipient_tag': null,
-      // 'user_id' lo imposta il trigger
+      'user_id': uid, // se hai un trigger che lo mette da solo, puoi ometterlo
     };
     await _client.from('honoo').insert(payload);
+    return true;
   }
 }

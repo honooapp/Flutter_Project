@@ -90,24 +90,22 @@ class HonooController {
     // opzionale: marca il primo come personal/moon e le altre come answer se necessario
     return thread;
   }
-
   /// Pubblica una copia dell'honoo sulla Luna senza toccare l'originale nello scrigno.
+  /// Ritorna:
+  ///  - true  => inserito ora ("Spedito sulla Luna")
+  ///  - false => già presente ("Già presente sulla Luna")
   Future<bool> sendToMoon(Honoo h) async {
-    final id = h.dbId; // non è indispensabile, ma utile per sanity-check
     try {
-      await HonooService.duplicateToMoon(h);
-
-      // Non rimuoviamo nulla dalla cache: l'originale resta in 'chest'.
-      // Se vuoi un piccolo segnale locale (es. “già spedito”), potresti
-      // marcare un flag nel modello o aggiornare la UI: non obbligatorio.
-      // version.value++; // se modifichi qualcosa in cache
-
-      return true;
+      final inserted = await HonooService.duplicateToMoon(h);
+      // Se vuoi, qui puoi anche marcare in cache un flag tipo `isFromMoonSaved`
+      // e fare version.value++; se modifichi la UI locale.
+      return inserted;
     } catch (e) {
       debugPrint('duplicateToMoon error: $e');
-      return false;
+      return false; // la UI potrà distinguere tra "già presente" ed errore? vedi nota sotto
     }
   }
+
 
   /// (Esempio) Cancella su DB, poi da cache
   Future<void> deleteHonoo(Honoo h) async {

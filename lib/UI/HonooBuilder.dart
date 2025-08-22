@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../Services/HonooImageUploader.dart';
 import '../Utility/HonooColors.dart';
 import 'dart:ui' as ui;
 
@@ -121,26 +122,26 @@ class _HonooBuilderState extends State<HonooBuilder> {
       final filename = '${DateTime.now().millisecondsSinceEpoch}_$sanitized';
       final storagePath = '$uid/uploads/$filename';
 
-      // 3) Upload con content-type
-      await client.storage.from(_bucketName).uploadBinary(
-        storagePath,
-        bytes,
-        fileOptions: FileOptions(
-          upsert: false,
-          contentType: _guessContentType(selected.name),
-        ),
-      );
+// 3) Upload via service (usa i bytes letti sopra)
+      final ext = _extensionFromName(selected.name); // ".png" / ".jpg" ecc.
+      final publicUrl = await HonooImageUploader.uploadImageBytes(bytes, ext);
 
-      // 4) URL pubblica HTTPS
-      final publicUrl = client.storage.from(_bucketName).getPublicUrl(storagePath);
+      if (publicUrl == null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Upload fallito')),
+        );
+        return;
+      }
 
-      // 5) Salvo e notifico il parent con URL https
+// 4) Salvo URL e notifico il parent
       setState(() {
         _publicImageUrl = publicUrl;
         // opzionale: verifica CDN
         // imageProvider = NetworkImage(_publicImageUrl);
       });
       _emitChange();
+
     } catch (e) {
       debugPrint('Errore selezione/upload immagine: $e');
       if (!mounted) return;
@@ -157,6 +158,16 @@ class _HonooBuilderState extends State<HonooBuilder> {
     if (ext.endsWith('.gif')) return 'image/gif';
     return 'image/jpeg';
   }
+
+  String _extensionFromName(String name) {
+    final n = name.toLowerCase();
+    final i = n.lastIndexOf('.');
+    if (i < 0) return '.jpg';
+    final e = n.substring(i);
+    if (e.length > 5) return '.jpg';
+    return e;
+  }
+
 
   String _sanitizeFileName(String name) {
     // rimuove spazi e caratteri strani dal nome file

@@ -80,13 +80,9 @@ class _ChestPageState extends State<ChestPage> {
           color: HonooColor.onBackground,
           tooltip: 'Spedisci sulla Luna',
           onPressed: () async {
-            final ok = await ctrl.sendToMoon(current);
-            if (!mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(ok ? 'Spedito sulla Luna ✨' : 'Errore nella spedizione.'),
-              ),
-            );
+            final ok = await HonooController().sendToMoon(current);
+            final text = ok ? 'Spedito sulla Luna' : 'Già presente sulla Luna';
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
 
             // opzionale: se rimuovi l’item, scorri alla pagina precedente se serve
             if (ok && _currentIndex >= ctrl.personal.length && _currentIndex > 0) {
