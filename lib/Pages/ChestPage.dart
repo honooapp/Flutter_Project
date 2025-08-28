@@ -3,16 +3,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
-import '../Controller/DeviceController.dart';
 import '../Controller/HonooController.dart';
 import '../Entites/Honoo.dart';
-import '../UI/HonooCard.dart';
 import '../UI/HonooThreadView.dart';
 import '../Utility/HonooColors.dart';
 import '../Utility/Utility.dart';
-import 'dart:math' as math;
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 
+// 👇 aggiunto per allineare il padding top come in NewHonooPage
+import '../Widgets/LunaFissa.dart';
 
 class ChestPage extends StatefulWidget {
   const ChestPage({super.key});
@@ -44,7 +43,17 @@ class _ChestPageState extends State<ChestPage> {
   bool _hasReplies(Honoo h) => h.hasReplies == true;
   bool _isFromMoonSaved(Honoo h) => h.isFromMoonSaved == true;
 
+  // === stessa funzione “breakpoints morbidi” usata in NewHonooPage ===
+  double _contentMaxWidth(double w) {
+    if (w < 480) return w * 0.94;
+    if (w < 768) return w * 0.92;
+    if (w < 1024) return w * 0.84;
+    if (w < 1440) return w * 0.70;
+    return w * 0.58;
+  }
+
   Widget _footerFor(Honoo? current) {
+    // footer invariato (come tuo file attuale) :contentReference[oaicite:1]{index=1}
     if (current == null) {
       return SizedBox(
         height: 60,
@@ -71,10 +80,12 @@ class _ChestPageState extends State<ChestPage> {
     ];
 
     if (_isPersonal(current) && !_hasReplies(current) && !_isFromMoonSaved(current)) {
-      // Spedisci sulla Luna
       actions.add(
         IconButton(
-          icon: const Icon(Icons.rocket_launch_outlined),
+          icon: SvgPicture.asset(
+            "assets/icons/moon.svg",
+            semanticsLabel: 'Luna',
+          ),
           iconSize: 32,
           splashRadius: 25,
           color: HonooColor.onBackground,
@@ -84,7 +95,6 @@ class _ChestPageState extends State<ChestPage> {
             final text = ok ? 'Spedito sulla Luna' : 'Già presente sulla Luna';
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
 
-            // opzionale: se rimuovi l’item, scorri alla pagina precedente se serve
             if (ok && _currentIndex >= ctrl.personal.length && _currentIndex > 0) {
               setState(() => _currentIndex = ctrl.personal.length - 1);
             }
@@ -92,21 +102,16 @@ class _ChestPageState extends State<ChestPage> {
         ),
       );
     } else if (_hasReplies(current) && !_isFromMoonSaved(current)) {
-      // Vedi risposte (apri thread, ma qui il thread è già verticale nella pagina)
       actions.add(
         IconButton(
           icon: SvgPicture.asset("assets/icons/reply.svg", semanticsLabel: 'Reply'),
           iconSize: 60,
           splashRadius: 25,
           tooltip: 'Vedi risposte',
-          onPressed: () {
-            // opzionale: potresti scrollare subito in alto nel verticale
-            // (vedi HonooThreadView per gestire animateToPage)
-          },
+          onPressed: () {},
         ),
       );
     } else if (_isFromMoonSaved(current)) {
-      // Rispondi a honoo salvato dalla Luna
       actions.add(
         IconButton(
           icon: SvgPicture.asset("assets/icons/reply.svg", semanticsLabel: 'Rispondi'),
@@ -121,16 +126,28 @@ class _ChestPageState extends State<ChestPage> {
       );
     }
 
-    // Cancella (sempre)
     actions.addAll([
       SizedBox(width: 5.w),
       IconButton(
-        icon: const Icon(Icons.delete_outline),
-        iconSize: 32,
+        icon: SvgPicture.asset("assets/icons/cancella.svg", semanticsLabel: 'Cancella'),
+        iconSize: 60,
         splashRadius: 25,
         color: HonooColor.onBackground,
         tooltip: 'Cancella',
-        onPressed: () => ctrl.deleteHonoo(current), // collega al tuo service
+        onPressed: () async {
+          final String? id = (current.dbId ?? current.id) as String?;
+          if (id == null || id.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Impossibile cancellare: id mancante.')),
+            );
+            return;
+          }
+
+          await ctrl.deleteHonooById(id); // accetta String?
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Honoo eliminato.')),
+          );
+        },
       ),
     ]);
 
@@ -145,11 +162,14 @@ class _ChestPageState extends State<ChestPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isPhone = DeviceController().isPhone();
-    final size = MediaQuery.of(context).size;
 
-    const titleH = 60.0;
+    const headerH = 60.0; // lasciamo il tuo titolo a 60 per “non cambiare altro”
     const footerH = 60.0;
+
+    // 👇 come in NewHonooPage: riserva top solo oltre l’header per non far coprire la Luna
+    final double lunaReserve = LunaFissa.reserveTopPadding(context);
+    final double extraTop = (lunaReserve - headerH);
+    final double contentTopPadding = extraTop > 0 ? extraTop : 0;
 
     return Scaffold(
       backgroundColor: HonooColor.background,
@@ -157,82 +177,107 @@ class _ChestPageState extends State<ChestPage> {
         child: AnimatedBuilder(
           animation: Listenable.merge([ctrl.isLoading, ctrl.version]),
           builder: (context, _) {
-            final personal = ctrl.personal; // include anche quelli salvati dalla luna (flag)
+            final personal = ctrl.personal;
             final Honoo? current = personal.isEmpty ? null : personal[_currentIndex];
 
             return LayoutBuilder(
               builder: (context, constraints) {
                 final availH = constraints.maxHeight;
-                final centerH = (availH - titleH - footerH).clamp(0.0, double.infinity);
-                final maxW = isPhone ? size.width * 0.96 : size.width * 0.5;
 
-                return Column(
+                // === stesse regole di NewHonooPage ===
+                final double targetMaxW = _contentMaxWidth(constraints.maxWidth);
+                final double availableCenterH =
+                (availH - headerH - contentTopPadding - footerH)
+                    .clamp(0.0, double.infinity);
+
+                return Stack(
+                  clipBehavior: Clip.none,
                   children: [
-                    // HEADER
-                    SizedBox(
-                      height: titleH,
-                      child: Center(
-                        child: Text(
-                          Utility().appName,
-                          style: GoogleFonts.libreFranklin(
-                            color: HonooColor.secondary,
-                            fontSize: 30,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-
-                    // --- CENTRO: carosello orizzontale senza peek + gutter esterno + gutter interno ---
-                    Expanded(
-                      child: Center(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(maxWidth: maxW, maxHeight: centerH),
-                          child: ctrl.isLoading.value
-                              ? const Center(child: CircularProgressIndicator())
-                              : (personal.isEmpty
-                              ? Center(
+                    // CONTENUTO PRINCIPALE (identico, ma con misure allineate a NewHonooPage)
+                    Column(
+                      children: [
+                        // HEADER
+                        SizedBox(
+                          height: headerH,
+                          child: Center(
                             child: Text(
-                              'Nessun honoo nello scrigno',
+                              Utility().appName,
                               style: GoogleFonts.libreFranklin(
-                                color: HonooColor.onBackground,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w400,
+                                color: HonooColor.secondary,
+                                fontSize: 30,
+                                fontWeight: FontWeight.w500,
                               ),
+                              textAlign: TextAlign.center,
                             ),
-                          )
-                              : Padding(
-                            // GUTTER ESTERNO: distanzia il carosello dal bordo schermo
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: cs.CarouselSlider.builder(
-                              itemCount: personal.length,
-                              options: cs.CarouselOptions(
-                                height: centerH,
-                                viewportFraction: 1.0,                  // nessun peek
-                                enableInfiniteScroll: false,
-                                padEnds: true,                          // margine primo/ultimo
-                                enlargeCenterPage: false,               // no enlarge orizzontale
-                                scrollPhysics: const BouncingScrollPhysics(),
-                                onPageChanged: (i, _) => setState(() => _currentIndex = i),
-                              ),
-                              itemBuilder: (context, index, realIdx) {
-                                return Padding(
-                                  // GUTTER INTERNO: margine garantito per ogni pagina
-                                  // (anche se il carosello è strettissimo)
-                                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: HonooThreadView(root: personal[index]),
-                                );
-                              },
-                            ),
-                          )),
+                          ),
                         ),
-                      ),
+
+                        // CENTRO: il carosello riempie tutta l’altezza disponibile,
+                        // con larghezza massima fluida come in NewHonooPage
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(
+                              0,
+                              contentTopPadding, // ← come NewHonooPage
+                              0,
+                              footerH,           // spazio per footer (come prima)
+                            ),
+                            child: Center(
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 90),
+                                curve: Curves.easeOutCubic,
+                                constraints: BoxConstraints(maxWidth: targetMaxW),
+                                child: SizedBox(
+                                  height: availableCenterH,
+                                  width: double.infinity,
+                                  child: personal.isEmpty
+                                      ? Center(
+                                    child: Text(
+                                      'Nessun honoo nello scrigno',
+                                      style: GoogleFonts.libreFranklin(
+                                        color: HonooColor.onBackground,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  )
+                                      : Padding(
+                                    // gutter esterno
+                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                    child: cs.CarouselSlider.builder(
+                                      itemCount: personal.length,
+                                      options: cs.CarouselOptions(
+                                        height: availableCenterH,     // ← come NewHonooPage (riempi tutto)
+                                        viewportFraction: 1.0,
+                                        enableInfiniteScroll: false,
+                                        padEnds: true,
+                                        enlargeCenterPage: false,
+                                        scrollPhysics: const BouncingScrollPhysics(),
+                                        onPageChanged: (i, _) =>
+                                            setState(() => _currentIndex = i),
+                                      ),
+                                      itemBuilder: (context, index, realIdx) {
+                                        return Padding(
+                                          // gutter interno
+                                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                                          child: HonooThreadView(root: personal[index]),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // FOOTER (invariato)
+                        _footerFor(current),
+                      ],
                     ),
 
-
-                    // FOOTER dinamico in base all'honoo corrente
-                    _footerFor(current),
+                    // 🌙 LUNA FISSA (overlay come in NewHonooPage)
+                    const LunaFissa(),
                   ],
                 );
               },

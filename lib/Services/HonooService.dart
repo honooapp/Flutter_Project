@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Entites/Honoo.dart';
 
@@ -47,7 +46,6 @@ class HonooService {
     required String id,
     required String destination,
   }) async {
-    final now = DateTime.now().toIso8601String();
     await _client
         .from('honoo')
         .update({
@@ -92,4 +90,9 @@ class HonooService {
     await _client.from('honoo').insert(payload);
     return true;
   }
+  /// Hard delete dal DB (tabella 'honoo')
+  static Future<void> deleteHonooById(String id) async {
+    await _client.from('honoo').delete().eq('id', id);
+  }
+
 }

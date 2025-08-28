@@ -107,12 +107,30 @@ class HonooController {
   }
 
 
-  /// (Esempio) Cancella su DB, poi da cache
   Future<void> deleteHonoo(Honoo h) async {
-    final id = h.dbId;
-    if (id == null) return;
-    // TODO: await HonooService.deleteHonoo(id);
-    _personal.removeWhere((x) => x.dbId == id);
+    final String? id = (h.dbId ?? h.id) as String?;
+    if (id == null || id.isEmpty) {
+      debugPrint('deleteHonoo: id mancante');
+      return;
+    }
+
+    await HonooService.deleteHonooById(id);
+
+    _personal.removeWhere((x) => (x.dbId ?? x.id) == id);
     version.value++;
   }
+
+
+  Future<void> deleteHonooById(String? id) async {
+    if (id == null || id.isEmpty) {
+      debugPrint('deleteHonooById: id vuoto');
+      return;
+    }
+
+    await HonooService.deleteHonooById(id);
+
+    _personal.removeWhere((x) => (x.dbId ?? x.id) == id);
+    version.value++;
+  }
+
 }
