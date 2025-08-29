@@ -6,10 +6,11 @@ import 'package:sizer/sizer.dart';
 
 import 'package:honoo/Controller/DeviceController.dart';
 import 'package:honoo/Controller/HonooController.dart';
-import 'package:honoo/Entites/Honoo.dart';
 import 'package:honoo/UI/HonooCard.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:honoo/Utility/Utility.dart';
+
+import '../Entities/Honoo.dart';
 
 class ConversationPage extends StatefulWidget {
   const ConversationPage({super.key, required this.honoo});

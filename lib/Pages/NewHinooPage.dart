@@ -1,126 +1,90 @@
+// lib/Pages/NewHinooPage.dart
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:honoo/Utility/HonooColors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../Entities/Honoo.dart';
-import '../Services/HonooImageUploader.dart';
-import '../UI/HonooBuilder.dart';
-import '../Utility/Utility.dart';
-import 'package:sizer/sizer.dart';
-import 'package:honoo/Services/HonooService.dart';
+import 'package:honoo/Utility/HonooColors.dart';
+import 'package:honoo/Utility/Utility.dart';
+import 'package:honoo/Widgets/LunaFissa.dart';
 
-import '../Widgets/LunaFissa.dart';
-import 'EmailLoginPage.dart';
+import '../Entities/Hinoo.dart';
 import 'ChestPage.dart';
+import 'EmailLoginPage.dart';
 
-class NewHonooPage extends StatefulWidget {
-  const NewHonooPage({super.key});
+// Builder + Entities
+import 'package:honoo/UI/HinooBuilder.dart';
+
+// ✅ Controller (nuovo)
+import 'package:honoo/Controller/HinooController.dart';
+
+class NewHinooPage extends StatefulWidget {
+  const NewHinooPage({super.key});
 
   @override
-  State<NewHonooPage> createState() => _NewHonooPageState();
+  State<NewHinooPage> createState() => _NewHinooPageState();
 }
 
-class _NewHonooPageState extends State<NewHonooPage> {
-  String _text = '';
-  String _imageUrl = '';
+class _NewHinooPageState extends State<NewHinooPage> {
+  /// Chiave per interrogare il builder (export del draft completo)
+  final GlobalKey<HinooBuilderState> _builderKey = GlobalKey<HinooBuilderState>();
 
-  /// stato: dopo salvataggio nello scrigno il bottone diventa “luna”
+  /// Controller centralizzato per validazione, upload immagini e publish/duplicate
+  final _controller = HinooController();
+
+  /// Stato "salvato nello scrigno" → il bottone OK diventa "luna"
   bool _savedToChest = false;
 
-  /// cache dell’URL immagine definitiva (dopo upload/risoluzione)
-  String? _finalImageUrlCache;
+  /// Cache dell’ultimo fingerprint salvato (per non resettare inutilmente l’icona)
+  String _lastSavedFingerprint = '';
 
-  /// contenuto effettivamente SALVATO (per evitare reset dello stato da update identici)
-  String _lastSavedText = '';
-  String _lastSavedRawImage = '';
-
-  /// Aggiorna solo se cambia DAVVERO e non è identico all’ultimo SALVATO.
-  void _onHonooChanged(String text, String imageUrl) {
-    // se identico allo stato attuale → nessun rebuild inutile
-    if (text == _text && imageUrl == _imageUrl) return;
-
-    final bool isSameAsLastSaved =
-    (text == _lastSavedText && imageUrl == _lastSavedRawImage);
-
-    setState(() {
-      _text = text;
-      _imageUrl = imageUrl;
-
-      // resetta l’icona solo se il contenuto è DIVERSO da quello salvato
-      if (!isSameAsLastSaved) {
-        _savedToChest = false;
-      }
-
-      // se cambia l’immagine rispetto a QUELLA SALVATA, invalida cache
-      if (imageUrl != _lastSavedRawImage) {
-        _finalImageUrlCache = null;
-      }
-    });
+  /// Callback dal builder per aggiornare lo stato e resettare l’icona se necessario
+  void _onHinooChanged(HinooDraft draft) {
+    final fp = _controller.fingerprint(draft);
+    if (fp == _lastSavedFingerprint) return; // identico a quanto salvato
+    if (_savedToChest) {
+      setState(() => _savedToChest = false); // è cambiato → torna “OK”
+    }
   }
 
-  Future<void> _submitHonoo() async {
+  Future<void> _submitHinoo() async {
+    // Preserviamo il comportamento: se non loggato → vai a login
     final user = Supabase.instance.client.auth.currentUser;
-
     if (user == null) {
       if (!mounted) return;
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => EmailLoginPage(
-            pendingHonooText: _text,
-            pendingImageUrl: _imageUrl,
-          ),
-        ),
+        MaterialPageRoute(builder: (context) => const EmailLoginPage()),
       );
       return;
     }
 
-    // usa cache se presente, altrimenti risolvi adesso
-    final String? finalImageUrl =
-        _finalImageUrlCache ?? await _resolveFinalImageUrl(_imageUrl);
-
-    if (finalImageUrl == null || finalImageUrl.isEmpty) {
+    final draft = _builderKey.currentState?.exportDraft();
+    if (draft == null || draft.pages.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Devi caricare un’immagine (URL pubblico).')),
+          const SnackBar(content: Text('Crea almeno 1 schermata 16:9 con sfondo e testo.')),
         );
       }
       return;
     }
 
-    final newHonoo = Honoo(
-      0,
-      _text,
-      finalImageUrl,
-      DateTime.now().toIso8601String(),
-      DateTime.now().toIso8601String(),
-      user.id,
-      HonooType.personal, // scrigno
-      null,
-      null,
-    );
-
     try {
-      await HonooService.publishHonoo(newHonoo);
+      // 👉 delega al controller: valida, risolve immagini, salva su “scrigno”
+      final fp = await _controller.saveToChest(draft);
 
       if (!mounted) return;
       setState(() {
-        _savedToChest = true;               // passa a “luna”
-        _finalImageUrlCache = finalImageUrl;
-
-        // memorizza il contenuto SALVATO per ignorare update identici
-        _lastSavedText = _text;
-        _lastSavedRawImage = _imageUrl;
+        _savedToChest = true;            // switch a “luna”
+        _lastSavedFingerprint = fp;      // memorizza fingerprint salvato
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Salvato nello scrigno.')),
+        const SnackBar(content: Text('Hinoo salvato nello scrigno.')),
       );
     } catch (e, st) {
-      debugPrint('publishHonoo failed: $e\n$st');
+      debugPrint('publishHinoo failed: $e\n$st');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Errore: $e')),
@@ -130,28 +94,25 @@ class _NewHonooPageState extends State<NewHonooPage> {
   }
 
   Future<void> _submitToMoon() async {
+    final draft = _builderKey.currentState?.exportDraft();
+    if (draft == null || draft.pages.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Nessun contenuto da pubblicare sulla Luna.')),
+        );
+      }
+      return;
+    }
+
     try {
-      final String? finalImageUrl =
-          _finalImageUrlCache ?? await _resolveFinalImageUrl(_imageUrl);
-
-      final honooForMoon = Honoo(
-        0,
-        _text,
-        finalImageUrl ?? '',
-        DateTime.now().toIso8601String(),
-        DateTime.now().toIso8601String(),
-        Supabase.instance.client.auth.currentUser?.id ?? '',
-        HonooType.personal,
-        null,
-        null,
-      );
-
-      final ok = await HonooService.duplicateToMoon(honooForMoon);
+      // 👉 delega al controller: valida, risolve immagini, duplica su “Luna”
+      final res = await _controller.sendToMoon(draft);
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(ok ? 'Pubblicato sulla Luna.' : 'Già presente sulla Luna.')),
-      );
+      final msg = (res == HinooMoonResult.published)
+          ? 'Pubblicato sulla Luna.'
+          : 'Già presente sulla Luna.';
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
     } catch (e, st) {
       debugPrint('duplicateToMoon failed: $e\n$st');
       if (mounted) {
@@ -162,26 +123,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
     }
   }
 
-  Future<String?> _resolveFinalImageUrl(String raw) async {
-    final s = raw.trim();
-    if (s.isEmpty) return null;
-
-    if (s.startsWith('http://') || s.startsWith('https://')) return s;
-
-    if (kIsWeb && s.startsWith('blob:')) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Immagine locale (blob) non caricabile dal browser.')),
-        );
-      }
-      return null;
-    }
-
-    final uploaded = await HonooImageUploader.uploadImageFromPath(s);
-    return uploaded;
-  }
-
-  // Larghezza massima fluida del contenuto (breakpoints morbidi)
+  // Larghezza massima fluida del contenuto (come NewHonooPage)
   double _contentMaxWidth(double w) {
     if (w < 480) return w * 0.94;
     if (w < 768) return w * 0.92;
@@ -192,14 +134,16 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
   @override
   Widget build(BuildContext context) {
-
-    // Header compatto per ridurre il gap sopra l’honoo
+    // Header compatto come in NewHonooPage
     const double headerH = 52;
 
-    // Padding superiore: solo la parte che serve oltre l’header per non far coprire la luna.
+    // Padding superiore per non far coprire la luna (stessa logica)
     final double lunaReserve = LunaFissa.reserveTopPadding(context);
     final double extraTop = (lunaReserve - headerH);
     final double contentTopPadding = extraTop > 0 ? extraTop : 0;
+
+    // Altezza riservata al footer (3 pulsanti)
+    const double footerH = 100.0;
 
     return Scaffold(
       backgroundColor: HonooColor.background,
@@ -208,21 +152,16 @@ class _NewHonooPageState extends State<NewHonooPage> {
           builder: (context, viewport) {
             final double viewW = viewport.maxWidth;
             final double viewH = viewport.maxHeight;
-
             final double targetMaxW = _contentMaxWidth(viewW);
 
-            // Altezza riservata al footer (3 pulsanti)
-            const double footerH = 100.0;
-
-            // Altezza disponibile per il box honoo
+            // Altezza disponibile per il box centrale
             final double availableH =
-            (viewH - headerH - contentTopPadding - footerH)
-                .clamp(0.0, double.infinity);
+            (viewH - headerH - contentTopPadding - footerH).clamp(0.0, double.infinity);
 
             return Stack(
               clipBehavior: Clip.none,
               children: [
-                // ===== HEADER + HONOO (full height) =====
+                // ===== HEADER + EDITOR =====
                 Column(
                   children: [
                     SizedBox(
@@ -240,7 +179,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                     ),
                     Expanded(
                       child: Padding(
-                        // top minimo (solo se la luna uscirebbe dall’header) + spazio per footer in basso
+                        // top minimo + spazio per footer
                         padding: EdgeInsets.fromLTRB(0, contentTopPadding, 0, footerH),
                         child: Center(
                           child: AnimatedContainer(
@@ -251,8 +190,22 @@ class _NewHonooPageState extends State<NewHonooPage> {
                               height: availableH,
                               width: double.infinity,
                               child: ClipRect(
-                                child: HonooBuilder(
-                                  onHonooChanged: _onHonooChanged,
+                                child: HinooBuilder(
+                                  key: _builderKey,
+                                  onHinooChanged: _onHinooChanged,
+                                  // ✅ inizializza reply mode quando serve
+                                  // initialType: HinooType.answer,
+                                  // initialReplyTo: 'ID_ORIGINALE',
+                                  // initialRecipientTag: '@poetaBlu',
+
+                                  // ✅ opzionale: ricevi PNG export per salvarlo su storage o condividerlo
+                                  onPngExported: (bytes) async {
+                                    // esempio: mostra solo are-you-sure
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('PNG ricevuto (memoria): pronto a salvare/condividere.')),
+                                    );
+                                    // Se vuoi: carica su storage (aggiungo metodo ad hoc nel controller nel prossimo step).
+                                  },
                                 ),
                               ),
                             ),
@@ -269,7 +222,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                   left: 0,
                   right: 0,
                   child: Padding(
-                    // piccolo margine per non “attaccare” i bottoni al bordo fisico
+                    // margine per non incollare i bottoni al bordo fisico
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -285,7 +238,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           color: HonooColor.onBackground,
                           onPressed: () => Navigator.pop(context),
                         ),
-                        SizedBox(width: 5.w),
+                        const SizedBox(width: 24),
 
                         // CHEST
                         IconButton(
@@ -298,11 +251,11 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => ChestPage()),
+                              MaterialPageRoute(builder: (context) => const ChestPage()),
                             );
                           },
                         ),
-                        SizedBox(width: 5.w),
+                        const SizedBox(width: 24),
 
                         // OK → LUNA (switch basato su _savedToChest)
                         _savedToChest
@@ -322,7 +275,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           ),
                           iconSize: 60,
                           splashRadius: 25,
-                          onPressed: _submitHonoo,
+                          onPressed: _submitHinoo,
                         ),
                       ],
                     ),

@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../Entites/Honoo.dart';
+import '../Entities/Honoo.dart';
 import '../Utility/HonooColors.dart';
 
 class HonooCard extends StatelessWidget {

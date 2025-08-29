@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../Entites/Honoo.dart';
+import '../Entities/Honoo.dart';
 
 class HonooService {
   static final _client = Supabase.instance.client;

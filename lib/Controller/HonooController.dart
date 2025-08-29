@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../Entites/Honoo.dart';
+import '../Entities/Honoo.dart';
 import '../Services/HonooService.dart';
 
 /// Repository + cache in memoria (niente mock)

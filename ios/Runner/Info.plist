@@ -47,5 +47,17 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Accesso alla libreria Foto (per scegliere sfondi) -->
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Carico uno sfondo per creare gli hinoo.</string>
+
+    <!-- (Opzionale) Salvataggio nella libreria Foto (se aggiungerai "salva in Foto") -->
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Consenti di salvare l’export PNG degli hinoo nella libreria.</string>
+
+    <!-- (Opzionale) Se userai anche la fotocamera come sorgente -->
+    <key>NSCameraUsageDescription</key>
+    <string>Scatto una foto da usare come sfondo per gli hinoo.</string>
+
 </dict>
 </plist>

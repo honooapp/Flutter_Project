@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:honoo/IsolaDelleStorie/Controller/ExerciseController.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/ExercisePage.dart';
 import 'package:honoo/IsolaDelleStorie/Utility/IsolaDelleStorieContentManager.dart';
+import 'package:honoo/Pages/NewHinooPage.dart';
 import 'package:honoo/Utility/FormattedText.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -311,6 +312,23 @@ class _IslandPageState extends State<IslandPage> {
                                     quote: Utility().shakespeare,
                                     bibliography: Utility().bibliography,
                                   ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        Positioned(
+                          bottom: -10,
+                          left: chestX,
+                          child: IconButton(
+                            icon: SvgPicture.asset("assets/icons/isoladellestorie/conchiglia.svg", semanticsLabel: 'Chest'),
+                            iconSize: chestSize,
+                            splashRadius: 40,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => NewHinooPage()
                                 ),
                               );
                             },

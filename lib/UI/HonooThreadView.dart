@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../Controller/HonooController.dart';
-import '../Entites/Honoo.dart';
+import '../Entities/Honoo.dart';
 import '../UI/HonooCard.dart';
 import '../Utility/HonooColors.dart';
 

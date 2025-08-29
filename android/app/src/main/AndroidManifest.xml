@@ -1,6 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="dev.lucagaudino.honoo">
 
+    <!-- Per Android 13+ (API 33): lettura immagini -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <!-- Per Android 12L e precedenti (API <= 32): lettura memoria esterna -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
+    <!-- (Opzionale) Se userai la fotocamera come sorgente -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:label="honoo"
         android:name="${applicationName}"

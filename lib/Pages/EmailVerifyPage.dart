@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../Entites/Honoo.dart';
+import '../Entities/Honoo.dart';
 import '../Services/HonooService.dart';
 import 'ChestPage.dart';
 

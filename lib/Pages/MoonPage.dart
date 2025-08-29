@@ -4,9 +4,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
+import '../Entities/Honoo.dart';
 import 'ComingSoonPage.dart';
 import '../Controller/DeviceController.dart';
-import '../Entites/Honoo.dart';
 import '../Services/HonooService.dart';
 import '../UI/HonooCard.dart';
 import '../Utility/HonooColors.dart';
