@@ -1,716 +1,211 @@
-// lib/UI/HinooBuilder.dart
-import 'dart:async';
-import 'dart:math' as math;
+// lib/UI/HinooBuilder/hinoobuilder.dart
+// ============================================================================
+// HinooBuilder – due pulsanti bianchi in ROW sopra il canvas,
+// Canvas 9:16 in Card (r=5), anteprime SOTTO al canvas.
+// Nessun overlay sopra il canvas o le anteprime.
+// ============================================================================
+
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-
-import 'package:flutter/foundation.dart' show kIsWeb; // ← per distinguere web
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+import 'HinooBuilder/overlays/cambiaSfondo.dart';
+import 'HinooBuilder/overlays/coloreTesto.dart';
+import 'HinooBuilder/overlays/scriviHinoo.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../Services/HinooStorageUploader.dart';
+import 'package:honoo/Widgets/WhiteIconButton.dart';
+import 'package:honoo/UI/HinooThumbnails.dart';
+import 'package:honoo/UI/AnteprimaPNG.dart';
 
-import 'package:honoo/Utility/HonooColors.dart';
-import 'package:honoo/Controller/HinooController.dart';
-import 'package:honoo/Utility/image_normalizer.dart';
+// Import coerenti con la struttura HinooBuilder
 
-// Mantengo il tuo path (coerente col progetto che hai caricato)
+// Wizard step (solo uno alla volta)
+enum _WizardStep { changeBg, pickColor, writeText }
 
-// ⬇⬇ Import condizionale per il download su Web
-import 'package:honoo/Utility/download_stub.dart'
-    if (dart.library.html) 'package:honoo/Utility/download_web.dart' as webdl;
 
-import '../Entities/Hinoo.dart';
-
-typedef HinooChanged = void Function(HinooDraft draft);
-typedef HinooPngExported = void Function(Uint8List pngBytes);
-
+// ============================================================================
+// Widget pubblico (callback opzionali)
+// ============================================================================
 class HinooBuilder extends StatefulWidget {
-  final HinooChanged? onHinooChanged;
-
-  // ✅ Reply mode / inizializzazione
-  final HinooType initialType;
-  final String? initialReplyTo;
-  final String? initialRecipientTag;
-
-  // ✅ Autosave
-  final bool autosaveEnabled;
-  final Duration autosaveDebounce;
-
-  // ✅ PNG export callback (opzionale)
-  final HinooPngExported? onPngExported;
-
   const HinooBuilder({
     super.key,
-    this.onHinooChanged,
-    this.initialType = HinooType.personal,
-    this.initialReplyTo,
-    this.initialRecipientTag,
-    this.autosaveEnabled = true,
-    this.autosaveDebounce = const Duration(milliseconds: 1500),
-    this.onPngExported,
+    this.onHinooChanged,   // notifica il draft quando cambia qualcosa
+    this.onPngExported,    // PNG generato (anteprima)
+    this.embedThumbnails = true, // se false, mostra solo il canvas 9:16
   });
 
+  final ValueChanged<dynamic>? onHinooChanged;
+  final ValueChanged<Uint8List>? onPngExported;
+  final bool embedThumbnails;
+
   @override
-  State<HinooBuilder> createState() => HinooBuilderState();
+  State<HinooBuilder> createState() => _HinooBuilderState();
 }
 
-class HinooBuilderState extends State<HinooBuilder> {
-  static const int _maxPages = 9;
-
-  final PageController _pageController = PageController();
+// ============================================================================
+// Stato/Orchestrazione
+// ============================================================================
+class _HinooBuilderState extends State<HinooBuilder> {
+  // Core
+  final GlobalKey _captureKey = GlobalKey(); // SOLO il canvas è sotto questa key
   final TextEditingController _textController = TextEditingController();
-  final TextEditingController _replyCtrl = TextEditingController();
-  final TextEditingController _recipCtrl = TextEditingController();
+  final FocusNode _textFocus = FocusNode();
 
-  // Controller per storage + service
-  final HinooController _controller = HinooController();
-
-  // Stato multipagina
-  List<HinooSlide> _pages = const [
-    HinooSlide(
-        backgroundImage: null,
-        text: '',
-        isTextWhite: true,
-        bgScale: 1.0,
-        bgOffsetX: 0.0,
-        bgOffsetY: 0.0),
-  ];
+  // Modello semplificato (sostituisci "dynamic" con il tuo tipo Slide/Page)
+  final List<dynamic> _pages = <dynamic>[];
   int _current = 0;
 
-  void _syncFromSlideTransform() {
-    final s = _pages[_current];
-    _scale = s.bgScale;
-    _offset = Offset(s.bgOffsetX, s.bgOffsetY);
-  }
-
-  // Stato generale del draft
-  late HinooType _type;
-  String? _replyTo;
-  String? _recipientTag;
-
-  // Stato sfondo: interazione prima del lock
-  bool _bgLocked = false;
+  // Trasformazioni testo sul canvas
   double _scale = 1.0;
   Offset _offset = Offset.zero;
 
-  double _scaleStart = 1.0;
-  Offset _offsetStart = Offset.zero;
-  Offset _focalStart = Offset.zero;
+  // Stato UI
+  ImageProvider? _localBgPreview; // preview locale dello sfondo
+  String? _bgPublicUrl;           // URL pubblico su storage
+  Color _txtColor = Colors.white;
+  bool _showTextField = false;
+  _WizardStep _step = _WizardStep.changeBg;
+  bool _bgChosen = false; // abilita bottone OK per procedere
+  final TransformationController _bgController = TransformationController();
+  Matrix4? _bgLockedMatrix;
 
-  // ✅ Autosave
-  Timer? _autosaveTimer;
+  // Export/anteprima
+  Uint8List? _lastPreviewBytes;
+  String? _exportFilenameHint;
 
-  // ✅ stato caricamento bozza
-  bool _loadingDraft = true;
-
-  // ✅ Export PNG
-  final GlobalKey _captureKey = GlobalKey();
-
+  // ========================================================================
+  // Lifecycle
+  // ========================================================================
   @override
   void initState() {
     super.initState();
-    _type = widget.initialType;
-    _replyTo = widget.initialReplyTo;
-    _recipientTag = widget.initialRecipientTag;
-    _replyCtrl.text = _replyTo ?? '';
-    _recipCtrl.text = _recipientTag ?? '';
-    _syncTextController();
-
-    // 1) tenta restore bozza (🛠️ prima era fuori dalla classe: ora è qui)
-    _restoreDraft();
-  }
-
-  Future<void> _restoreDraft() async {
-    try {
-      final draft = await _controller.getDraft();
-      if (draft != null && mounted) {
-        setState(() {
-          _type = draft.type;
-          _replyTo = draft.replyTo;
-          _recipientTag = draft.recipientTag;
-          _pages = draft.pages.isNotEmpty
-              ? List<HinooSlide>.from(draft.pages)
-              : const [
-                  HinooSlide(backgroundImage: null, text: '', isTextWhite: true)
-                ];
-          _current = 0;
-          // uniforma sfondo a quello della pagina 1
-          _enforceGlobalBackgroundAfterRestore();
-        });
-        _syncTextController();
-        _replyCtrl.text = _replyTo ?? '';
-        _recipCtrl.text = _recipientTag ?? '';
-        // non triggero autosave qui
-      }
-    } catch (_) {
-      // ignora errori restore
-    } finally {
-      if (mounted) {
-        setState(() => _loadingDraft = false);
-      }
+    if (_pages.isEmpty) {
+      _pages.add(_createEmptySlide());
     }
+    _textController.addListener(() => _onCanvasTextChanged(_textController.text));
   }
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _textController.removeListener((){}); // safety no-op
     _textController.dispose();
-    _autosaveTimer?.cancel();
-    _replyCtrl.dispose();
-    _recipCtrl.dispose();
+    _textFocus.dispose();
     super.dispose();
   }
 
-  /// Draft attuale (inclusi type/reply)
-  HinooDraft exportDraft() => HinooDraft(
-        pages: List.unmodifiable(_pages),
-        type: _type,
-        replyTo: _replyTo,
-        recipientTag: _recipientTag,
-      );
+  // ========================================================================
+  // Helpers / API pubbliche
+  // ========================================================================
+  void goToPublic(int index) => _goTo(index);            // vai alla pagina i
+  void addPagePublic() => _addPage();                    // aggiungi pagina
+  void reorderPagesPublic(int oldIndex, int newIndex) => _onReorder(oldIndex, newIndex);
 
-  void _notify() {
-    final d = exportDraft();
-    widget.onHinooChanged?.call(d);
-    _scheduleAutosave(d);
+  void deleteCurrentPagePublic() => _deleteCurrentPage(); // già usata
+  Future<void> openPreviewDialogPublic() => _openPreviewDialog();
+
+  dynamic exportDraft() {
+    return {
+      'pages': _pages,                // sostituisci col tuo tipo slide/pagina
+      'currentIndex': _current,
+      'text': _textController.text,
+      'textColor': _txtColor.value,
+      'hasBg': _localBgPreview != null || _bgPublicUrl != null,
+      'bgUrl': _bgPublicUrl,
+      'bgTransform': _bgLockedMatrix?.storage.toList(),
+      // preview immediata per thumbnails quando non c'è ancora un URL pubblico
+      'bgPreviewBytes': _localBgPreview is MemoryImage
+          ? (_localBgPreview as MemoryImage).bytes
+          : null,
+    };
   }
 
-  // ========= AUTOSAVE =========
-  void _scheduleAutosave(HinooDraft draft) {
-    if (!widget.autosaveEnabled) return;
-    _autosaveTimer?.cancel();
-    _autosaveTimer = Timer(widget.autosaveDebounce, () async {
-      try {
-        await _controller.saveDraft(draft);
-        // (silenzioso) — se vuoi feedback, qui puoi mostrare uno snack leggero
-      } catch (_) {
-        // ignora errori autosave
-      }
-    });
+  void _notifyChanged() {
+    final cb = widget.onHinooChanged;
+    if (cb != null) cb(exportDraft());
   }
 
-  // ========= BACKGROUND UPLOAD =========
-  Future<void> _pickBackgroundAndUpload() async {
-    try {
-      final picker = ImagePicker();
-      final XFile? file = await picker.pickImage(
-        source: ImageSource.gallery,
-        requestFullMetadata: false,
-      );
-      if (file == null) return;
-
-      final Uint8List raw = await file.readAsBytes();
-      final String rawExt = _inferExt(file.name);
-
-      final normalized = await normalizeBackgroundImage(
-        raw,
-        originalExt: rawExt,
-        // volendo puoi passare maxUploadBytes/maxW/maxH diversi
-      );
-
-      final Uint8List bytes = normalized.bytes;
-      final String ext = normalized.ext;
-
-      final publicUrl =
-          await _controller.uploadBackgroundBytes(bytes, ext: ext);
-
-      final slide = _pages[_current].copyWith(
-        backgroundImage: publicUrl,
-        bgScale: 1.0,
-        bgOffsetX: 0.0,
-        bgOffsetY: 0.0,
-      );
-
-      setState(() {
-        // forza che la modifica avvenga sulla pagina 1
-        _pages[0] = (_current == 0
-            ? slide
-            : _pages[0].copyWith(
-                backgroundImage: publicUrl,
-                bgScale: 1.0,
-                bgOffsetX: 0.0,
-                bgOffsetY: 0.0,
-              ));
-
-        // propaga a tutte le altre
-        _propagateBackgroundFromFirst();
-
-        // stato runtime per preview corrente
-        _bgLocked = false;
-        _scale = 1.0;
-        _offset = Offset.zero;
-      });
-      _notify();
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Upload sfondo fallito: $e')),
-      );
-    }
-  }
-
-  String _inferExt(String filename) {
-    final i = filename.lastIndexOf('.');
-    if (i <= 0) return 'jpg';
-    final raw = filename.substring(i + 1).toLowerCase();
-    if (raw == 'jpeg') return 'jpg';
-    const allowed = ['jpg', 'png', 'webp'];
-    return allowed.contains(raw) ? raw : 'jpg';
-  }
-
-  // ========= EXPORT PNG =========
-  Future<Uint8List?> exportCanvasPng({double pixelRatio = 3.0}) async {
-    try {
-      final boundary = _captureKey.currentContext?.findRenderObject()
-          as RenderRepaintBoundary?;
-      if (boundary == null) return null;
-      final ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      return byteData?.buffer.asUint8List();
-    } catch (e) {
-      return null;
-    }
-  }
-
-  /// (mantengo il tuo metodo – ora non usato dalla toolbar ma disponibile)
-  Future<void> _exportPngAndNotify() async {
-    final png = await exportCanvasPng(pixelRatio: 3.0);
-    if (png == null) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Export PNG fallito.')),
-      );
-      return;
-    }
-    widget.onPngExported?.call(png);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('PNG esportato.')),
-    );
-  }
-
-  /// 👉 nuovo: apre anteprima con azioni (Salva su Storage / Download Web)
-  Future<void> _openPngPreview() async {
-    final png = await exportCanvasPng(pixelRatio: 3.0);
-    if (png == null) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Export PNG fallito.')));
-      return;
-    }
-
-    // Dialog anteprima
-    if (!mounted) return;
-    await showDialog(
-      context: context,
-      builder: (ctx) => _PngPreviewDialog(
-        pngBytes: png,
-        onSaveToStorage: () async {
-          try {
-            final url = await _controller.uploadCanvasPng(png);
-            if (!mounted) return;
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text('PNG salvato: $url')));
-          } catch (e) {
-            if (!mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Errore salvataggio: $e')));
-          }
-        },
-        onDownloadLocal: () async {
-          if (kIsWeb) {
-            webdl.downloadBytes(
-              png,
-              filename: 'hinoo-${DateTime.now().millisecondsSinceEpoch}.png',
-              mimeType: 'image/png',
-            );
-          } else {
-            if (!mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('Download locale disponibile solo su Web.')),
-            );
-          }
-        },
-      ),
-    );
-
-    // callback opzionale esterna
-    widget.onPngExported?.call(png);
-  }
-
-  // ========= EDITING =========
-  void _toggleLock() {
-    setState(() => _bgLocked = !_bgLocked);
-  }
-
-  void _toggleTextColor() {
-    final slide = _pages[_current];
-    setState(() =>
-        _pages[_current] = slide.copyWith(isTextWhite: !slide.isTextWhite));
-    _notify();
-  }
-
-  void _onTextChanged(String v) {
-    final slide = _pages[_current];
-    setState(() => _pages[_current] = slide.copyWith(text: v));
-    _notify();
-  }
-
-  void _addPage() {
-    if (_pages.length >= _maxPages) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Puoi creare al massimo 9 schermate.')),
-      );
-      return;
-    }
-    setState(() {
-      final first = _pages.first;
-      _pages = List.of(_pages)
-        ..add(
-          HinooSlide(
-            backgroundImage: first.backgroundImage,
-            text: '',
-            isTextWhite: true,
-            bgScale: first.bgScale,
-            bgOffsetX: first.bgOffsetX,
-            bgOffsetY: first.bgOffsetY,
-          ),
-        );
-    });
-    _goTo(_pages.length - 1);
-    _notify();
-  }
-
-  void _removePage() {
-    if (_pages.length <= 1) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Deve esserci almeno una schermata.')),
-      );
-      return;
-    }
-    // ✅ Consenti rimozione solo dell’ultima pagina
-    if (_current != _pages.length - 1) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Puoi rimuovere solo l’ultima pagina.')),
-      );
-      return;
-    }
-
-    // ...il resto rimane uguale...
-    setState(() {
-      final newPages = List.of(_pages)..removeAt(_current);
-      _pages = newPages;
-      _current = math.max(0, _current - 1);
-    });
-    _pageController.jumpToPage(_current);
-    _syncTextController();
-    _notify();
-  }
-
-  void _goTo(int index) {
-    _current = index.clamp(0, _pages.length - 1);
-    _pageController.animateToPage(
-      _current,
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeOutCubic,
-    );
-    _syncTextController();
-  }
-
-  void _next() => _goTo((_current + 1).clamp(0, _pages.length - 1));
-
-  void _prev() => _goTo((_current - 1).clamp(0, _pages.length - 1));
-
-  void _syncTextController() {
-    _textController.text = _pages[_current].text;
-    _textController.selection = TextSelection.fromPosition(
-      TextPosition(offset: _textController.text.length),
-    );
-    _syncFromSlideTransform(); // ✅ aggiungi questa riga
-  }
-
-  void _onScaleStart(ScaleStartDetails d) {
-    if (_bgLocked) return;
-    // sfondo globale editabile SOLO nella pagina 1
-    if (_current != 0) return;
-
-    _scaleStart = _scale;
-    _offsetStart = _offset;
-    _focalStart = d.focalPoint;
-  }
-
-  void _onScaleUpdate(ScaleUpdateDetails d) {
-    if (_bgLocked) return;
-    if (_current != 0) return;
-
-    // 1) scala ancorata al valore di start
-    final newScale = (_scaleStart * d.scale).clamp(0.5, 5.0);
-
-    // 2) mantieni “ancorato” il punto sotto il dito (focal point)
-    //    calcolando la posizione locale del punto focale a inizio gesto
-    final focalStartLocal = (_focalStart - _offsetStart) / _scaleStart;
-    final newOffset = d.focalPoint - focalStartLocal * newScale;
-
-    setState(() {
-      _scale = newScale;
-      _offset = newOffset;
-
-      // aggiorna la pagina 1 (sfondo globale)
-      _pages[0] = _pages[0].copyWith(
-        bgScale: _scale,
-        bgOffsetX: _offset.dx,
-        bgOffsetY: _offset.dy,
-      );
-
-      // propaga a tutte le altre pagine
-      _propagateBackgroundFromFirst();
-    });
-
-    _notify();
-  }
-
-  void _onScaleEnd(ScaleEndDetails d) {}
-
-  void _propagateBackgroundFromFirst() {
-    if (_pages.isEmpty) return;
-    final first = _pages.first;
-    for (int i = 1; i < _pages.length; i++) {
-      _pages[i] = _pages[i].copyWith(
-        backgroundImage: first.backgroundImage,
-        bgScale: first.bgScale,
-        bgOffsetX: first.bgOffsetX,
-        bgOffsetY: first.bgOffsetY,
-      );
-    }
-  }
-  Widget _thumbnailsBar() {
-    return SizedBox(
-      height: 96,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _pages.length,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        itemBuilder: (context, i) {
-          final s = _pages[i];
-          final bool isCurrent = i == _current;
-          return GestureDetector(
-            onTap: () => _goTo(i),
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 6),
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: isCurrent ? HonooColor.secondary : Colors.black26,
-                  width: isCurrent ? 2 : 1,
-                ),
-              ),
-              child: SizedBox(
-                height: 88,
-                child: AspectRatio(
-                  aspectRatio: 9 / 16,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        if (s.backgroundImage != null && s.backgroundImage!.isNotEmpty)
-                          Image.network(s.backgroundImage!, fit: BoxFit.cover)
-                        else
-                          const ColoredBox(color: Colors.black12),
-
-                        // badge con numero pagina
-                        Positioned(
-                          right: 6,
-                          bottom: 6,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.black54,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              '${i + 1}',
-                              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  /// Se una bozza vecchia ha sfondi diversi, uniforma tutto alla 1ª.
-  void _enforceGlobalBackgroundAfterRestore() {
-    if (_pages.length <= 1) return;
-    _propagateBackgroundFromFirst();
-  }
-
+  // ========================================================================
+  // Build — ROW pulsanti sopra, canvas 9:16 al centro, anteprime sotto
+  // ========================================================================
   @override
   Widget build(BuildContext context) {
-    if (_loadingDraft) {
-      return const Center(child: CircularProgressIndicator());
+    // Quando embedThumbnails=false, il parent gestisce layout e 9:16.
+    if (!widget.embedThumbnails) {
+      const BorderRadius canvasRadius = BorderRadius.all(Radius.circular(5));
+      return Card(
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        color: Colors.black,
+        shape: const RoundedRectangleBorder(borderRadius: canvasRadius),
+        clipBehavior: Clip.antiAlias,
+        child: _buildCanvas(context),
+      );
     }
 
-    final slide = _pages[_current];
-    final txtColor = slide.isTextWhite ? Colors.white : Colors.black;
+    return LayoutBuilder(
+      builder: (context, box) {
+        // Box 9:16 responsivo
+        const double ar = 9 / 16;
+        final double maxW = box.maxWidth;
+        final double maxH = box.maxHeight;
 
-    return Column(
-      children: [
-        _Toolbar(
-          current: _current + 1,
-          total: _pages.length,
-          onPrev: _prev,
-          onNext: _next,
-          onAdd: _addPage,
-          onRemove: (_pages.length > 1 && _current == _pages.length - 1)
-              ? _removePage
-              : () {},
-          replyController: _replyCtrl,
-          // 👈 nuovo
-          recipientController: _recipCtrl,
-          type: _type,
-          onTypeChanged: (t) {
-            setState(() => _type = t);
-            _notify();
-          },
-          // ✅ Reply mode inline (campi opzionali)
-          replyTo: _replyTo,
-          recipientTag: _recipientTag,
-          onReplyChanged: (replyTo, recipient) {
-            setState(() {
-              _replyTo = replyTo?.trim().isEmpty == true ? null : replyTo;
-              _recipientTag =
-                  recipient?.trim().isEmpty == true ? null : recipient;
-            });
-            _notify();
-          },
-          // ✅ Ora apre l’anteprima con azioni
-          onExportPng: _openPngPreview,
-        ),
+        double targetW = maxW;
+        double targetH = targetW / ar;          // h = w * 16/9
+        if (targetH > maxH) {
+          targetH = maxH;
+          targetW = targetH * ar;               // w = h * 9/16
+        }
 
-        const SizedBox(height: 8),
+        const double outerGap = 8;              // padding laterale
+        const double thumbsH = 180;             // altezza thumbnails
+        const BorderRadius canvasRadius = BorderRadius.all(Radius.circular(5));
 
-        // Editor verticale 16:9 (9/16) — avvolto in RepaintBoundary per export PNG
-        Expanded(
-          child: Center(
-            child: AspectRatio(
-              aspectRatio: 9 / 16,
-              child: RepaintBoundary(
-                key: _captureKey,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Colors.black12,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: Colors.black26, width: 1),
-                  ),
-                  child: Stack(
-                    fit: StackFit.expand,
+        return Column(
+          children: [
+            // ===== Editor: pulsanti SOPRA + canvas 9:16 CENTRATO =====
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: outerGap),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (slide.backgroundImage != null &&
-                          slide.backgroundImage!.isNotEmpty)
-                        GestureDetector(
-                          onScaleStart: _onScaleStart,
-                          onScaleUpdate: _onScaleUpdate,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(14),
-                            child: Transform.translate(
-                              offset: _offset,
-                              child: Transform.scale(
-                                scale: _scale,
-                                child: Image.network(
-                                  slide.backgroundImage!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) =>
-                                      const ColoredBox(color: Colors.black12),
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
-                      else
-                        const ColoredBox(color: Colors.black12),
-
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: IgnorePointer(
-                            ignoring: true,
-                            child: Text(
-                              slide.text,
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.libreFranklin(
-                                color: txtColor,
-                                fontSize: 22,
-                                height: 1.25,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Pulsanti sfondo/lock
-                      Positioned(
-                        left: 8,
-                        bottom: 8,
+                      // --- ROW di pulsanti bianchi, centrati, sopra il canvas ---
+                      SizedBox(
+                        width: targetW,
+                        height: 44,
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Tooltip(
-                              message: _current == 0
-                                  ? 'Scegli un’immagine di sfondo'
-                                  : 'Modifica lo sfondo dalla pagina 1',
-                              waitDuration: const Duration(milliseconds: 300),
-                              child: ElevatedButton.icon(
-                                onPressed: _current == 0 ? _pickBackgroundAndUpload : null,
-                                icon: const Icon(Icons.image_outlined),
-                                label: const Text('Sfondo'),
-                              ),
+                            WhiteIconButton(
+                              tooltip: 'Scarica immagine',
+                              icon: Icons.download_outlined,
+                              onPressed: _openPreviewDialog,
                             ),
-
-                            const SizedBox(width: 8),
-                            Tooltip(
-                              message: (_current == 0)
-                                  ? (slide.backgroundImage == null || slide.backgroundImage!.isEmpty
-                                  ? 'Carica uno sfondo per poterlo bloccare'
-                                  : (_bgLocked ? 'Sblocca lo sfondo' : 'Blocca lo sfondo'))
-                                  : 'Disponibile solo nella pagina 1',
-                              waitDuration: const Duration(milliseconds: 300),
-                              child: OutlinedButton.icon(
-                                onPressed: (_current == 0 && slide.backgroundImage != null && slide.backgroundImage!.isNotEmpty)
-                                    ? _toggleLock
-                                    : null,
-                                icon: Icon(_bgLocked ? Icons.lock : Icons.lock_open),
-                                label: Text(_bgLocked ? 'Bloccato' : 'Sblocca'),
-                              ),
+                            const SizedBox(width: 12),
+                            WhiteIconButton(
+                              tooltip: 'Elimina pagina',
+                              icon: Icons.delete_outline,
+                              onPressed: _deleteCurrentPage,
                             ),
-
                           ],
                         ),
                       ),
-
-                      // Toggle colore testo
-                      Positioned(
-                        right: 8,
-                        bottom: 8,
-                        child: ElevatedButton.icon(
-                          onPressed: _toggleTextColor,
-                          icon: Icon(slide.isTextWhite
-                              ? Icons.format_color_text
-                              : Icons.format_color_fill),
-                          label: Text(slide.isTextWhite
-                              ? 'Testo bianco'
-                              : 'Testo nero'),
+                      // --- CANVAS 9:16 (Card con r=5, clip attiva) ---
+                      SizedBox(
+                        width: targetW,
+                        height: targetH,
+                        child: Card(
+                          elevation: 0,
+                          margin: EdgeInsets.zero,
+                          color: Colors.black,
+                          shape: RoundedRectangleBorder(borderRadius: canvasRadius),
+                          clipBehavior: Clip.antiAlias,
+                          child: _buildCanvas(context), // <-- RepaintBoundary è qui dentro
                         ),
                       ),
                     ],
@@ -718,270 +213,389 @@ class HinooBuilderState extends State<HinooBuilder> {
                 ),
               ),
             ),
-          ),
-        ),
 
-        const SizedBox(height: 8),
-        _thumbnailsBar(),
-
-        if (_current != 0) ...[
-          const SizedBox(height: 6),
-          Text(
-            'Lo sfondo vale per tutte le pagine. Modificalo dalla pagina 1.',
-            style:
-                GoogleFonts.libreFranklin(fontSize: 12, color: Colors.black54),
-            textAlign: TextAlign.center,
-          ),
-        ],
-        const SizedBox(height: 12),
-
-        // Input testo (centrato nel preview)
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: TextField(
-            controller: _textController,
-            onChanged: _onTextChanged,
-            textAlign: TextAlign.center,
-            maxLines: 3,
-            inputFormatters: [LengthLimitingTextInputFormatter(300)],
-            decoration: InputDecoration(
-              hintText: 'Scrivi il testo dell’hinoo…',
-              hintStyle: GoogleFonts.libreFranklin(
-                  color: HonooColor.onBackground.withOpacity(0.5)),
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _Toolbar extends StatelessWidget {
-  final int current;
-  final int total;
-  final VoidCallback onPrev;
-  final VoidCallback onNext;
-  final VoidCallback onAdd;
-  final VoidCallback onRemove;
-
-  final HinooType type;
-  final ValueChanged<HinooType> onTypeChanged;
-  final TextEditingController replyController;
-  final TextEditingController recipientController;
-
-  // ✅ Reply UI (semplice, opzionale)
-  final String? replyTo;
-  final String? recipientTag;
-  final void Function(String? replyTo, String? recipientTag) onReplyChanged;
-
-  // ✅ Export PNG
-  final VoidCallback onExportPng;
-
-  const _Toolbar({
-    required this.current,
-    required this.total,
-    required this.onPrev,
-    required this.onNext,
-    required this.onAdd,
-    required this.onRemove,
-    required this.type,
-    required this.onTypeChanged,
-    required this.replyTo,
-    required this.recipientTag,
-    required this.onReplyChanged,
-    required this.onExportPng,
-    required this.replyController,
-    required this.recipientController,
-  });
-
-
-
-  @override
-  Widget build(BuildContext context) {
-    // colori coerenti con Honoo
-    Color chipColor(HinooType t) {
-      switch (t) {
-        case HinooType.moon:
-          return HonooColor.tertiary; // come HonooType.moon
-        case HinooType.answer:
-          return HonooColor.secondary; // come HonooType.answer
-        case HinooType.personal:
-        default:
-          return HonooColor.background; // come HonooType.personal
-      }
-    }
-
-    return Row(
-      children: [
-        const SizedBox(width: 4),
-        IconButton(
-            onPressed: current > 1 ? onPrev : null,
-            icon: const Icon(Icons.chevron_left_rounded),
-            tooltip: 'Precedente'),
-        Text('$current / $total',
-            style: GoogleFonts.libreFranklin(
-                fontSize: 16, fontWeight: FontWeight.w600)),
-        IconButton(
-            onPressed: current < total ? onNext : null,
-            icon: const Icon(Icons.chevron_right_rounded),
-            tooltip: 'Successiva'),
-        const Spacer(),
-
-        // Selettore TYPE con colori come Honoo
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children: [
-            ChoiceChip(
-              selected: type == HinooType.personal,
-              label: const Text('Personal'),
-              selectedColor: chipColor(HinooType.personal),
-              onSelected: (_) => onTypeChanged(HinooType.personal),
-            ),
-            ChoiceChip(
-              selected: type == HinooType.moon,
-              label: const Text('Moon'),
-              selectedColor: chipColor(HinooType.moon),
-              onSelected: (_) => onTypeChanged(HinooType.moon),
-            ),
-            ChoiceChip(
-              selected: type == HinooType.answer,
-              label: const Text('Answer'),
-              selectedColor: chipColor(HinooType.answer),
-              onSelected: (_) => onTypeChanged(HinooType.answer),
-            ),
-
-            // Reply fields (mostrali solo in Answer)
-            if (type == HinooType.answer)
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    width: 160,
-                    child: TextField(
-                      controller: replyController, // ✅
-                      decoration: const InputDecoration(
-                        isDense: true,
-                        labelText: 'Reply to (id)',
-                        border: OutlineInputBorder(),
-                      ),
-                      onChanged: (_) => onReplyChanged(
-                          replyController.text, recipientController.text),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  SizedBox(
-                    width: 140,
-                    child: TextField(
-                      controller: recipientController, // ✅
-                      decoration: const InputDecoration(
-                        isDense: true,
-                        labelText: 'Recipient tag',
-                        border: OutlineInputBorder(),
-                      ),
-                      onChanged: (_) => onReplyChanged(
-                          replyController.text, recipientController.text),
-                    ),
-                  ),
-                ],
-              ),
-          ],
-        ),
-
-        const SizedBox(width: 12),
-
-        // Export PNG → ora apre la preview
-        OutlinedButton.icon(
-          onPressed: onExportPng,
-          icon: const Icon(Icons.image),
-          label: const Text('Export PNG'),
-        ),
-
-        const SizedBox(width: 12),
-        OutlinedButton.icon(
-            onPressed: onRemove,
-            icon: const Icon(Icons.delete_outline),
-            label: const Text('Rimuovi')),
-        const SizedBox(width: 8),
-        ElevatedButton.icon(
-            onPressed: onAdd,
-            icon: const Icon(Icons.add),
-            label: const Text('Aggiungi')),
-        const SizedBox(width: 4),
-      ],
-    );
-  }
-}
-
-// ====== Dialog di anteprima PNG 9:16 ======
-class _PngPreviewDialog extends StatelessWidget {
-  final Uint8List pngBytes;
-  final Future<void> Function() onSaveToStorage;
-  final Future<void> Function() onDownloadLocal;
-
-  const _PngPreviewDialog({
-    required this.pngBytes,
-    required this.onSaveToStorage,
-    required this.onDownloadLocal,
-  });
-
-
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: const EdgeInsets.all(16),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 420),
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Anteprima 9:16',
-                  style: TextStyle(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 12),
-              AspectRatio(
-                aspectRatio: 9 / 16,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.memory(pngBytes, fit: BoxFit.cover),
+            // ===== Barra miniature SOTTO al canvas =====
+            SizedBox(
+              height: thumbsH,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: outerGap, vertical: 8),
+                child: AnteprimaHinoo(
+                  pages: _pages,
+                  currentIndex: _current,
+                  onTapThumb: _goTo,
+                  onAddPage: _addPage,
+                  onReorder: _onReorder,
                 ),
               ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close),
-                      label: const Text('Chiudi'),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: onDownloadLocal,
-                      icon: const Icon(Icons.download),
-                      label: const Text('Download'),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: onSaveToStorage,
-                      icon: const Icon(Icons.cloud_upload),
-                      label: const Text('Salva'),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // ========================================================================
+  // Canvas (SOLO contenuto esportabile) — dentro la Card
+  // ========================================================================
+  Widget _buildCanvas(BuildContext context) {
+    return RepaintBoundary(
+      key: _captureKey,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Sfondo: usa sempre un unico percorso (asset di default oppure preview selezionata)
+          Builder(
+            builder: (_) {
+              final ImageProvider provider = _localBgPreview ?? const AssetImage('assets/images/hinoo_default_1080x1920.png');
+              final Widget fitted = FittedBox(
+                fit: BoxFit.cover,
+                child: Image(image: provider),
+              );
+              final bool interactive = (_step == _WizardStep.changeBg && _bgChosen && _localBgPreview != null);
+              if (!interactive && _bgLockedMatrix != null) {
+                _bgController.value = _bgLockedMatrix!.clone();
+              }
+              return ClipRect(
+                child: InteractiveViewer(
+                  transformationController: _bgController,
+                  panEnabled: interactive,
+                  scaleEnabled: interactive,
+                  minScale: 1.0,
+                  maxScale: 5.0,
+                  boundaryMargin: const EdgeInsets.all(200),
+                  child: fitted,
+                ),
+              );
+            },
           ),
-        ),
+
+          // Overlays sequenziali: uno solo alla volta
+          if (_step == _WizardStep.changeBg)
+            ...[
+              if (!_bgChosen)
+                CambiaSfondoOverlay(onTapChange: _pickAndUploadBackground),
+              if (_bgChosen)
+                Positioned(
+                  top: 12,
+                  left: 12,
+                  child: IconButton(
+                    iconSize: 44,
+                    onPressed: _confirmBgAndLock,
+                    icon: SvgPicture.asset('assets/icons/ok.svg', width: 44, height: 44),
+                  ),
+                ),
+            ]
+          else if (_step == _WizardStep.pickColor)
+            ColoreTestoOverlay(
+              onPick: (c) {
+                setState(() {
+          _txtColor = c;
+          // Propaga il colore su TUTTE le pagine per anteprime fedeli
+          for (var i = 0; i < _pages.length; i++) {
+            _pages[i] = _copySlideWithTextColor(_pages[i], _txtColor.value);
+          }
+          _step = _WizardStep.writeText;
+          _showTextField = false;
+        });
+        _notifyChanged();
+      },
+            )
+          else if (_step == _WizardStep.writeText)
+            ScriviHinooOverlay(
+              controller: _textController,
+              focusNode: _textFocus,
+              textColor: _txtColor,
+            ),
+        ],
+      ),
+    );
+  }
+
+  // ========================================================================
+  // Gestione testo/pagine/riordino
+  // ========================================================================
+  void _onCanvasTextChanged(String v) {
+    // TODO: aggiorna il tuo modello slide (qui esempio generico)
+    final s = _pages[_current];
+    final updated = _copySlideWithText(s, v);
+    setState(() => _pages[_current] = updated);
+    _scheduleAutosave();
+    _notifyChanged();
+  }
+
+  void _goTo(int index) {
+    if (index < 0 || index >= _pages.length) return;
+    setState(() => _current = index);
+  }
+
+  void _addPage() {
+    setState(() {
+      _pages.add(_createEmptySlide());
+      _current = _pages.length - 1;
+      _textController.clear();
+      _scale = 1.0;
+      _offset = Offset.zero;
+      // mantieni anteprima sfondo globale
+    });
+    _scheduleAutosave();
+    _notifyChanged();
+  }
+
+  void _onReorder(int oldIndex, int newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) newIndex -= 1;
+      final item = _pages.removeAt(oldIndex);
+      _pages.insert(newIndex, item);
+      if (_current == oldIndex) {
+        _current = newIndex;
+      } else if (oldIndex < _current && newIndex >= _current) {
+        _current -= 1;
+      } else if (oldIndex > _current && newIndex <= _current) {
+        _current += 1;
+      }
+    });
+    _scheduleAutosave();
+    _notifyChanged();
+  }
+
+  // Elimina pagina corrente (con conferma)
+  Future<void> _deleteCurrentPage() async {
+    if (_pages.isEmpty) return;
+
+    final bool? ok = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Eliminare questa pagina?'),
+        content: const Text('L’operazione non è reversibile.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annulla')),
+          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Elimina')),
+        ],
+      ),
+    );
+
+    if (ok != true) return;
+
+    setState(() {
+      if (_pages.length > 1) {
+        _pages.removeAt(_current);
+        if (_current >= _pages.length) _current = _pages.length - 1;
+
+        // Reset base (adatta al tuo modello)
+        _textController.text = _extractTextFromSlide(_pages[_current]);
+        _txtColor = Colors.white;
+        _scale = 1.0;
+        _offset = Offset.zero;
+        _localBgPreview = null;
+      } else {
+        // mantieni almeno una pagina vuota
+        _pages[0] = _createEmptySlide();
+        _current = 0;
+        _textController.clear();
+        _txtColor = Colors.white;
+        _scale = 1.0;
+        _offset = Offset.zero;
+        _localBgPreview = null;
+      }
+    });
+
+    _scheduleAutosave();
+    _notifyChanged();
+  }
+
+  // ========================================================================
+  // Export PNG + Dialog
+  // ========================================================================
+  Future<void> _openPreviewDialog() async {
+    await _renderCanvasAsPng();
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => AnteprimaPNG(
+        previewBytes: _lastPreviewBytes,
+        filenameHint: _exportFilenameHint,
+        onSavePng: _exportCanvasPng,
+        onClose: () => Navigator.of(context).pop(),
+      ),
+    );
+  }
+
+  Future<void> _renderCanvasAsPng() async {
+    try {
+      final boundary = _captureKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (boundary == null) return;
+      final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final Uint8List bytes = byteData!.buffer.asUint8List();
+      setState(() {
+        _lastPreviewBytes = bytes;
+        _exportFilenameHint = 'hinoo_${DateTime.now().millisecondsSinceEpoch}.png';
+      });
+      final cb = widget.onPngExported;
+      if (cb != null) cb(bytes);
+    } catch (e) {
+      debugPrint('render PNG error: $e');
+    }
+  }
+
+  Future<void> _exportCanvasPng() async {
+    // TODO: salva/condividi _lastPreviewBytes secondo piattaforma (web/mobile)
+    debugPrint('Salvataggio PNG... bytes: ${_lastPreviewBytes?.length}');
+    Navigator.of(context).maybePop();
+  }
+
+  // ========================================================================
+  // Autosave/Notify – collega al tuo servizio
+  // ========================================================================
+  void _scheduleAutosave() {
+    // debounce/save
+  }
+
+  void _confirmBgAndLock() {
+    setState(() {
+      _bgLockedMatrix = _bgController.value.clone();
+      // Propaga la trasformazione a tutte le pagine
+      for (var i = 0; i < _pages.length; i++) {
+        _pages[i] = _copySlideWithBgTransform(_pages[i], _bgLockedMatrix!);
+      }
+      _step = _WizardStep.pickColor;
+    });
+    _notifyChanged();
+    _scheduleAutosave();
+  }
+
+  // ========================================================================
+  // Cambio sfondo – picking + upload storage (come HonooBuilder, adattato 9:16)
+  // ========================================================================
+  Future<void> _pickAndUploadBackground() async {
+    try {
+      final picker = ImagePicker();
+      final XFile? selected = await picker.pickImage(source: ImageSource.gallery);
+      if (selected == null) return;
+
+      // Preview locale immediata
+      final Uint8List bytes = await selected.readAsBytes();
+      setState(() {
+        _localBgPreview = MemoryImage(bytes);
+        _bgChosen = true; // abilita OK per procedere
+      });
+
+      _persistBgUrl(bytes, selected.name);
+      _notifyChanged();
+    } catch (e) {
+      debugPrint('Errore cambio sfondo: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Errore sfondo: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _persistBgUrl(Uint8List bytes, String originalName) async {
+    try {
+      final client = Supabase.instance.client;
+      final user = client.auth.currentUser;
+      if (user == null) return; // opzionale: consenti preview locale senza upload
+
+      final ext = _extensionFromName(originalName);
+      final url = await HinooStorageUploader.uploadBackground(bytes: bytes, ext: ext, userId: user.id);
+      setState(() {
+        _bgPublicUrl = url;
+      });
+
+      // Propaga su tutte le pagine esistenti
+      setState(() {
+        for (var i = 0; i < _pages.length; i++) {
+          _pages[i] = _copySlideWithBgUrl(_pages[i], url);
+        }
+      });
+      _notifyChanged();
+      _scheduleAutosave();
+    } catch (e) {
+      debugPrint('Upload sfondo fallito: $e');
+    }
+  }
+
+  String _extensionFromName(String name) {
+    final n = name.toLowerCase();
+    final i = n.lastIndexOf('.');
+    if (i < 0) return 'jpg';
+    final e = n.substring(i + 1);
+    if (e.length > 5) return 'jpg';
+    return e;
+  }
+
+  // ========================================================================
+  // Utility basiche per slide (se non hai un model)
+  // ============================================================================
+  dynamic _createEmptySlide() => {
+        'text': '',
+        'bgUrl': _bgPublicUrl,
+        'textColor': _txtColor.value,
+        if (_bgLockedMatrix != null) 'bgTransform': _bgLockedMatrix!.storage.toList(),
+      };
+
+  dynamic _copySlideWithText(dynamic slide, String text) {
+    if (slide is Map) return {...slide, 'text': text};
+    return slide;
+  }
+
+  dynamic _copySlideWithBgUrl(dynamic slide, String url) {
+    if (slide is Map) return {...slide, 'bgUrl': url};
+    return slide;
+  }
+
+  String _extractTextFromSlide(dynamic slide) {
+    if (slide is Map && slide['text'] is String) return slide['text'] as String;
+    return '';
+  }
+
+  dynamic _copySlideWithBgTransform(dynamic slide, Matrix4 m) {
+    if (slide is Map) {
+      return {
+        ...slide,
+        'bgTransform': m.storage.toList(),
+      };
+    }
+    return slide;
+  }
+
+  dynamic _copySlideWithTextColor(dynamic slide, int colorValue) {
+    if (slide is Map) return {...slide, 'textColor': colorValue};
+    return slide;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Helper top-level: pulsante bianco rotondo (privato al file)
+// ---------------------------------------------------------------------------
+class _WhiteIconButton extends StatelessWidget {
+  const _WhiteIconButton({
+    required this.icon,
+    required this.onPressed,
+    this.tooltip,
+    super.key,
+  });
+
+  final IconData icon;
+  final VoidCallback onPressed;
+  final String? tooltip;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: tooltip,
+      onPressed: onPressed,
+      icon: Icon(icon, size: 18, color: Colors.black),
+      style: IconButton.styleFrom(
+        backgroundColor: Colors.white,
+        padding: const EdgeInsets.all(8),
+        shape: const CircleBorder(),
+        elevation: 2,
       ),
     );
   }
 }
+// ^ Non più usato: il pulsante viene fornito da lib/Widgets/WhiteIconButton.dart

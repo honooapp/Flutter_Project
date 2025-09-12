@@ -63,13 +63,11 @@ class HinooSlide {
 class HinooDraft {
   final List<HinooSlide> pages;
   final HinooType type;       // personal | moon | answer
-  final String? replyTo;      // opzionale → id hinoo a cui rispondi
   final String? recipientTag; // opzionale
 
   const HinooDraft({
     required this.pages,
     this.type = HinooType.personal,
-    this.replyTo,
     this.recipientTag,
   });
 
@@ -82,21 +80,18 @@ class HinooDraft {
     return HinooDraft(
       pages: pages ?? this.pages,
       type: type ?? this.type,
-      replyTo: replyTo ?? this.replyTo,
       recipientTag: recipientTag ?? this.recipientTag,
     );
   }
 
   Map<String, dynamic> toJson() => {
     'type': type.name,
-    'replyTo': replyTo,
     'recipientTag': recipientTag,
     'pages': pages.map((p) => p.toJson()).toList(),
   };
 
   factory HinooDraft.fromJson(Map<String, dynamic> json) => HinooDraft(
     type: _typeFrom(json['type'] as String?),
-    replyTo: json['replyTo'] as String?,
     recipientTag: json['recipientTag'] as String?,
     pages: (json['pages'] as List<dynamic>? ?? [])
         .map((e) => HinooSlide.fromJson(e as Map<String, dynamic>))

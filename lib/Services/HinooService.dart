@@ -1,5 +1,4 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 import '../Entities/Hinoo.dart';
 
 class HinooService {
@@ -14,7 +13,6 @@ class HinooService {
       'user_id': userId,
       'type': draft.type.name, // 'personal' | 'moon' | 'answer'
       'pages': draft.toJson()['pages'],
-      'reply_to': draft.replyTo,
       'recipient_tag': draft.recipientTag,
       // fingerprint può essere null (solo moon lo usa per dedup)
       'fingerprint': (draft.type == HinooType.moon) ? fingerprint(draft) : null,
@@ -50,7 +48,6 @@ class HinooService {
       'type': 'moon',
       'pages': draft.toJson()['pages'],
       'fingerprint': fp,
-      'reply_to': draft.replyTo,
       'recipient_tag': draft.recipientTag,
       'created_at': DateTime.now().toIso8601String(),
     };
@@ -68,7 +65,6 @@ class HinooService {
             'txt:${p.text}|'
             'col:${p.isTextWhite ? 'w' : 'b'}|'
             'tr:${p.bgScale.toStringAsFixed(4)},${p.bgOffsetX.toStringAsFixed(2)},${p.bgOffsetY.toStringAsFixed(2)}',
-      if (d.replyTo != null) 'replyTo=${d.replyTo}',
       if (d.recipientTag != null) 'recipient=${d.recipientTag}',
     ];
     return parts.join('||');

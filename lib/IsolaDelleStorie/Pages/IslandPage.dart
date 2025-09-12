@@ -231,11 +231,14 @@ class _IslandPageState extends State<IslandPage> {
                     const double chestSize = 70;
                     const double homeSize = 40;
                     const double logoSize = 70;
+                    final double conchigliaSize = 70;
+
 
                     final double bottleTargetX = (w / 2) + 60;
                     final double chestCenterX = (w / 2) - (chestSize / 2);
                     final double homeTargetX = (w / 2) - 190;
                     final double logoTargetX = (w / 2) + 110;
+
 
                     double clampX(double x, double size) =>
                         x.clamp(0.0, (w - size)).toDouble();
@@ -244,6 +247,8 @@ class _IslandPageState extends State<IslandPage> {
                     final double chestX = clampX(chestCenterX, chestSize);
                     final double homeX = clampX(homeTargetX, homeSize);
                     final double logoX = clampX(logoTargetX, logoSize);
+                    final double conchigliaX = ((homeX + chestX) / 2).clamp(0.0, w - conchigliaSize);
+
 
                     return Stack(
                       clipBehavior: Clip.none,
@@ -318,8 +323,8 @@ class _IslandPageState extends State<IslandPage> {
                           ),
                         ),
                         Positioned(
-                          bottom: -10,
-                          left: chestX,
+                          bottom: -20,
+                          left: conchigliaX,
                           child: IconButton(
                             icon: SvgPicture.asset("assets/icons/isoladellestorie/conchiglia.svg", semanticsLabel: 'Chest'),
                             iconSize: chestSize,
