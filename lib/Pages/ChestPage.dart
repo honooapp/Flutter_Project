@@ -5,7 +5,10 @@ import 'package:sizer/sizer.dart';
 
 import '../Controller/HonooController.dart';
 import '../Entities/Honoo.dart';
+import '../Entities/Hinoo.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../UI/HonooThreadView.dart';
+import '../UI/HinooViewer.dart';
 import '../Utility/HonooColors.dart';
 import '../Utility/Utility.dart';
 import 'package:carousel_slider/carousel_slider.dart' as cs;
@@ -25,17 +28,72 @@ class _ChestPageState extends State<ChestPage> {
   final HonooController ctrl = HonooController();
 
   int _currentIndex = 0;
+  List<_ChestItem> _items = const [];
+  List<_HinooRow> _hinoo = const [];
 
   @override
   void initState() {
     super.initState();
-    ctrl.loadChest(); // carica dallo scrigno (DB)
+    ctrl.loadChest(); // carica HONOO dallo scrigno (DB)
+    _loadHinoo();     // carica HINOO dallo scrigno (DB)
   }
 
   @override
   void dispose() {
     _pageCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadHinoo() async {
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    if (uid == null) return;
+    try {
+      final client = Supabase.instance.client;
+      final rows = await client
+          .from('hinoo')
+          .select('pages,type,recipient_tag,created_at')
+          .eq('user_id', uid)
+          .eq('type', 'personal')
+          .order('created_at', ascending: false);
+
+      final list = <_HinooRow>[];
+      for (final r in (rows as List)) {
+        final pages = r['pages'];
+        if (pages is List) {
+          final draft = HinooDraft(
+            pages: pages
+                .whereType<Map<String, dynamic>>()
+                .map((e) => HinooSlide.fromJson(e))
+                .toList(),
+            type: HinooType.personal,
+            recipientTag: r['recipient_tag'] as String?,
+          );
+          final created = DateTime.tryParse((r['created_at'] ?? '').toString()) ?? DateTime.now();
+          list.add(_HinooRow(draft: draft, createdAt: created));
+        }
+      }
+
+      if (!mounted) return;
+      setState(() {
+        _hinoo = list;
+        _rebuildItems();
+      });
+    } catch (_) {
+      // ignora errori silenziosamente per ora
+    }
+  }
+
+  void _rebuildItems() {
+    final honoo = ctrl.personal.map<_ChestItem>((h) {
+      final dt = DateTime.tryParse(h.created_at) ?? DateTime.fromMillisecondsSinceEpoch(0);
+      return _ChestItem.honoo(h, dt);
+    }).toList();
+
+    final hinoo = _hinoo.map<_ChestItem>((r) => _ChestItem.hinoo(r.draft, r.createdAt)).toList();
+
+    _items = [...honoo, ...hinoo]
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt)); // più recenti prima
+    if (_currentIndex >= _items.length) _currentIndex = _items.isEmpty ? 0 : _items.length - 1;
   }
 
   // --- helper menu dinamico
@@ -52,7 +110,7 @@ class _ChestPageState extends State<ChestPage> {
     return w * 0.58;
   }
 
-  Widget _footerFor(Honoo? current) {
+  Widget _footerForHonoo(Honoo? current) {
     // footer invariato (come tuo file attuale) :contentReference[oaicite:1]{index=1}
     if (current == null) {
       return SizedBox(
@@ -160,6 +218,13 @@ class _ChestPageState extends State<ChestPage> {
     );
   }
 
+  Widget _buildChestItem(_ChestItem item, double availableCenterH, double targetMaxW) {
+    return item.when(
+      honoo: (h) => HonooThreadView(root: h),
+      hinoo: (d) => HinooViewer(draft: d, maxHeight: availableCenterH, maxWidth: targetMaxW),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -177,8 +242,8 @@ class _ChestPageState extends State<ChestPage> {
         child: AnimatedBuilder(
           animation: Listenable.merge([ctrl.isLoading, ctrl.version]),
           builder: (context, _) {
-            final personal = ctrl.personal;
-            final Honoo? current = personal.isEmpty ? null : personal[_currentIndex];
+            _rebuildItems();
+            final _ChestItem? current = _items.isEmpty ? null : _items[_currentIndex];
 
             return LayoutBuilder(
               builder: (context, constraints) {
@@ -230,49 +295,49 @@ class _ChestPageState extends State<ChestPage> {
                                 child: SizedBox(
                                   height: availableCenterH,
                                   width: double.infinity,
-                                  child: personal.isEmpty
+                                  child: _items.isEmpty
                                       ? Center(
-                                    child: Text(
-                                      'Nessun honoo nello scrigno',
-                                      style: GoogleFonts.libreFranklin(
-                                        color: HonooColor.onBackground,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                  )
+                                        child: Text(
+                                      'Nessun contenuto nello scrigno',
+                                          style: GoogleFonts.libreFranklin(
+                                            color: HonooColor.onBackground,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      )
                                       : Padding(
-                                    // gutter esterno
-                                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                                    child: cs.CarouselSlider.builder(
-                                      itemCount: personal.length,
-                                      options: cs.CarouselOptions(
-                                        height: availableCenterH,     // ← come NewHonooPage (riempi tutto)
-                                        viewportFraction: 1.0,
-                                        enableInfiniteScroll: false,
-                                        padEnds: true,
-                                        enlargeCenterPage: false,
-                                        scrollPhysics: const BouncingScrollPhysics(),
-                                        onPageChanged: (i, _) =>
-                                            setState(() => _currentIndex = i),
+                                        // gutter esterno
+                                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                                        child: cs.CarouselSlider.builder(
+                                      itemCount: _items.length,
+                                          options: cs.CarouselOptions(
+                                            height: availableCenterH,     // ← come NewHonooPage (riempi tutto)
+                                            viewportFraction: 1.0,
+                                            enableInfiniteScroll: false,
+                                            padEnds: true,
+                                            enlargeCenterPage: false,
+                                            scrollPhysics: const BouncingScrollPhysics(),
+                                            onPageChanged: (i, _) =>
+                                                setState(() => _currentIndex = i),
+                                          ),
+                                          itemBuilder: (context, index, realIdx) {
+                                            return Padding(
+                                              // gutter interno
+                                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                                              child: _buildChestItem(_items[index], availableCenterH, targetMaxW),
+                                            );
+                                          },
+                                        ),
                                       ),
-                                      itemBuilder: (context, index, realIdx) {
-                                        return Padding(
-                                          // gutter interno
-                                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                                          child: HonooThreadView(root: personal[index]),
-                                        );
-                                      },
                                     ),
                                   ),
-                                ),
-                              ),
                             ),
                           ),
                         ),
 
                         // FOOTER (invariato)
-                        _footerFor(current),
+                        _footerForHonoo(current?.honoo),
                       ],
                     ),
 
@@ -287,4 +352,26 @@ class _ChestPageState extends State<ChestPage> {
       ),
     );
   }
+}
+
+// Unione semplice per elementi dello scrigno
+class _ChestItem {
+  final Honoo? honoo;
+  final HinooDraft? hinoo;
+  final DateTime createdAt;
+  const _ChestItem._(this.honoo, this.hinoo, this.createdAt);
+  factory _ChestItem.honoo(Honoo h, DateTime createdAt) => _ChestItem._(h, null, createdAt);
+  factory _ChestItem.hinoo(HinooDraft d, DateTime createdAt) => _ChestItem._(null, d, createdAt);
+
+  T when<T>({required T Function(Honoo h) honoo, required T Function(HinooDraft d) hinoo}) {
+    if (this.honoo != null) return honoo(this.honoo!);
+    return hinoo(this.hinoo!);
+  }
+}
+
+
+class _HinooRow {
+  final HinooDraft draft;
+  final DateTime createdAt;
+  const _HinooRow({required this.draft, required this.createdAt});
 }

@@ -24,7 +24,7 @@ class CambiaSfondoOverlay extends StatelessWidget {
           child: Text(
             'cambia lo sfondo del tuo hinoo',
             textAlign: TextAlign.center,
-            style: GoogleFonts.literata(color: Colors.white, fontSize: 16),
+            style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
           ),
         ),
       ),

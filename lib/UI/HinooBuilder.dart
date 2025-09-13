@@ -18,8 +18,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Services/HinooStorageUploader.dart';
 import 'package:honoo/Widgets/WhiteIconButton.dart';
-import 'package:honoo/UI/HinooThumbnails.dart';
-import 'package:honoo/UI/AnteprimaPNG.dart';
+import 'package:honoo/UI/HinooBuilder/thumbnails/HinooThumbnails.dart';
+import 'package:honoo/UI/HinooBuilder/dialogs/AnteprimaPNG.dart';
 
 // Import coerenti con la struttura HinooBuilder
 
@@ -276,8 +276,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
                 CambiaSfondoOverlay(onTapChange: _pickAndUploadBackground),
               if (_bgChosen)
                 Positioned(
-                  top: 12,
-                  left: 12,
+                  bottom: 12,
+                  right: 12,
                   child: IconButton(
                     iconSize: 44,
                     onPressed: _confirmBgAndLock,

@@ -7,8 +7,14 @@ import 'EmailVerifyPage.dart';
 class EmailLoginPage extends StatefulWidget {
   final String? pendingHonooText;
   final String? pendingImageUrl;
+  final Map<String, dynamic>? pendingHinooDraft; // nuova: bozza Hinoo
 
-  const EmailLoginPage({super.key, this.pendingHonooText, this.pendingImageUrl});
+  const EmailLoginPage({
+    super.key,
+    this.pendingHonooText,
+    this.pendingImageUrl,
+    this.pendingHinooDraft,
+  });
 
   @override
   State<EmailLoginPage> createState() => _EmailLoginPageState();
@@ -36,6 +42,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
             email: email,
             pendingHonooText: widget.pendingHonooText,
             pendingImageUrl: widget.pendingImageUrl,
+            pendingHinooDraft: widget.pendingHinooDraft,
           ),
         ),
       );

@@ -33,9 +33,9 @@ class ScriviHinooOverlay extends StatelessWidget {
               isCollapsed: true,
               contentPadding: EdgeInsets.zero,
             ),
-            style: GoogleFonts.arvo(
+            style: GoogleFonts.lora(
               color: textColor,
-              fontSize: 24,
+              fontSize: 16,
               height: 1.3,
             ),
           ),

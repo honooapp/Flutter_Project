@@ -101,4 +101,34 @@ class HinooService {
     }
     return null;
   }
+
+  /// Carica gli Hinoo personali dell'utente (dallo scrigno)
+  static Future<List<HinooDraft>> fetchUserHinoo(String userId, {HinooType type = HinooType.personal}) async {
+    final typeStr = type.name; // 'personal' | 'moon' | 'answer'
+    final rows = await _supabase
+        .from(_table)
+        .select('pages,type,recipient_tag,created_at')
+        .eq('user_id', userId)
+        .eq('type', typeStr)
+        .order('created_at', ascending: false);
+
+    final List<HinooDraft> list = [];
+    for (final r in (rows as List)) {
+      final pages = r['pages'];
+      final String? recipient = r['recipient_tag'] as String?;
+      if (pages is List) {
+        list.add(
+          HinooDraft(
+            pages: pages
+                .whereType<Map<String, dynamic>>()
+                .map((e) => HinooSlide.fromJson(e))
+                .toList(),
+            type: type,
+            recipientTag: recipient,
+          ),
+        );
+      }
+    }
+    return list;
+  }
 }

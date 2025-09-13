@@ -14,10 +14,11 @@ import 'package:honoo/Controller/HinooController.dart';
 import '../UI/HinooBuilder.dart';
 import '../Widgets/WhiteIconButton.dart';
 // IMPORT del tuo widget thumbnails esterno
-import 'package:honoo/UI/HinooThumbnails.dart';
+import 'package:honoo/UI/HinooBuilder/thumbnails/HinooThumbnails.dart';
 
 import 'ChestPage.dart';
 import 'EmailLoginPage.dart';
+import '../Entities/Hinoo.dart';
 
 class NewHinooPage extends StatefulWidget {
   const NewHinooPage({super.key});
@@ -97,16 +98,9 @@ class _NewHinooPageState extends State<NewHinooPage> {
 
   // Azioni footer
   Future<void> _submitHinoo() async {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) {
-      if (!mounted) return;
-      Navigator.push(context, MaterialPageRoute(builder: (_) => const EmailLoginPage()));
-      return;
-    }
-
-    final dynamic draft = (_builderKey.currentState as dynamic)?.exportDraft();
-    final pages = (draft is Map) ? (draft['pages'] as List?) : null;
-    if (draft == null || pages == null || pages.isEmpty) {
+    final dynamic rawDraft = (_builderKey.currentState as dynamic)?.exportDraft();
+    final pages = (rawDraft is Map) ? (rawDraft['pages'] as List?) : null;
+    if (rawDraft == null || pages == null || pages.isEmpty) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Crea almeno una schermata 9:16 con sfondo e testo.')),
@@ -114,8 +108,26 @@ class _NewHinooPageState extends State<NewHinooPage> {
       return;
     }
 
+    // Converte il draft grezzo del builder nel modello HinooDraft (Entities/Hinoo.dart)
+    final HinooDraft hinooDraft = _convertRawBuilderDraft(rawDraft);
+
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      if (!mounted) return;
+      // Porta in login passando la bozza da salvare dopo l'accesso
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => EmailLoginPage(
+            pendingHinooDraft: hinooDraft.toJson(),
+          ),
+        ),
+      );
+      return;
+    }
+
     try {
-      await _controller.saveToChest(draft);
+      await _controller.saveToChest(hinooDraft);
       if (!mounted) return;
       setState(() => _savedToChest = true);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -127,6 +139,40 @@ class _NewHinooPageState extends State<NewHinooPage> {
         SnackBar(content: Text('Errore: $e')),
       );
     }
+  }
+
+  // Converte il draft prodotto da HinooBuilder (Map) nel tipo HinooDraft
+  HinooDraft _convertRawBuilderDraft(Map raw) {
+    final List<dynamic> rawPages = (raw['pages'] as List<dynamic>? ?? []);
+    final List<HinooSlide> slides = [];
+    for (final p in rawPages) {
+      if (p is Map) {
+        final bgUrl = p['bgUrl'] as String?;
+        final txt = (p['text'] as String?) ?? '';
+        final textColorVal = (p['textColor'] as int?) ?? 0xFFFFFFFF;
+        final isTextWhite = textColorVal == const Color(0xFFFFFFFF).value;
+        // Estrai scale e offset (se presenti) dalla matrice 4x4
+        double scale = 1.0;
+        double offX = 0.0;
+        double offY = 0.0;
+        final tr = p['bgTransform'];
+        if (tr is List && tr.length == 16) {
+          final List<double> m = tr.map((e) => (e as num).toDouble()).toList();
+          scale = m[0];
+          offX = m[12];
+          offY = m[13];
+        }
+        slides.add(HinooSlide(
+          backgroundImage: bgUrl,
+          text: txt,
+          isTextWhite: isTextWhite,
+          bgScale: scale,
+          bgOffsetX: offX,
+          bgOffsetY: offY,
+        ));
+      }
+    }
+    return HinooDraft(pages: slides, type: HinooType.personal);
   }
 
   Future<void> _submitToMoon() async {

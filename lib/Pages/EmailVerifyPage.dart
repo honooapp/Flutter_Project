@@ -3,18 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Entities/Honoo.dart';
 import '../Services/HonooService.dart';
+import '../Entities/Hinoo.dart';
+import '../Services/HinooService.dart';
 import 'ChestPage.dart';
 
 class EmailVerifyPage extends StatefulWidget {
   final String email;
   final String? pendingHonooText;
   final String? pendingImageUrl;
+  final Map<String, dynamic>? pendingHinooDraft;
 
   const EmailVerifyPage({
     super.key,
     required this.email,
     this.pendingHonooText,
     this.pendingImageUrl,
+    this.pendingHinooDraft,
   });
 
   @override
@@ -54,6 +58,22 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
           // Debug facoltativo:
           // print('🟨 Honoo.toMap: ${honoo.toMap()}');
           await HonooService.publishHonoo(honoo);
+        }
+
+        // Se c'è un hinoo in sospeso, salvalo nello scrigno (type personal)
+        if (widget.pendingHinooDraft != null) {
+          try {
+            final map = widget.pendingHinooDraft!;
+            final draft = HinooDraft.fromJson(map);
+            await HinooService.publishHinoo(draft);
+          } catch (e) {
+            // Non bloccare il flusso di login; mostra feedback opzionale
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Errore salvataggio Hinoo: $e')),
+              );
+            }
+          }
         }
 
         if (!mounted) return;

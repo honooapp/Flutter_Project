@@ -24,7 +24,7 @@ class ColoreTestoOverlay extends StatelessWidget {
             child: Text(
               'scegli il colore del testo',
               textAlign: TextAlign.center,
-              style: GoogleFonts.literata(color: Colors.white, fontSize: 16),
+              style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
             ),
           ),
           const SizedBox(height: 16),
