@@ -34,11 +34,7 @@ class _HinooViewerState extends State<HinooViewer> {
     const double sideDotsW = 20; // larghezza colonna pallini
     const double gap = 8;         // spazio tra card e pallini
 
-    // riserva spazio per i pallini a destra
-    double availableForCard = (widget.maxWidth - sideDotsW - gap);
-    if (availableForCard < 0) availableForCard = widget.maxWidth;
-
-    double w = availableForCard;
+    double w = widget.maxWidth;
     double h = w / ar;
     if (h > widget.maxHeight) {
       h = widget.maxHeight;
@@ -47,39 +43,43 @@ class _HinooViewerState extends State<HinooViewer> {
 
     return Center(
       child: SizedBox(
-        width: w + gap + sideDotsW,
+        width: w,
         height: h,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
+        child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            SizedBox(
-              width: w,
-              height: h,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(5),
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onVerticalDragUpdate: (_) {}, // priorità al gesto verticale
-                  child: PageView.builder(
-                    scrollDirection: Axis.vertical,
-                    controller: _vController,
-                    physics: const PageScrollPhysics(),
-                    allowImplicitScrolling: true,
-                    itemCount: widget.draft.pages.length,
-                    onPageChanged: (i) => setState(() => _current = i),
-                    itemBuilder: (context, i) => _HinooSlideView(slide: widget.draft.pages[i]),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onVerticalDragUpdate: (_) {}, // priorità al gesto verticale
+                child: PageView.builder(
+                  scrollDirection: Axis.vertical,
+                  controller: _vController,
+                  physics: const PageScrollPhysics(),
+                  allowImplicitScrolling: true,
+                  itemCount: widget.draft.pages.length,
+                  onPageChanged: (i) => setState(() => _current = i),
+                  itemBuilder: (context, i) => _HinooSlideView(
+                    slide: widget.draft.pages[i],
+                    width: w,
+                    height: h,
+                    baseCanvasHeight: widget.draft.baseCanvasHeight,
                   ),
                 ),
               ),
             ),
-            SizedBox(width: gap),
-            SizedBox(
-              width: sideDotsW,
-              height: h,
-              child: _HinooPageDots(
-                count: widget.draft.pages.length,
-                currentIndex: _current,
+            Positioned(
+              right: -(gap + sideDotsW),
+              top: 0,
+              bottom: 0,
+              child: SizedBox(
+                width: sideDotsW,
+                height: h,
+                child: _HinooPageDots(
+                  count: widget.draft.pages.length,
+                  currentIndex: _current,
+                ),
               ),
             ),
           ],
@@ -91,7 +91,15 @@ class _HinooViewerState extends State<HinooViewer> {
 
 class _HinooSlideView extends StatelessWidget {
   final HinooSlide slide;
-  const _HinooSlideView({required this.slide});
+  final double width;
+  final double height;
+  final double? baseCanvasHeight;
+  const _HinooSlideView({
+    required this.slide,
+    required this.width,
+    required this.height,
+    required this.baseCanvasHeight,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -100,41 +108,66 @@ class _HinooSlideView extends StatelessWidget {
         ? NetworkImage(slide.backgroundImage!)
         : const AssetImage('assets/images/hinoo_default_1080x1920.png') as ImageProvider;
 
-    // Applica trasformazioni basilari (scale/offset) per coerenza
-    final Matrix4 transform = Matrix4.identity()
-      ..translate(slide.bgOffsetX, slide.bgOffsetY)
-      ..scale(slide.bgScale);
+    const double designWidth = 1080;
+    const double designHeight = 1920;
+    final double scaleX = width / designWidth;
+    final double scaleY = height / designHeight;
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        FittedBox(
-          fit: BoxFit.cover,
-          child: Transform(
-            transform: transform,
-            alignment: Alignment.center,
-            child: Image(image: bg),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Center(
-            child: Text(
-              slide.text,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.lora(
-                color: textColor,
-                fontSize: 16,
-                height: 1.3,
-                fontWeight: FontWeight.w600,
-              ),
-              maxLines: 8,
-              overflow: TextOverflow.ellipsis,
-              softWrap: true,
+    Matrix4 buildTransform() {
+      if (slide.bgTransform != null && slide.bgTransform!.length == 16) {
+        final List<double> m = List<double>.from(slide.bgTransform!);
+        m[12] *= scaleX;
+        m[13] *= scaleY;
+        return Matrix4.fromList(m);
+      }
+
+      final double tx = slide.bgOffsetX * scaleX;
+      final double ty = slide.bgOffsetY * scaleY;
+      return Matrix4.identity()
+        ..translate(tx, ty)
+        ..scale(slide.bgScale);
+    }
+
+    final Matrix4 transform = buildTransform();
+
+    final double referenceCanvasHeight = (baseCanvasHeight != null && baseCanvasHeight! > 0)
+        ? baseCanvasHeight!
+        : height;
+    final double fontScale = height / referenceCanvasHeight;
+    final double fontSize = (20 * fontScale).clamp(10.0, 60.0).toDouble();
+    final double padding = (16 * fontScale).clamp(8.0, 40.0).toDouble();
+
+    return SizedBox(
+      width: width,
+      height: height,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ClipRect(
+            child: Transform(
+              transform: transform,
+              alignment: Alignment.center,
+              child: Image(image: bg, fit: BoxFit.cover),
             ),
           ),
-        ),
-      ],
+          Padding(
+            padding: EdgeInsets.all(padding),
+            child: Center(
+              child: Text(
+                slide.text,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.lora(
+                  color: textColor,
+                  fontSize: fontSize,
+                  height: 1.3,
+                  fontWeight: FontWeight.w600,
+                ),
+                softWrap: true,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -177,4 +210,3 @@ class _HinooPageDots extends StatelessWidget {
     );
   }
 }
-

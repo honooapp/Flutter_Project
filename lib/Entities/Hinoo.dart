@@ -11,6 +11,7 @@ class HinooSlide {
   final double bgScale;   // default 1.0
   final double bgOffsetX; // default 0.0
   final double bgOffsetY; // default 0.0
+  final List<double>? bgTransform; // matrice completa 4x4 normalizzata (opzionale)
 
   const HinooSlide({
     required this.backgroundImage,
@@ -19,6 +20,7 @@ class HinooSlide {
     this.bgScale = 1.0,
     this.bgOffsetX = 0.0,
     this.bgOffsetY = 0.0,
+    this.bgTransform,
   });
 
   HinooSlide copyWith({
@@ -28,6 +30,7 @@ class HinooSlide {
     double? bgScale,
     double? bgOffsetX,
     double? bgOffsetY,
+    List<double>? bgTransform,
   }) {
     return HinooSlide(
       backgroundImage: backgroundImage ?? this.backgroundImage,
@@ -36,6 +39,7 @@ class HinooSlide {
       bgScale: bgScale ?? this.bgScale,
       bgOffsetX: bgOffsetX ?? this.bgOffsetX,
       bgOffsetY: bgOffsetY ?? this.bgOffsetY,
+      bgTransform: bgTransform ?? this.bgTransform,
     );
   }
 
@@ -46,6 +50,7 @@ class HinooSlide {
     'bgScale': bgScale,
     'bgOffsetX': bgOffsetX,
     'bgOffsetY': bgOffsetY,
+    if (bgTransform != null) 'bgTransform': bgTransform,
   };
 
 
@@ -56,6 +61,7 @@ class HinooSlide {
     bgScale: (json['bgScale'] as num?)?.toDouble() ?? 1.0,
     bgOffsetX: (json['bgOffsetX'] as num?)?.toDouble() ?? 0.0,
     bgOffsetY: (json['bgOffsetY'] as num?)?.toDouble() ?? 0.0,
+    bgTransform: (json['bgTransform'] as List?)?.map((e) => (e as num).toDouble()).toList(),
   );
 }
 
@@ -64,11 +70,13 @@ class HinooDraft {
   final List<HinooSlide> pages;
   final HinooType type;       // personal | moon | answer
   final String? recipientTag; // opzionale
+  final double? baseCanvasHeight; // altezza canvas al momento della creazione (per proporzioni testo)
 
   const HinooDraft({
     required this.pages,
     this.type = HinooType.personal,
     this.recipientTag,
+    this.baseCanvasHeight,
   });
 
   HinooDraft copyWith({
@@ -76,11 +84,13 @@ class HinooDraft {
     HinooType? type,
     String? replyTo,
     String? recipientTag,
+    double? baseCanvasHeight,
   }) {
     return HinooDraft(
       pages: pages ?? this.pages,
       type: type ?? this.type,
       recipientTag: recipientTag ?? this.recipientTag,
+      baseCanvasHeight: baseCanvasHeight ?? this.baseCanvasHeight,
     );
   }
 
@@ -88,6 +98,7 @@ class HinooDraft {
     'type': type.name,
     'recipientTag': recipientTag,
     'pages': pages.map((p) => p.toJson()).toList(),
+    if (baseCanvasHeight != null) 'baseCanvasHeight': baseCanvasHeight,
   };
 
   factory HinooDraft.fromJson(Map<String, dynamic> json) => HinooDraft(
@@ -96,6 +107,7 @@ class HinooDraft {
     pages: (json['pages'] as List<dynamic>? ?? [])
         .map((e) => HinooSlide.fromJson(e as Map<String, dynamic>))
         .toList(),
+    baseCanvasHeight: (json['baseCanvasHeight'] as num?)?.toDouble(),
   );
 
   static HinooType _typeFrom(String? s) {

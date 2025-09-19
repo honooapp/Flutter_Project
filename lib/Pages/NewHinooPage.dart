@@ -40,6 +40,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
   String? _globalBgUrl;
   List<dynamic>? _globalBgTransform;
   Uint8List? _globalBgPreviewBytes;
+  double _lastCanvasHeight = 0;
 
   // Costanti layout
   static const double _titleH = 52;     // riga titolo
@@ -84,6 +85,8 @@ class _NewHinooPageState extends State<NewHinooPage> {
       _globalBgTransform = (tr is List) ? tr : null;
       final bytes = draft['bgPreviewBytes'];
       _globalBgPreviewBytes = (bytes is Uint8List) ? bytes : null;
+      final ch = draft['canvasHeight'];
+      if (ch is num) _lastCanvasHeight = ch.toDouble();
       setState(() {}); // ridisegna thumbnails
     }
   }
@@ -155,12 +158,27 @@ class _NewHinooPageState extends State<NewHinooPage> {
         double scale = 1.0;
         double offX = 0.0;
         double offY = 0.0;
+        List<double>? normalizedTransform;
         final tr = p['bgTransform'];
         if (tr is List && tr.length == 16) {
           final List<double> m = tr.map((e) => (e as num).toDouble()).toList();
           scale = m[0];
           offX = m[12];
           offY = m[13];
+
+          const double designHeight = 1920;
+          const double designWidth = 1080;
+          final double canvasH = _lastCanvasHeight > 0 ? _lastCanvasHeight : designHeight;
+          final double canvasW = canvasH * (9 / 16);
+          final double factorX = canvasW != 0 ? designWidth / canvasW : 1.0;
+          final double factorY = canvasH != 0 ? designHeight / canvasH : 1.0;
+
+          normalizedTransform = List<double>.from(m);
+          normalizedTransform[12] = m[12] * factorX;
+          normalizedTransform[13] = m[13] * factorY;
+
+          offX = normalizedTransform[12];
+          offY = normalizedTransform[13];
         }
         slides.add(HinooSlide(
           backgroundImage: bgUrl,
@@ -169,10 +187,15 @@ class _NewHinooPageState extends State<NewHinooPage> {
           bgScale: scale,
           bgOffsetX: offX,
           bgOffsetY: offY,
+          bgTransform: normalizedTransform,
         ));
       }
     }
-    return HinooDraft(pages: slides, type: HinooType.personal);
+    return HinooDraft(
+      pages: slides,
+      type: HinooType.personal,
+      baseCanvasHeight: _lastCanvasHeight > 0 ? _lastCanvasHeight : null,
+    );
   }
 
   Future<void> _submitToMoon() async {
@@ -294,6 +317,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
               canvasH = availableH;
               canvasW = canvasH * ar;
             }
+            _lastCanvasHeight = canvasH;
 
             return Stack(
               clipBehavior: Clip.none,
@@ -385,6 +409,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
                           onTapThumb: _goToFromBuilder,
                           onAddPage: _addPageFromBuilder,
                           onReorder: _reorderFromBuilder,
+                          canvasHeight: canvasH,
                           fallbackBgUrl: _globalBgUrl,
                           fallbackBgTransform: _globalBgTransform,
                           fallbackBgBytes: _globalBgPreviewBytes,

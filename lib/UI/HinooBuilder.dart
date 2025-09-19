@@ -62,6 +62,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
   // Trasformazioni testo sul canvas
   double _scale = 1.0;
   Offset _offset = Offset.zero;
+  double _canvasHeight = 0;
 
   // Stato UI
   ImageProvider? _localBgPreview; // preview locale dello sfondo
@@ -116,6 +117,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
       'hasBg': _localBgPreview != null || _bgPublicUrl != null,
       'bgUrl': _bgPublicUrl,
       'bgTransform': _bgLockedMatrix?.storage.toList(),
+      'canvasHeight': _canvasHeight,
       // preview immediata per thumbnails quando non c'è ancora un URL pubblico
       'bgPreviewBytes': _localBgPreview is MemoryImage
           ? (_localBgPreview as MemoryImage).bytes
@@ -159,6 +161,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
           targetH = maxH;
           targetW = targetH * ar;               // w = h * 9/16
         }
+        _canvasHeight = targetH;
 
         const double outerGap = 8;              // padding laterale
         const double thumbsH = 180;             // altezza thumbnails
@@ -225,6 +228,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
                   onTapThumb: _goTo,
                   onAddPage: _addPage,
                   onReorder: _onReorder,
+                  canvasHeight: targetH,
                 ),
               ),
             ),

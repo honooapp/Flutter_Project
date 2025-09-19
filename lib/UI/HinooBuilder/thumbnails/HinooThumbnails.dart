@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AnteprimaHinoo extends StatelessWidget {
@@ -10,6 +11,7 @@ class AnteprimaHinoo extends StatelessWidget {
     required this.onTapThumb,
     required this.onAddPage,
     required this.onReorder,
+    required this.canvasHeight,
     this.fallbackBgUrl,
     this.fallbackBgTransform,
     this.fallbackBgBytes,
@@ -20,6 +22,7 @@ class AnteprimaHinoo extends StatelessWidget {
   final void Function(int index) onTapThumb;
   final VoidCallback onAddPage;
   final void Function(int oldIndex, int newIndex) onReorder;
+  final double canvasHeight;
   final String? fallbackBgUrl;
   final List<dynamic>? fallbackBgTransform; // 16 elementi double
   final Uint8List? fallbackBgBytes;
@@ -32,6 +35,7 @@ class AnteprimaHinoo extends StatelessWidget {
       onTapThumb: onTapThumb,
       onReorder: onReorder,
       onAddPage: onAddPage,
+      canvasHeight: canvasHeight,
       fallbackBgUrl: fallbackBgUrl,
       fallbackBgTransform: fallbackBgTransform,
       fallbackBgBytes: fallbackBgBytes,
@@ -46,6 +50,7 @@ class _ReorderableThumbs extends StatelessWidget {
     required this.onTapThumb,
     required this.onReorder,
     required this.onAddPage,
+    required this.canvasHeight,
     this.fallbackBgUrl,
     this.fallbackBgTransform,
     this.fallbackBgBytes,
@@ -56,6 +61,7 @@ class _ReorderableThumbs extends StatelessWidget {
   final void Function(int index) onTapThumb;
   final void Function(int oldIndex, int newIndex) onReorder;
   final VoidCallback onAddPage;
+  final double canvasHeight;
   final String? fallbackBgUrl;
   final List<dynamic>? fallbackBgTransform;
   final Uint8List? fallbackBgBytes;
@@ -118,6 +124,7 @@ class _ReorderableThumbs extends StatelessWidget {
                     index: i,
                     selected: i == currentIndex,
                     page: page,
+                    canvasHeight: canvasHeight,
                     fallbackBgUrl: fallbackBgUrl,
                     fallbackBgTransform: fallbackBgTransform,
                     fallbackBgBytes: fallbackBgBytes,
@@ -137,6 +144,7 @@ class _ThumbTile extends StatelessWidget {
     required this.index,
     required this.selected,
     required this.page,
+    required this.canvasHeight,
     this.fallbackBgUrl,
     this.fallbackBgTransform,
     this.fallbackBgBytes,
@@ -145,6 +153,7 @@ class _ThumbTile extends StatelessWidget {
   final int index;
   final bool selected;
   final dynamic page;
+  final double canvasHeight;
   final String? fallbackBgUrl;
   final List<dynamic>? fallbackBgTransform;
   final Uint8List? fallbackBgBytes;
@@ -154,6 +163,8 @@ class _ThumbTile extends StatelessWidget {
     const double ar = 9 / 16;
     const double thumbH = 128;
     const double thumbW = thumbH * ar;
+    const double designHeight = 1920;
+    const double designWidth = 1080;
 
     String? bgUrl = (page is Map) ? page['bgUrl'] as String? : null;
     bgUrl ??= fallbackBgUrl;
@@ -166,23 +177,68 @@ class _ThumbTile extends StatelessWidget {
         ? Matrix4.fromList(transformList.map((e) => (e as num).toDouble()).toList())
         : null;
 
-    Widget bg;
-    if (bgUrl != null && bgUrl.isNotEmpty) {
-      bg = Image.network(bgUrl, fit: BoxFit.cover);
-    } else if (fallbackBgBytes != null) {
-      bg = Image.memory(fallbackBgBytes!, fit: BoxFit.cover);
+    final double baseCanvasHeight = canvasHeight.isFinite && canvasHeight > 0 ? canvasHeight : designHeight;
+    final double scaleFactor = designHeight / baseCanvasHeight;
+    final Matrix4? effectiveTransform;
+    if (transform != null) {
+      effectiveTransform = transform.clone()
+        ..setTranslationRaw(
+          transform.storage[12] * scaleFactor,
+          transform.storage[13] * scaleFactor,
+          transform.storage[14],
+        );
     } else {
-      bg = const Image(
-        image: AssetImage('assets/images/hinoo_default_1080x1920.png'),
-        fit: BoxFit.cover,
+      effectiveTransform = null;
+    }
+
+    final ImageProvider bgProvider;
+    if (bgUrl != null && bgUrl.isNotEmpty) {
+      bgProvider = NetworkImage(bgUrl);
+    } else if (fallbackBgBytes != null && fallbackBgBytes!.isNotEmpty) {
+      bgProvider = MemoryImage(fallbackBgBytes!);
+    } else {
+      bgProvider = const AssetImage('assets/images/hinoo_default_1080x1920.png');
+    }
+
+    Widget buildBackground() {
+      final image = Image(image: bgProvider, fit: BoxFit.cover);
+      if (effectiveTransform == null) return image;
+      return Transform(
+        transform: effectiveTransform,
+        alignment: Alignment.center,
+        child: image,
       );
     }
 
-    if (transform != null) {
-      bg = Transform(
-        transform: transform,
-        alignment: Alignment.center,
-        child: bg,
+    Widget buildPagePreview() {
+      final double intrinsicFontSize = 16 * scaleFactor;
+      final double intrinsicPadding = 24 * scaleFactor;
+
+      return SizedBox(
+        width: designWidth,
+        height: designHeight,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            ClipRect(child: buildBackground()),
+            Padding(
+              padding: EdgeInsets.all(intrinsicPadding < 0 ? 0 : intrinsicPadding),
+              child: Center(
+                child: Text(
+                  text,
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                  style: GoogleFonts.lora(
+                    color: textColor,
+                    fontSize: intrinsicFontSize,
+                    height: 1.3,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       );
     }
 
@@ -203,11 +259,7 @@ class _ThumbTile extends StatelessWidget {
         children: [
           FittedBox(
             fit: BoxFit.cover,
-            child: SizedBox(
-              width: thumbW,
-              height: thumbH,
-              child: bg,
-            ),
+            child: buildPagePreview(),
           ),
           // Numero in alto a destra
           Positioned(
@@ -229,24 +281,7 @@ class _ThumbTile extends StatelessWidget {
               ),
             ),
           ),
-          // Testo centrato
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Center(
-              child: Text(
-                text,
-                textAlign: TextAlign.center,
-                maxLines: 4,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.arvo(
-                  color: textColor,
-                  fontSize: 12,
-                  height: 1.2,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          )
+          // Contenuto della pagina già renderizzato dal builder in miniatura
         ],
       ),
     );
