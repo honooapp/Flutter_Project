@@ -41,7 +41,7 @@ class _MoonPageState extends State<MoonPage> {
       final rows = await client
           .from('hinoo')
           .select('pages,type,recipient_tag,created_at')
-          .eq('type', 'moon')
+          .eq('type', 'public')
           .order('created_at', ascending: false);
 
       final List<_MoonItem> items = [];

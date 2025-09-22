@@ -112,7 +112,9 @@ class HinooDraft {
 
   static HinooType _typeFrom(String? s) {
     switch (s) {
-      case 'moon': return HinooType.moon;
+      case 'moon':
+      case 'public':
+        return HinooType.moon;
       case 'answer': return HinooType.answer;
       default: return HinooType.personal;
     }

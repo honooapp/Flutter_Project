@@ -5,13 +5,28 @@ class HinooService {
   static final _supabase = Supabase.instance.client;
   static const String _table = 'hinoo';
 
+  static String _toDbType(HinooType type) {
+    switch (type) {
+      case HinooType.moon:
+        return 'public';
+      default:
+        return type.name;
+    }
+  }
+
+  static HinooType _fromDbType(String? value) {
+    if (value == 'public') return HinooType.moon;
+    if (value == 'answer') return HinooType.answer;
+    return HinooType.personal;
+  }
+
   static Future<void> publishHinoo(HinooDraft draft) async {
     final userId = _supabase.auth.currentUser?.id;
     if (userId == null) throw 'Utente non autenticato';
 
     final data = {
       'user_id': userId,
-      'type': draft.type.name, // 'personal' | 'moon' | 'answer'
+      'type': _toDbType(draft.type),
       'pages': draft.toJson()['pages'],
       'recipient_tag': draft.recipientTag,
       // fingerprint può essere null (solo moon lo usa per dedup)
@@ -29,14 +44,15 @@ class HinooService {
     final userId = _supabase.auth.currentUser?.id;
     if (userId == null) throw 'Utente non autenticato';
 
-    final fp = fingerprint(draft.copyWith(type: HinooType.moon));
+    final sanitized = draft.copyWith(type: HinooType.moon);
+    final fp = fingerprint(sanitized);
 
     // Verifica duplicato nella STESSA tabella
     final existing = await _supabase
         .from(_table)
         .select('id')
         .eq('user_id', userId)
-        .eq('type', 'moon')
+        .eq('type', _toDbType(HinooType.moon))
         .eq('fingerprint', fp)
         .limit(1);
 
@@ -46,10 +62,10 @@ class HinooService {
 
     final data = {
       'user_id': userId,
-      'type': 'moon',
-      'pages': draft.toJson()['pages'],
+      'type': _toDbType(HinooType.moon),
+      'pages': sanitized.toJson()['pages'],
       'fingerprint': fp,
-      'recipient_tag': draft.recipientTag,
+      'recipient_tag': sanitized.recipientTag,
       'created_at': DateTime.now().toIso8601String(),
     };
 
@@ -105,7 +121,7 @@ class HinooService {
   /// Carica gli Hinoo personali dell'utente (dallo scrigno)
   static Future<List<HinooDraft>> fetchUserHinoo(String userId,
       {HinooType type = HinooType.personal}) async {
-    final typeStr = type.name; // 'personal' | 'moon' | 'answer'
+    final typeStr = _toDbType(type);
     final rows = await _supabase
         .from(_table)
         .select('pages,type,recipient_tag,created_at')
@@ -124,7 +140,7 @@ class HinooService {
                 .whereType<Map<String, dynamic>>()
                 .map((e) => HinooSlide.fromJson(e))
                 .toList(),
-            type: type,
+            type: _fromDbType(r['type'] as String?),
             recipientTag: recipient,
           ),
         );
