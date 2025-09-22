@@ -28,13 +28,16 @@ class HinooController {
 
   String fingerprint(HinooDraft d) => HinooService.fingerprint(d);
 
-  bool hasMeaningfulChanges(HinooDraft draft) => fingerprint(draft) != lastSavedFingerprint;
+  bool hasMeaningfulChanges(HinooDraft draft) =>
+      fingerprint(draft) != lastSavedFingerprint;
 
   /// Caricamento sfondo a storage (builder chiama questo con i bytes scelti)
-  Future<String> uploadBackgroundBytes(Uint8List bytes, {required String ext}) async {
+  Future<String> uploadBackgroundBytes(Uint8List bytes,
+      {required String ext}) async {
     _ensureLoggedIn();
     final userId = Supabase.instance.client.auth.currentUser!.id;
-    return HinooStorageUploader.uploadBytes(bytes: bytes, filenameExt: ext, userId: userId);
+    return HinooStorageUploader.uploadBytes(
+        bytes: bytes, filenameExt: ext, userId: userId);
   }
 
   /// Salvataggio nello scrigno (type personal/answer)
@@ -61,7 +64,8 @@ class HinooController {
       throw 'Draft non valido:\n- ${errors.join('\n- ')}';
     }
 
-    final ok = await HinooService.duplicateToMoon(draft);
+    final sanitized = draft.copyWith(type: HinooType.moon);
+    final ok = await HinooService.duplicateToMoon(sanitized);
     return ok ? HinooMoonResult.published : HinooMoonResult.alreadyPresent;
   }
 
@@ -85,5 +89,4 @@ class HinooController {
       userId: userId,
     );
   }
-
 }

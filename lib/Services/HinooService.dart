@@ -19,7 +19,8 @@ class HinooService {
       'created_at': DateTime.now().toIso8601String(),
     };
 
-    final res = await _supabase.from(_table).insert(data).select().maybeSingle();
+    final res =
+        await _supabase.from(_table).insert(data).select().maybeSingle();
     if (res == null) throw 'publishHinoo: insert fallita';
   }
 
@@ -70,7 +71,6 @@ class HinooService {
     return parts.join('||');
   }
 
-
   static Future<void> saveDraft(HinooDraft draft) async {
     final userId = _supabase.auth.currentUser?.id;
     if (userId == null) throw 'Utente non autenticato';
@@ -103,7 +103,8 @@ class HinooService {
   }
 
   /// Carica gli Hinoo personali dell'utente (dallo scrigno)
-  static Future<List<HinooDraft>> fetchUserHinoo(String userId, {HinooType type = HinooType.personal}) async {
+  static Future<List<HinooDraft>> fetchUserHinoo(String userId,
+      {HinooType type = HinooType.personal}) async {
     final typeStr = type.name; // 'personal' | 'moon' | 'answer'
     final rows = await _supabase
         .from(_table)

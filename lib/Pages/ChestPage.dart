@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
 import '../Controller/HonooController.dart';
+import '../Controller/HinooController.dart';
 import '../Entities/Honoo.dart';
 import '../Entities/Hinoo.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -26,6 +27,7 @@ class ChestPage extends StatefulWidget {
 class _ChestPageState extends State<ChestPage> {
   final _pageCtrl = PageController();
   final HonooController ctrl = HonooController();
+  final HinooController _hinooController = HinooController();
 
   int _currentIndex = 0;
   List<_ChestItem> _items = const [];
@@ -35,7 +37,7 @@ class _ChestPageState extends State<ChestPage> {
   void initState() {
     super.initState();
     ctrl.loadChest(); // carica HONOO dallo scrigno (DB)
-    _loadHinoo();     // carica HINOO dallo scrigno (DB)
+    _loadHinoo(); // carica HINOO dallo scrigno (DB)
   }
 
   @override
@@ -51,7 +53,7 @@ class _ChestPageState extends State<ChestPage> {
       final client = Supabase.instance.client;
       final rows = await client
           .from('hinoo')
-          .select('pages,type,recipient_tag,created_at')
+          .select('id,pages,type,recipient_tag,created_at')
           .eq('user_id', uid)
           .eq('type', 'personal')
           .order('created_at', ascending: false);
@@ -68,8 +70,14 @@ class _ChestPageState extends State<ChestPage> {
             type: HinooType.personal,
             recipientTag: r['recipient_tag'] as String?,
           );
-          final created = DateTime.tryParse((r['created_at'] ?? '').toString()) ?? DateTime.now();
-          list.add(_HinooRow(draft: draft, createdAt: created));
+          final created =
+              DateTime.tryParse((r['created_at'] ?? '').toString()) ??
+                  DateTime.now();
+          final dynamic rawId = r['id'];
+          final String? id = rawId?.toString();
+          if (id != null && id.isNotEmpty) {
+            list.add(_HinooRow(id: id, draft: draft, createdAt: created));
+          }
         }
       }
 
@@ -85,15 +93,17 @@ class _ChestPageState extends State<ChestPage> {
 
   void _rebuildItems() {
     final honoo = ctrl.personal.map<_ChestItem>((h) {
-      final dt = DateTime.tryParse(h.created_at) ?? DateTime.fromMillisecondsSinceEpoch(0);
+      final dt = DateTime.tryParse(h.created_at) ??
+          DateTime.fromMillisecondsSinceEpoch(0);
       return _ChestItem.honoo(h, dt);
     }).toList();
 
-    final hinoo = _hinoo.map<_ChestItem>((r) => _ChestItem.hinoo(r.draft, r.createdAt)).toList();
+    final hinoo = _hinoo.map<_ChestItem>((r) => _ChestItem.hinoo(r)).toList();
 
     _items = [...honoo, ...hinoo]
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt)); // più recenti prima
-    if (_currentIndex >= _items.length) _currentIndex = _items.isEmpty ? 0 : _items.length - 1;
+    if (_currentIndex >= _items.length)
+      _currentIndex = _items.isEmpty ? 0 : _items.length - 1;
   }
 
   // --- helper menu dinamico
@@ -117,7 +127,8 @@ class _ChestPageState extends State<ChestPage> {
         height: 60,
         child: Center(
           child: IconButton(
-            icon: SvgPicture.asset("assets/icons/home.svg", semanticsLabel: 'Home'),
+            icon: SvgPicture.asset("assets/icons/home.svg",
+                semanticsLabel: 'Home'),
             iconSize: 60,
             splashRadius: 25,
             onPressed: () => Navigator.pop(context),
@@ -137,7 +148,9 @@ class _ChestPageState extends State<ChestPage> {
       SizedBox(width: 5.w),
     ];
 
-    if (_isPersonal(current) && !_hasReplies(current) && !_isFromMoonSaved(current)) {
+    if (_isPersonal(current) &&
+        !_hasReplies(current) &&
+        !_isFromMoonSaved(current)) {
       actions.add(
         IconButton(
           icon: SvgPicture.asset(
@@ -151,9 +164,12 @@ class _ChestPageState extends State<ChestPage> {
           onPressed: () async {
             final ok = await HonooController().sendToMoon(current);
             final text = ok ? 'Spedito sulla Luna' : 'Già presente sulla Luna';
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(text)));
 
-            if (ok && _currentIndex >= ctrl.personal.length && _currentIndex > 0) {
+            if (ok &&
+                _currentIndex >= ctrl.personal.length &&
+                _currentIndex > 0) {
               setState(() => _currentIndex = ctrl.personal.length - 1);
             }
           },
@@ -162,7 +178,8 @@ class _ChestPageState extends State<ChestPage> {
     } else if (_hasReplies(current) && !_isFromMoonSaved(current)) {
       actions.add(
         IconButton(
-          icon: SvgPicture.asset("assets/icons/reply.svg", semanticsLabel: 'Reply'),
+          icon: SvgPicture.asset("assets/icons/reply.svg",
+              semanticsLabel: 'Reply'),
           iconSize: 60,
           splashRadius: 25,
           tooltip: 'Vedi risposte',
@@ -172,7 +189,8 @@ class _ChestPageState extends State<ChestPage> {
     } else if (_isFromMoonSaved(current)) {
       actions.add(
         IconButton(
-          icon: SvgPicture.asset("assets/icons/reply.svg", semanticsLabel: 'Rispondi'),
+          icon: SvgPicture.asset("assets/icons/reply.svg",
+              semanticsLabel: 'Rispondi'),
           iconSize: 60,
           splashRadius: 25,
           color: HonooColor.onBackground,
@@ -187,7 +205,8 @@ class _ChestPageState extends State<ChestPage> {
     actions.addAll([
       SizedBox(width: 5.w),
       IconButton(
-        icon: SvgPicture.asset("assets/icons/cancella.svg", semanticsLabel: 'Cancella'),
+        icon: SvgPicture.asset("assets/icons/cancella.svg",
+            semanticsLabel: 'Cancella'),
         iconSize: 60,
         splashRadius: 25,
         color: HonooColor.onBackground,
@@ -196,7 +215,8 @@ class _ChestPageState extends State<ChestPage> {
           final String? id = (current.dbId ?? current.id) as String?;
           if (id == null || id.isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Impossibile cancellare: id mancante.')),
+              const SnackBar(
+                  content: Text('Impossibile cancellare: id mancante.')),
             );
             return;
           }
@@ -218,17 +238,145 @@ class _ChestPageState extends State<ChestPage> {
     );
   }
 
-  Widget _buildChestItem(_ChestItem item, double availableCenterH, double targetMaxW) {
+  Widget _buildChestItem(
+      _ChestItem item, double availableCenterH, double targetMaxW) {
     return item.when(
       honoo: (h) => HonooThreadView(root: h),
-      hinoo: (d) => HinooViewer(draft: d, maxHeight: availableCenterH, maxWidth: targetMaxW),
+      hinoo: (row) => HinooViewer(
+        draft: row.draft,
+        maxHeight: availableCenterH,
+        maxWidth: targetMaxW,
+      ),
     );
+  }
+
+  Widget _footerForHinoo(_HinooRow? current) {
+    if (current == null) return _footerForHonoo(null);
+
+    final HinooDraft draft = current.draft;
+    final bool isPersonal = draft.type == HinooType.personal;
+    final bool isFromMoonSaved = draft.type == HinooType.moon;
+    final bool hasReplies = false; // Risposte non ancora supportate per Hinoo
+
+    final actions = <Widget>[
+      IconButton(
+        icon: SvgPicture.asset("assets/icons/home.svg", semanticsLabel: 'Home'),
+        iconSize: 60,
+        splashRadius: 25,
+        color: HonooColor.onBackground,
+        onPressed: () => Navigator.pop(context),
+      ),
+      SizedBox(width: 5.w),
+    ];
+
+    if (isPersonal && !hasReplies && !isFromMoonSaved) {
+      actions.add(
+        IconButton(
+          icon:
+              SvgPicture.asset("assets/icons/moon.svg", semanticsLabel: 'Luna'),
+          iconSize: 32,
+          splashRadius: 25,
+          color: HonooColor.onBackground,
+          tooltip: 'Spedisci sulla Luna',
+          onPressed: () async {
+            try {
+              final result = await _hinooController.sendToMoon(draft);
+              if (!mounted) return;
+              final text = result == HinooMoonResult.published
+                  ? 'Hinoo spedito sulla Luna.'
+                  : 'Hinoo già presente sulla Luna.';
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(text)));
+            } catch (e) {
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Errore: $e')),
+              );
+            }
+          },
+        ),
+      );
+    } else if (hasReplies && !isFromMoonSaved) {
+      actions.add(
+        IconButton(
+          icon: SvgPicture.asset("assets/icons/reply.svg",
+              semanticsLabel: 'Reply'),
+          iconSize: 60,
+          splashRadius: 25,
+          tooltip: 'Vedi risposte',
+          onPressed: () {},
+        ),
+      );
+    } else if (isFromMoonSaved) {
+      actions.add(
+        IconButton(
+          icon: SvgPicture.asset("assets/icons/reply.svg",
+              semanticsLabel: 'Rispondi'),
+          iconSize: 60,
+          splashRadius: 25,
+          color: HonooColor.onBackground,
+          tooltip: 'Rispondi',
+          onPressed: () {
+            // TODO: implementare risposta a Hinoo lunare
+          },
+        ),
+      );
+    }
+
+    actions.addAll([
+      SizedBox(width: 5.w),
+      IconButton(
+        icon: SvgPicture.asset("assets/icons/cancella.svg",
+            semanticsLabel: 'Cancella'),
+        iconSize: 60,
+        splashRadius: 25,
+        color: HonooColor.onBackground,
+        tooltip: 'Cancella',
+        onPressed: () => _deleteHinoo(current),
+      ),
+    ]);
+
+    return SizedBox(
+      height: 60,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: actions,
+      ),
+    );
+  }
+
+  Widget _footerForItem(_ChestItem? item) {
+    if (item == null) return _footerForHonoo(null);
+    return item.when(
+      honoo: (h) => _footerForHonoo(h),
+      hinoo: (row) => _footerForHinoo(row),
+    );
+  }
+
+  Future<void> _deleteHinoo(_HinooRow current) async {
+    try {
+      final client = Supabase.instance.client;
+      await client.from('hinoo').delete().eq('id', current.id);
+      if (!mounted) return;
+      setState(() {
+        _hinoo = _hinoo.where((r) => r.id != current.id).toList();
+        _rebuildItems();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Hinoo eliminato.')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Errore durante l\'eliminazione: $e')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-
-    const headerH = 60.0; // lasciamo il tuo titolo a 60 per “non cambiare altro”
+    const headerH =
+        60.0; // lasciamo il tuo titolo a 60 per “non cambiare altro”
     const footerH = 60.0;
 
     // 👇 come in NewHonooPage: riserva top solo oltre l’header per non far coprire la Luna
@@ -243,17 +391,19 @@ class _ChestPageState extends State<ChestPage> {
           animation: Listenable.merge([ctrl.isLoading, ctrl.version]),
           builder: (context, _) {
             _rebuildItems();
-            final _ChestItem? current = _items.isEmpty ? null : _items[_currentIndex];
+            final _ChestItem? current =
+                _items.isEmpty ? null : _items[_currentIndex];
 
             return LayoutBuilder(
               builder: (context, constraints) {
                 final availH = constraints.maxHeight;
 
                 // === stesse regole di NewHonooPage ===
-                final double targetMaxW = _contentMaxWidth(constraints.maxWidth);
+                final double targetMaxW =
+                    _contentMaxWidth(constraints.maxWidth);
                 final double availableCenterH =
-                (availH - headerH - contentTopPadding - footerH)
-                    .clamp(0.0, double.infinity);
+                    (availH - headerH - contentTopPadding - footerH)
+                        .clamp(0.0, double.infinity);
 
                 return Stack(
                   clipBehavior: Clip.none,
@@ -285,59 +435,69 @@ class _ChestPageState extends State<ChestPage> {
                               0,
                               contentTopPadding, // ← come NewHonooPage
                               0,
-                              footerH,           // spazio per footer (come prima)
+                              footerH, // spazio per footer (come prima)
                             ),
                             child: Center(
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 90),
                                 curve: Curves.easeOutCubic,
-                                constraints: BoxConstraints(maxWidth: targetMaxW),
+                                constraints:
+                                    BoxConstraints(maxWidth: targetMaxW),
                                 child: SizedBox(
                                   height: availableCenterH,
                                   width: double.infinity,
                                   child: _items.isEmpty
                                       ? Center(
-                                        child: Text(
-                                      'Nessun contenuto nello scrigno',
-                                          style: GoogleFonts.libreFranklin(
-                                            color: HonooColor.onBackground,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w400,
+                                          child: Text(
+                                            'Nessun contenuto nello scrigno',
+                                            style: GoogleFonts.libreFranklin(
+                                              color: HonooColor.onBackground,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w400,
+                                            ),
                                           ),
-                                        ),
-                                      )
+                                        )
                                       : Padding(
-                                        // gutter esterno
-                                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                                        child: cs.CarouselSlider.builder(
-                                      itemCount: _items.length,
-                                          options: cs.CarouselOptions(
-                                            height: availableCenterH,     // ← come NewHonooPage (riempi tutto)
-                                            viewportFraction: 1.0,
-                                            enableInfiniteScroll: false,
-                                            padEnds: true,
-                                            enlargeCenterPage: false,
-                                            scrollPhysics: const BouncingScrollPhysics(),
-                                            onPageChanged: (i, _) =>
-                                                setState(() => _currentIndex = i),
+                                          // gutter esterno
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16),
+                                          child: cs.CarouselSlider.builder(
+                                            itemCount: _items.length,
+                                            options: cs.CarouselOptions(
+                                              height:
+                                                  availableCenterH, // ← come NewHonooPage (riempi tutto)
+                                              viewportFraction: 1.0,
+                                              enableInfiniteScroll: false,
+                                              padEnds: true,
+                                              enlargeCenterPage: false,
+                                              scrollPhysics:
+                                                  const BouncingScrollPhysics(),
+                                              onPageChanged: (i, _) => setState(
+                                                  () => _currentIndex = i),
+                                            ),
+                                            itemBuilder:
+                                                (context, index, realIdx) {
+                                              return Padding(
+                                                // gutter interno
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 16),
+                                                child: _buildChestItem(
+                                                    _items[index],
+                                                    availableCenterH,
+                                                    targetMaxW),
+                                              );
+                                            },
                                           ),
-                                          itemBuilder: (context, index, realIdx) {
-                                            return Padding(
-                                              // gutter interno
-                                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                                              child: _buildChestItem(_items[index], availableCenterH, targetMaxW),
-                                            );
-                                          },
                                         ),
-                                      ),
-                                    ),
-                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
 
                         // FOOTER (invariato)
-                        _footerForHonoo(current?.honoo),
+                        _footerForItem(current),
                       ],
                     ),
 
@@ -357,21 +517,26 @@ class _ChestPageState extends State<ChestPage> {
 // Unione semplice per elementi dello scrigno
 class _ChestItem {
   final Honoo? honoo;
-  final HinooDraft? hinoo;
+  final _HinooRow? hinoo;
   final DateTime createdAt;
-  const _ChestItem._(this.honoo, this.hinoo, this.createdAt);
-  factory _ChestItem.honoo(Honoo h, DateTime createdAt) => _ChestItem._(h, null, createdAt);
-  factory _ChestItem.hinoo(HinooDraft d, DateTime createdAt) => _ChestItem._(null, d, createdAt);
+  const _ChestItem._({this.honoo, this.hinoo, required this.createdAt});
+  factory _ChestItem.honoo(Honoo h, DateTime createdAt) =>
+      _ChestItem._(honoo: h, createdAt: createdAt);
+  factory _ChestItem.hinoo(_HinooRow row) =>
+      _ChestItem._(hinoo: row, createdAt: row.createdAt);
 
-  T when<T>({required T Function(Honoo h) honoo, required T Function(HinooDraft d) hinoo}) {
+  T when<T>(
+      {required T Function(Honoo h) honoo,
+      required T Function(_HinooRow row) hinoo}) {
     if (this.honoo != null) return honoo(this.honoo!);
     return hinoo(this.hinoo!);
   }
 }
 
-
 class _HinooRow {
+  final String id;
   final HinooDraft draft;
   final DateTime createdAt;
-  const _HinooRow({required this.draft, required this.createdAt});
+  const _HinooRow(
+      {required this.id, required this.draft, required this.createdAt});
 }

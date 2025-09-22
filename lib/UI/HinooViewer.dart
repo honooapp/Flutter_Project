@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../Entities/Hinoo.dart';
+import '../Utility/HonooColors.dart';
 
 class HinooViewer extends StatefulWidget {
   final HinooDraft draft;
   final double maxHeight;
   final double maxWidth;
-  const HinooViewer({super.key, required this.draft, required this.maxHeight, required this.maxWidth});
+  final Color gapColor;
+  const HinooViewer({
+    super.key,
+    required this.draft,
+    required this.maxHeight,
+    required this.maxWidth,
+    this.gapColor = HonooColor.background,
+  });
 
   @override
   State<HinooViewer> createState() => _HinooViewerState();
@@ -32,7 +40,7 @@ class _HinooViewerState extends State<HinooViewer> {
   Widget build(BuildContext context) {
     const double ar = 9 / 16;
     const double sideDotsW = 20; // larghezza colonna pallini
-    const double gap = 8;         // spazio tra card e pallini
+    const double gap = 8; // spazio tra card e pallini
 
     double w = widget.maxWidth;
     double h = w / ar;
@@ -60,12 +68,33 @@ class _HinooViewerState extends State<HinooViewer> {
                   allowImplicitScrolling: true,
                   itemCount: widget.draft.pages.length,
                   onPageChanged: (i) => setState(() => _current = i),
-                  itemBuilder: (context, i) => _HinooSlideView(
-                    slide: widget.draft.pages[i],
-                    width: w,
-                    height: h,
-                    baseCanvasHeight: widget.draft.baseCanvasHeight,
-                  ),
+                  itemBuilder: (context, index) {
+                    return AnimatedBuilder(
+                      animation: _vController,
+                      builder: (context, child) {
+                        double distance = 0.0;
+                        if (_vController.hasClients &&
+                            _vController.position.haveDimensions) {
+                          final double page = _vController.page ??
+                              _vController.initialPage.toDouble();
+                          distance = (page - index).abs();
+                        } else {
+                          distance = (_current - index).abs().toDouble();
+                        }
+                        const double maxGap = 9.0;
+                        final double gap = (distance.clamp(0.0, 1.0) * maxGap)
+                            .clamp(0.0, maxGap);
+                        return _HinooSlideView(
+                          slide: widget.draft.pages[index],
+                          width: w,
+                          height: h,
+                          baseCanvasHeight: widget.draft.baseCanvasHeight,
+                          gap: gap,
+                          gapColor: widget.gapColor,
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
             ),
@@ -94,19 +123,25 @@ class _HinooSlideView extends StatelessWidget {
   final double width;
   final double height;
   final double? baseCanvasHeight;
+  final double gap;
+  final Color gapColor;
   const _HinooSlideView({
     required this.slide,
     required this.width,
     required this.height,
     required this.baseCanvasHeight,
+    required this.gap,
+    required this.gapColor,
   });
 
   @override
   Widget build(BuildContext context) {
     final Color textColor = slide.isTextWhite ? Colors.white : Colors.black;
-    final ImageProvider bg = (slide.backgroundImage != null && slide.backgroundImage!.isNotEmpty)
-        ? NetworkImage(slide.backgroundImage!)
-        : const AssetImage('assets/images/hinoo_default_1080x1920.png') as ImageProvider;
+    final ImageProvider bg =
+        (slide.backgroundImage != null && slide.backgroundImage!.isNotEmpty)
+            ? NetworkImage(slide.backgroundImage!)
+            : const AssetImage('assets/images/hinoo_default_1080x1920.png')
+                as ImageProvider;
 
     const double designWidth = 1080;
     const double designHeight = 1920;
@@ -130,12 +165,14 @@ class _HinooSlideView extends StatelessWidget {
 
     final Matrix4 transform = buildTransform();
 
-    final double referenceCanvasHeight = (baseCanvasHeight != null && baseCanvasHeight! > 0)
-        ? baseCanvasHeight!
-        : height;
+    final double referenceCanvasHeight =
+        (baseCanvasHeight != null && baseCanvasHeight! > 0)
+            ? baseCanvasHeight!
+            : height;
     final double fontScale = height / referenceCanvasHeight;
     final double fontSize = (20 * fontScale).clamp(10.0, 60.0).toDouble();
     final double padding = (16 * fontScale).clamp(8.0, 40.0).toDouble();
+    final double halfGap = gap / 2;
 
     return SizedBox(
       width: width,
@@ -150,22 +187,50 @@ class _HinooSlideView extends StatelessWidget {
               child: Image(image: bg, fit: BoxFit.cover),
             ),
           ),
-          Padding(
-            padding: EdgeInsets.all(padding),
-            child: Center(
-              child: Text(
-                slide.text,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.lora(
-                  color: textColor,
-                  fontSize: fontSize,
-                  height: 1.3,
-                  fontWeight: FontWeight.w600,
+          Positioned.fill(
+            top: gap / 2,
+            bottom: gap / 2,
+            child: Padding(
+              padding: EdgeInsets.all(padding),
+              child: Center(
+                child: Text(
+                  slide.text,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.lora(
+                    color: textColor,
+                    fontSize: fontSize,
+                    height: 1.3,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  softWrap: true,
                 ),
-                softWrap: true,
               ),
             ),
           ),
+          if (halfGap > 0.05)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              height: halfGap,
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(color: gapColor),
+                ),
+              ),
+            ),
+          if (halfGap > 0.05)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: halfGap,
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(color: gapColor),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -199,7 +264,8 @@ class _HinooPageDots extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: active ? Colors.white : Colors.white38,
-                    border: Border.all(color: Colors.white70, width: active ? 1.2 : 0.8),
+                    border: Border.all(
+                        color: Colors.white70, width: active ? 1.2 : 0.8),
                   ),
                 ),
               );

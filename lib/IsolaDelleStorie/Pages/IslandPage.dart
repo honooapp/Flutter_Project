@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:honoo/IsolaDelleStorie/Controller/ExerciseController.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/ExercisePage.dart';
 import 'package:honoo/IsolaDelleStorie/Utility/IsolaDelleStorieContentManager.dart';
-import 'package:honoo/Pages/NewHinooPage.dart';
 import 'package:honoo/Utility/FormattedText.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -231,7 +230,6 @@ class _IslandPageState extends State<IslandPage> {
                     const double chestSize = 70;
                     const double homeSize = 40;
                     const double logoSize = 70;
-                    final double conchigliaSize = 70;
 
 
                     final double bottleTargetX = (w / 2) + 60;
@@ -247,7 +245,6 @@ class _IslandPageState extends State<IslandPage> {
                     final double chestX = clampX(chestCenterX, chestSize);
                     final double homeX = clampX(homeTargetX, homeSize);
                     final double logoX = clampX(logoTargetX, logoSize);
-                    final double conchigliaX = ((homeX + chestX) / 2).clamp(0.0, w - conchigliaSize);
 
 
                     return Stack(
@@ -317,23 +314,6 @@ class _IslandPageState extends State<IslandPage> {
                                     quote: Utility().shakespeare,
                                     bibliography: Utility().bibliography,
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        Positioned(
-                          bottom: -20,
-                          left: conchigliaX,
-                          child: IconButton(
-                            icon: SvgPicture.asset("assets/icons/isoladellestorie/conchiglia.svg", semanticsLabel: 'Chest'),
-                            iconSize: chestSize,
-                            splashRadius: 40,
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => NewHinooPage()
                                 ),
                               );
                             },

@@ -20,6 +20,8 @@ import '../Services/HinooStorageUploader.dart';
 import 'package:honoo/Widgets/WhiteIconButton.dart';
 import 'package:honoo/UI/HinooBuilder/thumbnails/HinooThumbnails.dart';
 import 'package:honoo/UI/HinooBuilder/dialogs/AnteprimaPNG.dart';
+import 'package:honoo/UI/HinooBuilder/dialogs/DownloadHinooDialog.dart';
+import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
 
 // Import coerenti con la struttura HinooBuilder
 
@@ -71,8 +73,11 @@ class _HinooBuilderState extends State<HinooBuilder> {
   bool _showTextField = false;
   _WizardStep _step = _WizardStep.changeBg;
   bool _bgChosen = false; // abilita bottone OK per procedere
+  static const double _bgMinScale = 1.0;
+  static const double _bgMaxScale = 5.0;
   final TransformationController _bgController = TransformationController();
   Matrix4? _bgLockedMatrix;
+  double _bgScale = _bgMinScale;
 
   // Export/anteprima
   Uint8List? _lastPreviewBytes;
@@ -88,6 +93,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
       _pages.add(_createEmptySlide());
     }
     _textController.addListener(() => _onCanvasTextChanged(_textController.text));
+    _bgController.addListener(_handleBgTransform);
+    _bgScale = _extractScaleFromMatrix(_bgController.value);
   }
 
   @override
@@ -95,7 +102,225 @@ class _HinooBuilderState extends State<HinooBuilder> {
     _textController.removeListener((){}); // safety no-op
     _textController.dispose();
     _textFocus.dispose();
+    _bgController.removeListener(_handleBgTransform);
+    _bgController.dispose();
     super.dispose();
+  }
+
+  void _handleBgTransform() {
+    final double newScale = _extractScaleFromMatrix(_bgController.value);
+    if ((newScale - _bgScale).abs() > 0.005) {
+      setState(() => _bgScale = newScale);
+    }
+  }
+
+  double _extractScaleFromMatrix(Matrix4 matrix) {
+    final Float64List values = matrix.storage;
+    final double sx = values[0].abs();
+    final double sy = values[5].abs();
+    double raw;
+    if (sx > 0 && sy > 0) {
+      raw = (sx + sy) / 2;
+    } else if (sx > 0) {
+      raw = sx;
+    } else if (sy > 0) {
+      raw = sy;
+    } else {
+      raw = _bgMinScale;
+    }
+    return raw.clamp(_bgMinScale, _bgMaxScale).toDouble();
+  }
+
+  void _updateBgScale(double scale) {
+    final double clamped = scale.clamp(_bgMinScale, _bgMaxScale).toDouble();
+    final Matrix4 current = _bgController.value.clone();
+    final Float64List values = current.storage;
+    final double currentScale = _extractScaleFromMatrix(current);
+    final double safeScale = currentScale <= 0 ? _bgMinScale : currentScale;
+    final double tx = values[12];
+    final double ty = values[13];
+    final double adjustedTx = tx * (safeScale / clamped);
+    final double adjustedTy = ty * (safeScale / clamped);
+    final Matrix4 updated = Matrix4.identity()
+      ..translate(adjustedTx, adjustedTy)
+      ..scale(clamped);
+    _bgController.value = updated;
+  }
+
+  void _nudgeBgScale(double delta) {
+    _updateBgScale(_bgScale + delta);
+  }
+
+  void _resetBgTransform() {
+    _bgController.value = Matrix4.identity();
+    setState(() {
+      _bgScale = _bgMinScale;
+      _bgLockedMatrix = null;
+    });
+  }
+
+  void _applySlideState(dynamic slide) {
+    final String text = _extractTextFromSlide(slide);
+    if (_textController.text != text) {
+      _textController.value = TextEditingValue(
+        text: text,
+        selection: TextSelection.collapsed(offset: text.length),
+      );
+    }
+
+    final Color? textColor = _extractTextColorFromSlide(slide);
+    if (textColor != null) {
+      _txtColor = textColor;
+    }
+
+    final String? bgUrl = _extractBgUrlFromSlide(slide);
+    _bgPublicUrl = (bgUrl != null && bgUrl.isNotEmpty) ? bgUrl : null;
+
+    final Matrix4? transform = _extractBgTransformFromSlide(slide);
+    if (transform != null) {
+      _bgLockedMatrix = transform.clone();
+      _bgController.value = transform.clone();
+    } else if (_bgLockedMatrix != null) {
+      _bgLockedMatrix = null;
+      _bgController.value = Matrix4.identity();
+    }
+
+    _bgScale = _extractScaleFromMatrix(_bgController.value);
+    _bgChosen = _localBgPreview != null || (_bgPublicUrl != null && _bgPublicUrl!.isNotEmpty);
+  }
+
+  void _resetToBlankState() {
+    _textController.clear();
+    _txtColor = Colors.white;
+    _scale = 1.0;
+    _offset = Offset.zero;
+    _localBgPreview = null;
+    _bgPublicUrl = null;
+    _bgLockedMatrix = null;
+    _bgController.value = Matrix4.identity();
+    _bgScale = _bgMinScale;
+    _bgChosen = false;
+    _step = _WizardStep.changeBg;
+    _showTextField = false;
+  }
+
+  Future<void> _openDownloadDialog() async {
+    if (!mounted || _pages.isEmpty) return;
+    final DownloadChoice? choice = await showDialog<DownloadChoice>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => DownloadHinooDialog(pageCount: _pages.length),
+    );
+    if (choice == null) return;
+    await _downloadHinoo(allPages: choice == DownloadChoice.allPages);
+  }
+
+  Future<void> _downloadHinoo({required bool allPages}) async {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const DownloadProgressDialog(),
+    );
+
+    final List<int> indices = allPages
+        ? List<int>.generate(_pages.length, (int i) => i)
+        : <int>[0];
+    final int previousIndex = _current;
+    bool indexChanged = false;
+    final List<DownloadImage> images = <DownloadImage>[];
+    final DownloadSaver saver = getDownloadSaver();
+
+    try {
+      for (int pos = 0; pos < indices.length; pos++) {
+        final int pageIndex = indices[pos];
+        if (_current != pageIndex) {
+          setState(() => _current = pageIndex);
+          indexChanged = true;
+          await _waitForNextFrame();
+        }
+
+        final Uint8List? bytes = await _captureCurrentCanvasBytes();
+        if (bytes != null) {
+          final String filename = indices.length == 1
+              ? 'hinoo_${pageIndex + 1}.png'
+              : 'hinoo_${(pos + 1).toString().padLeft(2, '0')}.png';
+          images.add(DownloadImage(filename: filename, bytes: bytes));
+        }
+      }
+
+      if (images.isEmpty) {
+        throw Exception('Impossibile generare le immagini.');
+      }
+
+      final String message = await saver.save(
+        images,
+        message: 'Hinoo creati con Honoo',
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Errore download: $e')),
+        );
+      }
+    } finally {
+      if (indexChanged && mounted && _current != previousIndex) {
+        setState(() => _current = previousIndex);
+        await _waitForNextFrame();
+      }
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).maybePop();
+      }
+    }
+  }
+
+  Future<Uint8List?> _captureCurrentCanvasBytes({double pixelRatio = 3.0}) async {
+    try {
+      final RenderRepaintBoundary? boundary =
+          _captureKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (boundary == null) return null;
+      final ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
+      final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      return byteData?.buffer.asUint8List();
+    } catch (e) {
+      debugPrint('capture canvas error: $e');
+      return null;
+    }
+  }
+
+  Future<void> _waitForNextFrame() async {
+    await Future<void>.delayed(Duration.zero);
+    await WidgetsBinding.instance.endOfFrame;
+  }
+
+  Color? _extractTextColorFromSlide(dynamic slide) {
+    if (slide is Map && slide['textColor'] is int) {
+      return Color(slide['textColor'] as int);
+    }
+    return null;
+  }
+
+  String? _extractBgUrlFromSlide(dynamic slide) {
+    if (slide is Map && slide['bgUrl'] is String) {
+      final String value = slide['bgUrl'] as String;
+      if (value.isNotEmpty) return value;
+    }
+    return null;
+  }
+
+  Matrix4? _extractBgTransformFromSlide(dynamic slide) {
+    if (slide is Map) {
+      final dynamic raw = slide['bgTransform'];
+      if (raw is List && raw.length == 16) {
+        final List<double> values = raw.map((dynamic e) => (e as num).toDouble()).toList();
+        return Matrix4.fromList(values);
+      }
+    }
+    return null;
   }
 
   // ========================================================================
@@ -107,6 +332,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
   void deleteCurrentPagePublic() => _deleteCurrentPage(); // già usata
   Future<void> openPreviewDialogPublic() => _openPreviewDialog();
+  Future<void> openDownloadDialogPublic() => _openDownloadDialog();
+  Future<void> downloadAllPagesPublic() => _downloadHinoo(allPages: true);
 
   dynamic exportDraft() {
     return {
@@ -185,9 +412,9 @@ class _HinooBuilderState extends State<HinooBuilder> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             WhiteIconButton(
-                              tooltip: 'Scarica immagine',
+                              tooltip: 'Scarica immagini',
                               icon: Icons.download_outlined,
-                              onPressed: _openPreviewDialog,
+                              onPressed: _openDownloadDialog,
                             ),
                             const SizedBox(width: 12),
                             WhiteIconButton(
@@ -264,8 +491,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
                   transformationController: _bgController,
                   panEnabled: interactive,
                   scaleEnabled: interactive,
-                  minScale: 1.0,
-                  maxScale: 5.0,
+                  minScale: _bgMinScale,
+                  maxScale: _bgMaxScale,
                   boundaryMargin: const EdgeInsets.all(200),
                   child: fitted,
                 ),
@@ -276,8 +503,17 @@ class _HinooBuilderState extends State<HinooBuilder> {
           // Overlays sequenziali: uno solo alla volta
           if (_step == _WizardStep.changeBg)
             ...[
-              if (!_bgChosen)
-                CambiaSfondoOverlay(onTapChange: _pickAndUploadBackground),
+              CambiaSfondoOverlay(
+                onTapChange: _pickAndUploadBackground,
+                showControls: _bgChosen && _localBgPreview != null,
+                currentScale: _bgScale,
+                minScale: _bgMinScale,
+                maxScale: _bgMaxScale,
+                onScaleChanged: _bgChosen ? _updateBgScale : null,
+                onZoomIn: _bgChosen && _bgScale < _bgMaxScale ? () => _nudgeBgScale(0.1) : null,
+                onZoomOut: _bgChosen && _bgScale > _bgMinScale ? () => _nudgeBgScale(-0.1) : null,
+                onResetTransform: _bgChosen ? _resetBgTransform : null,
+              ),
               if (_bgChosen)
                 Positioned(
                   bottom: 12,
@@ -329,7 +565,10 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
   void _goTo(int index) {
     if (index < 0 || index >= _pages.length) return;
-    setState(() => _current = index);
+    setState(() {
+      _current = index;
+      _applySlideState(_pages[_current]);
+    });
   }
 
   void _addPage() {
@@ -380,26 +619,20 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
     if (ok != true) return;
 
+    final int removedIndex = _current;
+
     setState(() {
       if (_pages.length > 1) {
-        _pages.removeAt(_current);
-        if (_current >= _pages.length) _current = _pages.length - 1;
-
-        // Reset base (adatta al tuo modello)
-        _textController.text = _extractTextFromSlide(_pages[_current]);
-        _txtColor = Colors.white;
+        _pages.removeAt(removedIndex);
+        final int newIndex = removedIndex > 0 ? removedIndex - 1 : 0;
+        _current = newIndex.clamp(0, _pages.length - 1);
+        _applySlideState(_pages[_current]);
         _scale = 1.0;
         _offset = Offset.zero;
-        _localBgPreview = null;
       } else {
-        // mantieni almeno una pagina vuota
+        _resetToBlankState();
         _pages[0] = _createEmptySlide();
         _current = 0;
-        _textController.clear();
-        _txtColor = Colors.white;
-        _scale = 1.0;
-        _offset = Offset.zero;
-        _localBgPreview = null;
       }
     });
 
@@ -426,21 +659,14 @@ class _HinooBuilderState extends State<HinooBuilder> {
   }
 
   Future<void> _renderCanvasAsPng() async {
-    try {
-      final boundary = _captureKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-      if (boundary == null) return;
-      final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      final Uint8List bytes = byteData!.buffer.asUint8List();
-      setState(() {
-        _lastPreviewBytes = bytes;
-        _exportFilenameHint = 'hinoo_${DateTime.now().millisecondsSinceEpoch}.png';
-      });
-      final cb = widget.onPngExported;
-      if (cb != null) cb(bytes);
-    } catch (e) {
-      debugPrint('render PNG error: $e');
-    }
+    final Uint8List? bytes = await _captureCurrentCanvasBytes();
+    if (bytes == null) return;
+    setState(() {
+      _lastPreviewBytes = bytes;
+      _exportFilenameHint = 'hinoo_${DateTime.now().millisecondsSinceEpoch}.png';
+    });
+    final ValueChanged<Uint8List>? cb = widget.onPngExported;
+    if (cb != null) cb(bytes);
   }
 
   Future<void> _exportCanvasPng() async {
@@ -459,6 +685,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
   void _confirmBgAndLock() {
     setState(() {
       _bgLockedMatrix = _bgController.value.clone();
+      _bgScale = _extractScaleFromMatrix(_bgLockedMatrix!);
       // Propaga la trasformazione a tutte le pagine
       for (var i = 0; i < _pages.length; i++) {
         _pages[i] = _copySlideWithBgTransform(_pages[i], _bgLockedMatrix!);
@@ -483,7 +710,10 @@ class _HinooBuilderState extends State<HinooBuilder> {
       setState(() {
         _localBgPreview = MemoryImage(bytes);
         _bgChosen = true; // abilita OK per procedere
+        _bgLockedMatrix = null;
+        _bgScale = _bgMinScale;
       });
+      _bgController.value = Matrix4.identity();
 
       _persistBgUrl(bytes, selected.name);
       _notifyChanged();

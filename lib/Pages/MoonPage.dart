@@ -7,13 +7,13 @@ import 'package:sizer/sizer.dart';
 import '../Entities/Honoo.dart';
 import '../Entities/Hinoo.dart';
 import 'ComingSoonPage.dart';
-import '../Controller/DeviceController.dart';
 import '../Services/HonooService.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../UI/HonooCard.dart';
 import '../UI/HinooViewer.dart';
 import '../Utility/HonooColors.dart';
 import '../Utility/Utility.dart';
+import '../Controller/DeviceController.dart';
 
 class MoonPage extends StatefulWidget {
   const MoonPage({super.key});
@@ -23,10 +23,8 @@ class MoonPage extends StatefulWidget {
 }
 
 class _MoonPageState extends State<MoonPage> {
-  List<Honoo> _moonHonoo = [];
   List<_MoonItem> _items = [];
   bool _isLoading = true;
-  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -48,7 +46,8 @@ class _MoonPageState extends State<MoonPage> {
 
       final List<_MoonItem> items = [];
       for (final h in dataHonoo) {
-        final created = DateTime.tryParse(h.created_at) ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final created = DateTime.tryParse(h.created_at) ??
+            DateTime.fromMillisecondsSinceEpoch(0);
         items.add(_MoonItem.honoo(h, created));
       }
 
@@ -63,7 +62,9 @@ class _MoonPageState extends State<MoonPage> {
             type: HinooType.moon,
             recipientTag: r['recipient_tag'] as String?,
           );
-          final created = DateTime.tryParse((r['created_at'] ?? '').toString()) ?? DateTime.now();
+          final created =
+              DateTime.tryParse((r['created_at'] ?? '').toString()) ??
+                  DateTime.now();
           items.add(_MoonItem.hinoo(draft, created));
         }
       }
@@ -71,7 +72,6 @@ class _MoonPageState extends State<MoonPage> {
       items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
       setState(() {
-        _moonHonoo = dataHonoo;
         _items = items;
         _isLoading = false;
       });
@@ -87,11 +87,11 @@ class _MoonPageState extends State<MoonPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isPhone = DeviceController().isPhone();
-    final size = MediaQuery.of(context).size;
-
     const titleH = 60.0;
     const footerH = 60.0;
+
+    final isPhone = DeviceController().isPhone();
+    final size = MediaQuery.of(context).size;
 
     return Scaffold(
       backgroundColor: HonooColor.tertiary,
@@ -100,8 +100,8 @@ class _MoonPageState extends State<MoonPage> {
           builder: (context, constraints) {
             final availH = constraints.maxHeight;
             final centerH =
-            (availH - titleH - footerH).clamp(0.0, double.infinity);
-            final maxW = isPhone ? size.width * 0.96 : size.width * 0.5;
+                (availH - titleH - footerH).clamp(0.0, double.infinity);
+            final double maxW = isPhone ? size.width * 0.96 : size.width * 0.5;
 
             return Column(
               children: [
@@ -126,48 +126,44 @@ class _MoonPageState extends State<MoonPage> {
                   child: Center(
                     child: ConstrainedBox(
                       constraints:
-                      BoxConstraints(maxWidth: maxW, maxHeight: centerH),
+                          BoxConstraints(maxWidth: maxW, maxHeight: centerH),
                       child: _isLoading
                           ? const Center(child: CircularProgressIndicator())
                           : (_items.isEmpty
-                          ? Center(
-                            child: Text(
-                          'Nessun contenuto sulla Luna',
-                              style: GoogleFonts.libreFranklin(
-                                color: HonooColor.onTertiary,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          )
-                          : Padding(
-                        // gutter esterno per non toccare mai i bordi
-                        padding:
-                        const EdgeInsets.symmetric(horizontal: 16),
-                        child: cs.CarouselSlider.builder(
-                          itemCount: _items.length,
-                          options: cs.CarouselOptions(
-                            height: centerH,
-                            viewportFraction: 1.0, // no peek
-                            enableInfiniteScroll: false,
-                            padEnds: true, // margine su primo/ultimo
-                            enlargeCenterPage:
-                            false, // nessun enlarge orizzontale
-                            scrollPhysics:
-                            const BouncingScrollPhysics(),
-                            onPageChanged: (i, _) =>
-                                setState(() => _currentIndex = i),
-                          ),
-                          itemBuilder: (context, index, realIdx) {
-                            return Padding(
-                              // gutter interno per pagina
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16),
-                              child: _buildMoonItem(_items[index], centerH, maxW),
-                            );
-                          },
-                        ),
-                      )),
+                              ? Center(
+                                  child: Text(
+                                    'Nessun contenuto sulla Luna',
+                                    style: GoogleFonts.libreFranklin(
+                                      color: HonooColor.onTertiary,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                )
+                              : Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16),
+                                  child: cs.CarouselSlider.builder(
+                                    itemCount: _items.length,
+                                    options: cs.CarouselOptions(
+                                      height: centerH,
+                                      viewportFraction: 1.0,
+                                      enableInfiniteScroll: false,
+                                      padEnds: true,
+                                      enlargeCenterPage: false,
+                                      scrollPhysics:
+                                          const BouncingScrollPhysics(),
+                                    ),
+                                    itemBuilder: (context, index, realIdx) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16),
+                                        child: _buildMoonItem(
+                                            _items[index], centerH, maxW),
+                                      );
+                                    },
+                                  ),
+                                )),
                     ),
                   ),
                 ),
@@ -246,10 +242,14 @@ class _MoonItem {
   final HinooDraft? hinoo;
   final DateTime createdAt;
   const _MoonItem._(this.honoo, this.hinoo, this.createdAt);
-  factory _MoonItem.honoo(Honoo h, DateTime createdAt) => _MoonItem._(h, null, createdAt);
-  factory _MoonItem.hinoo(HinooDraft d, DateTime createdAt) => _MoonItem._(null, d, createdAt);
+  factory _MoonItem.honoo(Honoo h, DateTime createdAt) =>
+      _MoonItem._(h, null, createdAt);
+  factory _MoonItem.hinoo(HinooDraft d, DateTime createdAt) =>
+      _MoonItem._(null, d, createdAt);
 
-  T when<T>({required T Function(Honoo h) honoo, required T Function(HinooDraft d) hinoo}) {
+  T when<T>(
+      {required T Function(Honoo h) honoo,
+      required T Function(HinooDraft d) hinoo}) {
     if (this.honoo != null) return honoo(this.honoo!);
     return hinoo(this.hinoo!);
   }
@@ -258,6 +258,11 @@ class _MoonItem {
 Widget _buildMoonItem(_MoonItem item, double maxH, double maxW) {
   return item.when(
     honoo: (h) => HonooCard(honoo: h),
-    hinoo: (d) => HinooViewer(draft: d, maxHeight: maxH, maxWidth: maxW),
+    hinoo: (d) => HinooViewer(
+      draft: d,
+      maxHeight: maxH,
+      maxWidth: maxW,
+      gapColor: HonooColor.tertiary,
+    ),
   );
 }
