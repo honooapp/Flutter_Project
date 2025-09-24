@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Entities/Hinoo.dart';
 
@@ -34,9 +35,17 @@ class HinooService {
       'created_at': DateTime.now().toIso8601String(),
     };
 
-    final res =
-        await _supabase.from(_table).insert(data).select().maybeSingle();
-    if (res == null) throw 'publishHinoo: insert fallita';
+    try {
+      debugPrint('[HinooService] publishHinoo data=$data');
+      final res =
+          await _supabase.from(_table).insert(data).select().maybeSingle();
+      if (res == null) throw 'publishHinoo: insert fallita';
+    } on PostgrestException catch (e) {
+      debugPrint('[HinooService] publishHinoo error: ${e.message} details=${e.details}');
+      final msg = e.message ?? e.code ?? 'sconosciuto';
+      final details = e.details;
+      throw 'Errore salvataggio Hinoo: $msg${details != null ? ' ($details)' : ''}';
+    }
   }
 
   /// Inserisce un record type='moon' se non già presente (dedup su fingerprint)
@@ -52,7 +61,7 @@ class HinooService {
         .from(_table)
         .select('id')
         .eq('user_id', userId)
-        .eq('type', _toDbType(HinooType.moon))
+        .in_('type', ['moon', 'public'])
         .eq('fingerprint', fp)
         .limit(1);
 
@@ -69,8 +78,16 @@ class HinooService {
       'created_at': DateTime.now().toIso8601String(),
     };
 
-    await _supabase.from(_table).insert(data);
-    return true;
+    try {
+      debugPrint('[HinooService] duplicateToMoon data=$data');
+      await _supabase.from(_table).insert(data);
+      return true;
+    } on PostgrestException catch (e) {
+      debugPrint('[HinooService] duplicateToMoon error: ${e.message} details=${e.details}');
+      final msg = e.message ?? e.code ?? 'sconosciuto';
+      final details = e.details;
+      throw 'Errore pubblicazione Luna: $msg${details != null ? ' ($details)' : ''}';
+    }
   }
 
   static String fingerprint(HinooDraft d) {
@@ -122,12 +139,16 @@ class HinooService {
   static Future<List<HinooDraft>> fetchUserHinoo(String userId,
       {HinooType type = HinooType.personal}) async {
     final typeStr = _toDbType(type);
-    final rows = await _supabase
+    final baseQuery = _supabase
         .from(_table)
         .select('pages,type,recipient_tag,created_at')
-        .eq('user_id', userId)
-        .eq('type', typeStr)
-        .order('created_at', ascending: false);
+        .eq('user_id', userId);
+
+    final filteredQuery = type == HinooType.moon
+        ? baseQuery.in_('type', ['moon', 'public'])
+        : baseQuery.eq('type', typeStr);
+
+    final rows = await filteredQuery.order('created_at', ascending: false);
 
     final List<HinooDraft> list = [];
     for (final r in (rows as List)) {

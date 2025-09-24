@@ -210,11 +210,14 @@ class _NewHinooPageState extends State<NewHinooPage> {
     }
 
     try {
-      await _controller.sendToMoon(draft);
+      final HinooDraft hinooDraft = _convertRawBuilderDraft(draft);
+      final result = await _controller.sendToMoon(hinooDraft);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pubblicato sulla Luna.')),
-      );
+      final text = result == HinooMoonResult.published
+          ? 'Pubblicato sulla Luna.'
+          : 'Hinoo già presente sulla Luna.';
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(text)));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

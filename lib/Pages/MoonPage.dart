@@ -10,7 +10,7 @@ import 'ComingSoonPage.dart';
 import '../Services/HonooService.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../UI/HonooCard.dart';
-import '../UI/HinooViewer.dart';
+import '../UI/MoonHinooView.dart';
 import '../Utility/HonooColors.dart';
 import '../Utility/Utility.dart';
 import '../Controller/DeviceController.dart';
@@ -41,7 +41,7 @@ class _MoonPageState extends State<MoonPage> {
       final rows = await client
           .from('hinoo')
           .select('pages,type,recipient_tag,created_at')
-          .eq('type', 'public')
+          .in_('type', ['moon', 'public'])
           .order('created_at', ascending: false);
 
       final List<_MoonItem> items = [];
@@ -258,11 +258,11 @@ class _MoonItem {
 Widget _buildMoonItem(_MoonItem item, double maxH, double maxW) {
   return item.when(
     honoo: (h) => HonooCard(honoo: h),
-    hinoo: (d) => HinooViewer(
+    hinoo: (d) => MoonHinooView(
       draft: d,
       maxHeight: maxH,
       maxWidth: maxW,
-      gapColor: HonooColor.tertiary,
+      backgroundColor: HonooColor.tertiary,
     ),
   );
 }

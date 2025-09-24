@@ -81,10 +81,10 @@ class _HinooViewerState extends State<HinooViewer> {
                         } else {
                           distance = (_current - index).abs().toDouble();
                         }
-                        const double maxGap = 9.0;
+                        const double maxGap = 18.0;
                         final double gap = (distance.clamp(0.0, 1.0) * maxGap)
                             .clamp(0.0, maxGap);
-                        return _HinooSlideView(
+                        return HinooSlideView(
                           slide: widget.draft.pages[index],
                           width: w,
                           height: h,
@@ -118,14 +118,14 @@ class _HinooViewerState extends State<HinooViewer> {
   }
 }
 
-class _HinooSlideView extends StatelessWidget {
+class HinooSlideView extends StatelessWidget {
   final HinooSlide slide;
   final double width;
   final double height;
   final double? baseCanvasHeight;
   final double gap;
   final Color gapColor;
-  const _HinooSlideView({
+  const HinooSlideView({
     required this.slide,
     required this.width,
     required this.height,
