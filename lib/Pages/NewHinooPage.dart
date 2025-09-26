@@ -113,6 +113,15 @@ class _NewHinooPageState extends State<NewHinooPage> {
 
     // Converte il draft grezzo del builder nel modello HinooDraft (Entities/Hinoo.dart)
     final HinooDraft hinooDraft = _convertRawBuilderDraft(rawDraft);
+    final validationErrors = _controller.validateDraft(hinooDraft);
+    if (validationErrors.isNotEmpty) {
+      if (!mounted) return;
+      final errorText = 'Bozza non valida:\n- ${validationErrors.join('\n- ')}';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorText)),
+      );
+      return;
+    }
 
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
@@ -151,7 +160,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
     for (final p in rawPages) {
       if (p is Map) {
         final bgUrl = p['bgUrl'] as String?;
-        final txt = (p['text'] as String?) ?? '';
+        final txt = ((p['text'] as String?) ?? '').trim();
         final textColorVal = (p['textColor'] as int?) ?? 0xFFFFFFFF;
         final isTextWhite = textColorVal == const Color(0xFFFFFFFF).value;
         // Estrai scale e offset (se presenti) dalla matrice 4x4

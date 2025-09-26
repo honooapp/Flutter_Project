@@ -18,6 +18,18 @@ class HinooController {
     final n = draft.pages.length;
     if (n < 1) errors.add('Deve esserci almeno 1 schermata.');
     if (n > 9) errors.add('Puoi creare al massimo 9 schermate.');
+    for (var i = 0; i < n; i++) {
+      final slide = draft.pages[i];
+      final index = i + 1;
+      final bg = slide.backgroundImage?.trim() ?? '';
+      if (bg.isEmpty) {
+        errors.add('La schermata $index deve avere uno sfondo caricato.');
+      }
+      final text = slide.text.trim();
+      if (text.isEmpty) {
+        errors.add('La schermata $index deve avere un testo.');
+      }
+    }
     return errors;
   }
 

@@ -41,10 +41,15 @@ class HinooService {
           await _supabase.from(_table).insert(data).select().maybeSingle();
       if (res == null) throw 'publishHinoo: insert fallita';
     } on PostgrestException catch (e) {
-      debugPrint('[HinooService] publishHinoo error: ${e.message} details=${e.details}');
+      debugPrint('[HinooService] publishHinoo error: ${e.message} details=${e.details} hint=${e.hint} code=${e.code}');
       final msg = e.message ?? e.code ?? 'sconosciuto';
       final details = e.details;
-      throw 'Errore salvataggio Hinoo: $msg${details != null ? ' ($details)' : ''}';
+      final hint = e.hint;
+      final extra = [
+        if (details != null && details.isNotEmpty) details,
+        if (hint != null && hint.isNotEmpty) 'hint: $hint',
+      ].join(' — ');
+      throw 'Errore salvataggio Hinoo: $msg${extra.isNotEmpty ? ' ($extra)' : ''}';
     }
   }
 
@@ -83,10 +88,15 @@ class HinooService {
       await _supabase.from(_table).insert(data);
       return true;
     } on PostgrestException catch (e) {
-      debugPrint('[HinooService] duplicateToMoon error: ${e.message} details=${e.details}');
+      debugPrint('[HinooService] duplicateToMoon error: ${e.message} details=${e.details} hint=${e.hint} code=${e.code}');
       final msg = e.message ?? e.code ?? 'sconosciuto';
       final details = e.details;
-      throw 'Errore pubblicazione Luna: $msg${details != null ? ' ($details)' : ''}';
+      final hint = e.hint;
+      final extra = [
+        if (details != null && details.isNotEmpty) details,
+        if (hint != null && hint.isNotEmpty) 'hint: $hint',
+      ].join(' — ');
+      throw 'Errore pubblicazione Luna: $msg${extra.isNotEmpty ? ' ($extra)' : ''}';
     }
   }
 
