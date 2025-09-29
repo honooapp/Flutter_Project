@@ -1,19 +1,18 @@
-import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../Entities/Honoo.dart';
+import '../Controller/DeviceController.dart';
 import '../Entities/Hinoo.dart';
+import '../Entities/Honoo.dart';
 import 'ComingSoonPage.dart';
 import '../Services/HonooService.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../UI/HinooViewer.dart';
 import '../UI/HonooCard.dart';
-import '../UI/MoonHinooView.dart';
 import '../Utility/HonooColors.dart';
 import '../Utility/Utility.dart';
-import '../Controller/DeviceController.dart';
 
 class MoonPage extends StatefulWidget {
   const MoonPage({super.key});
@@ -23,48 +22,53 @@ class MoonPage extends StatefulWidget {
 }
 
 class _MoonPageState extends State<MoonPage> {
-  List<_MoonItem> _items = [];
+  final PageController _pageController = PageController();
   bool _isLoading = true;
+  List<_MoonItem> _items = [];
 
   @override
   void initState() {
     super.initState();
-    _loadMoonHonoo();
+    _loadMoonContent();
   }
 
-  Future<void> _loadMoonHonoo() async {
-    try {
-      final dataHonoo = await HonooService.fetchPublicHonoo();
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
-      // Fetch HINOO pubblici: type='moon'
-      final client = Supabase.instance.client;
-      final rows = await client
+  Future<void> _loadMoonContent() async {
+    try {
+      final honoo = await HonooService.fetchPublicHonoo();
+
+      final rows = await Supabase.instance.client
           .from('hinoo')
-          .select('pages,type,recipient_tag,created_at')
-          .in_('type', ['moon', 'public'])
+          .select('pages,recipient_tag,created_at')
+          .eq('type', 'moon')
           .order('created_at', ascending: false);
 
       final List<_MoonItem> items = [];
-      for (final h in dataHonoo) {
+
+      for (final h in honoo) {
         final created = DateTime.tryParse(h.created_at) ??
             DateTime.fromMillisecondsSinceEpoch(0);
         items.add(_MoonItem.honoo(h, created));
       }
 
-      for (final r in (rows as List)) {
-        final pages = r['pages'];
+      for (final row in (rows as List)) {
+        final pages = row['pages'];
         if (pages is List) {
           final draft = HinooDraft(
             pages: pages
                 .whereType<Map<String, dynamic>>()
-                .map((e) => HinooSlide.fromJson(e))
+                .map(HinooSlide.fromJson)
                 .toList(),
             type: HinooType.moon,
-            recipientTag: r['recipient_tag'] as String?,
+            recipientTag: row['recipient_tag'] as String?,
           );
-          final created =
-              DateTime.tryParse((r['created_at'] ?? '').toString()) ??
-                  DateTime.now();
+          final created = DateTime.tryParse((row['created_at'] ?? '').toString()) ??
+              DateTime.fromMillisecondsSinceEpoch(0);
           items.add(_MoonItem.hinoo(draft, created));
         }
       }
@@ -76,38 +80,37 @@ class _MoonPageState extends State<MoonPage> {
         _isLoading = false;
       });
     } catch (e) {
-      debugPrint("Errore caricamento Moon Honoo: $e");
-      setState(() => _isLoading = false);
+      debugPrint('Errore caricamento Moon: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Errore: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Errore caricamento Moon: $e')),
+        );
       }
+      setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    const titleH = 60.0;
-    const footerH = 60.0;
-
-    final isPhone = DeviceController().isPhone();
-    final size = MediaQuery.of(context).size;
+    const double headerHeight = 60;
+    const double footerHeight = 60;
+    final bool isPhone = DeviceController().isPhone();
+    final Size size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: HonooColor.tertiary,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final availH = constraints.maxHeight;
-            final centerH =
-                (availH - titleH - footerH).clamp(0.0, double.infinity);
-            final double maxW = isPhone ? size.width * 0.96 : size.width * 0.5;
+            final double availHeight = constraints.maxHeight;
+            final double centerHeight =
+                (availHeight - headerHeight - footerHeight).clamp(0.0, double.infinity);
+            final double maxWidth = isPhone ? size.width * 0.96 : size.width * 0.5;
 
             return Column(
               children: [
-                // HEADER
                 SizedBox(
-                  height: titleH,
+                  height: headerHeight,
                   child: Center(
                     child: Text(
                       Utility().appName,
@@ -116,67 +119,28 @@ class _MoonPageState extends State<MoonPage> {
                         fontSize: 30,
                         fontWeight: FontWeight.w500,
                       ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
-
-                // CENTRO: carosello orizzontale con layout “HonooCard”
                 Expanded(
                   child: Center(
                     child: ConstrainedBox(
-                      constraints:
-                          BoxConstraints(maxWidth: maxW, maxHeight: centerH),
-                      child: _isLoading
-                          ? const Center(child: CircularProgressIndicator())
-                          : (_items.isEmpty
-                              ? Center(
-                                  child: Text(
-                                    'Nessun contenuto sulla Luna',
-                                    style: GoogleFonts.libreFranklin(
-                                      color: HonooColor.onTertiary,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                )
-                              : Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16),
-                                  child: cs.CarouselSlider.builder(
-                                    itemCount: _items.length,
-                                    options: cs.CarouselOptions(
-                                      height: centerH,
-                                      viewportFraction: 1.0,
-                                      enableInfiniteScroll: false,
-                                      padEnds: true,
-                                      enlargeCenterPage: false,
-                                      scrollPhysics:
-                                          const BouncingScrollPhysics(),
-                                    ),
-                                    itemBuilder: (context, index, realIdx) {
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 16),
-                                        child: _buildMoonItem(
-                                            _items[index], centerH, maxW),
-                                      );
-                                    },
-                                  ),
-                                )),
+                      constraints: BoxConstraints(
+                        maxWidth: maxWidth,
+                        maxHeight: centerHeight,
+                      ),
+                      child: _buildBody(centerHeight, maxWidth),
                     ),
                   ),
                 ),
-
-                // FOOTER
                 SizedBox(
-                  height: footerH,
+                  height: footerHeight,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton(
                         icon: SvgPicture.asset(
-                          "assets/icons/home_onTertiary.svg",
+                          'assets/icons/home_onTertiary.svg',
                           semanticsLabel: 'Home',
                         ),
                         iconSize: 60,
@@ -186,7 +150,7 @@ class _MoonPageState extends State<MoonPage> {
                       SizedBox(width: 5.w),
                       IconButton(
                         icon: SvgPicture.asset(
-                          "assets/icons/heart.svg",
+                          'assets/icons/heart.svg',
                           semanticsLabel: 'Heart',
                         ),
                         iconSize: 60,
@@ -207,7 +171,7 @@ class _MoonPageState extends State<MoonPage> {
                       SizedBox(width: 5.w),
                       IconButton(
                         icon: SvgPicture.asset(
-                          "assets/icons/reply.svg",
+                          'assets/icons/reply.svg',
                           semanticsLabel: 'Reply',
                         ),
                         iconSize: 60,
@@ -235,34 +199,71 @@ class _MoonPageState extends State<MoonPage> {
       ),
     );
   }
+
+  Widget _buildBody(double maxHeight, double maxWidth) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_items.isEmpty) {
+      return Center(
+        child: Text(
+          'Nessun contenuto sulla Luna',
+          style: GoogleFonts.libreFranklin(
+            color: HonooColor.onTertiary,
+            fontSize: 18,
+            fontWeight: FontWeight.w400,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
+
+    return SizedBox(
+      width: maxWidth,
+      height: maxHeight,
+      child: PageView.builder(
+        controller: _pageController,
+        physics: const BouncingScrollPhysics(),
+        itemCount: _items.length,
+        itemBuilder: (context, index) {
+          final item = _items[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Center(
+              child: _buildMoonItem(item, maxHeight, maxWidth),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildMoonItem(_MoonItem item, double maxHeight, double maxWidth) {
+    if (item.honoo != null) {
+      return HonooCard(honoo: item.honoo!);
+    }
+
+    final draft = item.hinoo!;
+    return HinooViewer(
+      draft: draft,
+      maxHeight: maxHeight,
+      maxWidth: maxWidth,
+      gapColor: Colors.white,
+    );
+  }
 }
 
 class _MoonItem {
   final Honoo? honoo;
   final HinooDraft? hinoo;
   final DateTime createdAt;
+
   const _MoonItem._(this.honoo, this.hinoo, this.createdAt);
+
   factory _MoonItem.honoo(Honoo h, DateTime createdAt) =>
       _MoonItem._(h, null, createdAt);
-  factory _MoonItem.hinoo(HinooDraft d, DateTime createdAt) =>
-      _MoonItem._(null, d, createdAt);
 
-  T when<T>(
-      {required T Function(Honoo h) honoo,
-      required T Function(HinooDraft d) hinoo}) {
-    if (this.honoo != null) return honoo(this.honoo!);
-    return hinoo(this.hinoo!);
-  }
-}
-
-Widget _buildMoonItem(_MoonItem item, double maxH, double maxW) {
-  return item.when(
-    honoo: (h) => HonooCard(honoo: h),
-    hinoo: (d) => MoonHinooView(
-      draft: d,
-      maxHeight: maxH,
-      maxWidth: maxW,
-      backgroundColor: HonooColor.tertiary,
-    ),
-  );
+  factory _MoonItem.hinoo(HinooDraft h, DateTime createdAt) =>
+      _MoonItem._(null, h, createdAt);
 }

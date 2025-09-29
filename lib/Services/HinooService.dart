@@ -9,14 +9,14 @@ class HinooService {
   static String _toDbType(HinooType type) {
     switch (type) {
       case HinooType.moon:
-        return 'public';
+        return 'moon';
       default:
         return type.name;
     }
   }
 
   static HinooType _fromDbType(String? value) {
-    if (value == 'public') return HinooType.moon;
+    if (value == 'public' || value == 'moon') return HinooType.moon;
     if (value == 'answer') return HinooType.answer;
     return HinooType.personal;
   }
@@ -66,7 +66,7 @@ class HinooService {
         .from(_table)
         .select('id')
         .eq('user_id', userId)
-        .in_('type', ['moon', 'public'])
+        .eq('type', 'moon')
         .eq('fingerprint', fp)
         .limit(1);
 
@@ -155,7 +155,7 @@ class HinooService {
         .eq('user_id', userId);
 
     final filteredQuery = type == HinooType.moon
-        ? baseQuery.in_('type', ['moon', 'public'])
+        ? baseQuery.eq('type', 'moon')
         : baseQuery.eq('type', typeStr);
 
     final rows = await filteredQuery.order('created_at', ascending: false);
