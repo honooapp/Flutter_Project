@@ -1,16 +1,16 @@
+import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../Controller/DeviceController.dart';
 import '../Entities/Hinoo.dart';
 import '../Entities/Honoo.dart';
 import 'ComingSoonPage.dart';
 import '../Services/HonooService.dart';
 import '../UI/HinooViewer.dart';
-import '../UI/HonooCard.dart';
+import '../UI/HonooThreadView.dart';
 import '../Utility/HonooColors.dart';
 import '../Utility/Utility.dart';
 
@@ -22,7 +22,6 @@ class MoonPage extends StatefulWidget {
 }
 
 class _MoonPageState extends State<MoonPage> {
-  final PageController _pageController = PageController();
   bool _isLoading = true;
   List<_MoonItem> _items = [];
 
@@ -30,12 +29,6 @@ class _MoonPageState extends State<MoonPage> {
   void initState() {
     super.initState();
     _loadMoonContent();
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
   }
 
   Future<void> _loadMoonContent() async {
@@ -94,9 +87,6 @@ class _MoonPageState extends State<MoonPage> {
   Widget build(BuildContext context) {
     const double headerHeight = 60;
     const double footerHeight = 60;
-    final bool isPhone = DeviceController().isPhone();
-    final Size size = MediaQuery.of(context).size;
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -105,7 +95,7 @@ class _MoonPageState extends State<MoonPage> {
             final double availHeight = constraints.maxHeight;
             final double centerHeight =
                 (availHeight - headerHeight - footerHeight).clamp(0.0, double.infinity);
-            final double maxWidth = isPhone ? size.width * 0.96 : size.width * 0.5;
+            final double targetMaxWidth = _contentMaxWidth(constraints.maxWidth);
 
             return Column(
               children: [
@@ -124,12 +114,17 @@ class _MoonPageState extends State<MoonPage> {
                 ),
                 Expanded(
                   child: Center(
-                    child: ConstrainedBox(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 90),
+                      curve: Curves.easeOutCubic,
                       constraints: BoxConstraints(
-                        maxWidth: maxWidth,
-                        maxHeight: centerHeight,
+                        maxWidth: targetMaxWidth,
                       ),
-                      child: _buildBody(centerHeight, maxWidth),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: centerHeight,
+                        child: _buildBody(centerHeight, targetMaxWidth),
+                      ),
                     ),
                   ),
                 ),
@@ -220,28 +215,34 @@ class _MoonPageState extends State<MoonPage> {
     }
 
     return SizedBox(
-      width: maxWidth,
       height: maxHeight,
-      child: PageView.builder(
-        controller: _pageController,
-        physics: const BouncingScrollPhysics(),
-        itemCount: _items.length,
-        itemBuilder: (context, index) {
-          final item = _items[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: cs.CarouselSlider.builder(
+          itemCount: _items.length,
+          options: cs.CarouselOptions(
+            height: maxHeight,
+            viewportFraction: 1.0,
+            enableInfiniteScroll: false,
+            padEnds: true,
+            enlargeCenterPage: false,
+            scrollPhysics: const BouncingScrollPhysics(),
+          ),
+          itemBuilder: (context, index, realIndex) {
+            final item = _items[index];
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: _buildMoonItem(item, maxHeight, maxWidth),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
 
   Widget _buildMoonItem(_MoonItem item, double maxHeight, double maxWidth) {
     if (item.honoo != null) {
-      return HonooCard(honoo: item.honoo!);
+      return HonooThreadView(root: item.honoo!);
     }
 
     final draft = item.hinoo!;
@@ -250,7 +251,16 @@ class _MoonPageState extends State<MoonPage> {
       maxHeight: maxHeight,
       maxWidth: maxWidth,
       gapColor: Colors.white,
+      showDotsBorder: true,
     );
+  }
+
+  double _contentMaxWidth(double w) {
+    if (w < 480) return w * 0.94;
+    if (w < 768) return w * 0.92;
+    if (w < 1024) return w * 0.84;
+    if (w < 1440) return w * 0.70;
+    return w * 0.58;
   }
 }
 

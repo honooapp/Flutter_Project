@@ -41,6 +41,11 @@ class _NewHinooPageState extends State<NewHinooPage> {
   List<dynamic>? _globalBgTransform;
   Uint8List? _globalBgPreviewBytes;
   double _lastCanvasHeight = 0;
+  String _builderStep = 'changeBg';
+  int _currentTextLength = 0;
+
+  bool get _isWriteStep => _builderStep == 'writeText';
+  bool get _hasMinTextForDownload => _currentTextLength >= 1;
 
   // Costanti layout
   static const double _titleH = 52;     // riga titolo
@@ -55,7 +60,8 @@ class _NewHinooPageState extends State<NewHinooPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final dyn = _builderKey.currentState as dynamic;
       final draft = dyn?.exportDraft?.call();
-      _applyDraftToLocalState(draft);
+      if (!mounted) return;
+      setState(() => _applyDraftToLocalState(draft));
     });
   }
 
@@ -68,27 +74,41 @@ class _NewHinooPageState extends State<NewHinooPage> {
   }
 
   void _applyDraftToLocalState(dynamic draft) {
-    if (draft is Map) {
-      final p = draft['pages'];
-      if (p is List) _pages = p;
-      final idx = draft['currentIndex'];
-      if (idx is int) {
-        // sicurezza sugli estremi
-        final max = _pages.isEmpty ? 0 : _pages.length - 1;
-        _currentIndex = idx.clamp(0, max);
-      } else if (_currentIndex >= _pages.length) {
-        _currentIndex = _pages.isEmpty ? 0 : _pages.length - 1;
-      }
-      // fallback globabili per anteprime
-      _globalBgUrl = draft['bgUrl'] as String?;
-      final tr = draft['bgTransform'];
-      _globalBgTransform = (tr is List) ? tr : null;
-      final bytes = draft['bgPreviewBytes'];
-      _globalBgPreviewBytes = (bytes is Uint8List) ? bytes : null;
-      final ch = draft['canvasHeight'];
-      if (ch is num) _lastCanvasHeight = ch.toDouble();
-      setState(() {}); // ridisegna thumbnails
+    if (draft is! Map) return;
+
+    final dynamic p = draft['pages'];
+    if (p is List) _pages = p;
+
+    final dynamic idx = draft['currentIndex'];
+    if (idx is int) {
+      final int max = _pages.isEmpty ? 0 : _pages.length - 1;
+      _currentIndex = idx.clamp(0, max);
+    } else if (_currentIndex >= _pages.length) {
+      _currentIndex = _pages.isEmpty ? 0 : _pages.length - 1;
     }
+
+    _globalBgUrl = draft['bgUrl'] as String?;
+    final dynamic tr = draft['bgTransform'];
+    _globalBgTransform = (tr is List) ? tr : null;
+    final dynamic bytes = draft['bgPreviewBytes'];
+    _globalBgPreviewBytes = (bytes is Uint8List) ? bytes : null;
+    final dynamic ch = draft['canvasHeight'];
+    if (ch is num) _lastCanvasHeight = ch.toDouble();
+
+    final dynamic rawStep = draft['step'];
+    if (rawStep is String && rawStep.isNotEmpty) {
+      _builderStep = rawStep;
+    }
+
+    int detectedLength = 0;
+    final dynamic rawLength = draft['textLength'];
+    if (rawLength is int) {
+      detectedLength = rawLength;
+    } else {
+      final dynamic rawText = draft['text'];
+      if (rawText is String) detectedLength = rawText.trim().length;
+    }
+    _currentTextLength = detectedLength;
   }
 
   // PNG opzionale dal builder
@@ -254,13 +274,24 @@ class _NewHinooPageState extends State<NewHinooPage> {
     }
   }
 
-  void _openPreviewFromBuilder() {
+  void _triggerDownloadFromBuilder() {
     final dyn = _builderKey.currentState as dynamic;
-    if (dyn?.openPreviewDialogPublic != null) {
-      dyn.openPreviewDialogPublic();
+    if (dyn?.openDownloadDialogPublic != null) {
+      dyn.openDownloadDialogPublic();
     } else {
-      _warnMissingApi('_openPreviewFromBuilder → openPreviewDialogPublic');
+      _warnMissingApi('_triggerDownloadFromBuilder → openDownloadDialogPublic');
     }
+  }
+
+  void _handleDownloadTap() {
+    if (!_hasMinTextForDownload) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Scrivi almeno 10 caratteri prima di scaricare.')),
+      );
+      return;
+    }
+    _triggerDownloadFromBuilder();
   }
 
   void _goToFromBuilder(int index) {
@@ -371,12 +402,16 @@ class _NewHinooPageState extends State<NewHinooPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              WhiteIconButton(
-                                tooltip: 'Scarica immagine',
-                                icon: Icons.download_outlined,
-                                onPressed: _openPreviewFromBuilder,
-                              ),
-                              const SizedBox(width: 12),
+                              if (_isWriteStep) ...[
+                                WhiteIconButton(
+                                  tooltip: _hasMinTextForDownload
+                                      ? 'Scarica immagini'
+                                      : 'Scrivi almeno 10 caratteri per scaricare',
+                                  icon: Icons.download_outlined,
+                                  onPressed: _handleDownloadTap,
+                                ),
+                                const SizedBox(width: 12),
+                              ],
                               WhiteIconButton(
                                 tooltip: 'Elimina pagina',
                                 icon: Icons.delete_outline,

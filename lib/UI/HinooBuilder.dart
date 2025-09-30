@@ -217,11 +217,16 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
   Future<void> _downloadHinoo({required bool allPages}) async {
     if (!mounted) return;
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const DownloadProgressDialog(),
-    );
+    bool progressVisible = false;
+    if (mounted) {
+      progressVisible = true;
+      // ignore: unawaited_futures
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const DownloadProgressDialog(),
+      ).whenComplete(() => progressVisible = false);
+    }
 
     final List<int> indices = allPages
         ? List<int>.generate(_pages.length, (int i) => i)
@@ -272,8 +277,12 @@ class _HinooBuilderState extends State<HinooBuilder> {
         setState(() => _current = previousIndex);
         await _waitForNextFrame();
       }
-      if (mounted) {
-        Navigator.of(context, rootNavigator: true).maybePop();
+      if (progressVisible && mounted) {
+        final navigator = Navigator.of(context, rootNavigator: true);
+        if (navigator.canPop()) {
+          navigator.pop();
+          progressVisible = false;
+        }
       }
     }
   }
@@ -340,11 +349,13 @@ class _HinooBuilderState extends State<HinooBuilder> {
       'pages': _pages,                // sostituisci col tuo tipo slide/pagina
       'currentIndex': _current,
       'text': _textController.text,
+      'textLength': _textController.text.trim().length,
       'textColor': _txtColor.value,
       'hasBg': _localBgPreview != null || _bgPublicUrl != null,
       'bgUrl': _bgPublicUrl,
       'bgTransform': _bgLockedMatrix?.storage.toList(),
       'canvasHeight': _canvasHeight,
+      'step': _step.name,
       // preview immediata per thumbnails quando non c'è ancora un URL pubblico
       'bgPreviewBytes': _localBgPreview is MemoryImage
           ? (_localBgPreview as MemoryImage).bytes

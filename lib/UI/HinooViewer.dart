@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../Entities/Hinoo.dart';
@@ -8,12 +11,14 @@ class HinooViewer extends StatefulWidget {
   final double maxHeight;
   final double maxWidth;
   final Color gapColor;
+  final bool showDotsBorder;
   const HinooViewer({
     super.key,
     required this.draft,
     required this.maxHeight,
     required this.maxWidth,
     this.gapColor = HonooColor.background,
+    this.showDotsBorder = false,
   });
 
   @override
@@ -23,6 +28,7 @@ class HinooViewer extends StatefulWidget {
 class _HinooViewerState extends State<HinooViewer> {
   late final PageController _vController;
   int _current = 0;
+  Timer? _snapTimer;
 
   @override
   void initState() {
@@ -32,6 +38,7 @@ class _HinooViewerState extends State<HinooViewer> {
 
   @override
   void dispose() {
+    _snapTimer?.cancel();
     _vController.dispose();
     super.dispose();
   }
@@ -58,43 +65,71 @@ class _HinooViewerState extends State<HinooViewer> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(5),
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onVerticalDragUpdate: (_) {}, // priorità al gesto verticale
-                child: PageView.builder(
-                  scrollDirection: Axis.vertical,
-                  controller: _vController,
-                  physics: const PageScrollPhysics(),
-                  allowImplicitScrolling: true,
-                  itemCount: widget.draft.pages.length,
-                  onPageChanged: (i) => setState(() => _current = i),
-                  itemBuilder: (context, index) {
-                    return AnimatedBuilder(
-                      animation: _vController,
-                      builder: (context, child) {
-                        double distance = 0.0;
-                        if (_vController.hasClients &&
-                            _vController.position.haveDimensions) {
-                          final double page = _vController.page ??
-                              _vController.initialPage.toDouble();
-                          distance = (page - index).abs();
-                        } else {
-                          distance = (_current - index).abs().toDouble();
-                        }
-                        const double maxGap = 18.0;
-                        final double gap = (distance.clamp(0.0, 1.0) * maxGap)
-                            .clamp(0.0, maxGap);
-                        return HinooSlideView(
-                          slide: widget.draft.pages[index],
-                          width: w,
-                          height: h,
-                          baseCanvasHeight: widget.draft.baseCanvasHeight,
-                          gap: gap,
-                          gapColor: widget.gapColor,
-                        );
-                      },
-                    );
-                  },
+              child: Listener(
+                onPointerSignal: (event) {
+                  if (event is PointerScrollEvent &&
+                      widget.draft.pages.length > 1 &&
+                      _vController.hasClients &&
+                      _vController.position.haveDimensions) {
+                    final position = _vController.position;
+                    if ((position.maxScrollExtent -
+                            position.minScrollExtent)
+                        .abs() <
+                        0.5) {
+                      return;
+                    }
+                    final double target = (position.pixels + event.scrollDelta.dy)
+                        .clamp(position.minScrollExtent, position.maxScrollExtent);
+                    if ((target - position.pixels).abs() > 0.5) {
+                      _vController.jumpTo(target);
+                      _scheduleSnap();
+                    }
+                  }
+                },
+                child: ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(context).copyWith(
+                    dragDevices: {
+                      PointerDeviceKind.touch,
+                      PointerDeviceKind.mouse,
+                      PointerDeviceKind.stylus,
+                      PointerDeviceKind.trackpad,
+                    },
+                  ),
+                  child: PageView.builder(
+                    scrollDirection: Axis.vertical,
+                    controller: _vController,
+                    physics: const PageScrollPhysics(),
+                    allowImplicitScrolling: true,
+                    itemCount: widget.draft.pages.length,
+                    onPageChanged: (i) => setState(() => _current = i),
+                    itemBuilder: (context, index) {
+                      return AnimatedBuilder(
+                        animation: _vController,
+                        builder: (context, child) {
+                          double distance = 0.0;
+                          if (_vController.hasClients &&
+                              _vController.position.haveDimensions) {
+                            final double page =
+                                _vController.page ?? _vController.initialPage.toDouble();
+                            distance = (page - index).abs();
+                          } else {
+                            distance = (_current - index).abs().toDouble();
+                          }
+                          const double maxGap = 18.0;
+                          final double gap =
+                              (distance.clamp(0.0, 1.0) * maxGap).clamp(0.0, maxGap);
+                          return HinooSlideView(
+                            slide: widget.draft.pages[index],
+                            width: w,
+                            height: h,
+                            baseCanvasHeight: widget.draft.baseCanvasHeight,
+                            gap: gap,
+                            gapColor: widget.gapColor,
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
@@ -108,12 +143,38 @@ class _HinooViewerState extends State<HinooViewer> {
                 child: _HinooPageDots(
                   count: widget.draft.pages.length,
                   currentIndex: _current,
+                  borderColor: widget.showDotsBorder
+                      ? Colors.black.withOpacity(0.25)
+                      : Colors.white70,
+                  inactiveColor: widget.showDotsBorder
+                      ? Colors.white70
+                      : Colors.white38,
                 ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void _scheduleSnap() {
+    if (widget.draft.pages.length <= 1) return;
+    _snapTimer?.cancel();
+    _snapTimer = Timer(const Duration(milliseconds: 140), _snapToPage);
+  }
+
+  void _snapToPage() {
+    _snapTimer?.cancel();
+    if (widget.draft.pages.length <= 1) return;
+    if (!_vController.hasClients ||
+        !_vController.position.haveDimensions) return;
+    final double page = _vController.page ?? _vController.initialPage.toDouble();
+    final int target = page.round().clamp(0, widget.draft.pages.length - 1);
+    _vController.animateToPage(
+      target,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
     );
   }
 }
@@ -241,7 +302,14 @@ class HinooSlideView extends StatelessWidget {
 class _HinooPageDots extends StatelessWidget {
   final int count;
   final int currentIndex;
-  const _HinooPageDots({required this.count, required this.currentIndex});
+  final Color borderColor;
+  final Color inactiveColor;
+  const _HinooPageDots({
+    required this.count,
+    required this.currentIndex,
+    required this.borderColor,
+    required this.inactiveColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -263,9 +331,11 @@ class _HinooPageDots extends StatelessWidget {
                   height: dot,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: active ? Colors.white : Colors.white38,
+                    color: active ? Colors.white : inactiveColor,
                     border: Border.all(
-                        color: Colors.white70, width: active ? 1.2 : 0.8),
+                      color: borderColor,
+                      width: active ? 1.4 : 0.9,
+                    ),
                   ),
                 ),
               );

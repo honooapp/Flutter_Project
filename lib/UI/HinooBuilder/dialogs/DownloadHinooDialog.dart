@@ -32,9 +32,10 @@ class DownloadHinooDialog extends StatelessWidget {
       fontSize: 14,
       fontWeight: FontWeight.w600,
     );
-    final String bodyText = pageCount > 1
-        ? 'Scegli se scaricare solo la prima schermata o tutte le $pageCount schermate.'
-        : 'Scarica la schermata in formato PNG.';
+    final bool multiplePages = pageCount > 1;
+    final String bodyText = multiplePages
+        ? 'Scegli se scaricare la pagina corrente o tutte le $pageCount pagine.'
+        : 'Scarica la pagina in formato PNG.';
 
     return Dialog(
       backgroundColor: Colors.black.withOpacity(0.92),
@@ -60,10 +61,13 @@ class DownloadHinooDialog extends StatelessWidget {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
-                child: Text('Solo la prima schermata', style: buttonStyle),
+                child: Text(
+                  multiplePages ? 'Scarica pagina corrente' : 'Scarica',
+                  style: buttonStyle,
+                ),
               ),
             ),
-            if (pageCount > 1) ...[
+            if (multiplePages) ...[
               const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
@@ -75,7 +79,7 @@ class DownloadHinooDialog extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: Text('Tutte le schermate', style: outlinedStyle),
+                  child: Text('Scarica tutte le pagine', style: outlinedStyle),
                 ),
               ),
             ],
@@ -122,4 +126,3 @@ class DownloadProgressDialog extends StatelessWidget {
     );
   }
 }
-

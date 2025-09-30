@@ -51,14 +51,16 @@ class HonooCard extends StatelessWidget {
         final String imageUrl = honoo.image.toString();
         final bool hasImage = imageUrl.isNotEmpty;
 
+        const double cornerRadius = 5;
+
         return Center(
           child: Card(
             color: cardBg,
             elevation: 0,
             margin: EdgeInsets.zero,
-            clipBehavior: Clip.none,
+            clipBehavior: Clip.antiAlias,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5),
+              borderRadius: BorderRadius.circular(cornerRadius),
             ),
             child: SizedBox(
               width: imageSize,
@@ -75,7 +77,7 @@ class HonooCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: HonooColor.tertiary,
                         border: Border.all(color: Colors.black12),
-                        borderRadius: BorderRadius.circular(5),
+                        borderRadius: BorderRadius.circular(cornerRadius),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.05),
@@ -111,7 +113,7 @@ class HonooCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: HonooColor.tertiary,
                         border: Border.all(color: Colors.black12),
-                        borderRadius: BorderRadius.circular(5),
+                        borderRadius: BorderRadius.circular(cornerRadius),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.05),
@@ -121,9 +123,9 @@ class HonooCard extends StatelessWidget {
                         ],
                         image: hasImage
                             ? DecorationImage(
-                          image: NetworkImage(imageUrl),
-                          fit: BoxFit.cover,
-                        )
+                                image: NetworkImage(imageUrl),
+                                fit: BoxFit.cover,
+                              )
                             : null,
                       ),
                       child: hasImage
