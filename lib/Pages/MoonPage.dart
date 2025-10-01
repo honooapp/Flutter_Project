@@ -13,6 +13,7 @@ import '../UI/HinooViewer.dart';
 import '../UI/HonooThreadView.dart';
 import '../Utility/HonooColors.dart';
 import '../Utility/Utility.dart';
+import '../Utility/ResponsiveLayout.dart';
 
 class MoonPage extends StatefulWidget {
   const MoonPage({super.key});
@@ -95,7 +96,8 @@ class _MoonPageState extends State<MoonPage> {
             final double availHeight = constraints.maxHeight;
             final double centerHeight =
                 (availHeight - headerHeight - footerHeight).clamp(0.0, double.infinity);
-            final double targetMaxWidth = _contentMaxWidth(constraints.maxWidth);
+            final double targetMaxWidth =
+                ResponsiveLayout.contentMaxWidth(constraints.maxWidth);
 
             return Column(
               children: [
@@ -140,6 +142,7 @@ class _MoonPageState extends State<MoonPage> {
                         ),
                         iconSize: 60,
                         splashRadius: 25,
+                        tooltip: 'Indietro',
                         onPressed: () => Navigator.pop(context),
                       ),
                       SizedBox(width: 5.w),
@@ -150,6 +153,7 @@ class _MoonPageState extends State<MoonPage> {
                         ),
                         iconSize: 60,
                         splashRadius: 25,
+                        tooltip: 'Salva nel tuo Cuore',
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -171,6 +175,7 @@ class _MoonPageState extends State<MoonPage> {
                         ),
                         iconSize: 60,
                         splashRadius: 25,
+                        tooltip: 'Rispondi',
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -255,13 +260,6 @@ class _MoonPageState extends State<MoonPage> {
     );
   }
 
-  double _contentMaxWidth(double w) {
-    if (w < 480) return w * 0.94;
-    if (w < 768) return w * 0.92;
-    if (w < 1024) return w * 0.84;
-    if (w < 1440) return w * 0.70;
-    return w * 0.58;
-  }
 }
 
 class _MoonItem {

@@ -18,9 +18,9 @@ import '../Utility/IsolaDelleStorieContentManager.dart';
 
 
 class ExercisePage extends StatefulWidget {
-  ExercisePage({super.key, required this.exercise});
+  const ExercisePage({super.key, required this.exercise});
 
-  Exercise  exercise;
+  final Exercise exercise;
 
 
   @override
@@ -28,25 +28,32 @@ class ExercisePage extends StatefulWidget {
 }
 
 class _ExercisePageState extends State<ExercisePage> {
-
+  late Exercise _exercise;
   bool uiVisible = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _exercise = widget.exercise;
+  }
 
   @override
   Widget build(BuildContext context) {
 
     Function handleButtonPressed = (String buttonText) {
-    if (ExerciseController().methodMap.containsKey(buttonText)) {
-      Function method = ExerciseController().methodMap[buttonText]!;
-      Exercise ret = method();
-      setState(() {
-        widget.exercise = ret;
-      });
-    } else {
-      print("Invalid method name");
-    }
-  };
+      if (ExerciseController().methodMap.containsKey(buttonText)) {
+        final Function method = ExerciseController().methodMap[buttonText]!;
+        final Exercise ret = method();
+        setState(() {
+          _exercise = ret;
+        });
+      } else {
+        print("Invalid method name");
+      }
+    };
 
-    List<Widget> subExercises = ExerciseController().getExerciseButtons(widget.exercise, handleButtonPressed, context);
+    final List<Widget> subExercises =
+        ExerciseController().getExerciseButtons(_exercise, handleButtonPressed, context);
 
     List<Widget> mainPath = [
       Center(
@@ -75,6 +82,7 @@ class _ExercisePageState extends State<ExercisePage> {
             ),
             iconSize: 40,
             splashRadius: 30,
+            tooltip: "Torna all'Isola",
             onPressed: () {
               Navigator.pop(context);
             }
@@ -93,6 +101,7 @@ class _ExercisePageState extends State<ExercisePage> {
         ),
         iconSize: 40,
         splashRadius: 30,
+        tooltip: 'Mostra o nascondi il percorso',
         onPressed: () {
           setState(() {
             uiVisible = !uiVisible;
@@ -107,7 +116,7 @@ class _ExercisePageState extends State<ExercisePage> {
           child: RawMaterialButton(
             onPressed: () {
               setState(() {
-                widget.exercise = ExerciseController().getExercise1();
+                _exercise = ExerciseController().getExercise1();
               });
             },
             shape: CircleBorder(),
@@ -132,7 +141,7 @@ class _ExercisePageState extends State<ExercisePage> {
           child: RawMaterialButton(
             onPressed: () {
               setState(() {
-                widget.exercise = ExerciseController().getExercise2();
+                _exercise = ExerciseController().getExercise2();
               });
             },
             shape: CircleBorder(),
@@ -157,7 +166,7 @@ class _ExercisePageState extends State<ExercisePage> {
           child: RawMaterialButton(
             onPressed: () {
               setState(() {
-                widget.exercise = ExerciseController().getExercise3();
+                _exercise = ExerciseController().getExercise3();
               });
             },
             shape: CircleBorder(),
@@ -182,7 +191,7 @@ class _ExercisePageState extends State<ExercisePage> {
           child: RawMaterialButton(
             onPressed: () {
               setState(() {
-                widget.exercise = ExerciseController().getExercise4();
+                _exercise = ExerciseController().getExercise4();
               });
             },
             shape: CircleBorder(),
@@ -207,7 +216,7 @@ class _ExercisePageState extends State<ExercisePage> {
           child: RawMaterialButton(
             onPressed: () {
               setState(() {
-                widget.exercise = ExerciseController().getExercise5();
+                _exercise = ExerciseController().getExercise5();
               });
             },
             shape: CircleBorder(),
@@ -232,7 +241,7 @@ class _ExercisePageState extends State<ExercisePage> {
           child: RawMaterialButton(
             onPressed: () {
               setState(() {
-                widget.exercise = ExerciseController().getExercise6();
+                _exercise = ExerciseController().getExercise6();
               });
             },
             shape: CircleBorder(),
@@ -257,7 +266,7 @@ class _ExercisePageState extends State<ExercisePage> {
           child: RawMaterialButton(
             onPressed: () {
               setState(() {
-                widget.exercise = ExerciseController().getExercise7();
+                _exercise = ExerciseController().getExercise7();
               });
             },
             shape: CircleBorder(),
@@ -282,7 +291,7 @@ class _ExercisePageState extends State<ExercisePage> {
           child: RawMaterialButton(
             onPressed: () {
               setState(() {
-                widget.exercise = ExerciseController().getExercise8();
+                _exercise = ExerciseController().getExercise8();
               });
             },
             shape: CircleBorder(),
@@ -307,7 +316,7 @@ class _ExercisePageState extends State<ExercisePage> {
           child: RawMaterialButton(
             onPressed: () {
               setState(() {
-                widget.exercise = ExerciseController().getExercise9();
+                _exercise = ExerciseController().getExercise9();
               });
             },
             shape: CircleBorder(),
@@ -333,7 +342,7 @@ class _ExercisePageState extends State<ExercisePage> {
           // Background Image
           Positioned.fill(
             child: Image.asset(
-              widget.exercise.exerciseImage,
+              _exercise.exerciseImage,
               fit: BoxFit.cover,
             ),
           ),
@@ -351,7 +360,7 @@ class _ExercisePageState extends State<ExercisePage> {
                       height: 60,
                       child: Center(
                         child:Text(
-                          widget.exercise.exerciseTitle,
+                          _exercise.exerciseTitle,
                           style: GoogleFonts.libreFranklin(
                             color: HonooColor.secondary,
                             fontSize: 24,
@@ -382,34 +391,40 @@ class _ExercisePageState extends State<ExercisePage> {
                                   ),
                                   child:
                                   // SingleChildScrollView(
-                                  //   //child:IsolaDelleStoreContentManager.getRichText(widget.exercise.exerciseDescription),
-                                  //   child:FormattedText(inputText: widget.exercise.exerciseDescription, color: HonooColor.onBackground, fontSize: 18,),
+                                  //   //child:IsolaDelleStoreContentManager.getRichText(_exercise.exerciseDescription),
+                                  //   child:FormattedText(inputText: _exercise.exerciseDescription, color: HonooColor.onBackground, fontSize: 18,),
                                   // ),
                                   ListView(
                                     //padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.width/2), //per versione telefono
                                     padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height > MediaQuery.of(context).size.width ? MediaQuery.of(context).size.width/4 : MediaQuery.of(context).size.height/4 ),
                                     children: [
                                         FormattedText(
-                                          inputText: widget.exercise.exerciseDescription,
+                                          inputText: _exercise.exerciseDescription,
                                           color: HonooColor.onBackground,
                                           fontSize: 18,
                                         ),
-                                        if (widget.exercise.exerciseIcon != null)
+                                        if (_exercise.exerciseIcon != null)
                                           //SizedBox(height: 10),
-                                          IconButton(icon: SvgPicture.asset(
-                                            color: HonooColor.onBackground,
-                                            widget.exercise.exerciseIcon ?? "",
-                                            semanticsLabel: widget.exercise.exerciseIconName,
-                                          ),
+                                          IconButton(
+                                            icon: SvgPicture.asset(
+                                              _exercise.exerciseIcon ?? "",
+                                              colorFilter: const ColorFilter.mode(
+                                                HonooColor.onBackground,
+                                                BlendMode.srcIn,
+                                              ),
+                                              semanticsLabel:
+                                                  _exercise.exerciseIconName,
+                                            ),
                                           iconSize: 70,
                                           splashRadius: 40,
+                                          tooltip: _exercise.exerciseIconName ?? '',
                                               onPressed: () {
-                                                if (widget.exercise.exerciseIconName == "Dado") {
+                                                if (_exercise.exerciseIconName == "Dado") {
                                                   String header;
 
-                                                  if (widget.exercise.exerciseTitle == IsolaDelleStoreContentManager.e_3_1_title) {
+                                                  if (_exercise.exerciseTitle == IsolaDelleStoreContentManager.e_3_1_title) {
                                                     header = Utility().dadoTemporaryM;
-                                                  } else if (widget.exercise.exerciseTitle == IsolaDelleStoreContentManager.e_5_3_title) {
+                                                  } else if (_exercise.exerciseTitle == IsolaDelleStoreContentManager.e_5_3_title) {
                                                     header = Utility().dadoTemporaryL;
                                                   } else {
                                                     header = Utility().dadoTemporary;
@@ -427,10 +442,10 @@ class _ExercisePageState extends State<ExercisePage> {
                                                   );
                                                 }
                                               }),
-                                        if (widget.exercise.exerciseDescriptionMore != null)
+                                        if (_exercise.exerciseDescriptionMore != null)
                                          // SizedBox(height: 10),
                                           FormattedText(
-                                            inputText: widget.exercise.exerciseDescriptionMore ?? "",
+                                            inputText: _exercise.exerciseDescriptionMore ?? "",
                                             color: HonooColor.onBackground,
                                             fontSize: 18,
                                           ),
@@ -478,7 +493,7 @@ class _ExercisePageState extends State<ExercisePage> {
                         child: RawMaterialButton(
                           onPressed: () {
                             setState(() {
-                              widget.exercise = ExerciseController().getExercise6();
+                              _exercise = ExerciseController().getExercise6();
                             });
                           },
                           shape: CircleBorder(),

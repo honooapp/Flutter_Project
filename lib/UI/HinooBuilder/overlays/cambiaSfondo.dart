@@ -39,7 +39,7 @@ class CambiaSfondoOverlay extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              'cambia lo sfondo del tuo hinoo',
+              'Cambia lo sfondo del tuo hinoo',
               textAlign: TextAlign.center,
               style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
             ),

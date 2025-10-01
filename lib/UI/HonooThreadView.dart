@@ -3,7 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../Controller/HonooController.dart';
+import '../Controller/HonooThreadLoader.dart';
 import '../Entities/Honoo.dart';
 import '../UI/HonooCard.dart';
 import '../Utility/HonooColors.dart';
@@ -21,31 +21,39 @@ class HonooThreadView extends StatefulWidget {
 }
 
 class _HonooThreadViewState extends State<HonooThreadView> {
-  late final Future<List<Honoo>> _threadFuture;
+  late final HonooThreadLoader _loader;
   final _vController = cs.CarouselController();
 
   @override
   void initState() {
     super.initState();
-    // Cache del Future: calcolato una volta per questa pagina
-    _threadFuture = HonooController().getHonooHistory(widget.root);
+    _loader = HonooThreadLoader()..load(widget.root);
+  }
+
+  @override
+  void didUpdateWidget(covariant HonooThreadView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.root != widget.root) {
+      _loader.load(widget.root);
+    }
   }
 
   @override
   void dispose() {
+    _loader.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     // Il contenitore (ChestPage) impone già maxWidth/maxHeight
-    return FutureBuilder<List<Honoo>>(
-      future: _threadFuture,
-      builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.waiting) {
+    return ValueListenableBuilder<HonooThreadState>(
+      valueListenable: _loader,
+      builder: (context, state, _) {
+        if (state.isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
-        if (snap.hasError) {
+        if (state.error != null) {
           return Center(
             child: Text(
               'Errore nel caricamento',
@@ -58,7 +66,7 @@ class _HonooThreadViewState extends State<HonooThreadView> {
           );
         }
 
-        final thread = snap.data ?? const <Honoo>[];
+        final thread = state.thread;
 
         // Nessuna risposta: un solo box (l’honoo)
         if (thread.length <= 1) {

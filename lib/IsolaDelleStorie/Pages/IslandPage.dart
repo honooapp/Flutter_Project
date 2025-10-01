@@ -64,17 +64,17 @@ class _IslandPageState extends State<IslandPage> {
           Positioned(
             top: 0,
             right: 0,
-            child: Visibility(
-              visible: infoVisible,
-              child: IconButton(
-                icon: const Icon(Icons.close),
-                color: HonooColor.onBackground,
-                iconSize: 40,
-                onPressed: () {
-                  setState(() {
-                    infoVisible = !infoVisible;
-                  });
-                },
+          child: Visibility(
+            visible: infoVisible,
+            child: IconButton(
+              icon: const Icon(Icons.close, color: HonooColor.onBackground),
+              iconSize: 40,
+              tooltip: 'Chiudi informazioni',
+              onPressed: () {
+                    setState(() {
+                      infoVisible = !infoVisible;
+                    });
+                  },
               ),
             ),
           ),
@@ -263,6 +263,7 @@ class _IslandPageState extends State<IslandPage> {
                             icon: SvgPicture.asset("assets/icons/bottle.svg", semanticsLabel: 'Bottle'),
                             iconSize: bottleSize,
                             splashRadius: 40,
+                            tooltip: 'Scrivi',
                             onPressed: () {
                               Navigator.push(context, MaterialPageRoute(builder: (context) => const NewHonooPage()));
                             },
@@ -289,12 +290,13 @@ class _IslandPageState extends State<IslandPage> {
                               colorFilter: const ColorFilter.mode(
                                 HonooColor.onBackground,
                                 BlendMode.srcIn,
-                              ),                              width: homeSize,
+                            ),                              width: homeSize,
                               height: homeSize,
                               semanticsLabel: 'Home',
                             ),
                             iconSize: homeSize,
                             splashRadius: 1,
+                            tooltip: 'Indietro',
                             onPressed: () => Navigator.pop(context),
                           ),
                         ),
@@ -305,6 +307,7 @@ class _IslandPageState extends State<IslandPage> {
                             icon: SvgPicture.asset("assets/icons/chest.svg", semanticsLabel: 'Chest'),
                             iconSize: chestSize,
                             splashRadius: 40,
+                            tooltip: 'Apri il tuo Cuore',
                             onPressed: () {
                               Navigator.push(
                                 context,
@@ -326,6 +329,7 @@ class _IslandPageState extends State<IslandPage> {
                             icon: SvgPicture.asset("assets/icons/honoo_logo.svg", semanticsLabel: 'Logo'),
                             iconSize: logoSize,
                             splashRadius: 30,
+                            tooltip: 'Mostra informazioni',
                             onPressed: () => setState(() => infoVisible = !infoVisible),
                           ),
                         ),
@@ -348,6 +352,7 @@ class _IslandPageState extends State<IslandPage> {
                   icon: SvgPicture.asset("assets/icons/moon.svg", semanticsLabel: 'Moon'),
                   iconSize: 60,
                   splashRadius: 32,
+                  tooltip: 'Vai sulla Luna',
                   onPressed: () {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => const MoonPage()));
                   },
@@ -474,6 +479,7 @@ class IslandMapWithPins extends StatelessWidget {
                     icon: SvgPicture.asset(p.asset, width: pinSize, height: pinSize),
                     iconSize: pinSize,
                     splashRadius: pinSize * 0.75,
+                    tooltip: 'Apri esercizio ${p.index}',
                     onPressed: () => onPinTap?.call(p.index),
                   ),
                 );

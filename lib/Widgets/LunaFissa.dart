@@ -49,6 +49,7 @@ class LunaFissa extends StatelessWidget {
             ),
             iconSize: iconSize,
             splashRadius: (iconSize / 2) + 6,
+            tooltip: 'Vai sulla Luna',
             onPressed: () {
               Navigator.push(
                 context,

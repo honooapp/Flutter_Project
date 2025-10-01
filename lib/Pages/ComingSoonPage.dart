@@ -89,15 +89,18 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        IconButton(icon: SvgPicture.asset(
-                          "assets/icons/home.svg",
-                          semanticsLabel: 'Home',
+                        IconButton(
+                          icon: SvgPicture.asset(
+                            "assets/icons/home.svg",
+                            semanticsLabel: 'Home',
+                          ),
+                          iconSize: 60,
+                          splashRadius: 25,
+                          tooltip: 'Indietro',
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
                         ),
-                        iconSize: 60,
-                        splashRadius: 25,
-                        onPressed: () {
-                          Navigator.pop(context);
-                        }),
                       ],
                     ),
                   ),

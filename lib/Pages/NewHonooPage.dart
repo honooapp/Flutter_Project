@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -280,10 +282,14 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           icon: SvgPicture.asset(
                             "assets/icons/home.svg",
                             semanticsLabel: 'Home',
+                            colorFilter: const ColorFilter.mode(
+                              HonooColor.onBackground,
+                              BlendMode.srcIn,
+                            ),
                           ),
                           iconSize: 60,
                           splashRadius: 25,
-                          color: HonooColor.onBackground,
+                          tooltip: 'Indietro',
                           onPressed: () => Navigator.pop(context),
                         ),
                         SizedBox(width: 5.w),
@@ -296,6 +302,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           ),
                           iconSize: 60,
                           splashRadius: 40,
+                          tooltip: 'Apri il tuo Cuore',
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -314,6 +321,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           ),
                           iconSize: 32,
                           splashRadius: 25,
+                          tooltip: 'Spedisci sulla Luna',
                           onPressed: _submitToMoon,
                         )
                             : IconButton(
@@ -323,18 +331,20 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           ),
                           iconSize: 60,
                           splashRadius: 25,
+                          tooltip: 'Salva honoo',
                           onPressed: _submitHonoo,
                         ),
                   SizedBox(width: 5.w),
 
                         // NUOVA ICONA PIUMA
                         IconButton(
-                          icon: SvgPicture.asset(          // usa SvgPicture se è un .svg
-                            "assets/icons/piuma.svg",      // <-- cambia qui
+                          icon: SvgPicture.asset(
+                            "assets/icons/piuma.svg",
                             semanticsLabel: 'Piuma',
                           ),
                           iconSize: 60,
                           splashRadius: 25,
+                          tooltip: 'Scrivi',
                           onPressed: () {
                             Navigator.push(
                               context,

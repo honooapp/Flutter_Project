@@ -22,7 +22,7 @@ class ColoreTestoOverlay extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              'scegli il colore del testo',
+              'Scegli il colore del testo',
               textAlign: TextAlign.center,
               style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
             ),

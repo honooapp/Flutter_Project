@@ -1,5 +1,7 @@
 // lib/Pages/NewHinooPage.dart
 import 'dart:typed_data';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -283,11 +285,11 @@ class _NewHinooPageState extends State<NewHinooPage> {
     }
   }
 
-  void _handleDownloadTap() {
+  Future<void> _handleDownloadTap() async {
     if (!_hasMinTextForDownload) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Scrivi almeno 10 caratteri prima di scaricare.')),
+        const SnackBar(content: Text('Scrivi almeno 1 carattere prima di scaricare')),
       );
       return;
     }
@@ -404,11 +406,9 @@ class _NewHinooPageState extends State<NewHinooPage> {
                             children: [
                               if (_isWriteStep) ...[
                                 WhiteIconButton(
-                                  tooltip: _hasMinTextForDownload
-                                      ? 'Scarica immagini'
-                                      : 'Scrivi almeno 10 caratteri per scaricare',
+                                  tooltip: 'download',
                                   icon: Icons.download_outlined,
-                                  onPressed: _handleDownloadTap,
+                                  onPressed: () => _handleDownloadTap(),
                                 ),
                                 const SizedBox(width: 12),
                               ],
@@ -484,10 +484,17 @@ class _NewHinooPageState extends State<NewHinooPage> {
                       children: [
                         // HOME
                         IconButton(
-                          icon: SvgPicture.asset("assets/icons/home.svg", semanticsLabel: 'Home'),
+                          icon: SvgPicture.asset(
+                            "assets/icons/home.svg",
+                            semanticsLabel: 'Home',
+                            colorFilter: const ColorFilter.mode(
+                              HonooColor.onBackground,
+                              BlendMode.srcIn,
+                            ),
+                          ),
                           iconSize: 60,
                           splashRadius: 25,
-                          color: HonooColor.onBackground,
+                          tooltip: 'Indietro',
                           onPressed: () => Navigator.pop(context),
                         ),
                         const SizedBox(width: 24),
@@ -497,6 +504,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
                           icon: SvgPicture.asset("assets/icons/chest.svg", semanticsLabel: 'Chest'),
                           iconSize: 60,
                           splashRadius: 40,
+                          tooltip: 'Apri il tuo Cuore',
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -512,12 +520,14 @@ class _NewHinooPageState extends State<NewHinooPage> {
                           icon: SvgPicture.asset("assets/icons/moon.svg", semanticsLabel: 'Luna'),
                           iconSize: 32,
                           splashRadius: 25,
+                          tooltip: 'Spedisci sulla Luna',
                           onPressed: _submitToMoon,
                         )
                             : IconButton(
                           icon: SvgPicture.asset("assets/icons/ok.svg", semanticsLabel: 'OK'),
                           iconSize: 60,
                           splashRadius: 25,
+                          tooltip: 'Salva hinoo',
                           onPressed: _submitHinoo,
                         ),
                       ],

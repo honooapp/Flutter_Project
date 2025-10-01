@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -125,11 +127,15 @@ class _ConversationPageState extends State<ConversationPage> {
                           IconButton(
                             icon: SvgPicture.asset(
                               "assets/icons/home.svg",
-                              color: HonooColor.onBackground,
+                              colorFilter: const ColorFilter.mode(
+                                HonooColor.onBackground,
+                                BlendMode.srcIn,
+                              ),
                               semanticsLabel: 'Home',
                             ),
                             iconSize: 60,
                             splashRadius: 25,
+                            tooltip: 'Indietro',
                             onPressed: () => Navigator.pop(context),
                           ),
                           SizedBox(width: 5.w),
@@ -140,6 +146,7 @@ class _ConversationPageState extends State<ConversationPage> {
                             ),
                             iconSize: 60,
                             splashRadius: 25,
+                            tooltip: 'Cuore spezzato',
                             onPressed: () {
                               // TODO: azione "broken heart" (se prevista)
                             },
@@ -148,11 +155,15 @@ class _ConversationPageState extends State<ConversationPage> {
                           IconButton(
                             icon: SvgPicture.asset(
                               "assets/icons/reply.svg",
-                              color: HonooColor.onBackground,
+                              colorFilter: const ColorFilter.mode(
+                                HonooColor.onBackground,
+                                BlendMode.srcIn,
+                              ),
                               semanticsLabel: 'Reply',
                             ),
                             iconSize: 60,
                             splashRadius: 25,
+                            tooltip: 'Rispondi',
                             onPressed: () {
                               // TODO: apri composer risposta partendo da widget.honoo o dall'elemento corrente del carosello
                             },

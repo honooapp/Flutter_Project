@@ -162,17 +162,20 @@ class _NimPageState extends State<NimPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          IconButton(icon: SvgPicture.asset(
-                            "assets/icons/home.svg",
-                            semanticsLabel: 'Home',
+                          IconButton(
+                            icon: SvgPicture.asset(
+                              "assets/icons/home.svg",
+                              semanticsLabel: 'Home',
+                            ),
+                            iconSize: 60,
+                            tooltip: 'Indietro',
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const HomePage()),
+                              );
+                            },
                           ),
-                          iconSize: 60,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const HomePage()),
-                            );
-                          }),
                         ],
                       ),
                     ),

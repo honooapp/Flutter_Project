@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:honoo/Utility/HonooColors.dart';
@@ -60,18 +62,19 @@ class SeaFooterBar extends StatelessWidget {
               Positioned(
                 bottom: 10,
                 left: bottleX,
-                child: IconButton(
-                  icon: SvgPicture.asset(
-                    "assets/icons/bottle.svg",
-                    semanticsLabel: 'Bottle',
-                  ),
-                  iconSize: bottleSize,
-                  splashRadius: 40,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const NewHonooPage()),
+              child: IconButton(
+                icon: SvgPicture.asset(
+                  "assets/icons/bottle.svg",
+                  semanticsLabel: 'Bottle',
+                ),
+                iconSize: bottleSize,
+                splashRadius: 40,
+                tooltip: 'Scrivi',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const NewHonooPage()),
                     );
                   },
                 ),
@@ -104,24 +107,25 @@ class SeaFooterBar extends StatelessWidget {
               Positioned(
                 bottom: -16,
                 left: islandX,
-                child: IconButton(
-                  icon: SvgPicture.asset(
-                    "assets/icons/isoladellestorie/island.svg",
-                    colorFilter: const ColorFilter.mode(
-                      HonooColor.onBackground,
-                      BlendMode.srcIn,
-                    ),
-                    width: islandSize,
-                    height: islandSize,
-                    semanticsLabel: 'Island',
+              child: IconButton(
+                icon: SvgPicture.asset(
+                  "assets/icons/isoladellestorie/island.svg",
+                  colorFilter: const ColorFilter.mode(
+                    HonooColor.onBackground,
+                    BlendMode.srcIn,
                   ),
-                  iconSize: islandSize,
-                  splashRadius: 1,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const IslandPage()),
-                    );
+                  width: islandSize,
+                  height: islandSize,
+                  semanticsLabel: 'Island',
+                ),
+                iconSize: islandSize,
+                splashRadius: 1,
+                tooltip: "Vai all'Isola delle Storie",
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const IslandPage()),
+                  );
                   },
                 ),
               ),
@@ -130,15 +134,16 @@ class SeaFooterBar extends StatelessWidget {
               Positioned(
                 bottom: -20,
                 left: chestX,
-                child: IconButton(
-                  icon: SvgPicture.asset("assets/icons/chest.svg", semanticsLabel: 'Chest'),
-                  iconSize: chestSize,
-                  splashRadius: 40,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ChestPage()),
-                    );
+              child: IconButton(
+                icon: SvgPicture.asset("assets/icons/chest.svg", semanticsLabel: 'Chest'),
+                iconSize: chestSize,
+                splashRadius: 40,
+                tooltip: 'Apri il tuo Cuore',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ChestPage()),
+                  );
                   },
                 ),
               ),

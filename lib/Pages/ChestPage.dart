@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,6 +14,7 @@ import '../UI/HonooThreadView.dart';
 import '../UI/HinooViewer.dart';
 import '../Utility/HonooColors.dart';
 import '../Utility/Utility.dart';
+import '../Utility/ResponsiveLayout.dart';
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 
 // 👇 aggiunto per allineare il padding top come in NewHonooPage
@@ -111,15 +114,6 @@ class _ChestPageState extends State<ChestPage> {
   bool _hasReplies(Honoo h) => h.hasReplies == true;
   bool _isFromMoonSaved(Honoo h) => h.isFromMoonSaved == true;
 
-  // === stessa funzione “breakpoints morbidi” usata in NewHonooPage ===
-  double _contentMaxWidth(double w) {
-    if (w < 480) return w * 0.94;
-    if (w < 768) return w * 0.92;
-    if (w < 1024) return w * 0.84;
-    if (w < 1440) return w * 0.70;
-    return w * 0.58;
-  }
-
   Widget _footerForHonoo(Honoo? current) {
     // footer invariato (come tuo file attuale) :contentReference[oaicite:1]{index=1}
     if (current == null) {
@@ -131,6 +125,7 @@ class _ChestPageState extends State<ChestPage> {
                 semanticsLabel: 'Home'),
             iconSize: 60,
             splashRadius: 25,
+            tooltip: 'Indietro',
             onPressed: () => Navigator.pop(context),
           ),
         ),
@@ -139,10 +134,17 @@ class _ChestPageState extends State<ChestPage> {
 
     final actions = <Widget>[
       IconButton(
-        icon: SvgPicture.asset("assets/icons/home.svg", semanticsLabel: 'Home'),
+        icon: SvgPicture.asset(
+          "assets/icons/home.svg",
+          semanticsLabel: 'Home',
+          colorFilter: const ColorFilter.mode(
+            HonooColor.onBackground,
+            BlendMode.srcIn,
+          ),
+        ),
         iconSize: 60,
         splashRadius: 25,
-        color: HonooColor.onBackground,
+        tooltip: 'Indietro',
         onPressed: () => Navigator.pop(context),
       ),
       SizedBox(width: 5.w),
@@ -156,10 +158,13 @@ class _ChestPageState extends State<ChestPage> {
           icon: SvgPicture.asset(
             "assets/icons/moon.svg",
             semanticsLabel: 'Luna',
+            colorFilter: const ColorFilter.mode(
+              HonooColor.onBackground,
+              BlendMode.srcIn,
+            ),
           ),
           iconSize: 32,
           splashRadius: 25,
-          color: HonooColor.onBackground,
           tooltip: 'Spedisci sulla Luna',
           onPressed: () async {
             final ok = await HonooController().sendToMoon(current);
@@ -190,10 +195,13 @@ class _ChestPageState extends State<ChestPage> {
       actions.add(
         IconButton(
           icon: SvgPicture.asset("assets/icons/reply.svg",
-              semanticsLabel: 'Rispondi'),
+              semanticsLabel: 'Rispondi',
+              colorFilter: const ColorFilter.mode(
+                HonooColor.onBackground,
+                BlendMode.srcIn,
+              )),
           iconSize: 60,
           splashRadius: 25,
-          color: HonooColor.onBackground,
           tooltip: 'Rispondi',
           onPressed: () {
             // TODO: apri composer risposta (NewHonooPage) con replyTo=current.dbId
@@ -205,11 +213,16 @@ class _ChestPageState extends State<ChestPage> {
     actions.addAll([
       SizedBox(width: 5.w),
       IconButton(
-        icon: SvgPicture.asset("assets/icons/cancella.svg",
-            semanticsLabel: 'Cancella'),
+        icon: SvgPicture.asset(
+          "assets/icons/cancella.svg",
+          semanticsLabel: 'Cancella',
+          colorFilter: const ColorFilter.mode(
+            HonooColor.onBackground,
+            BlendMode.srcIn,
+          ),
+        ),
         iconSize: 60,
         splashRadius: 25,
-        color: HonooColor.onBackground,
         tooltip: 'Cancella',
         onPressed: () async {
           final String? id = (current.dbId ?? current.id) as String?;
@@ -256,27 +269,38 @@ class _ChestPageState extends State<ChestPage> {
     final HinooDraft draft = current.draft;
     final bool isPersonal = draft.type == HinooType.personal;
     final bool isFromMoonSaved = draft.type == HinooType.moon;
-    final bool hasReplies = false; // Risposte non ancora supportate per Hinoo
 
     final actions = <Widget>[
       IconButton(
-        icon: SvgPicture.asset("assets/icons/home.svg", semanticsLabel: 'Home'),
+        icon: SvgPicture.asset(
+          "assets/icons/home.svg",
+          semanticsLabel: 'Home',
+          colorFilter: const ColorFilter.mode(
+            HonooColor.onBackground,
+            BlendMode.srcIn,
+          ),
+        ),
         iconSize: 60,
         splashRadius: 25,
-        color: HonooColor.onBackground,
+        tooltip: 'Indietro',
         onPressed: () => Navigator.pop(context),
       ),
       SizedBox(width: 5.w),
     ];
 
-    if (isPersonal && !hasReplies && !isFromMoonSaved) {
+    if (isPersonal && !isFromMoonSaved) {
       actions.add(
         IconButton(
-          icon:
-              SvgPicture.asset("assets/icons/moon.svg", semanticsLabel: 'Luna'),
+          icon: SvgPicture.asset(
+            "assets/icons/moon.svg",
+            semanticsLabel: 'Luna',
+            colorFilter: const ColorFilter.mode(
+              HonooColor.onBackground,
+              BlendMode.srcIn,
+            ),
+          ),
           iconSize: 32,
           splashRadius: 25,
-          color: HonooColor.onBackground,
           tooltip: 'Spedisci sulla Luna',
           onPressed: () async {
             try {
@@ -296,25 +320,19 @@ class _ChestPageState extends State<ChestPage> {
           },
         ),
       );
-    } else if (hasReplies && !isFromMoonSaved) {
-      actions.add(
-        IconButton(
-          icon: SvgPicture.asset("assets/icons/reply.svg",
-              semanticsLabel: 'Reply'),
-          iconSize: 60,
-          splashRadius: 25,
-          tooltip: 'Vedi risposte',
-          onPressed: () {},
-        ),
-      );
     } else if (isFromMoonSaved) {
       actions.add(
         IconButton(
-          icon: SvgPicture.asset("assets/icons/reply.svg",
-              semanticsLabel: 'Rispondi'),
+          icon: SvgPicture.asset(
+            "assets/icons/reply.svg",
+            semanticsLabel: 'Rispondi',
+            colorFilter: const ColorFilter.mode(
+              HonooColor.onBackground,
+              BlendMode.srcIn,
+            ),
+          ),
           iconSize: 60,
           splashRadius: 25,
-          color: HonooColor.onBackground,
           tooltip: 'Rispondi',
           onPressed: () {
             // TODO: implementare risposta a Hinoo lunare
@@ -326,11 +344,16 @@ class _ChestPageState extends State<ChestPage> {
     actions.addAll([
       SizedBox(width: 5.w),
       IconButton(
-        icon: SvgPicture.asset("assets/icons/cancella.svg",
-            semanticsLabel: 'Cancella'),
+        icon: SvgPicture.asset(
+          "assets/icons/cancella.svg",
+          semanticsLabel: 'Cancella',
+          colorFilter: const ColorFilter.mode(
+            HonooColor.onBackground,
+            BlendMode.srcIn,
+          ),
+        ),
         iconSize: 60,
         splashRadius: 25,
-        color: HonooColor.onBackground,
         tooltip: 'Cancella',
         onPressed: () => _deleteHinoo(current),
       ),
@@ -400,7 +423,7 @@ class _ChestPageState extends State<ChestPage> {
 
                 // === stesse regole di NewHonooPage ===
                 final double targetMaxW =
-                    _contentMaxWidth(constraints.maxWidth);
+                    ResponsiveLayout.contentMaxWidth(constraints.maxWidth);
                 final double availableCenterH =
                     (availH - headerH - contentTopPadding - footerH)
                         .clamp(0.0, double.infinity);

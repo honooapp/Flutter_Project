@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,42 +11,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../Services/HonooImageUploader.dart';
 import '../Utility/HonooColors.dart';
-import 'dart:ui' as ui;
-
-/// Limita testo a X righe e Y caratteri per riga
-class VisibleSpaceFormatter extends TextInputFormatter {
-  final int maxLines;
-  final int maxLineLength;
-
-  const VisibleSpaceFormatter({
-    required this.maxLines,
-    required this.maxLineLength,
-  });
-
-  @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue,
-      TextEditingValue newValue,
-      ) {
-    final rawLines = newValue.text.split('\n');
-    final lines = rawLines.take(maxLines).toList();
-    for (var i = 0; i < lines.length; i++) {
-      if (lines[i].length > maxLineLength) {
-        lines[i] = lines[i].substring(0, maxLineLength);
-      }
-    }
-    final clipped = lines.join('\n');
-    if (clipped == newValue.text) return newValue;
-
-    final base = newValue.selection.baseOffset;
-    final newOffset = math.min(clipped.length, math.max(0, base));
-    return TextEditingValue(
-      text: clipped,
-      selection: TextSelection.collapsed(offset: newOffset),
-      composing: TextRange.empty,
-    );
-  }
-}
 
 class HonooBuilder extends StatefulWidget {
   final void Function(String text, String imageUrl)? onHonooChanged;
@@ -65,15 +30,7 @@ class _HonooBuilderState extends State<HonooBuilder> {
   // URL pubblica finale caricata su Supabase (non-null per il callback)
   String _publicImageUrl = '';
 
-  // Bucket pubblico su Supabase
-  static const String _bucketName = 'honoo-images';
-
   // Limiti testo
-  static const int _perLine = 32;
-  static const int _maxLines = 5;
-  static const int _capacity = 144;
-
-  static const double counterLift = 22.0;           // usata nel Positioned(top: -counterLift)
   final GlobalKey _imageBoundaryKey = GlobalKey();  // usata nel RepaintBoundary
 
   @override
@@ -109,8 +66,6 @@ class _HonooBuilderState extends State<HonooBuilder> {
         );
         return;
       }
-      final uid = session.user.id;
-
       // 1) Anteprima locale immediata (no blob:)
       final Uint8List bytes = await selected.readAsBytes();
       setState(() {
@@ -119,8 +74,7 @@ class _HonooBuilderState extends State<HonooBuilder> {
 
       // 2) Path per‑utente: "<uid>/uploads/<file>"
       final sanitized = _sanitizeFileName(selected.name);
-      final filename = '${DateTime.now().millisecondsSinceEpoch}_$sanitized';
-      final storagePath = '$uid/uploads/$filename';
+      final _ = '${DateTime.now().millisecondsSinceEpoch}_$sanitized';
 
 // 3) Upload via service (usa i bytes letti sopra)
       final ext = _extensionFromName(selected.name); // ".png" / ".jpg" ecc.
@@ -149,14 +103,6 @@ class _HonooBuilderState extends State<HonooBuilder> {
         SnackBar(content: Text('Errore immagine: $e')),
       );
     }
-  }
-
-  String _guessContentType(String name) {
-    final ext = name.toLowerCase();
-    if (ext.endsWith('.png')) return 'image/png';
-    if (ext.endsWith('.webp')) return 'image/webp';
-    if (ext.endsWith('.gif')) return 'image/gif';
-    return 'image/jpeg';
   }
 
   String _extensionFromName(String name) {
@@ -204,11 +150,6 @@ class _HonooBuilderState extends State<HonooBuilder> {
         final double totalHeight = textHeight + gap + imageSize;
 
         // helper per il colore in base ai caratteri residui
-        Color _counterColor(int remaining) {
-          if (remaining <= 12) return HonooColor.secondary; // rosso
-          return HonooColor.onBackground; // bianco
-        }
-
         return Center(
           child: Card(
             color: HonooColor.background,
@@ -231,31 +172,10 @@ class _HonooBuilderState extends State<HonooBuilder> {
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        // Contatore in alto a destra
-                        Positioned(
-                          right: 5,
-                          top: -counterLift,
-                          child: ValueListenableBuilder<TextEditingValue>(
-                            valueListenable: _textCtrl,
-                            builder: (context, value, _) {
-                              final int remaining =
-                              (_capacity - value.text.length)
-                                  .clamp(0, _capacity);
-                              return Text(
-                                '$remaining',
-                                style: GoogleFonts.libreFranklin(
-                                  color: _counterColor(remaining),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
                         // Area di testo
                         Positioned.fill(
                           child: Container(
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(40),
                             decoration: BoxDecoration(
                               color: HonooColor.tertiary,
                               border: Border.all(color: Colors.black12),
@@ -271,40 +191,47 @@ class _HonooBuilderState extends State<HonooBuilder> {
                             child: ValueListenableBuilder<TextEditingValue>(
                               valueListenable: _textCtrl,
                               builder: (context, value, _) {
+                                final textStyle = GoogleFonts.arvo(
+                                  color: HonooColor.onTertiary,
+                                  fontSize: 18,
+                                  height: 1.4,
+                                );
+                                final double textMaxWidth = math.max(1, imageSize - 80);
+                                final int lineCount = _countHonooLines(
+                                  value.text,
+                                  textMaxWidth,
+                                  textStyle,
+                                );
                                 final String? hint = value.text.isEmpty
-                                    ? 'Scrivi qui il tuo testo'
+                                    ? 'Scrivi qui il testo del tuo honoo'
                                     : null;
+
+                                final bool alignTop = lineCount > 1;
 
                                 return TextField(
                                   controller: _textCtrl,
                                   textAlign: TextAlign.center,
-                                  textAlignVertical: TextAlignVertical.center,
+                                  textAlignVertical: alignTop
+                                      ? TextAlignVertical.top
+                                      : TextAlignVertical.center,
                                   expands: true,
                                   minLines: null,
                                   maxLines: null,
                                   keyboardType: TextInputType.multiline,
-                                  inputFormatters: const [
-                                    VisibleSpaceFormatter(
-                                      maxLines: _maxLines,
-                                      maxLineLength: _perLine,
-                                    ),
-                                  ],
                                   decoration: InputDecoration(
                                     hintText: hint,
-                                    hintStyle: GoogleFonts.libreFranklin(
-                                      color: HonooColor.onTertiary.withOpacity(0.6),
-                                      fontSize: 18,
+                                    hintStyle: textStyle.copyWith(
+                                      color: HonooColor.background,
                                       height: 1.2,
                                     ),
                                     border: InputBorder.none,
                                     isCollapsed: true,
                                     contentPadding: EdgeInsets.zero,
                                   ),
-                                  style: GoogleFonts.arvo(
-                                    color: HonooColor.onTertiary,
-                                    fontSize: 18,
-                                    height: 1.4,
-                                  ),
+                                  inputFormatters: [
+                                    _lineLimitFormatter(textMaxWidth, textStyle),
+                                  ],
+                                  style: textStyle,
                                 );
                               },
                             ),
@@ -333,8 +260,8 @@ class _HonooBuilderState extends State<HonooBuilder> {
                               Text(
                                 'Carica qui la tua immagine',
                                 textAlign: TextAlign.center,
-                                style: GoogleFonts.libreFranklin(
-                                  color: HonooColor.onSecondary,
+                                style: GoogleFonts.arvo(
+                                  color: HonooColor.background,
                                   fontSize: 18,
                                 ),
                               ),
@@ -396,5 +323,46 @@ class _HonooBuilderState extends State<HonooBuilder> {
         );
       },
     );
+  }
+
+  static const int _honooMaxLines = 5;
+
+  TextPainter _createHonooPainter(
+    String text,
+    double maxWidth,
+    TextStyle style,
+  ) {
+    final painter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+      maxLines: null,
+    )..layout(minWidth: 0, maxWidth: maxWidth);
+
+    return painter;
+  }
+
+  int _countHonooLines(
+    String text,
+    double maxWidth,
+    TextStyle style,
+  ) {
+    if (text.isEmpty) return 0;
+    final painter = _createHonooPainter(text, maxWidth, style);
+    return painter.computeLineMetrics().length;
+  }
+
+  TextInputFormatter _lineLimitFormatter(
+    double maxWidth,
+    TextStyle style,
+  ) {
+    return TextInputFormatter.withFunction((oldValue, newValue) {
+      if (oldValue.text == newValue.text) return newValue;
+      final count = _countHonooLines(newValue.text, maxWidth, style);
+      if (count > _honooMaxLines) {
+        return oldValue;
+      }
+      return newValue;
+    });
   }
 }

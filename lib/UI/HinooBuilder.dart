@@ -22,6 +22,7 @@ import 'package:honoo/UI/HinooBuilder/thumbnails/HinooThumbnails.dart';
 import 'package:honoo/UI/HinooBuilder/dialogs/AnteprimaPNG.dart';
 import 'package:honoo/UI/HinooBuilder/dialogs/DownloadHinooDialog.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
+import 'package:honoo/UI/HinooBuilder/dialogs/NameHinooDialog.dart';
 
 // Import coerenti con la struttura HinooBuilder
 
@@ -62,15 +63,12 @@ class _HinooBuilderState extends State<HinooBuilder> {
   int _current = 0;
 
   // Trasformazioni testo sul canvas
-  double _scale = 1.0;
-  Offset _offset = Offset.zero;
   double _canvasHeight = 0;
 
   // Stato UI
   ImageProvider? _localBgPreview; // preview locale dello sfondo
   String? _bgPublicUrl;           // URL pubblico su storage
   Color _txtColor = Colors.white;
-  bool _showTextField = false;
   _WizardStep _step = _WizardStep.changeBg;
   bool _bgChosen = false; // abilita bottone OK per procedere
   static const double _bgMinScale = 1.0;
@@ -82,6 +80,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
   // Export/anteprima
   Uint8List? _lastPreviewBytes;
   String? _exportFilenameHint;
+  String? _lastFileBaseName;
 
   // ========================================================================
   // Lifecycle
@@ -192,8 +191,6 @@ class _HinooBuilderState extends State<HinooBuilder> {
   void _resetToBlankState() {
     _textController.clear();
     _txtColor = Colors.white;
-    _scale = 1.0;
-    _offset = Offset.zero;
     _localBgPreview = null;
     _bgPublicUrl = null;
     _bgLockedMatrix = null;
@@ -201,7 +198,6 @@ class _HinooBuilderState extends State<HinooBuilder> {
     _bgScale = _bgMinScale;
     _bgChosen = false;
     _step = _WizardStep.changeBg;
-    _showTextField = false;
   }
 
   Future<void> _openDownloadDialog() async {
@@ -212,10 +208,26 @@ class _HinooBuilderState extends State<HinooBuilder> {
       builder: (_) => DownloadHinooDialog(pageCount: _pages.length),
     );
     if (choice == null) return;
-    await _downloadHinoo(allPages: choice == DownloadChoice.allPages);
+    final String? chosenName = await showDialog<String>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => NameHinooDialog(initialValue: _lastFileBaseName),
+    );
+    final String? trimmed = chosenName?.trim();
+    if (trimmed == null || trimmed.isEmpty) {
+      return;
+    }
+    _lastFileBaseName = trimmed;
+    await _downloadHinoo(
+      allPages: choice == DownloadChoice.allPages,
+      baseName: trimmed,
+    );
   }
 
-  Future<void> _downloadHinoo({required bool allPages}) async {
+  Future<void> _downloadHinoo({
+    required bool allPages,
+    String? baseName,
+  }) async {
     if (!mounted) return;
     bool progressVisible = false;
     if (mounted) {
@@ -230,26 +242,28 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
     final List<int> indices = allPages
         ? List<int>.generate(_pages.length, (int i) => i)
-        : <int>[0];
+        : <int>[_current];
     final int previousIndex = _current;
     bool indexChanged = false;
     final List<DownloadImage> images = <DownloadImage>[];
     final DownloadSaver saver = getDownloadSaver();
+    final String fileBaseName = _prepareFileBaseName(baseName);
 
     try {
       for (int pos = 0; pos < indices.length; pos++) {
         final int pageIndex = indices[pos];
-        if (_current != pageIndex) {
-          setState(() => _current = pageIndex);
-          indexChanged = true;
-          await _waitForNextFrame();
-        }
+        final bool switched = _current != pageIndex;
+        _goTo(pageIndex);
+        if (switched) indexChanged = true;
+        await _waitForNextFrame();
 
         final Uint8List? bytes = await _captureCurrentCanvasBytes();
         if (bytes != null) {
-          final String filename = indices.length == 1
-              ? 'hinoo_${pageIndex + 1}.png'
-              : 'hinoo_${(pos + 1).toString().padLeft(2, '0')}.png';
+          final String filename = _resolveFileName(
+            baseName: fileBaseName,
+            isMulti: indices.length > 1,
+            pageNumber: pageIndex + 1,
+          );
           images.add(DownloadImage(filename: filename, bytes: bytes));
         }
       }
@@ -274,7 +288,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
       }
     } finally {
       if (indexChanged && mounted && _current != previousIndex) {
-        setState(() => _current = previousIndex);
+        _goTo(previousIndex);
         await _waitForNextFrame();
       }
       if (progressVisible && mounted) {
@@ -335,14 +349,40 @@ class _HinooBuilderState extends State<HinooBuilder> {
   // ========================================================================
   // Helpers / API pubbliche
   // ========================================================================
-  void goToPublic(int index) => _goTo(index);            // vai alla pagina i
-  void addPagePublic() => _addPage();                    // aggiungi pagina
-  void reorderPagesPublic(int oldIndex, int newIndex) => _onReorder(oldIndex, newIndex);
+  void goToPublic(int index) => _goTo(index); // vai alla pagina i
+  void addPagePublic() => _addPage(); // aggiungi pagina
+  void reorderPagesPublic(int oldIndex, int newIndex) =>
+      _onReorder(oldIndex, newIndex);
 
   void deleteCurrentPagePublic() => _deleteCurrentPage(); // già usata
   Future<void> openPreviewDialogPublic() => _openPreviewDialog();
   Future<void> openDownloadDialogPublic() => _openDownloadDialog();
-  Future<void> downloadAllPagesPublic() => _downloadHinoo(allPages: true);
+  Future<void> downloadAllPagesPublic({String? baseName}) =>
+      _downloadHinoo(allPages: true, baseName: baseName);
+
+  String _prepareFileBaseName(String? raw) {
+    const String fallback = 'hinoo';
+    final String? source = raw ?? _lastFileBaseName;
+    if (source == null) return fallback;
+    String base = source.trim();
+    if (base.isEmpty) return fallback;
+    base = base.replaceAll(RegExp(r'\s+'), '_');
+    base = base.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '');
+    if (base.isEmpty) return fallback;
+    return base;
+  }
+
+  String _resolveFileName({
+    required String baseName,
+    required bool isMulti,
+    required int pageNumber,
+  }) {
+    if (!isMulti) {
+      return '$baseName.png';
+    }
+    final String suffix = pageNumber.toString().padLeft(2, '0');
+    return '${baseName}_$suffix.png';
+  }
 
   dynamic exportDraft() {
     return {
@@ -425,7 +465,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
                             WhiteIconButton(
                               tooltip: 'Scarica immagini',
                               icon: Icons.download_outlined,
-                              onPressed: _openDownloadDialog,
+                              onPressed: () => _openDownloadDialog(),
                             ),
                             const SizedBox(width: 12),
                             WhiteIconButton(
@@ -533,6 +573,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
                     iconSize: 44,
                     onPressed: _confirmBgAndLock,
                     icon: SvgPicture.asset('assets/icons/ok.svg', width: 44, height: 44),
+                    tooltip: 'Conferma sfondo',
                   ),
                 ),
             ]
@@ -546,8 +587,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
             _pages[i] = _copySlideWithTextColor(_pages[i], _txtColor.value);
           }
           _step = _WizardStep.writeText;
-          _showTextField = false;
         });
+        FocusScope.of(context).requestFocus(_textFocus);
         _notifyChanged();
       },
             )
@@ -566,7 +607,6 @@ class _HinooBuilderState extends State<HinooBuilder> {
   // Gestione testo/pagine/riordino
   // ========================================================================
   void _onCanvasTextChanged(String v) {
-    // TODO: aggiorna il tuo modello slide (qui esempio generico)
     final s = _pages[_current];
     final updated = _copySlideWithText(s, v);
     setState(() => _pages[_current] = updated);
@@ -587,8 +627,6 @@ class _HinooBuilderState extends State<HinooBuilder> {
       _pages.add(_createEmptySlide());
       _current = _pages.length - 1;
       _textController.clear();
-      _scale = 1.0;
-      _offset = Offset.zero;
       // mantieni anteprima sfondo globale
     });
     _scheduleAutosave();
@@ -638,8 +676,6 @@ class _HinooBuilderState extends State<HinooBuilder> {
         final int newIndex = removedIndex > 0 ? removedIndex - 1 : 0;
         _current = newIndex.clamp(0, _pages.length - 1);
         _applySlideState(_pages[_current]);
-        _scale = 1.0;
-        _offset = Offset.zero;
       } else {
         _resetToBlankState();
         _pages[0] = _createEmptySlide();
@@ -811,36 +847,5 @@ class _HinooBuilderState extends State<HinooBuilder> {
     if (slide is Map) return {...slide, 'textColor': colorValue};
     return slide;
   }
+
 }
-
-// ---------------------------------------------------------------------------
-// Helper top-level: pulsante bianco rotondo (privato al file)
-// ---------------------------------------------------------------------------
-class _WhiteIconButton extends StatelessWidget {
-  const _WhiteIconButton({
-    required this.icon,
-    required this.onPressed,
-    this.tooltip,
-    super.key,
-  });
-
-  final IconData icon;
-  final VoidCallback onPressed;
-  final String? tooltip;
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      tooltip: tooltip,
-      onPressed: onPressed,
-      icon: Icon(icon, size: 18, color: Colors.black),
-      style: IconButton.styleFrom(
-        backgroundColor: Colors.white,
-        padding: const EdgeInsets.all(8),
-        shape: const CircleBorder(),
-        elevation: 2,
-      ),
-    );
-  }
-}
-// ^ Non più usato: il pulsante viene fornito da lib/Widgets/WhiteIconButton.dart

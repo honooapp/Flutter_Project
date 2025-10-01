@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:honoo/IsolaDelleStorie/Controller/ExerciseController.dart';
-import 'package:honoo/IsolaDelleStorie/Utility/NotionAPI.dart';
-import 'package:honoo/Pages/HomePage.dart';
-import 'package:honoo/Pages/PlaceholderPage.dart';
 import 'package:sizer/sizer.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'Pages/AuthGate.dart';
 import 'Pages/ChestPage.dart';
+import 'Utility/HonooColors.dart';
 
 
 
@@ -20,10 +17,6 @@ void main() async {
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11bGFyZGNyamVjd21vaGxoZXV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MDgxNDYsImV4cCI6MjA2OTM4NDE0Nn0.wt0CJD8XHkGoX2qLlmQgwG6RHLUfxx6JKO9EMnpTAsc', // 🔁 Chiave anonima
 
   );
-
-  // Notion config (puoi lasciare hardcoded o usare dotenv se preferisci)
-  final notionApi = 'secret_xUNRbof4rEOCTaBb2Q5N2E0A5hmwXz8D8ivevH9ZULv';
-  final databaseId = '666abc4e50e6478d980a9a8086943075';
 
   runApp(const MyApp());
 }
@@ -42,6 +35,20 @@ class MyApp extends StatelessWidget {
         return SafeArea(
           child: MaterialApp(
                   title: 'honoo',
+                  theme: ThemeData(
+                    tooltipTheme: TooltipThemeData(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [HonooColor.wave1, HonooColor.primary],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      textStyle: const TextStyle(color: Colors.white),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    ),
+                  ),
                   home: AuthGate(),
           // 🔑 routes nominate (qui puoi aggiungerne altre in futuro)
           routes: {

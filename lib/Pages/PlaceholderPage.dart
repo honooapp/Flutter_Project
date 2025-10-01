@@ -116,6 +116,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                     semanticsLabel: 'Home',
                   ),
                   iconSize: 60,
+                  tooltip: 'Indietro',
                   onPressed: () {
                     Navigator.push(
                       context,
