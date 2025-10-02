@@ -29,24 +29,15 @@ class _HomePageState extends State<HomePage> {
           // CONTENUTO PRINCIPALE
           Column(
             children: [
-              Opacity(
-                opacity: 0.5,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: SizedBox(
-                    height: 50,
-                    child: Center(
-                      child: Text(
-                        Utility().appName,
-                        style: GoogleFonts.libreFranklin(
-                          color: HonooColor.secondary,
-                          fontSize: 30,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+              SizedBox(
+                height: 52,
+                child: Center(
+                  child: Text(
+                    Utility().appName,
+                    style: GoogleFonts.libreFranklin(
+                      color: HonooColor.secondary,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -76,6 +67,7 @@ class _HomePageState extends State<HomePage> {
                                         child: SingleChildScrollView(
                                           child: Column(
                                             children: [
+                                              SizedBox(height: 32),
                                               Text(
                                                 Utility().textHome1,
                                                 style: GoogleFonts.arvo(
@@ -85,8 +77,7 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                                 textAlign: TextAlign.center,
                                               ),
-                                              const Padding(
-                                                  padding: EdgeInsets.all(10.0)),
+                                              const SizedBox(height: 24),
                                               Text(
                                                 Utility().textHome2,
                                                 style: GoogleFonts.arvo(

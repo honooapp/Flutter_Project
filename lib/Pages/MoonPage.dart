@@ -86,7 +86,7 @@ class _MoonPageState extends State<MoonPage> {
 
   @override
   Widget build(BuildContext context) {
-    const double headerHeight = 60;
+    const double headerHeight = 52;
     const double footerHeight = 60;
     return Scaffold(
       backgroundColor: Colors.white,
@@ -108,8 +108,8 @@ class _MoonPageState extends State<MoonPage> {
                       Utility().appName,
                       style: GoogleFonts.libreFranklin(
                         color: HonooColor.secondary,
-                        fontSize: 30,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),

@@ -96,14 +96,14 @@ class _IslandPageState extends State<IslandPage> {
                   Navigator.pop(context);
                 },
                 child: SizedBox(
-                  height: 60,
+                  height: 52,
                   child: Center(
                     child: Text(
                       Utility().appName,
                       style: GoogleFonts.libreFranklin(
                         color: HonooColor.secondary,
-                        fontSize: 30,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w600,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -120,10 +120,30 @@ class _IslandPageState extends State<IslandPage> {
                       physics: const BouncingScrollPhysics(),
                       child: LayoutBuilder(
                         builder: (context, constraints) {
-                          // Larghezza utile della colonna centrale: intera su phone, ~50% su desktop
-                          final double columnMaxW = DeviceController().isPhone()
+                          // Larghezza utile della colonna centrale: piena su phone, limite morbido su desktop.
+                          final bool isPhone = DeviceController().isPhone();
+                          const double desktopContentMaxWidth = 720;
+                          final double columnMaxW = isPhone
                               ? constraints.maxWidth
-                              : math.min(constraints.maxWidth, constraints.maxWidth * 0.5);
+                              : math.min(constraints.maxWidth, desktopContentMaxWidth);
+
+                          const double mapAspectRatio = 321 / 323;
+                          const double mapHorizontalPadding = 24.0; // 12 + 12
+                          final double mapMaxHeight = _maxMapHeight(context);
+                          final double mapMaxWidthFromHeight = mapMaxHeight * mapAspectRatio;
+                          final double mapAvailableWidth = math.max(columnMaxW - mapHorizontalPadding, 0.0);
+                          double targetMapWidth = mapAvailableWidth;
+                          if (mapMaxWidthFromHeight > 0) {
+                            targetMapWidth = targetMapWidth == 0
+                                ? mapMaxWidthFromHeight
+                                : math.min(targetMapWidth, mapMaxWidthFromHeight);
+                          }
+                          if (targetMapWidth <= 0) {
+                            targetMapWidth = mapMaxWidthFromHeight > 0
+                                ? mapMaxWidthFromHeight
+                                : (columnMaxW > 0 ? columnMaxW - mapHorizontalPadding : 320.0);
+                          }
+                          final double targetMapHeight = math.min(targetMapWidth / mapAspectRatio, mapMaxHeight);
 
                           return Row(
                             children: [
@@ -144,65 +164,112 @@ class _IslandPageState extends State<IslandPage> {
                                       ),
                                     ),
 
-                                    // ====== MAPPA RESPONSIVE + PIN SCALABILI ======
-                                    // NOTE: imposta aspectRatio con il TUO viewBox (width/height)
-                                    IslandMapWithPins(
-                                      svgAsset: "assets/icons/isoladellestorie/islandmap.svg",
-                                      aspectRatio: 1440 / 1024, // <--- METTI IL TUO (viewBoxW / viewBoxH)
-                                      // width: prende tutta la larghezza disponibile della colonna
-                                      // (nessun 95.w fisso: ora scala davvero col contenitore)
-                                      pins: const [
-                                        // Sostituisci con le TUE percentuali reali (0..1)
-                                        MapPinPct(
-                                          xPct: 0.11, yPct: 0.62,
-                                          asset: "assets/icons/isoladellestorie/button3.svg",
-                                          index: 3,
+                                    const SizedBox(height: 36),
+
+                                    // Mappa SVG responsiva con pin proporzionali all'area visibile.
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                                      child: Align(
+                                        alignment: Alignment.center,
+                                        child: SizedBox(
+                                          width: targetMapWidth,
+                                          height: targetMapHeight,
+                                          child: IslandMapWithPins(
+                                            svgAsset: "assets/icons/isoladellestorie/islandmap.svg",
+                                            aspectRatio: 321 / 323,
+                                            pins: const [
+                                              // x/y: coordinate percentuali del luogo nel viewBox originale.
+                                              // dx/dy: offset percentuali per spostare il bottone accanto all'illustrazione.
+                                              MapPinModel(
+                                                id: 1,
+                                                x: 0.12,
+                                                y: 0.95,
+                                                dx: 0.00,
+                                                dy: 0.01,
+                                                assetSvg: "assets/icons/isoladellestorie/button1.svg",
+                                                hint: 'Grotta delle Rondini',
+                                              ),
+                                              MapPinModel(
+                                                id: 2,
+                                                x: 0.16,
+                                                y: 0.60,
+                                                dx: -0.03,
+                                                dy: -0.02,
+                                                assetSvg: "assets/icons/isoladellestorie/button2.svg",
+                                                hint: 'Radura delle Bacche',
+                                              ),
+                                              MapPinModel(
+                                                id: 3,
+                                                x: 0.11,
+                                                y: 0.30,
+                                                dx: 0.02,
+                                                dy: -0.01,
+                                                assetSvg: "assets/icons/isoladellestorie/button3.svg",
+                                                hint: "Pozzo dell'Oracolo",
+                                              ),
+                                              MapPinModel(
+                                                id: 4,
+                                                x: 0.53,
+                                                y: 0.17,
+                                                dx: -0.02,
+                                                dy: -0.02,
+                                                assetSvg: "assets/icons/isoladellestorie/button4.svg",
+                                                hint: "Porta nell'Alabastro",
+                                              ),
+                                              MapPinModel(
+                                                id: 5,
+                                                x: 0.87,
+                                                y: 0.17,
+                                                dx: 0.02,
+                                                dy: 0.00,
+                                                assetSvg: "assets/icons/isoladellestorie/button5.svg",
+                                                hint: 'Primo Anello',
+                                              ),
+                                              MapPinModel(
+                                                id: 6,
+                                                x: 0.87,
+                                                y: 0.40,
+                                                dx: 0.02,
+                                                dy: 0.00,
+                                                assetSvg: "assets/icons/isoladellestorie/button6.svg",
+                                                hint: 'Secondo Anello',
+                                              ),
+                                              MapPinModel(
+                                                id: 7,
+                                                x: 0.92,
+                                                y: 0.62,
+                                                dx: 0.02,
+                                                dy: 0.00,
+                                                assetSvg: "assets/icons/isoladellestorie/button7.svg",
+                                                hint: 'Terzo Anello',
+                                              ),
+                                              MapPinModel(
+                                                id: 8,
+                                                x: 0.97,
+                                                y: 0.84,
+                                                dx: 0.02,
+                                                dy: 0.00,
+                                                assetSvg: "assets/icons/isoladellestorie/button8.svg",
+                                                hint: 'Quarto Anello',
+                                              ),
+                                              MapPinModel(
+                                                id: 9,
+                                                x: 0.65,
+                                                y: 0.98,
+                                                dx: 0.00,
+                                                dy: 0.00,
+                                                assetSvg: "assets/icons/isoladellestorie/button9.svg",
+                                                hint: 'Cunicolo verso la Luce',
+                                              ),
+                                            ],
+                                            pinSizeFactor: 0.0495,
+                                            onPinTap: _openExercise,
+                                          ),
                                         ),
-                                        MapPinPct(
-                                          xPct: 0.33, yPct: 0.70,
-                                          asset: "assets/icons/isoladellestorie/button2.svg",
-                                          index: 2,
-                                        ),
-                                        MapPinPct(
-                                          xPct: 0.50, yPct: 0.97,
-                                          asset: "assets/icons/isoladellestorie/button1.svg",
-                                          index: 1,
-                                        ),
-                                        MapPinPct(
-                                          xPct: 0.47, yPct: 0.40,
-                                          asset: "assets/icons/isoladellestorie/button4.svg",
-                                          index: 4,
-                                        ),
-                                        MapPinPct(
-                                          xPct: 0.70, yPct: 0.38,
-                                          asset: "assets/icons/isoladellestorie/button5.svg",
-                                          index: 5,
-                                        ),
-                                        MapPinPct(
-                                          xPct: 0.71, yPct: 0.52,
-                                          asset: "assets/icons/isoladellestorie/button6.svg",
-                                          index: 6,
-                                        ),
-                                        MapPinPct(
-                                          xPct: 0.74, yPct: 0.68,
-                                          asset: "assets/icons/isoladellestorie/button7.svg",
-                                          index: 7,
-                                        ),
-                                        MapPinPct(
-                                          xPct: 0.78, yPct: 0.86,
-                                          asset: "assets/icons/isoladellestorie/button8.svg",
-                                          index: 8,
-                                        ),
-                                        MapPinPct(
-                                          xPct: 0.50, yPct: 1.00,
-                                          asset: "assets/icons/isoladellestorie/button9.svg",
-                                          index: 9,
-                                        ),
-                                      ],
-                                      pinSizeFactor: 0.045, // 4.5% della larghezza mappa (scala con la mappa)
-                                      // debugGrid: true, // <-- attiva per allineare i pin visivamente
-                                      onPinTap: (index) => _openExercise(index),
+                                      ),
                                     ),
+
+                                    const SizedBox(height: 36),
                                   ],
                                 ),
                               ),
@@ -404,24 +471,44 @@ class _IslandPageState extends State<IslandPage> {
     Navigator.push(context, MaterialPageRoute(builder: (_) => page));
   }
 
+  double _maxMapHeight(BuildContext context) {
+    final media = MediaQuery.of(context);
+    const double headerHeight = 60.0;
+    const double introSpacing = 5.0;
+    const double introTextHeight = 70.0;
+    const double topSpacer = 36.0;
+    const double bottomSpacer = 36.0;
+    const double footerHeight = 80.0;
+    const double safetyGap = 24.0; // margine extra per evitare sovrapposizioni
+
+    final double reservedVertical = headerHeight + introSpacing + introTextHeight + topSpacer + bottomSpacer + footerHeight + safetyGap + media.padding.top + media.padding.bottom;
+    final double availableHeight = media.size.height - reservedVertical;
+    return math.max(availableHeight, 220.0);
+  }
+
 }
 
 /// ============================================================================
-///  MAPPA RESPONSIVE CON PIN SCALABILI (percentuali)
+///  MAPPA RESPONSIVE CON PIN SCALABILI (percentuali + offset)
 /// ============================================================================
 
-class MapPinPct {
-  /// Coordinate percentuali nel sistema della mappa (0..1)
-  final double xPct;
-  final double yPct;
-  final String asset;
-  final int index; // per sapere quale esercizio aprire
+class MapPinModel {
+  final int id; // 1..9
+  final double x; // 0..1: ascissa nel viewBox dell'SVG
+  final double y; // 0..1: ordinata nel viewBox dell'SVG
+  final double dx; // offset orizzontale percentuale per spostare il pin rispetto al punto logico
+  final double dy; // offset verticale percentuale per allineare il pin senza coprire il disegno
+  final String assetSvg;
+  final String hint;
 
-  const MapPinPct({
-    required this.xPct,
-    required this.yPct,
-    required this.asset,
-    required this.index,
+  const MapPinModel({
+    required this.id,
+    required this.x,
+    required this.y,
+    this.dx = 0,
+    this.dy = 0,
+    required this.assetSvg,
+    required this.hint,
   });
 }
 
@@ -429,58 +516,70 @@ class IslandMapWithPins extends StatelessWidget {
   const IslandMapWithPins({
     super.key,
     required this.svgAsset,
-    required this.aspectRatio, // viewBoxWidth / viewBoxHeight
+    required this.aspectRatio,
     required this.pins,
-    this.pinSizeFactor = 0.08, // % della larghezza mappa
+    this.pinSizeFactor = 0.045,
     this.onPinTap,
     this.debugGrid = false,
   });
 
   final String svgAsset;
-  final double aspectRatio;         // es: 1440/1024 (DEVE combaciare col viewBox)
-  final List<MapPinPct> pins;
-  final double pinSizeFactor;       // es: 0.04 => 4% della larghezza mappa
-  final void Function(int index)? onPinTap;
+  final double aspectRatio;
+  final List<MapPinModel> pins;
+  final double pinSizeFactor;
+  final void Function(int id)? onPinTap;
   final bool debugGrid;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (ctx, constraints) {
-        // Occupiamo TUTTA la larghezza disponibile del contenitore padre
-        final double targetW = constraints.maxWidth;
-        final double targetH = targetW / aspectRatio;
+        final double availableWidth = constraints.maxWidth;
+        final double renderWidth =
+            availableWidth.isFinite && availableWidth > 0 ? availableWidth : MediaQuery.of(ctx).size.width;
+        final double safeAspectRatio = aspectRatio <= 0 ? 1 : aspectRatio;
+        final double renderHeight = renderWidth / safeAspectRatio;
 
-        // Pin che scalano con la mappa
-        final double pinSize = (targetW * pinSizeFactor).clamp(24.0, 160.0);
+        final double pinVisualSize = (renderWidth * pinSizeFactor).clamp(24.0, 160.0);
+        final double hitTargetSize = math.max(pinVisualSize, 40.0);
 
         return SizedBox(
-          width: targetW,
-          height: targetH,
+          width: renderWidth,
+          height: renderHeight,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              // Mappa SVG che riempie l'area con l'AR già corretto
               Positioned.fill(
                 child: SvgPicture.asset(svgAsset, fit: BoxFit.fill),
               ),
+              if (debugGrid) ..._buildDebugGrid(renderWidth, renderHeight),
+              ...pins.map((pin) {
+                final double px = (pin.x * renderWidth) + (pin.dx * renderWidth) - (hitTargetSize / 2);
+                final double py = (pin.y * renderHeight) + (pin.dy * renderHeight) - (hitTargetSize / 2);
+                final VoidCallback? onPressed = onPinTap == null ? null : () => onPinTap!(pin.id);
 
-              // (Opzionale) Griglia di debug per tarare le percentuali
-              if (debugGrid) ..._buildDebugGrid(targetW, targetH),
-
-              // Pin percentuali
-              ...pins.map((p) {
-                final left = (p.xPct * targetW) - (pinSize / 2);
-                final top  = (p.yPct * targetH) - (pinSize / 2);
                 return Positioned(
-                  left: left,
-                  top: top,
-                  child: IconButton(
-                    icon: SvgPicture.asset(p.asset, width: pinSize, height: pinSize),
-                    iconSize: pinSize,
-                    splashRadius: pinSize * 0.75,
-                    tooltip: 'Apri esercizio ${p.index}',
-                    onPressed: () => onPinTap?.call(p.index),
+                  left: px,
+                  top: py,
+                  child: Semantics(
+                    label: pin.hint,
+                    button: true,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(
+                        minWidth: hitTargetSize,
+                        minHeight: hitTargetSize,
+                      ),
+                      iconSize: pinVisualSize,
+                      splashRadius: hitTargetSize / 2,
+                      tooltip: pin.hint,
+                      onPressed: onPressed,
+                      icon: SvgPicture.asset(
+                        pin.assetSvg,
+                        width: pinVisualSize,
+                        height: pinVisualSize,
+                      ),
+                    ),
                   ),
                 );
               }),
@@ -491,19 +590,29 @@ class IslandMapWithPins extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildDebugGrid(double w, double h) {
+  List<Widget> _buildDebugGrid(double width, double height) {
     final lines = <Widget>[];
-    // verticali
     for (int i = 1; i < 10; i++) {
-      final x = w * (i / 10);
-      lines.add(Positioned(left: x, top: 0, bottom: 0,
-          child: Container(width: 1, color: Colors.white.withOpacity(0.2))));
+      final double x = width * (i / 10);
+      lines.add(
+        Positioned(
+          left: x,
+          top: 0,
+          bottom: 0,
+          child: Container(width: 1, color: Colors.white.withOpacity(0.25)),
+        ),
+      );
     }
-    // orizzontali
     for (int j = 1; j < 10; j++) {
-      final y = h * (j / 10);
-      lines.add(Positioned(top: y, left: 0, right: 0,
-          child: Container(height: 1, color: Colors.white.withOpacity(0.2))));
+      final double y = height * (j / 10);
+      lines.add(
+        Positioned(
+          top: y,
+          left: 0,
+          right: 0,
+          child: Container(height: 1, color: Colors.white.withOpacity(0.25)),
+        ),
+      );
     }
     return lines;
   }

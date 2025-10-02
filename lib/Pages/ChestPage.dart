@@ -15,6 +15,7 @@ import '../UI/HinooViewer.dart';
 import '../Utility/HonooColors.dart';
 import '../Utility/Utility.dart';
 import '../Utility/ResponsiveLayout.dart';
+import '../Widgets/honoo_dialogs.dart';
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 
 // 👇 aggiunto per allineare il padding top come in NewHonooPage
@@ -225,6 +226,12 @@ class _ChestPageState extends State<ChestPage> {
         splashRadius: 25,
         tooltip: 'Cancella',
         onPressed: () async {
+          final bool? confirmed = await showHonooDeleteDialog(
+            context,
+            target: HonooDeletionTarget.honoo,
+          );
+          if (confirmed != true) return;
+
           final String? id = (current.dbId ?? current.id) as String?;
           if (id == null || id.isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -235,6 +242,7 @@ class _ChestPageState extends State<ChestPage> {
           }
 
           await ctrl.deleteHonooById(id); // accetta String?
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Honoo eliminato.')),
           );
@@ -377,6 +385,12 @@ class _ChestPageState extends State<ChestPage> {
   }
 
   Future<void> _deleteHinoo(_HinooRow current) async {
+    final bool? confirmed = await showHonooDeleteDialog(
+      context,
+      target: HonooDeletionTarget.hinoo,
+    );
+    if (confirmed != true) return;
+
     try {
       final client = Supabase.instance.client;
       await client.from('hinoo').delete().eq('id', current.id);
@@ -398,8 +412,7 @@ class _ChestPageState extends State<ChestPage> {
 
   @override
   Widget build(BuildContext context) {
-    const headerH =
-        60.0; // lasciamo il tuo titolo a 60 per “non cambiare altro”
+    const headerH = 52.0;
     const footerH = 60.0;
 
     // 👇 come in NewHonooPage: riserva top solo oltre l’header per non far coprire la Luna
@@ -442,8 +455,8 @@ class _ChestPageState extends State<ChestPage> {
                               Utility().appName,
                               style: GoogleFonts.libreFranklin(
                                 color: HonooColor.secondary,
-                                fontSize: 30,
-                                fontWeight: FontWeight.w500,
+                                fontSize: 28,
+                                fontWeight: FontWeight.w600,
                               ),
                               textAlign: TextAlign.center,
                             ),

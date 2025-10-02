@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:honoo/Widgets/honoo_dialogs.dart';
 
 enum DownloadChoice { firstOnly, allPages }
 
@@ -13,42 +13,20 @@ class DownloadHinooDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle titleStyle = GoogleFonts.lora(
-      color: Colors.white,
-      fontSize: 20,
-      fontWeight: FontWeight.bold,
-    );
-    final TextStyle bodyStyle = GoogleFonts.lora(
-      color: Colors.white70,
-      fontSize: 14,
-    );
-    final TextStyle buttonStyle = GoogleFonts.lora(
-      color: Colors.black,
-      fontSize: 14,
-      fontWeight: FontWeight.w600,
-    );
-    final TextStyle outlinedStyle = GoogleFonts.lora(
-      color: Colors.white,
-      fontSize: 14,
-      fontWeight: FontWeight.w600,
-    );
     final bool multiplePages = pageCount > 1;
     final String bodyText = multiplePages
         ? 'Scegli se scaricare la pagina corrente o tutte le $pageCount pagine.'
-        : 'Scarica la pagina in formato PNG.';
+        : 'Scarica la pagina in formato .png';
 
-    return Dialog(
-      backgroundColor: Colors.black.withOpacity(0.92),
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+    return HonooDialogShell(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Scarica hinoo', style: titleStyle, textAlign: TextAlign.center),
+            Text('Scarica hinoo', style: HonooDialogStyles.title(), textAlign: TextAlign.center),
             const SizedBox(height: 12),
-            Text(bodyText, style: bodyStyle, textAlign: TextAlign.center),
+            Text(bodyText, style: HonooDialogStyles.body(), textAlign: TextAlign.center),
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
@@ -63,7 +41,7 @@ class DownloadHinooDialog extends StatelessWidget {
                 ),
                 child: Text(
                   multiplePages ? 'Scarica pagina corrente' : 'Scarica',
-                  style: buttonStyle,
+                  style: HonooDialogStyles.primaryAction(),
                 ),
               ),
             ),
@@ -79,7 +57,7 @@ class DownloadHinooDialog extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: Text('Scarica tutte le pagine', style: outlinedStyle),
+                  child: Text('Scarica tutte le pagine', style: HonooDialogStyles.secondaryAction()),
                 ),
               ),
             ],
@@ -87,7 +65,7 @@ class DownloadHinooDialog extends StatelessWidget {
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               style: TextButton.styleFrom(foregroundColor: Colors.white54),
-              child: Text('Annulla', style: GoogleFonts.lora(fontSize: 13)),
+              child: Text('Annulla', style: HonooDialogStyles.tertiaryAction()),
             ),
           ],
         ),
@@ -101,9 +79,9 @@ class DownloadProgressDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.black.withOpacity(0.88),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    return HonooDialogShell(
+      opacity: 0.88,
+      maxWidth: 320,
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -117,7 +95,7 @@ class DownloadProgressDialog extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Preparazione download…',
-              style: GoogleFonts.lora(color: Colors.white, fontSize: 14),
+              style: HonooDialogStyles.body(color: Colors.white),
               textAlign: TextAlign.center,
             ),
           ],

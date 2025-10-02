@@ -41,14 +41,14 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   SizedBox(
-                    height: 60,
+                    height: 52,
                     child: Center(
-                      child:Text(
+                      child: Text(
                         Utility().appName,
                         style: GoogleFonts.libreFranklin(
                           color: HonooColor.secondary,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w600,
                         ),
                         textAlign: TextAlign.center,
                       ),

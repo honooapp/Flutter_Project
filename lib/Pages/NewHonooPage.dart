@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'dart:ui';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:honoo/Utility/HonooColors.dart';
@@ -18,6 +19,9 @@ import '../Widgets/LunaFissa.dart';
 import 'EmailLoginPage.dart';
 import 'ChestPage.dart';
 import 'NewHinooPage.dart';
+import '../Widgets/WhiteIconButton.dart';
+import '../Widgets/honoo_dialogs.dart';
+import '../UI/HonooBuilder/dialogs/NameHonooDialog.dart';
 
 class NewHonooPage extends StatefulWidget {
   const NewHonooPage({super.key});
@@ -27,6 +31,8 @@ class NewHonooPage extends StatefulWidget {
 }
 
 class _NewHonooPageState extends State<NewHonooPage> {
+  final GlobalKey<HonooBuilderState> _builderKey = GlobalKey<HonooBuilderState>();
+
   String _text = '';
   String _imageUrl = '';
 
@@ -39,6 +45,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
   /// contenuto effettivamente SALVATO (per evitare reset dello stato da update identici)
   String _lastSavedText = '';
   String _lastSavedRawImage = '';
+  bool _hasMinTextForDownload = false;
 
   /// Aggiorna solo se cambia DAVVERO e non è identico all’ultimo SALVATO.
   void _onHonooChanged(String text, String imageUrl) {
@@ -51,6 +58,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
     setState(() {
       _text = text;
       _imageUrl = imageUrl;
+      _hasMinTextForDownload = text.trim().isNotEmpty;
 
       // resetta l’icona solo se il contenuto è DIVERSO da quello salvato
       if (!isSameAsLastSaved) {
@@ -165,6 +173,60 @@ class _NewHonooPageState extends State<NewHonooPage> {
     }
   }
 
+  Future<void> _handleDownloadTap() async {
+    if (!_hasMinTextForDownload) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Scrivi almeno 1 carattere prima di scaricare')),
+      );
+      return;
+    }
+
+    final state = _builderKey.currentState;
+    if (state == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Impossibile avviare il download.')),
+      );
+      return;
+    }
+
+    final String? desiredName = await showDialog<String>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => NameHonooDialog(initialValue: _defaultHonooFileName()),
+    );
+    final String? trimmed = desiredName?.trim();
+    if (trimmed == null || trimmed.isEmpty) {
+      return;
+    }
+
+    await state.downloadHonooPublic(context, fileName: trimmed);
+  }
+
+  Future<void> _handleDeleteTap() async {
+    final bool? confirmed = await showHonooDeleteDialog(
+      context,
+      target: HonooDeletionTarget.page,
+    );
+    if (confirmed != true) return;
+
+    _builderKey.currentState?.resetContent();
+
+    setState(() {
+      _text = '';
+      _imageUrl = '';
+      _savedToChest = false;
+      _finalImageUrlCache = null;
+      _lastSavedText = '';
+      _lastSavedRawImage = '';
+      _hasMinTextForDownload = false;
+    });
+  }
+
+  void _onBuilderFocusChanged(bool hasFocus) {
+    if (mounted) setState(() {});
+  }
+
   Future<String?> _resolveFinalImageUrl(String raw) async {
     final s = raw.trim();
     if (s.isEmpty) return null;
@@ -182,6 +244,18 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
     final uploaded = await HonooImageUploader.uploadImageFromPath(s);
     return uploaded;
+  }
+
+  String _defaultHonooFileName() {
+    final String text = _text.trim();
+    if (text.isEmpty) return 'honoo';
+    final String slug = text
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+        .replaceAll(RegExp('_+'), '_')
+        .replaceAll(RegExp(r'^_|_$'), '');
+    if (slug.isEmpty) return 'honoo';
+    return slug.length > 32 ? slug.substring(0, 32) : slug;
   }
 
   // Larghezza massima fluida del contenuto (breakpoints morbidi)
@@ -216,11 +290,27 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
             // Altezza riservata al footer (3 pulsanti)
             const double footerH = 100.0;
+            const double controlsH = 44.0;
 
             // Altezza disponibile per il box honoo
             final double availableH =
-            (viewH - headerH - contentTopPadding - footerH)
-                .clamp(0.0, double.infinity);
+                (viewH - headerH - controlsH - contentTopPadding - footerH)
+                    .clamp(0.0, double.infinity);
+
+            const double _gap = 9.0;
+            const double _ratio = 1.5; // totale = imageSize * 1.5 + gap
+
+            final double maxImageByWidth = targetMaxW;
+            final double maxImageByHeight =
+                ((availableH - _gap) / _ratio).clamp(0.0, double.infinity);
+
+            double imageSize = math.min(maxImageByWidth, maxImageByHeight);
+            if (!imageSize.isFinite || imageSize <= 0) {
+              imageSize = math.min(targetMaxW, viewW);
+            }
+
+            final double builderWidth = imageSize;
+            final double builderHeight = imageSize * _ratio + _gap;
 
             return Stack(
               clipBehavior: Clip.none,
@@ -241,25 +331,52 @@ class _NewHonooPageState extends State<NewHonooPage> {
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: Padding(
-                        // top minimo (solo se la luna uscirebbe dall’header) + spazio per footer in basso
-                        padding: EdgeInsets.fromLTRB(0, contentTopPadding, 0, footerH),
-                        child: Center(
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 90),
-                            curve: Curves.easeOutCubic,
-                            constraints: BoxConstraints(maxWidth: targetMaxW),
+                    SizedBox(height: contentTopPadding),
+                    SizedBox(
+                      height: controlsH,
+                      child: Center(
+                        child: SizedBox(
+                          width: builderWidth,
+                          height: controlsH,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              if (_hasMinTextForDownload) ...[
+                                WhiteIconButton(
+                                  tooltip: 'Scarica honoo',
+                                  icon: Icons.download_outlined,
+                                  onPressed: _handleDownloadTap,
+                                ),
+                                const SizedBox(width: 12),
+                              ],
+                              WhiteIconButton(
+                                tooltip: 'Elimina honoo',
+                                icon: Icons.delete_outline,
+                                onPressed: _handleDeleteTap,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: availableH,
+                      child: Center(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 90),
+                          curve: Curves.easeOutCubic,
+                          constraints: BoxConstraints(maxWidth: targetMaxW),
                             child: SizedBox(
-                              height: availableH,
-                              width: double.infinity,
+                              width: builderWidth,
+                              height: builderHeight,
                               child: ClipRect(
                                 child: HonooBuilder(
+                                  key: _builderKey,
                                   onHonooChanged: _onHonooChanged,
+                                  onFocusChanged: _onBuilderFocusChanged,
                                 ),
                               ),
                             ),
-                          ),
                         ),
                       ),
                     ),
@@ -344,7 +461,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           ),
                           iconSize: 60,
                           splashRadius: 25,
-                          tooltip: 'Scrivi',
+                          tooltip: 'Scrivi hinoo',
                           onPressed: () {
                             Navigator.push(
                               context,

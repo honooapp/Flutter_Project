@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
 
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'package:sizer/sizer.dart';
 import '../../Pages/ComingSoonPage.dart';
 import '../../Utility/Utility.dart';
 import '../Utility/IsolaDelleStorieContentManager.dart';
+import '../../Widgets/map/responsive_track_with_pins.dart';
 
 
 class ExercisePage extends StatefulWidget {
@@ -31,10 +33,276 @@ class _ExercisePageState extends State<ExercisePage> {
   late Exercise _exercise;
   bool uiVisible = true;
 
+  static const double _iconButtonSize = 40.0;
+  static const double _trackAspectRatio = 257 / 59;
+  static const double _buttonOffsetX = 0;
+  static const double _buttonOffsetY = 0;
+  static const double _buttonGap = 8.0;
+  static const double _pathOverlapFactor = 0.5;
+  static const List<TrackPinModel> _trackPins = [
+    TrackPinModel(
+      id: 1,
+      x: 0.22,
+      y: 0.10,
+      dx: 0.00,
+      dy: -0.02,
+      assetSvg: "assets/icons/isoladellestorie/button1.svg",
+    ),
+    TrackPinModel(
+      id: 2,
+      x: 0.40,
+      y: 0.10,
+      dx: 0.00,
+      dy: -0.02,
+      assetSvg: "assets/icons/isoladellestorie/button2.svg",
+    ),
+    TrackPinModel(
+      id: 3,
+      x: 0.58,
+      y: 0.10,
+      dx: 0.00,
+      dy: -0.02,
+      assetSvg: "assets/icons/isoladellestorie/button3.svg",
+    ),
+    TrackPinModel(
+      id: 4,
+      x: 0.77,
+      y: 0.10,
+      dx: 0.00,
+      dy: -0.02,
+      assetSvg: "assets/icons/isoladellestorie/button4.svg",
+    ),
+    TrackPinModel(
+      id: 5,
+      x: 0.98,
+      y: 0.50,
+      dx: 0.00,
+      dy: 0.00,
+      assetSvg: "assets/icons/isoladellestorie/button5.svg",
+    ),
+    TrackPinModel(
+      id: 6,
+      x: 0.78,
+      y: 0.85,
+      dx: 0.00,
+      dy: 0.02,
+      assetSvg: "assets/icons/isoladellestorie/button6.svg",
+    ),
+    TrackPinModel(
+      id: 7,
+      x: 0.60,
+      y: 0.85,
+      dx: 0.00,
+      dy: 0.02,
+      assetSvg: "assets/icons/isoladellestorie/button7.svg",
+    ),
+    TrackPinModel(
+      id: 8,
+      x: 0.42,
+      y: 0.85,
+      dx: 0.00,
+      dy: 0.02,
+      assetSvg: "assets/icons/isoladellestorie/button8.svg",
+    ),
+    TrackPinModel(
+      id: 9,
+      x: 0.24,
+      y: 0.85,
+      dx: 0.00,
+      dy: 0.02,
+      assetSvg: "assets/icons/isoladellestorie/button9.svg",
+    ),
+  ];
+
   @override
   void initState() {
     super.initState();
     _exercise = widget.exercise;
+  }
+
+  void _openExerciseById(int id) {
+    final controller = ExerciseController();
+    Exercise next = _exercise;
+    switch (id) {
+      case 1:
+        next = controller.getExercise1();
+        break;
+      case 2:
+        next = controller.getExercise2();
+        break;
+      case 3:
+        next = controller.getExercise3();
+        break;
+      case 4:
+        next = controller.getExercise4();
+        break;
+      case 5:
+        next = controller.getExercise5();
+        break;
+      case 6:
+        next = controller.getExercise6();
+        break;
+      case 7:
+        next = controller.getExercise7();
+        break;
+      case 8:
+        next = controller.getExercise8();
+        break;
+      case 9:
+        next = controller.getExercise9();
+        break;
+      default:
+        next = controller.getExercise1();
+    }
+    setState(() {
+      _exercise = next;
+    });
+  }
+
+  Widget _buildTrackSection() {
+    const double verticalPadding = 12.0;
+    const double baseHorizontalMargin = 24.0;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final media = MediaQuery.of(context);
+        final double viewportHeight = media.size.height;
+        final double availableWidth =
+            constraints.maxWidth.isFinite && constraints.maxWidth > 0 ? constraints.maxWidth : media.size.width;
+        final double targetHeightBase = viewportHeight / 6;
+        final double targetHeight = math.max(targetHeightBase + 20.0, (verticalPadding * 2) + 32.0);
+
+        final bool ultraTight = availableWidth < 360;
+        final double gapWidth = _buttonGap;
+        final double horizontalMargin = baseHorizontalMargin;
+        final double gapW = ultraTight ? gapWidth * 0.85 : gapWidth;
+        final double hM = ultraTight ? horizontalMargin * 0.85 : horizontalMargin;
+
+        final double sideButtonSize = math.max(32.0, math.min(_iconButtonSize, targetHeight * 0.45));
+        final double trackHeight = math.max(targetHeight - (verticalPadding * 2), sideButtonSize);
+        final double trackWidth = trackHeight * _trackAspectRatio;
+
+        final double horizontalOverlap =
+            (_iconButtonSize * _pathOverlapFactor).clamp(0.0, hM);
+        final double drawWidth = trackWidth + horizontalOverlap;
+        final double effectiveOverlap = math.min(horizontalOverlap, drawWidth * 0.3);
+        final double pinVisualSize = math.max(24.0, math.min(sideButtonSize, _iconButtonSize));
+        final double drawWidthBase = math.max(0.0, drawWidth - effectiveOverlap);
+        final double pinBleedX = uiVisible
+            ? math.max(pinVisualSize * 0.5, effectiveOverlap + pinVisualSize * 0.25)
+            : 0.0;
+        final double pinBleedY = uiVisible ? pinVisualSize * 0.35 : 0.0;
+        final double drawWidthVisible = drawWidthBase + pinBleedX;
+        final double trackAreaHeight = trackHeight + pinBleedY;
+        final double leftPadding = math.max(0.0, hM - effectiveOverlap);
+
+        final Widget pathContent = ClipRect(
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: EdgeInsets.only(top: pinBleedY * 0.4),
+              child: SizedBox(
+                width: drawWidth,
+                height: trackHeight,
+                child: uiVisible
+                    ? ResponsiveTrackWithPins(
+                        trackSvgAsset: "assets/icons/isoladellestorie/path.svg",
+                        trackAspectRatio: _trackAspectRatio,
+                        pins: _trackPins,
+                        pinSizeFactor: 0.0495,
+                        pinFixedSize: pinVisualSize,
+                        onPinTap: _openExerciseById,
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ),
+          ),
+        );
+
+        return SizedBox(
+          height: targetHeight,
+          width: availableWidth,
+          child: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _buildTrackButtons(sideButtonSize),
+                SizedBox(width: gapW),
+                Flexible(
+                  fit: FlexFit.tight,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: leftPadding,
+                      right: hM,
+                      top: verticalPadding,
+                      bottom: verticalPadding,
+                    ),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.center,
+                      child: SizedBox(
+                        width: drawWidthVisible,
+                        height: trackAreaHeight,
+                        child: pathContent,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTrackButtons(double size) {
+    final double splash = math.max(24.0, size * 0.6);
+    final BoxConstraints constraints = BoxConstraints.tightFor(width: size, height: size);
+
+    Widget tightIconButton({
+      required String svg,
+      required String semantics,
+      required VoidCallback? onPressed,
+    }) {
+      return ConstrainedBox(
+        constraints: constraints,
+        child: IconButton(
+          onPressed: onPressed,
+          icon: SvgPicture.asset(
+            svg,
+            width: size,
+            height: size,
+            semanticsLabel: semantics,
+          ),
+          iconSize: size,
+          padding: EdgeInsets.zero,
+          constraints: constraints,
+          visualDensity: VisualDensity.compact,
+          splashRadius: splash,
+          tooltip: semantics,
+        ),
+      );
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (uiVisible)
+          tightIconButton(
+            svg: "assets/icons/isoladellestorie/islandhome.svg",
+            semantics: "Torna all'Isola",
+            onPressed: () => Navigator.pop(context),
+          ),
+
+        tightIconButton(
+          svg: "assets/icons/isoladellestorie/offUI.svg",
+          semantics: "Mostra o nascondi il percorso",
+          onPressed: () => setState(() => uiVisible = !uiVisible),
+        ),
+      ],
+    );
   }
 
   @override
@@ -55,285 +323,6 @@ class _ExercisePageState extends State<ExercisePage> {
     final List<Widget> subExercises =
         ExerciseController().getExerciseButtons(_exercise, handleButtonPressed, context);
 
-    List<Widget> mainPath = [
-      Center(
-        child: SizedBox(
-          width: 90.w,
-          height: 130,
-          child: Visibility(
-            visible: uiVisible,
-            child: SvgPicture.asset(
-              "assets/icons/isoladellestorie/path.svg",
-            ),
-          ),
-        ),
-      ),
-      Positioned(
-        top: 0.5.h,
-        left: 0,
-        child: Visibility(
-          visible: uiVisible,
-          child: IconButton(
-            icon: SvgPicture.asset(
-              width: 40,
-              height: 40,
-              "assets/icons/isoladellestorie/islandhome.svg",
-              semanticsLabel: 'Home Isola delle storie',
-            ),
-            iconSize: 40,
-            splashRadius: 30,
-            tooltip: "Torna all'Isola",
-            onPressed: () {
-              Navigator.pop(context);
-            }
-          ),
-        ),
-      ),
-      Positioned(
-        top: 8.h,
-        left: 0,
-        child: IconButton(
-        icon: SvgPicture.asset(
-          width: 40,
-          height: 40,
-          "assets/icons/isoladellestorie/offUI.svg",
-          semanticsLabel: 'Home Isola delle storie',
-        ),
-        iconSize: 40,
-        splashRadius: 30,
-        tooltip: 'Mostra o nascondi il percorso',
-        onPressed: () {
-          setState(() {
-            uiVisible = !uiVisible;
-          });
-        }),
-      ),
-      Visibility(
-        visible: uiVisible,
-        child: Positioned(
-          top: 1.h,
-          left: 20.w,
-          child: RawMaterialButton(
-            onPressed: () {
-              setState(() {
-                _exercise = ExerciseController().getExercise1();
-              });
-            },
-            shape: CircleBorder(),
-            fillColor: HonooColor.wave4,
-            constraints: BoxConstraints.tight(Size(40, 40)),
-            child: Text(
-              "1" ,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: HonooColor.onBackground,
-              ),
-            ),
-          ),
-        ),
-      ),
-      Visibility(
-        visible: uiVisible,
-        child: Positioned(
-          top: 1.h,
-          left: 38.w,
-          child: RawMaterialButton(
-            onPressed: () {
-              setState(() {
-                _exercise = ExerciseController().getExercise2();
-              });
-            },
-            shape: CircleBorder(),
-            fillColor: HonooColor.wave4,
-            constraints: BoxConstraints.tight(Size(40, 40)),
-            child: Text(
-              "2" ,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: HonooColor.onBackground,
-              ),
-            ),
-          ),
-        ),
-      ),
-      Visibility(
-        visible: uiVisible,
-        child: Positioned(
-          top: 1.h,
-          left: 56.w,
-          child: RawMaterialButton(
-            onPressed: () {
-              setState(() {
-                _exercise = ExerciseController().getExercise3();
-              });
-            },
-            shape: CircleBorder(),
-            fillColor: HonooColor.wave4,
-            constraints: BoxConstraints.tight(Size(40, 40)),
-            child: Text(
-              "3" ,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: HonooColor.onBackground,
-              ),
-            ),
-          ),
-        ),
-      ),
-      Visibility(
-        visible: uiVisible,
-        child: Positioned(
-          top: 1.h,
-          left: 74.w,
-          child: RawMaterialButton(
-            onPressed: () {
-              setState(() {
-                _exercise = ExerciseController().getExercise4();
-              });
-            },
-            shape: CircleBorder(),
-            fillColor: HonooColor.wave4,
-            constraints: BoxConstraints.tight(Size(40, 40)),
-            child: Text(
-              "4" ,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: HonooColor.onBackground,
-              ),
-            ),
-          ),
-        ),
-      ),
-      Visibility(
-        visible: uiVisible,
-        child: Positioned(
-          top: 5.h,
-          left: 86.w,
-          child: RawMaterialButton(
-            onPressed: () {
-              setState(() {
-                _exercise = ExerciseController().getExercise5();
-              });
-            },
-            shape: CircleBorder(),
-            fillColor: HonooColor.wave4,
-            constraints: BoxConstraints.tight(Size(40, 40)),
-            child: Text(
-              "5" ,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: HonooColor.onBackground,
-              ),
-            ),
-          ),
-        ),
-      ),
-      Visibility(
-        visible: uiVisible,
-        child: Positioned(
-          top: 9.h,
-          left: 74.w,
-          child: RawMaterialButton(
-            onPressed: () {
-              setState(() {
-                _exercise = ExerciseController().getExercise6();
-              });
-            },
-            shape: CircleBorder(),
-            fillColor: HonooColor.wave4,
-            constraints: BoxConstraints.tight(Size(40, 40)),
-            child: Text(
-              "6" ,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: HonooColor.onBackground,
-              ),
-            ),
-          ),
-        ),
-      ),
-      Visibility(
-        visible: uiVisible,
-        child: Positioned(
-          top: 9.h,
-          left: 56.w,
-          child: RawMaterialButton(
-            onPressed: () {
-              setState(() {
-                _exercise = ExerciseController().getExercise7();
-              });
-            },
-            shape: CircleBorder(),
-            fillColor: HonooColor.wave4,
-            constraints: BoxConstraints.tight(Size(40, 40)),
-            child: Text(
-              "7" ,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: HonooColor.onBackground,
-              ),
-            ),
-          ),
-        ),
-      ),
-      Visibility(
-        visible: uiVisible,
-        child: Positioned(
-          top: 9.h,
-          left: 38.w,
-          child: RawMaterialButton(
-            onPressed: () {
-              setState(() {
-                _exercise = ExerciseController().getExercise8();
-              });
-            },
-            shape: CircleBorder(),
-            fillColor: HonooColor.wave4,
-            constraints: BoxConstraints.tight(Size(40, 40)),
-            child: Text(
-              "8" ,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: HonooColor.onBackground,
-              ),
-            ),
-          ),
-        ),
-      ),
-      Visibility(
-        visible: uiVisible,
-          child: Positioned(
-          top: 9.h,
-          left: 20.w,
-          child: RawMaterialButton(
-            onPressed: () {
-              setState(() {
-                _exercise = ExerciseController().getExercise9();
-              });
-            },
-            shape: CircleBorder(),
-            fillColor: HonooColor.wave4,
-            constraints: BoxConstraints.tight(Size(40, 40)),
-            child: Text(
-              "9" ,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: HonooColor.onBackground,
-              ),
-            ),
-          ),
-        ),
-      ),
-    ];
 
     return Scaffold(
       backgroundColor: HonooColor.background,
@@ -363,8 +352,8 @@ class _ExercisePageState extends State<ExercisePage> {
                           _exercise.exerciseTitle,
                           style: GoogleFonts.libreFranklin(
                             color: HonooColor.secondary,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 26,
+                            fontWeight: FontWeight.w600,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -386,7 +375,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                   width: 80.w,
                                   padding: EdgeInsets.all(16.0),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.3),
+                                    color: HonooColor.wave1.withOpacity(0.6),
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   child:
@@ -460,23 +449,19 @@ class _ExercisePageState extends State<ExercisePage> {
                       ),
                     ),
                   ),
-                  Visibility(
-                    visible: !uiVisible,
-                    child: Expanded(
-                      child: Container(),
+                  const SizedBox(height: 8.0),
+                  if (subExercises.isNotEmpty && uiVisible)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 12.0,
+                        runSpacing: 12.0,
+                        children: subExercises,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 16.0),
-                  // Circular Buttons
-                  subExercises.isNotEmpty && uiVisible ?
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: subExercises,
-                  ) : Container(),
-                  Padding( padding: EdgeInsets.all(16.0),),
-                  Stack(
-                    children: mainPath,
-                  ),
+                  const SizedBox(height: 8.0),
+                  _buildTrackSection(),
                   /*Stack(
                     children: <Widget>[
                       Positioned.fill(

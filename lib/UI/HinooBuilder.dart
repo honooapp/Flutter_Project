@@ -18,6 +18,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Services/HinooStorageUploader.dart';
 import 'package:honoo/Widgets/WhiteIconButton.dart';
+import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/UI/HinooBuilder/thumbnails/HinooThumbnails.dart';
 import 'package:honoo/UI/HinooBuilder/dialogs/AnteprimaPNG.dart';
 import 'package:honoo/UI/HinooBuilder/dialogs/DownloadHinooDialog.dart';
@@ -654,16 +655,9 @@ class _HinooBuilderState extends State<HinooBuilder> {
   Future<void> _deleteCurrentPage() async {
     if (_pages.isEmpty) return;
 
-    final bool? ok = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Eliminare questa pagina?'),
-        content: const Text('L’operazione non è reversibile.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annulla')),
-          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Elimina')),
-        ],
-      ),
+    final bool? ok = await showHonooDeleteDialog(
+      context,
+      target: HonooDeletionTarget.page,
     );
 
     if (ok != true) return;

@@ -34,14 +34,14 @@ class _NimPageState extends State<NimPage> {
       body: Column(
         children: [
           SizedBox(
-            height: 60,
-            child: Center( 
-              child:Text(
+            height: 52,
+            child: Center(
+              child: Text(
                 Utility().appName,
                 style: GoogleFonts.libreFranklin(
                   color: HonooColor.secondary,
-                  fontSize: 30,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w600,
                 ),
                 textAlign: TextAlign.center,
               ),

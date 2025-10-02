@@ -1,6 +1,8 @@
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AnteprimaHinoo extends StatelessWidget {
@@ -212,32 +214,43 @@ class _ThumbTile extends StatelessWidget {
 
     Widget buildPagePreview() {
       final double intrinsicFontSize = 16 * scaleFactor;
-      final double intrinsicPadding = 24 * scaleFactor;
+      final double intrinsicPadding = 40 * scaleFactor;
+      final double safePadding = intrinsicPadding < 0 ? 0 : intrinsicPadding;
+      final textStyle = GoogleFonts.lora(
+        color: textColor,
+        fontSize: intrinsicFontSize,
+        height: 1.3,
+        fontWeight: FontWeight.w600,
+      );
 
       return SizedBox(
         width: designWidth,
         height: designHeight,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            ClipRect(child: buildBackground()),
-            Padding(
-              padding: EdgeInsets.all(intrinsicPadding < 0 ? 0 : intrinsicPadding),
-              child: Center(
-                child: Text(
-                  text,
-                  textAlign: TextAlign.center,
-                  softWrap: true,
-                  style: GoogleFonts.lora(
-                    color: textColor,
-                    fontSize: intrinsicFontSize,
-                    height: 1.3,
-                    fontWeight: FontWeight.w600,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final double maxTextWidth = math.max(1, constraints.maxWidth - safePadding * 2);
+            final int lineCount = _countTextLines(text, maxTextWidth, textStyle);
+            final Alignment alignment = lineCount > 1 ? Alignment.topCenter : Alignment.center;
+
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                ClipRect(child: buildBackground()),
+                Padding(
+                  padding: EdgeInsets.all(safePadding),
+                  child: Align(
+                    alignment: alignment,
+                    child: Text(
+                      text,
+                      textAlign: TextAlign.center,
+                      softWrap: true,
+                      style: textStyle,
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         ),
       );
     }
@@ -286,6 +299,20 @@ class _ThumbTile extends StatelessWidget {
       ),
     );
   }
+}
+
+int _countTextLines(String text, double maxWidth, TextStyle style) {
+  if (text.isEmpty) return 0;
+  final painter = TextPainter(
+    text: TextSpan(text: text, style: style),
+    textAlign: TextAlign.center,
+    textDirection: TextDirection.ltr,
+    maxLines: null,
+  )..layout(minWidth: 0, maxWidth: maxWidth);
+
+  final int autoLines = painter.computeLineMetrics().length;
+  final int manualLines = text.split('\n').length;
+  return math.max(autoLines, manualLines);
 }
 
 class _AddThumb extends StatelessWidget {

@@ -28,14 +28,14 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           SizedBox(
-            height: 60,
+            height: 52,
             child: Center(
               child: Text(
                 Utility().appName,
                 style: GoogleFonts.libreFranklin(
                   color: HonooColor.secondary,
-                  fontSize: 30,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w600,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -92,8 +92,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                           Utility().appName,
                           style: GoogleFonts.libreFranklin(
                             color: HonooColor.secondary,
-                            fontSize: 30,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w600,
                           ),
                           textAlign: TextAlign.center,
                         ),
