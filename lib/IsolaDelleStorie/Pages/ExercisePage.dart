@@ -35,9 +35,10 @@ class _ExercisePageState extends State<ExercisePage> {
 
   static const double _iconButtonSize = 40.0;
   static const double _trackAspectRatio = 257 / 59;
-  static const double _buttonOffsetX = 0;
-  static const double _buttonOffsetY = 0;
-  static const double _buttonGap = 8.0;
+  // Offsets are measured in logical pixels at the base icon size; we scale them with the buttons.
+  static const double _buttonOffsetX = 50;
+  static const double _buttonOffsetY = -22;
+  static const double _buttonGap = 20.0;
   static const double _pathOverlapFactor = 0.5;
   static const List<TrackPinModel> _trackPins = [
     TrackPinModel(
@@ -47,6 +48,7 @@ class _ExercisePageState extends State<ExercisePage> {
       dx: 0.00,
       dy: -0.02,
       assetSvg: "assets/icons/isoladellestorie/button1.svg",
+      hint: 'Grotta delle Rondini',
     ),
     TrackPinModel(
       id: 2,
@@ -55,6 +57,7 @@ class _ExercisePageState extends State<ExercisePage> {
       dx: 0.00,
       dy: -0.02,
       assetSvg: "assets/icons/isoladellestorie/button2.svg",
+      hint: 'Radura delle Bacche',
     ),
     TrackPinModel(
       id: 3,
@@ -63,6 +66,7 @@ class _ExercisePageState extends State<ExercisePage> {
       dx: 0.00,
       dy: -0.02,
       assetSvg: "assets/icons/isoladellestorie/button3.svg",
+      hint: "Pozzo dell'Oracolo",
     ),
     TrackPinModel(
       id: 4,
@@ -71,6 +75,7 @@ class _ExercisePageState extends State<ExercisePage> {
       dx: 0.00,
       dy: -0.02,
       assetSvg: "assets/icons/isoladellestorie/button4.svg",
+      hint: "Porta nell'Alabastro",
     ),
     TrackPinModel(
       id: 5,
@@ -79,6 +84,7 @@ class _ExercisePageState extends State<ExercisePage> {
       dx: 0.00,
       dy: 0.00,
       assetSvg: "assets/icons/isoladellestorie/button5.svg",
+      hint: 'Primo Anello',
     ),
     TrackPinModel(
       id: 6,
@@ -87,6 +93,7 @@ class _ExercisePageState extends State<ExercisePage> {
       dx: 0.00,
       dy: 0.02,
       assetSvg: "assets/icons/isoladellestorie/button6.svg",
+      hint: 'Secondo Anello',
     ),
     TrackPinModel(
       id: 7,
@@ -95,6 +102,7 @@ class _ExercisePageState extends State<ExercisePage> {
       dx: 0.00,
       dy: 0.02,
       assetSvg: "assets/icons/isoladellestorie/button7.svg",
+      hint: 'Terzo Anello',
     ),
     TrackPinModel(
       id: 8,
@@ -103,6 +111,7 @@ class _ExercisePageState extends State<ExercisePage> {
       dx: 0.00,
       dy: 0.02,
       assetSvg: "assets/icons/isoladellestorie/button8.svg",
+      hint: 'Quarto Anello',
     ),
     TrackPinModel(
       id: 9,
@@ -111,6 +120,7 @@ class _ExercisePageState extends State<ExercisePage> {
       dx: 0.00,
       dy: 0.02,
       assetSvg: "assets/icons/isoladellestorie/button9.svg",
+      hint: 'Cunicolo verso la Luce',
     ),
   ];
 
@@ -157,6 +167,81 @@ class _ExercisePageState extends State<ExercisePage> {
     setState(() {
       _exercise = next;
     });
+  }
+
+  Widget _buildDescriptionCard(BuildContext context) {
+    final media = MediaQuery.of(context);
+    final double bottomPadding = media.size.height > media.size.width
+        ? media.size.width / 4
+        : media.size.height / 4;
+
+    return Container(
+      key: ValueKey<String>('desc_${_exercise.id}'),
+      width: 80.w,
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: HonooColor.wave1.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      alignment: Alignment.center,
+      child: ListView(
+        key: ValueKey<String>('desc_list_${_exercise.id}'),
+        padding: EdgeInsets.only(bottom: bottomPadding),
+        physics: const BouncingScrollPhysics(),
+        children: [
+          FormattedText(
+            inputText: _exercise.exerciseDescription,
+            color: HonooColor.onBackground,
+            fontSize: 18,
+          ),
+          if (_exercise.exerciseIcon != null)
+            IconButton(
+                icon: SvgPicture.asset(
+                  _exercise.exerciseIcon ?? "",
+                  colorFilter: const ColorFilter.mode(
+                    HonooColor.onBackground,
+                    BlendMode.srcIn,
+                  ),
+                  semanticsLabel: _exercise.exerciseIconName,
+                ),
+                iconSize: 70,
+                splashRadius: 40,
+                tooltip: _exercise.exerciseIconName ?? '',
+                onPressed: () {
+                  if (_exercise.exerciseIconName == "Dado") {
+                    String header;
+
+                    if (_exercise.exerciseTitle ==
+                        IsolaDelleStoreContentManager.e_3_1_title) {
+                      header = Utility().dadoTemporaryM;
+                    } else if (_exercise.exerciseTitle ==
+                        IsolaDelleStoreContentManager.e_5_3_title) {
+                      header = Utility().dadoTemporaryL;
+                    } else {
+                      header = Utility().dadoTemporary;
+                    }
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ComingSoonPage(
+                          header: header,
+                          quote: Utility().shakespeare,
+                          bibliography: Utility().bibliography,
+                        ),
+                      ),
+                    );
+                  }
+                }),
+          if (_exercise.exerciseDescriptionMore != null)
+            FormattedText(
+              inputText: _exercise.exerciseDescriptionMore ?? "",
+              color: HonooColor.onBackground,
+              fontSize: 18,
+            ),
+        ],
+      ),
+    );
   }
 
   Widget _buildTrackSection() {
@@ -219,37 +304,62 @@ class _ExercisePageState extends State<ExercisePage> {
           ),
         );
 
+        final Widget trackWithMargin = Padding(
+          padding: EdgeInsets.only(
+            left: leftPadding,
+            right: hM,
+            top: verticalPadding,
+            bottom: verticalPadding,
+          ),
+          child: SizedBox(
+            width: drawWidthVisible,
+            height: trackAreaHeight,
+            child: pathContent,
+          ),
+        );
+
+        final double trackWidthWithMargin = leftPadding + drawWidthVisible + hM;
+        final double trackHeightWithMargin = trackAreaHeight + (verticalPadding * 2);
+        final Widget buttonColumn = _buildTrackButtons(sideButtonSize);
+        final int visibleButtons = uiVisible ? 2 : 1;
+        final double buttonColumnHeight =
+            (visibleButtons * sideButtonSize) + (uiVisible ? _buttonGap : 0.0);
+        final double baseWidth = sideButtonSize + gapW + trackWidthWithMargin;
+        final double baseHeight = math.max(buttonColumnHeight, trackHeightWithMargin);
+        final double sizeScale = sideButtonSize / _iconButtonSize;
+        final double buttonsBaseTop = (baseHeight - buttonColumnHeight) * 0.5;
+        final double trackBaseTop = (baseHeight - trackHeightWithMargin) * 0.5;
+        final double buttonsLeft = _buttonOffsetX * sizeScale;
+        final double buttonsTop = buttonsBaseTop + (_buttonOffsetY * sizeScale);
+
+        final Widget controlStack = SizedBox(
+          width: baseWidth,
+          height: baseHeight,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned(
+                left: sideButtonSize + gapW,
+                top: trackBaseTop,
+                child: trackWithMargin,
+              ),
+              Positioned(
+                left: buttonsLeft,
+                top: buttonsTop,
+                child: buttonColumn,
+              ),
+            ],
+          ),
+        );
+
         return SizedBox(
           height: targetHeight,
           width: availableWidth,
           child: Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _buildTrackButtons(sideButtonSize),
-                SizedBox(width: gapW),
-                Flexible(
-                  fit: FlexFit.tight,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      left: leftPadding,
-                      right: hM,
-                      top: verticalPadding,
-                      bottom: verticalPadding,
-                    ),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.center,
-                      child: SizedBox(
-                        width: drawWidthVisible,
-                        height: trackAreaHeight,
-                        child: pathContent,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: controlStack,
             ),
           ),
         );
@@ -289,12 +399,14 @@ class _ExercisePageState extends State<ExercisePage> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (uiVisible)
+        if (uiVisible) ...[
           tightIconButton(
             svg: "assets/icons/isoladellestorie/islandhome.svg",
             semantics: "Torna all'Isola",
             onPressed: () => Navigator.pop(context),
           ),
+          const SizedBox(height: _buttonGap),
+        ],
 
         tightIconButton(
           svg: "assets/icons/isoladellestorie/offUI.svg",
@@ -324,183 +436,95 @@ class _ExercisePageState extends State<ExercisePage> {
         ExerciseController().getExerciseButtons(_exercise, handleButtonPressed, context);
 
 
-    return Scaffold(
-      backgroundColor: HonooColor.background,
-      body: Stack(
+    final Widget pageContent = KeyedSubtree(
+      key: ValueKey<String>(_exercise.id),
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          // Background Image
           Positioned.fill(
             child: Image.asset(
               _exercise.exerciseImage,
               fit: BoxFit.cover,
             ),
           ),
-          // Content
           Positioned.fill(
-            child: Container(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  //Title
-                  Visibility(
-                    visible: uiVisible,
-                    child: SizedBox(
-                      height: 60,
-                      child: Center(
-                        child:Text(
-                          _exercise.exerciseTitle,
-                          style: GoogleFonts.libreFranklin(
-                            color: HonooColor.secondary,
-                            fontSize: 26,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          textAlign: TextAlign.center,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Visibility(
+                  visible: uiVisible,
+                  child: SizedBox(
+                    height: 60,
+                    child: Center(
+                      child: Text(
+                        _exercise.exerciseTitle,
+                        style: GoogleFonts.libreFranklin(
+                          color: HonooColor.secondary,
+                          fontSize: 26,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8.0),
+                Visibility(
+                  visible: uiVisible,
+                  child: Expanded(
+                    child: Center(
+                      child: ClipRect(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: _buildDescriptionCard(context),
                         ),
                       ),
                     ),
                   ),
-                  Padding( padding: EdgeInsets.all(8.0),),
-                  // Scrollable Text Box
-                  Visibility(
-                    visible: uiVisible,
-                      child: Expanded(
-                      child: Container(
-                        child: Center(
-                          child: Container(
-                            child: ClipRect(
-                              child: BackdropFilter(
-                                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                                child: Container(
-                                  width: 80.w,
-                                  padding: EdgeInsets.all(16.0),
-                                  decoration: BoxDecoration(
-                                    color: HonooColor.wave1.withOpacity(0.6),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  child:
-                                  // SingleChildScrollView(
-                                  //   //child:IsolaDelleStoreContentManager.getRichText(_exercise.exerciseDescription),
-                                  //   child:FormattedText(inputText: _exercise.exerciseDescription, color: HonooColor.onBackground, fontSize: 18,),
-                                  // ),
-                                  ListView(
-                                    //padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.width/2), //per versione telefono
-                                    padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height > MediaQuery.of(context).size.width ? MediaQuery.of(context).size.width/4 : MediaQuery.of(context).size.height/4 ),
-                                    children: [
-                                        FormattedText(
-                                          inputText: _exercise.exerciseDescription,
-                                          color: HonooColor.onBackground,
-                                          fontSize: 18,
-                                        ),
-                                        if (_exercise.exerciseIcon != null)
-                                          //SizedBox(height: 10),
-                                          IconButton(
-                                            icon: SvgPicture.asset(
-                                              _exercise.exerciseIcon ?? "",
-                                              colorFilter: const ColorFilter.mode(
-                                                HonooColor.onBackground,
-                                                BlendMode.srcIn,
-                                              ),
-                                              semanticsLabel:
-                                                  _exercise.exerciseIconName,
-                                            ),
-                                          iconSize: 70,
-                                          splashRadius: 40,
-                                          tooltip: _exercise.exerciseIconName ?? '',
-                                              onPressed: () {
-                                                if (_exercise.exerciseIconName == "Dado") {
-                                                  String header;
-
-                                                  if (_exercise.exerciseTitle == IsolaDelleStoreContentManager.e_3_1_title) {
-                                                    header = Utility().dadoTemporaryM;
-                                                  } else if (_exercise.exerciseTitle == IsolaDelleStoreContentManager.e_5_3_title) {
-                                                    header = Utility().dadoTemporaryL;
-                                                  } else {
-                                                    header = Utility().dadoTemporary;
-                                                  }
-
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) => ComingSoonPage(
-                                                        header: header,
-                                                        quote: Utility().shakespeare,
-                                                        bibliography: Utility().bibliography,
-                                                      ),
-                                                    ),
-                                                  );
-                                                }
-                                              }),
-                                        if (_exercise.exerciseDescriptionMore != null)
-                                         // SizedBox(height: 10),
-                                          FormattedText(
-                                            inputText: _exercise.exerciseDescriptionMore ?? "",
-                                            color: HonooColor.onBackground,
-                                            fontSize: 18,
-                                          ),
-                                      ],
-                                  ),
-
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                ),
+                const SizedBox(height: 8.0),
+                if (subExercises.isNotEmpty && uiVisible)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 12.0,
+                      runSpacing: 12.0,
+                      children: subExercises,
                     ),
                   ),
-                  const SizedBox(height: 8.0),
-                  if (subExercises.isNotEmpty && uiVisible)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        spacing: 12.0,
-                        runSpacing: 12.0,
-                        children: subExercises,
-                      ),
-                    ),
-                  const SizedBox(height: 8.0),
-                  _buildTrackSection(),
-                  /*Stack(
-                    children: <Widget>[
-                      Positioned.fill(
-                          child: SizedBox(
-                          width: 90.w,
-                          height: 130,
-                          child: SvgPicture.asset(
-                            "assets/icons/isoladellestorie/path.svg",
-                          ),
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment(-0.9, -0.1), // change .2 based on your need
-                        child: RawMaterialButton(
-                          onPressed: () {
-                            setState(() {
-                              _exercise = ExerciseController().getExercise6();
-                            });
-                          },
-                          shape: CircleBorder(),
-                          fillColor: HonooColor.wave4,
-                          constraints: BoxConstraints.tight(Size(20, 20)),
-                          child: Text(
-                            "6" ,
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: HonooColor.onBackground,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),*/
-                ],
-              ),
+                const SizedBox(height: 8.0),
+                _buildTrackSection(),
+              ],
             ),
           ),
         ],
+      ),
+    );
+
+    return Scaffold(
+      backgroundColor: HonooColor.background,
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 400),
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeInCubic,
+        layoutBuilder: (currentChild, previousChildren) {
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              ...previousChildren,
+              if (currentChild != null) currentChild,
+            ],
+          );
+        },
+        transitionBuilder: (child, animation) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+        child: pageContent,
       ),
     );
   }

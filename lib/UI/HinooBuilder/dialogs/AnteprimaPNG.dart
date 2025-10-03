@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'package:honoo/Widgets/loading_spinner.dart';
 
 class AnteprimaPNG extends StatelessWidget {
   const AnteprimaPNG({
@@ -23,7 +24,7 @@ class AnteprimaPNG extends StatelessWidget {
       previewSection = const SizedBox(
         height: 200,
         child: Center(
-          child: CircularProgressIndicator(color: Colors.white),
+          child: LoadingSpinner(color: Colors.white, semanticsLabel: 'Caricamento anteprima'),
         ),
       );
     } else {

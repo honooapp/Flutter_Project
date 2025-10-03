@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:honoo/Pages/PlaceholderPage.dart';
+import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'EmailLoginPage.dart';
@@ -62,7 +63,7 @@ class _AuthGateState extends State<AuthGate> {
         // ⛳ 1) Finché la Future NON è terminata → spinner
         if (snap.connectionState != ConnectionState.done) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(child: LoadingSpinner()),
           );
         }
 

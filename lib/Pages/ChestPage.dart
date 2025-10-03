@@ -16,6 +16,7 @@ import '../Utility/HonooColors.dart';
 import '../Utility/Utility.dart';
 import '../Utility/ResponsiveLayout.dart';
 import '../Widgets/honoo_dialogs.dart';
+import '../Widgets/loading_spinner.dart';
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 
 // 👇 aggiunto per allineare il padding top come in NewHonooPage
@@ -36,6 +37,7 @@ class _ChestPageState extends State<ChestPage> {
   int _currentIndex = 0;
   List<_ChestItem> _items = const [];
   List<_HinooRow> _hinoo = const [];
+  bool _isHinooLoading = true;
 
   @override
   void initState() {
@@ -52,7 +54,15 @@ class _ChestPageState extends State<ChestPage> {
 
   Future<void> _loadHinoo() async {
     final uid = Supabase.instance.client.auth.currentUser?.id;
-    if (uid == null) return;
+    if (uid == null) {
+      setState(() {
+        _isHinooLoading = false;
+      });
+      return;
+    }
+    setState(() {
+      _isHinooLoading = true;
+    });
     try {
       final client = Supabase.instance.client;
       final rows = await client
@@ -86,12 +96,20 @@ class _ChestPageState extends State<ChestPage> {
       }
 
       if (!mounted) return;
+      await Future<void>.delayed(const Duration(milliseconds: 900));
+      if (!mounted) return;
       setState(() {
         _hinoo = list;
+        _isHinooLoading = false;
         _rebuildItems();
       });
     } catch (_) {
       // ignora errori silenziosamente per ora
+      if (mounted) {
+        setState(() {
+          _isHinooLoading = false;
+        });
+      }
     }
   }
 
@@ -261,12 +279,27 @@ class _ChestPageState extends State<ChestPage> {
 
   Widget _buildChestItem(
       _ChestItem item, double availableCenterH, double targetMaxW) {
-    return item.when(
+    final String identity = item.when(
+      honoo: (h) => 'honoo_${h.dbId ?? h.id ?? item.createdAt.toIso8601String()}',
+      hinoo: (row) => 'hinoo_${row.id}',
+    );
+
+    final Widget content = item.when(
       honoo: (h) => HonooThreadView(root: h),
       hinoo: (row) => HinooViewer(
         draft: row.draft,
         maxHeight: availableCenterH,
         maxWidth: targetMaxW,
+      ),
+    );
+
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      child: KeyedSubtree(
+        key: ValueKey(identity),
+        child: content,
       ),
     );
   }
@@ -482,8 +515,21 @@ class _ChestPageState extends State<ChestPage> {
                                 child: SizedBox(
                                   height: availableCenterH,
                                   width: double.infinity,
-                                  child: _items.isEmpty
-                                      ? Center(
+                                  child: AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 350),
+                                    switchInCurve: Curves.easeOutCubic,
+                                    switchOutCurve: Curves.easeInCubic,
+                                    child: () {
+                                      if (ctrl.isLoading.value || _isHinooLoading) {
+                                        return const Center(
+                                          key: ValueKey('chest_loading'),
+                                          child: LoadingSpinner(color: Colors.white),
+                                        );
+                                      }
+
+                                      if (_items.isEmpty) {
+                                        return Center(
+                                          key: const ValueKey('chest_empty'),
                                           child: Text(
                                             'Nessun contenuto nello scrigno',
                                             style: GoogleFonts.libreFranklin(
@@ -492,40 +538,37 @@ class _ChestPageState extends State<ChestPage> {
                                               fontWeight: FontWeight.w400,
                                             ),
                                           ),
-                                        )
-                                      : Padding(
-                                          // gutter esterno
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 16),
-                                          child: cs.CarouselSlider.builder(
-                                            itemCount: _items.length,
-                                            options: cs.CarouselOptions(
-                                              height:
-                                                  availableCenterH, // ← come NewHonooPage (riempi tutto)
-                                              viewportFraction: 1.0,
-                                              enableInfiniteScroll: false,
-                                              padEnds: true,
-                                              enlargeCenterPage: false,
-                                              scrollPhysics:
-                                                  const BouncingScrollPhysics(),
-                                              onPageChanged: (i, _) => setState(
-                                                  () => _currentIndex = i),
-                                            ),
-                                            itemBuilder:
-                                                (context, index, realIdx) {
-                                              return Padding(
-                                                // gutter interno
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 16),
-                                                child: _buildChestItem(
-                                                    _items[index],
-                                                    availableCenterH,
-                                                    targetMaxW),
-                                              );
-                                            },
+                                        );
+                                      }
+
+                                      return Padding(
+                                        key: ValueKey('chest_content_${_items.length}'),
+                                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                                        child: cs.CarouselSlider.builder(
+                                          itemCount: _items.length,
+                                          options: cs.CarouselOptions(
+                                            height: availableCenterH,
+                                            viewportFraction: 1.0,
+                                            enableInfiniteScroll: false,
+                                            padEnds: true,
+                                            enlargeCenterPage: false,
+                                            scrollPhysics: const BouncingScrollPhysics(),
+                                            onPageChanged: (i, _) => setState(() => _currentIndex = i),
                                           ),
+                                          itemBuilder: (context, index, realIdx) {
+                                            return Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                                              child: _buildChestItem(
+                                                _items[index],
+                                                availableCenterH,
+                                                targetMaxW,
+                                              ),
+                                            );
+                                          },
                                         ),
+                                      );
+                                    }(),
+                                  ),
                                 ),
                               ),
                             ),

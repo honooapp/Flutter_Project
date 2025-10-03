@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -142,7 +141,7 @@ class SeaFooterBar extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ChestPage()),
+                    MaterialPageRoute(builder: (context) => const ChestPage()),
                   );
                   },
                 ),

@@ -11,6 +11,7 @@ import 'package:honoo/Controller/HonooController.dart';
 import 'package:honoo/UI/HonooCard.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:honoo/Utility/Utility.dart';
+import 'package:honoo/Widgets/loading_spinner.dart';
 
 import '../Entities/Honoo.dart';
 
@@ -91,7 +92,7 @@ class _ConversationPageState extends State<ConversationPage> {
                   children: [
                     Expanded(
                       child: _isLoading
-                          ? const Center(child: CircularProgressIndicator())
+                          ? const Center(child: LoadingSpinner())
                           : (_thread.isEmpty
                           ? Center(
                         child: Text(

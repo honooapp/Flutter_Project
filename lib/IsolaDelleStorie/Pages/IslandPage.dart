@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:honoo/IsolaDelleStorie/Controller/ExerciseController.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/ExercisePage.dart';
 import 'package:honoo/IsolaDelleStorie/Utility/IsolaDelleStorieContentManager.dart';
+import 'package:honoo/Pages/ChestPage.dart';
 import 'package:honoo/Utility/FormattedText.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -379,11 +380,7 @@ class _IslandPageState extends State<IslandPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => ComingSoonPage(
-                                    header: Utility().chestHeaderTemporary,
-                                    quote: Utility().shakespeare,
-                                    bibliography: Utility().bibliography,
-                                  ),
+                                  builder: (context) => const ChestPage(),
                                 ),
                               );
                             },

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:honoo/Widgets/loading_spinner.dart';
 import 'EmailVerifyPage.dart';
 
 class EmailLoginPage extends StatefulWidget {
@@ -71,7 +72,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
             ),
             const SizedBox(height: 20),
             _isLoading
-                ? const CircularProgressIndicator()
+                ? const LoadingSpinner()
                 : ElevatedButton(
               onPressed: _sendOtp,
               child: const Text('Invia codice'),

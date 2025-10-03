@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../Entities/Honoo.dart';
-import '../Services/HonooService.dart';
+
 import '../Entities/Hinoo.dart';
+import '../Entities/Honoo.dart';
 import '../Services/HinooService.dart';
+import '../Services/HonooService.dart';
+import '../Widgets/loading_spinner.dart';
 import 'ChestPage.dart';
 
 class EmailVerifyPage extends StatefulWidget {
@@ -142,7 +144,7 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
             ),
             const SizedBox(height: 20),
             _isVerifying
-                ? const CircularProgressIndicator()
+                ? const LoadingSpinner()
                 : ElevatedButton(
               onPressed: _verifyCode,
               child: const Text('Verifica'),

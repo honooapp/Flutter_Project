@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Services/HonooService.dart';
 import 'package:honoo/UI/HonooBuilder.dart';
 import 'package:honoo/Utility/HonooColors.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:sizer/sizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -120,7 +121,7 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
             if (_isSending)
               const Padding(
                 padding: EdgeInsets.all(16),
-                child: CircularProgressIndicator(),
+                child: LoadingSpinner(),
               ),
           ],
         ),

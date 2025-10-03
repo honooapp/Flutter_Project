@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
                   ),
-                  home: AuthGate(),
+                  home: const AuthGate(),
           // 🔑 routes nominate (qui puoi aggiungerne altre in futuro)
           routes: {
             '/chest': (context) => const ChestPage(),

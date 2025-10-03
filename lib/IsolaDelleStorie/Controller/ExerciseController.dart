@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/IsolaDelleStorie/Utility/IsolaDelleStorieContentManager.dart';
 import 'package:honoo/IsolaDelleStorie/Utility/NotionAPI.dart';
 
@@ -496,9 +497,9 @@ class ExerciseController {
               constraints: BoxConstraints.tight(Size(40, 40)),
               child: Text(
                 methodName ,
-                style: TextStyle(
+                style: GoogleFonts.libreFranklin(
                   fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: HonooColor.onBackground,
                 ),
               ),

@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../Entities/Hinoo.dart';
 import '../Entities/Honoo.dart';
+import 'ChestPage.dart';
 import 'ComingSoonPage.dart';
 import '../Services/HonooService.dart';
 import '../UI/HinooViewer.dart';
@@ -14,6 +15,7 @@ import '../UI/HonooThreadView.dart';
 import '../Utility/HonooColors.dart';
 import '../Utility/Utility.dart';
 import '../Utility/ResponsiveLayout.dart';
+import '../Widgets/loading_spinner.dart';
 
 class MoonPage extends StatefulWidget {
   const MoonPage({super.key});
@@ -68,6 +70,9 @@ class _MoonPageState extends State<MoonPage> {
       }
 
       items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      // Piccolo delay per mostrare lo spinner quando i dati arrivano troppo in fretta.
+      await Future<void>.delayed(const Duration(milliseconds: 900));
 
       setState(() {
         _items = items;
@@ -158,11 +163,7 @@ class _MoonPageState extends State<MoonPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ComingSoonPage(
-                                header: Utility().heartMoonHeader,
-                                quote: Utility().shakespeare,
-                                bibliography: Utility().bibliography,
-                              ),
+                            builder: (context) => const ChestPage(),
                             ),
                           );
                         },
@@ -201,12 +202,15 @@ class _MoonPageState extends State<MoonPage> {
   }
 
   Widget _buildBody(double maxHeight, double maxWidth) {
+    Widget child;
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (_items.isEmpty) {
-      return Center(
+      child = const Center(
+        key: ValueKey('moon_loading'),
+        child: LoadingSpinner(color: HonooColor.background),
+      );
+    } else if (_items.isEmpty) {
+      child = Center(
+        key: const ValueKey('moon_empty'),
         child: Text(
           'Nessun contenuto sulla Luna',
           style: GoogleFonts.libreFranklin(
@@ -217,46 +221,70 @@ class _MoonPageState extends State<MoonPage> {
           textAlign: TextAlign.center,
         ),
       );
+    } else {
+      child = SizedBox(
+        key: ValueKey('moon_content_${_items.length}'),
+        height: maxHeight,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: cs.CarouselSlider.builder(
+            itemCount: _items.length,
+            options: cs.CarouselOptions(
+              height: maxHeight,
+              viewportFraction: 1.0,
+              enableInfiniteScroll: false,
+              padEnds: true,
+              enlargeCenterPage: false,
+              scrollPhysics: const BouncingScrollPhysics(),
+            ),
+            itemBuilder: (context, index, realIndex) {
+              final item = _items[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _buildMoonItem(item, maxHeight, maxWidth),
+              );
+            },
+          ),
+        ),
+      );
     }
 
-    return SizedBox(
-      height: maxHeight,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: cs.CarouselSlider.builder(
-          itemCount: _items.length,
-          options: cs.CarouselOptions(
-            height: maxHeight,
-            viewportFraction: 1.0,
-            enableInfiniteScroll: false,
-            padEnds: true,
-            enlargeCenterPage: false,
-            scrollPhysics: const BouncingScrollPhysics(),
-          ),
-          itemBuilder: (context, index, realIndex) {
-            final item = _items[index];
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: _buildMoonItem(item, maxHeight, maxWidth),
-            );
-          },
-        ),
-      ),
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 350),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      child: child,
     );
   }
 
-  Widget _buildMoonItem(_MoonItem item, double maxHeight, double maxWidth) {
+Widget _buildMoonItem(_MoonItem item, double maxHeight, double maxWidth) {
+    final String identity;
+    final Widget content;
+
     if (item.honoo != null) {
-      return HonooThreadView(root: item.honoo!);
+      final honoo = item.honoo!;
+      identity = 'moon_honoo_${honoo.dbId ?? honoo.id ?? honoo.created_at}';
+      content = HonooThreadView(root: honoo);
+    } else {
+      final draft = item.hinoo!;
+      identity = 'moon_hinoo_${draft.hashCode}_${item.createdAt.toIso8601String()}';
+      content = HinooViewer(
+        draft: draft,
+        maxHeight: maxHeight,
+        maxWidth: maxWidth,
+        gapColor: Colors.white,
+        showDotsBorder: true,
+      );
     }
 
-    final draft = item.hinoo!;
-    return HinooViewer(
-      draft: draft,
-      maxHeight: maxHeight,
-      maxWidth: maxWidth,
-      gapColor: Colors.white,
-      showDotsBorder: true,
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      child: KeyedSubtree(
+        key: ValueKey(identity),
+        child: content,
+      ),
     );
   }
 

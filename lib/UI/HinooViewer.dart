@@ -190,7 +190,7 @@ class HinooSlideView extends StatelessWidget {
   final double? baseCanvasHeight;
   final double gap;
   final Color gapColor;
-  const HinooSlideView({
+  const HinooSlideView({super.key,
     required this.slide,
     required this.width,
     required this.height,

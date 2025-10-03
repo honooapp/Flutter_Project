@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'package:honoo/Widgets/loading_spinner.dart';
 
 enum DownloadChoice { firstOnly, allPages }
 
@@ -87,10 +88,10 @@ class DownloadProgressDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(
-              height: 48,
-              width: 48,
-              child: CircularProgressIndicator(color: Colors.white),
+            const LoadingSpinner(
+              size: 48,
+              color: Colors.white,
+              semanticsLabel: 'Preparazione download',
             ),
             const SizedBox(height: 16),
             Text(
