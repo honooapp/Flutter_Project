@@ -2,7 +2,19 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Entities/Honoo.dart';
 
 class HonooService {
-  static final _client = Supabase.instance.client;
+
+  //sostituisci fuori dal test con il tuo client
+  //static final _client = Supabase.instance.client;
+
+  // ✅ Usa un getter, così nei test possiamo sovrascrivere il client
+  static SupabaseClient get _client => _overrideClient ?? Supabase.instance.client;
+
+  // ✅ Campo usato solo nei test (rimane null in produzione)
+  static SupabaseClient? _overrideClient;
+
+  /// TEST-ONLY: abilita injection del client mock
+  static void $setTestClient(SupabaseClient? c) => _overrideClient = c;
+
 
   /// Honoo pubblici (Luna)
   static Future<List<Honoo>> fetchPublicHonoo() async {

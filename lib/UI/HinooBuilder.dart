@@ -278,13 +278,15 @@ class _HinooBuilderState extends State<HinooBuilder> {
         message: 'Hinoo creati con Honoo',
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
+      showHonooToast(
+        context,
+        message: message,
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Errore download: $e')),
+        showHonooToast(
+          context,
+          message: 'Errore download: $e',
         );
       }
     } finally {
@@ -761,8 +763,9 @@ class _HinooBuilderState extends State<HinooBuilder> {
     } catch (e) {
       debugPrint('Errore cambio sfondo: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Errore sfondo: $e')),
+        showHonooToast(
+          context,
+          message: 'Errore sfondo: $e',
         );
       }
     }

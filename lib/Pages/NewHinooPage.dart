@@ -10,6 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:honoo/Utility/Utility.dart';
 import 'package:honoo/Widgets/LunaFissa.dart';
+import 'package:honoo/Widgets/honoo_dialogs.dart';
 
 import 'package:honoo/Controller/HinooController.dart';
 
@@ -116,8 +117,9 @@ class _NewHinooPageState extends State<NewHinooPage> {
   // PNG opzionale dal builder
   Future<void> _onPngExported(Uint8List bytes) async {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('PNG generato: pronto per salvare o condividere.')),
+    showHonooToast(
+      context,
+      message: 'PNG generato: pronto per salvare o condividere.',
     );
   }
 
@@ -127,8 +129,9 @@ class _NewHinooPageState extends State<NewHinooPage> {
     final pages = (rawDraft is Map) ? (rawDraft['pages'] as List?) : null;
     if (rawDraft == null || pages == null || pages.isEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Crea almeno una schermata 9:16 con sfondo e testo.')),
+      showHonooToast(
+        context,
+        message: 'Crea almeno una schermata 9:16 con sfondo e testo.',
       );
       return;
     }
@@ -139,8 +142,9 @@ class _NewHinooPageState extends State<NewHinooPage> {
     if (validationErrors.isNotEmpty) {
       if (!mounted) return;
       final errorText = 'Bozza non valida:\n- ${validationErrors.join('\n- ')}';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorText)),
+      showHonooToast(
+        context,
+        message: errorText,
       );
       return;
     }
@@ -164,13 +168,15 @@ class _NewHinooPageState extends State<NewHinooPage> {
       await _controller.saveToChest(hinooDraft);
       if (!mounted) return;
       setState(() => _savedToChest = true);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Hinoo salvato nello scrigno.')),
+      showHonooToast(
+        context,
+        message: 'Hinoo salvato nello scrigno.',
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Errore: $e')),
+      showHonooToast(
+        context,
+        message: 'Errore: $e',
       );
     }
   }
@@ -234,8 +240,9 @@ class _NewHinooPageState extends State<NewHinooPage> {
     final pages = (draft is Map) ? (draft['pages'] as List?) : null;
     if (draft == null || pages == null || pages.isEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nessun contenuto da pubblicare sulla Luna.')),
+      showHonooToast(
+        context,
+        message: 'Nessun contenuto da pubblicare sulla Luna.',
       );
       return;
     }
@@ -247,12 +254,15 @@ class _NewHinooPageState extends State<NewHinooPage> {
       final text = result == HinooMoonResult.published
           ? 'Pubblicato sulla Luna.'
           : 'Hinoo già presente sulla Luna.';
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(text)));
+      showHonooToast(
+        context,
+        message: text,
+      );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Errore: $e')),
+      showHonooToast(
+        context,
+        message: 'Errore: $e',
       );
     }
   }
@@ -288,8 +298,9 @@ class _NewHinooPageState extends State<NewHinooPage> {
   Future<void> _handleDownloadTap() async {
     if (!_hasMinTextForDownload) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Scrivi almeno 1 carattere prima di scaricare')),
+      showHonooToast(
+        context,
+        message: 'Scrivi almeno 1 carattere prima di scaricare',
       );
       return;
     }
@@ -325,8 +336,9 @@ class _NewHinooPageState extends State<NewHinooPage> {
 
   void _warnMissingApi(String what) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Collega API del builder: $what')),
+    showHonooToast(
+      context,
+      message: 'Collega API del builder: $what',
     );
   }
 

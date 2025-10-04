@@ -6,6 +6,7 @@ import '../Entities/Hinoo.dart';
 import '../Entities/Honoo.dart';
 import '../Services/HinooService.dart';
 import '../Services/HonooService.dart';
+import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/loading_spinner.dart';
 import 'ChestPage.dart';
 
@@ -71,8 +72,9 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
           } catch (e) {
             // Non bloccare il flusso di login; mostra feedback opzionale
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Errore salvataggio Hinoo: $e')),
+              showHonooToast(
+                context,
+                message: 'Errore salvataggio Hinoo: $e',
               );
             }
           }
@@ -108,14 +110,16 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
 
       // Se la verifica va a buon fine, onAuthStateChange scatterà.
       if (response.user == null && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Codice non valido.')),
+        showHonooToast(
+          context,
+          message: 'Codice non valido.',
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Errore verifica: $e')),
+        showHonooToast(
+          context,
+          message: 'Errore verifica: $e',
         );
       }
     } finally {

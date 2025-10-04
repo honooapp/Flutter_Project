@@ -12,6 +12,7 @@ import 'package:honoo/UI/HonooCard.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:honoo/Utility/Utility.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
+import 'package:honoo/Widgets/honoo_dialogs.dart';
 
 import '../Entities/Honoo.dart';
 
@@ -48,8 +49,9 @@ class _ConversationPageState extends State<ConversationPage> {
       debugPrint('getHonooHistory error: $e');
       if (!mounted) return;
       setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Errore nel caricamento conversazione: $e')),
+      showHonooToast(
+        context,
+        message: 'Errore nel caricamento conversazione: $e',
       );
     }
   }

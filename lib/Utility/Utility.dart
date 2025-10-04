@@ -15,9 +15,9 @@ class Utility {
   final String text1_first = """Io lo scrivo sempre così:\nsenza virgolette\ne iniziale minuscola.\nE lo pronuncio "onù",\nsenza aspirazione iniziale.\n\nhonoo\nè un progetto multimediale,\narticolato in\n\nperformance\ne laboratori teatrali\n""";
   final String text1_second = """\n\nesplorazioni lunari\n""";
   final String text1_third = """\n\ne\nviaggi sull'Isola delle Storie.\n""";
-  final String text1_fourth = """\n\nNon ci sono profili utenti\nin honoo.\nE non ci sono i "mi piace".\nMa se trovi un honoo\nche ti piace,\npuoi salvarlo nel tuo cuore\ne,\nse ne hai voglia,\npuoi anche fare\nqualcosa in più.\n\nO molto di più.\n\nSe è come penso,\nl'ultima volta\nche ci siamo visti\n\n""";
+  final String text1_fourth = """\n\nNon ci sono profili utenti\nin honoo.\nE non ci sono i "mi piace".\nMa se trovi un honoo\nche ti piace,\npuoi salvarlo nel tuo cuore\ne,\nse ne hai voglia,\npuoi anche fare\nqualcosa di più.\n\nO molto di più.\n\nSe è come penso,\nl'ultima volta\nche ci siamo visti\n\n""";
   final String text1_fifth = """\n\navevi gli occhi chiusi\ne hai fatto la scelta giusta.\n\nMi chiamo\nVenceslao Cembalo\ne se telefoni al\n3274920811,\npuoi sentire\nun’altra volta\nla mia voce\ne continuare il viaggio.\n\n Se le cose\nstanno\ndiversamente,\nclicca sull’icona della\nhome\nin basso a sinistra.\n\nIn alto\nal centro\ndi ogni schermata\nc'è il logo\n\n""";
-  final String text1_six = """\n\nse ci clicchi sopra,\ntorni qui\na questa pagina.\n\nTi consiglio\ndi visualizzare il sito\nda cellulare,\nperché\nnon è stata ancora\nottimizzata\nla visualizzazione\nda monitor di computer.\n""";
+  final String text1_six = """\n\nse ci clicchi sopra,\ntorni qui\na questa pagina.\n""";
   final String textHome1 = 'Ti regaliamo la Luna.\nPer sempre.';
   final String textHome2 = 'Niente è per sempre,\ne nessuno può regalarti la Luna.\n\nÈ vero,\nma non per i poeti.\n\nVuoi essere un poeta di honoo?\n\nClicca sulla Bottiglia,\ne componi i tuoi honoo e hinoo.\n\nOppure sulla Luna,\ne guarda gli honoo\ne gli hinoo degli altri.\n\nO sull’Isola,\ne inizia il viaggio\nverso le tue storie.';
   final String chestHeader = 'Il tuo Cuore custodisce';

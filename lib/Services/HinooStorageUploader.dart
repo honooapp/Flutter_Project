@@ -8,6 +8,13 @@ class HinooStorageUploader {
   static final _supabase = Supabase.instance.client;
   static final _uuid = const Uuid();
 
+  // Sostituisci l’accesso diretto con un getter che possiamo sovrascrivere nei test
+  static SupabaseClient get _client => _overrideClient ?? Supabase.instance.client;
+  static SupabaseClient? _overrideClient;
+
+  /// TEST-ONLY: abilita injection di un client mock
+  static void $setTestClient(SupabaseClient? c) => _overrideClient = c;
+
   static String _normalizeExt(String ext) {
     final e = ext.trim().toLowerCase();
     if (e == 'jpeg') return 'jpg';

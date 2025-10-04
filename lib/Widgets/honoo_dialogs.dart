@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -122,6 +124,109 @@ class HonooConfirmDialog extends StatelessWidget {
 }
 
 enum HonooDeletionTarget { page, honoo, hinoo }
+
+class HonooMessageDialog extends StatefulWidget {
+  const HonooMessageDialog({
+    super.key,
+    required this.message,
+    this.title,
+    this.icon,
+    this.duration = const Duration(milliseconds: 1200),
+  });
+
+  final String message;
+  final String? title;
+  final IconData? icon;
+  final Duration duration;
+
+  @override
+  State<HonooMessageDialog> createState() => _HonooMessageDialogState();
+}
+
+class _HonooMessageDialogState extends State<HonooMessageDialog> {
+  @override
+  void initState() {
+    super.initState();
+    Future<void>.delayed(widget.duration, () {
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).maybePop();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return HonooDialogShell(
+      maxWidth: 320,
+      opacity: 0.88,
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (widget.icon != null) ...[
+              Icon(widget.icon, color: Colors.white, size: 40),
+              const SizedBox(height: 16),
+            ],
+            if (widget.title != null && widget.title!.trim().isNotEmpty) ...[
+              Text(
+                widget.title!,
+                style: HonooDialogStyles.title(),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+            ],
+            Text(
+              widget.message,
+              style: HonooDialogStyles.body(color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+Future<void> showHonooMessageDialog(
+  BuildContext context, {
+  required String message,
+  String? title,
+  IconData? icon,
+  Duration duration = const Duration(milliseconds: 1200),
+  bool barrierDismissible = true,
+}) {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: barrierDismissible,
+    useRootNavigator: true,
+    builder: (_) => HonooMessageDialog(
+      message: message,
+      title: title,
+      icon: icon,
+      duration: duration,
+    ),
+  );
+}
+
+void showHonooToast(
+  BuildContext context, {
+  required String message,
+  String? title,
+  IconData? icon,
+  Duration duration = const Duration(milliseconds: 1200),
+  bool barrierDismissible = true,
+}) {
+  unawaited(
+    showHonooMessageDialog(
+      context,
+      message: message,
+      title: title,
+      icon: icon,
+      duration: duration,
+      barrierDismissible: barrierDismissible,
+    ),
+  );
+}
 
 Future<bool?> showHonooDeleteDialog(
   BuildContext context, {

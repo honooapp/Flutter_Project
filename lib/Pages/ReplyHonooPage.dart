@@ -4,6 +4,7 @@ import 'package:honoo/Services/HonooService.dart';
 import 'package:honoo/UI/HonooBuilder.dart';
 import 'package:honoo/Utility/HonooColors.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
+import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:sizer/sizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -56,8 +57,9 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
       await HonooService.publishHonoo(newHonoo);
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('La tua risposta è partita.')),
+        showHonooToast(
+          context,
+          message: 'La tua risposta è partita.',
         );
         await Future.delayed(const Duration(seconds: 1));
         Navigator.pop(context);
@@ -65,8 +67,9 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
     } catch (e) {
       print('Errore invio reply: $e');
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Errore. Riprova più tardi.')),
+        showHonooToast(
+          context,
+          message: 'Errore. Riprova più tardi.',
         );
       }
     } finally {

@@ -6,6 +6,12 @@ class HinooService {
   static final _supabase = Supabase.instance.client;
   static const String _table = 'hinoo';
 
+  // all'inizio della classe
+  static SupabaseClient get _client => _overrideClient ?? Supabase.instance.client;
+  static SupabaseClient? _overrideClient;
+  static void $setTestClient(SupabaseClient? c) => _overrideClient = c;
+
+
   static String _toDbType(HinooType type) {
     switch (type) {
       case HinooType.moon:

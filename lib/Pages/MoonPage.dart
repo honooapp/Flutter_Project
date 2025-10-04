@@ -16,6 +16,7 @@ import '../Utility/HonooColors.dart';
 import '../Utility/Utility.dart';
 import '../Utility/ResponsiveLayout.dart';
 import '../Widgets/loading_spinner.dart';
+import '../Widgets/honoo_dialogs.dart';
 
 class MoonPage extends StatefulWidget {
   const MoonPage({super.key});
@@ -71,9 +72,6 @@ class _MoonPageState extends State<MoonPage> {
 
       items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-      // Piccolo delay per mostrare lo spinner quando i dati arrivano troppo in fretta.
-      await Future<void>.delayed(const Duration(milliseconds: 900));
-
       setState(() {
         _items = items;
         _isLoading = false;
@@ -81,8 +79,9 @@ class _MoonPageState extends State<MoonPage> {
     } catch (e) {
       debugPrint('Errore caricamento Moon: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Errore caricamento Moon: $e')),
+        showHonooToast(
+          context,
+          message: 'Errore caricamento Moon: $e',
         );
       }
       setState(() => _isLoading = false);

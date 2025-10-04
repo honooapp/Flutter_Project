@@ -16,6 +16,7 @@ import '../Utility/HonooColors.dart';
 import 'package:honoo/Widgets/centering_multiline_field.dart';
 import 'package:honoo/UI/HinooBuilder/overlays/cambiaSfondo.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
+import 'package:honoo/Widgets/honoo_dialogs.dart';
 
 class HonooBuilder extends StatefulWidget {
   final void Function(String text, String imageUrl)? onHonooChanged;
@@ -44,6 +45,7 @@ class HonooBuilderState extends State<HonooBuilder> {
   bool _imageConfirmed = false;
 
   bool get hasFocus => _textFocus.hasFocus;
+  bool get hasImage => imageProvider != null;
 
   // URL pubblica finale caricata su Supabase (non-null per il callback)
   String _publicImageUrl = '';
@@ -153,8 +155,9 @@ class HonooBuilderState extends State<HonooBuilder> {
       final session = client.auth.currentSession;
       if (session == null) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Devi essere loggato per caricare immagini.')),
+        showHonooToast(
+          context,
+          message: 'Devi essere loggato per caricare immagini.',
         );
         return;
       }
@@ -177,8 +180,9 @@ class HonooBuilderState extends State<HonooBuilder> {
 
       if (publicUrl == null) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Upload fallito')),
+        showHonooToast(
+          context,
+          message: 'Upload fallito',
         );
         return;
       }
@@ -194,8 +198,9 @@ class HonooBuilderState extends State<HonooBuilder> {
     } catch (e) {
       debugPrint('Errore selezione/upload immagine: $e');
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Errore immagine: $e')),
+      showHonooToast(
+        context,
+        message: 'Errore immagine: $e',
       );
     }
   }
@@ -516,11 +521,19 @@ class HonooBuilderState extends State<HonooBuilder> {
     BuildContext context, {
     String? fileName,
   }) async {
+    if (!hasImage) {
+      showHonooToast(
+        context,
+        message: "Inserisci prima un'immagine",
+      );
+      return;
+    }
     final Uint8List? bytes = await _captureCurrentAsPng();
     if (bytes == null || bytes.isEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Impossibile generare il file PNG.')),
+      showHonooToast(
+        context,
+        message: 'Impossibile generare il file PNG.',
       );
       return;
     }
@@ -544,13 +557,15 @@ class HonooBuilderState extends State<HonooBuilder> {
         DownloadImage(filename: filename, bytes: bytes),
       ]);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Download avviato: $filename')),
+      showHonooToast(
+        context,
+        message: 'Download avviato: $filename',
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Errore durante il salvataggio: $e')),
+      showHonooToast(
+        context,
+        message: 'Errore durante il salvataggio: $e',
       );
     }
   }

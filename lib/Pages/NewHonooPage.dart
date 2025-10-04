@@ -95,8 +95,9 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
     if (finalImageUrl == null || finalImageUrl.isEmpty) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Devi caricare un’immagine (URL pubblico).')),
+        showHonooToast(
+          context,
+          message: 'Devi caricare un’immagine (URL pubblico).',
         );
       }
       return;
@@ -127,14 +128,16 @@ class _NewHonooPageState extends State<NewHonooPage> {
         _lastSavedRawImage = _imageUrl;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Salvato nello scrigno.')),
+      showHonooToast(
+        context,
+        message: 'Salvato nello scrigno.',
       );
     } catch (e, st) {
       debugPrint('publishHonoo failed: $e\n$st');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Errore: $e')),
+        showHonooToast(
+          context,
+          message: 'Errore: $e',
         );
       }
     }
@@ -157,35 +160,47 @@ class _NewHonooPageState extends State<NewHonooPage> {
         null,
       );
 
-      final ok = await HonooService.duplicateToMoon(honooForMoon);
+    final ok = await HonooService.duplicateToMoon(honooForMoon);
 
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(ok ? 'Pubblicato sulla Luna.' : 'Già presente sulla Luna.')),
+    if (!mounted) return;
+    showHonooToast(
+      context,
+      message: ok ? 'Pubblicato sulla Luna.' : 'Già presente sulla Luna.',
+    );
+  } catch (e, st) {
+    debugPrint('duplicateToMoon failed: $e\n$st');
+    if (mounted) {
+      showHonooToast(
+        context,
+        message: 'Errore: $e',
       );
-    } catch (e, st) {
-      debugPrint('duplicateToMoon failed: $e\n$st');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Errore: $e')),
-        );
-      }
     }
   }
+}
 
   Future<void> _handleDownloadTap() async {
     if (!_hasMinTextForDownload) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Scrivi almeno 1 carattere prima di scaricare')),
+      showHonooToast(
+        context,
+        message: 'Scrivi almeno 1 carattere prima di scaricare',
       );
       return;
     }
 
     final state = _builderKey.currentState;
     if (state == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Impossibile avviare il download.')),
+      showHonooToast(
+        context,
+        message: 'Impossibile avviare il download.',
+      );
+      return;
+    }
+
+    if (!state.hasImage) {
+      showHonooToast(
+        context,
+        message: "Inserisci prima un'immagine",
       );
       return;
     }
@@ -235,8 +250,9 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
     if (kIsWeb && s.startsWith('blob:')) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Immagine locale (blob) non caricabile dal browser.')),
+        showHonooToast(
+          context,
+          message: 'Immagine locale (blob) non caricabile dal browser.',
         );
       }
       return null;

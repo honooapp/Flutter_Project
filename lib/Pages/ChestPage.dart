@@ -96,8 +96,6 @@ class _ChestPageState extends State<ChestPage> {
       }
 
       if (!mounted) return;
-      await Future<void>.delayed(const Duration(milliseconds: 900));
-      if (!mounted) return;
       setState(() {
         _hinoo = list;
         _isHinooLoading = false;
@@ -188,8 +186,10 @@ class _ChestPageState extends State<ChestPage> {
           onPressed: () async {
             final ok = await HonooController().sendToMoon(current);
             final text = ok ? 'Spedito sulla Luna' : 'Già presente sulla Luna';
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(text)));
+            showHonooToast(
+              context,
+              message: text,
+            );
 
             if (ok &&
                 _currentIndex >= ctrl.personal.length &&
@@ -252,17 +252,18 @@ class _ChestPageState extends State<ChestPage> {
 
           final String? id = (current.dbId ?? current.id) as String?;
           if (id == null || id.isEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('Impossibile cancellare: id mancante.')),
+            showHonooToast(
+              context,
+              message: 'Impossibile cancellare: id mancante.',
             );
             return;
           }
 
           await ctrl.deleteHonooById(id); // accetta String?
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Honoo eliminato.')),
+          showHonooToast(
+            context,
+            message: 'Honoo eliminato.',
           );
         },
       ),
@@ -350,12 +351,15 @@ class _ChestPageState extends State<ChestPage> {
               final text = result == HinooMoonResult.published
                   ? 'Hinoo spedito sulla Luna.'
                   : 'Hinoo già presente sulla Luna.';
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(text)));
+              showHonooToast(
+                context,
+                message: text,
+              );
             } catch (e) {
               if (!mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Errore: $e')),
+              showHonooToast(
+                context,
+                message: 'Errore: $e',
               );
             }
           },
@@ -432,13 +436,15 @@ class _ChestPageState extends State<ChestPage> {
         _hinoo = _hinoo.where((r) => r.id != current.id).toList();
         _rebuildItems();
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Hinoo eliminato.')),
+      showHonooToast(
+        context,
+        message: 'Hinoo eliminato.',
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Errore durante l\'eliminazione: $e')),
+      showHonooToast(
+        context,
+        message: 'Errore durante l\'eliminazione: $e',
       );
     }
   }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
+import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'EmailVerifyPage.dart';
 
 class EmailLoginPage extends StatefulWidget {
@@ -10,12 +11,15 @@ class EmailLoginPage extends StatefulWidget {
   final String? pendingImageUrl;
   final Map<String, dynamic>? pendingHinooDraft; // nuova: bozza Hinoo
 
+
   const EmailLoginPage({
     super.key,
     this.pendingHonooText,
     this.pendingImageUrl,
     this.pendingHinooDraft,
   });
+
+
 
   @override
   State<EmailLoginPage> createState() => _EmailLoginPageState();
@@ -49,8 +53,9 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Errore invio OTP: $e')),
+      showHonooToast(
+        context,
+        message: 'Errore invio OTP: $e',
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
