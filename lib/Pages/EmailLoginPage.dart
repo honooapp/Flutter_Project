@@ -11,15 +11,12 @@ class EmailLoginPage extends StatefulWidget {
   final String? pendingImageUrl;
   final Map<String, dynamic>? pendingHinooDraft; // nuova: bozza Hinoo
 
-
   const EmailLoginPage({
     super.key,
     this.pendingHonooText,
     this.pendingImageUrl,
     this.pendingHinooDraft,
   });
-
-
 
   @override
   State<EmailLoginPage> createState() => _EmailLoginPageState();
@@ -36,7 +33,6 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
     try {
       await Supabase.instance.client.auth.signInWithOtp(
         email: email,
-
       );
 
       if (!mounted) return;
@@ -79,10 +75,10 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
             _isLoading
                 ? const LoadingSpinner()
                 : ElevatedButton(
-              key: const Key('email_send_code_btn'),
-              onPressed: _sendOtp,
-              child: const Text('Invia codice'),
-            ),
+                    key: const Key('email_send_code_btn'),
+                    onPressed: _sendOtp,
+                    child: const Text('Invia codice'),
+                  ),
           ],
         ),
       ),

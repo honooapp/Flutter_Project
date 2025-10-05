@@ -38,7 +38,8 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
     super.initState();
 
     // 🎯 Ascolta magic link / cambi di stato
-    _authSub = Supabase.instance.client.auth.onAuthStateChange.listen((data) async {
+    _authSub =
+        Supabase.instance.client.auth.onAuthStateChange.listen((data) async {
       final event = data.event;
       final session = data.session;
 
@@ -84,7 +85,7 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (_) => const ChestPage()),
-              (route) => false,
+          (route) => false,
         );
       }
     });
@@ -137,22 +138,23 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
           children: [
             const Text(
               'Ti abbiamo inviato una mail.\n'
-                  'Inserisci il codice.\n',
+              'Inserisci il codice.\n',
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 20),
             TextField(
               controller: _codeController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Codice di verifica'),
+              decoration:
+                  const InputDecoration(labelText: 'Codice di verifica'),
             ),
             const SizedBox(height: 20),
             _isVerifying
                 ? const LoadingSpinner()
                 : ElevatedButton(
-              onPressed: _verifyCode,
-              child: const Text('Verifica'),
-            ),
+                    onPressed: _verifyCode,
+                    child: const Text('Verifica'),
+                  ),
           ],
         ),
       ),

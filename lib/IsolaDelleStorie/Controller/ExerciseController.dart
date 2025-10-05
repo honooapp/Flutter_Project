@@ -16,11 +16,21 @@ class ExerciseController {
 
   ExerciseController._internal();
 
-  List<int> listOfNumberOfSubExercises = [1,7,5,3,4,1,3,3,4]; //inizia da 0
+  List<int> listOfNumberOfSubExercises = [
+    1,
+    7,
+    5,
+    3,
+    4,
+    1,
+    3,
+    3,
+    4
+  ]; //inizia da 0
 
   Map<String, Function> methodMap = {};
 
-  void init () {
+  void init() {
     methodMap = {
       "1.1": getExercise1_1,
       "2.1": getExercise2_1,
@@ -168,41 +178,38 @@ class ExerciseController {
 
   Exercise getExercise3_1() {
     return Exercise(
-      "3.1",
-      3,
-      IsolaDelleStoreContentManager.e_3_1_title,
-      IsolaDelleStoreContentManager.e_3_1_first,
-      'assets/icons/isoladellestorie/backgrounds/3pozzooracolo.png',
-      exerciseDescriptionMore: IsolaDelleStoreContentManager.e_3_1_second,
-      exerciseIcon: 'assets/icons/dado.svg',
-      exerciseIconName: 'Dado'
-    );
+        "3.1",
+        3,
+        IsolaDelleStoreContentManager.e_3_1_title,
+        IsolaDelleStoreContentManager.e_3_1_first,
+        'assets/icons/isoladellestorie/backgrounds/3pozzooracolo.png',
+        exerciseDescriptionMore: IsolaDelleStoreContentManager.e_3_1_second,
+        exerciseIcon: 'assets/icons/dado.svg',
+        exerciseIconName: 'Dado');
   }
 
   Exercise getExercise3_2() {
     return Exercise(
-      "3.2",
-      3,
-      IsolaDelleStoreContentManager.e_3_2_title,
-      IsolaDelleStoreContentManager.e_3_2_first,
-      'assets/icons/isoladellestorie/backgrounds/3pozzooracolo.png',
-      exerciseDescriptionMore: IsolaDelleStoreContentManager.e_3_2_second,
-      exerciseIcon: 'assets/icons/dado.svg',
-      exerciseIconName: 'Dado'
-    );
+        "3.2",
+        3,
+        IsolaDelleStoreContentManager.e_3_2_title,
+        IsolaDelleStoreContentManager.e_3_2_first,
+        'assets/icons/isoladellestorie/backgrounds/3pozzooracolo.png',
+        exerciseDescriptionMore: IsolaDelleStoreContentManager.e_3_2_second,
+        exerciseIcon: 'assets/icons/dado.svg',
+        exerciseIconName: 'Dado');
   }
 
   Exercise getExercise3_3() {
     return Exercise(
-      "3.3",
-      3,
-      IsolaDelleStoreContentManager.e_3_3_title,
-      IsolaDelleStoreContentManager.e_3_3_first,
-      'assets/icons/isoladellestorie/backgrounds/3pozzooracolo.png',
-      exerciseDescriptionMore: IsolaDelleStoreContentManager.e_3_3_second,
-      exerciseIcon: 'assets/icons/dado.svg',
-      exerciseIconName: 'Dado'
-    );
+        "3.3",
+        3,
+        IsolaDelleStoreContentManager.e_3_3_title,
+        IsolaDelleStoreContentManager.e_3_3_first,
+        'assets/icons/isoladellestorie/backgrounds/3pozzooracolo.png',
+        exerciseDescriptionMore: IsolaDelleStoreContentManager.e_3_3_second,
+        exerciseIcon: 'assets/icons/dado.svg',
+        exerciseIconName: 'Dado');
   }
 
   Exercise getExercise3_4() {
@@ -277,41 +284,38 @@ class ExerciseController {
 
   Exercise getExercise5_1() {
     return Exercise(
-      "5.1",
-      5,
-      IsolaDelleStoreContentManager.e_5_1_title,
-      IsolaDelleStoreContentManager.e_5_1_first,
-      'assets/icons/isoladellestorie/backgrounds/5primoanello.png',
-      exerciseDescriptionMore: IsolaDelleStoreContentManager.e_5_1_second,
-      exerciseIcon: 'assets/icons/dado.svg',
-      exerciseIconName: 'Dado'
-    );
+        "5.1",
+        5,
+        IsolaDelleStoreContentManager.e_5_1_title,
+        IsolaDelleStoreContentManager.e_5_1_first,
+        'assets/icons/isoladellestorie/backgrounds/5primoanello.png',
+        exerciseDescriptionMore: IsolaDelleStoreContentManager.e_5_1_second,
+        exerciseIcon: 'assets/icons/dado.svg',
+        exerciseIconName: 'Dado');
   }
 
   Exercise getExercise5_2() {
     return Exercise(
-      "5.2",
-      5,
-      IsolaDelleStoreContentManager.e_5_2_title,
-      IsolaDelleStoreContentManager.e_5_2_first,
-      'assets/icons/isoladellestorie/backgrounds/5primoanello.png',
-      exerciseDescriptionMore: IsolaDelleStoreContentManager.e_5_2_second,
-      exerciseIcon: 'assets/icons/dado.svg',
-      exerciseIconName: 'Dado'
-    );
+        "5.2",
+        5,
+        IsolaDelleStoreContentManager.e_5_2_title,
+        IsolaDelleStoreContentManager.e_5_2_first,
+        'assets/icons/isoladellestorie/backgrounds/5primoanello.png',
+        exerciseDescriptionMore: IsolaDelleStoreContentManager.e_5_2_second,
+        exerciseIcon: 'assets/icons/dado.svg',
+        exerciseIconName: 'Dado');
   }
 
   Exercise getExercise5_3() {
     return Exercise(
-      "5.3",
-      5,
-      IsolaDelleStoreContentManager.e_5_3_title,
-      IsolaDelleStoreContentManager.e_5_3_first,
-      'assets/icons/isoladellestorie/backgrounds/5primoanello.png',
-      exerciseDescriptionMore: IsolaDelleStoreContentManager.e_5_3_second,
-      exerciseIcon: 'assets/icons/dado.svg',
-      exerciseIconName: 'Dado'
-    );
+        "5.3",
+        5,
+        IsolaDelleStoreContentManager.e_5_3_title,
+        IsolaDelleStoreContentManager.e_5_3_first,
+        'assets/icons/isoladellestorie/backgrounds/5primoanello.png',
+        exerciseDescriptionMore: IsolaDelleStoreContentManager.e_5_3_second,
+        exerciseIcon: 'assets/icons/dado.svg',
+        exerciseIconName: 'Dado');
   }
 
   Exercise getExercise5_4() {
@@ -474,8 +478,10 @@ class ExerciseController {
     );
   }
 
-  List<Widget> getExerciseButtons (Exercise exercise, Function handleButtonPressed, BuildContext context ) {
-    final int numberOfExercises = listOfNumberOfSubExercises[exercise.parentId-1];
+  List<Widget> getExerciseButtons(
+      Exercise exercise, Function handleButtonPressed, BuildContext context) {
+    final int numberOfExercises =
+        listOfNumberOfSubExercises[exercise.parentId - 1];
     List<Widget> ret = [];
     switch (exercise.parentId) {
       case 1:
@@ -488,7 +494,7 @@ class ExerciseController {
       case 8:
       case 9:
         for (var i = 0; i < numberOfExercises; i++) {
-          var methodName = "${exercise.parentId}.${i+1}";
+          var methodName = "${exercise.parentId}.${i + 1}";
           ret.add(
             RawMaterialButton(
               onPressed: () => handleButtonPressed(methodName),
@@ -496,7 +502,7 @@ class ExerciseController {
               fillColor: HonooColor.wave4,
               constraints: BoxConstraints.tight(Size(40, 40)),
               child: Text(
-                methodName ,
+                methodName,
                 style: GoogleFonts.libreFranklin(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
@@ -506,7 +512,7 @@ class ExerciseController {
             ),
           );
         }
-      break;
+        break;
       default:
     }
     /*
@@ -560,8 +566,7 @@ class ExerciseController {
     return ret;
   }
 
-  List<Exercise> getAllExercises () {
+  List<Exercise> getAllExercises() {
     return [];
   }
-
 }

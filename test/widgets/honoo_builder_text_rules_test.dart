@@ -9,7 +9,8 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('la virgoletta di chiusura ” resta visibile anche al limite', (tester) async {
+  testWidgets('la virgoletta di chiusura ” resta visibile anche al limite',
+      (tester) async {
     // 1) Monta il widget sotto test in un MaterialApp/Scaffold
     // SOSTITUISCI "WidgetUnderTest" con il tuo widget reale che mostra il testo con le virgolette.
     // Esempio 1: se hai un builder dedicato
@@ -44,7 +45,7 @@ void main() {
       quoteFinder,
       findsWidgets,
       reason:
-      'Non è stato trovato alcun Text/RichText che contenga la virgoletta di chiusura ”',
+          'Non è stato trovato alcun Text/RichText che contenga la virgoletta di chiusura ”',
     );
 
     // 4) (Opzionale) controlla che sia davvero visibile (non offstage)

@@ -30,15 +30,14 @@ import 'package:honoo/UI/HinooBuilder/dialogs/NameHinooDialog.dart';
 // Wizard step (solo uno alla volta)
 enum _WizardStep { changeBg, pickColor, writeText }
 
-
 // ============================================================================
 // Widget pubblico (callback opzionali)
 // ============================================================================
 class HinooBuilder extends StatefulWidget {
   const HinooBuilder({
     super.key,
-    this.onHinooChanged,   // notifica il draft quando cambia qualcosa
-    this.onPngExported,    // PNG generato (anteprima)
+    this.onHinooChanged, // notifica il draft quando cambia qualcosa
+    this.onPngExported, // PNG generato (anteprima)
     this.embedThumbnails = true, // se false, mostra solo il canvas 9:16
   });
 
@@ -55,7 +54,8 @@ class HinooBuilder extends StatefulWidget {
 // ============================================================================
 class _HinooBuilderState extends State<HinooBuilder> {
   // Core
-  final GlobalKey _captureKey = GlobalKey(); // SOLO il canvas è sotto questa key
+  final GlobalKey _captureKey =
+      GlobalKey(); // SOLO il canvas è sotto questa key
   final TextEditingController _textController = TextEditingController();
   final FocusNode _textFocus = FocusNode();
 
@@ -68,7 +68,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
   // Stato UI
   ImageProvider? _localBgPreview; // preview locale dello sfondo
-  String? _bgPublicUrl;           // URL pubblico su storage
+  String? _bgPublicUrl; // URL pubblico su storage
   Color _txtColor = Colors.white;
   _WizardStep _step = _WizardStep.changeBg;
   bool _bgChosen = false; // abilita bottone OK per procedere
@@ -92,14 +92,15 @@ class _HinooBuilderState extends State<HinooBuilder> {
     if (_pages.isEmpty) {
       _pages.add(_createEmptySlide());
     }
-    _textController.addListener(() => _onCanvasTextChanged(_textController.text));
+    _textController
+        .addListener(() => _onCanvasTextChanged(_textController.text));
     _bgController.addListener(_handleBgTransform);
     _bgScale = _extractScaleFromMatrix(_bgController.value);
   }
 
   @override
   void dispose() {
-    _textController.removeListener((){}); // safety no-op
+    _textController.removeListener(() {}); // safety no-op
     _textController.dispose();
     _textFocus.dispose();
     _bgController.removeListener(_handleBgTransform);
@@ -186,7 +187,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
     }
 
     _bgScale = _extractScaleFromMatrix(_bgController.value);
-    _bgChosen = _localBgPreview != null || (_bgPublicUrl != null && _bgPublicUrl!.isNotEmpty);
+    _bgChosen = _localBgPreview != null ||
+        (_bgPublicUrl != null && _bgPublicUrl!.isNotEmpty);
   }
 
   void _resetToBlankState() {
@@ -304,13 +306,15 @@ class _HinooBuilderState extends State<HinooBuilder> {
     }
   }
 
-  Future<Uint8List?> _captureCurrentCanvasBytes({double pixelRatio = 3.0}) async {
+  Future<Uint8List?> _captureCurrentCanvasBytes(
+      {double pixelRatio = 3.0}) async {
     try {
-      final RenderRepaintBoundary? boundary =
-          _captureKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      final RenderRepaintBoundary? boundary = _captureKey.currentContext
+          ?.findRenderObject() as RenderRepaintBoundary?;
       if (boundary == null) return null;
       final ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
-      final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
       return byteData?.buffer.asUint8List();
     } catch (e) {
       debugPrint('capture canvas error: $e');
@@ -342,7 +346,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
     if (slide is Map) {
       final dynamic raw = slide['bgTransform'];
       if (raw is List && raw.length == 16) {
-        final List<double> values = raw.map((dynamic e) => (e as num).toDouble()).toList();
+        final List<double> values =
+            raw.map((dynamic e) => (e as num).toDouble()).toList();
         return Matrix4.fromList(values);
       }
     }
@@ -389,7 +394,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
   dynamic exportDraft() {
     return {
-      'pages': _pages,                // sostituisci col tuo tipo slide/pagina
+      'pages': _pages, // sostituisci col tuo tipo slide/pagina
       'currentIndex': _current,
       'text': _textController.text,
       'textLength': _textController.text.trim().length,
@@ -437,15 +442,15 @@ class _HinooBuilderState extends State<HinooBuilder> {
         final double maxH = box.maxHeight;
 
         double targetW = maxW;
-        double targetH = targetW / ar;          // h = w * 16/9
+        double targetH = targetW / ar; // h = w * 16/9
         if (targetH > maxH) {
           targetH = maxH;
-          targetW = targetH * ar;               // w = h * 9/16
+          targetW = targetH * ar; // w = h * 9/16
         }
         _canvasHeight = targetH;
 
-        const double outerGap = 8;              // padding laterale
-        const double thumbsH = 180;             // altezza thumbnails
+        const double outerGap = 8; // padding laterale
+        const double thumbsH = 180; // altezza thumbnails
         const BorderRadius canvasRadius = BorderRadius.all(Radius.circular(5));
 
         return Column(
@@ -487,9 +492,11 @@ class _HinooBuilderState extends State<HinooBuilder> {
                           elevation: 0,
                           margin: EdgeInsets.zero,
                           color: Colors.black,
-                          shape: RoundedRectangleBorder(borderRadius: canvasRadius),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: canvasRadius),
                           clipBehavior: Clip.antiAlias,
-                          child: _buildCanvas(context), // <-- RepaintBoundary è qui dentro
+                          child: _buildCanvas(
+                              context), // <-- RepaintBoundary è qui dentro
                         ),
                       ),
                     ],
@@ -502,7 +509,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
             SizedBox(
               height: thumbsH,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: outerGap, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: outerGap, vertical: 8),
                 child: AnteprimaHinoo(
                   pages: _pages,
                   currentIndex: _current,
@@ -531,12 +539,15 @@ class _HinooBuilderState extends State<HinooBuilder> {
           // Sfondo: usa sempre un unico percorso (asset di default oppure preview selezionata)
           Builder(
             builder: (_) {
-              final ImageProvider provider = _localBgPreview ?? const AssetImage('assets/images/hinoo_default_1080x1920.png');
+              final ImageProvider provider = _localBgPreview ??
+                  const AssetImage('assets/images/hinoo_default_1080x1920.png');
               final Widget fitted = FittedBox(
                 fit: BoxFit.cover,
                 child: Image(image: provider),
               );
-              final bool interactive = (_step == _WizardStep.changeBg && _bgChosen && _localBgPreview != null);
+              final bool interactive = (_step == _WizardStep.changeBg &&
+                  _bgChosen &&
+                  _localBgPreview != null);
               if (!interactive && _bgLockedMatrix != null) {
                 _bgController.value = _bgLockedMatrix!.clone();
               }
@@ -555,45 +566,49 @@ class _HinooBuilderState extends State<HinooBuilder> {
           ),
 
           // Overlays sequenziali: uno solo alla volta
-          if (_step == _WizardStep.changeBg)
-            ...[
-              CambiaSfondoOverlay(
-                onTapChange: _pickAndUploadBackground,
-                showControls: _bgChosen && _localBgPreview != null,
-                currentScale: _bgScale,
-                minScale: _bgMinScale,
-                maxScale: _bgMaxScale,
-                onScaleChanged: _bgChosen ? _updateBgScale : null,
-                onZoomIn: _bgChosen && _bgScale < _bgMaxScale ? () => _nudgeBgScale(0.1) : null,
-                onZoomOut: _bgChosen && _bgScale > _bgMinScale ? () => _nudgeBgScale(-0.1) : null,
-                onResetTransform: _bgChosen ? _resetBgTransform : null,
-              ),
-              if (_bgChosen)
-                Positioned(
-                  bottom: 12,
-                  right: 12,
-                  child: IconButton(
-                    iconSize: 44,
-                    onPressed: _confirmBgAndLock,
-                    icon: SvgPicture.asset('assets/icons/ok.svg', width: 44, height: 44),
-                    tooltip: 'Conferma sfondo',
-                  ),
+          if (_step == _WizardStep.changeBg) ...[
+            CambiaSfondoOverlay(
+              onTapChange: _pickAndUploadBackground,
+              showControls: _bgChosen && _localBgPreview != null,
+              currentScale: _bgScale,
+              minScale: _bgMinScale,
+              maxScale: _bgMaxScale,
+              onScaleChanged: _bgChosen ? _updateBgScale : null,
+              onZoomIn: _bgChosen && _bgScale < _bgMaxScale
+                  ? () => _nudgeBgScale(0.1)
+                  : null,
+              onZoomOut: _bgChosen && _bgScale > _bgMinScale
+                  ? () => _nudgeBgScale(-0.1)
+                  : null,
+              onResetTransform: _bgChosen ? _resetBgTransform : null,
+            ),
+            if (_bgChosen)
+              Positioned(
+                bottom: 12,
+                right: 12,
+                child: IconButton(
+                  iconSize: 44,
+                  onPressed: _confirmBgAndLock,
+                  icon: SvgPicture.asset('assets/icons/ok.svg',
+                      width: 44, height: 44),
+                  tooltip: 'Conferma sfondo',
                 ),
-            ]
-          else if (_step == _WizardStep.pickColor)
+              ),
+          ] else if (_step == _WizardStep.pickColor)
             ColoreTestoOverlay(
               onPick: (c) {
                 setState(() {
-          _txtColor = c;
-          // Propaga il colore su TUTTE le pagine per anteprime fedeli
-          for (var i = 0; i < _pages.length; i++) {
-            _pages[i] = _copySlideWithTextColor(_pages[i], _txtColor.value);
-          }
-          _step = _WizardStep.writeText;
-        });
-        FocusScope.of(context).requestFocus(_textFocus);
-        _notifyChanged();
-      },
+                  _txtColor = c;
+                  // Propaga il colore su TUTTE le pagine per anteprime fedeli
+                  for (var i = 0; i < _pages.length; i++) {
+                    _pages[i] =
+                        _copySlideWithTextColor(_pages[i], _txtColor.value);
+                  }
+                  _step = _WizardStep.writeText;
+                });
+                FocusScope.of(context).requestFocus(_textFocus);
+                _notifyChanged();
+              },
             )
           else if (_step == _WizardStep.writeText)
             ScriviHinooOverlay(
@@ -706,7 +721,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
     if (bytes == null) return;
     setState(() {
       _lastPreviewBytes = bytes;
-      _exportFilenameHint = 'hinoo_${DateTime.now().millisecondsSinceEpoch}.png';
+      _exportFilenameHint =
+          'hinoo_${DateTime.now().millisecondsSinceEpoch}.png';
     });
     final ValueChanged<Uint8List>? cb = widget.onPngExported;
     if (cb != null) cb(bytes);
@@ -745,7 +761,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
   Future<void> _pickAndUploadBackground() async {
     try {
       final picker = ImagePicker();
-      final XFile? selected = await picker.pickImage(source: ImageSource.gallery);
+      final XFile? selected =
+          await picker.pickImage(source: ImageSource.gallery);
       if (selected == null) return;
 
       // Preview locale immediata
@@ -775,10 +792,12 @@ class _HinooBuilderState extends State<HinooBuilder> {
     try {
       final client = Supabase.instance.client;
       final user = client.auth.currentUser;
-      if (user == null) return; // opzionale: consenti preview locale senza upload
+      if (user == null)
+        return; // opzionale: consenti preview locale senza upload
 
       final ext = _extensionFromName(originalName);
-      final url = await HinooStorageUploader.uploadBackground(bytes: bytes, ext: ext, userId: user.id);
+      final url = await HinooStorageUploader.uploadBackground(
+          bytes: bytes, ext: ext, userId: user.id);
       setState(() {
         _bgPublicUrl = url;
       });
@@ -812,7 +831,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
         'text': '',
         'bgUrl': _bgPublicUrl,
         'textColor': _txtColor.value,
-        if (_bgLockedMatrix != null) 'bgTransform': _bgLockedMatrix!.storage.toList(),
+        if (_bgLockedMatrix != null)
+          'bgTransform': _bgLockedMatrix!.storage.toList(),
       };
 
   dynamic _copySlideWithText(dynamic slide, String text) {
@@ -844,5 +864,4 @@ class _HinooBuilderState extends State<HinooBuilder> {
     if (slide is Map) return {...slide, 'textColor': colorValue};
     return slide;
   }
-
 }

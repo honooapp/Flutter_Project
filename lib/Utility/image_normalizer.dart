@@ -21,17 +21,16 @@ String sanitizeExt(String ext) {
 /// ricodifica a JPG qualità 88 e ridimensiona entro 1440x2560.
 /// Altrimenti restituisce bytes+ext originali (ext sanificata).
 Future<NormalizedImage> normalizeBackgroundImage(
-    Uint8List rawBytes, {
-      String originalExt = 'jpg',
-      int maxUploadBytes = 10 * 1024 * 1024, // 10 MB
-      int maxW = 1440,
-      int maxH = 2560,
-    }) async {
+  Uint8List rawBytes, {
+  String originalExt = 'jpg',
+  int maxUploadBytes = 10 * 1024 * 1024, // 10 MB
+  int maxW = 1440,
+  int maxH = 2560,
+}) async {
   final lower = sanitizeExt(originalExt);
 
-  final shouldReencode =
-      rawBytes.lengthInBytes > maxUploadBytes ||
-          !(lower == 'jpg' || lower == 'png' || lower == 'webp');
+  final shouldReencode = rawBytes.lengthInBytes > maxUploadBytes ||
+      !(lower == 'jpg' || lower == 'png' || lower == 'webp');
 
   if (!shouldReencode) {
     return NormalizedImage(rawBytes, lower);

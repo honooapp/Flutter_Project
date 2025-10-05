@@ -26,5 +26,4 @@ class DeviceController {
     final data = MediaQueryData.fromView(WidgetsBinding.instance.window);
     return data.size.height;
   }
-
 }

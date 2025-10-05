@@ -46,7 +46,8 @@ class _DownloadSaverIo implements DownloadSaver {
     } else if (Platform.isWindows) {
       final String? userProfile = Platform.environment['USERPROFILE'];
       if (userProfile != null && userProfile.isNotEmpty) {
-        final Directory downloads = Directory(_joinPaths(userProfile, 'Downloads'));
+        final Directory downloads =
+            Directory(_joinPaths(userProfile, 'Downloads'));
         if (downloads.existsSync()) base = downloads;
       }
     }

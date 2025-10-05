@@ -10,23 +10,19 @@ import 'package:sizer/sizer.dart';
 
 import 'HomePage.dart';
 
-
 class NimPage extends StatefulWidget {
   const NimPage({super.key});
-
 
   @override
   State<NimPage> createState() => _NimPageState();
 }
 
 class _NimPageState extends State<NimPage> {
-
   final TextEditingController _controller = TextEditingController();
   TextEditingController removeTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-
     _controller.text = NimController().drawGame();
 
     return Scaffold(
@@ -51,29 +47,31 @@ class _NimPageState extends State<NimPage> {
             children: [
               Expanded(child: Container()),
               Container(
-                constraints: DeviceController().isPhone() ? BoxConstraints(maxWidth: 100.w, maxHeight: 100.h -60) : BoxConstraints(maxWidth: 50.w, maxHeight: 100.h - 60),
-                child:Column(
+                constraints: DeviceController().isPhone()
+                    ? BoxConstraints(maxWidth: 100.w, maxHeight: 100.h - 60)
+                    : BoxConstraints(maxWidth: 50.w, maxHeight: 100.h - 60),
+                child: Column(
                   children: [
                     TextField(
-                        controller: _controller,
-                        style: GoogleFonts.arvo(
+                      controller: _controller,
+                      style: GoogleFonts.arvo(
+                        color: const Color(0xFF9E172F),
+                        fontSize: 40,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      textAlignVertical: TextAlignVertical.center,
+                      maxLines: 4,
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "",
+                        hintStyle: GoogleFonts.arvo(
                           color: const Color(0xFF9E172F),
                           fontSize: 40,
                           fontWeight: FontWeight.w400,
                         ),
-                        textAlignVertical: TextAlignVertical.center,
-                        maxLines: 4,
-                        textAlign: TextAlign.center,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: "",
-                          hintStyle: GoogleFonts.arvo(
-                            color: const Color(0xFF9E172F),
-                            fontSize: 40,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
                       ),
+                    ),
                     const Padding(padding: EdgeInsets.all(30)),
                     //button to start the game
                     Row(
@@ -87,7 +85,8 @@ class _NimPageState extends State<NimPage> {
                             });
                           },
                           style: ElevatedButton.styleFrom(
-                            foregroundColor: const Color(0xFF000026), backgroundColor: const Color(0xFF9E172F),
+                            foregroundColor: const Color(0xFF000026),
+                            backgroundColor: const Color(0xFF9E172F),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20.0),
                             ),
@@ -105,7 +104,8 @@ class _NimPageState extends State<NimPage> {
                               });
                             },
                             style: ElevatedButton.styleFrom(
-                              foregroundColor: const Color(0xFF000026), backgroundColor: const Color(0xFF9E172F),
+                              foregroundColor: const Color(0xFF000026),
+                              backgroundColor: const Color(0xFF9E172F),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20.0),
                               ),
@@ -115,46 +115,54 @@ class _NimPageState extends State<NimPage> {
                         ),
                         //input to insert the number of matches to remove
                         SizedBox(
-                            width: 50,
-                            child: TextField(
-                              controller: removeTextController,
-                              style: GoogleFonts.arvo(
+                          width: 50,
+                          child: TextField(
+                            controller: removeTextController,
+                            style: GoogleFonts.arvo(
+                              color: const Color(0xFF9E172F),
+                              fontSize: 40,
+                              fontWeight: FontWeight.w400,
+                            ),
+                            textAlignVertical: TextAlignVertical.center,
+                            maxLines: 1,
+                            textAlign: TextAlign.center,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "",
+                              hintStyle: GoogleFonts.arvo(
                                 color: const Color(0xFF9E172F),
                                 fontSize: 40,
                                 fontWeight: FontWeight.w400,
                               ),
-                              textAlignVertical: TextAlignVertical.center,
-                              maxLines: 1,
-                              textAlign: TextAlign.center,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "",
-                                hintStyle: GoogleFonts.arvo(
-                                  color: const Color(0xFF9E172F),
-                                  fontSize: 40,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
                             ),
                           ),
+                        ),
                         //button to remove the matches
                         ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                NimController().playerMove(int.parse(removeTextController.text.split(' ')[0]), removeTextController.text.split(' ')[1].split(',').map(int.parse).toList());
-                                NimController().changePlayer();
-                                NimController().aiMove();
-                                _controller.text = NimController().drawGame();
-                              });
-                            },
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: const Color(0xFF000026), backgroundColor: const Color(0xFF9E172F),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20.0),
-                              ),
+                          onPressed: () {
+                            setState(() {
+                              NimController().playerMove(
+                                  int.parse(
+                                      removeTextController.text.split(' ')[0]),
+                                  removeTextController.text
+                                      .split(' ')[1]
+                                      .split(',')
+                                      .map(int.parse)
+                                      .toList());
+                              NimController().changePlayer();
+                              NimController().aiMove();
+                              _controller.text = NimController().drawGame();
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: const Color(0xFF000026),
+                            backgroundColor: const Color(0xFF9E172F),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
                             ),
-                            child: const Text("Togli"),
                           ),
+                          child: const Text("Togli"),
+                        ),
                       ],
                     ),
                     SizedBox(
@@ -172,7 +180,8 @@ class _NimPageState extends State<NimPage> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const HomePage()),
+                                MaterialPageRoute(
+                                    builder: (context) => const HomePage()),
                               );
                             },
                           ),

@@ -3,7 +3,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Entities/Hinoo.dart';
 
 class HinooService {
-  static final _supabase = Supabase.instance.client; // può restare ma NON usarlo
+  static final _supabase =
+      Supabase.instance.client; // può restare ma NON usarlo
   static const String _table = 'hinoo';
 
   // Iniezione client per i test
@@ -42,10 +43,11 @@ class HinooService {
     try {
       debugPrint('[HinooService] publishHinoo data=$data');
       final res =
-      await _client.from(_table).insert(data).select().maybeSingle();
+          await _client.from(_table).insert(data).select().maybeSingle();
       if (res == null) throw 'publishHinoo: insert fallita';
     } on PostgrestException catch (e) {
-      debugPrint('[HinooService] publishHinoo error: ${e.message} details=${e.details} hint=${e.hint} code=${e.code}');
+      debugPrint(
+          '[HinooService] publishHinoo error: ${e.message} details=${e.details} hint=${e.hint} code=${e.code}');
       final msg = e.message ?? e.code ?? 'sconosciuto';
       final details = e.details;
       final hint = e.hint;
@@ -92,7 +94,8 @@ class HinooService {
       await _client.from(_table).insert(data);
       return true;
     } on PostgrestException catch (e) {
-      debugPrint('[HinooService] duplicateToMoon error: ${e.message} details=${e.details} hint=${e.hint} code=${e.code}');
+      debugPrint(
+          '[HinooService] duplicateToMoon error: ${e.message} details=${e.details} hint=${e.hint} code=${e.code}');
       final msg = e.message ?? e.code ?? 'sconosciuto';
       final details = e.details;
       final hint = e.hint;

@@ -281,7 +281,8 @@ class _ChestPageState extends State<ChestPage> {
   Widget _buildChestItem(
       _ChestItem item, double availableCenterH, double targetMaxW) {
     final String identity = item.when(
-      honoo: (h) => 'honoo_${h.dbId ?? h.id ?? item.createdAt.toIso8601String()}',
+      honoo: (h) =>
+          'honoo_${h.dbId ?? h.id ?? item.createdAt.toIso8601String()}',
       hinoo: (row) => 'hinoo_${row.id}',
     );
 
@@ -526,10 +527,12 @@ class _ChestPageState extends State<ChestPage> {
                                     switchInCurve: Curves.easeOutCubic,
                                     switchOutCurve: Curves.easeInCubic,
                                     child: () {
-                                      if (ctrl.isLoading.value || _isHinooLoading) {
+                                      if (ctrl.isLoading.value ||
+                                          _isHinooLoading) {
                                         return const Center(
                                           key: ValueKey('chest_loading'),
-                                          child: LoadingSpinner(color: Colors.white),
+                                          child: LoadingSpinner(
+                                              color: Colors.white),
                                         );
                                       }
 
@@ -548,8 +551,10 @@ class _ChestPageState extends State<ChestPage> {
                                       }
 
                                       return Padding(
-                                        key: ValueKey('chest_content_${_items.length}'),
-                                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                                        key: ValueKey(
+                                            'chest_content_${_items.length}'),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16),
                                         child: cs.CarouselSlider.builder(
                                           itemCount: _items.length,
                                           options: cs.CarouselOptions(
@@ -558,12 +563,17 @@ class _ChestPageState extends State<ChestPage> {
                                             enableInfiniteScroll: false,
                                             padEnds: true,
                                             enlargeCenterPage: false,
-                                            scrollPhysics: const BouncingScrollPhysics(),
-                                            onPageChanged: (i, _) => setState(() => _currentIndex = i),
+                                            scrollPhysics:
+                                                const BouncingScrollPhysics(),
+                                            onPageChanged: (i, _) => setState(
+                                                () => _currentIndex = i),
                                           ),
-                                          itemBuilder: (context, index, realIdx) {
+                                          itemBuilder:
+                                              (context, index, realIdx) {
                                             return Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 16),
                                               child: _buildChestItem(
                                                 _items[index],
                                                 availableCenterH,

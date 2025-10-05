@@ -9,7 +9,6 @@ import 'package:sizer/sizer.dart';
 import '../Widgets/SeaFooterBar.dart';
 import '../Widgets/LunaFissa.dart';
 
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -71,7 +70,8 @@ class _HomePageState extends State<HomePage> {
                                               Text(
                                                 Utility().textHome1,
                                                 style: GoogleFonts.arvo(
-                                                  color: HonooColor.onBackground,
+                                                  color:
+                                                      HonooColor.onBackground,
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.w700,
                                                 ),
@@ -81,7 +81,8 @@ class _HomePageState extends State<HomePage> {
                                               Text(
                                                 Utility().textHome2,
                                                 style: GoogleFonts.arvo(
-                                                  color: HonooColor.onBackground,
+                                                  color:
+                                                      HonooColor.onBackground,
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.w400,
                                                 ),

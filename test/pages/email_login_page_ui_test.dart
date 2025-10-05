@@ -6,7 +6,8 @@ import 'package:honoo/Pages/EmailLoginPage.dart'; // adatta se il path è divers
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('EmailLoginPage: render, input email e azione presente', (tester) async {
+  testWidgets('EmailLoginPage: render, input email e azione presente',
+      (tester) async {
     // Avvia la pagina o l'app intera (scegline UNA delle due righe)
     // await tester.pumpWidget(const MyApp());
     await tester.pumpWidget(const MaterialApp(home: EmailLoginPage()));
@@ -23,7 +24,6 @@ void main() {
     await tester.ensureVisible(sendBtn);
     await tester.tap(sendBtn, warnIfMissed: false);
     await tester.pumpAndSettle();
-
 
     expect(sendBtn, findsOneWidget);
 

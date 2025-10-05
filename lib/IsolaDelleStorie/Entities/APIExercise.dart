@@ -19,9 +19,7 @@ class APIExercise {
 
   String get parentId => _id;
 
-  set id (String value) {
+  set id(String value) {
     _id = value;
   }
-
 }
-

@@ -71,7 +71,8 @@ class NimGame {
   }
 
   bool isBalanced(List<int> boardToCheck) {
-    int balanced = (boardToCheck[0] ^ boardToCheck[1]) ^ (boardToCheck[2] ^ boardToCheck[3]);
+    int balanced = (boardToCheck[0] ^ boardToCheck[1]) ^
+        (boardToCheck[2] ^ boardToCheck[3]);
     return balanced == 0;
   }
 
@@ -132,8 +133,7 @@ class NimGame {
 
     board[row] -= amount;
 
-    String playerMoveMessage =
-        'Player removed: $amount From row: ${row + 1}';
+    String playerMoveMessage = 'Player removed: $amount From row: ${row + 1}';
     playerMovesHistory.add(playerMoveMessage);
   }
 
@@ -234,7 +234,6 @@ class NimGame {
   }
 
   void playGame() {
-
     // ------------------------------------
     // GAME START
     // ------------------------------------
@@ -275,4 +274,3 @@ void main() {
   NimGame nimGame = NimGame();
   nimGame.playGame();
 }
-

@@ -16,7 +16,6 @@ class PlaceholderPage extends StatefulWidget {
 }
 
 class _PlaceholderPageState extends State<PlaceholderPage> {
-
   @override
   Widget build(BuildContext context) {
     final isPhone = DeviceController().isPhone();
@@ -58,7 +57,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                       WidgetSpan(
                         child: Padding(
                           padding: EdgeInsets.only(bottom: 3),
-                          child: Image.asset("assets/icons/performance.png", height: 70),
+                          child: Image.asset("assets/icons/performance.png",
+                              height: 70),
                         ),
                         alignment: PlaceholderAlignment.middle,
                       ),
@@ -66,7 +66,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                       WidgetSpan(
                         child: Padding(
                           padding: EdgeInsets.only(bottom: 3),
-                          child: Image.asset("assets/icons/luna.png", height: 70),
+                          child:
+                              Image.asset("assets/icons/luna.png", height: 70),
                         ),
                         alignment: PlaceholderAlignment.middle,
                       ),
@@ -74,7 +75,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                       WidgetSpan(
                         child: Padding(
                           padding: EdgeInsets.only(bottom: 3),
-                          child: Image.asset("assets/icons/isola.png", height: 70),
+                          child:
+                              Image.asset("assets/icons/isola.png", height: 70),
                         ),
                         alignment: PlaceholderAlignment.middle,
                       ),
@@ -82,7 +84,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                       WidgetSpan(
                         child: Padding(
                           padding: EdgeInsets.only(bottom: 3),
-                          child: Image.asset("assets/icons/performance.png", height: 70),
+                          child: Image.asset("assets/icons/performance.png",
+                              height: 70),
                         ),
                         alignment: PlaceholderAlignment.middle,
                       ),
@@ -139,18 +142,18 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           Expanded(child: Container()),
           isPhone
               ? Container(
-            color: HonooColor.background,
-            constraints: BoxConstraints(maxWidth: maxWidth),
-            child: content,
-          )
+                  color: HonooColor.background,
+                  constraints: BoxConstraints(maxWidth: maxWidth),
+                  child: content,
+                )
               : Opacity(
-            opacity: 0.7,
-            child: Container(
-              color: HonooColor.background,
-              constraints: BoxConstraints(maxWidth: maxWidth * 0.5),
-              child: content,
-            ),
-          ),
+                  opacity: 0.7,
+                  child: Container(
+                    color: HonooColor.background,
+                    constraints: BoxConstraints(maxWidth: maxWidth * 0.5),
+                    child: content,
+                  ),
+                ),
           Expanded(child: Container()),
         ],
       ),
@@ -159,5 +162,4 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     // Ritorna il widget con o senza Background
     return isPhone ? pageBody : Background(child: pageBody);
   }
-
 }

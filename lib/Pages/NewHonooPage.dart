@@ -31,7 +31,8 @@ class NewHonooPage extends StatefulWidget {
 }
 
 class _NewHonooPageState extends State<NewHonooPage> {
-  final GlobalKey<HonooBuilderState> _builderKey = GlobalKey<HonooBuilderState>();
+  final GlobalKey<HonooBuilderState> _builderKey =
+      GlobalKey<HonooBuilderState>();
 
   String _text = '';
   String _imageUrl = '';
@@ -53,7 +54,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
     if (text == _text && imageUrl == _imageUrl) return;
 
     final bool isSameAsLastSaved =
-    (text == _lastSavedText && imageUrl == _lastSavedRawImage);
+        (text == _lastSavedText && imageUrl == _lastSavedRawImage);
 
     setState(() {
       _text = text;
@@ -120,7 +121,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
       if (!mounted) return;
       setState(() {
-        _savedToChest = true;               // passa a “luna”
+        _savedToChest = true; // passa a “luna”
         _finalImageUrlCache = finalImageUrl;
 
         // memorizza il contenuto SALVATO per ignorare update identici
@@ -160,23 +161,23 @@ class _NewHonooPageState extends State<NewHonooPage> {
         null,
       );
 
-    final ok = await HonooService.duplicateToMoon(honooForMoon);
+      final ok = await HonooService.duplicateToMoon(honooForMoon);
 
-    if (!mounted) return;
-    showHonooToast(
-      context,
-      message: ok ? 'Pubblicato sulla Luna.' : 'Già presente sulla Luna.',
-    );
-  } catch (e, st) {
-    debugPrint('duplicateToMoon failed: $e\n$st');
-    if (mounted) {
+      if (!mounted) return;
       showHonooToast(
         context,
-        message: 'Errore: $e',
+        message: ok ? 'Pubblicato sulla Luna.' : 'Già presente sulla Luna.',
       );
+    } catch (e, st) {
+      debugPrint('duplicateToMoon failed: $e\n$st');
+      if (mounted) {
+        showHonooToast(
+          context,
+          message: 'Errore: $e',
+        );
+      }
     }
   }
-}
 
   Future<void> _handleDownloadTap() async {
     if (!_hasMinTextForDownload) {
@@ -285,7 +286,6 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
   @override
   Widget build(BuildContext context) {
-
     // Header compatto per ridurre il gap sopra l’honoo
     const double headerH = 52;
 
@@ -382,17 +382,17 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           duration: const Duration(milliseconds: 90),
                           curve: Curves.easeOutCubic,
                           constraints: BoxConstraints(maxWidth: targetMaxW),
-                            child: SizedBox(
-                              width: builderWidth,
-                              height: builderHeight,
-                              child: ClipRect(
-                                child: HonooBuilder(
-                                  key: _builderKey,
-                                  onHonooChanged: _onHonooChanged,
-                                  onFocusChanged: _onBuilderFocusChanged,
-                                ),
+                          child: SizedBox(
+                            width: builderWidth,
+                            height: builderHeight,
+                            child: ClipRect(
+                              child: HonooBuilder(
+                                key: _builderKey,
+                                onHonooChanged: _onHonooChanged,
+                                onFocusChanged: _onBuilderFocusChanged,
                               ),
                             ),
+                          ),
                         ),
                       ),
                     ),
@@ -439,7 +439,8 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => ChestPage()),
+                              MaterialPageRoute(
+                                  builder: (context) => ChestPage()),
                             );
                           },
                         ),
@@ -448,26 +449,26 @@ class _NewHonooPageState extends State<NewHonooPage> {
                         // OK → LUNA (switch basato su _savedToChest)
                         _savedToChest
                             ? IconButton(
-                          icon: SvgPicture.asset(
-                            "assets/icons/moon.svg",
-                            semanticsLabel: 'Luna',
-                          ),
-                          iconSize: 32,
-                          splashRadius: 25,
-                          tooltip: 'Spedisci sulla Luna',
-                          onPressed: _submitToMoon,
-                        )
+                                icon: SvgPicture.asset(
+                                  "assets/icons/moon.svg",
+                                  semanticsLabel: 'Luna',
+                                ),
+                                iconSize: 32,
+                                splashRadius: 25,
+                                tooltip: 'Spedisci sulla Luna',
+                                onPressed: _submitToMoon,
+                              )
                             : IconButton(
-                          icon: SvgPicture.asset(
-                            "assets/icons/ok.svg",
-                            semanticsLabel: 'OK',
-                          ),
-                          iconSize: 60,
-                          splashRadius: 25,
-                          tooltip: 'Salva honoo',
-                          onPressed: _submitHonoo,
-                        ),
-                  SizedBox(width: 5.w),
+                                icon: SvgPicture.asset(
+                                  "assets/icons/ok.svg",
+                                  semanticsLabel: 'OK',
+                                ),
+                                iconSize: 60,
+                                splashRadius: 25,
+                                tooltip: 'Salva honoo',
+                                onPressed: _submitHonoo,
+                              ),
+                        SizedBox(width: 5.w),
 
                         // NUOVA ICONA PIUMA
                         IconButton(
@@ -481,17 +482,17 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const NewHinooPage()),
+                              MaterialPageRoute(
+                                  builder: (context) => const NewHinooPage()),
                             );
                           },
                         ),
                       ],
                     ),
                   ),
-                ),       // ===== LUNA FISSA (non copre contenuti, responsive) =====
+                ), // ===== LUNA FISSA (non copre contenuti, responsive) =====
                 const LunaFissa(),
               ],
-
             );
           },
         ),
