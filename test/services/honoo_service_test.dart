@@ -1,17 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-// Supabase + Postgrest API (v1.x)
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:postgrest/postgrest.dart';
 
 import 'package:honoo/Services/HonooService.dart';
 import 'package:honoo/Entities/Honoo.dart';
 
-/// Mock unico che implementa i builder usati nella catena:
-/// - client.from('honoo') -> SupabaseQueryBuilder
-/// - .select/.delete/.eq/.order -> Postgrest* builders
-/// I builder Postgrest sono "awaitable", quindi mockiamo anche Future.then(...)
 class _MockQueryChain extends Mock
     implements
         SupabaseQueryBuilder,
@@ -25,7 +20,6 @@ void main() {
   late _MockQueryChain chain;
 
   setUpAll(() {
-    // Fallback per any() su mappe/argomenti dinamici
     registerFallbackValue(<String, dynamic>{});
   });
 
@@ -33,13 +27,9 @@ void main() {
     client = _MockSupabaseClient();
     chain  = _MockQueryChain();
 
-    // Inietta il client mock nel service
     HonooService.$setTestClient(client);
-
-    // client.from('honoo') -> chain
     when(() => client.from('honoo')).thenReturn(chain);
 
-    // Chaining fluente: ogni step ritorna la stessa chain
     when(() => chain.select(any())).thenReturn(chain);
     when(() => chain.delete()).thenReturn(chain);
     when(() => chain.eq(any(), any())).thenReturn(chain);
@@ -49,11 +39,10 @@ void main() {
 
   tearDown(() {
     HonooService.$setTestClient(null);
-    resetMocktailState(); // opzionale ma utile per isolamento tra test
+    resetMocktailState();
   });
 
   test('fetchPublicHonoo: filtra destination=moon e ordina per created_at desc', () async {
-    // Dati simulati restituiti dall'await della catena
     final rows = [
       {
         'id': 2,
@@ -75,7 +64,6 @@ void main() {
       },
     ];
 
-    // Stubbiamo il completamento del Future finale (await chain)
     when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
         .thenAnswer((invocation) async {
       final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);

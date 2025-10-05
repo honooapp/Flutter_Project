@@ -5,10 +5,11 @@ import 'package:uuid/uuid.dart';
 
 class HinooStorageUploader {
   static const String bucket = 'hinoo';
+  // (può restare, ma NON lo usiamo più)
   static final _supabase = Supabase.instance.client;
   static final _uuid = const Uuid();
 
-  // Sostituisci l’accesso diretto con un getter che possiamo sovrascrivere nei test
+  // Getter iniettabile nei test
   static SupabaseClient get _client => _overrideClient ?? Supabase.instance.client;
   static SupabaseClient? _overrideClient;
 
@@ -53,7 +54,7 @@ class HinooStorageUploader {
     final id = _uuid.v4();
     final path = '$userId/$safeFolder/$id.$safeExt';
 
-    await _supabase.storage.from(bucket).uploadBinary(
+    await _client.storage.from(bucket).uploadBinary(
       path,
       bytes,
       fileOptions: const FileOptions(
@@ -62,7 +63,7 @@ class HinooStorageUploader {
       ),
     );
 
-    return _supabase.storage.from(bucket).getPublicUrl(path);
+    return _client.storage.from(bucket).getPublicUrl(path);
   }
 
   /// Sfondi → hinoo/<userId>/backgrounds/<uuid>.<ext>

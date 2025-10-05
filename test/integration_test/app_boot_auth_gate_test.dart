@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:flutter/material.dart';
 import 'package:honoo/main.dart';
 
 void main() {
@@ -13,5 +12,7 @@ void main() {
     // accetta entrambe: se non loggato vedrai la login, se loggato la home
     expect(find.textContaining('Login', findRichText: true).evaluate().isNotEmpty ||
         find.textContaining('Home', findRichText: true).evaluate().isNotEmpty, isTrue);
-  });
+  },
+tags: ['integration']
+  );
 }

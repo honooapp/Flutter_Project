@@ -16,7 +16,8 @@ void main() {
   late _MockFileApi fileApi;
 
   setUpAll(() {
-    // Alcuni matcher su named args richiedono un fallback value
+    // Fallback per matcher su tipi posizionali/named
+    registerFallbackValue(Uint8List(0));
     registerFallbackValue(const FileOptions());
   });
 
@@ -25,16 +26,19 @@ void main() {
     storage = _MockStorageClient();
     fileApi = _MockFileApi();
 
-    // Inietta il client mock nell'uploader (grazie alla tua $setTestClient)
+    // Inietta il client mock nell'uploader
     HinooStorageUploader.$setTestClient(client);
 
     // catena: client.storage -> storage ; storage.from('hinoo') -> fileApi
     when(() => client.storage).thenReturn(storage);
     when(() => storage.from('hinoo')).thenReturn(fileApi);
 
-    // Per default: uploadBinary non lancia e getPublicUrl ritorna un URL plausibile
-    when(() => fileApi.uploadBinary(any(), any(), fileOptions: any(named: 'fileOptions')))
-        .thenAnswer((_) async => 'ignored-path-returned-by-upload'); // non usato dal tuo codice
+    // Stub base
+    when(() => fileApi.uploadBinary(
+      any(),                    // path
+      any<Uint8List>(),         // file
+      fileOptions: any(named: 'fileOptions'),
+    )).thenAnswer((_) async => 'ignored-path-returned-by-upload'); // non usato dal codice
     when(() => fileApi.getPublicUrl(any()))
         .thenReturn('https://cdn.example.com/hinoo/mock-url.png');
   });
@@ -53,18 +57,15 @@ void main() {
 
     expect(url, contains('https://cdn.example.com/hinoo/'));
 
-    // Cattura gli argomenti passati a uploadBinary per verificare path e opzioni
     final captured = verify(() => fileApi.uploadBinary(
       captureAny(), // path
-      any(that: isA<Uint8List>()),
+      any<Uint8List>(),
       fileOptions: any(named: 'fileOptions', that: isA<FileOptions>()),
     )).captured;
 
     final String path = captured.first as String;
     // path = u1/exports/<uuid>.png
     expect(path, allOf([contains('u1/exports/'), endsWith('.png')]));
-
-    // getPublicUrl deve essere chiamato con lo stesso path
     verify(() => fileApi.getPublicUrl(path)).called(1);
   });
 
@@ -82,7 +83,7 @@ void main() {
 
     final captured = verify(() => fileApi.uploadBinary(
       captureAny(),
-      any(that: isA<Uint8List>()),
+      any<Uint8List>(),
       fileOptions: any(named: 'fileOptions', that: isA<FileOptions>()),
     )).captured;
 
@@ -106,7 +107,7 @@ void main() {
 
     final captured = verify(() => fileApi.uploadBinary(
       captureAny(),
-      any(that: isA<Uint8List>()),
+      any<Uint8List>(),
       fileOptions: any(named: 'fileOptions', that: isA<FileOptions>()),
     )).captured;
 
@@ -124,7 +125,6 @@ void main() {
       ),
       throwsA(isA<String>()),
     );
-    // uploadBinary NON deve essere chiamato
     verifyNever(() => fileApi.uploadBinary(any(), any(), fileOptions: any(named: 'fileOptions')));
   });
 }

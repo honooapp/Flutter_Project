@@ -3,17 +3,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Entities/Hinoo.dart';
 
 class HinooService {
-  static final _supabase = Supabase.instance.client;
+  static final _supabase = Supabase.instance.client; // può restare ma NON usarlo
   static const String _table = 'hinoo';
 
-// Per i test: possiamo iniettare un client mock.
-// In produzione, usa Supabase.instance.client.
+  // Iniezione client per i test
   static SupabaseClient? _testClient;
   static void $setTestClient(SupabaseClient? c) => _testClient = c;
   static SupabaseClient get _client => _testClient ?? Supabase.instance.client;
-
-// NB: puoi lasciare _supabase dichiarato se c'è già, ma NON usarlo più nei metodi:
-// static final _supabase = Supabase.instance.client; // <-- non usato
 
   static String _toDbType(HinooType type) {
     switch (type) {
@@ -31,7 +27,7 @@ class HinooService {
   }
 
   static Future<void> publishHinoo(HinooDraft draft) async {
-    final userId = _supabase.auth.currentUser?.id;
+    final userId = _client.auth.currentUser?.id;
     if (userId == null) throw 'Utente non autenticato';
 
     final data = {
@@ -39,7 +35,6 @@ class HinooService {
       'type': _toDbType(draft.type),
       'pages': draft.toJson()['pages'],
       'recipient_tag': draft.recipientTag,
-      // fingerprint può essere null (solo moon lo usa per dedup)
       'fingerprint': (draft.type == HinooType.moon) ? fingerprint(draft) : null,
       'created_at': DateTime.now().toIso8601String(),
     };
@@ -47,7 +42,7 @@ class HinooService {
     try {
       debugPrint('[HinooService] publishHinoo data=$data');
       final res =
-          await _supabase.from(_table).insert(data).select().maybeSingle();
+      await _client.from(_table).insert(data).select().maybeSingle();
       if (res == null) throw 'publishHinoo: insert fallita';
     } on PostgrestException catch (e) {
       debugPrint('[HinooService] publishHinoo error: ${e.message} details=${e.details} hint=${e.hint} code=${e.code}');
@@ -64,14 +59,14 @@ class HinooService {
 
   /// Inserisce un record type='moon' se non già presente (dedup su fingerprint)
   static Future<bool> duplicateToMoon(HinooDraft draft) async {
-    final userId = _supabase.auth.currentUser?.id;
+    final userId = _client.auth.currentUser?.id;
     if (userId == null) throw 'Utente non autenticato';
 
     final sanitized = draft.copyWith(type: HinooType.moon);
     final fp = fingerprint(sanitized);
 
     // Verifica duplicato nella STESSA tabella
-    final existing = await _supabase
+    final existing = await _client
         .from(_table)
         .select('id')
         .eq('user_id', userId)
@@ -94,7 +89,7 @@ class HinooService {
 
     try {
       debugPrint('[HinooService] duplicateToMoon data=$data');
-      await _supabase.from(_table).insert(data);
+      await _client.from(_table).insert(data);
       return true;
     } on PostgrestException catch (e) {
       debugPrint('[HinooService] duplicateToMoon error: ${e.message} details=${e.details} hint=${e.hint} code=${e.code}');
@@ -124,10 +119,10 @@ class HinooService {
   }
 
   static Future<void> saveDraft(HinooDraft draft) async {
-    final userId = _supabase.auth.currentUser?.id;
+    final userId = _client.auth.currentUser?.id;
     if (userId == null) throw 'Utente non autenticato';
 
-    await _supabase.from('hinoo_drafts').upsert({
+    await _client.from('hinoo_drafts').upsert({
       'user_id': userId,
       'payload': draft.toJson(),
       'updated_at': DateTime.now().toIso8601String(),
@@ -135,10 +130,10 @@ class HinooService {
   }
 
   static Future<HinooDraft?> getDraft() async {
-    final userId = _supabase.auth.currentUser?.id;
+    final userId = _client.auth.currentUser?.id;
     if (userId == null) return null;
 
-    final res = await _supabase
+    final res = await _client
         .from('hinoo_drafts')
         .select('payload')
         .eq('user_id', userId)
@@ -158,7 +153,7 @@ class HinooService {
   static Future<List<HinooDraft>> fetchUserHinoo(String userId,
       {HinooType type = HinooType.personal}) async {
     final typeStr = _toDbType(type);
-    final baseQuery = _supabase
+    final baseQuery = _client
         .from(_table)
         .select('pages,type,recipient_tag,created_at')
         .eq('user_id', userId);

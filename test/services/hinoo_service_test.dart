@@ -1,17 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-// Supabase 1.x
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:postgrest/postgrest.dart';
 
 import 'package:honoo/Services/HinooService.dart';
 import 'package:honoo/Entities/Hinoo.dart';
 
-/// Mock unico che si comporta come i builder usati da supabase 1.x:
-/// - SupabaseQueryBuilder (ritorno di client.from(...))
-/// - PostgrestFilterBuilder (select/eq/order/limit/maybeSingle/upsert/insert)
-/// - PostgrestTransformBuilder (order/limit/maybeSingle)
 class _MockQueryChain extends Mock
     implements
         SupabaseQueryBuilder,
@@ -25,7 +20,6 @@ void main() {
   late _MockQueryChain chain;
 
   setUpAll(() {
-    // Fallback per matcher generici su mappe o argomenti dinamici
     registerFallbackValue(<String, dynamic>{});
   });
 
@@ -33,20 +27,15 @@ void main() {
     client = _MockSupabaseClient();
     chain = _MockQueryChain();
 
-    // Inietta il client mock nel service
     HinooService.$setTestClient(client);
-
-    // client.from('hinoo' | 'hinoo_drafts' ...) -> chain
     when(() => client.from(any())).thenReturn(chain);
 
-    // Chaining: ogni step torna la stessa chain
     when(() => chain.select(any())).thenReturn(chain);
     when(() => chain.eq(any(), any())).thenReturn(chain);
     when(() => chain.order(any(), ascending: any(named: 'ascending')))
         .thenReturn(chain);
     when(() => chain.limit(any())).thenReturn(chain);
 
-    // Imposta maybeSingle come step di trasformazione (torna la chain, non un Future)
     when(() => chain.maybeSingle()).thenReturn(chain);
   });
 
@@ -89,7 +78,6 @@ void main() {
       }
     ];
 
-    // Quando la catena viene awaitata (builder Future-like), restituiamo "rows"
     when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
         .thenAnswer((invocation) async {
       final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
@@ -108,7 +96,7 @@ void main() {
     verify(() => chain.eq('user_id', 'u1')).called(1);
     verify(() => chain.eq('type', 'personal')).called(1);
     verify(() => chain.order('created_at', ascending: false)).called(1);
-    verifyNever(() => chain.execute()); // in questo percorso non si usa execute()
+    verifyNever(() => chain.execute());
   });
 
   test('fetchUserHinoo: type=moon → filtra "moon" e ordina DESC', () async {
