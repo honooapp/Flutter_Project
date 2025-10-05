@@ -12,15 +12,16 @@ void main() {
       expect(c.personal, isA<List<Honoo>>());
     });
 
-    test('getHonooHistory: se dbId è null ritorna almeno l’honoo stesso', () async {
+    test('getHonooHistory: se dbId è null ritorna almeno l’honoo stesso',
+        () async {
       // Costruttore POSIZIONALE di Honoo: (id, text, image, created_at, updated_at, user_id, type, [replyTo, recipientTag])
       final h = Honoo(
         1,
         '“Solo locale”',
-        '',                         // image_url
-        '2024-01-01T00:00:00Z',     // created_at
-        '2024-01-01T00:00:00Z',     // updated_at
-        'user_local',               // user_id
+        '', // image_url
+        '2024-01-01T00:00:00Z', // created_at
+        '2024-01-01T00:00:00Z', // updated_at
+        'user_local', // user_id
         HonooType.personal,
       );
       // dbId resta null => ramo "offline"

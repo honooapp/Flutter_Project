@@ -6,7 +6,8 @@ import 'package:honoo/Pages/EmailLoginPage.dart'; // adatta path se serve
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('EmailLoginPage: mostra errore per email vuota/invalid', (tester) async {
+  testWidgets('EmailLoginPage: mostra errore per email vuota/invalid',
+      (tester) async {
     await tester.pumpWidget(const MaterialApp(home: EmailLoginPage()));
     await tester.pumpAndSettle();
 
@@ -23,7 +24,6 @@ void main() {
     await tester.ensureVisible(sendBtn);
     await tester.tap(sendBtn, warnIfMissed: false);
     await tester.pumpAndSettle();
-
 
     await tester.ensureVisible(sendBtn);
     await tester.tap(sendBtn, warnIfMissed: false);

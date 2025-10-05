@@ -22,7 +22,9 @@ class _DownloadSaverWeb implements DownloadSaver {
       html.Url.revokeObjectUrl(url);
     }
 
-    return images.length == 1 ? 'Download avviato.' : 'Download multipli avviati.';
+    return images.length == 1
+        ? 'Download avviato.'
+        : 'Download multipli avviati.';
   }
 }
 

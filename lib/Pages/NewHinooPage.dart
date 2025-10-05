@@ -51,8 +51,8 @@ class _NewHinooPageState extends State<NewHinooPage> {
   bool get _hasMinTextForDownload => _currentTextLength >= 1;
 
   // Costanti layout
-  static const double _titleH = 52;     // riga titolo
-  static const double _controlsH = 44;  // riga bottoni bianchi visibili
+  static const double _titleH = 52; // riga titolo
+  static const double _controlsH = 44; // riga bottoni bianchi visibili
   static const double _thumbsH = 140;
   static const double _footerH = 100.0; // riserva spazio per la navbar
 
@@ -125,7 +125,8 @@ class _NewHinooPageState extends State<NewHinooPage> {
 
   // Azioni footer
   Future<void> _submitHinoo() async {
-    final dynamic rawDraft = (_builderKey.currentState as dynamic)?.exportDraft();
+    final dynamic rawDraft =
+        (_builderKey.currentState as dynamic)?.exportDraft();
     final pages = (rawDraft is Map) ? (rawDraft['pages'] as List?) : null;
     if (rawDraft == null || pages == null || pages.isEmpty) {
       if (!mounted) return;
@@ -205,7 +206,8 @@ class _NewHinooPageState extends State<NewHinooPage> {
 
           const double designHeight = 1920;
           const double designWidth = 1080;
-          final double canvasH = _lastCanvasHeight > 0 ? _lastCanvasHeight : designHeight;
+          final double canvasH =
+              _lastCanvasHeight > 0 ? _lastCanvasHeight : designHeight;
           final double canvasW = canvasH * (9 / 16);
           final double factorX = canvasW != 0 ? designWidth / canvasW : 1.0;
           final double factorY = canvasH != 0 ? designHeight / canvasH : 1.0;
@@ -358,13 +360,18 @@ class _NewHinooPageState extends State<NewHinooPage> {
             final double targetMaxW = _contentMaxWidth(viewW);
 
             // Altezza centrale per canvas = tutto ciò che resta (footer è Positioned)
-            final double availableH = (viewH
-                - _titleH               // [Riga 1] titolo app
-                - contentTopPadding     // spazio riservato per non coprire i bottoni
-                - _controlsH            // [Riga 2] bottoni bianchi visibili
-                - _thumbsH              // [Riga 4] thumbnails
-                - _footerH              // riserva fisica per la navbar/overlay
-            ).clamp(0.0, double.infinity);
+            final double availableH = (viewH -
+                    _titleH // [Riga 1] titolo app
+                    -
+                    contentTopPadding // spazio riservato per non coprire i bottoni
+                    -
+                    _controlsH // [Riga 2] bottoni bianchi visibili
+                    -
+                    _thumbsH // [Riga 4] thumbnails
+                    -
+                    _footerH // riserva fisica per la navbar/overlay
+                )
+                .clamp(0.0, double.infinity);
 
             // Calcolo box 9:16 per [Riga 2]
             const double ar = 9 / 16;
@@ -513,14 +520,16 @@ class _NewHinooPageState extends State<NewHinooPage> {
 
                         // CHEST
                         IconButton(
-                          icon: SvgPicture.asset("assets/icons/chest.svg", semanticsLabel: 'Chest'),
+                          icon: SvgPicture.asset("assets/icons/chest.svg",
+                              semanticsLabel: 'Chest'),
                           iconSize: 60,
                           splashRadius: 40,
                           tooltip: 'Apri il tuo Cuore',
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => const ChestPage()),
+                              MaterialPageRoute(
+                                  builder: (_) => const ChestPage()),
                             );
                           },
                         ),
@@ -529,19 +538,21 @@ class _NewHinooPageState extends State<NewHinooPage> {
                         // OK → LUNA
                         _savedToChest
                             ? IconButton(
-                          icon: SvgPicture.asset("assets/icons/moon.svg", semanticsLabel: 'Luna'),
-                          iconSize: 32,
-                          splashRadius: 25,
-                          tooltip: 'Spedisci sulla Luna',
-                          onPressed: _submitToMoon,
-                        )
+                                icon: SvgPicture.asset("assets/icons/moon.svg",
+                                    semanticsLabel: 'Luna'),
+                                iconSize: 32,
+                                splashRadius: 25,
+                                tooltip: 'Spedisci sulla Luna',
+                                onPressed: _submitToMoon,
+                              )
                             : IconButton(
-                          icon: SvgPicture.asset("assets/icons/ok.svg", semanticsLabel: 'OK'),
-                          iconSize: 60,
-                          splashRadius: 25,
-                          tooltip: 'Salva hinoo',
-                          onPressed: _submitHinoo,
-                        ),
+                                icon: SvgPicture.asset("assets/icons/ok.svg",
+                                    semanticsLabel: 'OK'),
+                                iconSize: 60,
+                                splashRadius: 25,
+                                tooltip: 'Salva hinoo',
+                                onPressed: _submitHinoo,
+                              ),
                       ],
                     ),
                   ),

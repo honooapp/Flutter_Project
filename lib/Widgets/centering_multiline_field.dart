@@ -56,7 +56,8 @@ class CenteringMultilineField extends StatefulWidget {
   final ValueChanged<String>? onSubmitted;
 
   @override
-  State<CenteringMultilineField> createState() => _CenteringMultilineFieldState();
+  State<CenteringMultilineField> createState() =>
+      _CenteringMultilineFieldState();
 }
 
 class _CenteringMultilineFieldState extends State<CenteringMultilineField> {
@@ -118,15 +119,20 @@ class _CenteringMultilineFieldState extends State<CenteringMultilineField> {
   Widget build(BuildContext context) {
     Widget field = LayoutBuilder(
       builder: (context, constraints) {
-        final double maxWidth = constraints.maxWidth.isFinite ? constraints.maxWidth : 0;
-        final double maxHeight = constraints.maxHeight.isFinite ? constraints.maxHeight : 0;
+        final double maxWidth =
+            constraints.maxWidth.isFinite ? constraints.maxWidth : 0;
+        final double maxHeight =
+            constraints.maxHeight.isFinite ? constraints.maxHeight : 0;
 
         final double usableWidth = math.max(
           1,
-          maxWidth - widget.horizontalPadding.left - widget.horizontalPadding.right,
+          maxWidth -
+              widget.horizontalPadding.left -
+              widget.horizontalPadding.right,
         );
 
-        final String textForLayout = widget.controller.text.isEmpty ? ' ' : widget.controller.text;
+        final String textForLayout =
+            widget.controller.text.isEmpty ? ' ' : widget.controller.text;
         final TextPainter painter = TextPainter(
           text: TextSpan(text: textForLayout, style: widget.style),
           textAlign: TextAlign.center,
@@ -136,7 +142,8 @@ class _CenteringMultilineFieldState extends State<CenteringMultilineField> {
 
         double textHeight = painter.size.height;
         if (textHeight <= 0) {
-          final double baseLineHeight = (widget.style.height ?? 1.0) * (widget.style.fontSize ?? 16);
+          final double baseLineHeight =
+              (widget.style.height ?? 1.0) * (widget.style.fontSize ?? 16);
           textHeight = baseLineHeight;
         }
 
@@ -145,15 +152,17 @@ class _CenteringMultilineFieldState extends State<CenteringMultilineField> {
           padTop = math.max(0, (maxHeight - textHeight) / 2);
         }
 
-        final bool shouldAdjust =
-            _pendingScroll || _lastPadTop == null || (padTop - _lastPadTop!).abs() > 0.5;
+        final bool shouldAdjust = _pendingScroll ||
+            _lastPadTop == null ||
+            (padTop - _lastPadTop!).abs() > 0.5;
         if (shouldAdjust) {
           _scheduleScroll(padTop);
           _pendingScroll = false;
           _lastPadTop = padTop;
         }
 
-        final InputDecoration baseDecoration = widget.decoration ?? const InputDecoration();
+        final InputDecoration baseDecoration =
+            widget.decoration ?? const InputDecoration();
         final EdgeInsets contentPadding = EdgeInsets.only(
           top: padTop,
           left: widget.horizontalPadding.left,
@@ -199,7 +208,8 @@ class _CenteringMultilineFieldState extends State<CenteringMultilineField> {
     );
 
     if (widget.hardConstraints != null) {
-      field = ConstrainedBox(constraints: widget.hardConstraints!, child: field);
+      field =
+          ConstrainedBox(constraints: widget.hardConstraints!, child: field);
     }
 
     return field;

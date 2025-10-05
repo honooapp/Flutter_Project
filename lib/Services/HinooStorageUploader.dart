@@ -10,7 +10,8 @@ class HinooStorageUploader {
   static final _uuid = const Uuid();
 
   // Getter iniettabile nei test
-  static SupabaseClient get _client => _overrideClient ?? Supabase.instance.client;
+  static SupabaseClient get _client =>
+      _overrideClient ?? Supabase.instance.client;
   static SupabaseClient? _overrideClient;
 
   /// TEST-ONLY: abilita injection di un client mock
@@ -55,13 +56,13 @@ class HinooStorageUploader {
     final path = '$userId/$safeFolder/$id.$safeExt';
 
     await _client.storage.from(bucket).uploadBinary(
-      path,
-      bytes,
-      fileOptions: const FileOptions(
-        upsert: false,
-        cacheControl: 'public, max-age=31536000',
-      ),
-    );
+          path,
+          bytes,
+          fileOptions: const FileOptions(
+            upsert: false,
+            cacheControl: 'public, max-age=31536000',
+          ),
+        );
 
     return _client.storage.from(bucket).getPublicUrl(path);
   }

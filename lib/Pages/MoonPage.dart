@@ -64,8 +64,9 @@ class _MoonPageState extends State<MoonPage> {
             type: HinooType.moon,
             recipientTag: row['recipient_tag'] as String?,
           );
-          final created = DateTime.tryParse((row['created_at'] ?? '').toString()) ??
-              DateTime.fromMillisecondsSinceEpoch(0);
+          final created =
+              DateTime.tryParse((row['created_at'] ?? '').toString()) ??
+                  DateTime.fromMillisecondsSinceEpoch(0);
           items.add(_MoonItem.hinoo(draft, created));
         }
       }
@@ -99,7 +100,8 @@ class _MoonPageState extends State<MoonPage> {
           builder: (context, constraints) {
             final double availHeight = constraints.maxHeight;
             final double centerHeight =
-                (availHeight - headerHeight - footerHeight).clamp(0.0, double.infinity);
+                (availHeight - headerHeight - footerHeight)
+                    .clamp(0.0, double.infinity);
             final double targetMaxWidth =
                 ResponsiveLayout.contentMaxWidth(constraints.maxWidth);
 
@@ -162,7 +164,7 @@ class _MoonPageState extends State<MoonPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                            builder: (context) => const ChestPage(),
+                              builder: (context) => const ChestPage(),
                             ),
                           );
                         },
@@ -256,7 +258,7 @@ class _MoonPageState extends State<MoonPage> {
     );
   }
 
-Widget _buildMoonItem(_MoonItem item, double maxHeight, double maxWidth) {
+  Widget _buildMoonItem(_MoonItem item, double maxHeight, double maxWidth) {
     final String identity;
     final Widget content;
 
@@ -266,7 +268,8 @@ Widget _buildMoonItem(_MoonItem item, double maxHeight, double maxWidth) {
       content = HonooThreadView(root: honoo);
     } else {
       final draft = item.hinoo!;
-      identity = 'moon_hinoo_${draft.hashCode}_${item.createdAt.toIso8601String()}';
+      identity =
+          'moon_hinoo_${draft.hashCode}_${item.createdAt.toIso8601String()}';
       content = HinooViewer(
         draft: draft,
         maxHeight: maxHeight,
@@ -286,7 +289,6 @@ Widget _buildMoonItem(_MoonItem item, double maxHeight, double maxWidth) {
       ),
     );
   }
-
 }
 
 class _MoonItem {

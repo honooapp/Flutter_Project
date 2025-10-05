@@ -8,18 +8,14 @@ class Exercise {
   String? _exerciseIcon;
   String? _exerciseIconName;
 
-  Exercise(
-    this._id,
-    this._parentId,
-    this._exerciseTitle,
-    this._exerciseDescription,
-    this._exerciseImage, {
-    String? exerciseDescriptionMore,
-    String? exerciseIcon,
-    String? exerciseIconName
-  }) : _exerciseDescriptionMore = exerciseDescriptionMore,
-       _exerciseIcon = exerciseIcon,
-       _exerciseIconName = exerciseIconName;
+  Exercise(this._id, this._parentId, this._exerciseTitle,
+      this._exerciseDescription, this._exerciseImage,
+      {String? exerciseDescriptionMore,
+      String? exerciseIcon,
+      String? exerciseIconName})
+      : _exerciseDescriptionMore = exerciseDescriptionMore,
+        _exerciseIcon = exerciseIcon,
+        _exerciseIconName = exerciseIconName;
 
   String get id => _id;
   set id(String value) => _id = value;
@@ -37,7 +33,8 @@ class Exercise {
   set parentId(int value) => _parentId = value;
 
   String? get exerciseDescriptionMore => _exerciseDescriptionMore;
-  set exerciseDescriptionMore(String? value) => _exerciseDescriptionMore = value;
+  set exerciseDescriptionMore(String? value) =>
+      _exerciseDescriptionMore = value;
 
   String? get exerciseIcon => _exerciseIcon;
   set exerciseIcon(String? value) => _exerciseIcon = value;
@@ -45,4 +42,3 @@ class Exercise {
   String? get exerciseIconName => _exerciseIconName;
   set exerciseIconName(String? value) => _exerciseIconName = value;
 }
-

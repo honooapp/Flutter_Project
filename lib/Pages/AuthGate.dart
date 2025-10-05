@@ -37,13 +37,13 @@ class _AuthGateState extends State<AuthGate> {
         _navigated = true;
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const HomePage()),
-              (route) => false,
+          (route) => false,
         );
       } else {
         _navigated = true;
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const PlaceholderPage()),
-              (route) => false,
+          (route) => false,
         );
       }
     });
@@ -58,7 +58,8 @@ class _AuthGateState extends State<AuthGate> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Session?>(
-      future: _resolveSession(), // la tua funzione che fa un piccolo delay e poi legge currentSession
+      future:
+          _resolveSession(), // la tua funzione che fa un piccolo delay e poi legge currentSession
       builder: (context, snap) {
         // ⛳ 1) Finché la Future NON è terminata → spinner
         if (snap.connectionState != ConnectionState.done) {
@@ -70,9 +71,9 @@ class _AuthGateState extends State<AuthGate> {
         // ⛳ 2) La Future è terminata → sessione presente?
         final session = snap.data; // può essere null
         if (session != null) {
-          return const HomePage();          // utente loggato
+          return const HomePage(); // utente loggato
         } else {
-          return const PlaceholderPage();   // utente NON loggato
+          return const PlaceholderPage(); // utente NON loggato
         }
       },
     );

@@ -13,4 +13,3 @@ class DownloadImage {
   final String filename;
   final Uint8List bytes;
 }
-
