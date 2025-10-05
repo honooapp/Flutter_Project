@@ -1,0 +1,7 @@
+# Saltare per default i test lenti/fragili in CI (integrazione e golden)
+tags:
+  integration:
+    skip: true
+  golden:
+    skip: true
+  unit: {}   # i test unit girano normalmente

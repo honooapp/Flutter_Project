@@ -33,12 +33,12 @@ void main() {
     when(() => client.storage).thenReturn(storage);
     when(() => storage.from('hinoo')).thenReturn(fileApi);
 
-    // Stub base
+    // Stub base (asincrono → thenAnswer)
     when(() => fileApi.uploadBinary(
       any(),                    // path
       any<Uint8List>(),         // file
       fileOptions: any(named: 'fileOptions'),
-    )).thenAnswer((_) async => 'ignored-path-returned-by-upload'); // non usato dal codice
+    )).thenAnswer((_) async => 'ignored-path-returned-by-upload');
     when(() => fileApi.getPublicUrl(any()))
         .thenReturn('https://cdn.example.com/hinoo/mock-url.png');
   });
