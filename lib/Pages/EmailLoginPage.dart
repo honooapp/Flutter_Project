@@ -79,6 +79,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
             _isLoading
                 ? const LoadingSpinner()
                 : ElevatedButton(
+              key: const Key('email_send_code_btn'),
               onPressed: _sendOtp,
               child: const Text('Invia codice'),
             ),

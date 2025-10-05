@@ -1,41 +1,41 @@
 import 'dart:async';
-
+import 'dart:io' show Platform; // per Platform.environment (test/CI)
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HonooDialogStyles {
   static TextStyle title() => GoogleFonts.lora(
-        color: Colors.white,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-      );
+    color: Colors.white,
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+  );
 
   static TextStyle body({Color color = Colors.white70}) => GoogleFonts.lora(
-        color: color,
-        fontSize: 14,
-      );
+    color: color,
+    fontSize: 14,
+  );
 
   static TextStyle caption({Color color = Colors.white70}) => GoogleFonts.lora(
-        color: color,
-        fontSize: 12,
-      );
+    color: color,
+    fontSize: 12,
+  );
 
   static TextStyle primaryAction() => GoogleFonts.lora(
-        color: Colors.black,
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-      );
+    color: Colors.black,
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+  );
 
   static TextStyle secondaryAction() => GoogleFonts.lora(
-        color: Colors.white,
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-      );
+    color: Colors.white,
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+  );
 
   static TextStyle tertiaryAction({Color color = Colors.white54}) => GoogleFonts.lora(
-        color: color,
-        fontSize: 13,
-      );
+    color: color,
+    fontSize: 13,
+  );
 }
 
 class HonooDialogShell extends StatelessWidget {
@@ -144,13 +144,29 @@ class HonooMessageDialog extends StatefulWidget {
 }
 
 class _HonooMessageDialogState extends State<HonooMessageDialog> {
+  Timer? _autoClose;
+
   @override
   void initState() {
     super.initState();
-    Future<void>.delayed(widget.duration, () {
-      if (!mounted) return;
-      Navigator.of(context, rootNavigator: true).maybePop();
-    });
+
+    // Non avviare il timer in CI/test (Codex ha CI=true)
+    final bool inCi =
+        const bool.fromEnvironment('CI', defaultValue: false) ||
+            (Platform.environment['CI'] == 'true');
+
+    if (!inCi) {
+      _autoClose = Timer(widget.duration, () {
+        if (!mounted) return;
+        Navigator.of(context, rootNavigator: true).maybePop();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _autoClose?.cancel(); // evita timer pendenti nei test
+    super.dispose();
   }
 
   @override
@@ -188,13 +204,13 @@ class _HonooMessageDialogState extends State<HonooMessageDialog> {
 }
 
 Future<void> showHonooMessageDialog(
-  BuildContext context, {
-  required String message,
-  String? title,
-  IconData? icon,
-  Duration duration = const Duration(milliseconds: 1200),
-  bool barrierDismissible = true,
-}) {
+    BuildContext context, {
+      required String message,
+      String? title,
+      IconData? icon,
+      Duration duration = const Duration(milliseconds: 1200),
+      bool barrierDismissible = true,
+    }) {
   return showDialog<void>(
     context: context,
     barrierDismissible: barrierDismissible,
@@ -209,13 +225,13 @@ Future<void> showHonooMessageDialog(
 }
 
 void showHonooToast(
-  BuildContext context, {
-  required String message,
-  String? title,
-  IconData? icon,
-  Duration duration = const Duration(milliseconds: 1200),
-  bool barrierDismissible = true,
-}) {
+    BuildContext context, {
+      required String message,
+      String? title,
+      IconData? icon,
+      Duration duration = const Duration(milliseconds: 1200),
+      bool barrierDismissible = true,
+    }) {
   unawaited(
     showHonooMessageDialog(
       context,
@@ -229,11 +245,11 @@ void showHonooToast(
 }
 
 Future<bool?> showHonooDeleteDialog(
-  BuildContext context, {
-  required HonooDeletionTarget target,
-  String? message,
-  bool barrierDismissible = true,
-}) {
+    BuildContext context, {
+      required HonooDeletionTarget target,
+      String? message,
+      bool barrierDismissible = true,
+    }) {
   final String title;
   switch (target) {
     case HonooDeletionTarget.page:
