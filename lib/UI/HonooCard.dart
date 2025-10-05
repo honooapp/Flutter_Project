@@ -30,11 +30,14 @@ class HonooCard extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double availW =
-        constraints.maxWidth.isFinite ? constraints.maxWidth : media.size.width;
-        final double rawH =
-        constraints.maxHeight.isFinite ? constraints.maxHeight : media.size.height;
-        final double availH = (rawH - media.padding.vertical).clamp(0.0, double.infinity);
+        final double availW = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : media.size.width;
+        final double rawH = constraints.maxHeight.isFinite
+            ? constraints.maxHeight
+            : media.size.height;
+        final double availH =
+            (rawH - media.padding.vertical).clamp(0.0, double.infinity);
 
         if (availW <= 0 || availH <= 0) {
           return const SizedBox.shrink();
@@ -131,24 +134,24 @@ class HonooCard extends StatelessWidget {
                       child: hasImage
                           ? const SizedBox.shrink()
                           : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Carica qui la tua immagine',
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.libreFranklin(
-                              color: HonooColor.onSecondary,
-                              fontSize: 18,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Carica qui la tua immagine',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.libreFranklin(
+                                    color: HonooColor.onSecondary,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                const SizedBox(height: 22),
+                                const Icon(
+                                  Icons.photo,
+                                  size: 48,
+                                  color: HonooColor.primary,
+                                ),
+                              ],
                             ),
-                          ),
-                          const SizedBox(height: 22),
-                          const Icon(
-                            Icons.photo,
-                            size: 48,
-                            color: HonooColor.primary,
-                          ),
-                        ],
-                      ),
                     ),
                   ),
                 ],

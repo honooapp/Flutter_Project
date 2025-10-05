@@ -8,7 +8,7 @@ void main() {
 
   testWidgets(
     'boot → mostra login o home senza crash',
-        (tester) async {
+    (tester) async {
       await tester.pumpWidget(const MyApp());
       await tester.pumpAndSettle();
 
@@ -32,8 +32,7 @@ void main() {
             loginFoundByText ||
             homeFoundByText,
         isTrue,
-        reason:
-        'Non ho trovato né la schermata di Login né la Home. Aggiungi '
+        reason: 'Non ho trovato né la schermata di Login né la Home. Aggiungi '
             'Key(\'login_screen_root\') / Key(\'home_screen_root\') ai widget di root per test più stabili.',
       );
     },

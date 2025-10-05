@@ -25,7 +25,7 @@ void main() {
 
   setUp(() {
     client = _MockSupabaseClient();
-    chain  = _MockQueryChain();
+    chain = _MockQueryChain();
 
     HonooService.$setTestClient(client);
     when(() => client.from('honoo')).thenReturn(chain);
@@ -42,7 +42,8 @@ void main() {
     resetMocktailState();
   });
 
-  test('fetchPublicHonoo: filtra destination=moon e ordina per created_at desc', () async {
+  test('fetchPublicHonoo: filtra destination=moon e ordina per created_at desc',
+      () async {
     final rows = [
       {
         'id': 2,
@@ -66,7 +67,8 @@ void main() {
 
     when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
         .thenAnswer((invocation) async {
-      final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
+      final onValue =
+          invocation.positionalArguments[0] as dynamic Function(dynamic);
       return onValue(rows);
     });
 
@@ -85,7 +87,8 @@ void main() {
   test('deleteHonooById: chiama delete().eq("id", id) e completa', () async {
     when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
         .thenAnswer((invocation) async {
-      final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
+      final onValue =
+          invocation.positionalArguments[0] as dynamic Function(dynamic);
       return onValue(<String, dynamic>{});
     });
 

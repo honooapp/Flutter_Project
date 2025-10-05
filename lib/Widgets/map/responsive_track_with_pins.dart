@@ -48,13 +48,16 @@ class ResponsiveTrackWithPins extends StatelessWidget {
     Widget content = LayoutBuilder(
       builder: (context, constraints) {
         final double availableWidth = constraints.maxWidth;
-        final double renderWidth =
-            availableWidth.isFinite && availableWidth > 0 ? availableWidth : MediaQuery.of(context).size.width;
-        final double safeAspectRatio = trackAspectRatio <= 0 ? 1 : trackAspectRatio;
+        final double renderWidth = availableWidth.isFinite && availableWidth > 0
+            ? availableWidth
+            : MediaQuery.of(context).size.width;
+        final double safeAspectRatio =
+            trackAspectRatio <= 0 ? 1 : trackAspectRatio;
         final double renderHeight = renderWidth / safeAspectRatio;
 
         final double baseSize = math.min(renderWidth, renderHeight);
-        final double pinVisualSize = pinFixedSize ?? (baseSize * pinSizeFactor).clamp(24.0, 160.0);
+        final double pinVisualSize =
+            pinFixedSize ?? (baseSize * pinSizeFactor).clamp(24.0, 160.0);
         final double hitTarget = math.max(pinVisualSize, 40.0);
 
         return SizedBox(
@@ -67,8 +70,10 @@ class ResponsiveTrackWithPins extends StatelessWidget {
                 child: SvgPicture.asset(trackSvgAsset, fit: BoxFit.fill),
               ),
               ...pins.map((pin) {
-                final double centerX = (pin.x * renderWidth) + (pin.dx * renderWidth);
-                final double centerY = (pin.y * renderHeight) + (pin.dy * renderHeight);
+                final double centerX =
+                    (pin.x * renderWidth) + (pin.dx * renderWidth);
+                final double centerY =
+                    (pin.y * renderHeight) + (pin.dy * renderHeight);
                 final double left = centerX - (hitTarget / 2);
                 final double top = centerY - (hitTarget / 2);
                 final bool enabled = onPinTap != null;

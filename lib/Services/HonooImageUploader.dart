@@ -26,13 +26,13 @@ class HonooImageUploader {
       final storagePath = '$uid/uploads/$fileName'; // per-utente
 
       await _client.storage.from(_bucket).uploadBinary(
-        storagePath,
-        bytes,
-        fileOptions: FileOptions(
-          upsert: false,
-          contentType: _contentTypeFromExt(ext),
-        ),
-      );
+            storagePath,
+            bytes,
+            fileOptions: FileOptions(
+              upsert: false,
+              contentType: _contentTypeFromExt(ext),
+            ),
+          );
 
       return _client.storage.from(_bucket).getPublicUrl(storagePath);
     } catch (e) {
@@ -56,13 +56,13 @@ class HonooImageUploader {
       final storagePath = '$uid/uploads/$fileName'; // per-utente
 
       await _client.storage.from(_bucket).uploadBinary(
-        storagePath,
-        bytes,
-        fileOptions: FileOptions(
-          upsert: false,
-          contentType: _contentTypeFromExt(ext),
-        ),
-      );
+            storagePath,
+            bytes,
+            fileOptions: FileOptions(
+              upsert: false,
+              contentType: _contentTypeFromExt(ext),
+            ),
+          );
 
       return _client.storage.from(_bucket).getPublicUrl(storagePath);
     } catch (e) {

@@ -35,10 +35,8 @@ class HonooController {
       final ids = _personal.map((h) => h.dbId).whereType<String>().toList();
       if (ids.isNotEmpty) {
         final client = Supabase.instance.client;
-        final rows = await client
-            .from('honoo')
-            .select('reply_to')
-            .in_('reply_to', ids);
+        final rows =
+            await client.from('honoo').select('reply_to').in_('reply_to', ids);
 
         // reply_to presenti → esistono risposte
         final repliedParents = <String>{};
@@ -64,7 +62,6 @@ class HonooController {
     }
   }
 
-
   /// History (thread) per un honoo: include il padre e le sue reply
   Future<List<Honoo>> getHonooHistory(Honoo honoo) async {
     final id = honoo.dbId;
@@ -79,7 +76,8 @@ class HonooController {
     // or('id.eq.<id>,reply_to.eq.<id>')
     final rows = await client
         .from('honoo')
-        .select('id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id')
+        .select(
+            'id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id')
         .or('id.eq.$id,reply_to.eq.$id')
         .order('created_at', ascending: true);
 
@@ -90,6 +88,7 @@ class HonooController {
     // opzionale: marca il primo come personal/moon e le altre come answer se necessario
     return thread;
   }
+
   /// Pubblica una copia dell'honoo sulla Luna senza toccare l'originale nello scrigno.
   /// Ritorna:
   ///  - true  => inserito ora ("Spedito sulla Luna")
@@ -106,7 +105,6 @@ class HonooController {
     }
   }
 
-
   Future<void> deleteHonoo(Honoo h) async {
     final String? id = (h.dbId ?? h.id) as String?;
     if (id == null || id.isEmpty) {
@@ -120,7 +118,6 @@ class HonooController {
     version.value++;
   }
 
-
   Future<void> deleteHonooById(String? id) async {
     if (id == null || id.isEmpty) {
       debugPrint('deleteHonooById: id vuoto');
@@ -132,5 +129,4 @@ class HonooController {
     _personal.removeWhere((x) => (x.dbId ?? x.id) == id);
     version.value++;
   }
-
 }

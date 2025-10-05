@@ -24,7 +24,8 @@ class AnteprimaPNG extends StatelessWidget {
       previewSection = const SizedBox(
         height: 200,
         child: Center(
-          child: LoadingSpinner(color: Colors.white, semanticsLabel: 'Caricamento anteprima'),
+          child: LoadingSpinner(
+              color: Colors.white, semanticsLabel: 'Caricamento anteprima'),
         ),
       );
     } else {
@@ -68,13 +69,16 @@ class AnteprimaPNG extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                   disabledBackgroundColor: Colors.white10,
                   disabledForegroundColor: Colors.white38,
                 ),
-                child: Text('Salva PNG', style: HonooDialogStyles.primaryAction()),
+                child:
+                    Text('Salva PNG', style: HonooDialogStyles.primaryAction()),
               ),
             ),
             const SizedBox(height: 12),

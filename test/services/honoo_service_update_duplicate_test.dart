@@ -8,7 +8,9 @@ import 'package:honoo/Services/HinooService.dart';
 import 'package:honoo/Entities/Hinoo.dart';
 
 class _MockClient extends Mock implements SupabaseClient {}
+
 class _MockAuth extends Mock implements GoTrueClient {}
+
 class _MockUser extends Mock implements User {}
 
 class _MockQueryChain extends Mock
@@ -56,25 +58,26 @@ void main() {
 
   group('HinooService.duplicateToMoon', () {
     HinooDraft _sampleDraft() => const HinooDraft(
-      pages: [
-        HinooSlide(
-          text: 'Testo',
-          backgroundImage: null,
-          isTextWhite: true,
-          bgScale: 1.0,
-          bgOffsetX: 0,
-          bgOffsetY: 0,
-        ),
-      ],
-      type: HinooType.personal,
-      recipientTag: null,
-    );
+          pages: [
+            HinooSlide(
+              text: 'Testo',
+              backgroundImage: null,
+              isTextWhite: true,
+              bgScale: 1.0,
+              bgOffsetX: 0,
+              bgOffsetY: 0,
+            ),
+          ],
+          type: HinooType.personal,
+          recipientTag: null,
+        );
 
-    test('se ESISTE già un duplicato → ritorna false e NON inserisce', () async {
+    test('se ESISTE già un duplicato → ritorna false e NON inserisce',
+        () async {
       when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
           .thenAnswer((invocation) async {
         final onValue =
-        invocation.positionalArguments[0] as dynamic Function(dynamic);
+            invocation.positionalArguments[0] as dynamic Function(dynamic);
         return onValue([
           {'id': 99}
         ]);
@@ -97,7 +100,7 @@ void main() {
       when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
           .thenAnswer((invocation) async {
         final onValue =
-        invocation.positionalArguments[0] as dynamic Function(dynamic);
+            invocation.positionalArguments[0] as dynamic Function(dynamic);
         call++;
         if (call == 1) {
           return onValue(<Map<String, dynamic>>[]);

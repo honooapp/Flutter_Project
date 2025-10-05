@@ -38,7 +38,8 @@ void main() {
       'ventoBlu',
     );
 
-    when(() => mock.getHonooHistory(root)).thenAnswer((_) async => [root, reply]);
+    when(() => mock.getHonooHistory(root))
+        .thenAnswer((_) async => [root, reply]);
 
     final loader = HonooThreadLoader(controller: mock);
     expect(loader.value.isLoading, isTrue); // stato iniziale del ValueNotifier

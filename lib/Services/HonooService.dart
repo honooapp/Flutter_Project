@@ -2,19 +2,18 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Entities/Honoo.dart';
 
 class HonooService {
-
   //sostituisci fuori dal test con il tuo client
   //static final _client = Supabase.instance.client;
 
   // ✅ Usa un getter, così nei test possiamo sovrascrivere il client
-  static SupabaseClient get _client => _overrideClient ?? Supabase.instance.client;
+  static SupabaseClient get _client =>
+      _overrideClient ?? Supabase.instance.client;
 
   // ✅ Campo usato solo nei test (rimane null in produzione)
   static SupabaseClient? _overrideClient;
 
   /// TEST-ONLY: abilita injection del client mock
   static void $setTestClient(SupabaseClient? c) => _overrideClient = c;
-
 
   /// Honoo pubblici (Luna)
   static Future<List<Honoo>> fetchPublicHonoo() async {
@@ -27,7 +26,8 @@ class HonooService {
   }
 
   /// Honoo dell’utente per una certa destination (es. 'chest')
-  static Future<List<Honoo>> fetchUserHonoo(String userId, String destination) async {
+  static Future<List<Honoo>> fetchUserHonoo(
+      String userId, String destination) async {
     final response = await _client
         .from('honoo')
         .select('*')
@@ -58,12 +58,9 @@ class HonooService {
     required String id,
     required String destination,
   }) async {
-    await _client
-        .from('honoo')
-        .update({
+    await _client.from('honoo').update({
       'destination': destination,
-    })
-        .eq('id', id);
+    }).eq('id', id);
   }
 
   /// Duplica un honoo dello scrigno pubblicandolo sulla Luna (nuova INSERT).
@@ -102,9 +99,9 @@ class HonooService {
     await _client.from('honoo').insert(payload);
     return true;
   }
+
   /// Hard delete dal DB (tabella 'honoo')
   static Future<void> deleteHonooById(String id) async {
     await _client.from('honoo').delete().eq('id', id);
   }
-
 }

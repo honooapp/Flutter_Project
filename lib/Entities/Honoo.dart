@@ -19,16 +19,16 @@ class Honoo {
   bool _hasReplies;
 
   Honoo(
-      this._id,
-      this._text,
-      this._image,
-      this._created_at,
-      this._updated_at,
-      this._user_id,
-      this._type, [
-        this._replyTo,
-        this._recipientTag,
-      ])  : _dbId = null,
+    this._id,
+    this._text,
+    this._image,
+    this._created_at,
+    this._updated_at,
+    this._user_id,
+    this._type, [
+    this._replyTo,
+    this._recipientTag,
+  ])  : _dbId = null,
         _isFromMoonSaved = false,
         _hasReplies = false;
 
@@ -119,7 +119,7 @@ class Honoo {
     return {
       'text': _text,
       'image_url': _image.isEmpty ? null : _image,
-      'destination': dest,                     // 'chest' | 'moon' | 'reply'
+      'destination': dest, // 'chest' | 'moon' | 'reply'
       'reply_to': dest == 'reply' ? _replyTo : null,
       'recipient_tag': dest == 'reply' ? _recipientTag : null,
     };

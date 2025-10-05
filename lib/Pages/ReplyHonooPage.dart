@@ -10,7 +10,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../Entities/Honoo.dart';
 
-
 class ReplyHonooPage extends StatefulWidget {
   final Honoo originalHonoo;
 
@@ -41,17 +40,15 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
     final now = DateTime.now().toIso8601String();
 
     final newHonoo = Honoo(
-        0,                      // ID locale, ignorato da Supabase
-        _text,                  // text
-        _imageUrl ?? '',        // image
-        now,                    // created_at
-        now,                    // updated_at
+        0, // ID locale, ignorato da Supabase
+        _text, // text
+        _imageUrl ?? '', // image
+        now, // created_at
+        now, // updated_at
         Supabase.instance.client.auth.currentUser!.id,
-        HonooType.answer,       // destination: reply
+        HonooType.answer, // destination: reply
         widget.originalHonoo.id.toString(), // replyTo
-        widget.originalHonoo.recipientTag
-    );
-
+        widget.originalHonoo.recipientTag);
 
     try {
       await HonooService.publishHonoo(newHonoo);
@@ -109,7 +106,8 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
                   onPressed: _sendReply,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: HonooColor.secondary,
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 1.5.h),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 1.5.h),
                   ),
                   child: Text(
                     "Invia risposta",

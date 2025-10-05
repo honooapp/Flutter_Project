@@ -18,12 +18,10 @@ import '../../Utility/Utility.dart';
 import '../Utility/IsolaDelleStorieContentManager.dart';
 import '../../Widgets/map/responsive_track_with_pins.dart';
 
-
 class ExercisePage extends StatefulWidget {
   const ExercisePage({super.key, required this.exercise});
 
   final Exercise exercise;
-
 
   @override
   State<ExercisePage> createState() => _ExercisePageState();
@@ -253,28 +251,38 @@ class _ExercisePageState extends State<ExercisePage> {
         final media = MediaQuery.of(context);
         final double viewportHeight = media.size.height;
         final double availableWidth =
-            constraints.maxWidth.isFinite && constraints.maxWidth > 0 ? constraints.maxWidth : media.size.width;
+            constraints.maxWidth.isFinite && constraints.maxWidth > 0
+                ? constraints.maxWidth
+                : media.size.width;
         final double targetHeightBase = viewportHeight / 6;
-        final double targetHeight = math.max(targetHeightBase + 20.0, (verticalPadding * 2) + 32.0);
+        final double targetHeight =
+            math.max(targetHeightBase + 20.0, (verticalPadding * 2) + 32.0);
 
         final bool ultraTight = availableWidth < 360;
         final double gapWidth = _buttonGap;
         final double horizontalMargin = baseHorizontalMargin;
         final double gapW = ultraTight ? gapWidth * 0.85 : gapWidth;
-        final double hM = ultraTight ? horizontalMargin * 0.85 : horizontalMargin;
+        final double hM =
+            ultraTight ? horizontalMargin * 0.85 : horizontalMargin;
 
-        final double sideButtonSize = math.max(32.0, math.min(_iconButtonSize, targetHeight * 0.45));
-        final double trackHeight = math.max(targetHeight - (verticalPadding * 2), sideButtonSize);
+        final double sideButtonSize =
+            math.max(32.0, math.min(_iconButtonSize, targetHeight * 0.45));
+        final double trackHeight =
+            math.max(targetHeight - (verticalPadding * 2), sideButtonSize);
         final double trackWidth = trackHeight * _trackAspectRatio;
 
         final double horizontalOverlap =
             (_iconButtonSize * _pathOverlapFactor).clamp(0.0, hM);
         final double drawWidth = trackWidth + horizontalOverlap;
-        final double effectiveOverlap = math.min(horizontalOverlap, drawWidth * 0.3);
-        final double pinVisualSize = math.max(24.0, math.min(sideButtonSize, _iconButtonSize));
-        final double drawWidthBase = math.max(0.0, drawWidth - effectiveOverlap);
+        final double effectiveOverlap =
+            math.min(horizontalOverlap, drawWidth * 0.3);
+        final double pinVisualSize =
+            math.max(24.0, math.min(sideButtonSize, _iconButtonSize));
+        final double drawWidthBase =
+            math.max(0.0, drawWidth - effectiveOverlap);
         final double pinBleedX = uiVisible
-            ? math.max(pinVisualSize * 0.5, effectiveOverlap + pinVisualSize * 0.25)
+            ? math.max(
+                pinVisualSize * 0.5, effectiveOverlap + pinVisualSize * 0.25)
             : 0.0;
         final double pinBleedY = uiVisible ? pinVisualSize * 0.35 : 0.0;
         final double drawWidthVisible = drawWidthBase + pinBleedX;
@@ -319,13 +327,15 @@ class _ExercisePageState extends State<ExercisePage> {
         );
 
         final double trackWidthWithMargin = leftPadding + drawWidthVisible + hM;
-        final double trackHeightWithMargin = trackAreaHeight + (verticalPadding * 2);
+        final double trackHeightWithMargin =
+            trackAreaHeight + (verticalPadding * 2);
         final Widget buttonColumn = _buildTrackButtons(sideButtonSize);
         final int visibleButtons = uiVisible ? 2 : 1;
         final double buttonColumnHeight =
             (visibleButtons * sideButtonSize) + (uiVisible ? _buttonGap : 0.0);
         final double baseWidth = sideButtonSize + gapW + trackWidthWithMargin;
-        final double baseHeight = math.max(buttonColumnHeight, trackHeightWithMargin);
+        final double baseHeight =
+            math.max(buttonColumnHeight, trackHeightWithMargin);
         final double sizeScale = sideButtonSize / _iconButtonSize;
         final double buttonsBaseTop = (baseHeight - buttonColumnHeight) * 0.5;
         final double trackBaseTop = (baseHeight - trackHeightWithMargin) * 0.5;
@@ -369,7 +379,8 @@ class _ExercisePageState extends State<ExercisePage> {
 
   Widget _buildTrackButtons(double size) {
     final double splash = math.max(24.0, size * 0.6);
-    final BoxConstraints constraints = BoxConstraints.tightFor(width: size, height: size);
+    final BoxConstraints constraints =
+        BoxConstraints.tightFor(width: size, height: size);
 
     Widget tightIconButton({
       required String svg,
@@ -407,7 +418,6 @@ class _ExercisePageState extends State<ExercisePage> {
           ),
           const SizedBox(height: _buttonGap),
         ],
-
         tightIconButton(
           svg: "assets/icons/isoladellestorie/offUI.svg",
           semantics: "Mostra o nascondi il percorso",
@@ -419,7 +429,6 @@ class _ExercisePageState extends State<ExercisePage> {
 
   @override
   Widget build(BuildContext context) {
-
     Function handleButtonPressed = (String buttonText) {
       if (ExerciseController().methodMap.containsKey(buttonText)) {
         final Function method = ExerciseController().methodMap[buttonText]!;
@@ -432,9 +441,8 @@ class _ExercisePageState extends State<ExercisePage> {
       }
     };
 
-    final List<Widget> subExercises =
-        ExerciseController().getExerciseButtons(_exercise, handleButtonPressed, context);
-
+    final List<Widget> subExercises = ExerciseController()
+        .getExerciseButtons(_exercise, handleButtonPressed, context);
 
     final Widget pageContent = KeyedSubtree(
       key: ValueKey<String>(_exercise.id),

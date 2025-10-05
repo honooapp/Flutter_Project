@@ -10,9 +10,12 @@ import 'package:sizer/sizer.dart';
 
 import '../Controller/DeviceController.dart';
 
-
 class ComingSoonPage extends StatefulWidget {
-  ComingSoonPage({super.key, required this.header, required this.quote, required this.bibliography});
+  ComingSoonPage(
+      {super.key,
+      required this.header,
+      required this.quote,
+      required this.bibliography});
 
   final String header;
   final String quote;
@@ -23,20 +26,21 @@ class ComingSoonPage extends StatefulWidget {
 }
 
 class _ComingSoonPageState extends State<ComingSoonPage> {
-
   bool uiVisible = true;
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: HonooColor.background,
       body: Row(
         children: [
           Expanded(child: Container()),
           Container(
-            constraints: DeviceController().isPhone() ? BoxConstraints(maxWidth: MediaQuery.of(context).size.width) : BoxConstraints(maxWidth: MediaQuery.of(context).size.width) * 0.5,
-            child:Center(
+            constraints: DeviceController().isPhone()
+                ? BoxConstraints(maxWidth: MediaQuery.of(context).size.width)
+                : BoxConstraints(maxWidth: MediaQuery.of(context).size.width) *
+                    0.5,
+            child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -54,9 +58,17 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
                       ),
                     ),
                   ),
-                  Padding( padding: EdgeInsets.all(5.0),),
-                  FormattedText(inputText: widget.header, color: HonooColor.onBackground, fontSize:18,),
-                  Padding( padding: EdgeInsets.all(30.0),),
+                  Padding(
+                    padding: EdgeInsets.all(5.0),
+                  ),
+                  FormattedText(
+                    inputText: widget.header,
+                    color: HonooColor.onBackground,
+                    fontSize: 18,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(30.0),
+                  ),
                   SizedBox(
                     width: 80.w,
                     child: Text(
@@ -69,7 +81,9 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
                       textAlign: TextAlign.left,
                     ),
                   ),
-                  Padding( padding: EdgeInsets.all(10.0),),
+                  Padding(
+                    padding: EdgeInsets.all(10.0),
+                  ),
                   SizedBox(
                     height: 20.h,
                     width: 80.w,

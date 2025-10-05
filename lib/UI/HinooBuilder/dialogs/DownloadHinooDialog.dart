@@ -25,19 +25,24 @@ class DownloadHinooDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Scarica hinoo', style: HonooDialogStyles.title(), textAlign: TextAlign.center),
+            Text('Scarica hinoo',
+                style: HonooDialogStyles.title(), textAlign: TextAlign.center),
             const SizedBox(height: 12),
-            Text(bodyText, style: HonooDialogStyles.body(), textAlign: TextAlign.center),
+            Text(bodyText,
+                style: HonooDialogStyles.body(), textAlign: TextAlign.center),
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(DownloadChoice.firstOnly),
+                onPressed: () =>
+                    Navigator.of(context).pop(DownloadChoice.firstOnly),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
                 child: Text(
@@ -51,14 +56,18 @@ class DownloadHinooDialog extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
-                  onPressed: () => Navigator.of(context).pop(DownloadChoice.allPages),
+                  onPressed: () =>
+                      Navigator.of(context).pop(DownloadChoice.allPages),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.white,
                     side: const BorderSide(color: Colors.white70),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: Text('Scarica tutte le pagine', style: HonooDialogStyles.secondaryAction()),
+                  child: Text('Scarica tutte le pagine',
+                      style: HonooDialogStyles.secondaryAction()),
                 ),
               ),
             ],

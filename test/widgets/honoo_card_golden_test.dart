@@ -7,7 +7,7 @@ import 'package:honoo/Entities/Honoo.dart';
 void main() {
   testGoldens(
     'HonooCard golden default (con Honoo posizionale)',
-        (tester) async {
+    (tester) async {
       await loadAppFonts();
 
       final honoo = Honoo(

@@ -12,7 +12,7 @@ void main() {
 
   testWidgets(
     'Login flow end-to-end (magic link o email/password)',
-        (tester) async {
+    (tester) async {
       await tester.pumpWidget(const MyApp());
       await tester.pumpAndSettle();
 
@@ -25,7 +25,10 @@ void main() {
       await tester.pump();
 
       // Tappa su "Invia" / "Accedi"
-      final hasInvia = find.textContaining('Invia', findRichText: true).evaluate().isNotEmpty;
+      final hasInvia = find
+          .textContaining('Invia', findRichText: true)
+          .evaluate()
+          .isNotEmpty;
       final action = hasInvia
           ? find.textContaining('Invia', findRichText: true)
           : find.textContaining('Accedi', findRichText: true);
@@ -34,8 +37,14 @@ void main() {
       await tester.pumpAndSettle();
 
       // Heuristica: dopo l'invio potresti navigare a EmailVerifyPage o mostrare un messaggio di conferma.
-      final hasVerify = find.textContaining('verifica', findRichText: true).evaluate().isNotEmpty
-          || find.textContaining('controlla', findRichText: true).evaluate().isNotEmpty;
+      final hasVerify = find
+              .textContaining('verifica', findRichText: true)
+              .evaluate()
+              .isNotEmpty ||
+          find
+              .textContaining('controlla', findRichText: true)
+              .evaluate()
+              .isNotEmpty;
       expect(hasVerify, isTrue);
     },
     tags: ['integration'],
