@@ -6,11 +6,14 @@ class HinooService {
   static final _supabase = Supabase.instance.client;
   static const String _table = 'hinoo';
 
-  // all'inizio della classe
-  static SupabaseClient get _client => _overrideClient ?? Supabase.instance.client;
-  static SupabaseClient? _overrideClient;
-  static void $setTestClient(SupabaseClient? c) => _overrideClient = c;
+// Per i test: possiamo iniettare un client mock.
+// In produzione, usa Supabase.instance.client.
+  static SupabaseClient? _testClient;
+  static void $setTestClient(SupabaseClient? c) => _testClient = c;
+  static SupabaseClient get _client => _testClient ?? Supabase.instance.client;
 
+// NB: puoi lasciare _supabase dichiarato se c'è già, ma NON usarlo più nei metodi:
+// static final _supabase = Supabase.instance.client; // <-- non usato
 
   static String _toDbType(HinooType type) {
     switch (type) {

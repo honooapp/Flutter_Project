@@ -8,13 +8,10 @@ import 'package:postgrest/postgrest.dart';
 import 'package:honoo/Services/HonooService.dart';
 import 'package:honoo/Entities/Honoo.dart';
 
-/// Unico mock che implementa TUTTE le interfacce di builder usate nella catena:
+/// Mock unico che implementa i builder usati nella catena:
 /// - client.from('honoo') -> SupabaseQueryBuilder
-/// - .select()/.delete()  -> PostgrestFilterBuilder
-/// - .eq()/.order()       -> PostgrestFilterBuilder/PostgrestTransformBuilder
-///
-/// NB: PostgrestFilterBuilder / TransformBuilder sono "awaitable" (Future),
-/// quindi questo mock deve anche gestire Future.then(...) per restituire valori.
+/// - .select/.delete/.eq/.order -> Postgrest* builders
+/// I builder Postgrest sono "awaitable", quindi mockiamo anche Future.then(...)
 class _MockQueryChain extends Mock
     implements
         SupabaseQueryBuilder,
@@ -28,22 +25,21 @@ void main() {
   late _MockQueryChain chain;
 
   setUpAll(() {
-    // Mocktail richiede fallback per alcuni tipi generici usati in any()
+    // Fallback per any() su mappe/argomenti dinamici
     registerFallbackValue(<String, dynamic>{});
   });
 
   setUp(() {
     client = _MockSupabaseClient();
-    chain = _MockQueryChain();
+    chain  = _MockQueryChain();
 
-    // Usa il client mock nel service
+    // Inietta il client mock nel service
     HonooService.$setTestClient(client);
 
-    // client.from('honoo') -> il "chain" mock
+    // client.from('honoo') -> chain
     when(() => client.from('honoo')).thenReturn(chain);
 
-    // Di default, i metodi di chaining ritornano SEMPRE "chain" stesso,
-    // in modo da poter comporre select().eq()... ecc.
+    // Chaining fluente: ogni step ritorna la stessa chain
     when(() => chain.select(any())).thenReturn(chain);
     when(() => chain.delete()).thenReturn(chain);
     when(() => chain.eq(any(), any())).thenReturn(chain);
@@ -52,12 +48,12 @@ void main() {
   });
 
   tearDown(() {
-    // Ripristina il client reale dopo ogni test
     HonooService.$setTestClient(null);
+    resetMocktailState(); // opzionale ma utile per isolamento tra test
   });
 
   test('fetchPublicHonoo: filtra destination=moon e ordina per created_at desc', () async {
-    // Dato atteso dal "await" dell'ultima chiamata (la catena è awaitable):
+    // Dati simulati restituiti dall'await della catena
     final rows = [
       {
         'id': 2,
@@ -79,13 +75,11 @@ void main() {
       },
     ];
 
-    // Qui "insegniamo" al mock cosa restituire quando viene atteso (await chain)
-    // stubbando Future.then(...) sul builder finale della catena.
-    when(() => chain.then<dynamic>(any(),
-        onError: any(named: 'onError'))).thenAnswer((invocation) {
+    // Stubbiamo il completamento del Future finale (await chain)
+    when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
+        .thenAnswer((invocation) async {
       final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
-      // Simula il completamento del Future con "rows"
-      return Future.value(onValue(rows));
+      return onValue(rows);
     });
 
     final list = await HonooService.fetchPublicHonoo();
@@ -94,7 +88,6 @@ void main() {
     expect(list.length, 2);
     expect(list.first.id, 2);
 
-    // Verifiche puntuali sulla catena usata:
     verify(() => client.from('honoo')).called(1);
     verify(() => chain.select('*')).called(1);
     verify(() => chain.eq('destination', 'moon')).called(1);
@@ -102,11 +95,10 @@ void main() {
   });
 
   test('deleteHonooById: chiama delete().eq("id", id) e completa', () async {
-    // Quando il builder finale viene atteso (await), completiamo con {} (o null)
-    when(() => chain.then<dynamic>(any(),
-        onError: any(named: 'onError'))).thenAnswer((invocation) {
+    when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
+        .thenAnswer((invocation) async {
       final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
-      return Future.value(onValue({}));
+      return onValue(<String, dynamic>{});
     });
 
     await HonooService.deleteHonooById('123');

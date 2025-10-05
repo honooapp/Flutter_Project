@@ -25,32 +25,34 @@ void main() {
   late _MockQueryChain chain;
 
   setUpAll(() {
-    // fallback per named/dynamic usati in any()
+    // Fallback per matcher generici su mappe o argomenti dinamici
     registerFallbackValue(<String, dynamic>{});
   });
 
   setUp(() {
     client = _MockSupabaseClient();
-    chain  = _MockQueryChain();
+    chain = _MockQueryChain();
 
-    // usa il client mock nel service
+    // Inietta il client mock nel service
     HinooService.$setTestClient(client);
 
     // client.from('hinoo' | 'hinoo_drafts' ...) -> chain
     when(() => client.from(any())).thenReturn(chain);
 
-    // chaining: ogni step torna la chain
+    // Chaining: ogni step torna la stessa chain
     when(() => chain.select(any())).thenReturn(chain);
     when(() => chain.eq(any(), any())).thenReturn(chain);
     when(() => chain.order(any(), ascending: any(named: 'ascending')))
         .thenReturn(chain);
     when(() => chain.limit(any())).thenReturn(chain);
-    // 👇 correzione: maybeSingle deve tornare la CHAIN (non un Future)
+
+    // Imposta maybeSingle come step di trasformazione (torna la chain, non un Future)
     when(() => chain.maybeSingle()).thenReturn(chain);
   });
 
   tearDown(() {
     HinooService.$setTestClient(null);
+    resetMocktailState();
   });
 
   test('fetchUserHinoo: type=personal → mapping corretto e ordine DESC', () async {
@@ -87,11 +89,11 @@ void main() {
       }
     ];
 
-    // quando la catena viene awaitata, restituiamo "rows"
+    // Quando la catena viene awaitata (builder Future-like), restituiamo "rows"
     when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
-        .thenAnswer((invocation) {
+        .thenAnswer((invocation) async {
       final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
-      return Future.value(onValue(rows));
+      return onValue(rows);
     });
 
     final list = await HinooService.fetchUserHinoo('u1', type: HinooType.personal);
@@ -106,6 +108,7 @@ void main() {
     verify(() => chain.eq('user_id', 'u1')).called(1);
     verify(() => chain.eq('type', 'personal')).called(1);
     verify(() => chain.order('created_at', ascending: false)).called(1);
+    verifyNever(() => chain.execute()); // in questo percorso non si usa execute()
   });
 
   test('fetchUserHinoo: type=moon → filtra "moon" e ordina DESC', () async {
@@ -121,9 +124,9 @@ void main() {
     ];
 
     when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
-        .thenAnswer((invocation) {
+        .thenAnswer((invocation) async {
       final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
-      return Future.value(onValue(rows));
+      return onValue(rows);
     });
 
     final list = await HinooService.fetchUserHinoo('u2', type: HinooType.moon);
