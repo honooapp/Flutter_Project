@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Pages/NewHonooPage.dart';
 
+import '../test_pump.dart';
+
 void main() {
-  testWidgets('NewHonooPage si costruisce e accetta input di testo', (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: NewHonooPage()));
-    await tester.pumpAndSettle();
+  testWidgets('NewHonooPage si costruisce e accetta input di testo',
+      (tester) async {
+    await tester.pumpSizer(const NewHonooPage());
 
     final tf = find.byType(TextField).first;
     expect(tf, findsOneWidget);
