@@ -5,11 +5,17 @@ import 'package:integration_test/integration_test.dart';
 import 'package:honoo/main.dart';
 
 void main() {
+  final binding = WidgetsBinding.instance;
+  if (binding is TestWidgetsFlutterBinding &&
+      binding is! IntegrationTestWidgetsFlutterBinding) {
+    return;
+  }
+
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(
     'crea honoo e poi rispondi',
-        (tester) async {
+    (tester) async {
       await tester.pumpWidget(const MyApp());
       await tester.pumpAndSettle();
 
@@ -19,7 +25,8 @@ void main() {
       await tester.enterText(textField.first, 'ciao luna');
 
       // Tappa il pulsante “Crea” (se nella tua UI ha una Key, usa quella)
-      final creaBtn = find.text('Crea'); // oppure: find.byKey(const Key('email_send_code_btn'));
+      final creaBtn = find.text(
+          'Crea'); // oppure: find.byKey(const Key('email_send_code_btn'));
       expect(creaBtn, findsOneWidget);
       await tester.tap(creaBtn);
       await tester.pumpAndSettle();

@@ -75,12 +75,14 @@ class _HonooThreadViewState extends State<HonooThreadView> {
 
           if (thread.length <= 1) {
             child = Center(
-              key: ValueKey('thread_single_${widget.root.dbId ?? widget.root.id ?? widget.root.created_at}'),
+              key: ValueKey(
+                  'thread_single_${widget.root.dbId ?? widget.root.id ?? widget.root.created_at}'),
               child: HonooCard(honoo: widget.root),
             );
           } else {
             child = Padding(
-              key: ValueKey('thread_list_${thread.length}_${thread.first.id ?? ''}'),
+              key: ValueKey(
+                  'thread_list_${thread.length}_${thread.first.id ?? ''}'),
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: cs.CarouselSlider.builder(
                 carouselController: _vController,

@@ -51,7 +51,7 @@ class HonooBuilderState extends State<HonooBuilder> {
   String _publicImageUrl = '';
 
   // Limiti testo
-  final GlobalKey _imageBoundaryKey = GlobalKey();  // usata nel RepaintBoundary
+  final GlobalKey _imageBoundaryKey = GlobalKey(); // usata nel RepaintBoundary
   final GlobalKey _captureKey = GlobalKey();
 
   @override
@@ -119,7 +119,8 @@ class HonooBuilderState extends State<HonooBuilder> {
   }
 
   void _updateImageScale(double scale) {
-    final double clamped = scale.clamp(_imageMinScale, _imageMaxScale).toDouble();
+    final double clamped =
+        scale.clamp(_imageMinScale, _imageMaxScale).toDouble();
     final Matrix4 current = _imageController.value.clone();
     final Float64List values = current.storage;
     final double currentScale = _extractScale(current);
@@ -147,7 +148,8 @@ class HonooBuilderState extends State<HonooBuilder> {
   Future<void> _pickAndUploadImage() async {
     try {
       final picker = ImagePicker();
-      final XFile? selected = await picker.pickImage(source: ImageSource.gallery);
+      final XFile? selected =
+          await picker.pickImage(source: ImageSource.gallery);
       if (selected == null) return;
 
       // 0) Guardia autenticazione
@@ -194,7 +196,6 @@ class HonooBuilderState extends State<HonooBuilder> {
         // imageProvider = NetworkImage(_publicImageUrl);
       });
       _emitChange();
-
     } catch (e) {
       debugPrint('Errore selezione/upload immagine: $e');
       if (!mounted) return;
@@ -214,7 +215,6 @@ class HonooBuilderState extends State<HonooBuilder> {
     return e;
   }
 
-
   String _sanitizeFileName(String name) {
     // rimuove spazi e caratteri strani dal nome file
     return name.replaceAll(RegExp(r'[^a-zA-Z0-9\.\-_]'), '_');
@@ -226,10 +226,12 @@ class HonooBuilderState extends State<HonooBuilder> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double availW =
-            constraints.maxWidth.isFinite ? constraints.maxWidth : media.size.width;
-        final double rawH =
-            constraints.maxHeight.isFinite ? constraints.maxHeight : media.size.height;
+        final double availW = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : media.size.width;
+        final double rawH = constraints.maxHeight.isFinite
+            ? constraints.maxHeight
+            : media.size.height;
         final double availH =
             (rawH - media.padding.vertical - media.viewInsets.bottom)
                 .clamp(0.0, double.infinity);
@@ -494,7 +496,8 @@ class HonooBuilderState extends State<HonooBuilder> {
   }
 
   Future<Uint8List?> _captureCurrentAsPng() async {
-    final boundary = _captureKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+    final boundary = _captureKey.currentContext?.findRenderObject()
+        as RenderRepaintBoundary?;
     if (boundary == null) return null;
     try {
       final double pixelRatio = View.of(context).devicePixelRatio;
@@ -504,12 +507,18 @@ class HonooBuilderState extends State<HonooBuilder> {
       final int newHeight = base.height + framePx * 2;
 
       final ui.PictureRecorder recorder = ui.PictureRecorder();
-      final Canvas canvas = Canvas(recorder, Rect.fromLTWH(0, 0, newWidth.toDouble(), newHeight.toDouble()));
+      final Canvas canvas = Canvas(recorder,
+          Rect.fromLTWH(0, 0, newWidth.toDouble(), newHeight.toDouble()));
       final Paint bgPaint = Paint()..color = HonooColor.background;
-      canvas.drawRect(Rect.fromLTWH(0, 0, newWidth.toDouble(), newHeight.toDouble()), bgPaint);
-      canvas.drawImage(base, Offset(framePx.toDouble(), framePx.toDouble()), Paint());
-      final ui.Image framed = await recorder.endRecording().toImage(newWidth, newHeight);
-      final ByteData? byteData = await framed.toByteData(format: ui.ImageByteFormat.png);
+      canvas.drawRect(
+          Rect.fromLTWH(0, 0, newWidth.toDouble(), newHeight.toDouble()),
+          bgPaint);
+      canvas.drawImage(
+          base, Offset(framePx.toDouble(), framePx.toDouble()), Paint());
+      final ui.Image framed =
+          await recorder.endRecording().toImage(newWidth, newHeight);
+      final ByteData? byteData =
+          await framed.toByteData(format: ui.ImageByteFormat.png);
       return byteData?.buffer.asUint8List();
     } catch (e) {
       debugPrint('Errore cattura honoo: $e');
@@ -539,18 +548,17 @@ class HonooBuilderState extends State<HonooBuilder> {
     }
 
     final saver = getDownloadSaver();
-    final String fallbackName = 'honoo_${DateTime.now().millisecondsSinceEpoch}';
+    final String fallbackName =
+        'honoo_${DateTime.now().millisecondsSinceEpoch}';
     final String rawName = (fileName != null && fileName.trim().isNotEmpty)
         ? fileName.trim()
         : fallbackName;
     final String sanitizedInput = _sanitizeFileName(rawName);
     final bool hasContent = RegExp(r'[a-zA-Z0-9]').hasMatch(sanitizedInput);
-    final String sanitized = hasContent
-        ? sanitizedInput
-        : _sanitizeFileName(fallbackName);
-    final String filename = sanitized.toLowerCase().endsWith('.png')
-        ? sanitized
-        : '$sanitized.png';
+    final String sanitized =
+        hasContent ? sanitizedInput : _sanitizeFileName(fallbackName);
+    final String filename =
+        sanitized.toLowerCase().endsWith('.png') ? sanitized : '$sanitized.png';
 
     try {
       await saver.save([

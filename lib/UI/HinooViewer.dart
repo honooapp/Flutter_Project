@@ -81,14 +81,14 @@ class _HinooViewerState extends State<HinooViewer> {
                       _vController.hasClients &&
                       _vController.position.haveDimensions) {
                     final position = _vController.position;
-                    if ((position.maxScrollExtent -
-                            position.minScrollExtent)
-                        .abs() <
+                    if ((position.maxScrollExtent - position.minScrollExtent)
+                            .abs() <
                         0.5) {
                       return;
                     }
-                    final double target = (position.pixels + event.scrollDelta.dy)
-                        .clamp(position.minScrollExtent, position.maxScrollExtent);
+                    final double target =
+                        (position.pixels + event.scrollDelta.dy).clamp(
+                            position.minScrollExtent, position.maxScrollExtent);
                     if ((target - position.pixels).abs() > 0.5) {
                       _vController.jumpTo(target);
                       _scheduleSnap();
@@ -118,15 +118,15 @@ class _HinooViewerState extends State<HinooViewer> {
                           double distance = 0.0;
                           if (_vController.hasClients &&
                               _vController.position.haveDimensions) {
-                            final double page =
-                                _vController.page ?? _vController.initialPage.toDouble();
+                            final double page = _vController.page ??
+                                _vController.initialPage.toDouble();
                             distance = (page - index).abs();
                           } else {
                             distance = (_current - index).abs().toDouble();
                           }
                           const double maxGap = 18.0;
-                          final double gap =
-                              (distance.clamp(0.0, 1.0) * maxGap).clamp(0.0, maxGap);
+                          final double gap = (distance.clamp(0.0, 1.0) * maxGap)
+                              .clamp(0.0, maxGap);
                           return HinooSlideView(
                             slide: widget.draft.pages[index],
                             width: w,
@@ -171,9 +171,10 @@ class _HinooViewerState extends State<HinooViewer> {
   void _snapToPage() {
     _snapTimer?.cancel();
     if (widget.draft.pages.length <= 1) return;
-    if (!_vController.hasClients ||
-        !_vController.position.haveDimensions) return;
-    final double page = _vController.page ?? _vController.initialPage.toDouble();
+    if (!_vController.hasClients || !_vController.position.haveDimensions)
+      return;
+    final double page =
+        _vController.page ?? _vController.initialPage.toDouble();
     final int target = page.round().clamp(0, widget.draft.pages.length - 1);
     _vController.animateToPage(
       target,
@@ -190,7 +191,8 @@ class HinooSlideView extends StatelessWidget {
   final double? baseCanvasHeight;
   final double gap;
   final Color gapColor;
-  const HinooSlideView({super.key,
+  const HinooSlideView({
+    super.key,
     required this.slide,
     required this.width,
     required this.height,
@@ -320,9 +322,7 @@ class HinooPageDotsColumn extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, box) {
         final double h = box.maxHeight.isFinite ? box.maxHeight : 200;
-        final double dot = count > 0
-            ? (h / (count * 3)).clamp(4.0, 10.0)
-            : 0;
+        final double dot = count > 0 ? (h / (count * 3)).clamp(4.0, 10.0) : 0;
         final double gap = dot;
         return Center(
           child: Column(

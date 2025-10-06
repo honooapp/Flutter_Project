@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:honoo/Utility/HonooColors.dart';
@@ -26,19 +25,22 @@ class SeaFooterBar extends StatelessWidget {
           final w = constraints.maxWidth;
 
           // Dimensioni icone (coerenti con HomePage)
-          const double chestSize = 70;   // scrigno
-          const double bottleSize = 70;  // bottiglia
+          const double chestSize = 70; // scrigno
+          const double bottleSize = 70; // bottiglia
           const double islandSize = 180; // isola
 
           // Posizioni "storiche" rispetto al centro (coerenti con HomePage)
-          final double chestCenterX  = w / 2 - chestSize / 2;
+          final double chestCenterX = w / 2 - chestSize / 2;
           final double islandTargetX = (w / 2) - 200;
           final double bottleTargetX = (w / 2) + 80;
 
           // Clamp per evitare tagli laterali
-          final double islandX = islandTargetX.clamp(0.0, (w - islandSize)).toDouble();
-          final double bottleX = bottleTargetX.clamp(0.0, (w - bottleSize)).toDouble();
-          final double chestX  = chestCenterX.clamp(0.0, (w - chestSize)).toDouble();
+          final double islandX =
+              islandTargetX.clamp(0.0, (w - islandSize)).toDouble();
+          final double bottleX =
+              bottleTargetX.clamp(0.0, (w - bottleSize)).toDouble();
+          final double chestX =
+              chestCenterX.clamp(0.0, (w - chestSize)).toDouble();
 
           return Stack(
             clipBehavior: Clip.none,
@@ -61,19 +63,19 @@ class SeaFooterBar extends StatelessWidget {
               Positioned(
                 bottom: 10,
                 left: bottleX,
-              child: IconButton(
-                icon: SvgPicture.asset(
-                  "assets/icons/bottle.svg",
-                  semanticsLabel: 'Bottle',
-                ),
-                iconSize: bottleSize,
-                splashRadius: 40,
-                tooltip: 'Scrivi',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const NewHonooPage()),
+                child: IconButton(
+                  icon: SvgPicture.asset(
+                    "assets/icons/bottle.svg",
+                    semanticsLabel: 'Bottle',
+                  ),
+                  iconSize: bottleSize,
+                  splashRadius: 40,
+                  tooltip: 'Scrivi',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const NewHonooPage()),
                     );
                   },
                 ),
@@ -106,25 +108,26 @@ class SeaFooterBar extends StatelessWidget {
               Positioned(
                 bottom: -16,
                 left: islandX,
-              child: IconButton(
-                icon: SvgPicture.asset(
-                  "assets/icons/isoladellestorie/island.svg",
-                  colorFilter: const ColorFilter.mode(
-                    HonooColor.onBackground,
-                    BlendMode.srcIn,
+                child: IconButton(
+                  icon: SvgPicture.asset(
+                    "assets/icons/isoladellestorie/island.svg",
+                    colorFilter: const ColorFilter.mode(
+                      HonooColor.onBackground,
+                      BlendMode.srcIn,
+                    ),
+                    width: islandSize,
+                    height: islandSize,
+                    semanticsLabel: 'Island',
                   ),
-                  width: islandSize,
-                  height: islandSize,
-                  semanticsLabel: 'Island',
-                ),
-                iconSize: islandSize,
-                splashRadius: 1,
-                tooltip: "Vai all'Isola delle Storie",
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const IslandPage()),
-                  );
+                  iconSize: islandSize,
+                  splashRadius: 1,
+                  tooltip: "Vai all'Isola delle Storie",
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const IslandPage()),
+                    );
                   },
                 ),
               ),
@@ -133,16 +136,18 @@ class SeaFooterBar extends StatelessWidget {
               Positioned(
                 bottom: -20,
                 left: chestX,
-              child: IconButton(
-                icon: SvgPicture.asset("assets/icons/chest.svg", semanticsLabel: 'Chest'),
-                iconSize: chestSize,
-                splashRadius: 40,
-                tooltip: 'Apri il tuo Cuore',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ChestPage()),
-                  );
+                child: IconButton(
+                  icon: SvgPicture.asset("assets/icons/chest.svg",
+                      semanticsLabel: 'Chest'),
+                  iconSize: chestSize,
+                  splashRadius: 40,
+                  tooltip: 'Apri il tuo Cuore',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ChestPage()),
+                    );
                   },
                 ),
               ),

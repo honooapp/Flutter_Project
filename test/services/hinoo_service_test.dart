@@ -28,15 +28,15 @@ void main() {
     chain = _MockQueryChain();
 
     HinooService.$setTestClient(client);
-    when(() => client.from(any())).thenReturn(chain);
+    when(() => client.from(any())).thenAnswer((_) => chain);
 
-    when(() => chain.select(any())).thenReturn(chain);
-    when(() => chain.eq(any(), any())).thenReturn(chain);
+    when(() => chain.select(any())).thenAnswer((_) => chain);
+    when(() => chain.eq(any(), any())).thenAnswer((_) => chain);
     when(() => chain.order(any(), ascending: any(named: 'ascending')))
-        .thenReturn(chain);
-    when(() => chain.limit(any())).thenReturn(chain);
+        .thenAnswer((_) => chain);
+    when(() => chain.limit(any())).thenAnswer((_) => chain);
 
-    when(() => chain.maybeSingle()).thenReturn(chain);
+    when(() => chain.maybeSingle()).thenAnswer((_) => chain);
   });
 
   tearDown(() {
@@ -44,7 +44,8 @@ void main() {
     resetMocktailState();
   });
 
-  test('fetchUserHinoo: type=personal → mapping corretto e ordine DESC', () async {
+  test('fetchUserHinoo: type=personal → mapping corretto e ordine DESC',
+      () async {
     final rows = [
       {
         'pages': [
@@ -80,11 +81,13 @@ void main() {
 
     when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
         .thenAnswer((invocation) async {
-      final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
+      final onValue =
+          invocation.positionalArguments[0] as dynamic Function(dynamic);
       return onValue(rows);
     });
 
-    final list = await HinooService.fetchUserHinoo('u1', type: HinooType.personal);
+    final list =
+        await HinooService.fetchUserHinoo('u1', type: HinooType.personal);
 
     expect(list, isA<List<HinooDraft>>());
     expect(list.length, 2);
@@ -113,7 +116,8 @@ void main() {
 
     when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
         .thenAnswer((invocation) async {
-      final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
+      final onValue =
+          invocation.positionalArguments[0] as dynamic Function(dynamic);
       return onValue(rows);
     });
 

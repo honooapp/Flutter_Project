@@ -98,7 +98,8 @@ class _NameHonooDialogState extends State<NameHonooDialog> {
                   disabledBackgroundColor: Colors.white10,
                   disabledForegroundColor: Colors.white38,
                 ),
-                child: Text('Conferma', style: HonooDialogStyles.primaryAction()),
+                child:
+                    Text('Conferma', style: HonooDialogStyles.primaryAction()),
               ),
             ),
             const SizedBox(height: 12),

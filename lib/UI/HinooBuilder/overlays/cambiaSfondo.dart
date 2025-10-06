@@ -48,9 +48,11 @@ class CambiaSfondoOverlay extends StatelessWidget {
       );
     }
 
-    final double clampedScale = currentScale.clamp(minScale, maxScale).toDouble();
+    final double clampedScale =
+        currentScale.clamp(minScale, maxScale).toDouble();
     final int computedDivisions = ((maxScale - minScale) * 10).round();
-    final int? sliderDivisions = computedDivisions > 0 ? computedDivisions : null;
+    final int? sliderDivisions =
+        computedDivisions > 0 ? computedDivisions : null;
 
     return Align(
       alignment: Alignment.bottomCenter,
@@ -124,7 +126,8 @@ class CambiaSfondoOverlay extends StatelessWidget {
                   onPressed: onTapChange,
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   ),
                   icon: const Icon(Icons.photo_library_outlined),
                   label: const Text('Sostituisci sfondo'),

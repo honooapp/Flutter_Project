@@ -96,29 +96,29 @@ class _ConversationPageState extends State<ConversationPage> {
                       child: _isLoading
                           ? const Center(child: LoadingSpinner())
                           : (_thread.isEmpty
-                          ? Center(
-                        child: Text(
-                          'Nessuna conversazione',
-                          style: GoogleFonts.libreFranklin(
-                            color: HonooColor.onBackground,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      )
-                          : cs.CarouselSlider(
-                        carouselController: _carouselController,
-                        options: cs.CarouselOptions(
-                          scrollDirection: Axis.vertical,
-                          height: 100.h,
-                          aspectRatio: 9 / 16,
-                          enlargeCenterPage: true,
-                          enableInfiniteScroll: false,
-                        ),
-                        items: _thread
-                            .map((h) => HonooCard(honoo: h))
-                            .toList(),
-                      )),
+                              ? Center(
+                                  child: Text(
+                                    'Nessuna conversazione',
+                                    style: GoogleFonts.libreFranklin(
+                                      color: HonooColor.onBackground,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                )
+                              : cs.CarouselSlider(
+                                  carouselController: _carouselController,
+                                  options: cs.CarouselOptions(
+                                    scrollDirection: Axis.vertical,
+                                    height: 100.h,
+                                    aspectRatio: 9 / 16,
+                                    enlargeCenterPage: true,
+                                    enableInfiniteScroll: false,
+                                  ),
+                                  items: _thread
+                                      .map((h) => HonooCard(honoo: h))
+                                      .toList(),
+                                )),
                     ),
 
                     // FOOTER

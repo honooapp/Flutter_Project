@@ -1,6 +1,5 @@
 import 'dart:math';
 
-
 class NimController {
   static final NimController _instance = NimController._internal();
 
@@ -15,7 +14,12 @@ class NimController {
   int currentPlayer = 1;
   bool playerVictory = false;
   bool gameRunning = false;
-  List<List<int>> board = [[1], [1,1,1], [1,1,1,1,1], [1,1,1,1,1,1,1]];
+  List<List<int>> board = [
+    [1],
+    [1, 1, 1],
+    [1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1]
+  ];
   List<String> aiHistory = [];
   List<String> playerHistory = [];
 
@@ -24,7 +28,12 @@ class NimController {
     currentPlayer = 1;
     playerVictory = false;
     gameRunning = false;
-    board = [[1], [1,1,1], [1,1,1,1,1], [1,1,1,1,1,1,1]];
+    board = [
+      [1],
+      [1, 1, 1],
+      [1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1]
+    ];
     aiHistory = [];
     playerHistory = [];
   }
@@ -38,7 +47,10 @@ class NimController {
   }
 
   bool isBalanced(List<List<int>> board) {
-    var balanced = (board[0].reduce((value, element) => value + element) ^ board[1].reduce((value, element) => value + element)) ^ (board[2].reduce((value, element) => value + element) ^ board[3].reduce((value, element) => value + element));
+    var balanced = (board[0].reduce((value, element) => value + element) ^
+            board[1].reduce((value, element) => value + element)) ^
+        (board[2].reduce((value, element) => value + element) ^
+            board[3].reduce((value, element) => value + element));
     return balanced == 0;
   }
 
@@ -82,13 +94,16 @@ class NimController {
         if (tempList[0].reduce((value, element) => value + element) > 0) {
           remove(tempList, 0, [tempList[0].indexOf(1)]);
           board = List.from(tempList);
-        } else if (tempList[1].reduce((value, element) => value + element) > 0) {
+        } else if (tempList[1].reduce((value, element) => value + element) >
+            0) {
           remove(tempList, 1, [tempList[1].indexOf(1)]);
           board = List.from(tempList);
-        } else if (tempList[2].reduce((value, element) => value + element) > 0) {
+        } else if (tempList[2].reduce((value, element) => value + element) >
+            0) {
           remove(tempList, 2, [tempList[2].indexOf(1)]);
           board = List.from(tempList);
-        } else if (tempList[3].reduce((value, element) => value + element) > 0) {
+        } else if (tempList[3].reduce((value, element) => value + element) >
+            0) {
           remove(tempList, 3, [tempList[3].indexOf(1)]);
           board = List.from(tempList);
         }
@@ -98,19 +113,23 @@ class NimController {
           rowTraversed += 1;
 
           if (tempList[row].reduce((value, element) => value + element) > 0) {
-            for (int v = 0; v < tempList[row].reduce((value, element) => value + element); v++) {
+            for (int v = 0;
+                v < tempList[row].reduce((value, element) => value + element);
+                v++) {
               remove(tempList, row, [tempList[row].indexOf(1)]);
               amount += 1;
 
               if (isBalanced(tempList)) {
                 foundBalanced = true;
-                String aiMoveMessage = 'AI removed: $amount From row: $rowTraversed';
+                String aiMoveMessage =
+                    'AI removed: $amount From row: $rowTraversed';
                 aiHistory.add(aiMoveMessage);
                 board = List.from(tempList);
                 return;
               }
 
-              if (tempList[row].reduce((value, element) => value + element) == 0) {
+              if (tempList[row].reduce((value, element) => value + element) ==
+                  0) {
                 List<int> tmp0 = List.from(board[0]);
                 List<int> tmp1 = List.from(board[1]);
                 List<int> tmp2 = List.from(board[2]);
@@ -130,13 +149,16 @@ class NimController {
         if (tempList[0].reduce((value, element) => value + element) > 0) {
           remove(tempList, 0, [tempList[0].indexOf(1)]);
           board = List.from(tempList);
-        } else if (tempList[1].reduce((value, element) => value + element) > 0) {
+        } else if (tempList[1].reduce((value, element) => value + element) >
+            0) {
           remove(tempList, 1, [tempList[1].indexOf(1)]);
           board = List.from(tempList);
-        } else if (tempList[2].reduce((value, element) => value + element) > 0) {
+        } else if (tempList[2].reduce((value, element) => value + element) >
+            0) {
           remove(tempList, 2, [tempList[2].indexOf(1)]);
           board = List.from(tempList);
-        } else if (tempList[3].reduce((value, element) => value + element) > 0) {
+        } else if (tempList[3].reduce((value, element) => value + element) >
+            0) {
           remove(tempList, 3, [tempList[3].indexOf(1)]);
           board = List.from(tempList);
         }
@@ -173,5 +195,4 @@ class NimController {
   bool checkEndGame() {
     return gameRunning;
   }
-
 }

@@ -65,17 +65,17 @@ class _IslandPageState extends State<IslandPage> {
           Positioned(
             top: 0,
             right: 0,
-          child: Visibility(
-            visible: infoVisible,
-            child: IconButton(
-              icon: const Icon(Icons.close, color: HonooColor.onBackground),
-              iconSize: 40,
-              tooltip: 'Chiudi informazioni',
-              onPressed: () {
-                    setState(() {
-                      infoVisible = !infoVisible;
-                    });
-                  },
+            child: Visibility(
+              visible: infoVisible,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: HonooColor.onBackground),
+                iconSize: 40,
+                tooltip: 'Chiudi informazioni',
+                onPressed: () {
+                  setState(() {
+                    infoVisible = !infoVisible;
+                  });
+                },
               ),
             ),
           ),
@@ -126,31 +126,39 @@ class _IslandPageState extends State<IslandPage> {
                           const double desktopContentMaxWidth = 720;
                           final double columnMaxW = isPhone
                               ? constraints.maxWidth
-                              : math.min(constraints.maxWidth, desktopContentMaxWidth);
+                              : math.min(
+                                  constraints.maxWidth, desktopContentMaxWidth);
 
                           const double mapAspectRatio = 321 / 323;
                           const double mapHorizontalPadding = 24.0; // 12 + 12
                           final double mapMaxHeight = _maxMapHeight(context);
-                          final double mapMaxWidthFromHeight = mapMaxHeight * mapAspectRatio;
-                          final double mapAvailableWidth = math.max(columnMaxW - mapHorizontalPadding, 0.0);
+                          final double mapMaxWidthFromHeight =
+                              mapMaxHeight * mapAspectRatio;
+                          final double mapAvailableWidth =
+                              math.max(columnMaxW - mapHorizontalPadding, 0.0);
                           double targetMapWidth = mapAvailableWidth;
                           if (mapMaxWidthFromHeight > 0) {
                             targetMapWidth = targetMapWidth == 0
                                 ? mapMaxWidthFromHeight
-                                : math.min(targetMapWidth, mapMaxWidthFromHeight);
+                                : math.min(
+                                    targetMapWidth, mapMaxWidthFromHeight);
                           }
                           if (targetMapWidth <= 0) {
                             targetMapWidth = mapMaxWidthFromHeight > 0
                                 ? mapMaxWidthFromHeight
-                                : (columnMaxW > 0 ? columnMaxW - mapHorizontalPadding : 320.0);
+                                : (columnMaxW > 0
+                                    ? columnMaxW - mapHorizontalPadding
+                                    : 320.0);
                           }
-                          final double targetMapHeight = math.min(targetMapWidth / mapAspectRatio, mapMaxHeight);
+                          final double targetMapHeight = math.min(
+                              targetMapWidth / mapAspectRatio, mapMaxHeight);
 
                           return Row(
                             children: [
                               const Expanded(child: SizedBox()),
                               ConstrainedBox(
-                                constraints: BoxConstraints(maxWidth: columnMaxW),
+                                constraints:
+                                    BoxConstraints(maxWidth: columnMaxW),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -159,8 +167,10 @@ class _IslandPageState extends State<IslandPage> {
                                       height: 70,
                                       child: Align(
                                         alignment: Alignment.topCenter,
-                                        child: IsolaDelleStoreContentManager.getRichText(
-                                          IsolaDelleStoreContentManager.homeDescription,
+                                        child: IsolaDelleStoreContentManager
+                                            .getRichText(
+                                          IsolaDelleStoreContentManager
+                                              .homeDescription,
                                         ),
                                       ),
                                     ),
@@ -169,14 +179,16 @@ class _IslandPageState extends State<IslandPage> {
 
                                     // Mappa SVG responsiva con pin proporzionali all'area visibile.
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12.0),
                                       child: Align(
                                         alignment: Alignment.center,
                                         child: SizedBox(
                                           width: targetMapWidth,
                                           height: targetMapHeight,
                                           child: IslandMapWithPins(
-                                            svgAsset: "assets/icons/isoladellestorie/islandmap.svg",
+                                            svgAsset:
+                                                "assets/icons/isoladellestorie/islandmap.svg",
                                             aspectRatio: 321 / 323,
                                             pins: const [
                                               // x/y: coordinate percentuali del luogo nel viewBox originale.
@@ -187,7 +199,8 @@ class _IslandPageState extends State<IslandPage> {
                                                 y: 0.95,
                                                 dx: 0.00,
                                                 dy: 0.01,
-                                                assetSvg: "assets/icons/isoladellestorie/button1.svg",
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button1.svg",
                                                 hint: 'Grotta delle Rondini',
                                               ),
                                               MapPinModel(
@@ -196,7 +209,8 @@ class _IslandPageState extends State<IslandPage> {
                                                 y: 0.60,
                                                 dx: -0.03,
                                                 dy: -0.02,
-                                                assetSvg: "assets/icons/isoladellestorie/button2.svg",
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button2.svg",
                                                 hint: 'Radura delle Bacche',
                                               ),
                                               MapPinModel(
@@ -205,7 +219,8 @@ class _IslandPageState extends State<IslandPage> {
                                                 y: 0.30,
                                                 dx: 0.02,
                                                 dy: -0.01,
-                                                assetSvg: "assets/icons/isoladellestorie/button3.svg",
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button3.svg",
                                                 hint: "Pozzo dell'Oracolo",
                                               ),
                                               MapPinModel(
@@ -214,7 +229,8 @@ class _IslandPageState extends State<IslandPage> {
                                                 y: 0.17,
                                                 dx: -0.02,
                                                 dy: -0.02,
-                                                assetSvg: "assets/icons/isoladellestorie/button4.svg",
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button4.svg",
                                                 hint: "Porta nell'Alabastro",
                                               ),
                                               MapPinModel(
@@ -223,7 +239,8 @@ class _IslandPageState extends State<IslandPage> {
                                                 y: 0.17,
                                                 dx: 0.02,
                                                 dy: 0.00,
-                                                assetSvg: "assets/icons/isoladellestorie/button5.svg",
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button5.svg",
                                                 hint: 'Primo Anello',
                                               ),
                                               MapPinModel(
@@ -232,7 +249,8 @@ class _IslandPageState extends State<IslandPage> {
                                                 y: 0.40,
                                                 dx: 0.02,
                                                 dy: 0.00,
-                                                assetSvg: "assets/icons/isoladellestorie/button6.svg",
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button6.svg",
                                                 hint: 'Secondo Anello',
                                               ),
                                               MapPinModel(
@@ -241,7 +259,8 @@ class _IslandPageState extends State<IslandPage> {
                                                 y: 0.62,
                                                 dx: 0.02,
                                                 dy: 0.00,
-                                                assetSvg: "assets/icons/isoladellestorie/button7.svg",
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button7.svg",
                                                 hint: 'Terzo Anello',
                                               ),
                                               MapPinModel(
@@ -250,7 +269,8 @@ class _IslandPageState extends State<IslandPage> {
                                                 y: 0.84,
                                                 dx: 0.02,
                                                 dy: 0.00,
-                                                assetSvg: "assets/icons/isoladellestorie/button8.svg",
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button8.svg",
                                                 hint: 'Quarto Anello',
                                               ),
                                               MapPinModel(
@@ -259,7 +279,8 @@ class _IslandPageState extends State<IslandPage> {
                                                 y: 0.98,
                                                 dx: 0.00,
                                                 dy: 0.00,
-                                                assetSvg: "assets/icons/isoladellestorie/button9.svg",
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button9.svg",
                                                 hint: 'Cunicolo verso la Luce',
                                               ),
                                             ],
@@ -299,12 +320,10 @@ class _IslandPageState extends State<IslandPage> {
                     const double homeSize = 40;
                     const double logoSize = 70;
 
-
                     final double bottleTargetX = (w / 2) + 60;
                     final double chestCenterX = (w / 2) - (chestSize / 2);
                     final double homeTargetX = (w / 2) - 190;
                     final double logoTargetX = (w / 2) + 110;
-
 
                     double clampX(double x, double size) =>
                         x.clamp(0.0, (w - size)).toDouble();
@@ -314,7 +333,6 @@ class _IslandPageState extends State<IslandPage> {
                     final double homeX = clampX(homeTargetX, homeSize);
                     final double logoX = clampX(logoTargetX, logoSize);
 
-
                     return Stack(
                       clipBehavior: Clip.none,
                       children: [
@@ -322,18 +340,25 @@ class _IslandPageState extends State<IslandPage> {
                           bottom: 50,
                           left: 0,
                           right: 0,
-                          child: SizedBox(height: 10, child: Container(color: HonooColor.wave1)),
+                          child: SizedBox(
+                              height: 10,
+                              child: Container(color: HonooColor.wave1)),
                         ),
                         Positioned(
                           bottom: 10,
                           left: bottleX,
                           child: IconButton(
-                            icon: SvgPicture.asset("assets/icons/bottle.svg", semanticsLabel: 'Bottle'),
+                            icon: SvgPicture.asset("assets/icons/bottle.svg",
+                                semanticsLabel: 'Bottle'),
                             iconSize: bottleSize,
                             splashRadius: 40,
                             tooltip: 'Scrivi',
                             onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => const NewHonooPage()));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const NewHonooPage()));
                             },
                           ),
                         ),
@@ -341,13 +366,19 @@ class _IslandPageState extends State<IslandPage> {
                           bottom: 30,
                           left: 0,
                           right: 0,
-                          child: IgnorePointer(child: SizedBox(height: 20, child: Container(color: HonooColor.wave2))),
+                          child: IgnorePointer(
+                              child: SizedBox(
+                                  height: 20,
+                                  child: Container(color: HonooColor.wave2))),
                         ),
                         Positioned(
                           bottom: 0,
                           left: 0,
                           right: 0,
-                          child: IgnorePointer(child: SizedBox(height: 30, child: Container(color: HonooColor.wave3))),
+                          child: IgnorePointer(
+                              child: SizedBox(
+                                  height: 30,
+                                  child: Container(color: HonooColor.wave3))),
                         ),
                         Positioned(
                           bottom: 0,
@@ -358,7 +389,8 @@ class _IslandPageState extends State<IslandPage> {
                               colorFilter: const ColorFilter.mode(
                                 HonooColor.onBackground,
                                 BlendMode.srcIn,
-                            ),                              width: homeSize,
+                              ),
+                              width: homeSize,
                               height: homeSize,
                               semanticsLabel: 'Home',
                             ),
@@ -372,7 +404,8 @@ class _IslandPageState extends State<IslandPage> {
                           bottom: -20,
                           left: chestX,
                           child: IconButton(
-                            icon: SvgPicture.asset("assets/icons/chest.svg", semanticsLabel: 'Chest'),
+                            icon: SvgPicture.asset("assets/icons/chest.svg",
+                                semanticsLabel: 'Chest'),
                             iconSize: chestSize,
                             splashRadius: 40,
                             tooltip: 'Apri il tuo Cuore',
@@ -390,11 +423,14 @@ class _IslandPageState extends State<IslandPage> {
                           bottom: -15,
                           left: logoX,
                           child: IconButton(
-                            icon: SvgPicture.asset("assets/icons/honoo_logo.svg", semanticsLabel: 'Logo'),
+                            icon: SvgPicture.asset(
+                                "assets/icons/honoo_logo.svg",
+                                semanticsLabel: 'Logo'),
                             iconSize: logoSize,
                             splashRadius: 30,
                             tooltip: 'Mostra informazioni',
-                            onPressed: () => setState(() => infoVisible = !infoVisible),
+                            onPressed: () =>
+                                setState(() => infoVisible = !infoVisible),
                           ),
                         ),
                       ],
@@ -413,12 +449,16 @@ class _IslandPageState extends State<IslandPage> {
               child: Material(
                 color: Colors.transparent,
                 child: IconButton(
-                  icon: SvgPicture.asset("assets/icons/moon.svg", semanticsLabel: 'Moon'),
+                  icon: SvgPicture.asset("assets/icons/moon.svg",
+                      semanticsLabel: 'Moon'),
                   iconSize: 60,
                   splashRadius: 32,
                   tooltip: 'Vai sulla Luna',
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const MoonPage()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const MoonPage()));
                   },
                 ),
               ),
@@ -478,11 +518,18 @@ class _IslandPageState extends State<IslandPage> {
     const double footerHeight = 80.0;
     const double safetyGap = 24.0; // margine extra per evitare sovrapposizioni
 
-    final double reservedVertical = headerHeight + introSpacing + introTextHeight + topSpacer + bottomSpacer + footerHeight + safetyGap + media.padding.top + media.padding.bottom;
+    final double reservedVertical = headerHeight +
+        introSpacing +
+        introTextHeight +
+        topSpacer +
+        bottomSpacer +
+        footerHeight +
+        safetyGap +
+        media.padding.top +
+        media.padding.bottom;
     final double availableHeight = media.size.height - reservedVertical;
     return math.max(availableHeight, 220.0);
   }
-
 }
 
 /// ============================================================================
@@ -493,8 +540,10 @@ class MapPinModel {
   final int id; // 1..9
   final double x; // 0..1: ascissa nel viewBox dell'SVG
   final double y; // 0..1: ordinata nel viewBox dell'SVG
-  final double dx; // offset orizzontale percentuale per spostare il pin rispetto al punto logico
-  final double dy; // offset verticale percentuale per allineare il pin senza coprire il disegno
+  final double
+      dx; // offset orizzontale percentuale per spostare il pin rispetto al punto logico
+  final double
+      dy; // offset verticale percentuale per allineare il pin senza coprire il disegno
   final String assetSvg;
   final String hint;
 
@@ -532,12 +581,14 @@ class IslandMapWithPins extends StatelessWidget {
     return LayoutBuilder(
       builder: (ctx, constraints) {
         final double availableWidth = constraints.maxWidth;
-        final double renderWidth =
-            availableWidth.isFinite && availableWidth > 0 ? availableWidth : MediaQuery.of(ctx).size.width;
+        final double renderWidth = availableWidth.isFinite && availableWidth > 0
+            ? availableWidth
+            : MediaQuery.of(ctx).size.width;
         final double safeAspectRatio = aspectRatio <= 0 ? 1 : aspectRatio;
         final double renderHeight = renderWidth / safeAspectRatio;
 
-        final double pinVisualSize = (renderWidth * pinSizeFactor).clamp(24.0, 160.0);
+        final double pinVisualSize =
+            (renderWidth * pinSizeFactor).clamp(24.0, 160.0);
         final double hitTargetSize = math.max(pinVisualSize, 40.0);
 
         return SizedBox(
@@ -551,9 +602,14 @@ class IslandMapWithPins extends StatelessWidget {
               ),
               if (debugGrid) ..._buildDebugGrid(renderWidth, renderHeight),
               ...pins.map((pin) {
-                final double px = (pin.x * renderWidth) + (pin.dx * renderWidth) - (hitTargetSize / 2);
-                final double py = (pin.y * renderHeight) + (pin.dy * renderHeight) - (hitTargetSize / 2);
-                final VoidCallback? onPressed = onPinTap == null ? null : () => onPinTap!(pin.id);
+                final double px = (pin.x * renderWidth) +
+                    (pin.dx * renderWidth) -
+                    (hitTargetSize / 2);
+                final double py = (pin.y * renderHeight) +
+                    (pin.dy * renderHeight) -
+                    (hitTargetSize / 2);
+                final VoidCallback? onPressed =
+                    onPinTap == null ? null : () => onPinTap!(pin.id);
 
                 return Positioned(
                   left: px,

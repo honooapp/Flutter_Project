@@ -10,7 +10,8 @@ import 'package:honoo/Entities/Hinoo.dart';
 
 void main() {
   group('HinooService drafts (unit, no network)', () {
-    test('getDraft() → null quando utente non autenticato (early-return)', () async {
+    test('getDraft() → null quando utente non autenticato (early-return)',
+        () async {
       // Assicuriamoci che Supabase non abbia un utente loggato.
       // Se in setUp dell’app inizializzi Supabase altrove, qui non lo facciamo.
       // La funzione fa early return e non tocca la rete.
@@ -53,7 +54,8 @@ void main() {
       expect(true, isTrue);
     }, tags: ['integration']);
 
-    test('getDraft() restituisce l’ultimo draft salvato per l’utente', () async {
+    test('getDraft() restituisce l’ultimo draft salvato per l’utente',
+        () async {
       // Precondizione: utente loggato e almeno un draft salvato (vedi test sopra).
       final res = await HinooService.getDraft();
       expect(res, isNotNull);

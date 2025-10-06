@@ -21,7 +21,8 @@ class LoadingSpinner extends StatefulWidget {
   State<LoadingSpinner> createState() => _LoadingSpinnerState();
 }
 
-class _LoadingSpinnerState extends State<LoadingSpinner> with SingleTickerProviderStateMixin {
+class _LoadingSpinnerState extends State<LoadingSpinner>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override

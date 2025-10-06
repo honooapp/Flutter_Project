@@ -4,11 +4,17 @@ import 'package:integration_test/integration_test.dart';
 import 'package:honoo/main.dart';
 
 void main() {
+  final binding = WidgetsBinding.instance;
+  if (binding is TestWidgetsFlutterBinding &&
+      binding is! IntegrationTestWidgetsFlutterBinding) {
+    return;
+  }
+
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(
     'boot → mostra login o home senza crash',
-        (tester) async {
+    (tester) async {
       await tester.pumpWidget(const MyApp());
       await tester.pumpAndSettle();
 
@@ -32,8 +38,7 @@ void main() {
             loginFoundByText ||
             homeFoundByText,
         isTrue,
-        reason:
-        'Non ho trovato né la schermata di Login né la Home. Aggiungi '
+        reason: 'Non ho trovato né la schermata di Login né la Home. Aggiungi '
             'Key(\'login_screen_root\') / Key(\'home_screen_root\') ai widget di root per test più stabili.',
       );
     },

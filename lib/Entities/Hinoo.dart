@@ -6,12 +6,13 @@ enum HinooType { personal, moon, answer }
 @immutable
 class HinooSlide {
   final String? backgroundImage; // URL pubblico (dopo upload)
-  final String text;             // testo centrato
-  final bool isTextWhite;        // true=bianco, false=nero
-  final double bgScale;   // default 1.0
+  final String text; // testo centrato
+  final bool isTextWhite; // true=bianco, false=nero
+  final double bgScale; // default 1.0
   final double bgOffsetX; // default 0.0
   final double bgOffsetY; // default 0.0
-  final List<double>? bgTransform; // matrice completa 4x4 normalizzata (opzionale)
+  final List<double>?
+      bgTransform; // matrice completa 4x4 normalizzata (opzionale)
 
   const HinooSlide({
     required this.backgroundImage,
@@ -44,33 +45,35 @@ class HinooSlide {
   }
 
   Map<String, dynamic> toJson() => {
-    'backgroundImage': backgroundImage,
-    'text': text,
-    'isTextWhite': isTextWhite,
-    'bgScale': bgScale,
-    'bgOffsetX': bgOffsetX,
-    'bgOffsetY': bgOffsetY,
-    if (bgTransform != null) 'bgTransform': bgTransform,
-  };
-
+        'backgroundImage': backgroundImage,
+        'text': text,
+        'isTextWhite': isTextWhite,
+        'bgScale': bgScale,
+        'bgOffsetX': bgOffsetX,
+        'bgOffsetY': bgOffsetY,
+        if (bgTransform != null) 'bgTransform': bgTransform,
+      };
 
   factory HinooSlide.fromJson(Map<String, dynamic> json) => HinooSlide(
-    backgroundImage: json['backgroundImage'] as String?,
-    text: (json['text'] as String?) ?? '',
-    isTextWhite: (json['isTextWhite'] as bool?) ?? true,
-    bgScale: (json['bgScale'] as num?)?.toDouble() ?? 1.0,
-    bgOffsetX: (json['bgOffsetX'] as num?)?.toDouble() ?? 0.0,
-    bgOffsetY: (json['bgOffsetY'] as num?)?.toDouble() ?? 0.0,
-    bgTransform: (json['bgTransform'] as List?)?.map((e) => (e as num).toDouble()).toList(),
-  );
+        backgroundImage: json['backgroundImage'] as String?,
+        text: (json['text'] as String?) ?? '',
+        isTextWhite: (json['isTextWhite'] as bool?) ?? true,
+        bgScale: (json['bgScale'] as num?)?.toDouble() ?? 1.0,
+        bgOffsetX: (json['bgOffsetX'] as num?)?.toDouble() ?? 0.0,
+        bgOffsetY: (json['bgOffsetY'] as num?)?.toDouble() ?? 0.0,
+        bgTransform: (json['bgTransform'] as List?)
+            ?.map((e) => (e as num).toDouble())
+            .toList(),
+      );
 }
 
 @immutable
 class HinooDraft {
   final List<HinooSlide> pages;
-  final HinooType type;       // personal | moon | answer
+  final HinooType type; // personal | moon | answer
   final String? recipientTag; // opzionale
-  final double? baseCanvasHeight; // altezza canvas al momento della creazione (per proporzioni testo)
+  final double?
+      baseCanvasHeight; // altezza canvas al momento della creazione (per proporzioni testo)
 
   const HinooDraft({
     required this.pages,
@@ -95,28 +98,30 @@ class HinooDraft {
   }
 
   Map<String, dynamic> toJson() => {
-    'type': type.name,
-    'recipientTag': recipientTag,
-    'pages': pages.map((p) => p.toJson()).toList(),
-    if (baseCanvasHeight != null) 'baseCanvasHeight': baseCanvasHeight,
-  };
+        'type': type.name,
+        'recipientTag': recipientTag,
+        'pages': pages.map((p) => p.toJson()).toList(),
+        if (baseCanvasHeight != null) 'baseCanvasHeight': baseCanvasHeight,
+      };
 
   factory HinooDraft.fromJson(Map<String, dynamic> json) => HinooDraft(
-    type: _typeFrom(json['type'] as String?),
-    recipientTag: json['recipientTag'] as String?,
-    pages: (json['pages'] as List<dynamic>? ?? [])
-        .map((e) => HinooSlide.fromJson(e as Map<String, dynamic>))
-        .toList(),
-    baseCanvasHeight: (json['baseCanvasHeight'] as num?)?.toDouble(),
-  );
+        type: _typeFrom(json['type'] as String?),
+        recipientTag: json['recipientTag'] as String?,
+        pages: (json['pages'] as List<dynamic>? ?? [])
+            .map((e) => HinooSlide.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        baseCanvasHeight: (json['baseCanvasHeight'] as num?)?.toDouble(),
+      );
 
   static HinooType _typeFrom(String? s) {
     switch (s) {
       case 'moon':
       case 'public':
         return HinooType.moon;
-      case 'answer': return HinooType.answer;
-      default: return HinooType.personal;
+      case 'answer':
+        return HinooType.answer;
+      default:
+        return HinooType.personal;
     }
   }
 }

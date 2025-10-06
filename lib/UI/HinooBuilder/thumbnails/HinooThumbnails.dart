@@ -72,30 +72,36 @@ class _ReorderableThumbs extends StatelessWidget {
     // Calcola limite massimo e centratura dinamica
     const double _ar = 9 / 16;
     const double _thumbH = 128;
-    const double _tileHPad = 6; // padding orizzontale per ogni tile (a sinistra e destra)
+    const double _tileHPad =
+        6; // padding orizzontale per ogni tile (a sinistra e destra)
     const double _thumbW = _thumbH * _ar;
     const double _tileTotalW = _thumbW + (_tileHPad * 2);
 
     final int pageCount = pages.length;
-    final int visiblePages = pageCount > 9 ? 9 : pageCount; // massimo 9 pagine visibili
-    final bool showAdd = pageCount < 9; // alla nona pagina scompare il pulsante "+"
+    final int visiblePages =
+        pageCount > 9 ? 9 : pageCount; // massimo 9 pagine visibili
+    final bool showAdd =
+        pageCount < 9; // alla nona pagina scompare il pulsante "+"
     final int visibleCount = visiblePages + (showAdd ? 1 : 0);
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final double contentW = _tileTotalW * visibleCount;
-        final double maxW = constraints.maxWidth.isFinite ? constraints.maxWidth : contentW;
+        final double maxW =
+            constraints.maxWidth.isFinite ? constraints.maxWidth : contentW;
         final double margin = contentW < maxW ? (maxW - contentW) / 2 : 0;
 
         return ReorderableListView.builder(
           scrollDirection: Axis.horizontal,
-          physics: contentW <= maxW ? const NeverScrollableScrollPhysics() : null,
+          physics:
+              contentW <= maxW ? const NeverScrollableScrollPhysics() : null,
           padding: EdgeInsets.symmetric(horizontal: margin),
           buildDefaultDragHandles: false,
           onReorder: (oldIndex, newIndex) {
             // Se è visibile il "+", impedisci interazioni con esso
             if (showAdd) {
-              final int addIndex = visiblePages; // ultimo indice visibile occupato dal tile +
+              final int addIndex =
+                  visiblePages; // ultimo indice visibile occupato dal tile +
               if (oldIndex == addIndex || newIndex == addIndex) return;
             }
             if (newIndex > oldIndex) newIndex -= 1;
@@ -103,7 +109,8 @@ class _ReorderableThumbs extends StatelessWidget {
           },
           itemCount: visibleCount,
           itemBuilder: (context, i) {
-            final int addIndex = visiblePages; // posizione del tile + se presente
+            final int addIndex =
+                visiblePages; // posizione del tile + se presente
             if (showAdd && i == addIndex) {
               // Tile "+" – non riordinabile
               return Padding(
@@ -169,16 +176,22 @@ class _ThumbTile extends StatelessWidget {
 
     String? bgUrl = (page is Map) ? page['bgUrl'] as String? : null;
     bgUrl ??= fallbackBgUrl;
-    final String text = (page is Map && page['text'] is String) ? page['text'] as String : '';
+    final String text =
+        (page is Map && page['text'] is String) ? page['text'] as String : '';
     final int? textColorInt = (page is Map) ? page['textColor'] as int? : null;
-    final Color textColor = textColorInt != null ? Color(textColorInt) : Colors.white;
-    List<dynamic>? transformList = (page is Map) ? page['bgTransform'] as List<dynamic>? : null;
+    final Color textColor =
+        textColorInt != null ? Color(textColorInt) : Colors.white;
+    List<dynamic>? transformList =
+        (page is Map) ? page['bgTransform'] as List<dynamic>? : null;
     transformList ??= fallbackBgTransform;
-    final Matrix4? transform = (transformList != null && transformList.length == 16)
-        ? Matrix4.fromList(transformList.map((e) => (e as num).toDouble()).toList())
-        : null;
+    final Matrix4? transform =
+        (transformList != null && transformList.length == 16)
+            ? Matrix4.fromList(
+                transformList.map((e) => (e as num).toDouble()).toList())
+            : null;
 
-    final double baseCanvasHeight = canvasHeight.isFinite && canvasHeight > 0 ? canvasHeight : designHeight;
+    final double baseCanvasHeight =
+        canvasHeight.isFinite && canvasHeight > 0 ? canvasHeight : designHeight;
     final double scaleFactor = designHeight / baseCanvasHeight;
     final Matrix4? effectiveTransform;
     if (transform != null) {
@@ -198,7 +211,8 @@ class _ThumbTile extends StatelessWidget {
     } else if (fallbackBgBytes != null && fallbackBgBytes!.isNotEmpty) {
       bgProvider = MemoryImage(fallbackBgBytes!);
     } else {
-      bgProvider = const AssetImage('assets/images/hinoo_default_1080x1920.png');
+      bgProvider =
+          const AssetImage('assets/images/hinoo_default_1080x1920.png');
     }
 
     Widget buildBackground() {
@@ -227,9 +241,12 @@ class _ThumbTile extends StatelessWidget {
         height: designHeight,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final double maxTextWidth = math.max(1, constraints.maxWidth - safePadding * 2);
-            final int lineCount = _countTextLines(text, maxTextWidth, textStyle);
-            final Alignment alignment = lineCount > 1 ? Alignment.topCenter : Alignment.center;
+            final double maxTextWidth =
+                math.max(1, constraints.maxWidth - safePadding * 2);
+            final int lineCount =
+                _countTextLines(text, maxTextWidth, textStyle);
+            final Alignment alignment =
+                lineCount > 1 ? Alignment.topCenter : Alignment.center;
 
             return Stack(
               fit: StackFit.expand,

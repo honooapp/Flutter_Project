@@ -17,8 +17,8 @@ class ColonnaCentrata extends StatelessWidget {
           constraints: DeviceController().isPhone()
               ? BoxConstraints(maxWidth: MediaQuery.of(context).size.width)
               : BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.5,
-          ),
+                  maxWidth: MediaQuery.of(context).size.width * 0.5,
+                ),
           child: Center(
             child: child,
           ),

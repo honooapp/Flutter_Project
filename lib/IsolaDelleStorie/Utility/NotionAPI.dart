@@ -40,12 +40,13 @@ class NotionApi {
   List<APIExercise> getAllExercises() {
     // Ensure that the instance is initialized before using it
     if (instance == null) {
-      throw Exception("NotionApi has not been initialized. Call the 'initialize' method first.");
+      throw Exception(
+          "NotionApi has not been initialized. Call the 'initialize' method first.");
     }
 
     getDatabase().then((value) => () {
-      int a = 0;
-    });
+          int a = 0;
+        });
 
     return [];
   }
