@@ -35,18 +35,18 @@ void main() {
     user = _MockUser();
     chain = _MockQueryChain();
 
-    when(() => client.auth).thenReturn(auth);
-    when(() => auth.currentUser).thenReturn(user);
-    when(() => user.id).thenReturn('u-1');
+    when(() => client.auth).thenAnswer((_) => auth);
+    when(() => auth.currentUser).thenAnswer((_) => user);
+    when(() => user.id).thenAnswer((_) => 'u-1');
 
-    when(() => client.from('hinoo')).thenReturn(chain);
+    when(() => client.from('hinoo')).thenAnswer((_) => chain);
 
-    when(() => chain.select(any())).thenReturn(chain);
-    when(() => chain.eq(any(), any())).thenReturn(chain);
-    when(() => chain.limit(any())).thenReturn(chain);
-    when(() => chain.insert(any())).thenReturn(chain);
+    when(() => chain.select(any())).thenAnswer((_) => chain);
+    when(() => chain.eq(any(), any())).thenAnswer((_) => chain);
+    when(() => chain.limit(any())).thenAnswer((_) => chain);
+    when(() => chain.insert(any())).thenAnswer((_) => chain);
 
-    when(() => chain.maybeSingle()).thenReturn(chain);
+    when(() => chain.maybeSingle()).thenAnswer((_) => chain);
 
     HinooService.$setTestClient(client);
   });

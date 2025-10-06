@@ -8,6 +8,12 @@ import 'package:honoo/main.dart';
 // - Per eseguirlo in locale, togli lo "skip: true" in fondo e assicurati di avere le env corrette.
 
 void main() {
+  final binding = WidgetsBinding.instance;
+  if (binding is TestWidgetsFlutterBinding &&
+      binding is! IntegrationTestWidgetsFlutterBinding) {
+    return;
+  }
+
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(
