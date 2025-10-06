@@ -32,8 +32,8 @@ void main() {
     HinooStorageUploader.$setTestClient(client);
 
     // catena: client.storage -> storage ; storage.from('hinoo') -> fileApi
-    when(() => client.storage).thenReturn(storage);
-    when(() => storage.from('hinoo')).thenReturn(fileApi);
+    when(() => client.storage).thenAnswer((_) => storage);
+    when(() => storage.from('hinoo')).thenAnswer((_) => fileApi);
 
     // Stub base (asincrono → thenAnswer)
     when(() => fileApi.uploadBinary(
@@ -42,7 +42,7 @@ void main() {
           fileOptions: any(named: 'fileOptions'),
         )).thenAnswer((_) async => 'ignored-path-returned-by-upload');
     when(() => fileApi.getPublicUrl(any()))
-        .thenReturn('https://cdn.example.com/hinoo/mock-url.png');
+        .thenAnswer((_) => 'https://cdn.example.com/hinoo/mock-url.png');
   });
 
   tearDown(() {
@@ -76,7 +76,7 @@ void main() {
       'uploadBackground: usa folder backgrounds e rispetta estensione (jpeg → jpg)',
       () async {
     when(() => fileApi.getPublicUrl(any()))
-        .thenReturn('https://cdn.example.com/hinoo/bg.jpg');
+        .thenAnswer((_) => 'https://cdn.example.com/hinoo/bg.jpg');
 
     final url = await HinooStorageUploader.uploadBackground(
       bytes: Uint8List.fromList([1, 2, 3]),
@@ -101,7 +101,7 @@ void main() {
       'uploadBytes: folder custom e normalizzazione estensioni non permesse → jpg',
       () async {
     when(() => fileApi.getPublicUrl(any()))
-        .thenReturn('https://cdn.example.com/hinoo/custom.jpg');
+        .thenAnswer((_) => 'https://cdn.example.com/hinoo/custom.jpg');
 
     final url = await HinooStorageUploader.uploadBytes(
       bytes: Uint8List.fromList([9, 9]),

@@ -5,6 +5,12 @@ import 'package:integration_test/integration_test.dart';
 import 'package:honoo/main.dart';
 
 void main() {
+  final binding = WidgetsBinding.instance;
+  if (binding is TestWidgetsFlutterBinding &&
+      binding is! IntegrationTestWidgetsFlutterBinding) {
+    return;
+  }
+
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(

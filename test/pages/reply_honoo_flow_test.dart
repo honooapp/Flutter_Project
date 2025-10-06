@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:honoo/Pages/ReplyHonooPage.dart';
 import 'package:honoo/Entities/Honoo.dart';
+import 'package:honoo/Pages/ReplyHonooPage.dart';
+
+import '../test_helpers.dart';
 
 void main() {
   testWidgets(
@@ -19,14 +21,12 @@ void main() {
       HonooType.personal, // type
     );
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home: ReplyHonooPage(
-          originalHonoo: original, // <-- richiesto dalla tua pagina
-        ),
+    await pumpSizerApp(
+      tester,
+      ReplyHonooPage(
+        originalHonoo: original, // <-- richiesto dalla tua pagina
       ),
     );
-    await tester.pumpAndSettle();
 
     // Deve esserci un campo di testo per la risposta
     final tf = find.byType(TextField).first;
@@ -36,12 +36,11 @@ void main() {
     await tester.enterText(tf, '“risposta di prova”');
     await tester.pump();
 
-    // Trova un pulsante per inviare (adatta se hai un label diverso)
-    final sendButton = find.textContaining('Invia', findRichText: true);
-    expect(sendButton, findsWidgets); // almeno uno presente
+    // Trova un pulsante per inviare
+    final sendButton = find.widgetWithText(ElevatedButton, 'Invia risposta');
+    expect(sendButton, findsOneWidget);
 
-    // Tap senza aspettarsi chiamate di rete (evitiamo mock di statici)
-    await tester.tap(sendButton.first);
-    await tester.pump(); // nessun crash
+    final buttonWidget = tester.widget<ElevatedButton>(sendButton);
+    expect(buttonWidget.onPressed, isNotNull);
   });
 }

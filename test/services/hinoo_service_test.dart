@@ -28,15 +28,15 @@ void main() {
     chain = _MockQueryChain();
 
     HinooService.$setTestClient(client);
-    when(() => client.from(any())).thenReturn(chain);
+    when(() => client.from(any())).thenAnswer((_) => chain);
 
-    when(() => chain.select(any())).thenReturn(chain);
-    when(() => chain.eq(any(), any())).thenReturn(chain);
+    when(() => chain.select(any())).thenAnswer((_) => chain);
+    when(() => chain.eq(any(), any())).thenAnswer((_) => chain);
     when(() => chain.order(any(), ascending: any(named: 'ascending')))
-        .thenReturn(chain);
-    when(() => chain.limit(any())).thenReturn(chain);
+        .thenAnswer((_) => chain);
+    when(() => chain.limit(any())).thenAnswer((_) => chain);
 
-    when(() => chain.maybeSingle()).thenReturn(chain);
+    when(() => chain.maybeSingle()).thenAnswer((_) => chain);
   });
 
   tearDown(() {

@@ -28,13 +28,13 @@ void main() {
     chain = _MockQueryChain();
 
     HonooService.$setTestClient(client);
-    when(() => client.from('honoo')).thenReturn(chain);
+    when(() => client.from('honoo')).thenAnswer((_) => chain);
 
-    when(() => chain.select(any())).thenReturn(chain);
-    when(() => chain.delete()).thenReturn(chain);
-    when(() => chain.eq(any(), any())).thenReturn(chain);
+    when(() => chain.select(any())).thenAnswer((_) => chain);
+    when(() => chain.delete()).thenAnswer((_) => chain);
+    when(() => chain.eq(any(), any())).thenAnswer((_) => chain);
     when(() => chain.order(any(), ascending: any(named: 'ascending')))
-        .thenReturn(chain);
+        .thenAnswer((_) => chain);
   });
 
   tearDown(() {
@@ -53,6 +53,7 @@ void main() {
         'updated_at': '2024-01-02T00:00:00Z',
         'user_id': 'u2',
         'type': 'personal',
+        'destination': 'moon',
       },
       {
         'id': 1,
@@ -62,6 +63,7 @@ void main() {
         'updated_at': '2024-01-01T00:00:00Z',
         'user_id': 'u1',
         'type': 'personal',
+        'destination': 'moon',
       },
     ];
 
@@ -71,12 +73,17 @@ void main() {
           invocation.positionalArguments[0] as dynamic Function(dynamic);
       return onValue(rows);
     });
+    when(() => chain.then<dynamic>(any())).thenAnswer((invocation) async {
+      final onValue =
+          invocation.positionalArguments[0] as dynamic Function(dynamic);
+      return onValue(rows);
+    });
 
     final list = await HonooService.fetchPublicHonoo();
 
     expect(list, isA<List<Honoo>>());
     expect(list.length, 2);
-    expect(list.first.id, 2);
+    expect(list.first.text, '“b”');
 
     verify(() => client.from('honoo')).called(1);
     verify(() => chain.select('*')).called(1);
@@ -87,6 +94,11 @@ void main() {
   test('deleteHonooById: chiama delete().eq("id", id) e completa', () async {
     when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
         .thenAnswer((invocation) async {
+      final onValue =
+          invocation.positionalArguments[0] as dynamic Function(dynamic);
+      return onValue(<String, dynamic>{});
+    });
+    when(() => chain.then<dynamic>(any())).thenAnswer((invocation) async {
       final onValue =
           invocation.positionalArguments[0] as dynamic Function(dynamic);
       return onValue(<String, dynamic>{});
