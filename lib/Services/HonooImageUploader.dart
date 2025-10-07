@@ -2,11 +2,12 @@
 import 'dart:io' show File;
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 class HonooImageUploader {
-  static final _client = Supabase.instance.client;
+  static final _client = SupabaseProvider.client;
   static const String _bucket = 'honoo-images'; // <-- bucket pubblico
 
   /// Mobile (Android/iOS): carica da path locale e restituisce la public URL.

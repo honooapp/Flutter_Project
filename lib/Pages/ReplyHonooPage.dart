@@ -6,9 +6,9 @@ import 'package:honoo/Utility/HonooColors.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:sizer/sizer.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 import '../Entities/Honoo.dart';
+import 'package:honoo/Services/supabase_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 
 class ReplyHonooPage extends StatefulWidget {
@@ -46,7 +46,7 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
         _imageUrl ?? '',        // image
         now,                    // created_at
         now,                    // updated_at
-        Supabase.instance.client.auth.currentUser!.id,
+        SupabaseProvider.client.auth.currentUser!.id,
         HonooType.answer,       // destination: reply
         widget.originalHonoo.id.toString(), // replyTo
         widget.originalHonoo.recipientTag

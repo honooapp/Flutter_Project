@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 import '../Entities/Hinoo.dart';
 import '../Entities/Honoo.dart';
 import '../Services/HinooService.dart';
@@ -9,6 +7,8 @@ import '../Services/HonooService.dart';
 import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/loading_spinner.dart';
 import 'ChestPage.dart';
+import 'package:honoo/Services/supabase_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EmailVerifyPage extends StatefulWidget {
   final String email;
@@ -38,7 +38,7 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
     super.initState();
 
     // 🎯 Ascolta magic link / cambi di stato
-    _authSub = Supabase.instance.client.auth.onAuthStateChange.listen((data) async {
+    _authSub = SupabaseProvider.client.auth.onAuthStateChange.listen((data) async {
       final event = data.event;
       final session = data.session;
 
@@ -102,7 +102,7 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
     final code = _codeController.text.trim();
 
     try {
-      final response = await Supabase.instance.client.auth.verifyOTP(
+      final response = await SupabaseProvider.client.auth.verifyOTP(
         type: OtpType.email,
         email: widget.email,
         token: code,

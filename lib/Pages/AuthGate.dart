@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:honoo/Pages/PlaceholderPage.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 import 'EmailLoginPage.dart';
 import 'HomePage.dart';
+import 'package:honoo/Services/supabase_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
@@ -22,14 +22,14 @@ class _AuthGateState extends State<AuthGate> {
   Future<Session?> _resolveSession() async {
     // piccolo respiro per dare tempo all'idratazione da localStorage
     await Future<void>.delayed(const Duration(milliseconds: 20));
-    return Supabase.instance.client.auth.currentSession; // 1.x
+    return SupabaseProvider.client.auth.currentSession; // 1.x
   }
 
   @override
   void initState() {
     super.initState();
 
-    _authSub = Supabase.instance.client.auth.onAuthStateChange.listen((state) {
+    _authSub = SupabaseProvider.client.auth.onAuthStateChange.listen((state) {
       if (!mounted || _navigated) return;
       final session = state.session;
 

@@ -15,6 +15,7 @@ import 'HinooBuilder/overlays/coloreTesto.dart';
 import 'HinooBuilder/overlays/scriviHinoo.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Services/HinooStorageUploader.dart';
 import 'package:honoo/Widgets/WhiteIconButton.dart';
@@ -773,7 +774,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
   Future<void> _persistBgUrl(Uint8List bytes, String originalName) async {
     try {
-      final client = Supabase.instance.client;
+      final client = SupabaseProvider.client;
       final user = client.auth.currentUser;
       if (user == null) return; // opzionale: consenti preview locale senza upload
 

@@ -2,10 +2,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Pages/NewHonooPage.dart';
+import 'package:sizer/sizer.dart';
 
 void main() {
   testWidgets('NewHonooPage si costruisce e accetta input di testo', (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: NewHonooPage()));
+    await tester.pumpWidget(
+      Sizer(
+        builder: (context, orientation, deviceType) {
+          return const MaterialApp(home: NewHonooPage());
+        },
+      ),
+    );
     await tester.pumpAndSettle();
 
     final tf = find.byType(TextField).first;
@@ -15,7 +22,6 @@ void main() {
     await tester.pump();
 
     // bottone di pubblicazione presente (adatta label se diverso)
-    final publish = find.textContaining('Pubblica', findRichText: true);
-    expect(publish, findsWidgets);
+    expect(find.byTooltip('Salva honoo'), findsOneWidget);
   });
 }

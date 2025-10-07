@@ -8,6 +8,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -151,7 +152,7 @@ class HonooBuilderState extends State<HonooBuilder> {
       if (selected == null) return;
 
       // 0) Guardia autenticazione
-      final client = Supabase.instance.client;
+      final client = SupabaseProvider.client;
       final session = client.auth.currentSession;
       if (session == null) {
         if (!mounted) return;

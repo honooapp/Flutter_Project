@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -11,7 +13,21 @@ class _MockQueryChain extends Mock
     implements
         SupabaseQueryBuilder,
         PostgrestFilterBuilder<dynamic>,
-        PostgrestTransformBuilder<dynamic> {}
+        PostgrestTransformBuilder<dynamic> {
+  final Queue<dynamic> _responses = Queue<dynamic>();
+
+  void queueResponse(dynamic value) => _responses.add(value);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
+    if (invocation.memberName == #then && invocation.positionalArguments.isNotEmpty) {
+      final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
+      final result = _responses.isEmpty ? null : _responses.removeFirst();
+      return Future.value(onValue(result));
+    }
+    return super.noSuchMethod(invocation);
+  }
+}
 
 class _MockSupabaseClient extends Mock implements SupabaseClient {}
 
@@ -28,15 +44,15 @@ void main() {
     chain = _MockQueryChain();
 
     HinooService.$setTestClient(client);
-    when(() => client.from(any())).thenReturn(chain);
+    when(() => client.from(any())).thenAnswer((_) => chain);
 
-    when(() => chain.select(any())).thenReturn(chain);
-    when(() => chain.eq(any(), any())).thenReturn(chain);
+    when(() => chain.select(any())).thenAnswer((_) => chain);
+    when(() => chain.eq(any(), any())).thenAnswer((_) => chain);
     when(() => chain.order(any(), ascending: any(named: 'ascending')))
-        .thenReturn(chain);
-    when(() => chain.limit(any())).thenReturn(chain);
+        .thenAnswer((_) => chain);
+    when(() => chain.limit(any())).thenAnswer((_) => chain);
 
-    when(() => chain.maybeSingle()).thenReturn(chain);
+    when(() => chain.maybeSingle()).thenAnswer((_) => chain);
   });
 
   tearDown(() {
@@ -77,12 +93,7 @@ void main() {
         'created_at': '2024-01-01T00:00:00Z',
       }
     ];
-
-    when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
-        .thenAnswer((invocation) async {
-      final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
-      return onValue(rows);
-    });
+    chain.queueResponse(rows);
 
     final list = await HinooService.fetchUserHinoo('u1', type: HinooType.personal);
 
@@ -110,12 +121,7 @@ void main() {
         'created_at': '2024-01-03T00:00:00Z',
       }
     ];
-
-    when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
-        .thenAnswer((invocation) async {
-      final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
-      return onValue(rows);
-    });
+    chain.queueResponse(rows);
 
     final list = await HinooService.fetchUserHinoo('u2', type: HinooType.moon);
 

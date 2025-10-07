@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -15,7 +17,21 @@ class _MockQueryChain extends Mock
     implements
         SupabaseQueryBuilder,
         PostgrestFilterBuilder<dynamic>,
-        PostgrestTransformBuilder<dynamic> {}
+        PostgrestTransformBuilder<dynamic> {
+  final Queue<dynamic> _responses = Queue<dynamic>();
+
+  void queueResponse(dynamic value) => _responses.add(value);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
+    if (invocation.memberName == #then && invocation.positionalArguments.isNotEmpty) {
+      final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
+      final result = _responses.isEmpty ? null : _responses.removeFirst();
+      return Future.value(onValue(result));
+    }
+    return super.noSuchMethod(invocation);
+  }
+}
 
 void main() {
   late _MockClient client;
@@ -37,14 +53,13 @@ void main() {
     when(() => auth.currentUser).thenReturn(user);
     when(() => user.id).thenReturn('u-1');
 
-    when(() => client.from('hinoo')).thenReturn(chain);
+    when(() => client.from('hinoo')).thenAnswer((_) => chain);
 
-    when(() => chain.select(any())).thenReturn(chain);
-    when(() => chain.eq(any(), any())).thenReturn(chain);
-    when(() => chain.limit(any())).thenReturn(chain);
-    when(() => chain.insert(any())).thenReturn(chain);
-
-    when(() => chain.maybeSingle()).thenReturn(chain);
+    when(() => chain.select(any())).thenAnswer((_) => chain);
+    when(() => chain.eq(any(), any())).thenAnswer((_) => chain);
+    when(() => chain.limit(any())).thenAnswer((_) => chain);
+    when(() => chain.insert(any())).thenAnswer((_) => chain);
+    when(() => chain.maybeSingle()).thenAnswer((_) => chain);
 
     HinooService.$setTestClient(client);
   });
@@ -71,14 +86,9 @@ void main() {
     );
 
     test('se ESISTE già un duplicato → ritorna false e NON inserisce', () async {
-      when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
-          .thenAnswer((invocation) async {
-        final onValue =
-        invocation.positionalArguments[0] as dynamic Function(dynamic);
-        return onValue([
-          {'id': 99}
-        ]);
-      });
+      chain.queueResponse([
+        {'id': 99}
+      ]);
 
       final res = await HinooService.duplicateToMoon(_sampleDraft());
 
@@ -93,18 +103,8 @@ void main() {
     });
 
     test('se NON esiste duplicato → fa insert e ritorna true', () async {
-      var call = 0;
-      when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
-          .thenAnswer((invocation) async {
-        final onValue =
-        invocation.positionalArguments[0] as dynamic Function(dynamic);
-        call++;
-        if (call == 1) {
-          return onValue(<Map<String, dynamic>>[]);
-        } else {
-          return onValue(<String, dynamic>{});
-        }
-      });
+      chain.queueResponse(<Map<String, dynamic>>[]);
+      chain.queueResponse(<String, dynamic>{});
 
       final res = await HinooService.duplicateToMoon(_sampleDraft());
 

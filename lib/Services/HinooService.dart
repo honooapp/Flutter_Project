@@ -1,15 +1,16 @@
 import 'package:flutter/foundation.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Entities/Hinoo.dart';
 
 class HinooService {
-  static final _supabase = Supabase.instance.client; // può restare ma NON usarlo
+  static final _supabase = SupabaseProvider.client; // deprecato, mantenuto per retrocompatibilità
   static const String _table = 'hinoo';
 
   // Iniezione client per i test
   static SupabaseClient? _testClient;
   static void $setTestClient(SupabaseClient? c) => _testClient = c;
-  static SupabaseClient get _client => _testClient ?? Supabase.instance.client;
+  static SupabaseClient get _client => _testClient ?? SupabaseProvider.client;
 
   static String _toDbType(HinooType type) {
     switch (type) {

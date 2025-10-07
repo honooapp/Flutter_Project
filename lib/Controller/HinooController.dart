@@ -1,6 +1,7 @@
 // lib/Controller/HinooController.dart
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:honoo/Services/HinooService.dart';
@@ -34,7 +35,7 @@ class HinooController {
   }
 
   void _ensureLoggedIn() {
-    final user = Supabase.instance.client.auth.currentUser;
+    final user = SupabaseProvider.client.auth.currentUser;
     if (user == null) throw 'Utente non autenticato';
   }
 
@@ -47,7 +48,7 @@ class HinooController {
   Future<String> uploadBackgroundBytes(Uint8List bytes,
       {required String ext}) async {
     _ensureLoggedIn();
-    final userId = Supabase.instance.client.auth.currentUser!.id;
+    final userId = SupabaseProvider.client.auth.currentUser!.id;
     return HinooStorageUploader.uploadBytes(
         bytes: bytes, filenameExt: ext, userId: userId);
   }
@@ -95,7 +96,7 @@ class HinooController {
   /// Carica un PNG esportato del canvas nel bucket hinoo/exports e ritorna l'URL pubblico.
   Future<String> uploadCanvasPng(Uint8List pngBytes) async {
     _ensureLoggedIn();
-    final userId = Supabase.instance.client.auth.currentUser!.id;
+    final userId = SupabaseProvider.client.auth.currentUser!.id;
     return HinooStorageUploader.uploadExportPng(
       pngBytes: pngBytes,
       userId: userId,

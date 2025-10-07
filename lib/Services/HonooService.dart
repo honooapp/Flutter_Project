@@ -1,3 +1,4 @@
+import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Entities/Honoo.dart';
 
@@ -7,7 +8,7 @@ class HonooService {
   //static final _client = Supabase.instance.client;
 
   // ✅ Usa un getter, così nei test possiamo sovrascrivere il client
-  static SupabaseClient get _client => _overrideClient ?? Supabase.instance.client;
+  static SupabaseClient get _client => _overrideClient ?? SupabaseProvider.client;
 
   // ✅ Campo usato solo nei test (rimane null in produzione)
   static SupabaseClient? _overrideClient;

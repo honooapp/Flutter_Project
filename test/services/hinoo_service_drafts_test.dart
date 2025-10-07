@@ -7,9 +7,23 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 // App code
 import 'package:honoo/Services/HinooService.dart';
 import 'package:honoo/Entities/Hinoo.dart';
+import '../test_supabase_helper.dart';
 
 void main() {
   group('HinooService drafts (unit, no network)', () {
+    late SupabaseTestHarness harness;
+
+    setUpAll(registerSupabaseFallbacks);
+
+    setUp(() {
+      harness = SupabaseTestHarness();
+      harness.enableOverrides();
+    });
+
+    tearDown(() {
+      harness.disableOverrides();
+    });
+
     test('getDraft() → null quando utente non autenticato (early-return)', () async {
       // Assicuriamoci che Supabase non abbia un utente loggato.
       // Se in setUp dell’app inizializzi Supabase altrove, qui non lo facciamo.

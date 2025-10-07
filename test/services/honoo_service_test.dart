@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -11,7 +13,21 @@ class _MockQueryChain extends Mock
     implements
         SupabaseQueryBuilder,
         PostgrestFilterBuilder<dynamic>,
-        PostgrestTransformBuilder<dynamic> {}
+        PostgrestTransformBuilder<dynamic> {
+  final Queue<dynamic> _responses = Queue<dynamic>();
+
+  void queueResponse(dynamic value) => _responses.add(value);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
+    if (invocation.memberName == #then && invocation.positionalArguments.isNotEmpty) {
+      final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
+      final result = _responses.isEmpty ? null : _responses.removeFirst();
+      return Future.value(onValue(result));
+    }
+    return super.noSuchMethod(invocation);
+  }
+}
 
 class _MockSupabaseClient extends Mock implements SupabaseClient {}
 
@@ -28,13 +44,13 @@ void main() {
     chain  = _MockQueryChain();
 
     HonooService.$setTestClient(client);
-    when(() => client.from('honoo')).thenReturn(chain);
+    when(() => client.from('honoo')).thenAnswer((_) => chain);
 
-    when(() => chain.select(any())).thenReturn(chain);
-    when(() => chain.delete()).thenReturn(chain);
-    when(() => chain.eq(any(), any())).thenReturn(chain);
+    when(() => chain.select(any())).thenAnswer((_) => chain);
+    when(() => chain.delete()).thenAnswer((_) => chain);
+    when(() => chain.eq(any(), any())).thenAnswer((_) => chain);
     when(() => chain.order(any(), ascending: any(named: 'ascending')))
-        .thenReturn(chain);
+        .thenAnswer((_) => chain);
   });
 
   tearDown(() {
@@ -63,18 +79,13 @@ void main() {
         'type': 'personal',
       },
     ];
-
-    when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
-        .thenAnswer((invocation) async {
-      final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
-      return onValue(rows);
-    });
+    chain.queueResponse(rows);
 
     final list = await HonooService.fetchPublicHonoo();
 
     expect(list, isA<List<Honoo>>());
     expect(list.length, 2);
-    expect(list.first.id, 2);
+    expect(list.first.dbId, '2');
 
     verify(() => client.from('honoo')).called(1);
     verify(() => chain.select('*')).called(1);
@@ -83,11 +94,7 @@ void main() {
   });
 
   test('deleteHonooById: chiama delete().eq("id", id) e completa', () async {
-    when(() => chain.then<dynamic>(any(), onError: any(named: 'onError')))
-        .thenAnswer((invocation) async {
-      final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
-      return onValue(<String, dynamic>{});
-    });
+    chain.queueResponse(<String, dynamic>{});
 
     await HonooService.deleteHonooById('123');
 

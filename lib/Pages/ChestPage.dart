@@ -9,6 +9,7 @@ import '../Controller/HonooController.dart';
 import '../Controller/HinooController.dart';
 import '../Entities/Honoo.dart';
 import '../Entities/Hinoo.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../UI/HonooThreadView.dart';
 import '../UI/HinooViewer.dart';
@@ -53,7 +54,7 @@ class _ChestPageState extends State<ChestPage> {
   }
 
   Future<void> _loadHinoo() async {
-    final uid = Supabase.instance.client.auth.currentUser?.id;
+    final uid = SupabaseProvider.client.auth.currentUser?.id;
     if (uid == null) {
       setState(() {
         _isHinooLoading = false;
@@ -64,7 +65,7 @@ class _ChestPageState extends State<ChestPage> {
       _isHinooLoading = true;
     });
     try {
-      final client = Supabase.instance.client;
+      final client = SupabaseProvider.client;
       final rows = await client
           .from('hinoo')
           .select('id,pages,type,recipient_tag,created_at')
@@ -429,7 +430,7 @@ class _ChestPageState extends State<ChestPage> {
     if (confirmed != true) return;
 
     try {
-      final client = Supabase.instance.client;
+      final client = SupabaseProvider.client;
       await client.from('hinoo').delete().eq('id', current.id);
       if (!mounted) return;
       setState(() {

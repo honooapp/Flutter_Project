@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:honoo/Pages/EmailLoginPage.dart'; // adatta se il path è diverso
+import '../test_supabase_helper.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  late SupabaseTestHarness harness;
+
+  setUpAll(registerSupabaseFallbacks);
+
+  setUp(() {
+    harness = SupabaseTestHarness();
+    harness.enableOverrides();
+  });
+
+  tearDown(() {
+    harness.disableOverrides();
+  });
 
   testWidgets('EmailLoginPage: render, input email e azione presente', (tester) async {
     // Avvia la pagina o l'app intera (scegline UNA delle due righe)
@@ -18,7 +31,7 @@ void main() {
     expect(emailField, findsWidgets);
     await tester.enterText(emailField.first, 'ciao@example.com');
 
-    final sendBtn = find.byKey(const Key('email_send_code_btn'));
+    final sendBtn = find.byType(ElevatedButton);
     expect(sendBtn, findsOneWidget);
     await tester.ensureVisible(sendBtn);
     await tester.tap(sendBtn, warnIfMissed: false);

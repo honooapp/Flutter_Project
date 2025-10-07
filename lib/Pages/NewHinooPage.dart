@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:honoo/Utility/HonooColors.dart';
@@ -149,7 +150,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
       return;
     }
 
-    final user = Supabase.instance.client.auth.currentUser;
+    final user = SupabaseProvider.client.auth.currentUser;
     if (user == null) {
       if (!mounted) return;
       // Porta in login passando la bozza da salvare dopo l'accesso

@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:honoo/Pages/EmailLoginPage.dart'; // adatta path se serve
+
+import '../test_supabase_helper.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  late SupabaseTestHarness harness;
+
+  setUpAll(registerSupabaseFallbacks);
+
+  setUp(() {
+    harness = SupabaseTestHarness();
+    harness.enableOverrides();
+  });
+
+  tearDown(() {
+    harness.disableOverrides();
+  });
 
   testWidgets('EmailLoginPage: mostra errore per email vuota/invalid', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: EmailLoginPage()));
@@ -18,12 +31,11 @@ void main() {
     await tester.enterText(emailField.first, '');
     await tester.pump();
 
-    final sendBtn = find.byKey(const Key('email_send_code_btn'));
+    final sendBtn = find.byType(ElevatedButton);
     expect(sendBtn, findsOneWidget);
     await tester.ensureVisible(sendBtn);
     await tester.tap(sendBtn, warnIfMissed: false);
     await tester.pumpAndSettle();
-
 
     await tester.ensureVisible(sendBtn);
     await tester.tap(sendBtn, warnIfMissed: false);

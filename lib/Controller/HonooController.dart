@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../Entities/Honoo.dart';
@@ -15,7 +16,7 @@ class HonooController {
   final ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
   final ValueNotifier<int> version = ValueNotifier<int>(0);
 
-  String get _uid => Supabase.instance.client.auth.currentUser!.id;
+  String get _uid => SupabaseProvider.client.auth.currentUser!.id;
 
   List<Honoo> get personal => List.unmodifiable(_personal);
 
@@ -34,7 +35,7 @@ class HonooController {
       // prendo tutti gli uuid (dbId) disponibili
       final ids = _personal.map((h) => h.dbId).whereType<String>().toList();
       if (ids.isNotEmpty) {
-        final client = Supabase.instance.client;
+        final client = SupabaseProvider.client;
         final rows = await client
             .from('honoo')
             .select('reply_to')
@@ -73,7 +74,7 @@ class HonooController {
       return [honoo];
     }
 
-    final client = Supabase.instance.client;
+    final client = SupabaseProvider.client;
 
     // Prendiamo l'honoo originale + tutte le reply collegate
     // or('id.eq.<id>,reply_to.eq.<id>')

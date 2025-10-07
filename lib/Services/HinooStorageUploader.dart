@@ -1,16 +1,17 @@
 // lib/Services/HinooStorageUploader.dart
 import 'dart:typed_data';
+import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 class HinooStorageUploader {
   static const String bucket = 'hinoo';
   // (può restare, ma NON lo usiamo più)
-  static final _supabase = Supabase.instance.client;
+  static final _supabase = SupabaseProvider.client;
   static final _uuid = const Uuid();
 
   // Getter iniettabile nei test
-  static SupabaseClient get _client => _overrideClient ?? Supabase.instance.client;
+  static SupabaseClient get _client => _overrideClient ?? SupabaseProvider.client;
   static SupabaseClient? _overrideClient;
 
   /// TEST-ONLY: abilita injection di un client mock

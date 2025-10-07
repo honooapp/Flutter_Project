@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../Entities/Hinoo.dart';
@@ -39,7 +40,7 @@ class _MoonPageState extends State<MoonPage> {
     try {
       final honoo = await HonooService.fetchPublicHonoo();
 
-      final rows = await Supabase.instance.client
+      final rows = await SupabaseProvider.client
           .from('hinoo')
           .select('pages,recipient_tag,created_at')
           .eq('type', 'moon')

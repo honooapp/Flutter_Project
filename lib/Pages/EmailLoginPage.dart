@@ -1,9 +1,10 @@
 // EmailLoginPage.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'package:honoo/Services/supabase_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'EmailVerifyPage.dart';
 
 class EmailLoginPage extends StatefulWidget {
@@ -34,7 +35,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
     final email = _emailController.text.trim();
 
     try {
-      await Supabase.instance.client.auth.signInWithOtp(
+      await SupabaseProvider.client.auth.signInWithOtp(
         email: email,
 
       );
