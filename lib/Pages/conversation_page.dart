@@ -14,6 +14,7 @@ import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 
 import '../Entities/honoo.dart';
+import 'reply_honoo_page.dart';
 
 class ConversationPage extends StatefulWidget {
   const ConversationPage({super.key, required this.honoo});
@@ -29,6 +30,8 @@ class _ConversationPageState extends State<ConversationPage> {
 
   bool _isLoading = true;
   List<Honoo> _thread = []; // padre + reply in ordine cronologico
+  int _currentIndex = 0;
+  bool _savingToChest = false;
 
   @override
   void initState() {
@@ -113,6 +116,9 @@ class _ConversationPageState extends State<ConversationPage> {
                                     aspectRatio: 9 / 16,
                                     enlargeCenterPage: true,
                                     enableInfiniteScroll: false,
+                                    onPageChanged: (index, reason) {
+                                      setState(() => _currentIndex = index);
+                                    },
                                   ),
                                   items: _thread
                                       .map((h) => HonooCard(honoo: h))
@@ -141,17 +147,42 @@ class _ConversationPageState extends State<ConversationPage> {
                             onPressed: () => Navigator.pop(context),
                           ),
                           SizedBox(width: 5.w),
-                          IconButton(
-                            icon: SvgPicture.asset(
-                              "assets/icons/broken_heart.svg",
-                              semanticsLabel: 'Broken heart',
-                            ),
-                            iconSize: 60,
-                            splashRadius: 25,
-                            tooltip: 'Cuore spezzato',
-                            onPressed: () {
-                              // TODO: azione "broken heart" (se prevista)
-                            },
+                         IconButton(
+                           icon: SvgPicture.asset(
+                             "assets/icons/broken_heart.svg",
+                             semanticsLabel: 'Broken heart',
+                           ),
+                           iconSize: 60,
+                           splashRadius: 25,
+                           tooltip: 'Cuore spezzato',
+                            onPressed: (_thread.isEmpty || _savingToChest)
+                                ? null
+                                : () async {
+                                    setState(() => _savingToChest = true);
+                                    try {
+                                      final honoo = _thread[_currentIndex];
+                                      final saved = await HonooController()
+                                          .saveToChest(honoo);
+                                      if (!mounted) return;
+                                      showHonooToast(
+                                        context,
+                                        message: saved
+                                            ? 'Honoo salvato nel tuo scrigno.'
+                                            : 'Era già nel tuo scrigno.',
+                                      );
+                                    } catch (e) {
+                                      if (!mounted) return;
+                                      showHonooToast(
+                                        context,
+                                        message:
+                                            'Errore durante il salvataggio: $e',
+                                      );
+                                    } finally {
+                                      if (mounted) {
+                                        setState(() => _savingToChest = false);
+                                      }
+                                    }
+                                  },
                           ),
                           SizedBox(width: 5.w),
                           IconButton(
@@ -166,9 +197,23 @@ class _ConversationPageState extends State<ConversationPage> {
                             iconSize: 60,
                             splashRadius: 25,
                             tooltip: 'Rispondi',
-                            onPressed: () {
-                              // TODO: apri composer risposta partendo da widget.honoo o dall'elemento corrente del carosello
-                            },
+                            onPressed: (_thread.isEmpty || _savingToChest)
+                                ? null
+                                : () {
+                                    final honoo = _thread[_currentIndex];
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ReplyHonooPage(
+                                          originalHonoo: honoo,
+                                          initialHintText:
+                                              'Scrivi la tua risposta...',
+                                          initialImageHint:
+                                              'Aggiungi un’immagine (opzionale)',
+                                        ),
+                                      ),
+                                    );
+                                  },
                           ),
                         ],
                       ),

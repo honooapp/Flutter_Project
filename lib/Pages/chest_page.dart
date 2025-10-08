@@ -17,6 +17,7 @@ import '../Utility/responsive_layout.dart';
 import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/loading_spinner.dart';
 import 'package:carousel_slider/carousel_slider.dart' as cs;
+import 'reply_honoo_page.dart';
 
 // 👇 aggiunto per allineare il padding top come in NewHonooPage
 import '../Widgets/luna_fissa.dart';
@@ -225,7 +226,17 @@ class _ChestPageState extends State<ChestPage> {
           splashRadius: 25,
           tooltip: 'Rispondi',
           onPressed: () {
-            // TODO: apri composer risposta (NewHonooPage) con replyTo=current.dbId
+            final honoo = current;
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ReplyHonooPage(
+                  originalHonoo: honoo,
+                  initialHintText: 'Scrivi la tua risposta...',
+                  initialImageHint: 'Aggiungi un’immagine (opzionale)',
+                ),
+              ),
+            );
           },
         ),
       );
@@ -372,25 +383,6 @@ class _ChestPageState extends State<ChestPage> {
                 message: 'Errore: $e',
               );
             }
-          },
-        ),
-      );
-    } else if (isFromMoonSaved) {
-      actions.add(
-        IconButton(
-          icon: SvgPicture.asset(
-            "assets/icons/reply.svg",
-            semanticsLabel: 'Rispondi',
-            colorFilter: const ColorFilter.mode(
-              HonooColor.onBackground,
-              BlendMode.srcIn,
-            ),
-          ),
-          iconSize: 60,
-          splashRadius: 25,
-          tooltip: 'Rispondi',
-          onPressed: () {
-            // TODO: implementare risposta a Hinoo lunare
           },
         ),
       );

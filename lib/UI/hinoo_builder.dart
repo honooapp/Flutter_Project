@@ -7,6 +7,7 @@
 
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -731,9 +732,39 @@ class _HinooBuilderState extends State<HinooBuilder> {
   }
 
   Future<void> _exportCanvasPng() async {
-    // TODO: salva/condividi _lastPreviewBytes secondo piattaforma (web/mobile)
-    debugPrint('Salvataggio PNG... bytes: ${_lastPreviewBytes?.length}');
-    Navigator.of(context).maybePop();
+    final bytes = _lastPreviewBytes;
+    if (bytes == null || bytes.isEmpty) {
+      debugPrint('Nessun PNG da esportare');
+      return;
+    }
+
+    final saver = getDownloadSaver();
+    final filename = _exportFilenameHint ??
+        'hinoo_${DateTime.now().millisecondsSinceEpoch}.png';
+    try {
+      final message = await saver.save([
+        DownloadImage(filename: filename, bytes: bytes),
+      ]);
+      if (!mounted) return;
+      if (message.isNotEmpty) {
+        showHonooToast(
+          context,
+          message: message,
+        );
+      }
+    } catch (e) {
+      debugPrint('Errore durante il salvataggio/condivisione: $e');
+      if (mounted) {
+        showHonooToast(
+          context,
+          message: 'Errore durante il salvataggio: $e',
+        );
+      }
+    } finally {
+      if (mounted) {
+        Navigator.of(context).maybePop();
+      }
+    }
   }
 
   // ========================================================================

@@ -13,22 +13,25 @@ void main() {
       await tester.pumpWidget(const MyApp());
       await tester.pumpAndSettle();
 
-      // Trova il primo TextField disponibile ed inserisci testo
-      final textField = find.byType(TextField);
-      expect(textField, findsAtLeastNWidgets(1));
-      await tester.enterText(textField.first, 'ciao luna');
+      // Verifica che la conversazione mostri l'honoo appena creato
+      expect(find.textContaining('ciao luna'), findsWidgets);
 
-      // Tappa il pulsante “Crea” (se nella tua UI ha una Key, usa quella)
-      final creaBtn = find.text(
-          'Crea'); // oppure: find.byKey(const Key('email_send_code_btn'));
-      expect(creaBtn, findsOneWidget);
-      await tester.tap(creaBtn);
+      // Apri il composer di risposta
+      final replyButton = find.byTooltip('Rispondi');
+      await tester.tap(replyButton.first);
       await tester.pumpAndSettle();
 
-      // Verifica un effetto a schermo dopo la creazione
-      expect(find.textContaining('honoo'), findsWidgets);
+      // Compila la risposta
+      final replyField = find.byType(TextField).first;
+      await tester.enterText(replyField, 'risposta di test');
 
-      // TODO: prosegui con il flusso “rispondi” se necessario
+      // Invia la risposta
+      final sendButton = find.text('Invia risposta');
+      await tester.tap(sendButton);
+      await tester.pumpAndSettle(const Duration(seconds: 1));
+
+      // Controlla che la risposta compaia nella conversazione
+      expect(find.textContaining('risposta di test'), findsWidgets);
     },
     tags: ['integration'],
   );

@@ -917,7 +917,7 @@ packages:
     source: hosted
     version: "1.2.1"
   test:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: test
       sha256: "5301f54eb6fe945daa99bc8df6ece3f88b5ceaa6f996f250efdaaf63e22886be"

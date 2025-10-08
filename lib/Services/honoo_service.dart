@@ -64,6 +64,46 @@ class HonooService {
     }).eq('id', id);
   }
 
+  /// Duplica un honoo salvandolo nello scrigno dell'utente corrente.
+  /// Restituisce true se inserito ora, false se già presente.
+  static Future<bool> duplicateToChest(Honoo h) async {
+    final session = _client.auth.currentSession;
+    if (session == null) {
+      throw Exception('Nessuna sessione attiva');
+    }
+    final uid = session.user.id;
+
+    final existing = await _client
+        .from('honoo')
+        .select('id')
+        .eq('user_id', uid)
+        .eq('destination', 'chest')
+        .eq('text', h.text)
+        .eq('image_url', h.image.isEmpty ? null : h.image)
+        .limit(1);
+
+    if (existing != null && existing.isNotEmpty) {
+      return false;
+    }
+
+    final payload = <String, dynamic>{
+      'text': h.text,
+      'image_url': h.image.isEmpty ? null : h.image,
+      'destination': 'chest',
+      'reply_to': h.replyTo,
+      'recipient_tag': h.recipientTag,
+      'user_id': uid,
+    };
+
+    final inserted = await _client
+        .from('honoo')
+        .insert(payload)
+        .select()
+        .maybeSingle();
+
+    return inserted != null;
+  }
+
   /// Duplica un honoo dello scrigno pubblicandolo sulla Luna (nuova INSERT).
   /// Non tocca l'originale in 'chest'.
   static Future<bool> duplicateToMoon(Honoo h) async {

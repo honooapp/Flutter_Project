@@ -104,6 +104,19 @@ class HonooController {
     }
   }
 
+  Future<bool> saveToChest(Honoo h) async {
+    try {
+      final inserted = await HonooService.duplicateToChest(h);
+      if (inserted) {
+        await loadChest();
+      }
+      return inserted;
+    } catch (e) {
+      debugPrint('duplicateToChest error: $e');
+      return false;
+    }
+  }
+
   Future<void> deleteHonoo(Honoo h) async {
     final String? id = (h.dbId ?? h.id) as String?;
     if (id == null || id.isEmpty) {

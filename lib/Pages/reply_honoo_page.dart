@@ -12,7 +12,15 @@ import 'package:honoo/Services/supabase_provider.dart';
 class ReplyHonooPage extends StatefulWidget {
   final Honoo originalHonoo;
 
-  const ReplyHonooPage({super.key, required this.originalHonoo});
+  final String initialHintText;
+  final String initialImageHint;
+
+  const ReplyHonooPage({
+    super.key,
+    required this.originalHonoo,
+    this.initialHintText = 'Scrivi la tua risposta...',
+    this.initialImageHint = 'Aggiungi un’immagine (opzionale)',
+  });
 
   @override
   State<ReplyHonooPage> createState() => _ReplyHonooPageState();
@@ -98,6 +106,8 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
             Expanded(
               child: HonooBuilder(
                 onHonooChanged: _onHonooChanged,
+                initialText: widget.initialHintText,
+                imageHint: widget.initialImageHint,
               ),
             ),
             if (!_isSending)

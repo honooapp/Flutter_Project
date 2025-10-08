@@ -21,8 +21,16 @@ import 'package:honoo/Widgets/honoo_dialogs.dart';
 class HonooBuilder extends StatefulWidget {
   final void Function(String text, String imageUrl)? onHonooChanged;
   final ValueChanged<bool>? onFocusChanged;
+  final String? initialText;
+  final String? imageHint;
 
-  const HonooBuilder({super.key, this.onHonooChanged, this.onFocusChanged});
+  const HonooBuilder({
+    super.key,
+    this.onHonooChanged,
+    this.onFocusChanged,
+    this.initialText,
+    this.imageHint,
+  });
 
   @override
   State<HonooBuilder> createState() => HonooBuilderState();
@@ -57,6 +65,9 @@ class HonooBuilderState extends State<HonooBuilder> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialText != null && widget.initialText!.isNotEmpty) {
+      _textCtrl.text = widget.initialText!;
+    }
     _textCtrl.addListener(_emitChange);
     _imageController.addListener(_handleImageTransform);
     _textFocus.addListener(_handleFocusChange);

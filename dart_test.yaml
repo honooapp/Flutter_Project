@@ -1,7 +1,10 @@
-# Saltare per default i test lenti/fragili in CI (integrazione e golden)
+# Salta per default alcuni tag (compatibile con Dart 3.0.0)
 tags:
   integration:
     skip: true
   golden:
     skip: true
-  unit: {}   # i test unit girano normalmente
+  slow:
+    skip: true
+  unit: {}
+  live: {}
