@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:honoo/env/env.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'download_saver_base.dart';
@@ -38,14 +39,14 @@ class _DownloadSaverIo implements DownloadSaver {
     final String folderName = 'hinoo_${DateTime.now().millisecondsSinceEpoch}';
     Directory? base;
     if (Platform.isMacOS || Platform.isLinux) {
-      final String? home = Platform.environment['HOME'];
-      if (home != null && home.isNotEmpty) {
+      final String home = readEnv('HOME');
+      if (home.isNotEmpty) {
         final Directory downloads = Directory(_joinPaths(home, 'Downloads'));
         if (downloads.existsSync()) base = downloads;
       }
     } else if (Platform.isWindows) {
-      final String? userProfile = Platform.environment['USERPROFILE'];
-      if (userProfile != null && userProfile.isNotEmpty) {
+      final String userProfile = readEnv('USERPROFILE');
+      if (userProfile.isNotEmpty) {
         final Directory downloads =
             Directory(_joinPaths(userProfile, 'Downloads'));
         if (downloads.existsSync()) base = downloads;

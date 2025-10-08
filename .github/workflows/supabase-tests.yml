@@ -1,0 +1,73 @@
+name: Supabase Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      run_crud:
+        description: "Run CRUD tests on STAGING (ENABLE_WRITE_TESTS=1)"
+        required: false
+        default: "false"
+
+jobs:
+  readonly:
+    name: Read-only (analyze + supabase tests)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Flutter (stable)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Flutter pub get
+        run: flutter pub get
+      - name: Analyze
+        run: flutter analyze
+      - name: Run read-only tests (STAGING)
+        env:
+          SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+          TEST_EMAIL: ${{ secrets.STAGING_TEST_EMAIL }}
+          TEST_PASSWORD: ${{ secrets.STAGING_TEST_PASSWORD }}
+          TEST_IMAGE_URL: ${{ secrets.STAGING_TEST_IMAGE_URL }}
+        run: |
+          bash tool/run_supabase_readonly_staging.sh
+
+  crud_manual:
+    name: CRUD (manual, STAGING)
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.run_crud == 'true' }}
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Flutter (stable)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Flutter pub get
+        run: flutter pub get
+      - name: Run CRUD tests (ENABLE_WRITE_TESTS=1)
+        env:
+          SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+          TEST_EMAIL: ${{ secrets.STAGING_TEST_EMAIL }}
+          TEST_PASSWORD: ${{ secrets.STAGING_TEST_PASSWORD }}
+          ENABLE_WRITE_TESTS: "1"
+        run: |
+          bash tool/run_supabase_crud_staging.sh
+
+  web_build:
+    name: Web build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Flutter (stable)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Flutter pub get
+        run: flutter pub get
+      - name: Verify web-safe env access
+        run: bash tool/verify_web_compat.sh
+      - name: Flutter build web
+        run: flutter build web

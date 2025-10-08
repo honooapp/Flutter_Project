@@ -1,7 +1,8 @@
 import 'dart:async';
-import 'dart:io' show Platform; // per Platform.environment (test/CI)
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:honoo/env/env.dart';
 
 class HonooDialogStyles {
   static TextStyle title() => GoogleFonts.lora(
@@ -158,7 +159,7 @@ class _HonooMessageDialogState extends State<HonooMessageDialog> {
 
     // Non avviare il timer in CI/test (Codex ha CI=true)
     final bool inCi = const bool.fromEnvironment('CI', defaultValue: false) ||
-        (Platform.environment['CI'] == 'true');
+        (readEnv('CI') == 'true');
 
     if (!inCi) {
       _autoClose = Timer(widget.duration, () {

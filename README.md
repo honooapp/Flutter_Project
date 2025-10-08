@@ -37,3 +37,21 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+## Web env
+
+Verifica che l'accesso alle variabili d'ambiente sia compatibile con Flutter Web prima del deploy.
+
+```bash
+# (A) Verifica che lib/ non usi Platform.environment per le env
+./tool/verify_web_compat.sh
+```
+
+```bash
+# (B) Avvia Web con le define richieste
+flutter run -d chrome \
+  --dart-define=SUPABASE_URL=https://lnuzzrlkcbhxuzxyekbp.supabase.co \
+  --dart-define=SUPABASE_ANON_KEY='LA_TUA_ANON_KEY'
+```
+
+Se l’app parte senza l’errore “Unsupported operation: Platform.environment”, il fix è applicato correttamente.
