@@ -4,11 +4,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../Controller/device_controller.dart';
-import '../Utility/honoo_colors.dart';
-import '../Utility/utility.dart';
+import '../Widgets/honoo_app_title.dart';
 import 'package:sizer/sizer.dart';
 
 import 'home_page.dart';
+import 'placeholder_page.dart';
 
 class NimPage extends StatefulWidget {
   const NimPage({super.key});
@@ -32,14 +32,14 @@ class _NimPageState extends State<NimPage> {
           SizedBox(
             height: 52,
             child: Center(
-              child: Text(
-                Utility().appName,
-                style: GoogleFonts.libreFranklin(
-                  color: HonooColor.secondary,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w600,
-                ),
-                textAlign: TextAlign.center,
+              child: HonooAppTitle(
+                onTap: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                        builder: (_) => const PlaceholderPage()),
+                    (route) => false,
+                  );
+                },
               ),
             ),
           ),
@@ -176,12 +176,12 @@ class _NimPageState extends State<NimPage> {
                               semanticsLabel: 'Home',
                             ),
                             iconSize: 60,
-                            tooltip: 'Indietro',
+                            tooltip: 'Home',
                             onPressed: () {
-                              Navigator.push(
-                                context,
+                              Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(
-                                    builder: (context) => const HomePage()),
+                                    builder: (_) => const HomePage()),
+                                (route) => false,
                               );
                             },
                           ),

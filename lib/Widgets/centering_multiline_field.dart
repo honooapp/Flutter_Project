@@ -29,6 +29,9 @@ class CenteringMultilineField extends StatefulWidget {
     this.hardConstraints,
     this.onEditingComplete,
     this.onSubmitted,
+    this.cursorColor,
+    this.cursorWidth,
+    this.cursorRadius,
   });
 
   final TextEditingController controller;
@@ -54,6 +57,9 @@ class CenteringMultilineField extends StatefulWidget {
   final BoxConstraints? hardConstraints;
   final VoidCallback? onEditingComplete;
   final ValueChanged<String>? onSubmitted;
+  final Color? cursorColor;
+  final double? cursorWidth;
+  final Radius? cursorRadius;
 
   @override
   State<CenteringMultilineField> createState() =>
@@ -183,6 +189,9 @@ class _CenteringMultilineFieldState extends State<CenteringMultilineField> {
           controller: widget.controller,
           focusNode: widget.focusNode,
           style: widget.style,
+          cursorColor: widget.cursorColor,
+          cursorWidth: widget.cursorWidth ?? 2,
+          cursorRadius: widget.cursorRadius,
           keyboardType: widget.keyboardType,
           textInputAction: widget.textInputAction,
           textCapitalization: widget.textCapitalization,

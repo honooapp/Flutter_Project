@@ -9,14 +9,15 @@ import 'package:honoo/Pages/chest_page.dart';
 import 'package:honoo/Utility/formatted_text.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../Controller/device_controller.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../Pages/moon_page.dart';
 import '../../Pages/new_honoo_page.dart';
-import '../../Utility/utility.dart';
+import '../../Pages/home_page.dart';
+import '../../Pages/placeholder_page.dart';
+import 'package:honoo/Widgets/honoo_app_title.dart';
 
 class IslandPage extends StatefulWidget {
   const IslandPage({super.key});
@@ -46,7 +47,7 @@ class _IslandPageState extends State<IslandPage> {
                   width: 80.w,
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
+                    color: HonooColor.wave1.withOpacity(0.6),
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                   child: const SingleChildScrollView(
@@ -69,7 +70,7 @@ class _IslandPageState extends State<IslandPage> {
               child: IconButton(
                 icon: const Icon(Icons.close, color: HonooColor.onBackground),
                 iconSize: 40,
-                tooltip: 'Chiudi informazioni',
+                tooltip: 'Chiudi',
                 onPressed: () {
                   setState(() {
                     infoVisible = !infoVisible;
@@ -90,23 +91,17 @@ class _IslandPageState extends State<IslandPage> {
           Column(
             children: [
               // Header titolo
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                },
-                child: SizedBox(
-                  height: 52,
-                  child: Center(
-                    child: Text(
-                      Utility().appName,
-                      style: GoogleFonts.libreFranklin(
-                        color: HonooColor.secondary,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+              SizedBox(
+                height: 52,
+                child: Center(
+                  child: HonooAppTitle(
+                    onTap: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                            builder: (_) => const PlaceholderPage()),
+                        (route) => false,
+                      );
+                    },
                   ),
                 ),
               ),
@@ -395,8 +390,14 @@ class _IslandPageState extends State<IslandPage> {
                             ),
                             iconSize: homeSize,
                             splashRadius: 1,
-                            tooltip: 'Indietro',
-                            onPressed: () => Navigator.pop(context),
+                            tooltip: 'Home',
+                            onPressed: () {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                    builder: (_) => const HomePage()),
+                                (route) => false,
+                              );
+                            },
                           ),
                         ),
                         Positioned(
@@ -427,7 +428,7 @@ class _IslandPageState extends State<IslandPage> {
                                 semanticsLabel: 'Logo'),
                             iconSize: logoSize,
                             splashRadius: 30,
-                            tooltip: 'Mostra informazioni',
+                            tooltip: 'Info',
                             onPressed: () =>
                                 setState(() => infoVisible = !infoVisible),
                           ),

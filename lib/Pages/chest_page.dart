@@ -12,12 +12,14 @@ import 'package:honoo/Services/supabase_provider.dart';
 import '../UI/honoo_thread_view.dart';
 import '../UI/hinoo_viewer.dart';
 import '../Utility/honoo_colors.dart';
-import '../Utility/utility.dart';
 import '../Utility/responsive_layout.dart';
 import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/loading_spinner.dart';
+import '../Widgets/honoo_app_title.dart';
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'reply_honoo_page.dart';
+import 'home_page.dart';
+import 'placeholder_page.dart';
 
 // 👇 aggiunto per allineare il padding top come in NewHonooPage
 import '../Widgets/luna_fissa.dart';
@@ -38,6 +40,13 @@ class _ChestPageState extends State<ChestPage> {
   List<_ChestItem> _items = const [];
   List<_HinooRow> _hinoo = const [];
   bool _isHinooLoading = true;
+
+  void _goHome() {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const HomePage()),
+      (route) => false,
+    );
+  }
 
   @override
   void initState() {
@@ -143,8 +152,8 @@ class _ChestPageState extends State<ChestPage> {
                 semanticsLabel: 'Home'),
             iconSize: 60,
             splashRadius: 25,
-            tooltip: 'Indietro',
-            onPressed: () => Navigator.pop(context),
+            tooltip: 'Home',
+            onPressed: _goHome,
           ),
         ),
       );
@@ -162,8 +171,8 @@ class _ChestPageState extends State<ChestPage> {
         ),
         iconSize: 60,
         splashRadius: 25,
-        tooltip: 'Indietro',
-        onPressed: () => Navigator.pop(context),
+        tooltip: 'Home',
+        onPressed: _goHome,
       ),
       SizedBox(width: 5.w),
     ];
@@ -277,7 +286,7 @@ class _ChestPageState extends State<ChestPage> {
           if (!mounted) return;
           showHonooToast(
             context,
-            message: 'Honoo eliminato.',
+            message: 'honoo eliminato.',
           );
         },
       ),
@@ -345,8 +354,8 @@ class _ChestPageState extends State<ChestPage> {
         ),
         iconSize: 60,
         splashRadius: 25,
-        tooltip: 'Indietro',
-        onPressed: () => Navigator.pop(context),
+        tooltip: 'Home',
+        onPressed: _goHome,
       ),
       SizedBox(width: 5.w),
     ];
@@ -370,8 +379,8 @@ class _ChestPageState extends State<ChestPage> {
               final result = await _hinooController.sendToMoon(draft);
               if (!mounted) return;
               final text = result == HinooMoonResult.published
-                  ? 'Hinoo spedito sulla Luna.'
-                  : 'Hinoo già presente sulla Luna.';
+                  ? 'hinoo spedito sulla Luna.'
+                  : 'hinoo già presente sulla Luna.';
               showHonooToast(
                 context,
                 message: text,
@@ -440,7 +449,7 @@ class _ChestPageState extends State<ChestPage> {
       });
       showHonooToast(
         context,
-        message: 'Hinoo eliminato.',
+        message: 'hinoo eliminato.',
       );
     } catch (e) {
       if (!mounted) return;
@@ -492,14 +501,15 @@ class _ChestPageState extends State<ChestPage> {
                         SizedBox(
                           height: headerH,
                           child: Center(
-                            child: Text(
-                              Utility().appName,
-                              style: GoogleFonts.libreFranklin(
-                                color: HonooColor.secondary,
-                                fontSize: 28,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              textAlign: TextAlign.center,
+                            child: HonooAppTitle(
+                              onTap: () {
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (_) =>
+                                          const PlaceholderPage()),
+                                  (route) => false,
+                                );
+                              },
                             ),
                           ),
                         ),

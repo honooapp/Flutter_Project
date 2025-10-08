@@ -9,12 +9,14 @@ import 'package:honoo/Controller/device_controller.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
 import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
-import 'package:honoo/Utility/utility.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'package:honoo/Widgets/honoo_app_title.dart';
 
 import '../Entities/honoo.dart';
 import 'reply_honoo_page.dart';
+import 'home_page.dart';
+import 'placeholder_page.dart';
 
 class ConversationPage extends StatefulWidget {
   const ConversationPage({super.key, required this.honoo});
@@ -74,14 +76,14 @@ class _ConversationPageState extends State<ConversationPage> {
           SizedBox(
             height: 52,
             child: Center(
-              child: Text(
-                Utility().appName,
-                style: GoogleFonts.libreFranklin(
-                  color: HonooColor.secondary,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w600,
-                ),
-                textAlign: TextAlign.center,
+              child: HonooAppTitle(
+                onTap: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                        builder: (_) => const PlaceholderPage()),
+                    (route) => false,
+                  );
+                },
               ),
             ),
           ),
@@ -143,8 +145,14 @@ class _ConversationPageState extends State<ConversationPage> {
                             ),
                             iconSize: 60,
                             splashRadius: 25,
-                            tooltip: 'Indietro',
-                            onPressed: () => Navigator.pop(context),
+                            tooltip: 'Home',
+                            onPressed: () {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                    builder: (_) => const HomePage()),
+                                (route) => false,
+                              );
+                            },
                           ),
                           SizedBox(width: 5.w),
                          IconButton(
@@ -167,8 +175,8 @@ class _ConversationPageState extends State<ConversationPage> {
                                       showHonooToast(
                                         context,
                                         message: saved
-                                            ? 'Honoo salvato nel tuo scrigno.'
-                                            : 'Era già nel tuo scrigno.',
+                                            ? 'honoo salvato nel tuo Scrigno.'
+                                            : 'Era già nel tuo Scrigno.',
                                       );
                                     } catch (e) {
                                       if (!mounted) return;

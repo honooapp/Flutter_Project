@@ -9,6 +9,7 @@ import '../Entities/hinoo.dart';
 import '../Entities/honoo.dart';
 import 'chest_page.dart';
 import 'coming_soon_page.dart';
+import 'home_page.dart';
 import '../Services/honoo_service.dart';
 import '../UI/hinoo_viewer.dart';
 import '../UI/honoo_thread_view.dart';
@@ -17,6 +18,8 @@ import '../Utility/utility.dart';
 import '../Utility/responsive_layout.dart';
 import '../Widgets/loading_spinner.dart';
 import '../Widgets/honoo_dialogs.dart';
+import '../Widgets/honoo_app_title.dart';
+import 'placeholder_page.dart';
 
 class MoonPage extends StatefulWidget {
   const MoonPage({super.key});
@@ -110,13 +113,14 @@ class _MoonPageState extends State<MoonPage> {
                 SizedBox(
                   height: headerHeight,
                   child: Center(
-                    child: Text(
-                      Utility().appName,
-                      style: GoogleFonts.libreFranklin(
-                        color: HonooColor.secondary,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    child: HonooAppTitle(
+                      onTap: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (_) => const PlaceholderPage()),
+                          (route) => false,
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -148,8 +152,14 @@ class _MoonPageState extends State<MoonPage> {
                         ),
                         iconSize: 60,
                         splashRadius: 25,
-                        tooltip: 'Indietro',
-                        onPressed: () => Navigator.pop(context),
+                        tooltip: 'Home',
+                        onPressed: () {
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (_) => const HomePage()),
+                            (route) => false,
+                          );
+                        },
                       ),
                       SizedBox(width: 5.w),
                       IconButton(

@@ -52,6 +52,9 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
               autofocus: true,
               expands: true,
               scrollPhysics: const ClampingScrollPhysics(),
+              cursorColor: Colors.white,
+              cursorWidth: 3,
+              cursorRadius: const Radius.circular(0),
               inputFormatters: [
                 _lineLimitFormatter(maxWidth, textStyle),
               ],

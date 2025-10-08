@@ -342,6 +342,9 @@ class HonooBuilderState extends State<HonooBuilder> {
                   textInputAction: TextInputAction.newline,
                   expands: true,
                   scrollPhysics: const ClampingScrollPhysics(),
+                  cursorColor: Colors.black,
+                  cursorWidth: 3,
+                  cursorRadius: const Radius.circular(0),
                   inputFormatters: [
                     _lineLimitFormatter(textMaxWidth, textStyle),
                   ],
@@ -542,10 +545,10 @@ class HonooBuilderState extends State<HonooBuilder> {
     String? fileName,
   }) async {
     if (!hasImage) {
-      showHonooToast(
-        context,
-        message: "Inserisci prima un'immagine",
-      );
+        showHonooToast(
+          context,
+          message: 'Per poter caricare l\'immagine, devi essere prima loggato',
+        );
       return;
     }
     final Uint8List? bytes = await _captureCurrentAsPng();

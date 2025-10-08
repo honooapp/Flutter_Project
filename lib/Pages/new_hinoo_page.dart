@@ -3,13 +3,12 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 
 import 'package:honoo/Utility/honoo_colors.dart';
-import 'package:honoo/Utility/utility.dart';
 import 'package:honoo/Widgets/luna_fissa.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'package:honoo/Widgets/honoo_app_title.dart';
 
 import 'package:honoo/Controller/hinoo_controller.dart';
 
@@ -20,6 +19,8 @@ import 'package:honoo/UI/HinooBuilder/thumbnails/hinoo_thumbnails.dart';
 
 import 'chest_page.dart';
 import 'email_login_page.dart';
+import 'home_page.dart';
+import 'placeholder_page.dart';
 import '../Entities/hinoo.dart';
 
 class NewHinooPage extends StatefulWidget {
@@ -152,6 +153,17 @@ class _NewHinooPageState extends State<NewHinooPage> {
     final user = SupabaseProvider.client.auth.currentUser;
     if (user == null) {
       if (!mounted) return;
+      final bool? goLogin = await showDialog<bool>(
+        context: context,
+        barrierDismissible: true,
+        builder: (_) => const HonooConfirmDialog(
+          title: 'Devi accedere',
+          message:
+              'Per salvare questo hinoo, devi fare prima il log in. Vuoi andare alla pagina di login?',
+          confirmLabel: 'Vai al login',
+        ),
+      );
+      if (goLogin != true || !mounted) return;
       // Porta in login passando la bozza da salvare dopo l'accesso
       Navigator.push(
         context,
@@ -170,7 +182,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
       setState(() => _savedToChest = true);
       showHonooToast(
         context,
-        message: 'Hinoo salvato nello scrigno.',
+        message: 'salvato nello Scrigno.',
       );
     } catch (e) {
       if (!mounted) return;
@@ -254,7 +266,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
       if (!mounted) return;
       final text = result == HinooMoonResult.published
           ? 'Pubblicato sulla Luna.'
-          : 'Hinoo già presente sulla Luna.';
+          : 'hinoo già presente sulla Luna.';
       showHonooToast(
         context,
         message: text,
@@ -303,6 +315,30 @@ class _NewHinooPageState extends State<NewHinooPage> {
         context,
         message: 'Scrivi almeno 1 carattere prima di scaricare',
       );
+      return;
+    }
+
+    final user = SupabaseProvider.client.auth.currentUser;
+    if (user == null) {
+      if (!mounted) return;
+      final bool? goLogin = await showDialog<bool>(
+        context: context,
+        barrierDismissible: true,
+        builder: (_) => const HonooConfirmDialog(
+          title: 'Devi accedere',
+          message:
+              'Per scaricare questo hinoo, devi fare prima il log in. Vuoi andare alla pagina di login?',
+          confirmLabel: 'Vai al login',
+        ),
+      );
+      if (goLogin == true && mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const EmailLoginPage(),
+          ),
+        );
+      }
       return;
     }
     _triggerDownloadFromBuilder();
@@ -396,14 +432,14 @@ class _NewHinooPageState extends State<NewHinooPage> {
                         padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
                         child: Align(
                           alignment: Alignment.center,
-                          child: Text(
-                            Utility().appName,
-                            style: GoogleFonts.libreFranklin(
-                              color: HonooColor.secondary,
-                              fontSize: 28,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            overflow: TextOverflow.ellipsis,
+                          child: HonooAppTitle(
+                            onTap: () {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                    builder: (_) => const PlaceholderPage()),
+                                (route) => false,
+                              );
+                            },
                           ),
                         ),
                       ),
@@ -512,8 +548,14 @@ class _NewHinooPageState extends State<NewHinooPage> {
                           ),
                           iconSize: 60,
                           splashRadius: 25,
-                          tooltip: 'Indietro',
-                          onPressed: () => Navigator.pop(context),
+                          tooltip: 'Home',
+                          onPressed: () {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (_) => const HomePage()),
+                              (route) => false,
+                            );
+                          },
                         ),
                         const SizedBox(width: 24),
 

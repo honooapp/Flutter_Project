@@ -3,10 +3,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:honoo/Utility/formatted_text.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:honoo/Utility/utility.dart';
+import 'package:honoo/Widgets/honoo_app_title.dart';
 import 'package:sizer/sizer.dart';
 
 import '../Controller/device_controller.dart';
+import 'home_page.dart';
+import 'placeholder_page.dart';
 
 class ComingSoonPage extends StatefulWidget {
   const ComingSoonPage(
@@ -44,14 +46,14 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
                   SizedBox(
                     height: 52,
                     child: Center(
-                      child: Text(
-                        Utility().appName,
-                        style: GoogleFonts.libreFranklin(
-                          color: HonooColor.secondary,
-                          fontSize: 28,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        textAlign: TextAlign.center,
+                      child: HonooAppTitle(
+                        onTap: () {
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (_) => const PlaceholderPage()),
+                            (route) => false,
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -101,9 +103,13 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
                           ),
                           iconSize: 60,
                           splashRadius: 25,
-                          tooltip: 'Indietro',
+                          tooltip: 'Home',
                           onPressed: () {
-                            Navigator.pop(context);
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (_) => const HomePage()),
+                              (route) => false,
+                            );
                           },
                         ),
                       ],

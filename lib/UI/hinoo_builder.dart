@@ -110,8 +110,18 @@ class _HinooBuilderState extends State<HinooBuilder> {
   }
 
   void _handleBgTransform() {
-    final double newScale = _extractScaleFromMatrix(_bgController.value);
-    if ((newScale - _bgScale).abs() > 0.005) {
+    final Matrix4 currentMatrix = _bgController.value.clone();
+    final double newScale = _extractScaleFromMatrix(currentMatrix);
+
+    if (_bgChosen) {
+      setState(() {
+        _bgScale = newScale;
+        for (var i = 0; i < _pages.length; i++) {
+          _pages[i] = _copySlideWithBgTransform(_pages[i], currentMatrix);
+        }
+      });
+      _notifyChanged();
+    } else if ((newScale - _bgScale).abs() > 0.005) {
       setState(() => _bgScale = newScale);
     }
   }
@@ -236,6 +246,18 @@ class _HinooBuilderState extends State<HinooBuilder> {
   }) async {
     if (!mounted) return;
     bool progressVisible = false;
+    final NavigatorState rootNavigator =
+        Navigator.of(context, rootNavigator: true);
+    Future<void> dismissProgressDialogIfNeeded() async {
+      if (!mounted || !progressVisible) {
+        return;
+      }
+      if (rootNavigator.canPop()) {
+        rootNavigator.pop();
+      }
+      progressVisible = false;
+    }
+
     if (mounted) {
       progressVisible = true;
       // ignore: unawaited_futures
@@ -280,15 +302,20 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
       final String message = await saver.save(
         images,
-        message: 'Hinoo creati con Honoo',
+        message: 'hinoo creati con honoo',
       );
       if (!mounted) return;
+      await dismissProgressDialogIfNeeded();
+      if (!mounted) return;
+      // ignore: use_build_context_synchronously
       showHonooToast(
         context,
         message: message,
       );
     } catch (e) {
       if (mounted) {
+        await dismissProgressDialogIfNeeded();
+        // ignore: use_build_context_synchronously
         showHonooToast(
           context,
           message: 'Errore download: $e',
@@ -299,12 +326,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
         _goTo(previousIndex);
         await _waitForNextFrame();
       }
-      if (progressVisible && mounted) {
-        final navigator = Navigator.of(context, rootNavigator: true);
-        if (navigator.canPop()) {
-          navigator.pop();
-          progressVisible = false;
-        }
+      if (mounted) {
+        await dismissProgressDialogIfNeeded();
       }
     }
   }
@@ -396,6 +419,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
   }
 
   dynamic exportDraft() {
+    final Matrix4? currentTransform = _effectiveBgTransform();
     return {
       'pages': _pages, // sostituisci col tuo tipo slide/pagina
       'currentIndex': _current,
@@ -404,7 +428,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
       'textColor': _txtColor.value,
       'hasBg': _localBgPreview != null || _bgPublicUrl != null,
       'bgUrl': _bgPublicUrl,
-      'bgTransform': _bgLockedMatrix?.storage.toList(),
+      'bgTransform': currentTransform?.storage.toList(),
       'canvasHeight': _canvasHeight,
       'step': _step.name,
       // preview immediata per thumbnails quando non c'è ancora un URL pubblico
@@ -865,8 +889,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
         'text': '',
         'bgUrl': _bgPublicUrl,
         'textColor': _txtColor.value,
-        if (_bgLockedMatrix != null)
-          'bgTransform': _bgLockedMatrix!.storage.toList(),
+        if (_effectiveBgTransform() != null)
+          'bgTransform': _effectiveBgTransform()!.storage.toList(),
       };
 
   dynamic _copySlideWithText(dynamic slide, String text) {
@@ -897,5 +921,15 @@ class _HinooBuilderState extends State<HinooBuilder> {
   dynamic _copySlideWithTextColor(dynamic slide, int colorValue) {
     if (slide is Map) return {...slide, 'textColor': colorValue};
     return slide;
+  }
+
+  Matrix4? _effectiveBgTransform() {
+    if (_bgLockedMatrix != null) {
+      return _bgLockedMatrix!.clone();
+    }
+    if (!_bgChosen && _bgPublicUrl == null && _localBgPreview == null) {
+      return null;
+    }
+    return _bgController.value.clone();
   }
 }

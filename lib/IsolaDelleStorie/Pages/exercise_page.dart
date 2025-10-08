@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../Pages/coming_soon_page.dart';
+import '../../Pages/home_page.dart';
 import '../../Utility/utility.dart';
 import '../Utility/isola_delle_storie_content_manager.dart';
 import '../../Widgets/map/responsive_track_with_pins.dart';
@@ -411,8 +412,13 @@ class _ExercisePageState extends State<ExercisePage> {
         if (uiVisible) ...[
           tightIconButton(
             svg: "assets/icons/isoladellestorie/islandhome.svg",
-            semantics: "Torna all'Isola",
-            onPressed: () => Navigator.pop(context),
+            semantics: 'Home',
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const HomePage()),
+                (route) => false,
+              );
+            },
           ),
           const SizedBox(height: _buttonGap),
         ],

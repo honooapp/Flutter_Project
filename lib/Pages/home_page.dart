@@ -3,6 +3,8 @@ import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../Controller/device_controller.dart';
 import '../Utility/utility.dart';
+import '../Widgets/honoo_app_title.dart';
+import 'placeholder_page.dart';
 import 'package:sizer/sizer.dart';
 
 // Widgets riutilizzabili
@@ -31,13 +33,14 @@ class _HomePageState extends State<HomePage> {
               SizedBox(
                 height: 52,
                 child: Center(
-                  child: Text(
-                    Utility().appName,
-                    style: GoogleFonts.libreFranklin(
-                      color: HonooColor.secondary,
-                      fontSize: 28,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  child: HonooAppTitle(
+                    onTap: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                            builder: (_) => const PlaceholderPage()),
+                        (route) => false,
+                      );
+                    },
                   ),
                 ),
               ),

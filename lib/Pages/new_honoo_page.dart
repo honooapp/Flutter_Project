@@ -4,13 +4,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 
 import '../Entities/honoo.dart';
 import '../Services/honoo_image_uploader.dart';
 import '../UI/honoo_builder.dart';
-import '../Utility/utility.dart';
 import 'package:sizer/sizer.dart';
 import 'package:honoo/Services/honoo_service.dart';
 
@@ -18,9 +16,12 @@ import '../Widgets/luna_fissa.dart';
 import 'email_login_page.dart';
 import 'chest_page.dart';
 import 'new_hinoo_page.dart';
+import 'home_page.dart';
 import '../Widgets/white_icon_button.dart';
 import '../Widgets/honoo_dialogs.dart';
+import '../Widgets/honoo_app_title.dart';
 import '../UI/HonooBuilder/dialogs/name_honoo_dialog.dart';
+import 'placeholder_page.dart';
 
 class NewHonooPage extends StatefulWidget {
   const NewHonooPage({super.key});
@@ -77,6 +78,17 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
     if (user == null) {
       if (!mounted) return;
+      final bool? goLogin = await showDialog<bool>(
+        context: context,
+        barrierDismissible: true,
+        builder: (_) => const HonooConfirmDialog(
+          title: 'Devi accedere',
+          message:
+              'Per salvare il tuo honoo nello Scrigno devi prima effettuare l\'accesso. Vuoi andare alla pagina di login?',
+          confirmLabel: 'Vai al login',
+        ),
+      );
+      if (goLogin != true || !mounted) return;
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -130,7 +142,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
       showHonooToast(
         context,
-        message: 'Salvato nello scrigno.',
+        message: 'salvato nello Scrigno.',
       );
     } catch (e, st) {
       debugPrint('publishHonoo failed: $e\n$st');
@@ -338,13 +350,14 @@ class _NewHonooPageState extends State<NewHonooPage> {
                     SizedBox(
                       height: headerH,
                       child: Center(
-                        child: Text(
-                          Utility().appName,
-                          style: GoogleFonts.libreFranklin(
-                            color: HonooColor.secondary,
-                            fontSize: 28,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        child: HonooAppTitle(
+                          onTap: () {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (_) => const PlaceholderPage()),
+                              (route) => false,
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -423,8 +436,14 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           ),
                           iconSize: 60,
                           splashRadius: 25,
-                          tooltip: 'Indietro',
-                          onPressed: () => Navigator.pop(context),
+                          tooltip: 'Home',
+                          onPressed: () {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (_) => const HomePage()),
+                              (route) => false,
+                            );
+                          },
                         ),
                         SizedBox(width: 5.w),
 

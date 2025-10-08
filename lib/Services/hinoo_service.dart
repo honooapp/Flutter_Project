@@ -61,7 +61,7 @@ class HinooService {
         if (details != null && details.isNotEmpty) details,
         if (hint != null && hint.isNotEmpty) 'hint: $hint',
       ].join(' — ');
-      throw 'Errore salvataggio Hinoo: $msg${extra.isNotEmpty ? ' ($extra)' : ''}';
+      throw 'Errore salvataggio hinoo: $msg${extra.isNotEmpty ? ' ($extra)' : ''}';
     }
   }
 

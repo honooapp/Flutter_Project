@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../Utility/honoo_colors.dart';
 import '../Utility/utility.dart';
 import '../Widgets/background.dart';
+import '../Widgets/honoo_app_title.dart';
 import 'home_page.dart';
 
 class PlaceholderPage extends StatefulWidget {
@@ -19,31 +20,31 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   @override
   Widget build(BuildContext context) {
     final isPhone = DeviceController().isPhone();
-    final maxWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final double contentWidth;
+    if (isPhone) {
+      contentWidth = screenWidth;
+    } else {
+      const double minDesktopWidth = 420.0;
+      final double target = screenWidth * 0.4; // 20% più stretto rispetto al 50%
+      contentWidth = target < minDesktopWidth ? minDesktopWidth : target;
+    }
 
     // Contenuto principale, usato in entrambi i layout
     final Widget content = Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          SizedBox(
+          const SizedBox(
             height: 52,
             child: Center(
-              child: Text(
-                Utility().appName,
-                style: GoogleFonts.libreFranklin(
-                  color: HonooColor.secondary,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w600,
-                ),
-                textAlign: TextAlign.center,
-              ),
+              child: HonooAppTitle(),
             ),
           ),
           Expanded(
             child: SingleChildScrollView(
               child: SizedBox(
-                width: maxWidth,
+                width: contentWidth,
                 child: RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
@@ -119,11 +120,11 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                     semanticsLabel: 'Home',
                   ),
                   iconSize: 60,
-                  tooltip: 'Indietro',
+                  tooltip: 'Home',
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const HomePage()),
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const HomePage()),
+                      (route) => false,
                     );
                   },
                 ),
@@ -140,20 +141,16 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
       body: Row(
         children: [
           Expanded(child: Container()),
-          isPhone
-              ? Container(
-                  color: HonooColor.background,
-                  constraints: BoxConstraints(maxWidth: maxWidth),
-                  child: content,
-                )
-              : Opacity(
-                  opacity: 0.7,
-                  child: Container(
-                    color: HonooColor.background,
-                    constraints: BoxConstraints(maxWidth: maxWidth * 0.5),
-                    child: content,
-                  ),
-                ),
+          Align(
+            alignment: Alignment.center,
+            child: Container(
+              color: HonooColor.background.withOpacity(isPhone ? 1 : 0.7),
+              constraints: BoxConstraints(
+                maxWidth: contentWidth,
+              ),
+              child: content,
+            ),
+          ),
           Expanded(child: Container()),
         ],
       ),

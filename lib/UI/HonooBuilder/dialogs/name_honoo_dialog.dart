@@ -43,7 +43,7 @@ class _NameHonooDialogState extends State<NameHonooDialog> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Il nome verrà usato per il file PNG che scaricherai.',
+              'Se è per il mio corso, sei il numero 25, ed è il tuo primo honoo, devi chiamarlo 25.a',
               style: HonooDialogStyles.body(),
               textAlign: TextAlign.center,
             ),
@@ -54,7 +54,7 @@ class _NameHonooDialogState extends State<NameHonooDialog> {
               style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
               cursorColor: Colors.white,
               decoration: InputDecoration(
-                hintText: 'Es. honoo_speciale',
+                hintText: 'Es. 25.a',
                 hintStyle:
                     GoogleFonts.lora(color: Colors.white38, fontSize: 16),
                 filled: true,

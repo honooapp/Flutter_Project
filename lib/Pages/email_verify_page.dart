@@ -6,9 +6,12 @@ import '../Services/hinoo_service.dart';
 import '../Services/honoo_service.dart';
 import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/loading_spinner.dart';
+import '../Widgets/honoo_scaffold.dart';
 import 'chest_page.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:honoo/Utility/honoo_colors.dart';
 
 class EmailVerifyPage extends StatefulWidget {
   final String email;
@@ -75,7 +78,7 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
             if (mounted) {
               showHonooToast(
                 context,
-                message: 'Errore salvataggio Hinoo: $e',
+                message: 'Errore salvataggio hinoo: $e',
               );
             }
           }
@@ -130,34 +133,97 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Inserisci il codice')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const Text(
-              'Ti abbiamo inviato una mail.\n'
-              'Inserisci il codice.\n',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: _codeController,
-              keyboardType: TextInputType.number,
-              decoration:
-                  const InputDecoration(labelText: 'Codice di verifica'),
-            ),
-            const SizedBox(height: 20),
-            _isVerifying
-                ? const LoadingSpinner()
-                : ElevatedButton(
-                    onPressed: _verifyCode,
-                    child: const Text('Verifica'),
-                  ),
-          ],
+    final inputDecoration = InputDecoration(
+      labelText: 'Codice di verifica',
+      labelStyle: GoogleFonts.lora(color: Colors.white70),
+      filled: true,
+      fillColor: Colors.white.withOpacity(0.08),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.white24),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.white24),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Colors.white60),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+    );
+
+    final button = ElevatedButton(
+      onPressed: _isVerifying ? null : _verifyCode,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 0,
+        disabledBackgroundColor: Colors.white10,
+        disabledForegroundColor: Colors.white38,
+      ),
+      child: Text(
+        _isVerifying ? 'Verifica in corso…' : 'Verifica',
+        style: GoogleFonts.libreFranklin(
+          fontWeight: FontWeight.w600,
+          color: Colors.black,
         ),
       ),
     );
+
+    final content = SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Inserisci il codice',
+                style: GoogleFonts.libreFranklin(
+                  color: HonooColor.onBackground,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Controlla la posta in arrivo all’indirizzo ${widget.email}. '
+                'Inserisci qui il codice a sei cifre per completare l’accesso.',
+                style: GoogleFonts.arvo(
+                  color: HonooColor.onBackground.withOpacity(0.8),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              TextField(
+                controller: _codeController,
+                keyboardType: TextInputType.number,
+                style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
+                cursorColor: Colors.white,
+                cursorWidth: 3,
+                cursorRadius: const Radius.circular(0),
+                decoration: inputDecoration,
+              ),
+              const SizedBox(height: 24),
+              _isVerifying
+                  ? const Center(
+                      child: LoadingSpinner(color: Colors.white),
+                    )
+                  : button,
+            ],
+          ),
+        ),
+      ),
+    );
+
+    return HonooScaffold(body: content);
   }
 }
