@@ -8,5 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   test('APIExercise mapping – in attesa della firma reale', () {
     expect(true, isTrue);
-  }, skip: 'APIExercise non espone fromJson. Passami la firma/constructor reale per attivare il test.');
+  },
+      skip:
+          'APIExercise non espone fromJson. Passami la firma/constructor reale per attivare il test.');
 }

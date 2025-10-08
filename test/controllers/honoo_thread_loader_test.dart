@@ -1,9 +1,9 @@
 // test/controllers/honoo_thread_loader_test.dart
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:honoo/Controller/HonooThreadLoader.dart';
-import 'package:honoo/Controller/HonooController.dart';
-import 'package:honoo/Entities/Honoo.dart';
+import 'package:honoo/Controller/honoo_thread_loader.dart';
+import 'package:honoo/Controller/honoo_controller.dart';
+import 'package:honoo/Entities/honoo.dart';
 
 class _MockHonooController extends Mock implements HonooController {}
 
@@ -38,7 +38,8 @@ void main() {
       'ventoBlu',
     );
 
-    when(() => mock.getHonooHistory(root)).thenAnswer((_) async => [root, reply]);
+    when(() => mock.getHonooHistory(root))
+        .thenAnswer((_) async => [root, reply]);
 
     final loader = HonooThreadLoader(controller: mock);
     expect(loader.value.isLoading, isTrue); // stato iniziale del ValueNotifier

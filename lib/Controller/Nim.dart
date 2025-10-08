@@ -21,14 +21,14 @@ class NimGame {
 
   void difficultySetup() {
     clearConsole();
-    print('______');
-    print('*Please choose % chance of winning (difficulty) level 0 - 100:');
-    print('0 - Hardest');
-    print('100 - Easiest');
+    stdout.writeln('______');
+    stdout.writeln('*Please choose % chance of winning (difficulty) level 0 - 100:');
+    stdout.writeln('0 - Hardest');
+    stdout.writeln('100 - Easiest');
     int choice = int.parse(stdin.readLineSync()!);
 
     if (choice < 0 || choice > 100) {
-      print('Error! Only in the range 0-100 please!');
+      stdout.writeln('Error! Only in the range 0-100 please!');
       difficultySetup();
     } else {
       difficulty = choice;
@@ -36,14 +36,14 @@ class NimGame {
   }
 
   void modeSetup() {
-    print('______');
-    print('**Please choose mode 1 or 2:');
-    print('1 - vs AI');
-    print('2 - vs Player');
+    stdout.writeln('______');
+    stdout.writeln('**Please choose mode 1 or 2:');
+    stdout.writeln('1 - vs AI');
+    stdout.writeln('2 - vs Player');
     int choice = int.parse(stdin.readLineSync()!);
 
     if (choice < 1 || choice > 2) {
-      print('Error! There are 2 modes!');
+      stdout.writeln('Error! There are 2 modes!');
       modeSetup();
     } else {
       mode = choice;
@@ -60,18 +60,19 @@ class NimGame {
   void logLastMove(String target) {
     if (target == 'ai') {
       if (aiMovesHistory.isNotEmpty) {
-        print('033[1;32;40m${aiMovesHistory.last}');
-        print('033[1;37;40m');
+        stdout.writeln('033[1;32;40m${aiMovesHistory.last}');
+        stdout.writeln('033[1;37;40m');
       }
     } else {
       if (playerMovesHistory.isNotEmpty) {
-        print(playerMovesHistory.last);
+        stdout.writeln(playerMovesHistory.last);
       }
     }
   }
 
   bool isBalanced(List<int> boardToCheck) {
-    int balanced = (boardToCheck[0] ^ boardToCheck[1]) ^ (boardToCheck[2] ^ boardToCheck[3]);
+    int balanced = (boardToCheck[0] ^ boardToCheck[1]) ^
+        (boardToCheck[2] ^ boardToCheck[3]);
     return balanced == 0;
   }
 
@@ -91,7 +92,7 @@ class NimGame {
 
     stdout.writeln('');
 
-    // print('Balanced: ', isBalanced(boardToCheck));
+    // stdout.writeln('Balanced: ', isBalanced(boardToCheck));
   }
 
   int getCorrectRow() {
@@ -99,11 +100,11 @@ class NimGame {
     int row = int.parse(stdin.readLineSync()!);
 
     if (row < 1 || row > 4) {
-      print('Error! There are 4 rows!');
+      stdout.writeln('Error! There are 4 rows!');
       return getCorrectRow();
     } else {
       if (board[row - 1] < 1) {
-        print('Error! That row is empty!');
+        stdout.writeln('Error! That row is empty!');
         return getCorrectRow();
       } else {
         return row - 1;
@@ -116,7 +117,7 @@ class NimGame {
     int amount = int.parse(stdin.readLineSync()!);
 
     if (amount < 1 || amount > board[row]) {
-      print('Error! Illegal amount!');
+      stdout.writeln('Error! Illegal amount!');
       return getCorrectAmount(row);
     } else {
       return amount;
@@ -124,7 +125,7 @@ class NimGame {
   }
 
   void remove() {
-    print('Player $currentPlayer\'s turn!');
+    stdout.writeln('Player $currentPlayer\'s turn!');
     drawGame(board);
 
     int row = getCorrectRow();
@@ -132,8 +133,7 @@ class NimGame {
 
     board[row] -= amount;
 
-    String playerMoveMessage =
-        'Player removed: $amount From row: ${row + 1}';
+    String playerMoveMessage = 'Player removed: $amount From row: ${row + 1}';
     playerMovesHistory.add(playerMoveMessage);
   }
 
@@ -145,17 +145,17 @@ class NimGame {
       }
     }
 
-    print('----------------------------');
+    stdout.writeln('----------------------------');
     if (currentPlayer == 1) {
-      print('Player 1 Won!');
+      stdout.writeln('Player 1 Won!');
     } else {
       if (mode == 1) {
-        print('AI Won!');
+        stdout.writeln('AI Won!');
       } else {
-        print('Player 2 Won!');
+        stdout.writeln('Player 2 Won!');
       }
     }
-    print('----------------------------');
+    stdout.writeln('----------------------------');
 
     gameRunning = false;
   }
@@ -234,7 +234,6 @@ class NimGame {
   }
 
   void playGame() {
-
     // ------------------------------------
     // GAME START
     // ------------------------------------
@@ -275,4 +274,3 @@ void main() {
   NimGame nimGame = NimGame();
   nimGame.playGame();
 }
-

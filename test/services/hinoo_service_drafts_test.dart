@@ -1,12 +1,9 @@
 @Tags(['unit']) // i test non-tagged integration girano in Codex
 import 'package:flutter_test/flutter_test.dart';
 
-// SDK
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 // App code
-import 'package:honoo/Services/HinooService.dart';
-import 'package:honoo/Entities/Hinoo.dart';
+import 'package:honoo/Services/hinoo_service.dart';
+import 'package:honoo/Entities/hinoo.dart';
 import '../test_supabase_helper.dart';
 
 void main() {
@@ -24,7 +21,8 @@ void main() {
       harness.disableOverrides();
     });
 
-    test('getDraft() → null quando utente non autenticato (early-return)', () async {
+    test('getDraft() → null quando utente non autenticato (early-return)',
+        () async {
       // Assicuriamoci che Supabase non abbia un utente loggato.
       // Se in setUp dell’app inizializzi Supabase altrove, qui non lo facciamo.
       // La funzione fa early return e non tocca la rete.
@@ -44,7 +42,7 @@ void main() {
       // await Supabase.initialize(url: envUrl, anonKey: envKey);
       // await Supabase.instance.client.auth.signInAnonymously();
 
-      final draft = HinooDraft(
+      const draft = HinooDraft(
         pages: [
           HinooSlide(
             text: 'Bozza di prova',
@@ -67,7 +65,8 @@ void main() {
       expect(true, isTrue);
     }, tags: ['integration']);
 
-    test('getDraft() restituisce l’ultimo draft salvato per l’utente', () async {
+    test('getDraft() restituisce l’ultimo draft salvato per l’utente',
+        () async {
       // Precondizione: utente loggato e almeno un draft salvato (vedi test sopra).
       final res = await HinooService.getDraft();
       expect(res, isNotNull);

@@ -1,11 +1,12 @@
 // test/pages/new_honoo_page_smoke_test.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:honoo/Pages/NewHonooPage.dart';
+import 'package:honoo/Pages/new_honoo_page.dart';
 import 'package:sizer/sizer.dart';
 
 void main() {
-  testWidgets('NewHonooPage si costruisce e accetta input di testo', (tester) async {
+  testWidgets('NewHonooPage si costruisce e accetta input di testo',
+      (tester) async {
     await tester.pumpWidget(
       Sizer(
         builder: (context, orientation, deviceType) {

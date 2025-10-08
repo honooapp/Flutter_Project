@@ -4,10 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:postgrest/postgrest.dart';
 
-import 'package:honoo/Services/HinooService.dart';
-import 'package:honoo/Entities/Hinoo.dart';
+import 'package:honoo/Services/hinoo_service.dart';
+import 'package:honoo/Entities/hinoo.dart';
 
 class _MockQueryChain extends Mock
     implements
@@ -20,8 +19,10 @@ class _MockQueryChain extends Mock
 
   @override
   dynamic noSuchMethod(Invocation invocation) {
-    if (invocation.memberName == #then && invocation.positionalArguments.isNotEmpty) {
-      final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
+    if (invocation.memberName == #then &&
+        invocation.positionalArguments.isNotEmpty) {
+      final onValue =
+          invocation.positionalArguments[0] as dynamic Function(dynamic);
       final result = _responses.isEmpty ? null : _responses.removeFirst();
       return Future.value(onValue(result));
     }
@@ -60,7 +61,8 @@ void main() {
     resetMocktailState();
   });
 
-  test('fetchUserHinoo: type=personal → mapping corretto e ordine DESC', () async {
+  test('fetchUserHinoo: type=personal → mapping corretto e ordine DESC',
+      () async {
     final rows = [
       {
         'pages': [
@@ -95,7 +97,8 @@ void main() {
     ];
     chain.queueResponse(rows);
 
-    final list = await HinooService.fetchUserHinoo('u1', type: HinooType.personal);
+    final list =
+        await HinooService.fetchUserHinoo('u1', type: HinooType.personal);
 
     expect(list, isA<List<HinooDraft>>());
     expect(list.length, 2);
@@ -107,7 +110,6 @@ void main() {
     verify(() => chain.eq('user_id', 'u1')).called(1);
     verify(() => chain.eq('type', 'personal')).called(1);
     verify(() => chain.order('created_at', ascending: false)).called(1);
-    verifyNever(() => chain.execute());
   });
 
   test('fetchUserHinoo: type=moon → filtra "moon" e ordina DESC', () async {

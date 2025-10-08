@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:honoo/Pages/EmailLoginPage.dart'; // adatta se il path è diverso
+import 'package:honoo/Pages/email_login_page.dart'; // adatta se il path è diverso
 import '../test_supabase_helper.dart';
 
 void main() {
@@ -19,7 +19,8 @@ void main() {
     harness.disableOverrides();
   });
 
-  testWidgets('EmailLoginPage: render, input email e azione presente', (tester) async {
+  testWidgets('EmailLoginPage: render, input email e azione presente',
+      (tester) async {
     // Avvia la pagina o l'app intera (scegline UNA delle due righe)
     // await tester.pumpWidget(const MyApp());
     await tester.pumpWidget(const MaterialApp(home: EmailLoginPage()));
@@ -36,7 +37,6 @@ void main() {
     await tester.ensureVisible(sendBtn);
     await tester.tap(sendBtn, warnIfMissed: false);
     await tester.pumpAndSettle();
-
 
     expect(sendBtn, findsOneWidget);
 

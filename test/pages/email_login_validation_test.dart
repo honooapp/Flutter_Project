@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:honoo/Pages/EmailLoginPage.dart'; // adatta path se serve
+import 'package:honoo/Pages/email_login_page.dart'; // adatta path se serve
 
 import '../test_supabase_helper.dart';
 
@@ -19,7 +19,8 @@ void main() {
     harness.disableOverrides();
   });
 
-  testWidgets('EmailLoginPage: mostra errore per email vuota/invalid', (tester) async {
+  testWidgets('EmailLoginPage: mostra errore per email vuota/invalid',
+      (tester) async {
     await tester.pumpWidget(const MaterialApp(home: EmailLoginPage()));
     await tester.pumpAndSettle();
 

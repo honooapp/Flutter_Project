@@ -4,10 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:postgrest/postgrest.dart';
 
-import 'package:honoo/Services/HonooService.dart';
-import 'package:honoo/Entities/Honoo.dart';
+import 'package:honoo/Services/honoo_service.dart';
+import 'package:honoo/Entities/honoo.dart';
 
 class _MockQueryChain extends Mock
     implements
@@ -20,8 +19,10 @@ class _MockQueryChain extends Mock
 
   @override
   dynamic noSuchMethod(Invocation invocation) {
-    if (invocation.memberName == #then && invocation.positionalArguments.isNotEmpty) {
-      final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
+    if (invocation.memberName == #then &&
+        invocation.positionalArguments.isNotEmpty) {
+      final onValue =
+          invocation.positionalArguments[0] as dynamic Function(dynamic);
       final result = _responses.isEmpty ? null : _responses.removeFirst();
       return Future.value(onValue(result));
     }
@@ -41,7 +42,7 @@ void main() {
 
   setUp(() {
     client = _MockSupabaseClient();
-    chain  = _MockQueryChain();
+    chain = _MockQueryChain();
 
     HonooService.$setTestClient(client);
     when(() => client.from('honoo')).thenAnswer((_) => chain);
@@ -58,7 +59,8 @@ void main() {
     resetMocktailState();
   });
 
-  test('fetchPublicHonoo: filtra destination=moon e ordina per created_at desc', () async {
+  test('fetchPublicHonoo: filtra destination=moon e ordina per created_at desc',
+      () async {
     final rows = [
       {
         'id': 2,

@@ -3,11 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:honoo/Services/HinooStorageUploader.dart';
+import 'package:honoo/Services/hinoo_storage_uploader.dart';
 
 /// Mocks per supabase_flutter ^1.10.x
 class _MockSupabaseClient extends Mock implements SupabaseClient {}
+
 class _MockStorageClient extends Mock implements SupabaseStorageClient {}
+
 class _MockFileApi extends Mock implements StorageFileApi {}
 
 void main() {
@@ -35,10 +37,10 @@ void main() {
 
     // Stub base (asincrono → thenAnswer)
     when(() => fileApi.uploadBinary(
-      any(),                    // path
-      any<Uint8List>(),         // file
-      fileOptions: any(named: 'fileOptions'),
-    )).thenAnswer((_) async => 'ignored-path-returned-by-upload');
+          any(), // path
+          any<Uint8List>(), // file
+          fileOptions: any(named: 'fileOptions'),
+        )).thenAnswer((_) async => 'ignored-path-returned-by-upload');
     when(() => fileApi.getPublicUrl(any()))
         .thenReturn('https://cdn.example.com/hinoo/mock-url.png');
   });
@@ -47,7 +49,8 @@ void main() {
     HinooStorageUploader.$setTestClient(null);
   });
 
-  test('uploadExportPng: usa folder exports e ritorna un URL pubblico', () async {
+  test('uploadExportPng: usa folder exports e ritorna un URL pubblico',
+      () async {
     final bytes = Uint8List.fromList([137, 80, 78, 71]); // header PNG
 
     final url = await HinooStorageUploader.uploadExportPng(
@@ -58,10 +61,10 @@ void main() {
     expect(url, contains('https://cdn.example.com/hinoo/'));
 
     final captured = verify(() => fileApi.uploadBinary(
-      captureAny(), // path
-      any<Uint8List>(),
-      fileOptions: any(named: 'fileOptions', that: isA<FileOptions>()),
-    )).captured;
+          captureAny(), // path
+          any<Uint8List>(),
+          fileOptions: any(named: 'fileOptions', that: isA<FileOptions>()),
+        )).captured;
 
     final String path = captured.first as String;
     // path = u1/exports/<uuid>.png
@@ -69,7 +72,9 @@ void main() {
     verify(() => fileApi.getPublicUrl(path)).called(1);
   });
 
-  test('uploadBackground: usa folder backgrounds e rispetta estensione (jpeg → jpg)', () async {
+  test(
+      'uploadBackground: usa folder backgrounds e rispetta estensione (jpeg → jpg)',
+      () async {
     when(() => fileApi.getPublicUrl(any()))
         .thenReturn('https://cdn.example.com/hinoo/bg.jpg');
 
@@ -82,17 +87,19 @@ void main() {
     expect(url, endsWith('.jpg'));
 
     final captured = verify(() => fileApi.uploadBinary(
-      captureAny(),
-      any<Uint8List>(),
-      fileOptions: any(named: 'fileOptions', that: isA<FileOptions>()),
-    )).captured;
+          captureAny(),
+          any<Uint8List>(),
+          fileOptions: any(named: 'fileOptions', that: isA<FileOptions>()),
+        )).captured;
 
     final String path = captured.first as String;
     expect(path, allOf([contains('u2/backgrounds/'), endsWith('.jpg')]));
     verify(() => fileApi.getPublicUrl(path)).called(1);
   });
 
-  test('uploadBytes: folder custom e normalizzazione estensioni non permesse → jpg', () async {
+  test(
+      'uploadBytes: folder custom e normalizzazione estensioni non permesse → jpg',
+      () async {
     when(() => fileApi.getPublicUrl(any()))
         .thenReturn('https://cdn.example.com/hinoo/custom.jpg');
 
@@ -106,10 +113,10 @@ void main() {
     expect(url, endsWith('.jpg'));
 
     final captured = verify(() => fileApi.uploadBinary(
-      captureAny(),
-      any<Uint8List>(),
-      fileOptions: any(named: 'fileOptions', that: isA<FileOptions>()),
-    )).captured;
+          captureAny(),
+          any<Uint8List>(),
+          fileOptions: any(named: 'fileOptions', that: isA<FileOptions>()),
+        )).captured;
 
     final String path = captured.first as String;
     expect(path, allOf([contains('u3/backgrounds/'), endsWith('.jpg')]));
@@ -118,13 +125,14 @@ void main() {
 
   test('uploadBytes: userId non valido → lancia', () async {
     expect(
-          () => HinooStorageUploader.uploadBytes(
+      () => HinooStorageUploader.uploadBytes(
         bytes: Uint8List.fromList([0]),
         filenameExt: 'png',
         userId: 'invalid/user', // contiene '/'
       ),
       throwsA(isA<String>()),
     );
-    verifyNever(() => fileApi.uploadBinary(any(), any(), fileOptions: any(named: 'fileOptions')));
+    verifyNever(() => fileApi.uploadBinary(any(), any(),
+        fileOptions: any(named: 'fileOptions')));
   });
 }

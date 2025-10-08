@@ -21,7 +21,8 @@ class LoadingSpinner extends StatefulWidget {
   State<LoadingSpinner> createState() => _LoadingSpinnerState();
 }
 
-class _LoadingSpinnerState extends State<LoadingSpinner> with SingleTickerProviderStateMixin {
+class _LoadingSpinnerState extends State<LoadingSpinner>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -51,7 +52,7 @@ class _LoadingSpinnerState extends State<LoadingSpinner> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    final String? semantics = widget.semanticsLabel ?? 'Caricamento';
+    final String semantics = widget.semanticsLabel ?? 'Caricamento';
 
     Widget spinner = SvgPicture.asset(
       'assets/icons/load.svg',

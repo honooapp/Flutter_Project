@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:honoo/Pages/ReplyHonooPage.dart';
-import 'package:honoo/Entities/Honoo.dart';
+import 'package:honoo/Pages/reply_honoo_page.dart';
+import 'package:honoo/Entities/honoo.dart';
 import 'package:sizer/sizer.dart';
 
 import '../test_supabase_helper.dart';
@@ -23,7 +23,8 @@ void main() {
     harness.disableOverrides();
   });
 
-  testWidgets('ReplyHonooPage: si costruisce, accetta input e mostra azione di invio',
+  testWidgets(
+      'ReplyHonooPage: si costruisce, accetta input e mostra azione di invio',
       (tester) async {
     final original = Honoo(
       1,

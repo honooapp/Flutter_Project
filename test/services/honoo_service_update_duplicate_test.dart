@@ -4,13 +4,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:postgrest/postgrest.dart';
 
-import 'package:honoo/Services/HinooService.dart';
-import 'package:honoo/Entities/Hinoo.dart';
+import 'package:honoo/Services/hinoo_service.dart';
+import 'package:honoo/Entities/hinoo.dart';
 
 class _MockClient extends Mock implements SupabaseClient {}
+
 class _MockAuth extends Mock implements GoTrueClient {}
+
 class _MockUser extends Mock implements User {}
 
 class _MockQueryChain extends Mock
@@ -24,8 +25,10 @@ class _MockQueryChain extends Mock
 
   @override
   dynamic noSuchMethod(Invocation invocation) {
-    if (invocation.memberName == #then && invocation.positionalArguments.isNotEmpty) {
-      final onValue = invocation.positionalArguments[0] as dynamic Function(dynamic);
+    if (invocation.memberName == #then &&
+        invocation.positionalArguments.isNotEmpty) {
+      final onValue =
+          invocation.positionalArguments[0] as dynamic Function(dynamic);
       final result = _responses.isEmpty ? null : _responses.removeFirst();
       return Future.value(onValue(result));
     }
@@ -70,27 +73,28 @@ void main() {
   });
 
   group('HinooService.duplicateToMoon', () {
-    HinooDraft _sampleDraft() => const HinooDraft(
-      pages: [
-        HinooSlide(
-          text: 'Testo',
-          backgroundImage: null,
-          isTextWhite: true,
-          bgScale: 1.0,
-          bgOffsetX: 0,
-          bgOffsetY: 0,
-        ),
-      ],
-      type: HinooType.personal,
-      recipientTag: null,
-    );
+    HinooDraft sampleDraft() => const HinooDraft(
+          pages: [
+            HinooSlide(
+              text: 'Testo',
+              backgroundImage: null,
+              isTextWhite: true,
+              bgScale: 1.0,
+              bgOffsetX: 0,
+              bgOffsetY: 0,
+            ),
+          ],
+          type: HinooType.personal,
+          recipientTag: null,
+        );
 
-    test('se ESISTE già un duplicato → ritorna false e NON inserisce', () async {
+    test('se ESISTE già un duplicato → ritorna false e NON inserisce',
+        () async {
       chain.queueResponse([
         {'id': 99}
       ]);
 
-      final res = await HinooService.duplicateToMoon(_sampleDraft());
+      final res = await HinooService.duplicateToMoon(sampleDraft());
 
       expect(res, isFalse);
       verify(() => client.from('hinoo')).called(1);
@@ -106,7 +110,7 @@ void main() {
       chain.queueResponse(<Map<String, dynamic>>[]);
       chain.queueResponse(<String, dynamic>{});
 
-      final res = await HinooService.duplicateToMoon(_sampleDraft());
+      final res = await HinooService.duplicateToMoon(sampleDraft());
 
       expect(res, isTrue);
       verify(() => client.from('hinoo')).called(greaterThanOrEqualTo(1));

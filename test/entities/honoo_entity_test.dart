@@ -1,6 +1,6 @@
 // test/entities/honoo_entity_test.dart
 import 'package:flutter_test/flutter_test.dart';
-import 'package:honoo/Entities/Honoo.dart';
+import 'package:honoo/Entities/honoo.dart';
 
 void main() {
   test('Honoo costruttore posizionale base', () {

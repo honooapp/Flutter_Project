@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 
-import 'package:honoo/UI/HonooCard.dart';
-import 'package:honoo/Entities/Honoo.dart';
+import 'package:honoo/UI/honoo_card.dart';
+import 'package:honoo/Entities/honoo.dart';
 
 void main() {
   testGoldens(
     'HonooCard golden default (con Honoo posizionale)',
-        (tester) async {
+    (tester) async {
       await loadAppFonts();
 
       final honoo = Honoo(

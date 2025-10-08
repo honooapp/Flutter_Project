@@ -2,21 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 // importa il widget reale che vuoi testare
-// es.: import 'package:honoo/UI/HonooBuilder.dart';
+// es.: import 'package:honoo/UI/honoo_builder.dart';
 // oppure l'entry che costruisce il testo con la virgoletta
 // ADATTA la riga qui sotto al tuo widget reale:
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('la virgoletta di chiusura ” resta visibile anche al limite', (tester) async {
+  testWidgets('la virgoletta di chiusura ” resta visibile anche al limite',
+      (tester) async {
     // 1) Monta il widget sotto test in un MaterialApp/Scaffold
     // SOSTITUISCI "WidgetUnderTest" con il tuo widget reale che mostra il testo con le virgolette.
     // Esempio 1: se hai un builder dedicato
     // final widget = WidgetUnderTest(text: '“ciao”');
     //
     // Esempio 2: semplice Text per riprodurre la regola
-    final widget = const MaterialApp(
+    const widget = MaterialApp(
       home: Scaffold(
         body: Center(child: Text('“ciao”')), // ADATTA qui al tuo caso reale
       ),
@@ -44,7 +45,7 @@ void main() {
       quoteFinder,
       findsWidgets,
       reason:
-      'Non è stato trovato alcun Text/RichText che contenga la virgoletta di chiusura ”',
+          'Non è stato trovato alcun Text/RichText che contenga la virgoletta di chiusura ”',
     );
 
     // 4) (Opzionale) controlla che sia davvero visibile (non offstage)
