@@ -1,10 +1,16 @@
+import 'dart:io';
 import 'dart:async';
 import 'dart:collection';
 
 import 'package:honoo/Services/honoo_service.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
 
@@ -44,10 +50,74 @@ class MockQueryChain extends Mock
 
 class FakeAuthState extends Fake implements AuthState {}
 
-void registerSupabaseFallbacks() {
+bool _googleFontsRegistered = false;
+
+Future<void> registerSupabaseFallbacks() async {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences.setMockInitialValues(<String, Object>{});
+  PathProviderPlatform.instance = _FakePathProviderPlatform();
+  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+      .setMockMethodCallHandler(
+          const MethodChannel('com.llfbandit.app_links/messages'),
+          (call) async {
+    switch (call.method) {
+      case 'getInitialAppLink':
+      case 'getInitialLink':
+        return null;
+      case 'getLatestAppLink':
+      case 'getLatestLink':
+        return null;
+      default:
+        return null;
+    }
+  });
+  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+      .setMockMethodCallHandler(
+          const MethodChannel('com.llfbandit.app_links/events'), (call) async {
+    switch (call.method) {
+      case 'listen':
+      case 'cancel':
+        return null;
+      default:
+        return null;
+    }
+  });
   registerFallbackValue(<String, dynamic>{});
   registerFallbackValue(FakeAuthState());
   registerFallbackValue(OtpType.email);
+
+  if (!_googleFontsRegistered) {
+    GoogleFonts.config.allowRuntimeFetching = false;
+    await Future.wait([
+      _loadGoogleFontFamily('Libre Franklin', const [
+        'assets/google_fonts/LibreFranklin-VariableFont_wght.ttf',
+        'assets/google_fonts/LibreFranklin-Medium.ttf',
+        'assets/google_fonts/LibreFranklin-Italic-VariableFont_wght.ttf',
+      ]),
+      _loadGoogleFontFamily('Arvo', const [
+        'assets/google_fonts/Arvo-Regular.ttf',
+        'assets/google_fonts/Arvo-Bold.ttf',
+        'assets/google_fonts/Arvo-Italic.ttf',
+        'assets/google_fonts/Arvo-BoldItalic.ttf',
+      ]),
+      _loadGoogleFontFamily('Lora', const [
+        'assets/google_fonts/Lora-VariableFont_wght.ttf',
+        'assets/google_fonts/Lora-Italic-VariableFont_wght.ttf',
+      ]),
+    ]);
+    _googleFontsRegistered = true;
+  }
+}
+
+Future<void> _loadGoogleFontFamily(
+  String family,
+  List<String> assetPaths,
+) async {
+  final loader = FontLoader(family);
+  for (final asset in assetPaths) {
+    loader.addFont(rootBundle.load(asset));
+  }
+  await loader.load();
 }
 
 class SupabaseTestHarness {
@@ -104,4 +174,42 @@ class SupabaseTestHarness {
     when(() => chain.maybeSingle()).thenAnswer((_) => chain);
     return chain;
   }
+}
+
+class _FakePathProviderPlatform extends PathProviderPlatform {
+  _FakePathProviderPlatform() {
+    _tempDir = Directory.systemTemp.createTempSync('path_provider_test');
+  }
+
+  late final Directory _tempDir;
+
+  @override
+  Future<String?> getTemporaryPath() async => _tempDir.path;
+
+  @override
+  Future<String?> getApplicationSupportPath() async => _tempDir.path;
+
+  @override
+  Future<String?> getLibraryPath() async => _tempDir.path;
+
+  @override
+  Future<String?> getApplicationDocumentsPath() async => _tempDir.path;
+
+  @override
+  Future<String?> getApplicationCachePath() async => _tempDir.path;
+
+  @override
+  Future<String?> getExternalStoragePath() async => _tempDir.path;
+
+  @override
+  Future<List<String>?> getExternalCachePaths() async =>
+      <String>[_tempDir.path];
+
+  @override
+  Future<List<String>?> getExternalStoragePaths(
+          {StorageDirectory? type}) async =>
+      <String>[_tempDir.path];
+
+  @override
+  Future<String?> getDownloadsPath() async => _tempDir.path;
 }

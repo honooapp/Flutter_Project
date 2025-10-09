@@ -60,6 +60,8 @@ dev_dependencies:
   mocktail: 1.0.0
   golden_toolkit: ^0.15.0
   test: ^1.23.1
+  shared_preferences: ^2.2.2
+  path_provider_platform_interface: ^2.1.1
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

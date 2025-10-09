@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Services/auth_service.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import '../Widgets/honoo_scaffold.dart';
@@ -27,7 +28,13 @@ class EmailLoginPage extends StatefulWidget {
 class _EmailLoginPageState extends State<EmailLoginPage> {
   final TextEditingController _emailController = TextEditingController();
   bool _isLoading = false;
-  final AuthService _authService = AuthService();
+  late final AuthService _authService;
+
+  @override
+  void initState() {
+    super.initState();
+    _authService = AuthService(client: SupabaseProvider.client);
+  }
 
   Future<void> _sendOtp() async {
     setState(() => _isLoading = true);

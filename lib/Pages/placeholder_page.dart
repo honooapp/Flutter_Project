@@ -96,8 +96,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                           Utility().appName,
                           style: GoogleFonts.libreFranklin(
                             color: HonooColor.secondary,
-                            fontSize: 28,
-                            fontWeight: FontWeight.w600,
+                            fontSize: 30,
+                            fontWeight: FontWeight.w500,
                           ),
                           textAlign: TextAlign.center,
                         ),

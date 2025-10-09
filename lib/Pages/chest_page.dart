@@ -551,7 +551,7 @@ class _ChestPageState extends State<ChestPage> {
                                         return Center(
                                           key: const ValueKey('chest_empty'),
                                           child: Text(
-                                            'Nessun contenuto nello scrigno',
+                                            'Nessun contenuto nello Scrigno',
                                             style: GoogleFonts.libreFranklin(
                                               color: HonooColor.onBackground,
                                               fontSize: 18,
