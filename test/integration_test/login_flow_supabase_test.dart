@@ -11,7 +11,7 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(
-    'Login flow end-to-end (magic link o email/password)',
+    'Login flow end-to-end (magic link)',
     (tester) async {
       await tester.pumpWidget(const MyApp());
       await tester.pumpAndSettle();

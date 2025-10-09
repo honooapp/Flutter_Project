@@ -5,7 +5,10 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
-// Helpers
+// In passwordless mode usiamo un bearer token ottenuto via magic link/OTP.
+// Impostalo con TEST_BEARER_TOKEN prima di abilitare i test di scrittura.
+const _bearerEnvKey = 'TEST_BEARER_TOKEN';
+
 String env(String k) {
   final fromDefine = _fromDefines(k);
   if (fromDefine.isNotEmpty) {
@@ -21,10 +24,8 @@ String _fromDefines(String key) {
     case 'SUPABASE_ANON_KEY':
       return const String.fromEnvironment('SUPABASE_ANON_KEY',
           defaultValue: '');
-    case 'TEST_EMAIL':
-      return const String.fromEnvironment('TEST_EMAIL', defaultValue: '');
-    case 'TEST_PASSWORD':
-      return const String.fromEnvironment('TEST_PASSWORD', defaultValue: '');
+    case _bearerEnvKey:
+      return const String.fromEnvironment(_bearerEnvKey, defaultValue: '');
     case 'ENABLE_WRITE_TESTS':
       return const String.fromEnvironment('ENABLE_WRITE_TESTS',
           defaultValue: '');
@@ -33,37 +34,13 @@ String _fromDefines(String key) {
   }
 }
 
-Future<String> _signInAndGetAccessToken({
-  required String url,
-  required String anonKey,
-  required String email,
-  required String password,
-}) async {
-  final uri = Uri.parse('$url/auth/v1/token?grant_type=password');
-  final resp = await http
-      .post(uri,
-          headers: {'apikey': anonKey, 'Content-Type': 'application/json'},
-          body: jsonEncode({'email': email, 'password': password}))
-      .timeout(const Duration(seconds: 20));
-  if (resp.statusCode != 200) {
-    throw StateError('Auth failed ${resp.statusCode}: ${resp.body}');
-  }
-  final json = jsonDecode(resp.body) as Map<String, dynamic>;
-  final token = json['access_token'] as String?;
-  if (token == null || token.isEmpty) {
-    throw StateError('Missing access_token');
-  }
-  return token;
-}
-
 void main() {
   final baseUrl = env('SUPABASE_URL');
   final anonKey = env('SUPABASE_ANON_KEY');
-  final email = env('TEST_EMAIL');
-  final password = env('TEST_PASSWORD');
+  final bearer = env(_bearerEnvKey);
   final enableWrites = env('ENABLE_WRITE_TESTS') == '1';
 
-  group('Supabase REST CRUD (e2e_items)', () {
+  group('Supabase REST CRUD (OTP session)', () {
     if (!enableWrites) {
       test('Scritture disabilitate (set ENABLE_WRITE_TESTS=1 per abilitare)',
           () {
@@ -72,28 +49,14 @@ void main() {
       return;
     }
 
-    late String bearer;
-    late String createdId;
+    if ([baseUrl, anonKey, bearer].any((value) => value.isEmpty)) {
+      test('Env mancanti per i test Supabase', () {
+        fail('Env mancanti');
+      }, skip: 'passwordless mode: set SUPABASE_URL, SUPABASE_ANON_KEY e TEST_BEARER_TOKEN per abilitare i test di integrazione.');
+      return;
+    }
 
-    setUpAll(() async {
-      final requiredEnv = <String, String>{
-        'SUPABASE_URL': baseUrl,
-        'SUPABASE_ANON_KEY': anonKey,
-        'TEST_EMAIL': email,
-        'TEST_PASSWORD': password,
-      };
-      requiredEnv.forEach((key, value) {
-        if (value.isEmpty) {
-          throw StateError('Env mancante: $key');
-        }
-      });
-      bearer = await _signInAndGetAccessToken(
-        url: baseUrl,
-        anonKey: anonKey,
-        email: email,
-        password: password,
-      );
-    });
+    late String createdId;
 
     test('INSERT (creates test row)',
         timeout: const Timeout(Duration(seconds: 20)), () async {
@@ -104,10 +67,9 @@ void main() {
                 'apikey': anonKey,
                 'Authorization': 'Bearer $bearer',
                 'Content-Type': 'application/json',
-                'Prefer': 'return=representation' // ritorna la riga creata
+                'Prefer': 'return=representation'
               },
               body: jsonEncode({
-                // user_id sarà impostato da default auth.uid()
                 'label': 'live-insert-${DateTime.now().toIso8601String()}',
                 'is_test': true,
               }))
@@ -154,7 +116,7 @@ void main() {
       final rows = jsonDecode(resp.body) as List<dynamic>;
       expect(rows.length, 1);
       final row = rows.first as Map<String, dynamic>;
-      expect(row['is_test'], isTrue); // policy/flag
+      expect(row['is_test'], isTrue);
     });
 
     tearDownAll(() async {

@@ -1,42 +1,83 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
+import 'package:mocktail/mocktail.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:test/test.dart';
 
-import '_env.dart';
+import 'package:honoo/Services/auth_service.dart';
+
+class _MockSupabaseClient extends Mock implements SupabaseClient {}
+
+class _MockGoTrueClient extends Mock implements GoTrueClient {}
 
 void main() {
-  group('Supabase REST auth', () {
-    test('signInWithPassword (GoTrue)',
-        timeout: const Timeout(Duration(seconds: 25)), () async {
-      final url = env('SUPABASE_URL');
-      final key = env('SUPABASE_ANON_KEY');
-      final email = env('TEST_EMAIL');
-      final password = env('TEST_PASSWORD');
+  late _MockSupabaseClient client;
+  late _MockGoTrueClient auth;
+  late AuthService service;
 
-      for (final v in [url, key, email, password]) {
-        expect(v, isNotEmpty,
-            reason:
-                'Variabili mancanti: SUPABASE_URL, SUPABASE_ANON_KEY, TEST_EMAIL, TEST_PASSWORD');
-      }
+  setUp(() {
+    client = _MockSupabaseClient();
+    auth = _MockGoTrueClient();
+    when(() => client.auth).thenReturn(auth);
+    service = AuthService(client: client);
+  });
 
-      final uri = Uri.parse('$url/auth/v1/token?grant_type=password');
-      final resp = await http
-          .post(
-            uri,
-            headers: {
-              'apikey': key,
-              'Content-Type': 'application/json',
-            },
-            body: jsonEncode({'email': email, 'password': password}),
-          )
-          .timeout(const Duration(seconds: 20));
+  test('requestMagicLink delega a signInWithOtp', () async {
+    when(
+      () => auth.signInWithOtp(
+        email: 'user@example.com',
+        emailRedirectTo: 'https://app.test/otp',
+        data: null,
+        shouldCreateUser: null,
+        captchaToken: null,
+        channel: OtpChannel.sms,
+      ),
+    ).thenAnswer((_) async {});
 
-      expect(resp.statusCode, 200,
-          reason: 'HTTP ${resp.statusCode}: ${resp.body}');
-      final json = jsonDecode(resp.body) as Map<String, dynamic>;
-      expect(json['access_token'], isA<String>());
-      expect(json['user']?['email'], email);
-    });
+    await service.requestMagicLink(
+      'user@example.com',
+      redirectUrl: 'https://app.test/otp',
+    );
+
+    verify(
+      () => auth.signInWithOtp(
+        email: 'user@example.com',
+        emailRedirectTo: 'https://app.test/otp',
+        data: null,
+        shouldCreateUser: null,
+        captchaToken: null,
+        channel: OtpChannel.sms,
+      ),
+    ).called(1);
+  });
+
+  test('registerEmailOnly crea utente via OTP flow', () async {
+    final metadata = {'source': 'test'};
+
+    when(
+      () => auth.signInWithOtp(
+        email: 'new@example.com',
+        emailRedirectTo: 'app://redirect',
+        data: metadata,
+        shouldCreateUser: true,
+        captchaToken: null,
+        channel: OtpChannel.sms,
+      ),
+    ).thenAnswer((_) async {});
+
+    await service.registerEmailOnly(
+      'new@example.com',
+      data: metadata,
+      redirectUrl: 'app://redirect',
+    );
+
+    verify(
+      () => auth.signInWithOtp(
+        email: 'new@example.com',
+        emailRedirectTo: 'app://redirect',
+        data: metadata,
+        shouldCreateUser: true,
+        captchaToken: null,
+        channel: OtpChannel.sms,
+      ),
+    ).called(1);
   });
 }

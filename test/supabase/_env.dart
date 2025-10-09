@@ -17,8 +17,8 @@ String _fromDefines(String key) {
           defaultValue: '');
     case 'TEST_EMAIL':
       return const String.fromEnvironment('TEST_EMAIL', defaultValue: '');
-    case 'TEST_PASSWORD':
-      return const String.fromEnvironment('TEST_PASSWORD', defaultValue: '');
+    case 'TEST_BEARER_TOKEN':
+      return const String.fromEnvironment('TEST_BEARER_TOKEN', defaultValue: '');
     case 'TEST_IMAGE_URL':
       return const String.fromEnvironment('TEST_IMAGE_URL', defaultValue: '');
     default:
