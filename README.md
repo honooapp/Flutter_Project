@@ -55,3 +55,10 @@ flutter run -d chrome \
 ```
 
 Se l’app parte senza l’errore “Unsupported operation: Platform.environment”, il fix è applicato correttamente.
+
+## Auth: Passwordless policy
+
+- Password disabilitate: accesso e registrazione solo via magic link/OTP.
+- UI reset password rimossa/nascosta in modalità passwordless.
+- Script `tool/guard_no_password_flows.sh` blinda il repo da regressioni.
+- Edge Function opzionale `otp-proxy` con rate limit per email/IP (richiede `SUPABASE_SERVICE_ROLE_KEY` lato server, non esporlo ai client).
