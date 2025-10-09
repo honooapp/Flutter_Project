@@ -151,10 +151,12 @@ class SupabaseTestHarness {
   void enableOverrides() {
     SupabaseProvider.overrideForTests(client);
     HonooService.$setTestClient(client);
+    HonooService.$clearCacheForTests();
   }
 
   void disableOverrides() {
     SupabaseProvider.overrideForTests(null);
+    HonooService.$clearCacheForTests();
     HonooService.$setTestClient(null);
   }
 
@@ -167,6 +169,7 @@ class SupabaseTestHarness {
     when(() => chain.order(any(), ascending: any(named: 'ascending')))
         .thenAnswer((_) => chain);
     when(() => chain.limit(any())).thenAnswer((_) => chain);
+    when(() => chain.lt(any(), any())).thenAnswer((_) => chain);
     when(() => chain.or(any())).thenAnswer((_) => chain);
     when(() => chain.in_(any(), any())).thenAnswer((_) => chain);
     when(() => chain.delete()).thenAnswer((_) => chain);

@@ -1,3 +1,4 @@
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -8,6 +9,7 @@ import '../Controller/honoo_controller.dart';
 import '../Controller/hinoo_controller.dart';
 import '../Entities/honoo.dart';
 import '../Entities/hinoo.dart';
+import 'package:honoo/Services/hinoo_service.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import '../UI/honoo_thread_view.dart';
 import '../UI/hinoo_viewer.dart';
@@ -32,7 +34,6 @@ class ChestPage extends StatefulWidget {
 }
 
 class _ChestPageState extends State<ChestPage> {
-  final _pageCtrl = PageController();
   final HonooController ctrl = HonooController();
   final HinooController _hinooController = HinooController();
 
@@ -40,6 +41,10 @@ class _ChestPageState extends State<ChestPage> {
   List<_ChestItem> _items = const [];
   List<_HinooRow> _hinoo = const [];
   bool _isHinooLoading = true;
+  bool _hinooHasMore = true;
+  DateTime? _lastHinooCreatedAt;
+  bool _isPrefetching = false;
+  final Set<String> _hinooIds = <String>{};
 
   void _goHome() {
     Navigator.of(context).pushAndRemoveUntil(
@@ -51,72 +56,163 @@ class _ChestPageState extends State<ChestPage> {
   @override
   void initState() {
     super.initState();
-    ctrl.loadChest(); // carica HONOO dallo scrigno (DB)
-    _loadHinoo(); // carica HINOO dallo scrigno (DB)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _bootstrap();
+    });
   }
 
   @override
   void dispose() {
-    _pageCtrl.dispose();
     super.dispose();
   }
 
-  Future<void> _loadHinoo() async {
+  Future<void> _bootstrap() async {
+    try {
+      await Future.wait([
+        ctrl.loadChest(refresh: true),
+        _loadHinoo(refresh: true),
+      ]);
+    } finally {
+      if (mounted) {
+        setState(() {});
+        unawaited(_maybePrefetch(_currentIndex));
+      }
+    }
+  }
+
+  Future<void> _loadHinoo({bool refresh = false}) async {
     final uid = SupabaseProvider.client.auth.currentUser?.id;
     if (uid == null) {
-      setState(() {
-        _isHinooLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _hinoo = const [];
+          _hinooIds.clear();
+          _hinooHasMore = false;
+          _isHinooLoading = false;
+        });
+      }
       return;
     }
-    setState(() {
-      _isHinooLoading = true;
-    });
-    try {
-      final client = SupabaseProvider.client;
-      final rows = await client
-          .from('hinoo')
-          .select('id,pages,type,recipient_tag,created_at')
-          .eq('user_id', uid)
-          .eq('type', 'personal')
-          .order('created_at', ascending: false);
 
-      final list = <_HinooRow>[];
-      for (final r in (rows as List)) {
-        final pages = r['pages'];
-        if (pages is List) {
-          final draft = HinooDraft(
-            pages: pages
-                .whereType<Map<String, dynamic>>()
-                .map((e) => HinooSlide.fromJson(e))
-                .toList(),
-            type: HinooType.personal,
-            recipientTag: r['recipient_tag'] as String?,
-          );
-          final created =
-              DateTime.tryParse((r['created_at'] ?? '').toString()) ??
-                  DateTime.now();
-          final dynamic rawId = r['id'];
-          final String? id = rawId?.toString();
-          if (id != null && id.isNotEmpty) {
-            list.add(_HinooRow(id: id, draft: draft, createdAt: created));
-          }
+    if (refresh) {
+      _hinoo = const [];
+      _hinooIds.clear();
+      _hinooHasMore = true;
+      _lastHinooCreatedAt = null;
+    }
+
+    if (!_hinooHasMore) {
+      return;
+    }
+
+    final bool showLoader = refresh || _hinoo.isEmpty;
+    if (showLoader && mounted) {
+      setState(() {
+        _isHinooLoading = true;
+      });
+    }
+
+    try {
+      final rows = await HinooService.fetchHinooEntries(
+        type: HinooType.personal,
+        userId: uid,
+        limit: HinooService.defaultPageSize,
+        before: refresh ? null : _lastHinooCreatedAt,
+      );
+
+      if (rows.length < HinooService.defaultPageSize) {
+        _hinooHasMore = false;
+      }
+
+      final List<_HinooRow> newRows = [];
+
+      for (final row in rows) {
+        final dynamic rawId = row['id'];
+        final String? id = rawId?.toString();
+        if (id == null || id.isEmpty) continue;
+        if (!_hinooIds.add(id)) continue;
+
+        final pages = row['pages'];
+        if (pages is! List) continue;
+
+        final draft = HinooDraft(
+          pages: pages
+              .whereType<Map<String, dynamic>>()
+              .map(HinooSlide.fromJson)
+              .toList(),
+          type: HinooType.personal,
+          recipientTag: row['recipient_tag'] as String?,
+        );
+
+        final created =
+            DateTime.tryParse((row['created_at'] ?? '').toString()) ??
+                DateTime.now();
+
+        newRows.add(_HinooRow(id: id, draft: draft, createdAt: created));
+      }
+
+      if (newRows.isNotEmpty) {
+        final oldest = newRows
+            .map((r) => r.createdAt)
+            .reduce((a, b) => a.isBefore(b) ? a : b);
+        if (_lastHinooCreatedAt == null ||
+            oldest.isBefore(_lastHinooCreatedAt!)) {
+          _lastHinooCreatedAt = oldest;
         }
       }
 
-      if (!mounted) return;
-      setState(() {
-        _hinoo = list;
-        _isHinooLoading = false;
-        _rebuildItems();
-      });
-    } catch (_) {
-      // ignora errori silenziosamente per ora
       if (mounted) {
+        setState(() {
+          if (refresh) {
+            _hinoo = newRows;
+          } else if (newRows.isNotEmpty) {
+            _hinoo = [..._hinoo, ...newRows];
+          }
+          _rebuildItems();
+        });
+      }
+    } catch (e) {
+      debugPrint('loadHinoo error: $e');
+    } finally {
+      if (showLoader && mounted) {
         setState(() {
           _isHinooLoading = false;
         });
       }
+    }
+  }
+
+  void _handlePageChanged(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+    unawaited(_maybePrefetch(index));
+  }
+
+  Future<void> _maybePrefetch(int index) async {
+    if (_isPrefetching) return;
+    const threshold = 3;
+    if (_items.length - index > threshold) return;
+    if (!ctrl.hasMore && !_hinooHasMore) return;
+
+    _isPrefetching = true;
+    try {
+      final futures = <Future<dynamic>>[];
+      if (ctrl.hasMore) {
+        futures.add(ctrl.loadMoreChest());
+      }
+      if (_hinooHasMore) {
+        futures.add(_loadHinoo());
+      }
+      if (futures.isEmpty) return;
+      await Future.wait(futures, eagerError: true);
+      if (mounted) {
+        setState(() {});
+      }
+    } catch (e) {
+      debugPrint('Chest prefetch error: $e');
+    } finally {
+      _isPrefetching = false;
     }
   }
 
@@ -445,6 +541,7 @@ class _ChestPageState extends State<ChestPage> {
       if (!mounted) return;
       setState(() {
         _hinoo = _hinoo.where((r) => r.id != current.id).toList();
+        _hinooIds.remove(current.id);
         _rebuildItems();
       });
       showHonooToast(
@@ -505,8 +602,7 @@ class _ChestPageState extends State<ChestPage> {
                               onTap: () {
                                 Navigator.of(context).pushAndRemoveUntil(
                                   MaterialPageRoute(
-                                      builder: (_) =>
-                                          const PlaceholderPage()),
+                                      builder: (_) => const PlaceholderPage()),
                                   (route) => false,
                                 );
                               },
@@ -576,8 +672,8 @@ class _ChestPageState extends State<ChestPage> {
                                             enlargeCenterPage: false,
                                             scrollPhysics:
                                                 const BouncingScrollPhysics(),
-                                            onPageChanged: (i, _) => setState(
-                                                () => _currentIndex = i),
+                                            onPageChanged: (i, _) =>
+                                                _handlePageChanged(i),
                                           ),
                                           itemBuilder:
                                               (context, index, realIdx) {

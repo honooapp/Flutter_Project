@@ -14,52 +14,73 @@ class HonooController {
   final ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
   final ValueNotifier<int> version = ValueNotifier<int>(0);
 
+  DateTime? _oldestCreatedAt;
+  bool _hasMore = true;
+  bool _isFetching = false;
+
   String get _uid => SupabaseProvider.client.auth.currentUser!.id;
 
   List<Honoo> get personal => List.unmodifiable(_personal);
+  bool get hasMore => _hasMore;
+  bool get isFetchingMore => _isFetching;
+  DateTime? get oldestCreatedAt => _oldestCreatedAt;
 
   /// Carica dallo scrigno (destination='chest') – niente mock
-  Future<void> loadChest() async {
-    isLoading.value = true;
+  Future<List<Honoo>> loadChest({bool refresh = false}) async {
+    if (_isFetching) return const [];
+
+    if (refresh) {
+      _personal.clear();
+      _oldestCreatedAt = null;
+      _hasMore = true;
+    }
+
+    if (!_hasMore) {
+      return const [];
+    }
+
+    final bool showLoader = refresh || _personal.isEmpty;
+    if (showLoader) {
+      isLoading.value = true;
+    }
+
+    _isFetching = true;
     try {
-      final chest = await HonooService.fetchUserHonoo(_uid, 'chest');
+      final fetched = await HonooService.fetchUserHonoo(
+        _uid,
+        'chest',
+        limit: HonooService.defaultPageSize,
+        before: refresh ? null : _oldestCreatedAt,
+      );
 
-      // Popola cache iniziale
-      _personal
-        ..clear()
-        ..addAll(chest);
+      final newItems = _mergeNewHonoo(fetched);
 
-      // === Calcolo hasReplies con una query IN (...) su reply_to ===
-      // prendo tutti gli uuid (dbId) disponibili
-      final ids = _personal.map((h) => h.dbId).whereType<String>().toList();
-      if (ids.isNotEmpty) {
-        final client = SupabaseProvider.client;
-        final rows =
-            await client.from('honoo').select('reply_to').in_('reply_to', ids);
+      await _syncRepliesForIds(
+        refresh
+            ? _personal.map((h) => h.dbId).whereType<String>()
+            : newItems.map((h) => h.dbId).whereType<String>(),
+        updateAll: refresh,
+      );
 
-        // reply_to presenti → esistono risposte
-        final repliedParents = <String>{};
-        for (final row in (rows as List)) {
-          final p = row['reply_to']?.toString();
-          if (p != null) repliedParents.add(p);
-        }
+      _updateOldestTimestamp();
+      _hasMore = fetched.length >= HonooService.defaultPageSize;
 
-        // marca i tuoi honoo personali che hanno risposte
-        for (var i = 0; i < _personal.length; i++) {
-          final h = _personal[i];
-          final has = h.dbId != null && repliedParents.contains(h.dbId);
-          if (has != h.hasReplies) {
-            _personal[i] = h.copyWith(hasReplies: has);
-          }
-        }
+      if (newItems.isNotEmpty || refresh) {
+        version.value++;
       }
 
-      // NB: isFromMoonSaved resta quello che arriva da DB (o false se non hai colonna)
-      version.value++;
+      return newItems;
     } finally {
-      isLoading.value = false;
+      _isFetching = false;
+      if (showLoader) {
+        isLoading.value = false;
+      }
     }
   }
+
+  Future<void> refreshChest() => loadChest(refresh: true);
+
+  Future<void> loadMoreChest() => loadChest();
 
   /// History (thread) per un honoo: include il padre e le sue reply
   Future<List<Honoo>> getHonooHistory(Honoo honoo) async {
@@ -108,13 +129,99 @@ class HonooController {
     try {
       final inserted = await HonooService.duplicateToChest(h);
       if (inserted) {
-        await loadChest();
+        await loadChest(refresh: true);
       }
       return inserted;
     } catch (e) {
       debugPrint('duplicateToChest error: $e');
       return false;
     }
+  }
+
+  List<Honoo> _mergeNewHonoo(List<Honoo> fetched) {
+    if (fetched.isEmpty) {
+      return const [];
+    }
+
+    final existingIds = {for (final h in _personal) _honooKey(h)};
+
+    final List<Honoo> newItems = [];
+    for (final honoo in fetched) {
+      final key = _honooKey(honoo);
+      if (existingIds.contains(key)) {
+        continue;
+      }
+      newItems.add(honoo);
+      existingIds.add(key);
+      _personal.add(honoo);
+    }
+
+    _personal.sort((a, b) {
+      final aDate = DateTime.tryParse(a.createdAt);
+      final bDate = DateTime.tryParse(b.createdAt);
+      if (aDate != null && bDate != null) {
+        return bDate.compareTo(aDate);
+      }
+      return b.createdAt.compareTo(a.createdAt);
+    });
+
+    return newItems;
+  }
+
+  Future<void> _syncRepliesForIds(
+    Iterable<String> ids, {
+    required bool updateAll,
+  }) async {
+    final targetIds = updateAll
+        ? _personal.map((h) => h.dbId).whereType<String>().toSet()
+        : ids.where((id) => id.isNotEmpty).toSet();
+    if (targetIds.isEmpty) return;
+
+    final client = SupabaseProvider.client;
+    final rows = await client
+        .from('honoo')
+        .select('reply_to')
+        .in_('reply_to', targetIds.toList());
+
+    final repliedParents = <String>{};
+    for (final row in (rows as List)) {
+      final parent = row['reply_to']?.toString();
+      if (parent != null) {
+        repliedParents.add(parent);
+      }
+    }
+
+    for (var i = 0; i < _personal.length; i++) {
+      final honoo = _personal[i];
+      final dbId = honoo.dbId;
+      if (dbId == null || dbId.isEmpty) continue;
+      if (!updateAll && !targetIds.contains(dbId)) {
+        continue;
+      }
+      final has = repliedParents.contains(dbId);
+      if (has != honoo.hasReplies) {
+        _personal[i] = honoo.copyWith(hasReplies: has);
+      }
+    }
+  }
+
+  void _updateOldestTimestamp() {
+    DateTime? oldest;
+    for (final honoo in _personal) {
+      final created = DateTime.tryParse(honoo.createdAt);
+      if (created == null) continue;
+      if (oldest == null || created.isBefore(oldest)) {
+        oldest = created;
+      }
+    }
+    _oldestCreatedAt = oldest;
+  }
+
+  String _honooKey(Honoo honoo) {
+    if (honoo.dbId != null && honoo.dbId!.isNotEmpty) {
+      return honoo.dbId!;
+    }
+    return '${honoo.id}_${honoo.createdAt}_${honoo.text.hashCode}';
   }
 
   Future<void> deleteHonoo(Honoo h) async {

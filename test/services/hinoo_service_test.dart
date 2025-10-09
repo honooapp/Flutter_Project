@@ -52,6 +52,7 @@ void main() {
     when(() => chain.order(any(), ascending: any(named: 'ascending')))
         .thenAnswer((_) => chain);
     when(() => chain.limit(any())).thenAnswer((_) => chain);
+    when(() => chain.lt(any(), any())).thenAnswer((_) => chain);
 
     when(() => chain.maybeSingle()).thenAnswer((_) => chain);
   });
@@ -106,10 +107,12 @@ void main() {
     expect(list.first.pages.first.text, 'ciao');
 
     verify(() => client.from('hinoo')).called(1);
-    verify(() => chain.select('pages,type,recipient_tag,created_at')).called(1);
+    verify(() => chain.select('id,pages,type,recipient_tag,created_at'))
+        .called(1);
     verify(() => chain.eq('user_id', 'u1')).called(1);
     verify(() => chain.eq('type', 'personal')).called(1);
     verify(() => chain.order('created_at', ascending: false)).called(1);
+    verify(() => chain.limit(HinooService.defaultPageSize)).called(1);
   });
 
   test('fetchUserHinoo: type=moon → filtra "moon" e ordina DESC', () async {
@@ -135,5 +138,6 @@ void main() {
     verify(() => chain.eq('user_id', 'u2')).called(1);
     verify(() => chain.eq('type', 'moon')).called(1);
     verify(() => chain.order('created_at', ascending: false)).called(1);
+    verify(() => chain.limit(HinooService.defaultPageSize)).called(1);
   });
 }

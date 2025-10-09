@@ -44,6 +44,7 @@ void main() {
     client = _MockSupabaseClient();
     chain = _MockQueryChain();
 
+    HonooService.$clearCacheForTests();
     HonooService.$setTestClient(client);
     when(() => client.from('honoo')).thenAnswer((_) => chain);
 
@@ -52,9 +53,12 @@ void main() {
     when(() => chain.eq(any(), any())).thenAnswer((_) => chain);
     when(() => chain.order(any(), ascending: any(named: 'ascending')))
         .thenAnswer((_) => chain);
+    when(() => chain.limit(any())).thenAnswer((_) => chain);
+    when(() => chain.lt(any(), any())).thenAnswer((_) => chain);
   });
 
   tearDown(() {
+    HonooService.$clearCacheForTests();
     HonooService.$setTestClient(null);
     resetMocktailState();
   });
@@ -90,7 +94,13 @@ void main() {
     expect(list.first.dbId, '2');
 
     verify(() => client.from('honoo')).called(1);
-    verify(() => chain.select('*')).called(1);
+    final captured =
+        verify(() => chain.select(captureAny())).captured.single as String;
+    expect(
+      captured,
+      'id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id,is_from_moon_saved,has_replies',
+    );
+    verify(() => chain.limit(HonooService.defaultPageSize)).called(1);
     verify(() => chain.eq('destination', 'moon')).called(1);
     verify(() => chain.order('created_at', ascending: false)).called(1);
   });

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:honoo/IsolaDelleStorie/Controller/exercise_controller.dart';
 import 'package:sizer/sizer.dart';
@@ -5,11 +7,23 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'Pages/auth_gate.dart';
 import 'Pages/chest_page.dart';
+import 'Services/telemetry_service.dart';
 import 'Utility/honoo_colors.dart';
+import 'env/env.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+
+  TelemetryService.configure(
+    supabaseTable: readEnv('SUPABASE_METRICS_TABLE'),
+    sentryDsn: readEnv('SENTRY_DSN'),
+  );
+
+  runZonedGuarded(() {
+    runApp(const MyApp());
+  }, (error, stack) {
+    TelemetryService.recordError(error, stack);
+  });
 }
 
 class MyApp extends StatefulWidget {
@@ -32,14 +46,28 @@ class _MyAppState extends State<MyApp> {
   Future<void> _bootstrapAsync() async {
     if (_initStarted) return;
     _initStarted = true;
+    final stopwatch = Stopwatch()..start();
 
-    await Supabase.initialize(
-      url: 'https://mulardcrjecwmohlheuz.supabase.co',
-      anonKey:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11bGFyZGNyamVjd21vaGxoZXV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MDgxNDYsImV4cCI6MjA2OTM4NDE0Nn0.wt0CJD8XHkGoX2qLlmQgwG6RHLUfxx6JKO9EMnpTAsc',
-    );
-
-    ExerciseController().init();
+    try {
+      await Supabase.initialize(
+        url: 'https://mulardcrjecwmohlheuz.supabase.co',
+        anonKey:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11bGFyZGNyamVjd21vaGxoZXV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MDgxNDYsImV4cCI6MjA2OTM4NDE0Nn0.wt0CJD8XHkGoX2qLlmQgwG6RHLUfxx6JKO9EMnpTAsc',
+      );
+      ExerciseController().init();
+      unawaited(TelemetryService.recordFetch(
+        'supabase_bootstrap',
+        duration: stopwatch.elapsed,
+        extra: {'status': 'ok'},
+      ));
+    } catch (error, stack) {
+      TelemetryService.recordError(
+        error,
+        stack,
+        category: 'supabase_init',
+      );
+      rethrow;
+    }
 
     if (!mounted) return;
     setState(() {

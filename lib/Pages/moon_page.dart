@@ -1,9 +1,10 @@
+import 'dart:async';
+
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
-import 'package:honoo/Services/supabase_provider.dart';
 
 import '../Entities/hinoo.dart';
 import '../Entities/honoo.dart';
@@ -11,6 +12,7 @@ import 'chest_page.dart';
 import 'coming_soon_page.dart';
 import 'home_page.dart';
 import '../Services/honoo_service.dart';
+import '../Services/hinoo_service.dart';
 import '../UI/hinoo_viewer.dart';
 import '../UI/honoo_thread_view.dart';
 import '../Utility/honoo_colors.dart';
@@ -31,55 +33,51 @@ class MoonPage extends StatefulWidget {
 class _MoonPageState extends State<MoonPage> {
   bool _isLoading = true;
   List<_MoonItem> _items = [];
+  int _currentIndex = 0;
+  bool _honooHasMore = true;
+  bool _hinooHasMore = true;
+  DateTime? _oldestHonoo;
+  DateTime? _oldestHinoo;
+  bool _isPrefetching = false;
+  final Set<String> _honooIds = <String>{};
+  final Set<String> _hinooIds = <String>{};
 
   @override
   void initState() {
     super.initState();
-    _loadMoonContent();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadMoonContent(refresh: true);
+    });
   }
 
-  Future<void> _loadMoonContent() async {
+  Future<void> _loadMoonContent({bool refresh = false}) async {
+    if (refresh) {
+      _resetPagination();
+    }
+
+    if (refresh) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
+
     try {
-      final honoo = await HonooService.fetchPublicHonoo();
+      final results = await Future.wait([
+        _fetchHonooPage(refresh: true),
+        _fetchHinooPage(refresh: true),
+      ]);
 
-      final rows = await SupabaseProvider.client
-          .from('hinoo')
-          .select('pages,recipient_tag,created_at')
-          .eq('type', 'moon')
-          .order('created_at', ascending: false);
+      if (!mounted) return;
 
-      final List<_MoonItem> items = [];
-
-      for (final h in honoo) {
-        final created = DateTime.tryParse(h.createdAt) ??
-            DateTime.fromMillisecondsSinceEpoch(0);
-        items.add(_MoonItem.honoo(h, created));
-      }
-
-      for (final row in (rows as List)) {
-        final pages = row['pages'];
-        if (pages is List) {
-          final draft = HinooDraft(
-            pages: pages
-                .whereType<Map<String, dynamic>>()
-                .map(HinooSlide.fromJson)
-                .toList(),
-            type: HinooType.moon,
-            recipientTag: row['recipient_tag'] as String?,
-          );
-          final created =
-              DateTime.tryParse((row['created_at'] ?? '').toString()) ??
-                  DateTime.fromMillisecondsSinceEpoch(0);
-          items.add(_MoonItem.hinoo(draft, created));
-        }
-      }
-
-      items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      final combined = <_MoonItem>[...results[0], ...results[1]]
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
       setState(() {
-        _items = items;
+        _items = combined;
         _isLoading = false;
       });
+
+      unawaited(_maybePrefetch(_currentIndex));
     } catch (e) {
       debugPrint('Errore caricamento Moon: $e');
       if (mounted) {
@@ -87,9 +85,144 @@ class _MoonPageState extends State<MoonPage> {
           context,
           message: 'Errore caricamento Moon: $e',
         );
+        setState(() => _isLoading = false);
       }
-      setState(() => _isLoading = false);
     }
+  }
+
+  void _resetPagination() {
+    _items = [];
+    _honooIds.clear();
+    _hinooIds.clear();
+    _honooHasMore = true;
+    _hinooHasMore = true;
+    _oldestHonoo = null;
+    _oldestHinoo = null;
+    _currentIndex = 0;
+  }
+
+  Future<List<_MoonItem>> _fetchHonooPage({required bool refresh}) async {
+    final list = await HonooService.fetchPublicHonoo(
+      limit: HonooService.defaultPageSize,
+      before: refresh ? null : _oldestHonoo,
+    );
+
+    if (list.length < HonooService.defaultPageSize) {
+      _honooHasMore = false;
+    }
+
+    final items = <_MoonItem>[];
+    for (final honoo in list) {
+      final key = _honooKey(honoo);
+      if (!_honooIds.add(key)) continue;
+      final created = DateTime.tryParse(honoo.createdAt) ??
+          DateTime.fromMillisecondsSinceEpoch(0);
+      if (_oldestHonoo == null || created.isBefore(_oldestHonoo!)) {
+        _oldestHonoo = created;
+      }
+      items.add(_MoonItem.honoo(honoo, created));
+    }
+    return items;
+  }
+
+  Future<List<_MoonItem>> _fetchHinooPage({required bool refresh}) async {
+    final rows = await HinooService.fetchHinooEntries(
+      type: HinooType.moon,
+      limit: HinooService.defaultPageSize,
+      before: refresh ? null : _oldestHinoo,
+    );
+
+    if (rows.length < HinooService.defaultPageSize) {
+      _hinooHasMore = false;
+    }
+
+    final items = <_MoonItem>[];
+    for (final row in rows) {
+      final dynamic rawId = row['id'];
+      final String? id = rawId?.toString();
+      if (id == null || id.isEmpty) continue;
+      if (!_hinooIds.add(id)) continue;
+
+      final pages = row['pages'];
+      if (pages is! List) continue;
+
+      final draft = HinooDraft(
+        pages: pages
+            .whereType<Map<String, dynamic>>()
+            .map(HinooSlide.fromJson)
+            .toList(),
+        type: HinooType.moon,
+        recipientTag: row['recipient_tag'] as String?,
+      );
+
+      final created = DateTime.tryParse((row['created_at'] ?? '').toString()) ??
+          DateTime.fromMillisecondsSinceEpoch(0);
+
+      if (_oldestHinoo == null || created.isBefore(_oldestHinoo!)) {
+        _oldestHinoo = created;
+      }
+
+      items.add(_MoonItem.hinoo(draft, created));
+    }
+    return items;
+  }
+
+  void _handlePageChanged(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+    unawaited(_maybePrefetch(index));
+  }
+
+  Future<void> _maybePrefetch(int index) async {
+    if (_isPrefetching) return;
+    const threshold = 3;
+    if (_items.length - index > threshold) return;
+    if (!_honooHasMore && !_hinooHasMore) return;
+
+    _isPrefetching = true;
+    try {
+      final futures = <Future<List<_MoonItem>>>[];
+      if (_honooHasMore) {
+        futures.add(_fetchHonooPage(refresh: false));
+      }
+      if (_hinooHasMore) {
+        futures.add(_fetchHinooPage(refresh: false));
+      }
+      if (futures.isEmpty) return;
+      final batches = await Future.wait(futures, eagerError: true);
+
+      var appended = false;
+      final merged = List<_MoonItem>.from(_items);
+      for (final batch in batches) {
+        if (batch.isEmpty) continue;
+        merged.addAll(batch);
+        appended = true;
+      }
+
+      if (appended) {
+        merged.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      }
+
+      if (mounted && (appended || !_honooHasMore || !_hinooHasMore)) {
+        setState(() {
+          if (appended) {
+            _items = merged;
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint('Moon prefetch error: $e');
+    } finally {
+      _isPrefetching = false;
+    }
+  }
+
+  String _honooKey(Honoo honoo) {
+    if (honoo.dbId != null && honoo.dbId!.isNotEmpty) {
+      return honoo.dbId!;
+    }
+    return '${honoo.id}_${honoo.createdAt}_${honoo.text.hashCode}';
   }
 
   @override
@@ -155,8 +288,7 @@ class _MoonPageState extends State<MoonPage> {
                         tooltip: 'Home',
                         onPressed: () {
                           Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (_) => const HomePage()),
+                            MaterialPageRoute(builder: (_) => const HomePage()),
                             (route) => false,
                           );
                         },
@@ -247,6 +379,7 @@ class _MoonPageState extends State<MoonPage> {
               padEnds: true,
               enlargeCenterPage: false,
               scrollPhysics: const BouncingScrollPhysics(),
+              onPageChanged: (index, _) => _handlePageChanged(index),
             ),
             itemBuilder: (context, index, realIndex) {
               final item = _items[index];

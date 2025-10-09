@@ -1,10 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../Entities/hinoo.dart';
+import 'telemetry_service.dart';
 
 class HinooService {
   static const String _table = 'hinoo';
+  static const int defaultPageSize = 20;
 
   // Iniezione client per i test
   static SupabaseClient? _testClient;
@@ -167,21 +172,18 @@ class HinooService {
 
   /// Carica gli Hinoo personali dell'utente (dallo scrigno)
   static Future<List<HinooDraft>> fetchUserHinoo(String userId,
-      {HinooType type = HinooType.personal}) async {
-    final typeStr = _toDbType(type);
-    final baseQuery = _client
-        .from(_table)
-        .select('pages,type,recipient_tag,created_at')
-        .eq('user_id', userId);
-
-    final filteredQuery = type == HinooType.moon
-        ? baseQuery.eq('type', 'moon')
-        : baseQuery.eq('type', typeStr);
-
-    final rows = await filteredQuery.order('created_at', ascending: false);
+      {HinooType type = HinooType.personal,
+      int limit = defaultPageSize,
+      DateTime? before}) async {
+    final rows = await fetchHinooEntries(
+      type: type,
+      userId: userId,
+      limit: limit,
+      before: before,
+    );
 
     final List<HinooDraft> list = [];
-    for (final r in (rows as List)) {
+    for (final r in rows) {
       final pages = r['pages'];
       final String? recipient = r['recipient_tag'] as String?;
       if (pages is List) {
@@ -197,6 +199,48 @@ class HinooService {
         );
       }
     }
+    return list;
+  }
+
+  static Future<List<Map<String, dynamic>>> fetchHinooEntries({
+    required HinooType type,
+    String? userId,
+    int limit = defaultPageSize,
+    DateTime? before,
+  }) async {
+    final stopwatch = Stopwatch()..start();
+
+    var query = _client
+        .from(_table)
+        .select('id,pages,type,recipient_tag,created_at')
+        .eq('type', _toDbType(type));
+
+    if (userId != null) {
+      query = query.eq('user_id', userId);
+    }
+
+    if (before != null) {
+      query = query.lt('created_at', before.toUtc().toIso8601String());
+    }
+
+    final rows = await query
+        .order('created_at', ascending: false)
+        .limit(limit);
+    final list = (rows is List)
+        ? rows.whereType<Map<String, dynamic>>().toList(growable: false)
+        : const <Map<String, dynamic>>[];
+
+    unawaited(TelemetryService.recordFetch(
+      'hinoo_${type.name}',
+      duration: stopwatch.elapsed,
+      count: list.length,
+      extra: {
+        if (userId != null) 'user_id': userId,
+        'limit': limit,
+        'before': before?.toUtc().toIso8601String(),
+      },
+    ));
+
     return list;
   }
 }

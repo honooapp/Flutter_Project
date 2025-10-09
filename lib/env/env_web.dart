@@ -7,6 +7,9 @@ const _supabaseUrlDefine =
     String.fromEnvironment('SUPABASE_URL', defaultValue: '');
 const _supabaseAnonKeyDefine =
     String.fromEnvironment('SUPABASE_ANON_KEY', defaultValue: '');
+const _sentryDsnDefine = String.fromEnvironment('SENTRY_DSN', defaultValue: '');
+const _supabaseMetricsTableDefine =
+    String.fromEnvironment('SUPABASE_METRICS_TABLE', defaultValue: '');
 
 // Interfaccia compatibile con il resto dell'app.
 String readEnv(String key, {String fallback = ''}) {
@@ -14,9 +17,13 @@ String readEnv(String key, {String fallback = ''}) {
     case 'SUPABASE_URL':
       return _supabaseUrlDefine.isEmpty ? fallback : _supabaseUrlDefine;
     case 'SUPABASE_ANON_KEY':
-      return _supabaseAnonKeyDefine.isEmpty
+      return _supabaseAnonKeyDefine.isEmpty ? fallback : _supabaseAnonKeyDefine;
+    case 'SENTRY_DSN':
+      return _sentryDsnDefine.isEmpty ? fallback : _sentryDsnDefine;
+    case 'SUPABASE_METRICS_TABLE':
+      return _supabaseMetricsTableDefine.isEmpty
           ? fallback
-          : _supabaseAnonKeyDefine;
+          : _supabaseMetricsTableDefine;
     default:
       // Su Web gestiamo solo le chiavi note (aggiungine qui se ti servono altre define)
       return fallback;
