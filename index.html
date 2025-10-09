@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Apri gli occhi: c’è l’Isola davanti a te.">
+
+  <!-- ✅ Tema colore per Chrome, Android, ecc. -->
+  <meta name="theme-color" content="#0175C2">
+
+  <!-- ✅ PWA manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Favicon principale -->
+  <link rel="icon" href="favicon.ico">
+
+  <!-- Fallback per browser moderni (opzionale) -->
+  <link rel="icon" type="image/png" href="icons/honoo_icon-48.png">
+
+  <!-- ✅ Icona per dispositivi Apple -->
+  <link rel="apple-touch-icon" href="icons/honoo_icon-192.png">
+
+  <!-- iOS meta tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="honoo">
+
+  <title>honoo</title>
+
+  <!-- Sentry browser SDK & helpers -->
+  <script
+    src="https://browser.sentry-cdn.com/7.120.0/bundle.tracing.replay.min.js"
+    crossorigin="anonymous"></script>
+  <script>
+    window.__honooSentryInitialized = false;
+    window.honooInitSentry = function (dsn) {
+      if (!dsn || typeof dsn !== 'string') {
+        return;
+      }
+      if (!window.Sentry) {
+        console.warn('[honoo] Sentry SDK non caricato');
+        return;
+      }
+      if (window.__honooSentryInitialized) {
+        return;
+      }
+      window.Sentry.init({
+        dsn: dsn,
+        tracesSampleRate: 0.2,
+        replaysSessionSampleRate: 0.0,
+        replaysOnErrorSampleRate: 0.1,
+      });
+      window.__honooSentryInitialized = true;
+    };
+
+    window.honooCaptureException = function (payload) {
+      if (!window.Sentry || !payload) {
+        return;
+      }
+      const message = typeof payload.error === 'string'
+        ? payload.error
+        : 'Unhandled error';
+      const error = new Error(message);
+      if (payload.stack && typeof payload.stack === 'string') {
+        error.stack = payload.stack;
+      }
+      window.Sentry.captureException(error, {
+        extra: (payload.context && typeof payload.context === 'object')
+          ? payload.context
+          : {},
+      });
+    };
+
+    window.honooAddBreadcrumb = function (category, message, data) {
+      if (!window.Sentry) {
+        return;
+      }
+      window.Sentry.addBreadcrumb({
+        category: category || 'app',
+        message: message || '',
+        data: data || {},
+      });
+    };
+  </script>
+
+  <script>
+    // The value below is injected by flutter build, do not touch.
+    var serviceWorkerVersion = "2328238697";
+  </script>
+  <script src="flutter.js" defer></script>
+</head>
+<body>
+<script>
+  window.addEventListener('load', function(ev) {
+    _flutter.loader.loadEntrypoint({
+      serviceWorker: {
+        serviceWorkerVersion: serviceWorkerVersion,
+      },
+      onEntrypointLoaded: function(engineInitializer) {
+        engineInitializer.initializeEngine().then(function(appRunner) {
+          appRunner.runApp();
+        });
+      }
+    });
+  });
+</script>
+</body>
+</html>
