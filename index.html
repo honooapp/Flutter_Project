@@ -30,65 +30,9 @@
 
   <title>honoo</title>
 
-  <!-- Sentry browser SDK & helpers -->
-  <script
-    src="https://browser.sentry-cdn.com/7.120.0/bundle.tracing.replay.min.js"
-    crossorigin="anonymous"></script>
-  <script>
-    window.__honooSentryInitialized = false;
-    window.honooInitSentry = function (dsn) {
-      if (!dsn || typeof dsn !== 'string') {
-        return;
-      }
-      if (!window.Sentry) {
-        console.warn('[honoo] Sentry SDK non caricato');
-        return;
-      }
-      if (window.__honooSentryInitialized) {
-        return;
-      }
-      window.Sentry.init({
-        dsn: dsn,
-        tracesSampleRate: 0.2,
-        replaysSessionSampleRate: 0.0,
-        replaysOnErrorSampleRate: 0.1,
-      });
-      window.__honooSentryInitialized = true;
-    };
-
-    window.honooCaptureException = function (payload) {
-      if (!window.Sentry || !payload) {
-        return;
-      }
-      const message = typeof payload.error === 'string'
-        ? payload.error
-        : 'Unhandled error';
-      const error = new Error(message);
-      if (payload.stack && typeof payload.stack === 'string') {
-        error.stack = payload.stack;
-      }
-      window.Sentry.captureException(error, {
-        extra: (payload.context && typeof payload.context === 'object')
-          ? payload.context
-          : {},
-      });
-    };
-
-    window.honooAddBreadcrumb = function (category, message, data) {
-      if (!window.Sentry) {
-        return;
-      }
-      window.Sentry.addBreadcrumb({
-        category: category || 'app',
-        message: message || '',
-        data: data || {},
-      });
-    };
-  </script>
-
   <script>
     // The value below is injected by flutter build, do not touch.
-    var serviceWorkerVersion = "2328238697";
+    var serviceWorkerVersion = "2258050990";
   </script>
   <script src="flutter.js" defer></script>
 </head>
