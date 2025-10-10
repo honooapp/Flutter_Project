@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:honoo/Pages/email_login_page.dart';
 import 'package:honoo/Pages/moon_page.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 
 class LunaFissa extends StatelessWidget {
   const LunaFissa({super.key});
@@ -51,9 +53,21 @@ class LunaFissa extends StatelessWidget {
             splashRadius: (iconSize / 2) + 6,
             tooltip: 'Vai sulla Luna',
             onPressed: () {
+              final user = SupabaseProvider.client.auth.currentUser;
+              if (user == null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const EmailLoginPage(),
+                  ),
+                );
+                return;
+              }
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const MoonPage()),
+                MaterialPageRoute(
+                  builder: (context) => const MoonPage(),
+                ),
               );
             },
           ),
