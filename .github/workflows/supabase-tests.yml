@@ -16,10 +16,10 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Flutter (stable)
+      - name: Setup Flutter 3.10.0
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: '3.10.0'
       - name: Flutter pub get
         run: flutter pub get
       - name: Analyze
@@ -40,10 +40,10 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Flutter (stable)
+      - name: Setup Flutter 3.10.0
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: '3.10.0'
       - name: Flutter pub get
         run: flutter pub get
       - name: Run CRUD tests (ENABLE_WRITE_TESTS=1)
@@ -61,10 +61,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Flutter (stable)
+      - name: Setup Flutter 3.10.0
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: '3.10.0'
       - name: Flutter pub get
         run: flutter pub get
       - name: Verify web-safe env access
