@@ -14,8 +14,6 @@ import 'package:honoo/Controller/hinoo_controller.dart';
 
 import '../UI/hinoo_builder.dart';
 import '../Widgets/white_icon_button.dart';
-// IMPORT del tuo widget thumbnails esterno
-import 'package:honoo/UI/HinooBuilder/thumbnails/hinoo_thumbnails.dart';
 
 import 'chest_page.dart';
 import 'email_login_page.dart';
@@ -37,15 +35,11 @@ class _NewHinooPageState extends State<NewHinooPage> {
   final _controller = HinooController();
   bool _savedToChest = false;
 
-  // Stato locale per collegare AnteprimaHinoo
-  List<dynamic> _pages = const [];
-  int _currentIndex = 0;
-  String? _globalBgUrl;
-  List<dynamic>? _globalBgTransform;
-  Uint8List? _globalBgPreviewBytes;
+  // Stato locale proveniente dal builder
   double _lastCanvasHeight = 0;
   String _builderStep = 'changeBg';
   int _currentTextLength = 0;
+  bool _bgUploadInProgress = false;
 
   bool get _isWriteStep => _builderStep == 'writeText';
   bool get _hasMinTextForDownload => _currentTextLength >= 1;
@@ -53,7 +47,6 @@ class _NewHinooPageState extends State<NewHinooPage> {
   // Costanti layout
   static const double _titleH = 52; // riga titolo
   static const double _controlsH = 44; // riga bottoni bianchi visibili
-  static const double _thumbsH = 140;
   static const double _footerH = 100.0; // riserva spazio per la navbar
 
   @override
@@ -79,22 +72,6 @@ class _NewHinooPageState extends State<NewHinooPage> {
   void _applyDraftToLocalState(dynamic draft) {
     if (draft is! Map) return;
 
-    final dynamic p = draft['pages'];
-    if (p is List) _pages = p;
-
-    final dynamic idx = draft['currentIndex'];
-    if (idx is int) {
-      final int max = _pages.isEmpty ? 0 : _pages.length - 1;
-      _currentIndex = idx.clamp(0, max);
-    } else if (_currentIndex >= _pages.length) {
-      _currentIndex = _pages.isEmpty ? 0 : _pages.length - 1;
-    }
-
-    _globalBgUrl = draft['bgUrl'] as String?;
-    final dynamic tr = draft['bgTransform'];
-    _globalBgTransform = (tr is List) ? tr : null;
-    final dynamic bytes = draft['bgPreviewBytes'];
-    _globalBgPreviewBytes = (bytes is Uint8List) ? bytes : null;
     final dynamic ch = draft['canvasHeight'];
     if (ch is num) _lastCanvasHeight = ch.toDouble();
 
@@ -102,6 +79,8 @@ class _NewHinooPageState extends State<NewHinooPage> {
     if (rawStep is String && rawStep.isNotEmpty) {
       _builderStep = rawStep;
     }
+
+    _bgUploadInProgress = draft['isUploadingBg'] == true;
 
     int detectedLength = 0;
     final dynamic rawLength = draft['textLength'];
@@ -132,23 +111,12 @@ class _NewHinooPageState extends State<NewHinooPage> {
       if (!mounted) return;
       showHonooToast(
         context,
-        message: 'Crea almeno una schermata 9:16 con sfondo e testo.',
+        message: 'Completa il tuo hinoo caricando l’immagine e il testo.',
       );
       return;
     }
 
-    // Converte il draft grezzo del builder nel modello HinooDraft (Entities/hinoo.dart)
     final HinooDraft hinooDraft = _convertRawBuilderDraft(rawDraft);
-    final validationErrors = _controller.validateDraft(hinooDraft);
-    if (validationErrors.isNotEmpty) {
-      if (!mounted) return;
-      final errorText = 'Bozza non valida:\n- ${validationErrors.join('\n- ')}';
-      showHonooToast(
-        context,
-        message: errorText,
-      );
-      return;
-    }
 
     final user = SupabaseProvider.client.auth.currentUser;
     if (user == null) {
@@ -163,15 +131,52 @@ class _NewHinooPageState extends State<NewHinooPage> {
           confirmLabel: 'Vai al login',
         ),
       );
-      if (goLogin != true || !mounted) return;
-      // Porta in login passando la bozza da salvare dopo l'accesso
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => EmailLoginPage(
-            pendingHinooDraft: hinooDraft.toJson(),
+      if (goLogin == true && mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => EmailLoginPage(
+              pendingHinooDraft: hinooDraft.toJson(),
+            ),
           ),
-        ),
+        );
+      }
+      return;
+    }
+
+    if (rawDraft['isUploadingBg'] == true || _bgUploadInProgress) {
+      if (!mounted) return;
+      showHonooToast(
+        context,
+        message: 'Attendi il caricamento dello sfondo prima di continuare.',
+      );
+      return;
+    }
+
+    // Converte il draft grezzo del builder nel modello HinooDraft (Entities/hinoo.dart)
+    final bool hasMissingBg = hinooDraft.pages
+        .any((slide) => (slide.backgroundImage == null ||
+            slide.backgroundImage!.isEmpty));
+    if (hasMissingBg) {
+      final bool hadLocalBg = (rawDraft['hasBg'] as bool?) ?? false;
+      final bool hadPreview = rawDraft['bgPreviewBytes'] != null;
+      if (hadLocalBg || hadPreview) {
+        if (!mounted) return;
+        showHonooToast(
+          context,
+          message:
+              'Non siamo riusciti a salvare lo sfondo. Riprova a caricare l\'immagine.',
+        );
+        return;
+      }
+    }
+    final validationErrors = _controller.validateDraft(hinooDraft);
+    if (validationErrors.isNotEmpty) {
+      if (!mounted) return;
+      final errorText = 'Bozza non valida:\n- ${validationErrors.join('\n- ')}';
+      showHonooToast(
+        context,
+        message: errorText,
       );
       return;
     }
@@ -344,33 +349,6 @@ class _NewHinooPageState extends State<NewHinooPage> {
     _triggerDownloadFromBuilder();
   }
 
-  void _goToFromBuilder(int index) {
-    final dyn = _builderKey.currentState as dynamic;
-    if (dyn?.goToPublic != null) {
-      dyn.goToPublic(index);
-    } else {
-      _warnMissingApi('onTapThumb → goToPublic');
-    }
-  }
-
-  void _addPageFromBuilder() {
-    final dyn = _builderKey.currentState as dynamic;
-    if (dyn?.addPagePublic != null) {
-      dyn.addPagePublic();
-    } else {
-      _warnMissingApi('onAddPage → addPagePublic');
-    }
-  }
-
-  void _reorderFromBuilder(int oldIndex, int newIndex) {
-    final dyn = _builderKey.currentState as dynamic;
-    if (dyn?.reorderPagesPublic != null) {
-      dyn.reorderPagesPublic(oldIndex, newIndex);
-    } else {
-      _warnMissingApi('onReorder → reorderPagesPublic');
-    }
-  }
-
   void _warnMissingApi(String what) {
     if (!mounted) return;
     showHonooToast(
@@ -401,8 +379,6 @@ class _NewHinooPageState extends State<NewHinooPage> {
                     contentTopPadding // spazio riservato per non coprire i bottoni
                     -
                     _controlsH // [Riga 2] bottoni bianchi visibili
-                    -
-                    _thumbsH // [Riga 4] thumbnails
                     -
                     _footerH // riserva fisica per la navbar/overlay
                 )
@@ -467,7 +443,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
                                 const SizedBox(width: 12),
                               ],
                               WhiteIconButton(
-                                tooltip: 'Elimina pagina',
+                                tooltip: 'Svuota hinoo',
                                 icon: Icons.delete_outline,
                                 onPressed: _deleteCurrentFromBuilder,
                               ),
@@ -491,7 +467,6 @@ class _NewHinooPageState extends State<NewHinooPage> {
                                 key: _builderKey,
                                 onHinooChanged: _onHinooChanged,
                                 onPngExported: _onPngExported,
-                                embedThumbnails: false,
                               ),
                             ),
                           ),
@@ -499,26 +474,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
                       ),
                     ),
 
-                    // [Riga 4] THUMBNAILS — usa il tuo widget esterno
-                    SizedBox(
-                      height: _thumbsH,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                        child: AnteprimaHinoo(
-                          pages: _pages,
-                          currentIndex: _currentIndex,
-                          onTapThumb: _goToFromBuilder,
-                          onAddPage: _addPageFromBuilder,
-                          onReorder: _reorderFromBuilder,
-                          canvasHeight: canvasH,
-                          fallbackBgUrl: _globalBgUrl,
-                          fallbackBgTransform: _globalBgTransform,
-                          fallbackBgBytes: _globalBgPreviewBytes,
-                        ),
-                      ),
-                    ),
-
-                    // [Riga 5] Spazio riservato per la navbar (overlay)
+                    // [Riga 4] Spazio riservato per la navbar (overlay)
                     const SizedBox(height: _footerH),
                   ],
                 ),

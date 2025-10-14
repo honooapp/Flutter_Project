@@ -6,6 +6,7 @@ class CambiaSfondoOverlay extends StatelessWidget {
     super.key,
     required this.onTapChange,
     this.showControls = false,
+    this.isUploading = false,
     this.currentScale = 1.0,
     this.minScale = 1.0,
     this.maxScale = 5.0,
@@ -17,6 +18,7 @@ class CambiaSfondoOverlay extends StatelessWidget {
 
   final VoidCallback onTapChange;
   final bool showControls;
+  final bool isUploading;
   final double currentScale;
   final double minScale;
   final double maxScale;
@@ -39,7 +41,7 @@ class CambiaSfondoOverlay extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              'Cambia lo sfondo del tuo hinoo',
+              'Carica prima la tua immagine, e poi scrivi il tuo testo',
               textAlign: TextAlign.center,
               style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
             ),
@@ -75,45 +77,51 @@ class CambiaSfondoOverlay extends StatelessWidget {
                   style: GoogleFonts.lora(color: Colors.white, fontSize: 14),
                 ),
                 const SizedBox(height: 12),
-                SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    trackHeight: 2,
-                    activeTrackColor: Colors.white,
-                    inactiveTrackColor: Colors.white24,
-                    thumbColor: Colors.white,
-                    overlayColor: Colors.white24,
-                  ),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        onPressed: onZoomOut,
-                        icon: const Icon(Icons.remove),
-                        color: Colors.white,
-                        tooltip: 'Riduci zoom',
+                IgnorePointer(
+                  ignoring: isUploading,
+                  child: Opacity(
+                    opacity: isUploading ? 0.6 : 1,
+                    child: SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        trackHeight: 2,
+                        activeTrackColor: Colors.white,
+                        inactiveTrackColor: Colors.white24,
+                        thumbColor: Colors.white,
+                        overlayColor: Colors.white24,
                       ),
-                      Expanded(
-                        child: Slider(
-                          value: clampedScale,
-                          min: minScale,
-                          max: maxScale,
-                          divisions: sliderDivisions,
-                          label: '${clampedScale.toStringAsFixed(1)}x',
-                          onChanged: onScaleChanged,
-                        ),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            onPressed: onZoomOut,
+                            icon: const Icon(Icons.remove),
+                            color: Colors.white,
+                            tooltip: 'Riduci zoom',
+                          ),
+                          Expanded(
+                            child: Slider(
+                              value: clampedScale,
+                              min: minScale,
+                              max: maxScale,
+                              divisions: sliderDivisions,
+                              label: '${clampedScale.toStringAsFixed(1)}x',
+                              onChanged: onScaleChanged,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: onZoomIn,
+                            icon: const Icon(Icons.add),
+                            color: Colors.white,
+                            tooltip: 'Aumenta zoom',
+                          ),
+                          IconButton(
+                            onPressed: onResetTransform,
+                            icon: const Icon(Icons.center_focus_strong_outlined),
+                            color: Colors.white,
+                            tooltip: 'Reimposta posizione',
+                          ),
+                        ],
                       ),
-                      IconButton(
-                        onPressed: onZoomIn,
-                        icon: const Icon(Icons.add),
-                        color: Colors.white,
-                        tooltip: 'Aumenta zoom',
-                      ),
-                      IconButton(
-                        onPressed: onResetTransform,
-                        icon: const Icon(Icons.center_focus_strong_outlined),
-                        color: Colors.white,
-                        tooltip: 'Reimposta posizione',
-                      ),
-                    ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -121,6 +129,28 @@ class CambiaSfondoOverlay extends StatelessWidget {
                   'Zoom: ${clampedScale.toStringAsFixed(1)}x',
                   style: GoogleFonts.lora(color: Colors.white70, fontSize: 12),
                 ),
+                if (isUploading) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Caricamento sfondo…',
+                        style:
+                            GoogleFonts.lora(color: Colors.white70, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 12),
                 TextButton.icon(
                   onPressed: onTapChange,

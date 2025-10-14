@@ -13,17 +13,20 @@ class DeviceController {
     // Determine if we should use mobile layout or not. The
     // number 600 here is a common breakpoint for a typical
     // 7-inch tablet.
-    final data = MediaQueryData.fromView(WidgetsBinding.instance.window);
+    final view = WidgetsBinding.instance.platformDispatcher.views.first;
+    final data = MediaQueryData.fromView(view);
     return data.size.shortestSide < 600;
   }
 
   double getWidth() {
-    final data = MediaQueryData.fromView(WidgetsBinding.instance.window);
+    final view = WidgetsBinding.instance.platformDispatcher.views.first;
+    final data = MediaQueryData.fromView(view);
     return data.size.width;
   }
 
   double getHeight() {
-    final data = MediaQueryData.fromView(WidgetsBinding.instance.window);
+    final view = WidgetsBinding.instance.platformDispatcher.views.first;
+    final data = MediaQueryData.fromView(view);
     return data.size.height;
   }
 }

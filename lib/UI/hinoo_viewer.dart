@@ -12,16 +12,12 @@ class HinooViewer extends StatefulWidget {
   final double maxHeight;
   final double maxWidth;
   final Color gapColor;
-  final bool showDotsBorder;
-  final HinooIndicatorStyle? indicatorStyle;
   const HinooViewer({
     super.key,
     required this.draft,
     required this.maxHeight,
     required this.maxWidth,
     this.gapColor = HonooColor.background,
-    this.showDotsBorder = false,
-    this.indicatorStyle,
   });
 
   @override
@@ -30,7 +26,6 @@ class HinooViewer extends StatefulWidget {
 
 class _HinooViewerState extends State<HinooViewer> {
   late final PageController _vController;
-  int _current = 0;
   Timer? _snapTimer;
 
   @override
@@ -49,9 +44,6 @@ class _HinooViewerState extends State<HinooViewer> {
   @override
   Widget build(BuildContext context) {
     const double ar = 9 / 16;
-    const double sideDotsW = 20; // larghezza colonna pallini
-    const double gap = 8; // spazio tra card e pallini
-
     final Size canvasSize = ResponsiveLayout.fitAspectRatio(
       widget.maxWidth,
       widget.maxHeight,
@@ -59,11 +51,6 @@ class _HinooViewerState extends State<HinooViewer> {
     );
     final double w = canvasSize.width;
     final double h = canvasSize.height;
-
-    final HinooIndicatorStyle indicatorStyle = widget.indicatorStyle ??
-        (widget.showDotsBorder
-            ? HinooIndicatorStyle.moon()
-            : const HinooIndicatorStyle.chest());
 
     return Center(
       child: SizedBox(
@@ -110,49 +97,17 @@ class _HinooViewerState extends State<HinooViewer> {
                     physics: const PageScrollPhysics(),
                     allowImplicitScrolling: true,
                     itemCount: widget.draft.pages.length,
-                    onPageChanged: (i) => setState(() => _current = i),
                     itemBuilder: (context, index) {
-                      return AnimatedBuilder(
-                        animation: _vController,
-                        builder: (context, child) {
-                          double distance = 0.0;
-                          if (_vController.hasClients &&
-                              _vController.position.haveDimensions) {
-                            final double page = _vController.page ??
-                                _vController.initialPage.toDouble();
-                            distance = (page - index).abs();
-                          } else {
-                            distance = (_current - index).abs().toDouble();
-                          }
-                          const double maxGap = 18.0;
-                          final double gap = (distance.clamp(0.0, 1.0) * maxGap)
-                              .clamp(0.0, maxGap);
-                          return HinooSlideView(
-                            slide: widget.draft.pages[index],
-                            width: w,
-                            height: h,
-                            baseCanvasHeight: widget.draft.baseCanvasHeight,
-                            gap: gap,
-                            gapColor: widget.gapColor,
-                          );
-                        },
+                      return HinooSlideView(
+                        slide: widget.draft.pages[index],
+                        width: w,
+                        height: h,
+                        baseCanvasHeight: widget.draft.baseCanvasHeight,
+                        gap: 0,
+                        gapColor: widget.gapColor,
                       );
                     },
                   ),
-                ),
-              ),
-            ),
-            Positioned(
-              right: -(gap + sideDotsW),
-              top: 0,
-              bottom: 0,
-              child: SizedBox(
-                width: sideDotsW,
-                height: h,
-                child: HinooPageDotsColumn(
-                  count: widget.draft.pages.length,
-                  currentIndex: _current,
-                  style: indicatorStyle,
                 ),
               ),
             ),
@@ -239,7 +194,7 @@ class HinooSlideView extends StatelessWidget {
             : height;
     final double fontScale = height / referenceCanvasHeight;
     final double fontSize = (20 * fontScale).clamp(10.0, 60.0).toDouble();
-    final double padding = (16 * fontScale).clamp(8.0, 40.0).toDouble();
+    final double padding = (10 * fontScale).clamp(5.0, 32.0).toDouble();
     final double halfGap = gap / 2;
 
     return SizedBox(
@@ -303,84 +258,4 @@ class HinooSlideView extends StatelessWidget {
       ),
     );
   }
-}
-
-// Indicatore verticale a pallini per le pagine Hinoo
-class HinooPageDotsColumn extends StatelessWidget {
-  final int count;
-  final int currentIndex;
-  final HinooIndicatorStyle style;
-
-  const HinooPageDotsColumn({
-    super.key,
-    required this.count,
-    required this.currentIndex,
-    required this.style,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, box) {
-        final double h = box.maxHeight.isFinite ? box.maxHeight : 200;
-        final double dot = count > 0 ? (h / (count * 3)).clamp(4.0, 10.0) : 0;
-        final double gap = dot;
-        return Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: List.generate(count, (i) {
-              final bool active = i == currentIndex;
-              return Padding(
-                padding: EdgeInsets.symmetric(vertical: gap / 2),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  width: dot,
-                  height: dot,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: active ? style.activeColor : style.inactiveColor,
-                    border: Border.all(
-                      color: style.borderColor,
-                      width: active
-                          ? style.activeBorderWidth
-                          : style.inactiveBorderWidth,
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class HinooIndicatorStyle {
-  final Color activeColor;
-  final Color inactiveColor;
-  final Color borderColor;
-  final double activeBorderWidth;
-  final double inactiveBorderWidth;
-
-  const HinooIndicatorStyle({
-    required this.activeColor,
-    required this.inactiveColor,
-    required this.borderColor,
-    this.activeBorderWidth = 1.4,
-    this.inactiveBorderWidth = 0.9,
-  });
-
-  const HinooIndicatorStyle.chest()
-      : this(
-          activeColor: Colors.white,
-          inactiveColor: Colors.white38,
-          borderColor: Colors.white70,
-        );
-
-  factory HinooIndicatorStyle.moon() => HinooIndicatorStyle(
-        activeColor: HonooColor.onTertiary,
-        inactiveColor: HonooColor.onTertiary.withOpacity(0.32),
-        borderColor: HonooColor.onTertiary.withOpacity(0.45),
-      );
 }

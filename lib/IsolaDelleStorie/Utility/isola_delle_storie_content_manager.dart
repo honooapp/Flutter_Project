@@ -1,3 +1,4 @@
+// ignore_for_file: unnecessary_string_escapes
 //static class
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
