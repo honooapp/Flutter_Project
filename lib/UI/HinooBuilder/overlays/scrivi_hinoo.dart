@@ -28,7 +28,7 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
   Widget build(BuildContext context) {
     return Positioned.fill(
       child: Padding(
-        padding: const EdgeInsets.all(40),
+        padding: const EdgeInsets.fromLTRB(12, 40, 12, 40),
         child: LayoutBuilder(
           builder: (context, constraints) {
             final double maxWidth = math.max(1, constraints.maxWidth);

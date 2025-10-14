@@ -18,9 +18,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import '../Services/hinoo_storage_uploader.dart';
-import 'package:honoo/Widgets/white_icon_button.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
-import 'package:honoo/UI/HinooBuilder/thumbnails/hinoo_thumbnails.dart';
 import 'package:honoo/UI/HinooBuilder/dialogs/anteprima_png.dart';
 import 'package:honoo/UI/HinooBuilder/dialogs/download_hinoo_dialog.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
@@ -39,12 +37,10 @@ class HinooBuilder extends StatefulWidget {
     super.key,
     this.onHinooChanged, // notifica il draft quando cambia qualcosa
     this.onPngExported, // PNG generato (anteprima)
-    this.embedThumbnails = true, // se false, mostra solo il canvas 9:16
   });
 
   final ValueChanged<dynamic>? onHinooChanged;
   final ValueChanged<Uint8List>? onPngExported;
-  final bool embedThumbnails;
 
   @override
   State<HinooBuilder> createState() => _HinooBuilderState();
@@ -73,6 +69,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
   Color _txtColor = Colors.white;
   _WizardStep _step = _WizardStep.changeBg;
   bool _bgChosen = false; // abilita bottone OK per procedere
+  bool _isUploadingBg = false;
   static const double _bgMinScale = 1.0;
   static const double _bgMaxScale = 5.0;
   final TransformationController _bgController = TransformationController();
@@ -431,6 +428,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
       'bgTransform': currentTransform?.storage.toList(),
       'canvasHeight': _canvasHeight,
       'step': _step.name,
+      'isUploadingBg': _isUploadingBg,
       // preview immediata per thumbnails quando non c'è ancora un URL pubblico
       'bgPreviewBytes': _localBgPreview is MemoryImage
           ? (_localBgPreview as MemoryImage).bytes
@@ -448,107 +446,54 @@ class _HinooBuilderState extends State<HinooBuilder> {
   // ========================================================================
   @override
   Widget build(BuildContext context) {
-    // Quando embedThumbnails=false, il parent gestisce layout e 9:16.
-    if (!widget.embedThumbnails) {
-      const BorderRadius canvasRadius = BorderRadius.all(Radius.circular(5));
-      return Card(
-        elevation: 0,
-        margin: EdgeInsets.zero,
-        color: Colors.black,
-        shape: const RoundedRectangleBorder(borderRadius: canvasRadius),
-        clipBehavior: Clip.antiAlias,
-        child: _buildCanvas(context),
-      );
-    }
-
     return LayoutBuilder(
-      builder: (context, box) {
-        // Box 9:16 responsivo
+      builder: (context, constraints) {
         const double ar = 9 / 16;
-        final double maxW = box.maxWidth;
-        final double maxH = box.maxHeight;
+        final double maxW = constraints.maxWidth;
+        final double maxH = constraints.maxHeight;
 
-        double targetW = maxW;
-        double targetH = targetW / ar; // h = w * 16/9
-        if (targetH > maxH) {
-          targetH = maxH;
-          targetW = targetH * ar; // w = h * 9/16
+        double targetW = maxW.isFinite && maxW > 0 ? maxW : 0;
+        double targetH = targetW / ar;
+
+        if (!targetH.isFinite || targetH <= 0) {
+          targetH = maxH.isFinite && maxH > 0 ? maxH : 0;
+          targetW = targetH * ar;
         }
+
+        if (targetH > maxH && maxH.isFinite && maxH > 0) {
+          targetH = maxH;
+          targetW = targetH * ar;
+        }
+        if ((targetW <= 0 || !targetW.isFinite) &&
+            maxH.isFinite &&
+            maxH > 0) {
+          targetH = maxH;
+          targetW = targetH * ar;
+        }
+        if (targetW <= 0 || !targetW.isFinite) {
+          targetW = 360;
+          targetH = targetW / ar;
+        }
+
         _canvasHeight = targetH;
 
-        const double outerGap = 8; // padding laterale
-        const double thumbsH = 180; // altezza thumbnails
         const BorderRadius canvasRadius = BorderRadius.all(Radius.circular(5));
 
-        return Column(
-          children: [
-            // ===== Editor: pulsanti SOPRA + canvas 9:16 CENTRATO =====
-            Expanded(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: outerGap),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // --- ROW di pulsanti bianchi, centrati, sopra il canvas ---
-                      SizedBox(
-                        width: targetW,
-                        height: 44,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            WhiteIconButton(
-                              tooltip: 'Scarica immagini',
-                              icon: Icons.download_outlined,
-                              onPressed: () => _openDownloadDialog(),
-                            ),
-                            const SizedBox(width: 12),
-                            WhiteIconButton(
-                              tooltip: 'Elimina pagina',
-                              icon: Icons.delete_outline,
-                              onPressed: _deleteCurrentPage,
-                            ),
-                          ],
-                        ),
-                      ),
-                      // --- CANVAS 9:16 (Card con r=5, clip attiva) ---
-                      SizedBox(
-                        width: targetW,
-                        height: targetH,
-                        child: Card(
-                          elevation: 0,
-                          margin: EdgeInsets.zero,
-                          color: Colors.black,
-                          shape: const RoundedRectangleBorder(
-                              borderRadius: canvasRadius),
-                          clipBehavior: Clip.antiAlias,
-                          child: _buildCanvas(
-                              context), // <-- RepaintBoundary è qui dentro
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+        return Center(
+          child: SizedBox(
+            width: targetW,
+            height: targetH,
+            child: Card(
+              elevation: 0,
+              margin: EdgeInsets.zero,
+              color: Colors.black,
+              shape: const RoundedRectangleBorder(
+                borderRadius: canvasRadius,
               ),
+              clipBehavior: Clip.antiAlias,
+              child: _buildCanvas(context),
             ),
-
-            // ===== Barra miniature SOTTO al canvas =====
-            SizedBox(
-              height: thumbsH,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: outerGap, vertical: 8),
-                child: AnteprimaHinoo(
-                  pages: _pages,
-                  currentIndex: _current,
-                  onTapThumb: _goTo,
-                  onAddPage: _addPage,
-                  onReorder: _onReorder,
-                  canvasHeight: targetH,
-                ),
-              ),
-            ),
-          ],
+          ),
         );
       },
     );
@@ -597,6 +542,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
             CambiaSfondoOverlay(
               onTapChange: _pickAndUploadBackground,
               showControls: _bgChosen && _localBgPreview != null,
+              isUploading: _isUploadingBg,
               currentScale: _bgScale,
               minScale: _bgMinScale,
               maxScale: _bgMaxScale,
@@ -609,7 +555,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
                   : null,
               onResetTransform: _bgChosen ? _resetBgTransform : null,
             ),
-            if (_bgChosen)
+            if (_bgChosen && !_isUploadingBg)
               Positioned(
                 bottom: 12,
                 right: 12,
@@ -701,7 +647,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
     final bool? ok = await showHonooDeleteDialog(
       context,
-      target: HonooDeletionTarget.page,
+      target: HonooDeletionTarget.hinoo,
     );
 
     if (ok != true) return;
@@ -799,6 +745,22 @@ class _HinooBuilderState extends State<HinooBuilder> {
   }
 
   void _confirmBgAndLock() {
+    if (_isUploadingBg) {
+      showHonooToast(
+        context,
+        message: 'Attendi il caricamento dello sfondo.',
+      );
+      return;
+    }
+    if (!_bgChosen &&
+        _localBgPreview == null &&
+        (_bgPublicUrl == null || _bgPublicUrl!.isEmpty)) {
+      showHonooToast(
+        context,
+        message: 'Carica l\'immagine dello sfondo prima di proseguire.',
+      );
+      return;
+    }
     setState(() {
       _bgLockedMatrix = _bgController.value.clone();
       _bgScale = _extractScaleFromMatrix(_bgLockedMatrix!);
@@ -829,13 +791,23 @@ class _HinooBuilderState extends State<HinooBuilder> {
         _bgChosen = true; // abilita OK per procedere
         _bgLockedMatrix = null;
         _bgScale = _bgMinScale;
+        _isUploadingBg = true;
       });
       _bgController.value = Matrix4.identity();
 
-      _persistBgUrl(bytes, selected.name);
+      await _persistBgUrl(bytes, selected.name);
+      if (!mounted) return;
+      setState(() {
+        _isUploadingBg = false;
+      });
       _notifyChanged();
     } catch (e) {
       debugPrint('Errore cambio sfondo: $e');
+      if (mounted) {
+        setState(() {
+          _isUploadingBg = false;
+        });
+      }
       if (mounted) {
         showHonooToast(
           context,
@@ -850,6 +822,16 @@ class _HinooBuilderState extends State<HinooBuilder> {
       final client = SupabaseProvider.client;
       final user = client.auth.currentUser;
       if (user == null) {
+        if (mounted) {
+          showHonooToast(
+            context,
+            message: 'Accedi per caricare lo sfondo del tuo hinoo.',
+          );
+        }
+        setState(() {
+          _bgPublicUrl = null;
+          _isUploadingBg = false;
+        });
         return; // opzionale: consenti preview locale senza upload
       }
 
@@ -870,6 +852,16 @@ class _HinooBuilderState extends State<HinooBuilder> {
       _scheduleAutosave();
     } catch (e) {
       debugPrint('Upload sfondo fallito: $e');
+      if (mounted) {
+        setState(() {
+          _bgPublicUrl = null;
+          _isUploadingBg = false;
+        });
+        showHonooToast(
+          context,
+          message: 'Caricamento sfondo fallito. Riprova.',
+        );
+      }
     }
   }
 

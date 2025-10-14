@@ -289,7 +289,6 @@ class _MoonPageState extends State<MoonPage> {
         maxHeight: maxHeight,
         maxWidth: maxWidth,
         gapColor: Colors.white,
-        showDotsBorder: true,
       );
     }
 

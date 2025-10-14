@@ -16,8 +16,8 @@ class DownloadHinooDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool multiplePages = pageCount > 1;
     final String bodyText = multiplePages
-        ? 'Scegli se scaricare la pagina corrente o tutte le $pageCount pagine.'
-        : 'Scarica la pagina in formato .png';
+        ? 'Scegli se scaricare questa versione o tutte le pagine disponibili.'
+        : 'Scarica il tuo hinoo in formato .png.';
 
     return HonooDialogShell(
       child: Padding(
@@ -45,10 +45,8 @@ class DownloadHinooDialog extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
-                child: Text(
-                  multiplePages ? 'Scarica pagina corrente' : 'Scarica',
-                  style: HonooDialogStyles.primaryAction(),
-                ),
+                child: Text(multiplePages ? 'Scarica questa versione' : 'Scarica',
+                    style: HonooDialogStyles.primaryAction()),
               ),
             ),
             if (multiplePages) ...[
