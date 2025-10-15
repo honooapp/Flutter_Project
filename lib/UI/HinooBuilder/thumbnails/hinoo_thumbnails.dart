@@ -3,6 +3,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:honoo/UI/hinoo_font_utils.dart';
+import 'package:honoo/UI/hinoo_text_metrics.dart';
 
 class AnteprimaHinoo extends StatelessWidget {
   const AnteprimaHinoo({
@@ -190,9 +192,10 @@ class _ThumbTile extends StatelessWidget {
                 transformList.map((e) => (e as num).toDouble()).toList())
             : null;
 
-    final double baseCanvasHeight =
-        canvasHeight.isFinite && canvasHeight > 0 ? canvasHeight : designHeight;
-    final double scaleFactor = designHeight / baseCanvasHeight;
+    final double simulatedWidth = HinooTextMetrics.canvasWidthFromHeight(
+        canvasHeight.isFinite && canvasHeight > 0 ? canvasHeight : designHeight);
+    final double scaleFactor =
+        designWidth / simulatedWidth.clamp(1, designWidth);
     final Matrix4? effectiveTransform;
     if (transform != null) {
       effectiveTransform = transform.clone()
@@ -226,15 +229,26 @@ class _ThumbTile extends StatelessWidget {
     }
 
     Widget buildPagePreview() {
-      final double intrinsicFontSize = 16 * scaleFactor;
-      final double intrinsicPadding = 40 * scaleFactor;
-      final double safePadding = intrinsicPadding < 0 ? 0 : intrinsicPadding;
-      final textStyle = GoogleFonts.lora(
+      final double intrinsicFontSize =
+          HinooTextMetrics.displayFontSize(designWidth);
+      final double horizontalPadding =
+          HinooTextMetrics.displayHorizontalPadding(designWidth);
+      final double verticalPadding =
+          HinooTextMetrics.displayVerticalPadding(designWidth);
+      final double usableWidth =
+          math.max(1, designWidth - (horizontalPadding * 2));
+      final TextStyle baseStyle = GoogleFonts.lora(
         color: textColor,
         fontSize: intrinsicFontSize,
         height: 1.3,
         fontWeight: FontWeight.w600,
       );
+      final double calibratedFontSize = calibrateFontSizeForWidth(
+        baseStyle: baseStyle,
+        maxWidth: usableWidth,
+      );
+      final TextStyle textStyle =
+          baseStyle.copyWith(fontSize: calibratedFontSize);
 
       return SizedBox(
         width: designWidth,
@@ -242,7 +256,7 @@ class _ThumbTile extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final double maxTextWidth =
-                math.max(1, constraints.maxWidth - safePadding * 2);
+                math.max(1, constraints.maxWidth - horizontalPadding * 2);
             final int lineCount =
                 _countTextLines(text, maxTextWidth, textStyle);
             final Alignment alignment =
@@ -253,7 +267,10 @@ class _ThumbTile extends StatelessWidget {
               children: [
                 ClipRect(child: buildBackground()),
                 Padding(
-                  padding: EdgeInsets.all(safePadding),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: horizontalPadding,
+                    vertical: verticalPadding,
+                  ),
                   child: Align(
                     alignment: alignment,
                     child: Text(

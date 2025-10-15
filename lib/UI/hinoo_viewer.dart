@@ -4,6 +4,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../Entities/hinoo.dart';
+import 'hinoo_font_utils.dart';
+import 'hinoo_text_metrics.dart';
 import '../Utility/honoo_colors.dart';
 import '../Utility/responsive_layout.dart';
 
@@ -102,7 +104,6 @@ class _HinooViewerState extends State<HinooViewer> {
                         slide: widget.draft.pages[index],
                         width: w,
                         height: h,
-                        baseCanvasHeight: widget.draft.baseCanvasHeight,
                         gap: 0,
                         gapColor: widget.gapColor,
                       );
@@ -144,7 +145,6 @@ class HinooSlideView extends StatelessWidget {
   final HinooSlide slide;
   final double width;
   final double height;
-  final double? baseCanvasHeight;
   final double gap;
   final Color gapColor;
   const HinooSlideView({
@@ -152,7 +152,6 @@ class HinooSlideView extends StatelessWidget {
     required this.slide,
     required this.width,
     required this.height,
-    required this.baseCanvasHeight,
     required this.gap,
     required this.gapColor,
   });
@@ -188,13 +187,26 @@ class HinooSlideView extends StatelessWidget {
 
     final Matrix4 transform = buildTransform();
 
-    final double referenceCanvasHeight =
-        (baseCanvasHeight != null && baseCanvasHeight! > 0)
-            ? baseCanvasHeight!
-            : height;
-    final double fontScale = height / referenceCanvasHeight;
-    final double fontSize = (20 * fontScale).clamp(10.0, 60.0).toDouble();
-    final double padding = (10 * fontScale).clamp(5.0, 32.0).toDouble();
+    final double fontSize = HinooTextMetrics.displayFontSize(width);
+    final double horizontalPadding =
+        HinooTextMetrics.displayHorizontalPadding(width);
+    final double verticalPadding =
+        HinooTextMetrics.displayVerticalPadding(width);
+    final double usableWidth =
+        (width - (horizontalPadding * 2)).clamp(1.0, double.infinity);
+    final TextStyle baseStyle = GoogleFonts.lora(
+      color: textColor,
+      fontSize: fontSize,
+      height: 1.3,
+      fontWeight: FontWeight.w600,
+    );
+    final double calibratedFontSize = calibrateFontSizeForWidth(
+      baseStyle: baseStyle,
+      maxWidth: usableWidth,
+      targetFillRatio: 0.985,
+    );
+    final TextStyle effectiveStyle =
+        baseStyle.copyWith(fontSize: calibratedFontSize);
     final double halfGap = gap / 2;
 
     return SizedBox(
@@ -214,17 +226,15 @@ class HinooSlideView extends StatelessWidget {
             top: gap / 2,
             bottom: gap / 2,
             child: Padding(
-              padding: EdgeInsets.all(padding),
+              padding: EdgeInsets.symmetric(
+                horizontal: horizontalPadding,
+                vertical: verticalPadding,
+              ),
               child: Center(
                 child: Text(
                   slide.text,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.lora(
-                    color: textColor,
-                    fontSize: fontSize,
-                    height: 1.3,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: effectiveStyle,
                   softWrap: true,
                 ),
               ),

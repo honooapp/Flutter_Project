@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Widgets/centering_multiline_field.dart';
+import 'package:honoo/UI/hinoo_font_utils.dart';
+import 'package:honoo/UI/hinoo_text_metrics.dart';
 
 class ScriviHinooOverlay extends StatefulWidget {
   const ScriviHinooOverlay({
@@ -28,36 +30,54 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
   Widget build(BuildContext context) {
     return Positioned.fill(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 40, 12, 40),
+        padding: EdgeInsets.zero,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final double maxWidth = math.max(1, constraints.maxWidth);
-            final textStyle = GoogleFonts.lora(
+            final double canvasWidth = math.max(1, constraints.maxWidth);
+            final double fontSize =
+                HinooTextMetrics.editingFontSize(canvasWidth);
+            final double horizontalPad =
+                HinooTextMetrics.editingHorizontalPadding(canvasWidth);
+            final double verticalPad =
+                HinooTextMetrics.editingVerticalPadding(canvasWidth);
+            final double usableWidth =
+                HinooTextMetrics.editingTextAreaWidth(canvasWidth);
+            final TextStyle baseStyle = GoogleFonts.lora(
               color: widget.textColor,
-              fontSize: 16,
+              fontSize: fontSize,
               height: 1.3,
             );
+            final double calibratedFontSize = calibrateFontSizeForWidth(
+              baseStyle: baseStyle,
+              maxWidth: usableWidth,
+            );
+            final TextStyle effectiveStyle =
+                baseStyle.copyWith(fontSize: calibratedFontSize);
 
-            return CenteringMultilineField(
-              controller: widget.controller,
-              focusNode: widget.focusNode,
-              style: textStyle,
-              horizontalPadding: EdgeInsets.zero,
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                isCollapsed: true,
+            return Padding(
+              padding: EdgeInsets.fromLTRB(
+                  horizontalPad, verticalPad, horizontalPad, verticalPad),
+              child: CenteringMultilineField(
+                controller: widget.controller,
+                focusNode: widget.focusNode,
+                style: effectiveStyle,
+                horizontalPadding: EdgeInsets.zero,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  isCollapsed: true,
+                ),
+                keyboardType: TextInputType.multiline,
+                textInputAction: TextInputAction.newline,
+                autofocus: true,
+                expands: true,
+                scrollPhysics: const ClampingScrollPhysics(),
+                cursorColor: Colors.white,
+                cursorWidth: 3,
+                cursorRadius: const Radius.circular(0),
+                inputFormatters: [
+                  _lineLimitFormatter(usableWidth, effectiveStyle),
+                ],
               ),
-              keyboardType: TextInputType.multiline,
-              textInputAction: TextInputAction.newline,
-              autofocus: true,
-              expands: true,
-              scrollPhysics: const ClampingScrollPhysics(),
-              cursorColor: Colors.white,
-              cursorWidth: 3,
-              cursorRadius: const Radius.circular(0),
-              inputFormatters: [
-                _lineLimitFormatter(maxWidth, textStyle),
-              ],
             );
           },
         ),

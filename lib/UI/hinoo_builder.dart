@@ -335,7 +335,16 @@ class _HinooBuilderState extends State<HinooBuilder> {
       final RenderRepaintBoundary? boundary = _captureKey.currentContext
           ?.findRenderObject() as RenderRepaintBoundary?;
       if (boundary == null) return null;
-      final ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
+      double effectivePixelRatio = pixelRatio;
+      final Size logicalSize = boundary.size;
+      const double targetHeight = 1920.0;
+      if (logicalSize.width > 0 && logicalSize.height > 0) {
+        final double ratioH = targetHeight / logicalSize.height;
+        effectivePixelRatio =
+            ratioH.isFinite && ratioH > 0 ? ratioH : effectivePixelRatio;
+      }
+      final ui.Image image =
+          await boundary.toImage(pixelRatio: effectivePixelRatio);
       final ByteData? byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);
       return byteData?.buffer.asUint8List();
