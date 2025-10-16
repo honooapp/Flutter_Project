@@ -64,23 +64,4 @@ class HinooTypography {
     if (!height.isFinite || height <= 0) return baselineCanvasWidth;
     return height * aspectRatio;
   }
-
-  /// Measure the width of the reference line at fixed font size
-  static double measureReferenceLineWidth() {
-    final painter = TextPainter(
-      text: TextSpan(
-        text: referenceLine,
-        style: textStyle(color: Colors.black),
-      ),
-      textAlign: TextAlign.center,
-      textDirection: TextDirection.ltr,
-      maxLines: 1,
-    )..layout();
-    return painter.width;
-  }
-
-  /// Calculate maximum line width for a given canvas width
-  static double maxLineWidth(double canvasWidth) {
-    return usableWidth(canvasWidth);
-  }
 }

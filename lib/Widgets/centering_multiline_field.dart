@@ -132,15 +132,14 @@ class _CenteringMultilineFieldState extends State<CenteringMultilineField> {
 
         final String textForLayout =
             widget.controller.text.isEmpty ? ' ' : widget.controller.text;
-        // Layout with very large width to prevent automatic wrapping
-        // Input formatters will enforce actual line width limits
-        final double layoutWidth = maxWidth * 10; // Much larger than screen
+        // Use large width for layout to prevent wrapping
+        // The input formatter enforces actual line width limits
         final TextPainter painter = TextPainter(
           text: TextSpan(text: textForLayout, style: widget.style),
           textAlign: TextAlign.center,
           textDirection: TextDirection.ltr,
           maxLines: widget.maxLines,
-        )..layout(minWidth: 0, maxWidth: layoutWidth);
+        )..layout(minWidth: 0, maxWidth: maxWidth * 10);
 
         double textHeight = painter.size.height;
         if (textHeight <= 0) {
