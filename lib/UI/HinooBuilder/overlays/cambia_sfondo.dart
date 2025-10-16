@@ -40,10 +40,21 @@ class CambiaSfondoOverlay extends StatelessWidget {
               color: Colors.black.withOpacity(0.50),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Text(
-              'Carica prima la tua immagine, e poi scrivi il tuo testo',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Carica prima la tua immagine,\n e poi scrivi il tuo testo',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
+                ),
+                const SizedBox(height: 22),
+                const Icon(
+                  Icons.photo,
+                  size: 48,
+                  color: Colors.white,
+                ),
+              ],
             ),
           ),
         ),
