@@ -13,7 +13,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../Services/honoo_image_uploader.dart';
 import '../Utility/honoo_colors.dart';
-import 'package:honoo/Widgets/centering_multiline_field.dart';
+import 'package:honoo/Widgets/width_limited_multiline_field.dart';
 import 'package:honoo/UI/HinooBuilder/overlays/cambia_sfondo.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
@@ -322,12 +322,13 @@ class HonooBuilderState extends State<HonooBuilder> {
                   fontSize: 18,
                   height: 1.4,
                 );
-                final double textMaxWidth = math.max(1, imageSize - 80);
 
-                return CenteringMultilineField(
+                return WidthLimitedMultilineField(
                   controller: _textCtrl,
                   focusNode: _textFocus,
                   style: textStyle,
+                  maxLines: 5,
+                  maxCharsPerLine: 34, // Lunghezza di "— Hai il presente. Non ti basta?"
                   horizontalPadding: const EdgeInsets.symmetric(horizontal: 40),
                   decoration: InputDecoration(
                     hintText: 'Scrivi qui il testo del tuo honoo',
@@ -345,9 +346,6 @@ class HonooBuilderState extends State<HonooBuilder> {
                   cursorColor: Colors.black,
                   cursorWidth: 3,
                   cursorRadius: const Radius.circular(0),
-                  inputFormatters: [
-                    _lineLimitFormatter(textMaxWidth, textStyle),
-                  ],
                 );
               },
             ),
@@ -451,49 +449,6 @@ class HonooBuilderState extends State<HonooBuilder> {
         ),
       ),
     );
-  }
-
-  static const int _honooMaxLines = 5;
-
-  TextPainter _createHonooPainter(
-    String text,
-    double maxWidth,
-    TextStyle style,
-  ) {
-    final painter = TextPainter(
-      text: TextSpan(text: text, style: style),
-      textAlign: TextAlign.center,
-      textDirection: TextDirection.ltr,
-      maxLines: null,
-    )..layout(minWidth: 0, maxWidth: maxWidth);
-
-    return painter;
-  }
-
-  int _countHonooLines(
-    String text,
-    double maxWidth,
-    TextStyle style,
-  ) {
-    if (text.isEmpty) return 0;
-    final painter = _createHonooPainter(text, maxWidth, style);
-    final int autoCount = painter.computeLineMetrics().length;
-    final int manualCount = text.split('\n').length;
-    return math.max(autoCount, manualCount);
-  }
-
-  TextInputFormatter _lineLimitFormatter(
-    double maxWidth,
-    TextStyle style,
-  ) {
-    return TextInputFormatter.withFunction((oldValue, newValue) {
-      if (oldValue.text == newValue.text) return newValue;
-      final count = _countHonooLines(newValue.text, maxWidth, style);
-      if (count > _honooMaxLines) {
-        return oldValue;
-      }
-      return newValue;
-    });
   }
 
   void resetContent() {

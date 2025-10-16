@@ -3,18 +3,24 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class CenteringMultilineField extends StatefulWidget {
-  const CenteringMultilineField({
+/// A multiline text field that prevents automatic text wrapping by blocking input
+/// when either character count or physical width limits are exceeded.
+/// 
+/// Users must manually insert line breaks (Enter key) to start new lines.
+/// This ensures consistent typography across both Honoo and Hinoo.
+class WidthLimitedMultilineField extends StatefulWidget {
+  const WidthLimitedMultilineField({
     super.key,
     required this.controller,
     this.focusNode,
     required this.style,
+    required this.maxLines,
+    required this.maxCharsPerLine,
     this.horizontalPadding = EdgeInsets.zero,
-    this.maxLines,
     this.minLines,
     this.decoration,
     this.onChanged,
-    this.inputFormatters,
+    this.additionalInputFormatters,
     this.keyboardType = TextInputType.multiline,
     this.textInputAction = TextInputAction.newline,
     this.autofocus = false,
@@ -37,12 +43,13 @@ class CenteringMultilineField extends StatefulWidget {
   final TextEditingController controller;
   final FocusNode? focusNode;
   final TextStyle style;
+  final int maxLines;
+  final int maxCharsPerLine;
   final EdgeInsets horizontalPadding;
-  final int? maxLines;
   final int? minLines;
   final InputDecoration? decoration;
   final VoidCallback? onChanged;
-  final List<TextInputFormatter>? inputFormatters;
+  final List<TextInputFormatter>? additionalInputFormatters;
   final TextInputType keyboardType;
   final TextInputAction textInputAction;
   final bool autofocus;
@@ -62,11 +69,11 @@ class CenteringMultilineField extends StatefulWidget {
   final Radius? cursorRadius;
 
   @override
-  State<CenteringMultilineField> createState() =>
-      _CenteringMultilineFieldState();
+  State<WidthLimitedMultilineField> createState() =>
+      _WidthLimitedMultilineFieldState();
 }
 
-class _CenteringMultilineFieldState extends State<CenteringMultilineField> {
+class _WidthLimitedMultilineFieldState extends State<WidthLimitedMultilineField> {
   final ScrollController _scrollController = ScrollController();
   double? _lastPadTop;
   bool _pendingScroll = true;
@@ -78,7 +85,7 @@ class _CenteringMultilineFieldState extends State<CenteringMultilineField> {
   }
 
   @override
-  void didUpdateWidget(CenteringMultilineField oldWidget) {
+  void didUpdateWidget(WidthLimitedMultilineField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_handleControllerChange);
@@ -121,6 +128,52 @@ class _CenteringMultilineFieldState extends State<CenteringMultilineField> {
     });
   }
 
+  /// Measures the width of a single line of text
+  double _measureLineWidth(String line) {
+    if (line.isEmpty) return 0.0;
+    
+    final painter = TextPainter(
+      text: TextSpan(text: line, style: widget.style),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+      maxLines: 1,
+    )..layout();
+    
+    return painter.width;
+  }
+
+  /// Creates the input formatter that enforces both character and width limits
+  TextInputFormatter _createWidthLimitFormatter(double maxWidth) {
+    return TextInputFormatter.withFunction((oldValue, newValue) {
+      if (oldValue.text == newValue.text) return newValue;
+      
+      final bool isDeletion = newValue.text.length < oldValue.text.length;
+      if (isDeletion) return newValue;
+      
+      // Check total line count (manual breaks only)
+      final lines = newValue.text.split('\n');
+      if (lines.length > widget.maxLines) {
+        return oldValue;
+      }
+      
+      // Check each line: prevent typing if EITHER condition is met:
+      // 1. Line exceeds character limit
+      // 2. Line exceeds physical width
+      for (final line in lines) {
+        if (line.length > widget.maxCharsPerLine) {
+          return oldValue; // Block: too many characters
+        }
+        
+        final lineWidth = _measureLineWidth(line);
+        if (lineWidth > maxWidth) {
+          return oldValue; // Block: line too wide
+        }
+      }
+      
+      return newValue;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget field = LayoutBuilder(
@@ -132,14 +185,14 @@ class _CenteringMultilineFieldState extends State<CenteringMultilineField> {
 
         final String textForLayout =
             widget.controller.text.isEmpty ? ' ' : widget.controller.text;
-        // Use large width for layout to prevent wrapping
-        // The input formatter enforces actual line width limits
+        final double usableWidth = math.max(1, maxWidth - widget.horizontalPadding.horizontal);
+        
         final TextPainter painter = TextPainter(
           text: TextSpan(text: textForLayout, style: widget.style),
           textAlign: TextAlign.center,
           textDirection: TextDirection.ltr,
           maxLines: widget.maxLines,
-        )..layout(minWidth: 0, maxWidth: maxWidth * 10);
+        )..layout(minWidth: 0, maxWidth: usableWidth);
 
         double textHeight = painter.size.height;
         if (textHeight <= 0) {
@@ -180,39 +233,39 @@ class _CenteringMultilineFieldState extends State<CenteringMultilineField> {
         final int? effectiveMaxLines = expands ? null : widget.maxLines;
         final int? effectiveMinLines = expands ? null : widget.minLines;
 
-        // Wrap TextField in OverflowBox to give it more internal width
-        // This prevents automatic text wrapping at the container edge
-        return OverflowBox(
-          alignment: Alignment.center,
-          maxWidth: maxWidth * 3, // Give 3x width to prevent wrapping
-          child: TextField(
-            controller: widget.controller,
-            focusNode: widget.focusNode,
-            style: widget.style,
-            cursorColor: widget.cursorColor,
-            cursorWidth: widget.cursorWidth ?? 2,
-            cursorRadius: widget.cursorRadius,
-            keyboardType: widget.keyboardType,
-            textInputAction: widget.textInputAction,
-            textCapitalization: widget.textCapitalization,
-            autocorrect: widget.autocorrect,
-            enableSuggestions: widget.enableSuggestions,
-            autofocus: widget.autofocus,
-            readOnly: widget.readOnly,
-            enabled: widget.enabled,
-            expands: expands,
-            minLines: effectiveMinLines,
-            maxLines: effectiveMaxLines,
-            textAlign: TextAlign.center,
-            textAlignVertical: TextAlignVertical.top,
-            inputFormatters: widget.inputFormatters,
-            scrollController: _scrollController,
-            scrollPhysics: widget.scrollPhysics ?? const ClampingScrollPhysics(),
-            decoration: effectiveDecoration,
-            onEditingComplete: widget.onEditingComplete,
-            onSubmitted: widget.onSubmitted,
-            autofillHints: widget.autofillHints,
-          ),
+        // Combine width limit formatter with any additional formatters
+        final List<TextInputFormatter> allFormatters = [
+          _createWidthLimitFormatter(usableWidth),
+          ...?widget.additionalInputFormatters,
+        ];
+
+        return TextField(
+          controller: widget.controller,
+          focusNode: widget.focusNode,
+          style: widget.style,
+          cursorColor: widget.cursorColor,
+          cursorWidth: widget.cursorWidth ?? 2,
+          cursorRadius: widget.cursorRadius,
+          keyboardType: widget.keyboardType,
+          textInputAction: widget.textInputAction,
+          textCapitalization: widget.textCapitalization,
+          autocorrect: widget.autocorrect,
+          enableSuggestions: widget.enableSuggestions,
+          autofocus: widget.autofocus,
+          readOnly: widget.readOnly,
+          enabled: widget.enabled,
+          expands: expands,
+          minLines: effectiveMinLines,
+          maxLines: effectiveMaxLines,
+          textAlign: TextAlign.center,
+          textAlignVertical: TextAlignVertical.top,
+          inputFormatters: allFormatters,
+          scrollController: _scrollController,
+          scrollPhysics: widget.scrollPhysics ?? const ClampingScrollPhysics(),
+          decoration: effectiveDecoration,
+          onEditingComplete: widget.onEditingComplete,
+          onSubmitted: widget.onSubmitted,
+          autofillHints: widget.autofillHints,
         );
       },
     );
