@@ -43,7 +43,7 @@ class _NameHinooDialogState extends State<NameHinooDialog> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Se è per il mio corso, sei il numero 37, ed è il tuo primo hinoo, devi chiamarlo 37.a',
+              'Se è per il mio corso, sei il numero 37 ed è il tuo primo lavoro, chiamalo 37.1. Se è il tuo secondo lavoro 37.2',
               style: HonooDialogStyles.body(),
               textAlign: TextAlign.center,
             ),
@@ -54,7 +54,7 @@ class _NameHinooDialogState extends State<NameHinooDialog> {
               style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
               cursorColor: Colors.white,
               decoration: InputDecoration(
-                hintText: 'Es. 37.a',
+                hintText: 'Es. 37.1',
                 hintStyle:
                     GoogleFonts.lora(color: Colors.white38, fontSize: 16),
                 filled: true,
