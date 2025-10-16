@@ -2,10 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Widgets/centering_multiline_field.dart';
-import 'package:honoo/UI/hinoo_font_utils.dart';
-import 'package:honoo/UI/hinoo_text_metrics.dart';
+import 'package:honoo/UI/hinoo_typography.dart';
 
 class ScriviHinooOverlay extends StatefulWidget {
   const ScriviHinooOverlay({
@@ -24,8 +22,6 @@ class ScriviHinooOverlay extends StatefulWidget {
 }
 
 class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
-  static const int _maxLines = 21;
-
   @override
   Widget build(BuildContext context) {
     return Positioned.fill(
@@ -34,25 +30,12 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final double canvasWidth = math.max(1, constraints.maxWidth);
-            final double fontSize =
-                HinooTextMetrics.editingFontSize(canvasWidth);
-            final double horizontalPad =
-                HinooTextMetrics.editingHorizontalPadding(canvasWidth);
-            final double verticalPad =
-                HinooTextMetrics.editingVerticalPadding(canvasWidth);
-            final double usableWidth =
-                HinooTextMetrics.editingTextAreaWidth(canvasWidth);
-            final TextStyle baseStyle = GoogleFonts.lora(
+            final double horizontalPad = HinooTypography.horizontalPadding;
+            final double verticalPad = HinooTypography.verticalPadding(canvasWidth);
+            final double usableWidth = HinooTypography.usableWidth(canvasWidth);
+            final TextStyle effectiveStyle = HinooTypography.textStyle(
               color: widget.textColor,
-              fontSize: fontSize,
-              height: 1.3,
             );
-            final double calibratedFontSize = calibrateFontSizeForWidth(
-              baseStyle: baseStyle,
-              maxWidth: usableWidth,
-            );
-            final TextStyle effectiveStyle =
-                baseStyle.copyWith(fontSize: calibratedFontSize);
 
             return Padding(
               padding: EdgeInsets.fromLTRB(
@@ -74,8 +57,9 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
                 cursorColor: Colors.white,
                 cursorWidth: 3,
                 cursorRadius: const Radius.circular(0),
+                maxLines: null, // Allow multiple lines but no auto-wrapping per line
                 inputFormatters: [
-                  _lineLimitFormatter(usableWidth, effectiveStyle),
+                  _lineWidthAndCountFormatter(usableWidth, effectiveStyle),
                 ],
               ),
             );
@@ -85,37 +69,29 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
     );
   }
 
-  TextPainter _createPainter(
-    String text,
-    double maxWidth,
-    TextStyle style,
-  ) {
+  /// Measures the width of a line of text
+  double _measureLineWidth(String line, TextStyle style) {
+    if (line.isEmpty) return 0.0;
+    
     final painter = TextPainter(
-      text: TextSpan(text: text, style: style),
+      text: TextSpan(text: line, style: style),
       textAlign: TextAlign.center,
       textDirection: TextDirection.ltr,
-      maxLines: null,
-    )..layout(minWidth: 0, maxWidth: maxWidth);
-
-    return painter;
+      maxLines: 1,
+    )..layout();
+    
+    return painter.width;
   }
 
-  int _countLines(
-    String text,
+  /// Formatter that prevents lines from exceeding width and enforces max line count
+  /// Uses two conditions: character count limit AND physical width limit
+  TextInputFormatter _lineWidthAndCountFormatter(
     double maxWidth,
     TextStyle style,
   ) {
-    if (text.isEmpty) return 0;
-    final int manualCount = text.split('\n').length;
-    final painter = _createPainter(text, maxWidth, style);
-    final int autoCount = painter.computeLineMetrics().length;
-    return math.max(autoCount, manualCount);
-  }
-
-  TextInputFormatter _lineLimitFormatter(
-    double maxWidth,
-    TextStyle style,
-  ) {
+    // Maximum characters is based on the reference line length
+    const int maxCharsPerLine = HinooTypography.referenceLine.length;
+    
     return TextInputFormatter.withFunction((oldValue, newValue) {
       if (oldValue.text == newValue.text) {
         return newValue;
@@ -126,10 +102,24 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
         return newValue;
       }
 
-      final int newLineCount = _countLines(newValue.text, maxWidth, style);
-
-      if (newLineCount > _maxLines) {
+      // Check total line count first
+      final lines = newValue.text.split('\n');
+      if (lines.length > HinooTypography.maxLines) {
         return oldValue;
+      }
+
+      // Check each line: either too many characters OR too wide
+      for (final line in lines) {
+        // Condition 1: Line has more characters than reference line
+        if (line.length > maxCharsPerLine) {
+          return oldValue;
+        }
+        
+        // Condition 2: Line width exceeds available space (for narrow screens)
+        final lineWidth = _measureLineWidth(line, style);
+        if (lineWidth > maxWidth) {
+          return oldValue;
+        }
       }
 
       return newValue;

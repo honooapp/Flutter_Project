@@ -2,10 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../Entities/hinoo.dart';
-import 'hinoo_font_utils.dart';
-import 'hinoo_text_metrics.dart';
+import 'hinoo_typography.dart';
 import '../Utility/honoo_colors.dart';
 import '../Utility/responsive_layout.dart';
 
@@ -187,26 +185,11 @@ class HinooSlideView extends StatelessWidget {
 
     final Matrix4 transform = buildTransform();
 
-    final double fontSize = HinooTextMetrics.displayFontSize(width);
-    final double horizontalPadding =
-        HinooTextMetrics.displayHorizontalPadding(width);
-    final double verticalPadding =
-        HinooTextMetrics.displayVerticalPadding(width);
-    final double usableWidth =
-        (width - (horizontalPadding * 2)).clamp(1.0, double.infinity);
-    final TextStyle baseStyle = GoogleFonts.lora(
+    final double horizontalPadding = HinooTypography.horizontalPadding;
+    final double verticalPadding = HinooTypography.verticalPadding(width);
+    final TextStyle effectiveStyle = HinooTypography.displayTextStyle(
       color: textColor,
-      fontSize: fontSize,
-      height: 1.3,
-      fontWeight: FontWeight.w600,
     );
-    final double calibratedFontSize = calibrateFontSizeForWidth(
-      baseStyle: baseStyle,
-      maxWidth: usableWidth,
-      targetFillRatio: 0.985,
-    );
-    final TextStyle effectiveStyle =
-        baseStyle.copyWith(fontSize: calibratedFontSize);
     final double halfGap = gap / 2;
 
     return SizedBox(

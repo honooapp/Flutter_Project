@@ -3,8 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:honoo/UI/hinoo_font_utils.dart';
-import 'package:honoo/UI/hinoo_text_metrics.dart';
+import 'package:honoo/UI/hinoo_typography.dart';
 
 class AnteprimaHinoo extends StatelessWidget {
   const AnteprimaHinoo({
@@ -192,7 +191,7 @@ class _ThumbTile extends StatelessWidget {
                 transformList.map((e) => (e as num).toDouble()).toList())
             : null;
 
-    final double simulatedWidth = HinooTextMetrics.canvasWidthFromHeight(
+    final double simulatedWidth = HinooTypography.canvasWidthFromHeight(
         canvasHeight.isFinite && canvasHeight > 0 ? canvasHeight : designHeight);
     final double scaleFactor =
         designWidth / simulatedWidth.clamp(1, designWidth);
@@ -229,26 +228,11 @@ class _ThumbTile extends StatelessWidget {
     }
 
     Widget buildPagePreview() {
-      final double intrinsicFontSize =
-          HinooTextMetrics.displayFontSize(designWidth);
-      final double horizontalPadding =
-          HinooTextMetrics.displayHorizontalPadding(designWidth);
-      final double verticalPadding =
-          HinooTextMetrics.displayVerticalPadding(designWidth);
-      final double usableWidth =
-          math.max(1, designWidth - (horizontalPadding * 2));
-      final TextStyle baseStyle = GoogleFonts.lora(
+      final double horizontalPadding = HinooTypography.horizontalPadding;
+      final double verticalPadding = HinooTypography.verticalPadding(designWidth);
+      final TextStyle textStyle = HinooTypography.displayTextStyle(
         color: textColor,
-        fontSize: intrinsicFontSize,
-        height: 1.3,
-        fontWeight: FontWeight.w600,
       );
-      final double calibratedFontSize = calibrateFontSizeForWidth(
-        baseStyle: baseStyle,
-        maxWidth: usableWidth,
-      );
-      final TextStyle textStyle =
-          baseStyle.copyWith(fontSize: calibratedFontSize);
 
       return SizedBox(
         width: designWidth,

@@ -207,4 +207,27 @@ git push --tags
 * New CI/CD steps or secrets are introduced.
 * You uncover fundamentals that a future session should remember (workflow quirks, release steps, high-impact fixes). Skip short-lived, feature-specific trivia.
 
+## 14. Hinoo Typography Calibration (2025-10-16)
+
+* **Fixed Typography**: Lora font, size 18pt, line height ~1.375 (24.75pt). No dynamic scaling.
+* **Line length limits (dual condition)**: User is blocked from typing more when EITHER condition is met:
+  1. **Character count**: Line exceeds 35 characters (length of reference line "— Hai il presente. Non ti basta?")
+  2. **Physical width**: Line width exceeds available screen space (matters on narrow screens)
+* **No automatic wrapping**: Text never wraps automatically. User must manually press Enter for new lines.
+* **Padding**: Horizontal padding 32px per side (from 360px baseline), vertical padding as needed.
+* **Line limit**: Maximum 20 lines. The user can't write anymore text after 20 lines.
+* **Export**: PNG renders at 1080×1920 with same fixed typography.
+
+Typography behavior:
+- **Wide screens (≥360px)**: Up to 35 characters per line (reference line fits exactly).
+- **Narrow screens**: Fewer characters fit before hitting physical width limit (font stays 18pt).
+- **Input blocking**: User cannot type when either character count (35) OR physical width is reached.
+- **Manual line breaks**: User must press Enter to start a new line.
+
+If typography needs adjustment, check:
+1. Font size: 18pt (from image analysis)
+2. Line height: 1.375 (~1.35-1.4 range from image analysis)
+3. Character limit: 35 chars (reference line length in `HinooTypography.referenceLine`)
+4. Dual-condition logic in `ScriviHinooOverlay._lineWidthAndCountFormatter`
+
 This guide should give any Codex agent enough context to operate effectively without rediscovering the project architecture from scratch. Happy building! 🚀

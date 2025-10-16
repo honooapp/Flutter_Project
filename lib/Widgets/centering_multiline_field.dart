@@ -130,21 +130,17 @@ class _CenteringMultilineFieldState extends State<CenteringMultilineField> {
         final double maxHeight =
             constraints.maxHeight.isFinite ? constraints.maxHeight : 0;
 
-        final double usableWidth = math.max(
-          1,
-          maxWidth -
-              widget.horizontalPadding.left -
-              widget.horizontalPadding.right,
-        );
-
         final String textForLayout =
             widget.controller.text.isEmpty ? ' ' : widget.controller.text;
+        // Layout with very large width to prevent automatic wrapping
+        // Input formatters will enforce actual line width limits
+        final double layoutWidth = maxWidth * 10; // Much larger than screen
         final TextPainter painter = TextPainter(
           text: TextSpan(text: textForLayout, style: widget.style),
           textAlign: TextAlign.center,
           textDirection: TextDirection.ltr,
           maxLines: widget.maxLines,
-        )..layout(minWidth: 0, maxWidth: usableWidth);
+        )..layout(minWidth: 0, maxWidth: layoutWidth);
 
         double textHeight = painter.size.height;
         if (textHeight <= 0) {
@@ -185,33 +181,39 @@ class _CenteringMultilineFieldState extends State<CenteringMultilineField> {
         final int? effectiveMaxLines = expands ? null : widget.maxLines;
         final int? effectiveMinLines = expands ? null : widget.minLines;
 
-        return TextField(
-          controller: widget.controller,
-          focusNode: widget.focusNode,
-          style: widget.style,
-          cursorColor: widget.cursorColor,
-          cursorWidth: widget.cursorWidth ?? 2,
-          cursorRadius: widget.cursorRadius,
-          keyboardType: widget.keyboardType,
-          textInputAction: widget.textInputAction,
-          textCapitalization: widget.textCapitalization,
-          autocorrect: widget.autocorrect,
-          enableSuggestions: widget.enableSuggestions,
-          autofocus: widget.autofocus,
-          readOnly: widget.readOnly,
-          enabled: widget.enabled,
-          expands: expands,
-          minLines: effectiveMinLines,
-          maxLines: effectiveMaxLines,
-          textAlign: TextAlign.center,
-          textAlignVertical: TextAlignVertical.top,
-          inputFormatters: widget.inputFormatters,
-          scrollController: _scrollController,
-          scrollPhysics: widget.scrollPhysics ?? const ClampingScrollPhysics(),
-          decoration: effectiveDecoration,
-          onEditingComplete: widget.onEditingComplete,
-          onSubmitted: widget.onSubmitted,
-          autofillHints: widget.autofillHints,
+        // Wrap TextField in OverflowBox to give it more internal width
+        // This prevents automatic text wrapping at the container edge
+        return OverflowBox(
+          alignment: Alignment.center,
+          maxWidth: maxWidth * 3, // Give 3x width to prevent wrapping
+          child: TextField(
+            controller: widget.controller,
+            focusNode: widget.focusNode,
+            style: widget.style,
+            cursorColor: widget.cursorColor,
+            cursorWidth: widget.cursorWidth ?? 2,
+            cursorRadius: widget.cursorRadius,
+            keyboardType: widget.keyboardType,
+            textInputAction: widget.textInputAction,
+            textCapitalization: widget.textCapitalization,
+            autocorrect: widget.autocorrect,
+            enableSuggestions: widget.enableSuggestions,
+            autofocus: widget.autofocus,
+            readOnly: widget.readOnly,
+            enabled: widget.enabled,
+            expands: expands,
+            minLines: effectiveMinLines,
+            maxLines: effectiveMaxLines,
+            textAlign: TextAlign.center,
+            textAlignVertical: TextAlignVertical.top,
+            inputFormatters: widget.inputFormatters,
+            scrollController: _scrollController,
+            scrollPhysics: widget.scrollPhysics ?? const ClampingScrollPhysics(),
+            decoration: effectiveDecoration,
+            onEditingComplete: widget.onEditingComplete,
+            onSubmitted: widget.onSubmitted,
+            autofillHints: widget.autofillHints,
+          ),
         );
       },
     );
