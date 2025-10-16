@@ -185,7 +185,7 @@ class HinooSlideView extends StatelessWidget {
 
     final Matrix4 transform = buildTransform();
 
-    final double horizontalPadding = HinooTypography.horizontalPadding;
+    const double horizontalPadding = HinooTypography.horizontalPadding;
     final double verticalPadding = HinooTypography.verticalPadding(width);
     final TextStyle effectiveStyle = HinooTypography.displayTextStyle(
       color: textColor,

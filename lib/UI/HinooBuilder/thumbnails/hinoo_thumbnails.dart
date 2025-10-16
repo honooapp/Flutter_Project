@@ -228,7 +228,7 @@ class _ThumbTile extends StatelessWidget {
     }
 
     Widget buildPagePreview() {
-      final double horizontalPadding = HinooTypography.horizontalPadding;
+      const double horizontalPadding = HinooTypography.horizontalPadding;
       final double verticalPadding = HinooTypography.verticalPadding(designWidth);
       final TextStyle textStyle = HinooTypography.displayTextStyle(
         color: textColor,

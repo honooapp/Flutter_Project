@@ -30,7 +30,7 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final double canvasWidth = math.max(1, constraints.maxWidth);
-            final double horizontalPad = HinooTypography.horizontalPadding;
+            const double horizontalPad = HinooTypography.horizontalPadding;
             final double verticalPad = HinooTypography.verticalPadding(canvasWidth);
             final double usableWidth = HinooTypography.usableWidth(canvasWidth);
             final TextStyle effectiveStyle = HinooTypography.textStyle(
@@ -89,9 +89,6 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
     double maxWidth,
     TextStyle style,
   ) {
-    // Maximum characters is based on the reference line length
-    const int maxCharsPerLine = HinooTypography.referenceLine.length;
-    
     return TextInputFormatter.withFunction((oldValue, newValue) {
       if (oldValue.text == newValue.text) {
         return newValue;
@@ -110,8 +107,8 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
 
       // Check each line: either too many characters OR too wide
       for (final line in lines) {
-        // Condition 1: Line has more characters than reference line
-        if (line.length > maxCharsPerLine) {
+        // Condition 1: Line has more characters than maximum
+        if (line.length > HinooTypography.maxCharsPerLine) {
           return oldValue;
         }
         
