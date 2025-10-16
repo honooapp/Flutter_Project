@@ -91970,7 +91970,7 @@ s=m.split("\n")
 n=s.length
 if(n>20)return a
 for(m=this.c,r=this.a,q=this.b,p=0;p<n;++p){o=s[p]
-if(J.b_(o)>32)return a
+if(J.b_(o)>36)return a
 if(r.ahx(o,q)>m)return a}return b},
 $S:130}
 A.B4.prototype={}
