@@ -92885,7 +92885,7 @@ return A.co(new A.hn(A.aEu(new A.ag(p,o+9+p,A.cY(A.b([new A.ag(p,o,r.a9z(p),l),B
 $S:203}
 A.acJ.prototype={
 $1(a){var s=null,r=A.iC(B.a8,s,18,s,s,1.4),q=this.a
-return A.aNc(!1,q.d,B.m,B.r,3,A.C6(s,B.fx,s,s,s,s,s,s,!0,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,r.apU(B.a8,1.2),"Scrivi qui il tuo testo",s,s,s,s,!0,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s),!0,q.e,B.HC,B.i7,34,5,B.mU,r,B.i6)},
+return A.aNc(!1,q.d,B.m,B.r,3,A.C6(s,B.fx,s,s,s,s,s,s,!0,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,r.apU(B.a8,1.2),"Scrivi qui il tuo testo",s,s,s,s,!0,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s),!0,q.e,B.HC,B.i7,33,5,B.mU,r,B.i6)},
 $S:564}
 A.acI.prototype={
 $2(a,b){var s,r,q,p,o=null,n=this.a,m=n.f
@@ -103669,10 +103669,10 @@ B.HA=new A.aB(18,16,18,16)
 B.nT=new A.aB(200,200,200,200)
 B.nU=new A.aB(20,0,20,3)
 B.HB=new A.aB(20,20,20,20)
+B.HC=new A.aB(22,0,22,0)
 B.h0=new A.aB(24,24,24,16)
 B.jo=new A.aB(24,24,24,24)
 B.nV=new A.aB(24,32,24,32)
-B.HC=new A.aB(40,0,40,0)
 B.jp=new A.aB(4,0,4,0)
 B.HD=new A.aB(4,4,4,4)
 B.a0_=new A.aB(4,4,4,5)
