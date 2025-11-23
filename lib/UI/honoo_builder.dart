@@ -328,9 +328,9 @@ class HonooBuilderState extends State<HonooBuilder> {
                   focusNode: _textFocus,
                   style: textStyle,
                   maxLines: 5,
-                  maxCharsPerLine:
-                      34, // Lunghezza di "— Hai il presente. Non ti basta?"
-                  horizontalPadding: const EdgeInsets.symmetric(horizontal: 40),
+                  maxCharsPerLine: ("-- Hai il predente. Non ti basta?").length,
+                  //32, Lunghezza di "— Hai il presente. Non ti basta?"
+                  horizontalPadding: const EdgeInsets.symmetric(horizontal: 22),
                   decoration: InputDecoration(
                     hintText: 'Scrivi qui il tuo testo',
                     hintStyle: textStyle.copyWith(
