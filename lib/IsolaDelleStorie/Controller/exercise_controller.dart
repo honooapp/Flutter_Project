@@ -136,12 +136,14 @@ class ExerciseController {
 
   Exercise getExercise2_5() {
     return Exercise(
-      "2.5",
-      2,
-      IsolaDelleStoreContentManager.e25Title,
-      IsolaDelleStoreContentManager.e25,
-      'assets/icons/isoladellestorie/backgrounds/2radurabacche.png',
-    );
+        "2.5",
+        2,
+        IsolaDelleStoreContentManager.e25Title,
+        IsolaDelleStoreContentManager.e25First,
+        'assets/icons/isoladellestorie/backgrounds/2radurabacche.png',
+        exerciseDescriptionMore: IsolaDelleStoreContentManager.e25Second,
+        exerciseIcon: 'assets/icons/dado.svg',
+        exerciseIconName: 'Dado');
   }
 
   Exercise getExercise2_6() {
