@@ -34,6 +34,8 @@ class _NewHonooPageState extends State<NewHonooPage> {
   final GlobalKey<HonooBuilderState> _builderKey =
       GlobalKey<HonooBuilderState>();
 
+  double? _initialViewH; //xxx   AGGIUNGI QUESTA RIGA
+
   String _text = '';
   String _imageUrl = '';
 
@@ -308,12 +310,16 @@ class _NewHonooPageState extends State<NewHonooPage> {
     final double contentTopPadding = extraTop > 0 ? extraTop : 0;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false, //xxx AGGIUNTA
       backgroundColor: HonooColor.background,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, viewport) {
             final double viewW = viewport.maxWidth;
-            final double viewH = viewport.maxHeight;
+
+            //xxx memorizza la prima altezza vista e poi usala sempre
+            _initialViewH ??= viewport.maxHeight; // xxx1
+            final double viewH = _initialViewH!; // xxx1
 
             final double targetMaxW = _contentMaxWidth(viewW);
 

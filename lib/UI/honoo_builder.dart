@@ -244,7 +244,7 @@ class HonooBuilderState extends State<HonooBuilder> {
             ? constraints.maxHeight
             : media.size.height;
         final double availH =
-            (rawH - media.padding.vertical - media.viewInsets.bottom)
+            (rawH - media.padding.vertical) // xxx1 rimosso viewInsets.bottom
                 .clamp(0.0, double.infinity);
 
         if (availW <= 0 || availH <= 0) {
@@ -328,10 +328,11 @@ class HonooBuilderState extends State<HonooBuilder> {
                   focusNode: _textFocus,
                   style: textStyle,
                   maxLines: 5,
-                  maxCharsPerLine: 34, // Lunghezza di "— Hai il presente. Non ti basta?"
+                  maxCharsPerLine:
+                      34, // Lunghezza di "— Hai il presente. Non ti basta?"
                   horizontalPadding: const EdgeInsets.symmetric(horizontal: 40),
                   decoration: InputDecoration(
-                    hintText: 'Scrivi qui il testo del tuo honoo',
+                    hintText: 'Scrivi qui il tuo testo',
                     hintStyle: textStyle.copyWith(
                       color: HonooColor.background,
                       height: 1.2,
@@ -500,10 +501,10 @@ class HonooBuilderState extends State<HonooBuilder> {
     String? fileName,
   }) async {
     if (!hasImage) {
-        showHonooToast(
-          context,
-          message: 'Per poter caricare l\'immagine, devi essere prima loggato',
-        );
+      showHonooToast(
+        context,
+        message: 'Per poter caricare l\'immagine, devi essere prima loggato',
+      );
       return;
     }
     final Uint8List? bytes = await _captureCurrentAsPng();
