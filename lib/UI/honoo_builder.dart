@@ -244,8 +244,7 @@ class HonooBuilderState extends State<HonooBuilder> {
             ? constraints.maxHeight
             : media.size.height;
         final double availH =
-            (rawH - media.padding.vertical) // xxx1 rimosso viewInsets.bottom
-                .clamp(0.0, double.infinity);
+            (rawH - media.padding.vertical).clamp(0.0, double.infinity);
 
         if (availW <= 0 || availH <= 0) {
           return const SizedBox.shrink();
@@ -319,7 +318,7 @@ class HonooBuilderState extends State<HonooBuilder> {
               builder: (context) {
                 final textStyle = GoogleFonts.arvo(
                   color: HonooColor.onTertiary,
-                  fontSize: 18,
+                  fontSize: 18, //xxx font base
                   height: 1.4,
                 );
 
@@ -328,9 +327,10 @@ class HonooBuilderState extends State<HonooBuilder> {
                   focusNode: _textFocus,
                   style: textStyle,
                   maxLines: 5,
-                  maxCharsPerLine: ("-- Hai il predente. Non ti basta?").length,
-                  //32, Lunghezza di "— Hai il presente. Non ti basta?"
-                  horizontalPadding: const EdgeInsets.symmetric(horizontal: 22),
+                  maxCharsPerLine:
+                      34, //xxx lunghezza "— Hai il presente. Non ti basta?"
+                  horizontalPadding:
+                      const EdgeInsets.symmetric(horizontal: 22), //xxx
                   decoration: InputDecoration(
                     hintText: 'Scrivi qui il tuo testo',
                     hintStyle: textStyle.copyWith(

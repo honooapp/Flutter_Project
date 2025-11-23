@@ -3,11 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// A multiline text field that prevents automatic text wrapping by blocking input
-/// when either character count or physical width limits are exceeded.
-/// 
-/// Users must manually insert line breaks (Enter key) to start new lines.
-/// This ensures consistent typography across both Honoo and Hinoo.
 class WidthLimitedMultilineField extends StatefulWidget {
   const WidthLimitedMultilineField({
     super.key,
@@ -73,14 +68,25 @@ class WidthLimitedMultilineField extends StatefulWidget {
       _WidthLimitedMultilineFieldState();
 }
 
-class _WidthLimitedMultilineFieldState extends State<WidthLimitedMultilineField> {
+class _WidthLimitedMultilineFieldState
+    extends State<WidthLimitedMultilineField> {
   final ScrollController _scrollController = ScrollController();
   double? _lastPadTop;
   bool _pendingScroll = true;
 
+  late double _baseFontSize; //xxx
+  late double _currentFontSize; //xxx
+  static const double _minFontSizeAbs = 12; //xxx font minimo assoluto
+  static const double _minFactor = 0.7; //xxx % minima del font base
+
+  double get _minFontSize =>
+      math.max(_minFontSizeAbs, _baseFontSize * _minFactor); //xxx
+
   @override
   void initState() {
     super.initState();
+    _baseFontSize = widget.style.fontSize ?? 18; //xxx
+    _currentFontSize = _baseFontSize; //xxx
     widget.controller.addListener(_handleControllerChange);
   }
 
@@ -91,6 +97,13 @@ class _WidthLimitedMultilineFieldState extends State<WidthLimitedMultilineField>
       oldWidget.controller.removeListener(_handleControllerChange);
       widget.controller.addListener(_handleControllerChange);
       _pendingScroll = true;
+    }
+    if (oldWidget.style.fontSize != widget.style.fontSize &&
+        widget.style.fontSize != null) {
+      _baseFontSize = widget.style.fontSize!; //xxx
+      // se cambiano stile/tema, riallinea il font corrente
+      _currentFontSize =
+          _currentFontSize.clamp(_minFontSize, _baseFontSize); //xxx
     }
   }
 
@@ -128,48 +141,86 @@ class _WidthLimitedMultilineFieldState extends State<WidthLimitedMultilineField>
     });
   }
 
-  /// Measures the width of a single line of text
+  /// misura la larghezza di UNA riga con il font corrente
   double _measureLineWidth(String line) {
     if (line.isEmpty) return 0.0;
-    
+
     final painter = TextPainter(
-      text: TextSpan(text: line, style: widget.style),
+      text: TextSpan(
+        text: line,
+        style: widget.style.copyWith(fontSize: _currentFontSize), //xxx
+      ),
       textAlign: TextAlign.center,
       textDirection: TextDirection.ltr,
       maxLines: 1,
     )..layout();
-    
+
     return painter.width;
   }
 
-  /// Creates the input formatter that enforces both character and width limits
+  void _maybeGrowFont(double maxWidth, String fullText) {
+    // chiamata quando cancelli: se il testo è diventato "corto", torna verso il font base
+    if (fullText.isEmpty) {
+      if (_currentFontSize != _baseFontSize) {
+        setState(() => _currentFontSize = _baseFontSize); //xxx
+      }
+      return;
+    }
+
+    // se il testo è molto sotto al limite caratteri → torna al font base
+    if (fullText.length < widget.maxCharsPerLine ~/ 2 &&
+        _currentFontSize < _baseFontSize) {
+      setState(() => _currentFontSize = _baseFontSize); //xxx
+    }
+  }
+
+  /// formatter che gestisce LIMITE caratteri + larghezza + font dinamico
   TextInputFormatter _createWidthLimitFormatter(double maxWidth) {
     return TextInputFormatter.withFunction((oldValue, newValue) {
       if (oldValue.text == newValue.text) return newValue;
-      
+
       final bool isDeletion = newValue.text.length < oldValue.text.length;
-      if (isDeletion) return newValue;
-      
-      // Check total line count (manual breaks only)
+      if (isDeletion) {
+        // mai bloccare il backspace
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          _maybeGrowFont(maxWidth, newValue.text); //xxx ingrandisci se puoi
+        });
+        return newValue;
+      }
+
+      // Limite righe inserite manualmente
       final lines = newValue.text.split('\n');
       if (lines.length > widget.maxLines) {
         return oldValue;
       }
-      
-      // Check each line: prevent typing if EITHER condition is met:
-      // 1. Line exceeds character limit
-      // 2. Line exceeds physical width
+
       for (final line in lines) {
+        // 1) limite caratteri rigido
         if (line.length > widget.maxCharsPerLine) {
-          return oldValue; // Block: too many characters
+          return oldValue;
         }
-        
+
+        // 2) controllo larghezza fisica
         final lineWidth = _measureLineWidth(line);
         if (lineWidth > maxWidth) {
-          return oldValue; // Block: line too wide
+          // se posso, riduco il font e ACCETTO il carattere
+          if (_currentFontSize > _minFontSize) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              setState(() {
+                _currentFontSize =
+                    (_currentFontSize - 1).clamp(_minFontSize, _baseFontSize);
+              });
+            });
+            return newValue; // permetti il carattere, poi ridisegni più piccolo
+          }
+
+          // font già al minimo → blocco l'input
+          return oldValue;
         }
       }
-      
+
       return newValue;
     });
   }
@@ -185,10 +236,14 @@ class _WidthLimitedMultilineFieldState extends State<WidthLimitedMultilineField>
 
         final String textForLayout =
             widget.controller.text.isEmpty ? ' ' : widget.controller.text;
-        final double usableWidth = math.max(1, maxWidth - widget.horizontalPadding.horizontal);
-        
+        final double usableWidth =
+            math.max(1, maxWidth - widget.horizontalPadding.horizontal);
+
+        final textStyle =
+            widget.style.copyWith(fontSize: _currentFontSize); //xxx
+
         final TextPainter painter = TextPainter(
-          text: TextSpan(text: textForLayout, style: widget.style),
+          text: TextSpan(text: textForLayout, style: textStyle), //xxx
           textAlign: TextAlign.center,
           textDirection: TextDirection.ltr,
           maxLines: widget.maxLines,
@@ -197,7 +252,7 @@ class _WidthLimitedMultilineFieldState extends State<WidthLimitedMultilineField>
         double textHeight = painter.size.height;
         if (textHeight <= 0) {
           final double baseLineHeight =
-              (widget.style.height ?? 1.0) * (widget.style.fontSize ?? 16);
+              (textStyle.height ?? 1.0) * (textStyle.fontSize ?? 16); //xxx
           textHeight = baseLineHeight;
         }
 
@@ -233,16 +288,15 @@ class _WidthLimitedMultilineFieldState extends State<WidthLimitedMultilineField>
         final int? effectiveMaxLines = expands ? null : widget.maxLines;
         final int? effectiveMinLines = expands ? null : widget.minLines;
 
-        // Combine width limit formatter with any additional formatters
         final List<TextInputFormatter> allFormatters = [
-          _createWidthLimitFormatter(usableWidth),
+          _createWidthLimitFormatter(usableWidth), //xxx
           ...?widget.additionalInputFormatters,
         ];
 
         return TextField(
           controller: widget.controller,
           focusNode: widget.focusNode,
-          style: widget.style,
+          style: textStyle, //xxx usa sempre il font dinamico
           cursorColor: widget.cursorColor,
           cursorWidth: widget.cursorWidth ?? 2,
           cursorRadius: widget.cursorRadius,
