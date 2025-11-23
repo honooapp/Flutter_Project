@@ -14313,7 +14313,7 @@ _.d=d
 _.e=e
 _.f=f},
 a_x:function a_x(){},
-lB(a,b){return new A.tE(b,a,null)},
+lB(a,b,c){return new A.tE(b,a,c,null)},
 akb(a){var s=a.BX(t.Np)
 if(s!=null)return s
 throw A.c(A.Bu(A.b([A.r4("Scaffold.of() called with a context that does not contain a Scaffold."),A.bD("No Scaffold ancestor could be found starting from the context that was passed to Scaffold.of(). This usually happens when the context provided is from the same StatefulWidget as that whose build function actually creates the Scaffold widget being sought."),A.aa0('There are several ways to avoid this problem. The simplest is to use a Builder to get a context that is "under" the Scaffold. For an example of this, please see the documentation for Scaffold.of():\n  https://api.flutter.dev/flutter/material/Scaffold/of.html'),A.aa0("A more efficient solution is to split your build function into several widgets. This introduces a new context from which you can obtain the Scaffold. In this solution, you would have an outer widget that creates the Scaffold populated by instances of your new inner widgets, and then in these inner widgets you would use Scaffold.of().\nA less elegant but more expedient solution is assign a GlobalKey to the Scaffold, then use the key.currentState property to obtain the ScaffoldState rather than using the Scaffold.of() function."),a.aqI("The context used was")],t.F)))},
@@ -14401,9 +14401,11 @@ _.b=c
 _.c=null},
 ath:function ath(a,b){this.a=a
 this.b=b},
-tE:function tE(a,b,c){this.f=a
-this.ch=b
-this.a=c},
+tE:function tE(a,b,c,d){var _=this
+_.f=a
+_.ch=b
+_.cy=c
+_.a=d},
 xi:function xi(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p){var _=this
 _.d=a
 _.e=b
@@ -26029,11 +26031,12 @@ awK:function awK(){},
 t4:function t4(a){this.a=a},
 Im:function Im(a,b){var _=this
 _.d=a
-_.f=_.e=""
-_.r=!1
-_.w=null
-_.y=_.x=""
-_.z=!1
+_.e=null
+_.r=_.f=""
+_.w=!1
+_.x=null
+_.z=_.y=""
+_.Q=!1
 _.a=null
 _.b=b
 _.c=null},
@@ -59053,8 +59056,8 @@ ag5(){var s,r=this.c
 r.toString
 s=A.RB(r)
 if(s!=null&&s.d.length!==0)s.jy(0,B.Gu,B.eh)},
-gqj(){this.a.toString
-return!0},
+gqj(){var s=this.a.cy
+return s!==!1},
 aF(){var s,r=this,q=null
 r.aO()
 s=r.c
@@ -59108,71 +59111,63 @@ yy(a,b,c,d,e,f,g){return this.EY(a,b,c,!1,!1,d,e,f,g)},
 Oz(a,b,c,d,e,f,g,h){return this.EY(a,b,c,d,!1,e,f,g,h)},
 OW(a,b){this.a.toString},
 OV(a,b){this.a.toString},
-J(a){var s,r,q,p,o,n,m,l,k,j=this,i=null,h={},g=A.aj(a),f=a.aJ(t.I)
-f.toString
-s=f.w
+J(a){var s,r,q,p,o,n,m,l,k=this,j=null,i={},h=A.aj(a),g=a.aJ(t.I)
+g.toString
+s=g.w
 r=A.b([],t.s9)
-f=j.a.f
-j.gqj()
-j.a8J(r,new A.W7(new A.iG(f,j.f),!1,!1,i),B.is,!0,!1,!1,!1,!1)
-if(j.dy)j.yy(r,A.aFA(!0,i,j.fr,!1,i,i,i),B.iu,!0,!0,!0,!0)
-j.a.toString
-h.a=!1
-h.b=null
-if(j.at!=null||j.as.length!==0){f=A.al(j.as,!0,t.l7)
-q=j.at
-if(q!=null)f.push(q.a)
-p=A.dv(B.iA,f,B.D,B.am)
-j.gqj()
-j.yy(r,p,B.iv,!0,!1,!1,!0)}f=j.z
-if(f!=null){f.a.gayR()
-h.a=!1
-f=j.z
-if(f!=null){f=f.a
-f.gbB(f)}h.b=g.dZ.w
-f=j.z
-f=f==null?i:f.a
-j.a.toString
-j.gqj()
-j.Oz(r,f,B.e2,!1,!1,!1,!1,!0)}h.c=!1
-if(j.Q!=null){a.aJ(t.iB)
-f=A.aj(a)
-o=f.ry.f
-h.c=(o==null?0:o)!==0
-f=j.Q
-f=f==null?i:f.a
-j.a.toString
-j.gqj()
-j.Oz(r,f,B.iw,!1,!0,!1,!1,!1)}j.a.toString
-f=j.ch
-f===$&&A.a()
-q=j.CW
+g=k.a.f
+k.a8J(r,new A.W7(new A.iG(g,k.f),!1,!1,j),B.is,k.gqj(),!1,!1,!1,!1)
+if(k.dy)k.yy(r,A.aFA(!0,j,k.fr,!1,j,j,j),B.iu,!0,!0,!0,!0)
+k.a.toString
+i.a=!1
+i.b=null
+if(k.at!=null||k.as.length!==0){g=A.al(k.as,!0,t.l7)
+q=k.at
+if(q!=null)g.push(q.a)
+k.yy(r,A.dv(B.iA,g,B.D,B.am),B.iv,k.gqj(),!1,!1,!0)}g=k.z
+if(g!=null){g.a.gayR()
+i.a=!1
+g=k.z
+if(g!=null){g=g.a
+g.gbB(g)}i.b=h.dZ.w
+g=k.z
+g=g==null?j:g.a
+k.a.toString
+k.Oz(r,g,B.e2,!k.gqj(),!1,!1,!1,!0)}i.c=!1
+if(k.Q!=null){a.aJ(t.iB)
+g=A.aj(a)
+p=g.ry.f
+i.c=(p==null?0:p)!==0
+g=k.Q
+g=g==null?j:g.a
+k.a.toString
+k.Oz(r,g,B.iw,!k.gqj(),!0,!1,!1,!1)}k.a.toString
+g=k.ch
+g===$&&A.a()
+q=k.CW
 q===$&&A.a()
-n=j.dx
+o=k.dx
+o===$&&A.a()
+n=k.db
 n===$&&A.a()
-m=j.db
-m===$&&A.a()
-j.yy(r,new A.Hk(i,f,q,n,m,i),B.ix,!0,!0,!0,!0)
-switch(g.r.a){case 2:case 4:j.yy(r,A.l9(B.aF,i,B.a_,!0,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,i,j.gag4(),i,i,i,i,i,i,!1,B.bD),B.it,!0,!1,!1,!0)
+k.yy(r,new A.Hk(j,g,q,o,n,j),B.ix,!0,!0,!0,!0)
+switch(h.r.a){case 2:case 4:k.yy(r,A.l9(B.aF,j,B.a_,!0,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,j,k.gag4(),j,j,j,j,j,j,!1,B.bD),B.it,!0,!1,!1,!0)
 break
-case 0:case 1:case 3:case 5:break}f=j.x
-q=f.y
-if(q==null?A.l(f).h("dB.T").a(q):q){j.OV(r,s)
-j.OW(r,s)}else{j.OW(r,s)
-j.OV(r,s)}f=t.w
-q=A.bp(a,B.bI,f).w
-j.gqj()
-n=A.bp(a,B.ir,f).w
-l=q.f.Bd(n.e.d)
-q=A.bp(a,B.a_4,f).w
-j.gqj()
-f=A.bp(a,B.ir,f).w
-f=f.e.d!==0?0:i
-k=q.r.Bd(f)
-if(l.d<=0)j.a.toString
-f=j.a.ch
-if(f==null)f=g.go
-return new A.a0n(!1,new A.Ex(A.mT(B.af,!0,i,A.jc(j.ch,new A.aka(h,j,!1,l,k,s,r),i),B.k,f,0,i,i,i,i,i,B.eK),i),i)}}
+case 0:case 1:case 3:case 5:break}g=k.x
+q=g.y
+if(q==null?A.l(g).h("dB.T").a(q):q){k.OV(r,s)
+k.OW(r,s)}else{k.OW(r,s)
+k.OV(r,s)}g=t.w
+q=A.bp(a,B.bI,g).w
+o=k.gqj()?A.bp(a,B.ir,g).w.e.d:0
+m=q.f.Bd(o)
+o=A.bp(a,B.a_4,g).w
+g=k.gqj()&&A.bp(a,B.ir,g).w.e.d!==0?0:j
+l=o.r.Bd(g)
+if(m.d<=0)k.a.toString
+g=k.a.ch
+if(g==null)g=h.go
+return new A.a0n(!1,new A.Ex(A.mT(B.af,!0,j,A.jc(k.ch,new A.aka(i,k,!1,m,l,s,r),j),B.k,g,0,j,j,j,j,j,B.eK),j),j)}}
 A.ak9.prototype={
 $0(){this.a.z=this.b},
 $S:0}
@@ -90083,7 +90078,7 @@ a0U(){return new A.bi("2.5","2.5.Categorie",'<b>2.Radura delle Bacche:<b>\n<b>qu
 a0W(){return new A.bi("2.6","2.6.Finalmente ho cominciato","<b>2.Radura delle Bacche:<b>\n<b>questo \xe8 il sesto<b>\n<b>di sette esercizi<b>\n<b>e si chiama<b>\n<b>2.6.Finalmente<b>\n<b>ho cominciato<b>\n\nLo scopo\n di questi\xa0 esercizi\n \xe8\n trovare il <b>nome<b>\n di quello\n che diventer\xe0\n il tuo <b>primo elemento<b>.\n\nTi consiglio\n di ripetere\xa0\n gli esercizi\n della <b>Radura delle Bacche<b>\n <b>ogni giorno<b>,\n alternandoli,\n o facendo solo quelli\n che preferisci.\n\nL\u2019importante\n \xe8\n lavorare ogni giorno,\n senza saltare alcun giorno.\n\nContinua\n fino a quando\n vedrai affiorare dal tuo lavoro\n un <b>elemento<b>,\n magari un personaggio,\n a cui dovrai attribuire\n un <b>nome<b>,\n come \u201cLaura\u201d\n o\n \u201cAndrea\u201d.\n\nQuando avrai trovato\n il nome,\n puoi passare all\u2019esercizio\n <b>2.7.Ho sentito il mio nome<b>.\n\nIl tema\n dell\u2019esercizio\n <b>2.6.Finalmente ho cominciato<b>\n\xe8\nqualcosa\nche\nfinalmente\nhai iniziato.\n\nSvolgi\n nell\u2019arco della giornata\n le tre fasi dell\u2019esercizio:\n <b>scrittura libera<b>,\n <b>honoo<b>\n e\n <b>hinoo<b>.\n",u.d,2,null,null,null)},
 a0Y(){return new A.bi("2.7","2.7.Ho sentito il mio nome","<b>2.Radura delle Bacche:<b>\n<b>questo \xe8 l\u2019ultimo esercizio<b>\n<b>e si chiama<b>\n<b>2.7.Ho sentito il mio nome<b>\n\nIl tema\n \xe8\n il <b>primo elemento<b>,\n che in questo esercizio\n parla\n in <b>prima persona<b>.\n\nE dice\n tutto quello\n che ha voglia di dire,\n prima nella <b>scrittura libera<b>,\n poi nell\u2019<b>honoo<b>\n e infine nell\u2019<b>hinoo<b>.\n\nPratica\n questo esercizio\n per il numero di giorni\n che vuoi,\n poi clicca su <b>3<b>,\n e mettiti in cammino per\n il <b>Pozzo dell\u2019Oracolo<b>.\n",u.d,2,null,null,null)},
 a1_(){return new A.bi("3.1","3.1.Missioni",'<b>3.Pozzo dell\u2019Oracolo:<b>\n<b>questo \xe8 il primo<b>\n<b>di cinque esercizi<b>\n<b>e si chiama<b>\n<b>3.1.Missioni<b>\n\nIn questo contesto\nutilizzo la parola\n"missione"\ncome sinonimo di\n\u201ccompito da portare a termine\u201d\ne anche come sinonimo di\n\u201ccircostanze che possono verificarsi\u201d.\n\nTi propongo\nil mio elenco di\n<b>centoquarantaquattro missioni<b>:\ncol metodo di scelta casuale\nche preferisci,\nscegli una <b>missione<b>\nalla volta\ne usala come <b>tema<b>\nper l\u2019esercitazione,\narticolata,\ncome sempre,\nin tre fasi:\n<b>scrittura libera<b>,\n<b>honoo<b>\ne\n<b>hinoo<b>.\n\nSe clicchi sul \n',u.j,3,"\nscelgo io\nuna missione per te.\n\n\n1\n<b>Abbracciare<b>\n\n2\n<b>Accarezzare un animale<b>\n\n3\n<b>Accettare una proposta<b>\n\n4\n<b>Accusare<b>\n\n5\n<b>Addormentarsi<b>\n\n6\n<b>Affittare una casa<b>\n\n7\n<b>Amare<b>\n\n8\n<b>Andare per la prima volta in un posto<b>\n\n9\n<b>Ascoltare il figlio<b>\n\n10\n<b>Ascoltare il padre<b>\n\n11\n<b>Ascoltare la figlia<b>\n\n12\n<b>Ascoltare la madre<b>\n\n13\n<b>Ascoltare una canzone<b>\n\n14\n<b>Assolvere<b>\n\n15\n<b>Assumere sostanze<b>\n\n16\n<b>Baciare<b>\n\n17\n<b>Baciarsi<b>\n\n18\n<b>Cadere<b>\n\n19\n<b>Cadere di nuovo<b>\n\n20\n<b>Cambiare idea<b>\n\n21\n<b>Camminare mano<b>\n<b>nella mano<b>\n\n22\n<b>Chiedere aiuto<b>\n\n23\n<b>Chiedere perdono<b>\n\n24\n<b>Chiedere un consiglio<b>\n\n25\n<b>Combattere<b>\n<b>una dipendenza<b>\n\n26\n<b>Commettere un errore<b>\n\n27\n<b>Commettere un reato<b>\n\n28\n<b>Commiserare<b>\n\n29\n<b>Comprare cibo<b>\n\n30\n<b>Comprare qualcosa<b>\n\n31\n<b>Comprare un regalo<b>\n\n32\n<b>Comprare un\u2019auto<b>\n\n33\n<b>Comprare una lavatrice<b>\n\n34\n<b>Comprare vestiti<b>\n\n35\n<b>Condannare<b>\n\n36\n<b>Confidarsi<b>\n\n37\n<b>Controllare di nascosto<b>\n<b>il suo cellulare<b>\n\n38\n<b>Costruire qualcosa<b>\n\n39\n<b>Curarsi<b>\n\n40\n<b>Danzare<b>\n\n41\n<b>Dare un consiglio<b>\n\n42\n<b>Dare un ordine<b>\n\n43\n<b>Decidere di fare un figlio<b>\n\n44\n<b>Decidere di non tenere<b>\n<b>un figlio<b>\n\n45\n<b>Deludere<b>\n\n46\n<b>Deridere<b>\n\n47\n<b>Desiderare<b>\n\n48\n<b>Dimenticare<b>\n\n49\n<b>Dire la verit\xe0<b>\n\n50\n<b>Dire una bugia<b>\n\n51\n<b>Distruggere qualcosa<b>\n\n52\n<b>Dormire<b>\n\n53\n<b>Dormire poco<b>\n\n54\n<b>Essere abbracciati<b>\n\n55\n<b>Essere accusati<b>\n\n56\n<b>Essere amati<b>\n\n57\n<b>Essere assolti<b>\n\n58\n<b>Essere assunti<b>\n\n59\n<b>Essere baciati<b>\n\n60\n<b>Essere commiserati<b>\n\n61\n<b>Essere condannati<b>\n\n62\n<b>Essere curati<b>\n\n63\n<b>Essere delusi da qualcuno<b>\n\n64\n<b>Essere derisi<b>\n\n65\n<b>Essere desiderati<b>\n\n66\n<b>Essere dimenticati<b>\n\n67\n<b>Essere dipendenti<b>\n\n68\n<b>Essere gelosi<b>\n\n69\n<b>Essere giudicati<b>\n\n70\n<b>Essere insultati<b>\n\n71\n<b>Essere perdonati<b>\n\n72\n<b>Essere ricordati<b>\n\n73\n<b>Essere scoperti<b>\n\n74\n<b>Essere sedotti<b>\n\n75\n<b>Essere seducenti<b>\n\n76\n<b>Essere traditi<b>\n\n77\n<b>Fantasticare<b>\n\n78\n<b>Fare la pace<b>\n\n79\n<b>Fare una proposta<b>\n\n80\n<b>Fidarsi<b>\n\n81\n<b>Giudicare<b>\n\n82\n<b>Guadagnare soldi<b>\n\n83\n<b>Imparare qualcosa<b>\n\n84\n<b>Insultare<b>\n\n85\n<b>Invitare qualcuno<b>\n<b>a ballare<b>\n\n86\n<b>Lasciarsi<b>\n\n87\n<b>Litigare<b>\n\n88\n<b>Mettersi insieme<b>\n\n89\n<b>Morire<b>\n\n90\n<b>Nascere<b>\n\n91\n<b>Nascondere qualcosa<b>\n\n92\n<b>Non abbracciare<b>\n\n93\n<b>Non dormire abbastanza<b>\n\n94\n<b>Non fidarsi<b>\n\n95\n<b>Non riuscire a dormire<b>\n\n96\n<b>Non salutare<b>\n\n97\n<b>Parlare al figlio<b>\n\n98\n<b>Parlare al padre<b>\n\n99\n<b>Parlare alla figlia<b>\n\n100\n<b>Parlare alla madre<b>\n\n101\n<b>Parlare troppo<b>\n\n102\n<b>Perdere soldi<b>\n\n103\n<b>Perdonare<b>\n\n104\n<b>Perdonarsi<b>\n\n105\n<b>Piangere<b>\n\n106\n<b>Piantare un albero<b>\n\n107\n<b>Prendere la mano<b>\n<b>di qualcuno<b>\n\n108\n<b>Prendere una decisione<b>\n\n109\n<b>Prendersi cura<b>\n\n110\n<b>Preparare da mangiare<b>\n<b>per qualcuno<b>\n\n111\n<b>Provare piet\xe0<b>\n\n112\n<b>Rialzarsi<b>\n\n113\n<b>Ricevere un consiglio<b>\n\n114\n<b>Ricevere un ordine<b>\n\n115\n<b>Ricevere un regalo<b>\n\n116\n<b>Ricevere una lettera<b>\n\n117\n<b>Ricevere una telefonata<b>\n\n118\n<b>Ricordare<b>\n\n119\n<b>Ricordare un sogno<b>\n\n120\n<b>Ridere<b>\n\n121\n<b>Rifiutare una proposta<b>\n\n122\n<b>Rimpiangere<b>\n\n123\n<b>Rinunciare<b>\n\n124\n<b>Riparare<b>\n\n125\n<b>Salutare affettuosamente<b>\n\n126\n<b>Scegliere un corso di studi<b>\n\n127\n<b>Scegliere un regalo<b>\n\n128\n<b>Scoprire<b>\n\n129\n<b>Scrivere<b>\n\n130\n<b>Scrivere una lettera<b>\n\n131\n<b>Sognare<b>\n\n132\n<b>Studiare<b>\n\n133\n<b>Subire un'ingiustizia<b>\n\n134\n<b>Tacere<b>\n\n135\n<b>Telefonare<b>\n\n136\n<b>Tornare insieme<b>\n\n137\n<b>Tradire<b>\n\n138\n<b>Trasferirsi<b>\n<b>in un'altra citt\xe0<b>\n\n139\n<b>Traslocare<b>\n\n140\n<b>Trovare il telefono occupato<b>\n\n141\n<b>Utilizzare un falso profilo<b>\n\n142\n<b>Vendere qualcosa<b>\n\n143\n<b>Vendicarsi<b>\n\n144\n<b>Vivere un lutto<b>\n\n\nUtilizza come tema\nla <b>missione<b> \"<b>in generale<b>\",\ne continua\ncon questo esercizio\ntutti i giorni,\ncambiando missioni, \nfino a quando\nvedrai\nil tuo <b>primo personaggio<b>\n<b>apparire<b>\nin quello\nche stai scrivendo.\n\nCosa intendo\nper\n\"veder apparire\u201d\nil <b>primo personaggio<b>\nall\u2019interno degli esercizi?\n\nPer me\nsignifica\nche avrai guadagnato\nqualche frammento:\nimmagini,\nun'azione,\nun dettaglio,\nmagari solo un avverbio.\n\nQuando questo\nsar\xe0 accaduto,\nesci\ndal <b>Pozzo dell\u2019Oracolo<b>\ne vai verso\nla <b>Porta nell\u2019Alabastro<b>.\n\nSe non ti convince\nla proposta \ndi dedicarti ad altro\ne di aspettare\nche il tuo personaggio\nappaia,\nti consiglio di prendere\nla <b>Scorciatoia<b>,\ncliccare su <b>6<b>,e di arrivare direttamente\nal <b>Secondo Anello<b>.\n","assets/icons/dado.svg","Dado")},
-a11(){return new A.bi("3.2","3.2.Le Tue Missioni","<b>3.Pozzo dell\u2019Oracolo:<b>\n<b>questo \xe8 il secondo<b>\n<b>di cinque esercizi<b>\n<b>e si chiama<b>\n<b>3.2.Le Tue Missioni<b>\n\nQuesto esercizio \n\xe8 una variante di\n<b>3.1.Missioni<b>.\n\nCompila la <b>tua lista<b>\n<b>di centoquarantaquattro missioni<b>.\n\nScegli a caso\nuna <b>missione<b>\ndalla tua <b>lista<b>\ne usa la missione scelta\ncome tema\nper l\u2019esercitazione.\n\nSe clicchi sul \n\n\n\nscelgo io\nuna missione per te\n",u.j,3,"\nscelgo io una missione.\n","assets/icons/dado.svg","Dado")},
+a11(){return new A.bi("3.2","3.2.Le Tue Missioni","<b>3.Pozzo dell\u2019Oracolo:<b>\n<b>questo \xe8 il secondo<b>\n<b>di cinque esercizi<b>\n<b>e si chiama<b>\n<b>3.2.Le Tue Missioni<b>\n\nQuesto esercizio \n\xe8 una variante di\n<b>3.1.Missioni<b>.\n\nCompila la <b>tua lista<b>\n<b>di centoquarantaquattro missioni<b>.\n\nScegli a caso\nuna <b>missione<b>\ndalla tua <b>lista<b>\ne usa la missione scelta\ncome tema\nper l\u2019esercitazione.\n\nSe clicchi sul\n",u.j,3,"\nscelgo io\nuna missione per te.\n","assets/icons/dado.svg","Dado")},
 a13(){return new A.bi("3.3","3.3.I Ching","<b>3.Pozzo dell\u2019Oracolo:<b>\n<b>questo \xe8 il terzo<b>\n<b>di cinque esercizi<b>\n<b>e si chiama<b>\n<b>3.3.I Ching<b>\n\nQuesto esercizio \n\xe8 una variante di\n<b>3.1.Missioni<b>.\n\nScegli a caso\nuno\ndei sessantaquattro <b>esagrammi<b>\nde <i>I Ching<i>,\ne,\ndopo aver letto\ni commenti all'esagramma\ncontenuti in\n<i>I Ching<i>:\n<i>il libro dei mutamenti<i>,\na cura di Richard Wilhelm,\nMilano, Adephi, 1995,\nindividua\nla tua <b>missione<b>\ne usala come <b>tema<b>\nper l\u2019esercitazione.\n\nIl testo contiene\nuna prefazione\ndi Carl Gustav Jung\ndel 1949,\nin cui si parla\ndi\n<b>sincronicit\xe0<b>\ne del profondo interesse\ndel pensiero tradizionale cinese\nper gli aspetti accidentali\ndegli eventi.\n\nCredo che\nquesta prefazione\nabbia avuto un ruolo\nnella mia formazione,\ne che abbia influenzato\nil modo in cui,\nnella costruzione\ndegli esercizi\ndell\u2019Isola delle Storie,\nho inserito spesso\nl\u2019elemento\ndella scelta casuale\ndi un numero\no\ndi una lettera.\n\nAd esempio\nadesso,\nse clicchi sul \n\n",u.j,3,"\nscelgo io\nun esagramma\nper il tuo esercizio\n<b>3.3.I Ching<b>.\n","assets/icons/dado.svg","Dado")},
 a15(){return new A.bi("3.4","3.4.Frammenti","<b>3.Pozzo dell\u2019Oracolo:<b>\n<b>questo \xe8 il quarto<b>\n<b>di cinque esercizi<b>\n<b>e si chiama<b>\n<b>3.4.Frammenti<b>\n\nQuesto esercizio\n\xe8 una variante di\n<b>3.1.Missioni<b>.\n\nPrendi un <b>libro<b>\nimportante per te,\nscegli un punto a caso,\ndi una pagina a caso,\ne,\na partire da quel punto,\nestrapola un <b>frammento<b>,\n<b>al massimo<b>\n<b>centoquarantaquattro caratteri,<b>\nspazi compresi.\n\nA partire dall'analisi \ndi quel frammento,\nindividua la tua <b>missione<b>\ne usala come <b>tema<b>\nper l\u2019 esercitazione.\n",u.j,3,null,null,null)},
 a17(){return new A.bi("3.5","3.5.Oroscopi",'<b>3.Pozzo dell\u2019Oracolo:<b>\n<b>questo \xe8 l\u2019ultimo<b>\n<b>di cinque esercizi<b>\n<b>e si chiama<b>\n<b>3.5.Oroscopi<b>\n\nQuesto esercizio \n\xe8 una variante di\n<b>3.1.Missioni<b>.\n\nNel modo\nche ritieni opportuno,\nscegli\nun <b>oroscopo<b>\ndi <b>Rob Brezny<b>\no anche un suo\n"compito per casa":\n\n<l>Oroscopo||www.internazionale.it/oroscopo<l>\n\nA partire dall\u2019analisi del testo,\nindividua la tua <b>missione<b>\ne usala come tema\nper l\u2019esercitazione.\n',u.j,3,null,null,null)},
@@ -90182,7 +90177,7 @@ q=A.b([r,B.i3,A.ap9(A.iy(A.co(A.ml(A.aIT(n.a9k(a),p),B.D),m,m,m),1),q),B.i3],o)
 if(s.length!==0&&n.e)q.push(new A.bt(B.cU,new A.Vr(B.Zf,12,12,s,m),m))
 q.push(B.i3)
 q.push(n.a9D())
-return A.lB(B.a8,A.zJ(new A.iG(A.dv(B.V,A.b([l,A.n5(0,A.cY(q,B.ds,B.aZ,B.K),0)],o),B.D,B.cH),new A.cf(k.a,t.c)),B.fX,new A.at2(),B.bN,B.dt,new A.at3()))}}
+return A.lB(B.a8,A.zJ(new A.iG(A.dv(B.V,A.b([l,A.n5(0,A.cY(q,B.ds,B.aZ,B.K),0)],o),B.D,B.cH),new A.cf(k.a,t.c)),B.fX,new A.at2(),B.bN,B.dt,new A.at3()),m)}}
 A.at1.prototype={
 $0(){this.b.d=this.a.a},
 $S:0}
@@ -90283,7 +90278,7 @@ m=A.ap9(A.ml(A.aIT(A.cZ(q,B.S1,B.k,q,q,new A.de(A.ah(153,2,34,81),q,q,A.cy(8),q,
 l=r.d
 k=t.p
 s=A.da(q,A.dv(B.V,A.b([m,A.da(q,A.ap9(A.bZ(q,q,B.IN,40,new A.avf(r),q,q,q,"Chiudi",q),l),q,q,q,0,0,q)],k),B.D,B.am),80*n/100,q,10*p/100,10*o/100,0,q)
-return A.lB(B.a8,A.dv(B.V,A.b([A.cY(A.b([new A.ag(q,52,A.co(new A.jj(new A.avg(a),q),q,q,q),q),A.iy(A.dv(B.V,A.b([A.EY(new A.dX(new A.avh(r),q),q,B.di),s],k),B.k,B.am),1),new A.ag(q,80,new A.dX(new A.avi(r),q),q)],k),B.P,B.J,B.K),A.da(q,A.pj(A.mT(B.af,!0,q,A.bZ(q,q,A.c3("assets/icons/moon.svg",q,B.C,q,"Moon",q),60,new A.avj(a),q,32,q,"Vai sulla Luna",q),B.k,B.T,0,q,q,q,q,q,B.eK),!0),q,q,q,8,8,q)],k),B.D,B.cH))},
+return A.lB(B.a8,A.dv(B.V,A.b([A.cY(A.b([new A.ag(q,52,A.co(new A.jj(new A.avg(a),q),q,q,q),q),A.iy(A.dv(B.V,A.b([A.EY(new A.dX(new A.avh(r),q),q,B.di),s],k),B.k,B.am),1),new A.ag(q,80,new A.dX(new A.avi(r),q),q)],k),B.P,B.J,B.K),A.da(q,A.pj(A.mT(B.af,!0,q,A.bZ(q,q,A.c3("assets/icons/moon.svg",q,B.C,q,"Moon",q),60,new A.avj(a),q,32,q,"Vai sulla Luna",q),B.k,B.T,0,q,q,q,q,q,B.eK),!0),q,q,q,8,8,q)],k),B.D,B.cH),q)},
 aiH(a){var s,r,q,p=null,o="1.Grotta delle Rondini",n=u.F,m=u.Z
 $.L_()
 s=A.aN("page")
@@ -90459,7 +90454,7 @@ A.aqo.prototype={
 $1(a){return!1},
 $S:9}
 A.aqk.prototype={
-$2(a,b){if(b.a!==B.fS)return B.QB
+$2(a,b){if(b.a!==B.fS)return B.QC
 if(b.b!=null)return B.bP
 else return B.bW},
 $S:528}
@@ -90585,7 +90580,7 @@ case 7:case 1:return A.B(q,r)
 case 2:return A.A(o,r)}})
 return A.C($async$uu,r)},
 J(a){var s=A.aFw(a)-52,r=s>0?s:0,q=this.e
-return A.lB(B.a8,A.pj(A.jc(new A.pY(A.b([q.b,q.c],t.bA)),new A.arO(this,r),null),!0))}}
+return A.lB(B.a8,A.pj(A.jc(new A.pY(A.b([q.b,q.c],t.bA)),new A.arO(this,r),null),!0),null)}}
 A.arw.prototype={
 $1(a){return B.bP},
 $S:29}
@@ -90785,7 +90780,7 @@ A.ol.prototype={
 ae(){return new A.Wx(B.j)}}
 A.Wx.prototype={
 J(a){var s=null,r=$.a4B().Cq(),q=A.bp(a,s,t.w).w.a.a,p=r?q:q*0.5,o=A.co(new A.jj(new A.arY(a),s),s,s,s),n=this.a.c,m=$.eX.ac(),l=A.bq(this.a.d,s,s,s,s,A.hO(B.j6,18,B.aM),B.fi,s),k=$.xx.ac(),j=t.p
-return A.lB(B.a8,A.fx(A.b([B.l6,A.cZ(s,A.co(A.cY(A.b([new A.ag(s,52,o,s),B.zX,new A.rl(n,B.h,18,s),B.Sg,new A.ag(80*m/100,s,l,s),B.Se,new A.ag(80*$.eX.ac()/100,20*k/100,A.bq(this.a.e,s,s,s,s,A.hO(B.j6,14,B.aM),B.fi,s),s),B.l6,new A.ag(s,60,A.fx(A.b([A.bZ(s,s,A.c3("assets/icons/home.svg",s,B.C,s,"Home",s),60,new A.arZ(a),s,25,s,"Home",s)],j),B.J,B.K),s)],j),B.P,B.aZ,B.K),s,s,s),B.k,s,new A.ak(0,p,0,1/0),s,s,s,s,s,s,s,s,s),B.l6],j),B.J,B.K))}}
+return A.lB(B.a8,A.fx(A.b([B.l6,A.cZ(s,A.co(A.cY(A.b([new A.ag(s,52,o,s),B.zX,new A.rl(n,B.h,18,s),B.Sg,new A.ag(80*m/100,s,l,s),B.Se,new A.ag(80*$.eX.ac()/100,20*k/100,A.bq(this.a.e,s,s,s,s,A.hO(B.j6,14,B.aM),B.fi,s),s),B.l6,new A.ag(s,60,A.fx(A.b([A.bZ(s,s,A.c3("assets/icons/home.svg",s,B.C,s,"Home",s),60,new A.arZ(a),s,25,s,"Home",s)],j),B.J,B.K),s)],j),B.P,B.aZ,B.K),s,s,s),B.k,s,new A.ak(0,p,0,1/0),s,s,s,s,s,s,s,s,s),B.l6],j),B.J,B.K),s)}}
 A.arY.prototype={
 $0(){A.bm(this.a,!1).eP(A.c7(new A.arW(),null,t.z),new A.arX())},
 $S:0}
@@ -90996,7 +90991,7 @@ A.Yi.prototype={
 J(a){var s,r=null,q=A.co(new A.jj(new A.auw(a),r),r,r,r),p=$.eX.ac(),o=A.iy(A.cZ(r,r,B.k,r,r,r,r,r,r,r,r,r,r,r),1),n=$.a4B().Cq()?new A.ak(0,100*$.eX.ac()/100,0,1/0):new A.ak(0,50*$.eX.ac()/100,0,1/0),m=$.xx.ac()
 $.qs()
 s=t.p
-return A.lB(B.a8,A.dv(B.V,A.b([A.cY(A.b([new A.ag(r,52,q,r),A.iy(A.EY(new A.ag(100*p/100,r,A.fx(A.b([o,A.cZ(r,A.cY(A.b([new A.ag(r,80*m/100,A.dv(B.V,A.b([A.n5(0,new A.fq(B.iB,r,r,A.EY(A.cY(A.b([B.l3,A.bq("Ti regaliamo la Luna.\nPer sempre.",r,r,r,r,A.iC(B.h,r,18,r,B.av,r),B.G,r),B.cd,A.bq("Niente \xe8 per sempre,\ne nessuno pu\xf2 regalarti la Luna.\n\n\xc8 vero,\nma non per i poeti.\n\nVuoi essere un poeta di honoo?\n\nClicca sulla Bottiglia,\ne componi i tuoi honoo e hinoo.\n\nOppure sulla Luna,\ne guarda gli honoo\ne gli hinoo degli altri.\n\nO sull\u2019Isola,\ne inizia il viaggio\nverso le tue storie.",r,r,r,r,A.iC(B.h,r,18,r,B.w,r),B.G,r)],s),B.P,B.J,B.K),r,r),r),0)],s),B.k,B.am),r)],s),B.P,B.J,B.K),B.k,r,n,r,r,r,r,r,r,r,r,r),A.iy(A.cZ(r,r,B.k,r,r,r,r,r,r,r,r,r,r,r),1)],s),B.J,B.K),r),r,r),1),B.QR],s),B.P,B.J,B.K),B.eJ],s),B.k,B.cH))}}
+return A.lB(B.a8,A.dv(B.V,A.b([A.cY(A.b([new A.ag(r,52,q,r),A.iy(A.EY(new A.ag(100*p/100,r,A.fx(A.b([o,A.cZ(r,A.cY(A.b([new A.ag(r,80*m/100,A.dv(B.V,A.b([A.n5(0,new A.fq(B.iB,r,r,A.EY(A.cY(A.b([B.l3,A.bq("Ti regaliamo la Luna.\nPer sempre.",r,r,r,r,A.iC(B.h,r,18,r,B.av,r),B.G,r),B.cd,A.bq("Niente \xe8 per sempre,\ne nessuno pu\xf2 regalarti la Luna.\n\n\xc8 vero,\nma non per i poeti.\n\nVuoi essere un poeta di honoo?\n\nClicca sulla Bottiglia,\ne componi i tuoi honoo e hinoo.\n\nOppure sulla Luna,\ne guarda gli honoo\ne gli hinoo degli altri.\n\nO sull\u2019Isola,\ne inizia il viaggio\nverso le tue storie.",r,r,r,r,A.iC(B.h,r,18,r,B.w,r),B.G,r)],s),B.P,B.J,B.K),r,r),r),0)],s),B.k,B.am),r)],s),B.P,B.J,B.K),B.k,r,n,r,r,r,r,r,r,r,r,r),A.iy(A.cZ(r,r,B.k,r,r,r,r,r,r,r,r,r,r,r),1)],s),B.J,B.K),r),r,r),1),B.QR],s),B.P,B.J,B.K),B.eJ],s),B.k,B.cH),r)}}
 A.auw.prototype={
 $0(){A.bm(this.a,!1).eP(A.c7(new A.auu(),null,t.z),new A.auv())},
 $S:0}
@@ -91056,7 +91051,7 @@ break
 case 5:return A.B(null,r)
 case 1:return A.A(p,r)}})
 return A.C($async$uN,r)},
-J(a){return A.lB(B.h,A.pj(new A.dX(new A.awg(this),null),!0))},
+J(a){return A.lB(B.h,A.pj(new A.dX(new A.awg(this),null),!0),null)},
 a9h(a,b){var s,r,q=null
 if(this.d)s=B.DE
 else{r=this.e.length
@@ -91307,7 +91302,7 @@ V5(a){var s=this.c
 if(s==null)return
 A.bJ(s,"Collega API del builder: "+a)},
 J(a){var s=A.aFw(a)-52
-return A.lB(B.a8,A.pj(new A.dX(new A.awT(this,s>0?s:0),null),!0))}}
+return A.lB(B.a8,A.pj(new A.dX(new A.awT(this,s>0?s:0),null),!0),null)}}
 A.awV.prototype={
 $1(a){var s,r=this.a,q=r.d.gR()
 if(q==null)s=null
@@ -91391,8 +91386,8 @@ A.t4.prototype={
 ae(){return new A.Im(new A.bR(null,t.dx),B.j)}}
 A.Im.prototype={
 ahR(a,b){var s=this
-if(a===s.e&&b===s.f)return
-s.W(new A.awZ(s,a,b,a===s.x&&b===s.y))},
+if(a===s.f&&b===s.r)return
+s.W(new A.awZ(s,a,b,a===s.y&&b===s.z))},
 qs(){var s=0,r=A.D(t.H),q,p=2,o,n=this,m,l,k,j,i,h,g,f,e,d
 var $async$qs=A.z(function(a,b){if(a===1){o=b
 s=p}while(true)switch(s){case 0:e=$.bG()
@@ -91414,11 +91409,11 @@ h=A.c7(new A.ax0(n),null,t.z)
 A.bm(e,!1).da(h)
 s=1
 break
-case 4:g=n.w
+case 4:g=n.x
 s=g==null?6:8
 break
 case 6:s=9
-return A.o(n.v0(n.f),$async$qs)
+return A.o(n.v0(n.r),$async$qs)
 case 9:s=7
 break
 case 8:b=g
@@ -91426,7 +91421,7 @@ case 7:m=b
 if(m==null||J.b_(m)===0){e=n.c
 if(e!=null)A.bJ(e,"Devi caricare un\u2019immagine (URL pubblico).")
 s=1
-break}l=A.Pa(0,n.e,m,new A.cA(Date.now(),!1).hP(),new A.cA(Date.now(),!1).hP(),i.a,B.ep,null,null)
+break}l=A.Pa(0,n.f,m,new A.cA(Date.now(),!1).hP(),new A.cA(Date.now(),!1).hP(),i.a,B.ep,null,null)
 p=11
 s=14
 return A.o(A.BR(l),$async$qs)
@@ -91455,16 +91450,16 @@ return A.C($async$qs,r)},
 va(){var s=0,r=A.D(t.H),q,p=2,o,n=this,m,l,k,j,i,h,g,f,e,d,c,b,a
 var $async$va=A.z(function(a0,a1){if(a0===1){o=a1
 s=p}while(true)switch(s){case 0:p=4
-h=n.w
+h=n.x
 s=h==null?7:9
 break
 case 7:s=10
-return A.o(n.v0(n.f),$async$va)
+return A.o(n.v0(n.r),$async$va)
 case 10:s=8
 break
 case 9:a1=h
 case 8:m=a1
-g=n.e
+g=n.f
 f=m
 if(f==null)f=""
 e=new A.cA(Date.now(),!1).hP()
@@ -91502,7 +91497,7 @@ case 2:return A.A(o,r)}})
 return A.C($async$va,r)},
 uG(){var s=0,r=A.D(t.H),q,p=this,o,n,m,l
 var $async$uG=A.z(function(a,b){if(a===1)return A.A(b,r)
-while(true)switch(s){case 0:if(!p.z){o=p.c
+while(true)switch(s){case 0:if(!p.Q){o=p.c
 if(o==null){s=1
 break}A.bJ(o,u.o)
 s=1
@@ -91563,7 +91558,7 @@ s=1
 break
 case 1:return A.B(q,r)}})
 return A.C($async$v0,r)},
-abl(){var s,r,q,p=B.c.ci(this.e)
+abl(){var s,r,q,p=B.c.ci(this.f)
 if(p.length===0)return"honoo"
 s=A.by("[^a-z0-9]+",!0,!1)
 s=A.cW(p.toLowerCase(),s,"_")
@@ -91580,59 +91575,64 @@ if(a<1024)return a*0.84
 if(a<1440)return a*0.7
 return a*0.58},
 J(a){var s=A.aFw(a)-52
-return A.lB(B.a8,A.pj(new A.dX(new A.axc(this,s>0?s:0),null),!0))}}
+return A.lB(B.a8,A.pj(new A.dX(new A.axc(this,s>0?s:0),null),!0),!1)}}
 A.awZ.prototype={
 $0(){var s,r=this,q=r.a,p=r.b
-q.e=p
+q.f=p
 s=r.c
-q.f=s
-q.z=B.c.ci(p).length!==0
-if(!r.d)q.r=!1
-if(s!==q.y)q.w=null},
+q.r=s
+q.Q=B.c.ci(p).length!==0
+if(!r.d)q.w=!1
+if(s!==q.z)q.x=null},
 $S:0}
 A.ax_.prototype={
 $1(a){return B.It},
 $S:90}
 A.ax0.prototype={
 $1(a){var s=this.a
-return new A.mw(s.e,s.f,null,null)},
+return new A.mw(s.f,s.r,null,null)},
 $S:91}
 A.ax1.prototype={
 $0(){var s=this.a
-s.r=!0
-s.w=this.b
-s.x=s.e
-s.y=s.f},
+s.w=!0
+s.x=this.b
+s.y=s.f
+s.z=s.r},
 $S:0}
 A.awX.prototype={
 $1(a){return new A.rZ(this.a.abl(),null)},
 $S:552}
 A.awW.prototype={
 $0(){var s=this.a
-s.f=s.e=""
-s.r=!1
-s.w=null
-s.y=s.x=""
-s.z=!1},
+s.r=s.f=""
+s.w=!1
+s.x=null
+s.z=s.y=""
+s.Q=!1},
 $S:0}
 A.awY.prototype={
 $0(){},
 $S:0}
 A.axc.prototype={
-$2(a,b){var s,r,q,p,o,n=null,m=b.b,l=this.a,k=l.aaL(m),j=this.b,i=B.d.cr(b.d-52-44-j-100,0,1/0),h=Math.min(k,B.d.cr((i-9)/1.5,0,1/0))
-if(!isFinite(h)||h<=0)h=Math.min(k,m)
-s=A.co(new A.jj(new A.ax8(a),n),n,n,n)
-r=t.p
-q=A.b([],r)
-if(l.z)B.b.C(q,A.b([new A.uf(B.ou,l.gae4(),"Scarica honoo",n),B.zU],r))
-q.push(new A.uf(B.os,l.gae2(),"Elimina honoo",n))
-j=A.cY(A.b([new A.ag(n,52,s,n),new A.ag(n,j,n,n),new A.ag(n,44,A.co(new A.ag(h,44,A.fx(q,B.uV,B.K),n),n,n,n),n),new A.ag(n,i,A.co(A.aEi(new A.ag(h,h*1.5+9,A.ml(new A.wa(l.gahQ(),l.gahW(),n,l.d),B.D),n),new A.ak(0,k,0,1/0),B.bN,B.jl),n,n,n),n)],r),B.P,B.J,B.K)
-s=A.bZ(n,n,A.c3("assets/icons/home.svg",B.ba,B.C,n,"Home",n),60,new A.ax9(a),n,25,n,"Home",n)
-q=$.eX.ac()
-p=A.bZ(n,n,A.c3("assets/icons/chest.svg",n,B.C,n,"Chest",n),60,new A.axa(a),n,40,n,"Apri il tuo Cuore",n)
-o=$.eX.ac()
-l=l.r?A.bZ(n,n,A.c3("assets/icons/moon.svg",n,B.C,n,"Luna",n),32,l.gam5(),n,25,n,"Spedisci sulla Luna",n):A.bZ(n,n,A.c3("assets/icons/ok.svg",n,B.C,n,"OK",n),60,l.gam4(),n,25,n,"Salva honoo",n)
-return A.dv(B.V,A.b([j,A.da(0,new A.bt(B.nP,A.fx(A.b([s,new A.ag(5*q/100,n,n,n),p,new A.ag(5*o/100,n,n,n),l,new A.ag(5*$.eX.ac()/100,n,n,n),A.bZ(n,n,A.c3("assets/icons/piuma.svg",n,B.C,n,"Piuma",n),60,new A.axb(a),n,25,n,"Scrivi hinoo",n)],r),B.aZ,B.K),n),n,n,0,0,n,n),B.eJ],r),B.k,B.am)},
+$2(a,b){var s,r,q,p,o,n,m,l,k,j=null,i=b.b,h=this.a,g=h.e
+if(g==null)g=h.e=b.d
+s=h.aaL(i)
+r=this.b
+q=B.d.cr(g-52-44-r-100,0,1/0)
+p=Math.min(s,B.d.cr((q-9)/1.5,0,1/0))
+if(!isFinite(p)||p<=0)p=Math.min(s,i)
+o=A.co(new A.jj(new A.ax8(a),j),j,j,j)
+n=t.p
+m=A.b([],n)
+if(h.Q)B.b.C(m,A.b([new A.uf(B.ou,h.gae4(),"Scarica honoo",j),B.zU],n))
+m.push(new A.uf(B.os,h.gae2(),"Elimina honoo",j))
+r=A.cY(A.b([new A.ag(j,52,o,j),new A.ag(j,r,j,j),new A.ag(j,44,A.co(new A.ag(p,44,A.fx(m,B.uV,B.K),j),j,j,j),j),new A.ag(j,q,A.co(A.aEi(new A.ag(p,p*1.5+9,A.ml(new A.wa(h.gahQ(),h.gahW(),j,h.d),B.D),j),new A.ak(0,s,0,1/0),B.bN,B.jl),j,j,j),j)],n),B.P,B.J,B.K)
+o=A.bZ(j,j,A.c3("assets/icons/home.svg",B.ba,B.C,j,"Home",j),60,new A.ax9(a),j,25,j,"Home",j)
+m=$.eX.ac()
+l=A.bZ(j,j,A.c3("assets/icons/chest.svg",j,B.C,j,"Chest",j),60,new A.axa(a),j,40,j,"Apri il tuo Cuore",j)
+k=$.eX.ac()
+h=h.w?A.bZ(j,j,A.c3("assets/icons/moon.svg",j,B.C,j,"Luna",j),32,h.gam5(),j,25,j,"Spedisci sulla Luna",j):A.bZ(j,j,A.c3("assets/icons/ok.svg",j,B.C,j,"OK",j),60,h.gam4(),j,25,j,"Salva honoo",j)
+return A.dv(B.V,A.b([r,A.da(0,new A.bt(B.nP,A.fx(A.b([o,new A.ag(5*m/100,j,j,j),l,new A.ag(5*k/100,j,j,j),h,new A.ag(5*$.eX.ac()/100,j,j,j),A.bZ(j,j,A.c3("assets/icons/piuma.svg",j,B.C,j,"Piuma",j),60,new A.axb(a),j,25,j,"Scrivi hinoo",j)],n),B.aZ,B.K),j),j,j,0,0,j,j),B.eJ],n),B.k,B.am)},
 $S:61}
 A.ax8.prototype={
 $0(){A.bm(this.a,!1).eP(A.c7(new A.ax6(),null,t.z),new A.ax7())},
@@ -91677,7 +91677,7 @@ $.qs()
 p=t.p
 o=A.co(A.cY(A.b([B.Sc,A.iy(A.EY(new A.ag(s,m,A.SO(m,m,B.cJ,m,m,!0,m,A.bV(A.b([A.bV(m,m,m,'Io lo scrivo sempre cos\xec:\nsenza virgolette\ne iniziale minuscola.\nE lo pronuncio "on\xf9",\nsenza aspirazione iniziale.\n\nhonoo\n\xe8 un progetto multimediale,\narticolato in\n\nperformance\ne laboratori teatrali\n'),new A.i9(new A.bt(B.fZ,A.BZ(l,m,70,m),m),B.eX,m,m),A.bV(m,m,m,"\n\nesplorazioni lunari\n"),new A.i9(new A.bt(B.fZ,A.BZ("assets/icons/luna.png",m,70,m),m),B.eX,m,m),A.bV(m,m,m,"\n\ne\nviaggi sull'Isola delle Storie.\n"),new A.i9(new A.bt(B.fZ,A.BZ("assets/icons/isola.png",m,70,m),m),B.eX,m,m),A.bV(m,m,m,'\n\nNon ci sono profili utenti\nin honoo.\nE non ci sono i "mi piace".\nMa se trovi un honoo\nche ti piace,\npuoi salvarlo nel tuo cuore\ne,\nse ne hai voglia,\npuoi anche fare\nqualcosa di pi\xf9.\n\nO molto di pi\xf9.\n\nSe \xe8 come penso,\nl\'ultima volta\nche ci siamo visti\n\n'),new A.i9(new A.bt(B.fZ,A.BZ(l,m,70,m),m),B.eX,m,m),A.bV(m,m,m,"\n\navevi gli occhi chiusi\ne hai fatto la scelta giusta.\n\nMi chiamo\nVenceslao Cembalo\ne se telefoni al\n3274920811,\npuoi sentire\nun\u2019altra volta\nla mia voce\ne continuare il viaggio.\n\n Se le cose\nstanno\ndiversamente,\nclicca sull\u2019icona della\nhome\nin basso a sinistra.\n\nIn alto\nal centro\ndi ogni schermata\nc'\xe8 il logo\n\n"),new A.i9(A.bq("honoo",m,m,m,m,A.hO(B.dr,28,B.aj),B.G,m),B.eX,m,m),A.bV(m,m,m,"\n\nse ci clicchi sopra,\ntorni qui\na questa pagina.\n")],t.VO),m,q,m),B.G,m,m,1,B.aQ),m),m,m),1),new A.ag(m,60,A.fx(A.b([A.bZ(m,m,A.c3("assets/icons/home.svg",m,B.C,m,"Home",m),60,new A.axq(a),m,m,m,"Home",m)],p),B.J,B.K),m)],p),B.P,B.aZ,B.K),m,m,m)
 q=A.iy(A.cZ(m,m,B.k,m,m,m,m,m,m,m,m,m,m,m),1)
-n=A.lB(B.T,A.fx(A.b([q,new A.fq(B.y,m,m,A.cZ(m,o,B.k,A.ah(B.d.aN(255*(k?1:0.7)),1,14,34),new A.ak(0,s,0,1/0),m,m,m,m,m,m,m,m,m),m),A.iy(A.cZ(m,m,B.k,m,m,m,m,m,m,m,m,m,m,m),1)],p),B.J,B.K))
+n=A.lB(B.T,A.fx(A.b([q,new A.fq(B.y,m,m,A.cZ(m,o,B.k,A.ah(B.d.aN(255*(k?1:0.7)),1,14,34),new A.ak(0,s,0,1/0),m,m,m,m,m,m,m,m,m),m),A.iy(A.cZ(m,m,B.k,m,m,m,m,m,m,m,m,m,m,m),1)],p),B.J,B.K),m)
 return k?n:new A.LC(n,m)}}
 A.axq.prototype={
 $0(){A.bm(this.a,!1).eP(A.c7(new A.axo(),null,t.z),new A.axp())},
@@ -91747,7 +91747,7 @@ r=10*$.eX.ac()/100
 q=1.5*$.xx.ac()/100
 q=A.r1(o,o,B.dr,o,o,o,o,o,o,o,o,o,new A.aB(r,q,r,q),o,o,o,o,o,o)
 n.push(new A.bt(new A.aB(0,s,0,s),A.vQ(A.bq("Invia risposta",o,o,o,o,A.hO(B.a8,16,B.av),o,o),o,p.gala(),q),o))}if(p.f)n.push(B.Pq)
-return A.lB(B.a8,A.pj(A.cY(n,B.P,B.J,B.K),!0))}}
+return A.lB(B.a8,A.pj(A.cY(n,B.P,B.J,B.K),!0),o)}}
 A.ayg.prototype={
 $0(){var s=this.a
 s.d=this.b
@@ -92874,19 +92874,18 @@ $2(a,b){var s,r,q,p,o,n,m=this,l=null,k=b.b
 k=isFinite(k)?k:m.b.a.a
 s=b.d
 s=isFinite(s)?s:m.b.a.b
-r=m.b
-q=r.f
-p=B.d.cr(s-(q.gbQ(q)+q.gbY(q))-r.e.d,0,1/0)
-if(k<=0||p<=0)return B.a4
-o=Math.min(k,(p-9-0.5)/1.5)
-n=o/2
+r=m.b.f
+q=B.d.cr(s-(r.gbQ(r)+r.gbY(r)),0,1/0)
+if(k<=0||q<=0)return B.a4
+p=Math.min(k,(q-9-0.5)/1.5)
+o=p/2
 r=m.a
-q=A.cy(5)
-return A.co(new A.hn(A.aEu(new A.ag(o,n+9+o,A.cY(A.b([new A.ag(o,n,r.a9z(o),l),B.zY,new A.ag(o,o,r.a9o(),l)],t.p),B.P,B.J,B.aw),l),B.k,B.a8,0,B.a9,new A.cv(q,B.q)),r.Q),l,l,l)},
+n=A.cy(5)
+return A.co(new A.hn(A.aEu(new A.ag(p,o+9+p,A.cY(A.b([new A.ag(p,o,r.a9z(p),l),B.zY,new A.ag(p,p,r.a9o(),l)],t.p),B.P,B.J,B.aw),l),B.k,B.a8,0,B.a9,new A.cv(n,B.q)),r.Q),l,l,l)},
 $S:203}
 A.acJ.prototype={
 $1(a){var s=null,r=A.iC(B.a8,s,18,s,s,1.4),q=this.a
-return A.aNc(!1,q.d,B.m,B.r,3,A.C6(s,B.fx,s,s,s,s,s,s,!0,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,r.apU(B.a8,1.2),"Scrivi qui il testo del tuo honoo",s,s,s,s,!0,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s),!0,q.e,B.HC,B.i7,34,5,B.mU,r,B.i6)},
+return A.aNc(!1,q.d,B.m,B.r,3,A.C6(s,B.fx,s,s,s,s,s,s,!0,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,r.apU(B.a8,1.2),"Scrivi qui il tuo testo",s,s,s,s,!0,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s),!0,q.e,B.HC,B.i7,34,5,B.mU,r,B.i6)},
 $S:564}
 A.acI.prototype={
 $2(a,b){var s,r,q,p,o=null,n=this.a,m=n.f
@@ -93088,7 +93087,7 @@ $1(a){return new A.mK(this.a.a,this.b,"Elimina",null)},
 $S:90}
 A.Pc.prototype={
 J(a){var s=null,r=t.p,q=A.b([new A.ag(s,52,A.co(new A.jj(new A.ad3(a),s),s,s,s),s),A.iy(this.c,1)],r)
-return A.lB(B.a8,A.pj(A.dv(B.V,A.b([A.cY(q,B.P,B.J,B.K),B.eJ],r),B.D,B.cH),!0))}}
+return A.lB(B.a8,A.pj(A.dv(B.V,A.b([A.cY(q,B.P,B.J,B.K),B.eJ],r),B.D,B.cH),!0),s)}}
 A.ad3.prototype={
 $0(){A.bm(this.a,!1).eP(A.c7(new A.ad1(),null,t.z),new A.ad2())},
 $S:0}
@@ -93351,7 +93350,7 @@ A.awq.prototype={
 $1(a){return B.cR},
 $S:40}
 A.W8.prototype={
-J(a){return B.QC}}
+J(a){return B.QB}}
 A.aCJ.prototype={
 $1(a){return a.A1("GET",this.a,this.b)},
 $S:93}
@@ -105465,12 +105464,12 @@ B.kH=new A.ko(null,null)
 B.Qz=new A.Eo(1333)
 B.kI=new A.Eo(2222)
 B.QA=new A.T_(null,null)
-B.DI=new A.ir(B.y,null,null,B.k6,null)
-B.QB=new A.tE(B.DI,null,null)
 B.a0e=new A.apH(0,"material")
 B.DN=new A.vd(4,null,null)
 B.DF=new A.ir(B.y,null,null,B.DN,null)
-B.QC=new A.tE(B.DF,null,null)
+B.QB=new A.tE(B.DF,null,null,null)
+B.DI=new A.ir(B.y,null,null,B.k6,null)
+B.QC=new A.tE(B.DI,null,null,null)
 B.dP=new A.tF(0,"idle")
 B.QD=new A.tF(1,"transientCallbacks")
 B.QE=new A.tF(2,"midFrameMicrotasks")
