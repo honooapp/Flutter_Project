@@ -318,7 +318,7 @@ class HonooBuilderState extends State<HonooBuilder> {
               builder: (context) {
                 final textStyle = GoogleFonts.arvo(
                   color: HonooColor.onTertiary,
-                  fontSize: 18, //xxx font base
+                  fontSize: 18,
                   height: 1.4,
                 );
 
@@ -327,10 +327,9 @@ class HonooBuilderState extends State<HonooBuilder> {
                   focusNode: _textFocus,
                   style: textStyle,
                   maxLines: 5,
-                  maxCharsPerLine:
-                      34, //xxx lunghezza "— Hai il presente. Non ti basta?"
-                  horizontalPadding:
-                      const EdgeInsets.symmetric(horizontal: 22), //xxx
+                  maxCharsPerLine: ("-- Hai il presente. Non ti basta?").length,
+                  // lunghezza "-- Hai il presente. Non ti basta?"
+                  horizontalPadding: const EdgeInsets.symmetric(horizontal: 22),
                   decoration: InputDecoration(
                     hintText: 'Scrivi qui il tuo testo',
                     hintStyle: textStyle.copyWith(

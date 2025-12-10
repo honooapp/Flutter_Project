@@ -74,19 +74,19 @@ class _WidthLimitedMultilineFieldState
   double? _lastPadTop;
   bool _pendingScroll = true;
 
-  late double _baseFontSize; //xxx
-  late double _currentFontSize; //xxx
-  static const double _minFontSizeAbs = 12; //xxx font minimo assoluto
-  static const double _minFactor = 0.7; //xxx % minima del font base
+  late double _baseFontSize;
+  late double _currentFontSize;
+  static const double _minFontSizeAbs = 12;
+  static const double _minFactor = 0.7;
 
   double get _minFontSize =>
-      math.max(_minFontSizeAbs, _baseFontSize * _minFactor); //xxx
+      math.max(_minFontSizeAbs, _baseFontSize * _minFactor);
 
   @override
   void initState() {
     super.initState();
-    _baseFontSize = widget.style.fontSize ?? 18; //xxx
-    _currentFontSize = _baseFontSize; //xxx
+    _baseFontSize = widget.style.fontSize ?? 18;
+    _currentFontSize = _baseFontSize;
     widget.controller.addListener(_handleControllerChange);
   }
 
@@ -100,10 +100,9 @@ class _WidthLimitedMultilineFieldState
     }
     if (oldWidget.style.fontSize != widget.style.fontSize &&
         widget.style.fontSize != null) {
-      _baseFontSize = widget.style.fontSize!; //xxx
+      _baseFontSize = widget.style.fontSize!;
       // se cambiano stile/tema, riallinea il font corrente
-      _currentFontSize =
-          _currentFontSize.clamp(_minFontSize, _baseFontSize); //xxx
+      _currentFontSize = _currentFontSize.clamp(_minFontSize, _baseFontSize);
     }
   }
 
@@ -148,7 +147,7 @@ class _WidthLimitedMultilineFieldState
     final painter = TextPainter(
       text: TextSpan(
         text: line,
-        style: widget.style.copyWith(fontSize: _currentFontSize), //xxx
+        style: widget.style.copyWith(fontSize: _currentFontSize),
       ),
       textAlign: TextAlign.center,
       textDirection: TextDirection.ltr,
@@ -162,7 +161,7 @@ class _WidthLimitedMultilineFieldState
     // chiamata quando cancelli: se il testo è diventato "corto", torna verso il font base
     if (fullText.isEmpty) {
       if (_currentFontSize != _baseFontSize) {
-        setState(() => _currentFontSize = _baseFontSize); //xxx
+        setState(() => _currentFontSize = _baseFontSize);
       }
       return;
     }
@@ -170,7 +169,7 @@ class _WidthLimitedMultilineFieldState
     // se il testo è molto sotto al limite caratteri → torna al font base
     if (fullText.length < widget.maxCharsPerLine ~/ 2 &&
         _currentFontSize < _baseFontSize) {
-      setState(() => _currentFontSize = _baseFontSize); //xxx
+      setState(() => _currentFontSize = _baseFontSize);
     }
   }
 
@@ -184,7 +183,7 @@ class _WidthLimitedMultilineFieldState
         // mai bloccare il backspace
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
-          _maybeGrowFont(maxWidth, newValue.text); //xxx ingrandisci se puoi
+          _maybeGrowFont(maxWidth, newValue.text);
         });
         return newValue;
       }
@@ -239,11 +238,10 @@ class _WidthLimitedMultilineFieldState
         final double usableWidth =
             math.max(1, maxWidth - widget.horizontalPadding.horizontal);
 
-        final textStyle =
-            widget.style.copyWith(fontSize: _currentFontSize); //xxx
+        final textStyle = widget.style.copyWith(fontSize: _currentFontSize);
 
         final TextPainter painter = TextPainter(
-          text: TextSpan(text: textForLayout, style: textStyle), //xxx
+          text: TextSpan(text: textForLayout, style: textStyle),
           textAlign: TextAlign.center,
           textDirection: TextDirection.ltr,
           maxLines: widget.maxLines,
@@ -252,7 +250,7 @@ class _WidthLimitedMultilineFieldState
         double textHeight = painter.size.height;
         if (textHeight <= 0) {
           final double baseLineHeight =
-              (textStyle.height ?? 1.0) * (textStyle.fontSize ?? 16); //xxx
+              (textStyle.height ?? 1.0) * (textStyle.fontSize ?? 16);
           textHeight = baseLineHeight;
         }
 
@@ -289,14 +287,14 @@ class _WidthLimitedMultilineFieldState
         final int? effectiveMinLines = expands ? null : widget.minLines;
 
         final List<TextInputFormatter> allFormatters = [
-          _createWidthLimitFormatter(usableWidth), //xxx
+          _createWidthLimitFormatter(usableWidth),
           ...?widget.additionalInputFormatters,
         ];
 
         return TextField(
           controller: widget.controller,
           focusNode: widget.focusNode,
-          style: textStyle, //xxx usa sempre il font dinamico
+          style: textStyle,
           cursorColor: widget.cursorColor,
           cursorWidth: widget.cursorWidth ?? 2,
           cursorRadius: widget.cursorRadius,
