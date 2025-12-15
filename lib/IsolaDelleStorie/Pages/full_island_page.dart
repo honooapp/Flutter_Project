@@ -166,7 +166,7 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                       children: [
                                         const SizedBox(height: 5),
                                         SizedBox(
-                                          height: 70,
+                                          height: 25,
                                           child: Align(
                                             alignment: Alignment.topCenter,
                                             child: IsolaDelleStoreContentManager
@@ -212,7 +212,7 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                                 color: HonooColor.onBackground,
                                                 fontSize: 18,
                                               ),
-                                              const SizedBox(height: 12),
+                                              const SizedBox(height: 0),
                                               InkWell(
                                                 onTap: () {
                                                   Navigator.of(context)
@@ -223,12 +223,16 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                                     (route) => false,
                                                   );
                                                 },
-                                                child: const FormattedText(
-                                                  inputText:
-                                                      '<b>Torna indietro<b>',
-                                                  color:
-                                                      HonooColor.onBackground,
-                                                  fontSize: 18,
+                                                child: Text(
+                                                  'torna indietro',
+                                                  style: GoogleFonts.arvo(
+                                                    color:
+                                                        HonooColor.onBackground,
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w700,
+                                                    decoration: TextDecoration
+                                                        .underline,
+                                                  ),
                                                 ),
                                               ),
                                             ],
