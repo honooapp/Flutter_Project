@@ -11,7 +11,10 @@ class FormattedText extends StatelessWidget {
   final double fontSize;
 
   const FormattedText(
-      {super.key, required this.inputText, required this.color, required this.fontSize});
+      {super.key,
+      required this.inputText,
+      required this.color,
+      required this.fontSize});
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +50,10 @@ class FormattedText extends StatelessWidget {
           } else if (tag == 'l') {
             final strings = text.split("||");
             textSpans.add(_buildHyperlinkSpan(strings[0], strings[1], context));
+          } else if (tag == 'lb') {
+            final strings = text.split("||");
+            textSpans
+                .add(_buildHyperlinkBoldSpan(strings[0], strings[1], context));
           }
         }
 
@@ -67,6 +74,26 @@ class FormattedText extends StatelessWidget {
     return RichText(
       text: TextSpan(children: textSpans),
       textAlign: TextAlign.center,
+    );
+  }
+
+  TextSpan _buildHyperlinkBoldSpan(
+      String text, String link, BuildContext context) {
+    return TextSpan(
+      text: text,
+      style: GoogleFonts.arvo(
+        color: HonooColor.onBackground,
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+        decoration: TextDecoration.underline,
+      ),
+      recognizer: TapGestureRecognizer()
+        ..onTap = () async {
+          final Uri url = Uri.parse('https://$link');
+          if (!await launchUrl(url)) {
+            throw Exception('Could not launch $url');
+          }
+        },
     );
   }
 

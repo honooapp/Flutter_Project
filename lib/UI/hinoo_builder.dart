@@ -473,9 +473,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
           targetH = maxH;
           targetW = targetH * ar;
         }
-        if ((targetW <= 0 || !targetW.isFinite) &&
-            maxH.isFinite &&
-            maxH > 0) {
+        if ((targetW <= 0 || !targetW.isFinite) && maxH.isFinite && maxH > 0) {
           targetH = maxH;
           targetW = targetH * ar;
         }
