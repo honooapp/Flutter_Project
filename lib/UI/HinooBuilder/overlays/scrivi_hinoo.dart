@@ -30,8 +30,7 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
           builder: (context, constraints) {
             final double canvasWidth = math.max(1, constraints.maxWidth);
             const double horizontalPad = HinooTypography.horizontalPadding;
-            final double verticalPad =
-                HinooTypography.verticalPadding(canvasWidth);
+            final double verticalPad = HinooTypography.verticalPadding(canvasWidth);
             final TextStyle effectiveStyle = HinooTypography.textStyle(
               color: widget.textColor,
             );
