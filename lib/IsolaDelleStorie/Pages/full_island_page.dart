@@ -2,10 +2,8 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:honoo/IsolaDelleStorie/Pages/island_page.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:honoo/IsolaDelleStorie/Controller/exercise_controller.dart';
-import 'package:honoo/IsolaDelleStorie/Pages/exercise_page.dart';
-import 'package:honoo/IsolaDelleStorie/Pages/full_island_page.dart';
 import 'package:honoo/IsolaDelleStorie/Utility/isola_delle_storie_content_manager.dart';
 import 'package:honoo/Pages/chest_page.dart';
 import 'package:honoo/Utility/formatted_text.dart';
@@ -21,14 +19,14 @@ import '../../Pages/home_page.dart';
 import '../../Pages/placeholder_page.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
 
-class IslandPage extends StatefulWidget {
-  const IslandPage({super.key});
+class FullIslandPage extends StatefulWidget {
+  const FullIslandPage({super.key});
 
   @override
-  State<IslandPage> createState() => _IslandPageState();
+  State<FullIslandPage> createState() => _FullIslandPageState();
 }
 
-class _IslandPageState extends State<IslandPage> {
+class _FullIslandPageState extends State<FullIslandPage> {
   bool infoVisible = false;
 
   @override
@@ -150,9 +148,6 @@ class _IslandPageState extends State<IslandPage> {
                                         ? columnMaxW - mapHorizontalPadding
                                         : 320.0);
                               }
-                              final double targetMapHeight = math.min(
-                                  targetMapWidth / mapAspectRatio,
-                                  mapMaxHeight);
 
                               return Row(
                                 children: [
@@ -166,155 +161,65 @@ class _IslandPageState extends State<IslandPage> {
                                       children: [
                                         const SizedBox(height: 5),
                                         SizedBox(
-                                          height: 70,
+                                          height: 25,
                                           child: Align(
                                             alignment: Alignment.topCenter,
                                             child: IsolaDelleStoreContentManager
                                                 .getRichText(
                                               IsolaDelleStoreContentManager
-                                                  .homeDescription,
+                                                  .fullIslandHeadDescription,
                                             ),
                                           ),
                                         ),
 
-                                        const SizedBox(height: 36),
-
-                                        // Mappa SVG responsiva con pin proporzionali all'area visibile.
+                                        const SizedBox(height: 9),
+                                        // ==== IMMAGINE =====
                                         Padding(
                                           padding: const EdgeInsets.symmetric(
-                                              horizontal: 12.0),
-                                          child: Align(
-                                            alignment: Alignment.center,
-                                            child: SizedBox(
-                                              width: targetMapWidth,
-                                              height: targetMapHeight,
-                                              child: IslandMapWithPins(
-                                                svgAsset:
-                                                    "assets/icons/isoladellestorie/islandmap.svg",
-                                                aspectRatio: 321 / 323,
-                                                pins: const [
-                                                  // x/y: coordinate percentuali del luogo nel viewBox originale.
-                                                  // dx/dy: offset percentuali per spostare il bottone accanto all'illustrazione.
-                                                  MapPinModel(
-                                                    id: 1,
-                                                    x: 0.12,
-                                                    y: 0.95,
-                                                    dx: 0.00,
-                                                    dy: 0.01,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button1.svg",
-                                                    hint:
-                                                        'Grotta delle Rondini',
-                                                  ),
-                                                  MapPinModel(
-                                                    id: 2,
-                                                    x: 0.16,
-                                                    y: 0.60,
-                                                    dx: -0.03,
-                                                    dy: -0.02,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button2.svg",
-                                                    hint: 'Radura delle Bacche',
-                                                  ),
-                                                  MapPinModel(
-                                                    id: 3,
-                                                    x: 0.11,
-                                                    y: 0.30,
-                                                    dx: 0.02,
-                                                    dy: -0.01,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button3.svg",
-                                                    hint: "Pozzo dell'Oracolo",
-                                                  ),
-                                                  MapPinModel(
-                                                    id: 4,
-                                                    x: 0.53,
-                                                    y: 0.17,
-                                                    dx: -0.02,
-                                                    dy: -0.02,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button4.svg",
-                                                    hint:
-                                                        "Porta nell'Alabastro",
-                                                  ),
-                                                  MapPinModel(
-                                                    id: 5,
-                                                    x: 0.87,
-                                                    y: 0.17,
-                                                    dx: 0.02,
-                                                    dy: 0.00,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button5.svg",
-                                                    hint: 'Primo Anello',
-                                                  ),
-                                                  MapPinModel(
-                                                    id: 6,
-                                                    x: 0.87,
-                                                    y: 0.40,
-                                                    dx: 0.02,
-                                                    dy: 0.00,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button6.svg",
-                                                    hint: 'Secondo Anello',
-                                                  ),
-                                                  MapPinModel(
-                                                    id: 7,
-                                                    x: 0.92,
-                                                    y: 0.62,
-                                                    dx: 0.02,
-                                                    dy: 0.00,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button7.svg",
-                                                    hint: 'Terzo Anello',
-                                                  ),
-                                                  MapPinModel(
-                                                    id: 8,
-                                                    x: 0.97,
-                                                    y: 0.84,
-                                                    dx: 0.02,
-                                                    dy: 0.00,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button8.svg",
-                                                    hint: 'Quarto Anello',
-                                                  ),
-                                                  MapPinModel(
-                                                    id: 9,
-                                                    x: 0.65,
-                                                    y: 0.98,
-                                                    dx: 0.00,
-                                                    dy: 0.00,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button9.svg",
-                                                    hint:
-                                                        'Cunicolo verso la Luce',
-                                                  ),
-                                                ],
-                                                pinSizeFactor: 0.0495,
-                                                onPinTap: _openExercise,
+                                              horizontal: 16.0),
+                                          child: Center(
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              child: AspectRatio(
+                                                aspectRatio: 7 / 5,
+                                                child: Image.asset(
+                                                  "assets/icons/isoladellestorie/islandmap.jpg",
+                                                  fit: BoxFit.cover,
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
 
-                                        const SizedBox(height: 36),
+                                        const SizedBox(height: 16),
+
+                                        // ===== TESTO SOTTO IMMAGINE =====
                                         Padding(
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 16.0),
                                           child: Column(
                                             children: [
-                                              const SizedBox(height: 4),
+                                              const FormattedText(
+                                                inputText:
+                                                    IsolaDelleStoreContentManager
+                                                        .fullIslandDescription,
+                                                color: HonooColor.onBackground,
+                                                fontSize: 18,
+                                              ),
+                                              const SizedBox(height: 0),
                                               InkWell(
                                                 onTap: () {
                                                   Navigator.of(context)
                                                       .pushAndRemoveUntil(
                                                     MaterialPageRoute(
                                                         builder: (_) =>
-                                                            const FullIslandPage()),
+                                                            const IslandPage()),
                                                     (route) => false,
                                                   );
                                                 },
                                                 child: Text(
-                                                  'Se vuoi di più, clicca qui',
+                                                  'torna indietro',
                                                   style: GoogleFonts.arvo(
                                                     color:
                                                         HonooColor.onBackground,
@@ -486,6 +391,7 @@ class _IslandPageState extends State<IslandPage> {
                   ),
                 ],
               ),
+              // 🌙 Luna fissa
               Positioned(
                 top: 8,
                 right: 8,
@@ -513,45 +419,6 @@ class _IslandPageState extends State<IslandPage> {
         },
       ),
     );
-  }
-
-  void _openExercise(int n) {
-    final controller = ExerciseController();
-    late ExercisePage page;
-
-    switch (n) {
-      case 1:
-        page = ExercisePage(exercise: controller.getExercise1());
-        break;
-      case 2:
-        page = ExercisePage(exercise: controller.getExercise2());
-        break;
-      case 3:
-        page = ExercisePage(exercise: controller.getExercise3());
-        break;
-      case 4:
-        page = ExercisePage(exercise: controller.getExercise4());
-        break;
-      case 5:
-        page = ExercisePage(exercise: controller.getExercise5());
-        break;
-      case 6:
-        page = ExercisePage(exercise: controller.getExercise6());
-        break;
-      case 7:
-        page = ExercisePage(exercise: controller.getExercise7());
-        break;
-      case 8:
-        page = ExercisePage(exercise: controller.getExercise8());
-        break;
-      case 9:
-        page = ExercisePage(exercise: controller.getExercise9());
-        break;
-      default:
-        page = ExercisePage(exercise: controller.getExercise1());
-    }
-
-    Navigator.push(context, MaterialPageRoute(builder: (_) => page));
   }
 
   double _maxMapHeight(BuildContext context) {
