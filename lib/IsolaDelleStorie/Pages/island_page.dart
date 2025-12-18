@@ -296,17 +296,12 @@ class _IslandPageState extends State<IslandPage> {
                                           ),
                                         ),
 
-                                        const SizedBox(height: 9),
+                                        const SizedBox(height: 36),
                                         Padding(
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 16.0),
                                           child: Column(
                                             children: [
-                                              const FormattedText(
-                                                inputText: "Se vuoi di più,",
-                                                color: HonooColor.onBackground,
-                                                fontSize: 18,
-                                              ),
                                               const SizedBox(height: 4),
                                               InkWell(
                                                 onTap: () {
@@ -319,7 +314,7 @@ class _IslandPageState extends State<IslandPage> {
                                                   );
                                                 },
                                                 child: Text(
-                                                  'Clicca qui',
+                                                  'Se vuoi di più, clicca qui',
                                                   style: GoogleFonts.arvo(
                                                     color:
                                                         HonooColor.onBackground,
