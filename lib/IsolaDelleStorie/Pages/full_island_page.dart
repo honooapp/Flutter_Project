@@ -2,6 +2,8 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:honoo/IsolaDelleStorie/Controller/exercise_controller.dart';
+import 'package:honoo/IsolaDelleStorie/Pages/exercise_page.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/island_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/IsolaDelleStorie/Utility/isola_delle_storie_content_manager.dart';
@@ -148,6 +150,9 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                         ? columnMaxW - mapHorizontalPadding
                                         : 320.0);
                               }
+                              final double targetMapHeight = math.min(
+                                  targetMapWidth / mapAspectRatio,
+                                  mapMaxHeight);
 
                               return Row(
                                 children: [
@@ -161,7 +166,7 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                       children: [
                                         const SizedBox(height: 5),
                                         SizedBox(
-                                          height: 25,
+                                          height: 70,
                                           child: Align(
                                             alignment: Alignment.topCenter,
                                             child: IsolaDelleStoreContentManager
@@ -200,14 +205,14 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                               horizontal: 16.0),
                                           child: Column(
                                             children: [
-                                              const FormattedText(
+                                              FormattedText(
                                                 inputText:
                                                     IsolaDelleStoreContentManager
                                                         .fullIslandDescription,
                                                 color: HonooColor.onBackground,
                                                 fontSize: 18,
                                               ),
-                                              const SizedBox(height: 0),
+                                              const SizedBox(height: 12),
                                               InkWell(
                                                 onTap: () {
                                                   Navigator.of(context)
@@ -218,16 +223,12 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                                     (route) => false,
                                                   );
                                                 },
-                                                child: Text(
-                                                  'torna indietro',
-                                                  style: GoogleFonts.arvo(
-                                                    color:
-                                                        HonooColor.onBackground,
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w700,
-                                                    decoration: TextDecoration
-                                                        .underline,
-                                                  ),
+                                                child: const FormattedText(
+                                                  inputText:
+                                                      '<b>Torna indietro<b>',
+                                                  color:
+                                                      HonooColor.onBackground,
+                                                  fontSize: 18,
                                                 ),
                                               ),
                                             ],
