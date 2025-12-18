@@ -111,6 +111,8 @@ class SeaFooterBar extends StatelessWidget {
                 child: IconButton(
                   icon: SvgPicture.asset(
                     "assets/icons/isoladellestorie/island.svg",
+                    theme:
+                        const SvgTheme(currentColor: HonooColor.onBackground),
                     colorFilter: const ColorFilter.mode(
                       HonooColor.onBackground,
                       BlendMode.srcIn,
