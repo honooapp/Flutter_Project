@@ -8,8 +8,8 @@ const RESOURCES = {"flutter.js": "6fef97aeca90b426343ba6c5c9dc5d4a",
 "icons/honoo_icon-512.png": "9ffa8db87af77fe122309e4aeed54971",
 "icons/honoo_icon-48.png": "ef17724e0caeefe32b66eb71b36265a5",
 "manifest.json": "68268adfd9ea5553746313cc93c5f887",
-"index.html": "2c0235059416c8ebd9a00b7d4e6cf7bc",
-"/": "2c0235059416c8ebd9a00b7d4e6cf7bc",
+"index.html": "3e1016b01a2ac6a79ef0b752d9697057",
+"/": "3e1016b01a2ac6a79ef0b752d9697057",
 "assets/shaders/ink_sparkle.frag": "f8b80e740d33eb157090be4e995febdf",
 "assets/assets/icons/home_onTertiary.svg": "790e0648b9a8ba278dca0ac4cbe4bcf9",
 "assets/assets/icons/performance.png": "ee1d62c63a3359c3b24162a4ac3a6dda",
@@ -114,7 +114,7 @@ const RESOURCES = {"flutter.js": "6fef97aeca90b426343ba6c5c9dc5d4a",
 "canvaskit/skwasm.wasm": "6711032e17bf49924b2b001cef0d3ea3",
 "favicon.ico": "ed54c59b64878d2d06ec2bf2c1a3aa7d",
 "version.json": "36ebf088e792919511c898d53ed38677",
-"main.dart.js": "b4a42f20b35ce67224ff180e160de16a"};
+"main.dart.js": "a5e60c1f628e8f5a446aca352b3bcd27"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",
