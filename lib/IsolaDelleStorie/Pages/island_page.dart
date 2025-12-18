@@ -2,10 +2,8 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/IsolaDelleStorie/Controller/exercise_controller.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/exercise_page.dart';
-import 'package:honoo/IsolaDelleStorie/Pages/full_island_page.dart';
 import 'package:honoo/IsolaDelleStorie/Utility/isola_delle_storie_content_manager.dart';
 import 'package:honoo/Pages/chest_page.dart';
 import 'package:honoo/Utility/formatted_text.dart';
@@ -87,435 +85,386 @@ class _IslandPageState extends State<IslandPage> {
 
     return Scaffold(
       backgroundColor: HonooColor.background,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return Stack(
-            fit: StackFit.expand,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Column(
             children: [
-              Column(
-                children: [
-                  // Header titolo
-                  SizedBox(
-                    height: 52,
-                    child: Center(
-                      child: HonooAppTitle(
-                        onTap: () {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (_) => const PlaceholderPage()),
-                            (route) => false,
+              // Header titolo
+              SizedBox(
+                height: 52,
+                child: Center(
+                  child: HonooAppTitle(
+                    onTap: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                            builder: (_) => const PlaceholderPage()),
+                        (route) => false,
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              // Contenuto
+              Expanded(
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          // Larghezza utile della colonna centrale: piena su phone, limite morbido su desktop.
+                          final bool isPhone = DeviceController().isPhone();
+                          const double desktopContentMaxWidth = 720;
+                          final double columnMaxW = isPhone
+                              ? constraints.maxWidth
+                              : math.min(
+                                  constraints.maxWidth, desktopContentMaxWidth);
+
+                          const double mapAspectRatio = 321 / 323;
+                          const double mapHorizontalPadding = 24.0; // 12 + 12
+                          final double mapMaxHeight = _maxMapHeight(context);
+                          final double mapMaxWidthFromHeight =
+                              mapMaxHeight * mapAspectRatio;
+                          final double mapAvailableWidth =
+                              math.max(columnMaxW - mapHorizontalPadding, 0.0);
+                          double targetMapWidth = mapAvailableWidth;
+                          if (mapMaxWidthFromHeight > 0) {
+                            targetMapWidth = targetMapWidth == 0
+                                ? mapMaxWidthFromHeight
+                                : math.min(
+                                    targetMapWidth, mapMaxWidthFromHeight);
+                          }
+                          if (targetMapWidth <= 0) {
+                            targetMapWidth = mapMaxWidthFromHeight > 0
+                                ? mapMaxWidthFromHeight
+                                : (columnMaxW > 0
+                                    ? columnMaxW - mapHorizontalPadding
+                                    : 320.0);
+                          }
+                          final double targetMapHeight = math.min(
+                              targetMapWidth / mapAspectRatio, mapMaxHeight);
+
+                          return Row(
+                            children: [
+                              const Expanded(child: SizedBox()),
+                              ConstrainedBox(
+                                constraints:
+                                    BoxConstraints(maxWidth: columnMaxW),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const SizedBox(height: 5),
+                                    SizedBox(
+                                      height: 70,
+                                      child: Align(
+                                        alignment: Alignment.topCenter,
+                                        child: IsolaDelleStoreContentManager
+                                            .getRichText(
+                                          IsolaDelleStoreContentManager
+                                              .homeDescription,
+                                        ),
+                                      ),
+                                    ),
+
+                                    const SizedBox(height: 36),
+
+                                    // Mappa SVG responsiva con pin proporzionali all'area visibile.
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12.0),
+                                      child: Align(
+                                        alignment: Alignment.center,
+                                        child: SizedBox(
+                                          width: targetMapWidth,
+                                          height: targetMapHeight,
+                                          child: IslandMapWithPins(
+                                            svgAsset:
+                                                "assets/icons/isoladellestorie/islandmap.svg",
+                                            aspectRatio: 321 / 323,
+                                            pins: const [
+                                              // x/y: coordinate percentuali del luogo nel viewBox originale.
+                                              // dx/dy: offset percentuali per spostare il bottone accanto all'illustrazione.
+                                              MapPinModel(
+                                                id: 1,
+                                                x: 0.12,
+                                                y: 0.95,
+                                                dx: 0.00,
+                                                dy: 0.01,
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button1.svg",
+                                                hint: 'Grotta delle Rondini',
+                                              ),
+                                              MapPinModel(
+                                                id: 2,
+                                                x: 0.16,
+                                                y: 0.60,
+                                                dx: -0.03,
+                                                dy: -0.02,
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button2.svg",
+                                                hint: 'Radura delle Bacche',
+                                              ),
+                                              MapPinModel(
+                                                id: 3,
+                                                x: 0.11,
+                                                y: 0.30,
+                                                dx: 0.02,
+                                                dy: -0.01,
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button3.svg",
+                                                hint: "Pozzo dell'Oracolo",
+                                              ),
+                                              MapPinModel(
+                                                id: 4,
+                                                x: 0.53,
+                                                y: 0.17,
+                                                dx: -0.02,
+                                                dy: -0.02,
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button4.svg",
+                                                hint: "Porta nell'Alabastro",
+                                              ),
+                                              MapPinModel(
+                                                id: 5,
+                                                x: 0.87,
+                                                y: 0.17,
+                                                dx: 0.02,
+                                                dy: 0.00,
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button5.svg",
+                                                hint: 'Primo Anello',
+                                              ),
+                                              MapPinModel(
+                                                id: 6,
+                                                x: 0.87,
+                                                y: 0.40,
+                                                dx: 0.02,
+                                                dy: 0.00,
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button6.svg",
+                                                hint: 'Secondo Anello',
+                                              ),
+                                              MapPinModel(
+                                                id: 7,
+                                                x: 0.92,
+                                                y: 0.62,
+                                                dx: 0.02,
+                                                dy: 0.00,
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button7.svg",
+                                                hint: 'Terzo Anello',
+                                              ),
+                                              MapPinModel(
+                                                id: 8,
+                                                x: 0.97,
+                                                y: 0.84,
+                                                dx: 0.02,
+                                                dy: 0.00,
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button8.svg",
+                                                hint: 'Quarto Anello',
+                                              ),
+                                              MapPinModel(
+                                                id: 9,
+                                                x: 0.65,
+                                                y: 0.98,
+                                                dx: 0.00,
+                                                dy: 0.00,
+                                                assetSvg:
+                                                    "assets/icons/isoladellestorie/button9.svg",
+                                                hint: 'Cunicolo verso la Luce',
+                                              ),
+                                            ],
+                                            pinSizeFactor: 0.0495,
+                                            onPinTap: _openExercise,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    const SizedBox(height: 36),
+                                  ],
+                                ),
+                              ),
+                              const Expanded(child: SizedBox()),
+                            ],
                           );
                         },
                       ),
                     ),
-                  ),
 
-                  // Contenuto
-                  Expanded(
-                    child: Stack(
+                    // Overlay regole
+                    info,
+                  ],
+                ),
+              ),
+
+              // Footer (onde + icone)
+              SizedBox(
+                height: 80,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final double w = constraints.maxWidth;
+
+                    const double bottleSize = 70;
+                    const double chestSize = 70;
+                    const double homeSize = 40;
+                    const double logoSize = 70;
+
+                    final double bottleTargetX = (w / 2) + 60;
+                    final double chestCenterX = (w / 2) - (chestSize / 2);
+                    final double homeTargetX = (w / 2) - 190;
+                    final double logoTargetX = (w / 2) + 110;
+
+                    double clampX(double x, double size) =>
+                        x.clamp(0.0, (w - size)).toDouble();
+
+                    final double bottleX = clampX(bottleTargetX, bottleSize);
+                    final double chestX = clampX(chestCenterX, chestSize);
+                    final double homeX = clampX(homeTargetX, homeSize);
+                    final double logoX = clampX(logoTargetX, logoSize);
+
+                    return Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              // Larghezza utile della colonna centrale: piena su phone, limite morbido su desktop.
-                              final bool isPhone = DeviceController().isPhone();
-                              const double desktopContentMaxWidth = 720;
-                              final double columnMaxW = isPhone
-                                  ? constraints.maxWidth
-                                  : math.min(constraints.maxWidth,
-                                      desktopContentMaxWidth);
-
-                              const double mapAspectRatio = 321 / 323;
-                              const double mapHorizontalPadding =
-                                  24.0; // 12 + 12
-                              final double mapMaxHeight =
-                                  _maxMapHeight(context);
-                              final double mapMaxWidthFromHeight =
-                                  mapMaxHeight * mapAspectRatio;
-                              final double mapAvailableWidth = math.max(
-                                  columnMaxW - mapHorizontalPadding, 0.0);
-                              double targetMapWidth = mapAvailableWidth;
-                              if (mapMaxWidthFromHeight > 0) {
-                                targetMapWidth = targetMapWidth == 0
-                                    ? mapMaxWidthFromHeight
-                                    : math.min(
-                                        targetMapWidth, mapMaxWidthFromHeight);
-                              }
-                              if (targetMapWidth <= 0) {
-                                targetMapWidth = mapMaxWidthFromHeight > 0
-                                    ? mapMaxWidthFromHeight
-                                    : (columnMaxW > 0
-                                        ? columnMaxW - mapHorizontalPadding
-                                        : 320.0);
-                              }
-                              final double targetMapHeight = math.min(
-                                  targetMapWidth / mapAspectRatio,
-                                  mapMaxHeight);
-
-                              return Row(
-                                children: [
-                                  const Expanded(child: SizedBox()),
-                                  ConstrainedBox(
-                                    constraints:
-                                        BoxConstraints(maxWidth: columnMaxW),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const SizedBox(height: 5),
-                                        SizedBox(
-                                          height: 70,
-                                          child: Align(
-                                            alignment: Alignment.topCenter,
-                                            child: IsolaDelleStoreContentManager
-                                                .getRichText(
-                                              IsolaDelleStoreContentManager
-                                                  .homeDescription,
-                                            ),
-                                          ),
-                                        ),
-
-                                        const SizedBox(height: 36),
-
-                                        // Mappa SVG responsiva con pin proporzionali all'area visibile.
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 12.0),
-                                          child: Align(
-                                            alignment: Alignment.center,
-                                            child: SizedBox(
-                                              width: targetMapWidth,
-                                              height: targetMapHeight,
-                                              child: IslandMapWithPins(
-                                                svgAsset:
-                                                    "assets/icons/isoladellestorie/islandmap.svg",
-                                                aspectRatio: 321 / 323,
-                                                pins: const [
-                                                  // x/y: coordinate percentuali del luogo nel viewBox originale.
-                                                  // dx/dy: offset percentuali per spostare il bottone accanto all'illustrazione.
-                                                  MapPinModel(
-                                                    id: 1,
-                                                    x: 0.12,
-                                                    y: 0.95,
-                                                    dx: 0.00,
-                                                    dy: 0.01,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button1.svg",
-                                                    hint:
-                                                        'Grotta delle Rondini',
-                                                  ),
-                                                  MapPinModel(
-                                                    id: 2,
-                                                    x: 0.16,
-                                                    y: 0.60,
-                                                    dx: -0.03,
-                                                    dy: -0.02,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button2.svg",
-                                                    hint: 'Radura delle Bacche',
-                                                  ),
-                                                  MapPinModel(
-                                                    id: 3,
-                                                    x: 0.11,
-                                                    y: 0.30,
-                                                    dx: 0.02,
-                                                    dy: -0.01,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button3.svg",
-                                                    hint: "Pozzo dell'Oracolo",
-                                                  ),
-                                                  MapPinModel(
-                                                    id: 4,
-                                                    x: 0.53,
-                                                    y: 0.17,
-                                                    dx: -0.02,
-                                                    dy: -0.02,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button4.svg",
-                                                    hint:
-                                                        "Porta nell'Alabastro",
-                                                  ),
-                                                  MapPinModel(
-                                                    id: 5,
-                                                    x: 0.87,
-                                                    y: 0.17,
-                                                    dx: 0.02,
-                                                    dy: 0.00,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button5.svg",
-                                                    hint: 'Primo Anello',
-                                                  ),
-                                                  MapPinModel(
-                                                    id: 6,
-                                                    x: 0.87,
-                                                    y: 0.40,
-                                                    dx: 0.02,
-                                                    dy: 0.00,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button6.svg",
-                                                    hint: 'Secondo Anello',
-                                                  ),
-                                                  MapPinModel(
-                                                    id: 7,
-                                                    x: 0.92,
-                                                    y: 0.62,
-                                                    dx: 0.02,
-                                                    dy: 0.00,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button7.svg",
-                                                    hint: 'Terzo Anello',
-                                                  ),
-                                                  MapPinModel(
-                                                    id: 8,
-                                                    x: 0.97,
-                                                    y: 0.84,
-                                                    dx: 0.02,
-                                                    dy: 0.00,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button8.svg",
-                                                    hint: 'Quarto Anello',
-                                                  ),
-                                                  MapPinModel(
-                                                    id: 9,
-                                                    x: 0.65,
-                                                    y: 0.98,
-                                                    dx: 0.00,
-                                                    dy: 0.00,
-                                                    assetSvg:
-                                                        "assets/icons/isoladellestorie/button9.svg",
-                                                    hint:
-                                                        'Cunicolo verso la Luce',
-                                                  ),
-                                                ],
-                                                pinSizeFactor: 0.0495,
-                                                onPinTap: _openExercise,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-
-                                        const SizedBox(height: 9),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 16.0),
-                                          child: Column(
-                                            children: [
-                                              const FormattedText(
-                                                inputText: "Se vuoi di più,",
-                                                color: HonooColor.onBackground,
-                                                fontSize: 18,
-                                              ),
-                                              const SizedBox(height: 4),
-                                              InkWell(
-                                                onTap: () {
-                                                  Navigator.of(context)
-                                                      .pushAndRemoveUntil(
-                                                    MaterialPageRoute(
-                                                        builder: (_) =>
-                                                            const FullIslandPage()),
-                                                    (route) => false,
-                                                  );
-                                                },
-                                                child: Text(
-                                                  'Clicca qui',
-                                                  style: GoogleFonts.arvo(
-                                                    color:
-                                                        HonooColor.onBackground,
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w700,
-                                                    decoration: TextDecoration
-                                                        .underline,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const Expanded(child: SizedBox()),
-                                ],
+                        Positioned(
+                          bottom: 50,
+                          left: 0,
+                          right: 0,
+                          child: SizedBox(
+                              height: 10,
+                              child: Container(color: HonooColor.wave1)),
+                        ),
+                        Positioned(
+                          bottom: 10,
+                          left: bottleX,
+                          child: IconButton(
+                            icon: SvgPicture.asset("assets/icons/bottle.svg",
+                                semanticsLabel: 'Bottle'),
+                            iconSize: bottleSize,
+                            splashRadius: 40,
+                            tooltip: 'Scrivi',
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const NewHonooPage()));
+                            },
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 30,
+                          left: 0,
+                          right: 0,
+                          child: IgnorePointer(
+                              child: SizedBox(
+                                  height: 20,
+                                  child: Container(color: HonooColor.wave2))),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: IgnorePointer(
+                              child: SizedBox(
+                                  height: 30,
+                                  child: Container(color: HonooColor.wave3))),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          left: homeX,
+                          child: IconButton(
+                            icon: SvgPicture.asset(
+                              "assets/icons/home.svg",
+                              colorFilter: const ColorFilter.mode(
+                                HonooColor.onBackground,
+                                BlendMode.srcIn,
+                              ),
+                              width: homeSize,
+                              height: homeSize,
+                              semanticsLabel: 'Home',
+                            ),
+                            iconSize: homeSize,
+                            splashRadius: 1,
+                            tooltip: 'Home',
+                            onPressed: () {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                    builder: (_) => const HomePage()),
+                                (route) => false,
                               );
                             },
                           ),
                         ),
-
-                        // Overlay regole
-                        info,
-                      ],
-                    ),
-                  ),
-
-                  // Footer (onde + icone)
-                  SizedBox(
-                    height: 80,
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final double w = constraints.maxWidth;
-
-                        const double bottleSize = 70;
-                        const double chestSize = 70;
-                        const double homeSize = 40;
-                        const double logoSize = 70;
-
-                        final double bottleTargetX = (w / 2) + 60;
-                        final double chestCenterX = (w / 2) - (chestSize / 2);
-                        final double homeTargetX = (w / 2) - 190;
-                        final double logoTargetX = (w / 2) + 110;
-
-                        double clampX(double x, double size) =>
-                            x.clamp(0.0, (w - size)).toDouble();
-
-                        final double bottleX =
-                            clampX(bottleTargetX, bottleSize);
-                        final double chestX = clampX(chestCenterX, chestSize);
-                        final double homeX = clampX(homeTargetX, homeSize);
-                        final double logoX = clampX(logoTargetX, logoSize);
-
-                        return Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Positioned(
-                              bottom: 50,
-                              left: 0,
-                              right: 0,
-                              child: SizedBox(
-                                  height: 10,
-                                  child: Container(color: HonooColor.wave1)),
-                            ),
-                            Positioned(
-                              bottom: 10,
-                              left: bottleX,
-                              child: IconButton(
-                                icon: SvgPicture.asset(
-                                    "assets/icons/bottle.svg",
-                                    semanticsLabel: 'Bottle'),
-                                iconSize: bottleSize,
-                                splashRadius: 40,
-                                tooltip: 'Scrivi',
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const NewHonooPage()));
-                                },
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 30,
-                              left: 0,
-                              right: 0,
-                              child: IgnorePointer(
-                                  child: SizedBox(
-                                      height: 20,
-                                      child:
-                                          Container(color: HonooColor.wave2))),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: IgnorePointer(
-                                  child: SizedBox(
-                                      height: 30,
-                                      child:
-                                          Container(color: HonooColor.wave3))),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              left: homeX,
-                              child: IconButton(
-                                icon: SvgPicture.asset(
-                                  "assets/icons/home.svg",
-                                  colorFilter: const ColorFilter.mode(
-                                    HonooColor.onBackground,
-                                    BlendMode.srcIn,
-                                  ),
-                                  width: homeSize,
-                                  height: homeSize,
-                                  semanticsLabel: 'Home',
+                        Positioned(
+                          bottom: -20,
+                          left: chestX,
+                          child: IconButton(
+                            icon: SvgPicture.asset("assets/icons/chest.svg",
+                                semanticsLabel: 'Chest'),
+                            iconSize: chestSize,
+                            splashRadius: 40,
+                            tooltip: 'Apri il tuo Cuore',
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ChestPage(),
                                 ),
-                                iconSize: homeSize,
-                                splashRadius: 1,
-                                tooltip: 'Home',
-                                onPressed: () {
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                        builder: (_) => const HomePage()),
-                                    (route) => false,
-                                  );
-                                },
-                              ),
-                            ),
-                            Positioned(
-                              bottom: -20,
-                              left: chestX,
-                              child: IconButton(
-                                icon: SvgPicture.asset("assets/icons/chest.svg",
-                                    semanticsLabel: 'Chest'),
-                                iconSize: chestSize,
-                                splashRadius: 40,
-                                tooltip: 'Apri il tuo Cuore',
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const ChestPage(),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            Positioned(
-                              bottom: -15,
-                              left: logoX,
-                              child: IconButton(
-                                icon: SvgPicture.asset(
-                                    "assets/icons/honoo_logo.svg",
-                                    semanticsLabel: 'Logo'),
-                                iconSize: logoSize,
-                                splashRadius: 30,
-                                tooltip: 'Info',
-                                onPressed: () =>
-                                    setState(() => infoVisible = !infoVisible),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: SafeArea(
-                  child: Material(
-                    color: Colors.transparent,
-                    child: IconButton(
-                      icon: SvgPicture.asset("assets/icons/moon.svg",
-                          semanticsLabel: 'Moon'),
-                      iconSize: 60,
-                      splashRadius: 32,
-                      tooltip: 'Vai sulla Luna',
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const MoonPage()));
-                      },
-                    ),
-                  ),
+                              );
+                            },
+                          ),
+                        ),
+                        Positioned(
+                          bottom: -15,
+                          left: logoX,
+                          child: IconButton(
+                            icon: SvgPicture.asset(
+                                "assets/icons/honoo_logo.svg",
+                                semanticsLabel: 'Logo'),
+                            iconSize: logoSize,
+                            splashRadius: 30,
+                            tooltip: 'Info',
+                            onPressed: () =>
+                                setState(() => infoVisible = !infoVisible),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ],
-          );
-        },
+          ),
+
+          // 🌙 Luna fissa
+          Positioned(
+            top: 8,
+            right: 8,
+            child: SafeArea(
+              child: Material(
+                color: Colors.transparent,
+                child: IconButton(
+                  icon: SvgPicture.asset("assets/icons/moon.svg",
+                      semanticsLabel: 'Moon'),
+                  iconSize: 60,
+                  splashRadius: 32,
+                  tooltip: 'Vai sulla Luna',
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const MoonPage()));
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
