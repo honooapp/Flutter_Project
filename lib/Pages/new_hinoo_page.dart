@@ -29,13 +29,11 @@ class NewHinooPage extends StatefulWidget {
 }
 
 class _NewHinooPageState extends State<NewHinooPage> {
-  // Chiave per interrogare/controllare il builder
   final GlobalKey _builderKey = GlobalKey();
 
   final _controller = HinooController();
   bool _savedToChest = false;
 
-  // Stato locale proveniente dal builder
   double _lastCanvasHeight = 0;
   String _builderStep = 'changeBg';
   int _currentTextLength = 0;
@@ -44,15 +42,13 @@ class _NewHinooPageState extends State<NewHinooPage> {
   bool get _isWriteStep => _builderStep == 'writeText';
   bool get _hasMinTextForDownload => _currentTextLength >= 1;
 
-  // Costanti layout
-  static const double _titleH = 52; // riga titolo
-  static const double _controlsH = 44; // riga bottoni bianchi visibili
-  static const double _footerH = 100.0; // riserva spazio per la navbar
+  static const double _titleH = 52;
+  static const double _controlsH = 44;
+  static const double _footerH = 100.0;
 
   @override
   void initState() {
     super.initState();
-    // Dopo il primo frame, prova a leggere il draft dal builder per popolare thumbnails
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final dyn = _builderKey.currentState as dynamic;
       final draft = dyn?.exportDraft?.call();
@@ -61,7 +57,6 @@ class _NewHinooPageState extends State<NewHinooPage> {
     });
   }
 
-  // Callback dal builder: ogni modifica torna allo stato "OK" + sync thumbnails
   void _onHinooChanged(dynamic draft) {
     setState(() {
       if (_savedToChest) _savedToChest = false;
@@ -93,16 +88,12 @@ class _NewHinooPageState extends State<NewHinooPage> {
     _currentTextLength = detectedLength;
   }
 
-  // PNG opzionale dal builder
   Future<void> _onPngExported(Uint8List bytes) async {
     if (!mounted) return;
-    showHonooToast(
-      context,
-      message: 'PNG generato: pronto per salvare o condividere.',
-    );
+    showHonooToast(context,
+        message: 'PNG generato: pronto per salvare o condividere.');
   }
 
-  // Azioni footer
   Future<void> _submitHinoo() async {
     final dynamic rawDraft =
         (_builderKey.currentState as dynamic)?.exportDraft();
@@ -135,9 +126,8 @@ class _NewHinooPageState extends State<NewHinooPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => EmailLoginPage(
-              pendingHinooDraft: hinooDraft.toJson(),
-            ),
+            builder: (_) =>
+                EmailLoginPage(pendingHinooDraft: hinooDraft.toJson()),
           ),
         );
       }
@@ -153,10 +143,10 @@ class _NewHinooPageState extends State<NewHinooPage> {
       return;
     }
 
-    // Converte il draft grezzo del builder nel modello HinooDraft (Entities/hinoo.dart)
-    final bool hasMissingBg = hinooDraft.pages
-        .any((slide) => (slide.backgroundImage == null ||
-            slide.backgroundImage!.isEmpty));
+    final bool hasMissingBg = hinooDraft.pages.any(
+      (slide) =>
+          (slide.backgroundImage == null || slide.backgroundImage!.isEmpty),
+    );
     if (hasMissingBg) {
       final bool hadLocalBg = (rawDraft['hasBg'] as bool?) ?? false;
       final bool hadPreview = rawDraft['bgPreviewBytes'] != null;
@@ -170,14 +160,12 @@ class _NewHinooPageState extends State<NewHinooPage> {
         return;
       }
     }
+
     final validationErrors = _controller.validateDraft(hinooDraft);
     if (validationErrors.isNotEmpty) {
       if (!mounted) return;
       final errorText = 'Bozza non valida:\n- ${validationErrors.join('\n- ')}';
-      showHonooToast(
-        context,
-        message: errorText,
-      );
+      showHonooToast(context, message: errorText);
       return;
     }
 
@@ -185,40 +173,33 @@ class _NewHinooPageState extends State<NewHinooPage> {
       await _controller.saveToChest(hinooDraft);
       if (!mounted) return;
       setState(() => _savedToChest = true);
-      showHonooToast(
-        context,
-        message: 'salvato nello Scrigno.',
-      );
+      showHonooToast(context, message: 'salvato nello Scrigno.');
     } catch (e) {
       if (!mounted) return;
-      showHonooToast(
-        context,
-        message: 'Errore: $e',
-      );
+      showHonooToast(context, message: 'Errore: $e');
     }
   }
 
-  // Converte il draft prodotto da HinooBuilder (Map) nel tipo HinooDraft
   HinooDraft _convertRawBuilderDraft(Map raw) {
     final List<dynamic> rawPages = (raw['pages'] as List<dynamic>? ?? []);
     final List<HinooSlide> slides = [];
+
     for (final p in rawPages) {
       if (p is Map) {
         final bgUrl = p['bgUrl'] as String?;
         final txt = ((p['text'] as String?) ?? '').trim();
         final textColorVal = (p['textColor'] as int?) ?? 0xFFFFFFFF;
         final isTextWhite = textColorVal == const Color(0xFFFFFFFF).value;
-        // Estrai scale e offset (se presenti) dalla matrice 4x4
+
         double scale = 1.0;
         double offX = 0.0;
         double offY = 0.0;
         List<double>? normalizedTransform;
+
         final tr = p['bgTransform'];
         if (tr is List && tr.length == 16) {
           final List<double> m = tr.map((e) => (e as num).toDouble()).toList();
           scale = m[0];
-          offX = m[12];
-          offY = m[13];
 
           const double designHeight = 1920;
           const double designWidth = 1080;
@@ -235,6 +216,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
           offX = normalizedTransform[12];
           offY = normalizedTransform[13];
         }
+
         slides.add(HinooSlide(
           backgroundImage: bgUrl,
           text: txt,
@@ -246,6 +228,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
         ));
       }
     }
+
     return HinooDraft(
       pages: slides,
       type: HinooType.personal,
@@ -258,10 +241,8 @@ class _NewHinooPageState extends State<NewHinooPage> {
     final pages = (draft is Map) ? (draft['pages'] as List?) : null;
     if (draft == null || pages == null || pages.isEmpty) {
       if (!mounted) return;
-      showHonooToast(
-        context,
-        message: 'Nessun contenuto da pubblicare sulla Luna.',
-      );
+      showHonooToast(context,
+          message: 'Nessun contenuto da pubblicare sulla Luna.');
       return;
     }
 
@@ -272,20 +253,13 @@ class _NewHinooPageState extends State<NewHinooPage> {
       final text = result == HinooMoonResult.published
           ? 'Pubblicato sulla Luna.'
           : 'hinoo già presente sulla Luna.';
-      showHonooToast(
-        context,
-        message: text,
-      );
+      showHonooToast(context, message: text);
     } catch (e) {
       if (!mounted) return;
-      showHonooToast(
-        context,
-        message: 'Errore: $e',
-      );
+      showHonooToast(context, message: 'Errore: $e');
     }
   }
 
-  // Helpers layout
   double _contentMaxWidth(double w) {
     if (w < 480) return w * 0.94;
     if (w < 768) return w * 0.92;
@@ -294,7 +268,6 @@ class _NewHinooPageState extends State<NewHinooPage> {
     return w * 0.58;
   }
 
-  // --- Pulsanti esterni che comandano il builder via GlobalKey ---
   void _deleteCurrentFromBuilder() {
     final dyn = _builderKey.currentState as dynamic;
     if (dyn?.deleteCurrentPagePublic != null) {
@@ -316,10 +289,8 @@ class _NewHinooPageState extends State<NewHinooPage> {
   Future<void> _handleDownloadTap() async {
     if (!_hasMinTextForDownload) {
       if (!mounted) return;
-      showHonooToast(
-        context,
-        message: 'Scrivi almeno 1 carattere prima di scaricare',
-      );
+      showHonooToast(context,
+          message: 'Scrivi almeno 1 carattere prima di scaricare');
       return;
     }
 
@@ -338,23 +309,17 @@ class _NewHinooPageState extends State<NewHinooPage> {
       );
       if (goLogin == true && mounted) {
         Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const EmailLoginPage(),
-          ),
-        );
+            context, MaterialPageRoute(builder: (_) => const EmailLoginPage()));
       }
       return;
     }
+
     _triggerDownloadFromBuilder();
   }
 
   void _warnMissingApi(String what) {
     if (!mounted) return;
-    showHonooToast(
-      context,
-      message: 'Collega API del builder: $what',
-    );
+    showHonooToast(context, message: 'Collega API del builder: $what');
   }
 
   @override
@@ -364,27 +329,23 @@ class _NewHinooPageState extends State<NewHinooPage> {
     final double contentTopPadding = extraTop > 0 ? extraTop : 0;
 
     return Scaffold(
+      // ✅ tastiera “overlay”: non ridimensiona la pagina
+      resizeToAvoidBottomInset: false,
       backgroundColor: HonooColor.background,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, viewport) {
+            final double keyboard = MediaQuery.of(context).viewInsets.bottom;
+            final bool kbOpen = keyboard > 0;
+
             final double viewW = viewport.maxWidth;
-            final double viewH = viewport.maxHeight;
+            final double viewH = viewport.maxHeight; // ✅ stabile su web
             final double targetMaxW = _contentMaxWidth(viewW);
 
-            // Altezza centrale per canvas = tutto ciò che resta (footer è Positioned)
-            final double availableH = (viewH -
-                    _titleH // [Riga 1] titolo app
-                    -
-                    contentTopPadding // spazio riservato per non coprire i bottoni
-                    -
-                    _controlsH // [Riga 2] bottoni bianchi visibili
-                    -
-                    _footerH // riserva fisica per la navbar/overlay
-                )
-                .clamp(0.0, double.infinity);
+            final double availableH =
+                (viewH - _titleH - contentTopPadding - _controlsH - _footerH)
+                    .clamp(0.0, double.infinity);
 
-            // Calcolo box 9:16 per [Riga 2]
             const double ar = 9 / 16;
             double canvasW = targetMaxW;
             double canvasH = canvasW / ar;
@@ -394,163 +355,181 @@ class _NewHinooPageState extends State<NewHinooPage> {
             }
             _lastCanvasHeight = canvasH;
 
+            // ✅ Colonna principale: scrollabile SOLO quando kb aperta
+            final Widget mainColumn = Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                  height: _titleH,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: HonooAppTitle(
+                        onTap: () {
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (_) => const PlaceholderPage()),
+                            (route) => false,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: contentTopPadding),
+
+                SizedBox(
+                  height: _controlsH,
+                  child: Center(
+                    child: SizedBox(
+                      width: canvasW,
+                      height: _controlsH,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          if (_isWriteStep) ...[
+                            WhiteIconButton(
+                              tooltip: 'download',
+                              icon: Icons.download_outlined,
+                              onPressed: _handleDownloadTap,
+                            ),
+                            const SizedBox(width: 12),
+                          ],
+                          WhiteIconButton(
+                            tooltip: 'Svuota hinoo',
+                            icon: Icons.delete_outline,
+                            onPressed: _deleteCurrentFromBuilder,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                SizedBox(
+                  height: availableH,
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: targetMaxW),
+                      child: SizedBox(
+                        width: canvasW,
+                        height: canvasH,
+                        child: ClipRect(
+                          child: HinooBuilder(
+                            key: _builderKey,
+                            onHinooChanged: _onHinooChanged,
+                            onPngExported: _onPngExported,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // spazio “fisico” per il footer (che resta overlay nello Stack)
+                const SizedBox(height: _footerH),
+              ],
+            );
+
+            final Widget content = kbOpen
+                ? SingleChildScrollView(
+                    // ✅ NON dismissare la tastiera con scroll
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.manual,
+                    // ✅ aggiungo spazio extra per scrollare anche con kb sopra
+                    padding: EdgeInsets.only(bottom: keyboard),
+                    physics: const ClampingScrollPhysics(),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: viewH),
+                      child: mainColumn,
+                    ),
+                  )
+                : mainColumn;
+
             return Stack(
               clipBehavior: Clip.none,
               children: [
-                // ===== COLONNA PRINCIPALE: 3 righe visive + spazio riservato ====
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // [Riga 1] Titolo/app name
-                    SizedBox(
-                      height: _titleH,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: HonooAppTitle(
-                            onTap: () {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (_) => const PlaceholderPage()),
-                                (route) => false,
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
+                content,
 
-                    // Spazio riservato per non far coprire dalla luna
-                    SizedBox(height: contentTopPadding),
-
-                    // [Riga 2] Bottoni bianchi (fissi in alto a destra del canvas)
-                    SizedBox(
-                      height: _controlsH,
-                      child: Center(
-                        child: SizedBox(
-                          width: canvasW,
-                          height: _controlsH,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              if (_isWriteStep) ...[
-                                WhiteIconButton(
-                                  tooltip: 'download',
-                                  icon: Icons.download_outlined,
-                                  onPressed: () => _handleDownloadTap(),
-                                ),
-                                const SizedBox(width: 12),
-                              ],
-                              WhiteIconButton(
-                                tooltip: 'Svuota hinoo',
-                                icon: Icons.delete_outline,
-                                onPressed: _deleteCurrentFromBuilder,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // [Riga 3] CANVAS 9:16 — HinooBuilder centrato, nessun overlay
-                    SizedBox(
-                      height: availableH,
-                      child: Center(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(maxWidth: targetMaxW),
-                          child: SizedBox(
-                            width: canvasW,
-                            height: canvasH,
-                            child: ClipRect(
-                              child: HinooBuilder(
-                                key: _builderKey,
-                                onHinooChanged: _onHinooChanged,
-                                onPngExported: _onPngExported,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // [Riga 4] Spazio riservato per la navbar (overlay)
-                    const SizedBox(height: _footerH),
-                  ],
-                ),
-
-                // LUNA FISSA (sopra, ma abbiamo riservato spazio → non accavalla)
                 const LunaFissa(),
 
-                // ============ FOOTER: Home – Chest – OK/Luna ============ //
+                // Footer overlay: disattivato con kb aperta per non rubare tocchi
                 Positioned(
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // HOME
-                        IconButton(
-                          icon: SvgPicture.asset(
-                            "assets/icons/home.svg",
-                            semanticsLabel: 'Home',
-                            colorFilter: const ColorFilter.mode(
-                              HonooColor.onBackground,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                          iconSize: 60,
-                          splashRadius: 25,
-                          tooltip: 'Home',
-                          onPressed: () {
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (_) => const HomePage()),
-                              (route) => false,
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 24),
-
-                        // CHEST
-                        IconButton(
-                          icon: SvgPicture.asset("assets/icons/chest.svg",
-                              semanticsLabel: 'Chest'),
-                          iconSize: 60,
-                          splashRadius: 40,
-                          tooltip: 'Apri il tuo Cuore',
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const ChestPage()),
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 24),
-
-                        // OK → LUNA
-                        _savedToChest
-                            ? IconButton(
-                                icon: SvgPicture.asset("assets/icons/moon.svg",
-                                    semanticsLabel: 'Luna'),
-                                iconSize: 32,
-                                splashRadius: 25,
-                                tooltip: 'Spedisci sulla Luna',
-                                onPressed: _submitToMoon,
-                              )
-                            : IconButton(
-                                icon: SvgPicture.asset("assets/icons/ok.svg",
-                                    semanticsLabel: 'OK'),
-                                iconSize: 60,
-                                splashRadius: 25,
-                                tooltip: 'Salva hinoo',
-                                onPressed: _submitHinoo,
+                  child: IgnorePointer(
+                    ignoring: kbOpen,
+                    child: SafeArea(
+                      top: false,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              icon: SvgPicture.asset(
+                                "assets/icons/home.svg",
+                                semanticsLabel: 'Home',
+                                colorFilter: const ColorFilter.mode(
+                                  HonooColor.onBackground,
+                                  BlendMode.srcIn,
+                                ),
                               ),
-                      ],
+                              iconSize: 60,
+                              splashRadius: 25,
+                              tooltip: 'Home',
+                              onPressed: () {
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (_) => const HomePage()),
+                                  (route) => false,
+                                );
+                              },
+                            ),
+                            const SizedBox(width: 24),
+                            IconButton(
+                              icon: SvgPicture.asset(
+                                "assets/icons/chest.svg",
+                                semanticsLabel: 'Chest',
+                              ),
+                              iconSize: 60,
+                              splashRadius: 40,
+                              tooltip: 'Apri il tuo Cuore',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const ChestPage()),
+                                );
+                              },
+                            ),
+                            const SizedBox(width: 24),
+                            _savedToChest
+                                ? IconButton(
+                                    icon: SvgPicture.asset(
+                                      "assets/icons/moon.svg",
+                                      semanticsLabel: 'Luna',
+                                    ),
+                                    iconSize: 32,
+                                    splashRadius: 25,
+                                    tooltip: 'Spedisci sulla Luna',
+                                    onPressed: _submitToMoon,
+                                  )
+                                : IconButton(
+                                    icon: SvgPicture.asset(
+                                      "assets/icons/ok.svg",
+                                      semanticsLabel: 'OK',
+                                    ),
+                                    iconSize: 60,
+                                    splashRadius: 25,
+                                    tooltip: 'Salva hinoo',
+                                    onPressed: _submitHinoo,
+                                  ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -562,5 +541,3 @@ class _NewHinooPageState extends State<NewHinooPage> {
     );
   }
 }
-
-// Pulsante bianco estratto in lib/Widgets/white_icon_button.dart
