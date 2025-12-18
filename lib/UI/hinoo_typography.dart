@@ -6,10 +6,10 @@ import 'package:google_fonts/google_fonts.dart';
 class HinooTypography {
   /// Reference line that defines maximum line width at baseline screen size
   /// This phrase has exactly 34 characters and defines the maximum line length
-  static const String referenceLine = 'Hai il presente. Non ti basta? __';
-
+  static const String referenceLine = '—- Hai il presente. Non ti basta?';
+  
   /// Maximum characters allowed per line (same as reference line length)
-  static const int maxCharsPerLine = 33;
+  static const int maxCharsPerLine = 34;
 
   /// Fixed font size in dp/points (does not scale)
   static const double fontSize = 18.0;
