@@ -5,13 +5,16 @@ import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
 import '../Widgets/honoo_scaffold.dart';
+import '../Widgets/luna_fissa.dart';
 import 'email_verify_page.dart';
 
 class EmailLoginPage extends StatefulWidget {
   final String? pendingHonooText;
   final String? pendingImageUrl;
-  final Map<String, dynamic>? pendingHinooDraft; // nuova: bozza Hinoo
+  final Map<String, dynamic>? pendingHinooDraft;
 
   const EmailLoginPage({
     super.key,
@@ -71,6 +74,12 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
   }
 
   @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final inputDecoration = InputDecoration(
       labelText: 'Email',
@@ -113,7 +122,43 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
       ),
     );
 
-    final content = SingleChildScrollView(
+    final w = MediaQuery.of(context).size.width;
+    final bottomSafe = MediaQuery.of(context).viewPadding.bottom;
+
+    const double margin = 8.0;
+
+    final iconSize = LunaFissa.iconSizeForWidth(w);
+
+    final bottomLeftBackButton = Positioned(
+      bottom: bottomSafe + margin,
+      left: margin,
+      child: Material(
+        color: Colors.transparent,
+        child: IconButton(
+          padding: EdgeInsets.zero,
+          constraints: BoxConstraints.tightFor(
+            width: iconSize * 1.2,
+            height: iconSize * 1.2,
+          ),
+          icon: SvgPicture.asset(
+            "assets/icons/arrow_left.svg",
+            width: iconSize * 0.6,
+            height: iconSize * 0.6,
+            fit: BoxFit.contain,
+            colorFilter: const ColorFilter.mode(
+              HonooColor.onBackground,
+              BlendMode.srcIn,
+            ),
+          ),
+          tooltip: 'torna indietro',
+          onPressed: () {
+            if (Navigator.canPop(context)) Navigator.pop(context);
+          },
+        ),
+      ),
+    );
+
+    final scrollContent = SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32),
       child: Center(
         child: ConstrainedBox(
@@ -122,6 +167,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const SizedBox(height: 56),
               Text(
                 'Accedi con la tua email',
                 style: GoogleFonts.arvo(
@@ -133,7 +179,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Ti invieremo un codice di verifica. Inserisci la tua email e premi “Invia codice”.',
+                'Ti invieremo un codice di verifica.\nInserisci la tua email\ne premi “Invia codice”.',
                 style: GoogleFonts.lora(
                   color: HonooColor.onBackground.withOpacity(0.8),
                   fontSize: 16,
@@ -161,6 +207,13 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
           ),
         ),
       ),
+    );
+
+    final content = Stack(
+      children: [
+        scrollContent,
+        bottomLeftBackButton,
+      ],
     );
 
     return HonooScaffold(body: content);
