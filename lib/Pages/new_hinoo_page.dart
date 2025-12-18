@@ -363,200 +363,213 @@ class _NewHinooPageState extends State<NewHinooPage> {
     final double contentTopPadding = extraTop > 0 ? extraTop : 0;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: HonooColor.background,
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, viewport) {
-            final double viewW = viewport.maxWidth;
-            final double viewH = viewport.maxHeight;
-            final double targetMaxW = _contentMaxWidth(viewW);
+      body: Builder(
+        builder: (context) {
+          final double keyboard = MediaQuery.of(context).viewInsets.bottom;
 
-            // Altezza centrale per canvas = tutto ciò che resta (footer è Positioned)
-            final double availableH = (viewH -
-                    _titleH // [Riga 1] titolo app
-                    -
-                    contentTopPadding // spazio riservato per non coprire i bottoni
-                    -
-                    _controlsH // [Riga 2] bottoni bianchi visibili
-                    -
-                    _footerH // riserva fisica per la navbar/overlay
-                )
-                .clamp(0.0, double.infinity);
+          final Widget content = SafeArea(
+            child: LayoutBuilder(
+              builder: (context, viewport) {
+                final bool kbOpen =
+                    MediaQuery.of(context).viewInsets.bottom > 0;
+                final double viewW = viewport.maxWidth;
+                final media = MediaQuery.of(context);
+                final double viewH = media.size.height - media.padding.vertical;
+                final double targetMaxW = _contentMaxWidth(viewW);
 
-            // Calcolo box 9:16 per [Riga 2]
-            const double ar = 9 / 16;
-            double canvasW = targetMaxW;
-            double canvasH = canvasW / ar;
-            if (canvasH > availableH) {
-              canvasH = availableH;
-              canvasW = canvasH * ar;
-            }
-            _lastCanvasHeight = canvasH;
+                final double availableH = (viewH -
+                        _titleH -
+                        contentTopPadding -
+                        _controlsH -
+                        _footerH)
+                    .clamp(0.0, double.infinity);
 
-            return Stack(
-              clipBehavior: Clip.none,
-              children: [
-                // ===== COLONNA PRINCIPALE: 3 righe visive + spazio riservato ====
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                const double ar = 9 / 16;
+                double canvasW = targetMaxW;
+                double canvasH = canvasW / ar;
+                if (canvasH > availableH) {
+                  canvasH = availableH;
+                  canvasW = canvasH * ar;
+                }
+                _lastCanvasHeight = canvasH;
+
+                return Stack(
+                  clipBehavior: Clip.none,
                   children: [
-                    // [Riga 1] Titolo/app name
-                    SizedBox(
-                      height: _titleH,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: HonooAppTitle(
-                            onTap: () {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (_) => const PlaceholderPage()),
-                                (route) => false,
-                              );
-                            },
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(
+                          height: _titleH,
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: HonooAppTitle(
+                                onTap: () {
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (_) =>
+                                            const PlaceholderPage()),
+                                    (route) => false,
+                                  );
+                                },
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-
-                    // Spazio riservato per non far coprire dalla luna
-                    SizedBox(height: contentTopPadding),
-
-                    // [Riga 2] Bottoni bianchi (fissi in alto a destra del canvas)
-                    SizedBox(
-                      height: _controlsH,
-                      child: Center(
-                        child: SizedBox(
-                          width: canvasW,
+                        SizedBox(height: contentTopPadding),
+                        SizedBox(
                           height: _controlsH,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              if (_isWriteStep) ...[
-                                WhiteIconButton(
-                                  tooltip: 'download',
-                                  icon: Icons.download_outlined,
-                                  onPressed: () => _handleDownloadTap(),
-                                ),
-                                const SizedBox(width: 12),
-                              ],
-                              WhiteIconButton(
-                                tooltip: 'Svuota hinoo',
-                                icon: Icons.delete_outline,
-                                onPressed: _deleteCurrentFromBuilder,
+                          child: Center(
+                            child: SizedBox(
+                              width: canvasW,
+                              height: _controlsH,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  if (_isWriteStep) ...[
+                                    WhiteIconButton(
+                                      tooltip: 'download',
+                                      icon: Icons.download_outlined,
+                                      onPressed: () => _handleDownloadTap(),
+                                    ),
+                                    const SizedBox(width: 12),
+                                  ],
+                                  WhiteIconButton(
+                                    tooltip: 'Svuota hinoo',
+                                    icon: Icons.delete_outline,
+                                    onPressed: _deleteCurrentFromBuilder,
+                                  ),
+                                ],
                               ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: availableH,
+                          child: Center(
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(maxWidth: targetMaxW),
+                              child: SizedBox(
+                                width: canvasW,
+                                height: canvasH,
+                                child: ClipRect(
+                                  child: HinooBuilder(
+                                    key: _builderKey,
+                                    onHinooChanged: _onHinooChanged,
+                                    onPngExported: _onPngExported,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: _footerH),
+                      ],
+                    ),
+                    IgnorePointer(
+                      ignoring: kbOpen,
+                      child: const LunaFissa(),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: IgnorePointer(
+                        ignoring: kbOpen,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                icon: SvgPicture.asset(
+                                  "assets/icons/home.svg",
+                                  semanticsLabel: 'Home',
+                                  colorFilter: const ColorFilter.mode(
+                                    HonooColor.onBackground,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                                iconSize: 60,
+                                splashRadius: 25,
+                                tooltip: 'Home',
+                                onPressed: () {
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (_) => const HomePage()),
+                                    (route) => false,
+                                  );
+                                },
+                              ),
+                              const SizedBox(width: 24),
+                              IconButton(
+                                icon: SvgPicture.asset("assets/icons/chest.svg",
+                                    semanticsLabel: 'Chest'),
+                                iconSize: 60,
+                                splashRadius: 40,
+                                tooltip: 'Apri il tuo Cuore',
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => const ChestPage()),
+                                  );
+                                },
+                              ),
+                              const SizedBox(width: 24),
+                              _savedToChest
+                                  ? IconButton(
+                                      icon: SvgPicture.asset(
+                                          "assets/icons/moon.svg",
+                                          semanticsLabel: 'Luna'),
+                                      iconSize: 32,
+                                      splashRadius: 25,
+                                      tooltip: 'Spedisci sulla Luna',
+                                      onPressed: _submitToMoon,
+                                    )
+                                  : IconButton(
+                                      icon: SvgPicture.asset(
+                                          "assets/icons/ok.svg",
+                                          semanticsLabel: 'OK'),
+                                      iconSize: 60,
+                                      splashRadius: 25,
+                                      tooltip: 'Salva hinoo',
+                                      onPressed: _submitHinoo,
+                                    ),
                             ],
                           ),
                         ),
                       ),
                     ),
-
-                    // [Riga 3] CANVAS 9:16 — HinooBuilder centrato, nessun overlay
-                    SizedBox(
-                      height: availableH,
-                      child: Center(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(maxWidth: targetMaxW),
-                          child: SizedBox(
-                            width: canvasW,
-                            height: canvasH,
-                            child: ClipRect(
-                              child: HinooBuilder(
-                                key: _builderKey,
-                                onHinooChanged: _onHinooChanged,
-                                onPngExported: _onPngExported,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // [Riga 4] Spazio riservato per la navbar (overlay)
-                    const SizedBox(height: _footerH),
                   ],
-                ),
+                );
+              },
+            ),
+          );
 
-                // LUNA FISSA (sopra, ma abbiamo riservato spazio → non accavalla)
-                const LunaFissa(),
+          final screenH = MediaQuery.of(context).size.height;
 
-                // ============ FOOTER: Home – Chest – OK/Luna ============ //
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // HOME
-                        IconButton(
-                          icon: SvgPicture.asset(
-                            "assets/icons/home.svg",
-                            semanticsLabel: 'Home',
-                            colorFilter: const ColorFilter.mode(
-                              HonooColor.onBackground,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                          iconSize: 60,
-                          splashRadius: 25,
-                          tooltip: 'Home',
-                          onPressed: () {
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (_) => const HomePage()),
-                              (route) => false,
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 24),
-
-                        // CHEST
-                        IconButton(
-                          icon: SvgPicture.asset("assets/icons/chest.svg",
-                              semanticsLabel: 'Chest'),
-                          iconSize: 60,
-                          splashRadius: 40,
-                          tooltip: 'Apri il tuo Cuore',
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const ChestPage()),
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 24),
-
-                        // OK → LUNA
-                        _savedToChest
-                            ? IconButton(
-                                icon: SvgPicture.asset("assets/icons/moon.svg",
-                                    semanticsLabel: 'Luna'),
-                                iconSize: 32,
-                                splashRadius: 25,
-                                tooltip: 'Spedisci sulla Luna',
-                                onPressed: _submitToMoon,
-                              )
-                            : IconButton(
-                                icon: SvgPicture.asset("assets/icons/ok.svg",
-                                    semanticsLabel: 'OK'),
-                                iconSize: 60,
-                                splashRadius: 25,
-                                tooltip: 'Salva hinoo',
-                                onPressed: _submitHinoo,
-                              ),
-                      ],
+          return keyboard == 0
+              ? content
+              : SizedBox(
+                  height: screenH - keyboard,
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (_) {
+                      if (FocusScope.of(context).hasFocus) return true;
+                      return false;
+                    },
+                    child: SingleChildScrollView(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.manual,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: content,
                     ),
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
+                  ));
+        },
       ),
     );
   }
