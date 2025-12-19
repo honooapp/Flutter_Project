@@ -24,44 +24,51 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
   @override
   Widget build(BuildContext context) {
     return Positioned.fill(
-      child: Padding(
-        padding: EdgeInsets.zero,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final double canvasWidth = math.max(1, constraints.maxWidth);
-            const double horizontalPad = HinooTypography.horizontalPadding;
-            final double verticalPad =
-                HinooTypography.verticalPadding(canvasWidth);
-            final TextStyle effectiveStyle = HinooTypography.textStyle(
-              color: widget.textColor,
-            );
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final double canvasWidth = math.max(1, constraints.maxWidth);
 
-            return Padding(
-              padding: EdgeInsets.fromLTRB(
-                  horizontalPad, verticalPad, horizontalPad, verticalPad),
-              child: WidthLimitedMultilineField(
-                controller: widget.controller,
-                focusNode: widget.focusNode,
-                style: effectiveStyle,
-                maxLines: HinooTypography.maxLines,
-                maxCharsPerLine: HinooTypography.maxCharsPerLine,
-                horizontalPadding: EdgeInsets.zero,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  isCollapsed: true,
-                ),
-                keyboardType: TextInputType.multiline,
-                textInputAction: TextInputAction.newline,
-                autofocus: true,
-                expands: true,
-                scrollPhysics: const ClampingScrollPhysics(),
-                cursorColor: Colors.white,
-                cursorWidth: 3,
-                cursorRadius: const Radius.circular(0),
+          const double horizontalPad = HinooTypography.horizontalPadding;
+
+          final double baseVerticalPad =
+              HinooTypography.verticalPadding(canvasWidth);
+
+          final double topPad = baseVerticalPad * 0.45;
+          const double bottomPad = 6.0;
+
+          final TextStyle effectiveStyle = HinooTypography.textStyle(
+            color: widget.textColor,
+          );
+
+          return Padding(
+            padding: EdgeInsets.fromLTRB(
+              horizontalPad,
+              topPad,
+              horizontalPad,
+              bottomPad,
+            ),
+            child: WidthLimitedMultilineField(
+              controller: widget.controller,
+              focusNode: widget.focusNode,
+              style: effectiveStyle,
+              maxLines: HinooTypography.maxLines,
+              maxCharsPerLine: HinooTypography.maxCharsPerLine,
+              horizontalPadding: EdgeInsets.zero,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                isCollapsed: true,
               ),
-            );
-          },
-        ),
+              keyboardType: TextInputType.multiline,
+              textInputAction: TextInputAction.newline,
+              autofocus: true,
+              expands: true,
+              scrollPhysics: const ClampingScrollPhysics(),
+              cursorColor: Colors.white,
+              cursorWidth: 3,
+              cursorRadius: const Radius.circular(0),
+            ),
+          );
+        },
       ),
     );
   }

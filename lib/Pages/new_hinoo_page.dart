@@ -1,5 +1,6 @@
 // lib/Pages/new_hinoo_page.dart
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -38,6 +39,9 @@ class _NewHinooPageState extends State<NewHinooPage> {
   String _builderStep = 'changeBg';
   int _currentTextLength = 0;
   bool _bgUploadInProgress = false;
+
+  // ✅ nuovo: vero se c'è uno sfondo immagine (locale o url)
+  bool _hasBgImage = false;
 
   bool get _isWriteStep => _builderStep == 'writeText';
   bool get _hasMinTextForDownload => _currentTextLength >= 1;
@@ -86,6 +90,14 @@ class _NewHinooPageState extends State<NewHinooPage> {
       if (rawText is String) detectedLength = rawText.trim().length;
     }
     _currentTextLength = detectedLength;
+
+    // ✅ Determina se c’è uno sfondo immagine
+    final bool hasBgFlag = draft['hasBg'] == true;
+    final bool hasPreviewBytes = draft['bgPreviewBytes'] != null;
+    final dynamic bgUrlRaw = draft['bgUrl'];
+    final bool hasBgUrl = bgUrlRaw is String && bgUrlRaw.trim().isNotEmpty;
+
+    _hasBgImage = hasBgFlag || hasPreviewBytes || hasBgUrl;
   }
 
   Future<void> _onPngExported(Uint8List bytes) async {
@@ -322,6 +334,91 @@ class _NewHinooPageState extends State<NewHinooPage> {
     showHonooToast(context, message: 'Collega API del builder: $what');
   }
 
+  Widget _tightIcon({
+    required IconData icon,
+    required String tooltip,
+    required VoidCallback onPressed,
+  }) {
+    const double s = 26; // dimensione icona
+    const double box = 32; // dimensione box cliccabile
+
+    return IconButton(
+      tooltip: tooltip,
+      onPressed: onPressed,
+      icon: Icon(icon, size: s, color: Colors.white),
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints.tightFor(width: box, height: box),
+      splashRadius: box / 2,
+      visualDensity: VisualDensity.compact,
+    );
+  }
+
+  Widget _buildCanvasControls() {
+    const double iconSize = 22;
+    const double buttonBox = 34;
+    const double pillHeight = 40;
+
+    Widget iconBtn({
+      required IconData icon,
+      required String tooltip,
+      required VoidCallback onPressed,
+    }) {
+      return SizedBox(
+        width: buttonBox,
+        height: buttonBox,
+        child: IconButton(
+          tooltip: tooltip,
+          onPressed: onPressed,
+          icon: Icon(icon, size: iconSize, color: Colors.white),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+          splashRadius: buttonBox / 2,
+          visualDensity: VisualDensity.compact,
+        ),
+      );
+    }
+
+    final controls = Container(
+      height: pillHeight,
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.55),
+        borderRadius: BorderRadius.circular(pillHeight / 2),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (_isWriteStep) ...[
+            iconBtn(
+              tooltip: 'download',
+              icon: Icons.download_outlined,
+              onPressed: _handleDownloadTap,
+            ),
+            const SizedBox(width: 6),
+          ],
+          iconBtn(
+            tooltip: 'Svuota hinoo',
+            icon: Icons.delete_outline,
+            onPressed: _deleteCurrentFromBuilder,
+          ),
+        ],
+      ),
+    );
+
+    if (_hasBgImage) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(pillHeight / 2),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+          child: controls,
+        ),
+      );
+    }
+
+    return controls;
+  }
+
   @override
   Widget build(BuildContext context) {
     final double lunaReserve = LunaFissa.reserveTopPadding(context);
@@ -329,7 +426,6 @@ class _NewHinooPageState extends State<NewHinooPage> {
     final double contentTopPadding = extraTop > 0 ? extraTop : 0;
 
     return Scaffold(
-      // ✅ tastiera “overlay”: non ridimensiona la pagina
       resizeToAvoidBottomInset: false,
       backgroundColor: HonooColor.background,
       body: SafeArea(
@@ -339,7 +435,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
             final bool kbOpen = keyboard > 0;
 
             final double viewW = viewport.maxWidth;
-            final double viewH = viewport.maxHeight; // ✅ stabile su web
+            final double viewH = viewport.maxHeight;
             final double targetMaxW = _contentMaxWidth(viewW);
 
             final double availableH =
@@ -355,7 +451,6 @@ class _NewHinooPageState extends State<NewHinooPage> {
             }
             _lastCanvasHeight = canvasH;
 
-            // ✅ Colonna principale: scrollabile SOLO quando kb aperta
             final Widget mainColumn = Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -378,35 +473,6 @@ class _NewHinooPageState extends State<NewHinooPage> {
                   ),
                 ),
                 SizedBox(height: contentTopPadding),
-
-                SizedBox(
-                  height: _controlsH,
-                  child: Center(
-                    child: SizedBox(
-                      width: canvasW,
-                      height: _controlsH,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          if (_isWriteStep) ...[
-                            WhiteIconButton(
-                              tooltip: 'download',
-                              icon: Icons.download_outlined,
-                              onPressed: _handleDownloadTap,
-                            ),
-                            const SizedBox(width: 12),
-                          ],
-                          WhiteIconButton(
-                            tooltip: 'Svuota hinoo',
-                            icon: Icons.delete_outline,
-                            onPressed: _deleteCurrentFromBuilder,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
                 SizedBox(
                   height: availableH,
                   child: Center(
@@ -415,29 +481,36 @@ class _NewHinooPageState extends State<NewHinooPage> {
                       child: SizedBox(
                         width: canvasW,
                         height: canvasH,
-                        child: ClipRect(
-                          child: HinooBuilder(
-                            key: _builderKey,
-                            onHinooChanged: _onHinooChanged,
-                            onPngExported: _onPngExported,
-                          ),
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              child: ClipRect(
+                                child: HinooBuilder(
+                                  key: _builderKey,
+                                  onHinooChanged: _onHinooChanged,
+                                  onPngExported: _onPngExported,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: _buildCanvasControls(),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
                 ),
-
-                // spazio “fisico” per il footer (che resta overlay nello Stack)
                 const SizedBox(height: _footerH),
               ],
             );
 
             final Widget content = kbOpen
                 ? SingleChildScrollView(
-                    // ✅ NON dismissare la tastiera con scroll
                     keyboardDismissBehavior:
                         ScrollViewKeyboardDismissBehavior.manual,
-                    // ✅ aggiungo spazio extra per scrollare anche con kb sopra
                     padding: EdgeInsets.only(bottom: keyboard),
                     physics: const ClampingScrollPhysics(),
                     child: ConstrainedBox(
@@ -451,10 +524,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
               clipBehavior: Clip.none,
               children: [
                 content,
-
                 const LunaFissa(),
-
-                // Footer overlay: disattivato con kb aperta per non rubare tocchi
                 Positioned(
                   bottom: 0,
                   left: 0,
