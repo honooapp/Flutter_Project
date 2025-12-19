@@ -90214,7 +90214,7 @@ l=n.length
 return A.cr(B.A,new A.PZ(new A.amf(!0,!0,!0,n,m),new A.aA(0,0,0,s),B.aV,!1,j,j,B.cR,!1,j,l,B.a1,B.bZ,j,B.B,new A.ch("desc_list_"+o.a,h)),B.k,j,j,new A.d6(q,j,j,p,j,j,B.a_),j,j,new A.ch("desc_"+i.a,h),j,B.h4,j,j,80*r/100)},
 a9H(){return new A.dt(new A.at8(this),null)},
 a9G(a){var s=Math.max(24,a*0.6),r=new A.at7(A.mj(a,a),a,s),q=t.p,p=A.b([],q)
-if(this.e)B.b.C(p,A.b([r.$3$onPressed$semantics$svg(new A.at5(this),"Home","assets/icons/isoladellestorie/islandhome.svg"),B.Si],q))
+if(this.e)B.b.C(p,A.b([r.$3$onPressed$semantics$svg(new A.at5(this),"Home","assets/icons/isoladellestorie/islandhome.svg"),B.Sh],q))
 p.push(r.$3$onPressed$semantics$svg(new A.at6(this),"Mostra o nascondi il percorso","assets/icons/isoladellestorie/offUI.svg"))
 return A.cx(p,B.r,B.F,B.aq)},
 J(a){var s,r,q,p,o,n=this,m=null,l=$.L5(),k=n.d
@@ -90489,7 +90489,7 @@ if(m<=0)if(n)m=p
 else m=j>0?r:320
 l=Math.min(m/0.9938080495356038,q)
 r=t.p
-return A.fm(A.b([B.h7,new A.er(new A.ak(0,j,0,1/0),A.cx(A.b([B.lb,new A.aa(k,70,new A.f8(B.fC,k,k,A.aLc("Apri gli occhi:\nc\u2019\xe8 l\u2019Isola\ndavanti a te"),k),k),B.A1,new A.bp(B.Hu,new A.f8(B.A,k,k,new A.aa(m,l,new A.PD("assets/icons/isoladellestorie/islandmap.svg",0.9938080495356038,B.Kc,0.0495,this.a.gaiM(),k),k),k),k),B.A1,new A.bp(B.bQ,A.cx(A.b([B.Sk,A.aee(!1,!0,A.bn("Se vuoi di pi\xf9, clicca qui",k,k,k,k,A.fR(B.h,B.dh,18,k,B.ah,k),k,k),k,!0,k,k,k,k,k,k,k,k,k,new A.avJ(a),k,k,k,k)],r),B.r,B.F,B.G),k)],r),B.r,B.aO,B.G),k),B.h7],r),B.r,B.F,B.G)},
+return A.fm(A.b([B.h7,new A.er(new A.ak(0,j,0,1/0),A.cx(A.b([B.lb,new A.aa(k,70,new A.f8(B.fC,k,k,A.aLc("Apri gli occhi:\nc\u2019\xe8 l\u2019Isola\ndavanti a te"),k),k),B.A1,new A.bp(B.Hu,new A.f8(B.A,k,k,new A.aa(m,l,new A.PD("assets/icons/isoladellestorie/islandmap.svg",0.9938080495356038,B.Kc,0.0495,this.a.gaiM(),k),k),k),k),B.A1,new A.bp(B.bQ,A.cx(A.b([B.Sj,A.aee(!1,!0,A.bn("Se vuoi di pi\xf9, clicca qui",k,k,k,k,A.fR(B.h,B.dh,18,k,B.ah,k),k,k),k,!0,k,k,k,k,k,k,k,k,k,new A.avJ(a),k,k,k,k)],r),B.r,B.F,B.G),k)],r),B.r,B.aO,B.G),k),B.h7],r),B.r,B.F,B.G)},
 $S:138}
 A.avJ.prototype={
 $0(){A.bb(this.a,!1).e3(A.bP(new A.avC(),null,t.z),new A.avD())},
@@ -90941,7 +90941,7 @@ A.om.prototype={
 ae(){return new A.WB(B.j)}}
 A.WB.prototype={
 J(a){var s=null,r=$.L4().wF(),q=A.bj(a,s,t.w).w.a.a,p=r?q:q*0.5,o=A.ck(new A.iE(new A.as4(a),s),s,s,s),n=this.a.c,m=$.eg.a8(),l=A.bn(this.a.d,s,s,s,s,A.hR(B.jd,18,B.aN),B.fk,s),k=$.tU.a8(),j=t.p
-return A.kq(B.a9,A.fm(A.b([B.lf,A.cr(s,A.ck(A.cx(A.b([new A.aa(s,52,o,s),B.lb,new A.oy(n,B.h,18,s),B.Sj,new A.aa(80*m/100,s,l,s),B.Sh,new A.aa(80*$.eg.a8()/100,20*k/100,A.bn(this.a.e,s,s,s,s,A.hR(B.jd,14,B.aN),B.fk,s),s),B.lf,new A.aa(s,60,A.fm(A.b([A.bC(s,s,A.bQ("assets/icons/home.svg",s,B.z,s,"Home",s,s),60,new A.as5(a),s,25,s,"Home",s)],j),B.r,B.F,B.G),s)],j),B.r,B.aO,B.G),s,s,s),B.k,s,new A.ak(0,p,0,1/0),s,s,s,s,s,s,s,s,s),B.lf],j),B.r,B.F,B.G),s)}}
+return A.kq(B.a9,A.fm(A.b([B.lf,A.cr(s,A.ck(A.cx(A.b([new A.aa(s,52,o,s),B.lb,new A.oy(n,B.h,18,s),B.Si,new A.aa(80*m/100,s,l,s),B.Sg,new A.aa(80*$.eg.a8()/100,20*k/100,A.bn(this.a.e,s,s,s,s,A.hR(B.jd,14,B.aN),B.fk,s),s),B.lf,new A.aa(s,60,A.fm(A.b([A.bC(s,s,A.bQ("assets/icons/home.svg",s,B.z,s,"Home",s,s),60,new A.as5(a),s,25,s,"Home",s)],j),B.r,B.F,B.G),s)],j),B.r,B.aO,B.G),s,s,s),B.k,s,new A.ak(0,p,0,1/0),s,s,s,s,s,s,s,s,s),B.lf],j),B.r,B.F,B.G),s)}}
 A.as4.prototype={
 $0(){A.bb(this.a,!1).e3(A.bP(new A.as2(),null,t.z),new A.as3())},
 $S:0}
@@ -91490,7 +91490,7 @@ l.push(p.$3$icon$onPressed$tooltip(B.oy,r.gabt(),"Svuota hinoo"))
 s=A.cr(q,A.fm(l,B.r,B.F,B.aq),B.k,q,q,new A.d6(o,q,q,n,q,q,B.a_),q,40,q,q,B.h6,q,q,q)
 if(r.z)return A.a7d(A.cd(20),A.a5B(s,$.a9().vJ(6,6,B.ay)))
 return s},
-J(a){var s=A.aGc(a)-52
+J(a){var s=A.aGc(a)-65
 return A.kq(B.a9,A.lF(new A.dt(new A.axr(this,s>0?s:0),null),!0),!1)}}
 A.axt.prototype={
 $1(a){var s,r=this.a,q=r.d.gR()
@@ -91534,12 +91534,12 @@ $3$icon$onPressed$tooltip(a,b,c){var s=null
 return new A.aa(34,34,A.bC(s,B.cv,A.aFW(a,B.h,22),s,b,B.ab,17,s,c,B.lK),s)},
 $S:554}
 A.axr.prototype={
-$2(a,b){var s,r,q,p,o,n=null,m=A.bj(a,n,t.w).w.e.d,l=m>0,k=b.d,j=this.a,i=j.ahT(b.b),h=this.b,g=B.d.ce(k-52-h-44-100,0,1/0),f=i/0.5625
+$2(a,b){var s,r,q,p,o,n=null,m=A.bj(a,n,t.w).w.e.d,l=m>0,k=b.d,j=this.a,i=j.ahT(b.b),h=this.b,g=B.d.ce(k-65-h-44-50,0,1/0),f=i/0.5625
 if(f>g){s=g*0.5625
 f=g}else s=i
 j.r=f
 r=t.p
-q=A.cx(A.b([new A.aa(n,52,new A.bp(B.Hy,new A.f8(B.A,n,n,new A.iE(new A.axo(a),n),n),n),n),new A.aa(n,h,n,n),new A.aa(n,g,A.ck(new A.er(new A.ak(0,i,0,1/0),new A.aa(s,f,A.cT(B.P,A.b([A.lB(0,A.l3(new A.BM(j.gaim(),j.d),B.B),0),A.c4(n,j.a9l(),n,n,n,8,8,n)],r),B.B,B.Y),n),n),n,n,n),n),B.Sg],r),B.dv,B.F,B.G)
+q=A.cx(A.b([new A.aa(n,65,new A.bp(B.Hy,new A.f8(B.A,n,n,new A.iE(new A.axo(a),n),n),n),n),new A.aa(n,h,n,n),new A.aa(n,g,A.ck(new A.er(new A.ak(0,i,0,1/0),new A.aa(s,f,A.cT(B.P,A.b([A.lB(0,A.l3(new A.BM(j.gaim(),j.d),B.B),0),A.c4(n,j.a9l(),n,n,n,8,8,n)],r),B.B,B.Y),n),n),n,n,n),n),B.Sk],r),B.dv,B.F,B.G)
 p=l?A.tT(new A.er(new A.ak(0,1/0,k,1/0),q,n),B.bZ,new A.aA(0,0,0,m),B.j0):q
 h=A.bC(n,n,A.bQ("assets/icons/home.svg",B.b_,B.z,n,"Home",n,n),60,new A.axp(a),n,25,n,"Home",n)
 o=A.bC(n,n,A.bQ("assets/icons/chest.svg",n,B.z,n,"Chest",n,n),60,new A.axq(a),n,40,n,"Apri il tuo Cuore",n)
@@ -105931,17 +105931,17 @@ B.Iv=new A.iE(null,null)
 B.DJ=new A.it(B.A,null,null,B.Iv,null)
 B.Se=new A.aa(null,52,B.DJ,null)
 B.Sf=new A.aa(null,0,null,null)
-B.Sg=new A.aa(null,100,null,null)
-B.Sh=new A.aa(null,10,null,null)
+B.Sg=new A.aa(null,10,null,null)
 B.bI=new A.aa(null,12,null,null)
 B.dZ=new A.aa(null,16,null,null)
-B.Si=new A.aa(null,20,null,null)
+B.Sh=new A.aa(null,20,null,null)
 B.l9=new A.aa(null,22,null,null)
 B.cf=new A.aa(null,24,null,null)
-B.Sj=new A.aa(null,30,null,null)
+B.Si=new A.aa(null,30,null,null)
 B.la=new A.aa(null,32,null,null)
 B.A1=new A.aa(null,36,null,null)
-B.Sk=new A.aa(null,4,null,null)
+B.Sj=new A.aa(null,4,null,null)
+B.Sk=new A.aa(null,50,null,null)
 B.Sl=new A.aa(null,56,null,null)
 B.lb=new A.aa(null,5,null,null)
 B.ia=new A.aa(null,8,null,null)
