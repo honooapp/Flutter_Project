@@ -46,9 +46,9 @@ class _NewHinooPageState extends State<NewHinooPage> {
   bool get _isWriteStep => _builderStep == 'writeText';
   bool get _hasMinTextForDownload => _currentTextLength >= 1;
 
-  static const double _titleH = 52;
+  static const double _titleH = 65;
   static const double _controlsH = 44;
-  static const double _footerH = 100.0;
+  static const double _footerH = 50.0;
 
   @override
   void initState() {
