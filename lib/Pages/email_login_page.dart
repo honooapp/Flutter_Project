@@ -80,8 +80,11 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
   @override
   Widget build(BuildContext context) {
     final inputDecoration = InputDecoration(
-      labelText: 'Email',
-      labelStyle: GoogleFonts.lora(color: Colors.white70),
+      hintText: 'Email',
+      hintStyle: GoogleFonts.lora(
+        color: Colors.white70,
+        fontSize: 16,
+      ),
       filled: true,
       fillColor: Colors.white.withOpacity(0.08),
       border: OutlineInputBorder(
@@ -96,111 +99,110 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
         borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: Colors.white60),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 18,
+      ),
     );
 
     final button = ElevatedButton(
-      key: const Key('email_send_code_btn'),
       onPressed: _isLoading ? null : _sendOtp,
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         elevation: 0,
-        disabledBackgroundColor: Colors.white10,
-        disabledForegroundColor: Colors.white38,
       ),
       child: Text(
         _isLoading ? 'Invio in corso…' : 'Invia codice',
         style: GoogleFonts.libreFranklin(
           fontWeight: FontWeight.w600,
-          color: Colors.black,
         ),
       ),
     );
 
-    final scrollContent = SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 56),
-              Text(
-                'Accedi con la tua email',
-                style: GoogleFonts.arvo(
-                  color: HonooColor.onBackground,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
+    return HonooScaffold(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 56),
+                Text(
+                  'Accedi con la tua email',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.arvo(
+                    color: HonooColor.onBackground,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Ti invieremo un codice di verifica.\nInserisci la tua email\ne premi “Invia codice”.',
-                style: GoogleFonts.lora(
-                  color: HonooColor.onBackground.withOpacity(0.8),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
+                const SizedBox(height: 16),
+                Text(
+                  'Ti invieremo un codice di verifica.\n'
+                  'Inserisci la tua email\ne premi “Invia codice”.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.lora(
+                    color: HonooColor.onBackground.withOpacity(0.8),
+                    fontSize: 16,
+                  ),
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 32),
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
-                cursorColor: Colors.white,
-                cursorWidth: 3,
-                cursorRadius: const Radius.circular(0),
-                decoration: inputDecoration,
-              ),
-              const SizedBox(height: 24),
-              _isLoading
-                  ? const Center(
-                      child: LoadingSpinner(color: Colors.white),
-                    )
-                  : button,
-              Text(
-                'o',
-                style: GoogleFonts.lora(
-                  color: HonooColor.onBackground.withOpacity(0.8),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
+                const SizedBox(height: 32),
+
+                // ✅ EMAIL CENTRATA
+                TextField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.lora(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                  cursorColor: Colors.white,
+                  decoration: inputDecoration,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              InkWell(
-                onTap: () {
-                  if (Navigator.canPop(context)) Navigator.pop(context);
-                },
-                child: Text(
-                  'torna indietro',
+
+                const SizedBox(height: 24),
+                _isLoading
+                    ? const Center(
+                        child: LoadingSpinner(color: Colors.white),
+                      )
+                    : button,
+                const SizedBox(height: 8),
+                Text(
+                  'o',
                   style: GoogleFonts.lora(
                     color: HonooColor.onBackground.withOpacity(0.8),
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
-                    decoration: TextDecoration.underline,
                   ),
                   textAlign: TextAlign.center,
                 ),
-              ),
-            ],
+                const SizedBox(height: 8),
+                InkWell(
+                  onTap: () {
+                    if (Navigator.canPop(context)) Navigator.pop(context);
+                  },
+                  child: Text(
+                    'torna indietro',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.lora(
+                      color: HonooColor.onBackground.withOpacity(0.8),
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
-
-    final content = Stack(
-      children: [
-        scrollContent,
-      ],
-    );
-
-    return HonooScaffold(body: content);
   }
 }

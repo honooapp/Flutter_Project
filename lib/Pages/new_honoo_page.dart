@@ -50,6 +50,8 @@ class _NewHonooPageState extends State<NewHonooPage> {
   String _lastSavedRawImage = '';
   bool _hasMinTextForDownload = false;
 
+  bool get _hasImageForDownload => _imageUrl.trim().isNotEmpty;
+
   /// Aggiorna solo se cambia DAVVERO e non è identico all’ultimo SALVATO.
   void _onHonooChanged(String text, String imageUrl) {
     // se identico allo stato attuale → nessun rebuild inutile
@@ -61,6 +63,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
     setState(() {
       _text = text;
       _imageUrl = imageUrl;
+
       _hasMinTextForDownload = text.trim().isNotEmpty;
 
       // resetta l’icona solo se il contenuto è DIVERSO da quello salvato
@@ -376,19 +379,20 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              if (_hasMinTextForDownload) ...[
+                              if (_hasMinTextForDownload ||
+                                  _hasImageForDownload) ...[
                                 WhiteIconButton(
                                   tooltip: 'Scarica honoo',
                                   icon: Icons.download_outlined,
                                   onPressed: _handleDownloadTap,
                                 ),
                                 const SizedBox(width: 12),
+                                WhiteIconButton(
+                                  tooltip: 'Elimina honoo',
+                                  icon: Icons.delete_outline,
+                                  onPressed: _handleDeleteTap,
+                                ),
                               ],
-                              WhiteIconButton(
-                                tooltip: 'Elimina honoo',
-                                icon: Icons.delete_outline,
-                                onPressed: _handleDeleteTap,
-                              ),
                             ],
                           ),
                         ),
@@ -424,7 +428,6 @@ class _NewHonooPageState extends State<NewHonooPage> {
                   left: 0,
                   right: 0,
                   child: Padding(
-                    // piccolo margine per non “attaccare” i bottoni al bordo fisico
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -495,7 +498,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                               ),
                         SizedBox(width: 5.w),
 
-                        // NUOVA ICONA PIUMA
+                        // PIUMA
                         IconButton(
                           icon: SvgPicture.asset(
                             "assets/icons/piuma.svg",
@@ -515,7 +518,8 @@ class _NewHonooPageState extends State<NewHonooPage> {
                       ],
                     ),
                   ),
-                ), // ===== LUNA FISSA (non copre contenuti, responsive) =====
+                ),
+
                 const LunaFissa(),
               ],
             );
