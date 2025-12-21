@@ -15,6 +15,7 @@ import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
 import 'package:honoo/Widgets/width_limited_multiline_field.dart';
 
+import '../Pages/email_login_page.dart';
 import '../Services/honoo_image_uploader.dart';
 import '../UI/HinooBuilder/overlays/cambia_sfondo.dart';
 
@@ -206,8 +207,25 @@ class HonooBuilderState extends State<HonooBuilder> {
     final session = client.auth.currentSession;
     if (session == null) {
       if (!mounted) return;
-      showHonooToast(context,
-          message: 'Devi essere loggato per caricare immagini.');
+      final bool? goLogin = await showDialog<bool>(
+        context: context,
+        barrierDismissible: true,
+        builder: (_) => const HonooConfirmDialog(
+          title: 'Devi accedere prima',
+          message:
+              'Per caricare un’immagine,\ndevi fare prima il login.\nVuoi andare alla pagina di login?',
+          confirmLabel: 'Vai al login',
+        ),
+      );
+
+      if (goLogin == true && mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const EmailLoginPage(),
+          ),
+        );
+      }
       return;
     }
 

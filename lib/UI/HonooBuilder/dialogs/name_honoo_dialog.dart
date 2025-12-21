@@ -43,7 +43,7 @@ class _NameHonooDialogState extends State<NameHonooDialog> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Se è per il mio corso, sei il numero 25 ed è il tuo primo lavoro, chiamalo 25.1. Se è il tuo secondo lavoro 25.2',
+              'Se è per il mio corso,\nsei il numero 25 ed è il tuo primo lavoro,\nchiamalo 25.1.\nSe è il tuo secondo lavoro,\nchiamalo 25.2',
               style: HonooDialogStyles.body(),
               textAlign: TextAlign.center,
             ),

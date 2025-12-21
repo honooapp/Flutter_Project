@@ -81,8 +81,10 @@ class _NewHonooPageState extends State<NewHonooPage> {
   Future<void> _submitHonoo() async {
     final user = SupabaseProvider.client.auth.currentUser;
 
+    // 1) Se non sei loggato: vai al login e torna qui (senza auto-salvare)
     if (user == null) {
       if (!mounted) return;
+
       final bool? goLogin = await showDialog<bool>(
         context: context,
         barrierDismissible: true,
@@ -93,8 +95,11 @@ class _NewHonooPageState extends State<NewHonooPage> {
           confirmLabel: 'Vai al login',
         ),
       );
+
       if (goLogin != true || !mounted) return;
-      Navigator.push(
+
+      // ✅ aspetta la fine del login
+      final bool? ok = await Navigator.push<bool>(
         context,
         MaterialPageRoute(
           builder: (context) => EmailLoginPage(
@@ -103,23 +108,47 @@ class _NewHonooPageState extends State<NewHonooPage> {
           ),
         ),
       );
+
+      if (!mounted) return;
+
+      // ✅ niente auto-save: solo feedback opzionale
+      if (ok == true) {
+        showHonooToast(
+          context,
+          message: 'Accesso completato. Premi di nuovo OK per salvare.',
+        );
+      }
+
       return;
     }
 
-    // usa cache se presente, altrimenti risolvi adesso
+    // 2) Validazioni minime (testo + immagine)
+    if (_text.trim().isEmpty) {
+      if (!mounted) return;
+      showHonooToast(context, message: 'Scrivi qualcosa prima di salvare.');
+      return;
+    }
+
+    if (_imageUrl.trim().isEmpty) {
+      if (!mounted) return;
+      showHonooToast(context, message: 'Carica un’immagine prima di salvare.');
+      return;
+    }
+
+    // 3) Risolvi URL definitivo (usa cache se già risolto)
     final String? finalImageUrl =
         _finalImageUrlCache ?? await _resolveFinalImageUrl(_imageUrl);
 
     if (finalImageUrl == null || finalImageUrl.isEmpty) {
-      if (mounted) {
-        showHonooToast(
-          context,
-          message: 'Devi caricare un’immagine (URL pubblico).',
-        );
-      }
+      if (!mounted) return;
+      showHonooToast(
+        context,
+        message: 'Immagine non valida. Ricaricala e riprova.',
+      );
       return;
     }
 
+    // 4) Crea e salva
     final newHonoo = Honoo(
       0,
       _text,
@@ -137,26 +166,17 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
       if (!mounted) return;
       setState(() {
-        _savedToChest = true; // passa a “luna”
+        _savedToChest = true;
         _finalImageUrlCache = finalImageUrl;
-
-        // memorizza il contenuto SALVATO per ignorare update identici
         _lastSavedText = _text;
         _lastSavedRawImage = _imageUrl;
       });
 
-      showHonooToast(
-        context,
-        message: 'salvato nello Scrigno.',
-      );
+      showHonooToast(context, message: 'salvato nello Scrigno.');
     } catch (e, st) {
       debugPrint('publishHonoo failed: $e\n$st');
-      if (mounted) {
-        showHonooToast(
-          context,
-          message: 'Errore: $e',
-        );
-      }
+      if (!mounted) return;
+      showHonooToast(context, message: 'Errore: $e');
     }
   }
 

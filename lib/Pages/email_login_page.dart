@@ -49,7 +49,8 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
       );
 
       if (!mounted) return;
-      Navigator.push(
+
+      final ok = await Navigator.push<bool>(
         context,
         MaterialPageRoute(
           builder: (context) => EmailVerifyPage(
@@ -60,6 +61,13 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
           ),
         ),
       );
+
+      if (!mounted) return;
+
+      // Se login completato: chiudi anche EmailLoginPage e torna all'editor
+      if (ok == true) {
+        Navigator.pop(context, true);
+      }
     } catch (e) {
       if (!mounted) return;
       showHonooToast(

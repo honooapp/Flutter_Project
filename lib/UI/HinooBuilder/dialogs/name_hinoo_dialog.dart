@@ -37,13 +37,13 @@ class _NameHinooDialogState extends State<NameHinooDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Come vuoi chiamare il tuo hinoo?',
+              'Come vuoi chiamare\nil tuo hinoo?',
               style: HonooDialogStyles.title(),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             Text(
-              'Se è per il mio corso, sei il numero 37 ed è il tuo primo lavoro, chiamalo 37.1. Se è il tuo secondo lavoro 37.2',
+              'Se è per il mio corso,\nsei il numero 37\ned è il tuo primo lavoro,\nchiamalo 37.1.\nSe è il tuo secondo lavoro,\nchiamalo 37.2',
               style: HonooDialogStyles.body(),
               textAlign: TextAlign.center,
             ),

@@ -124,25 +124,65 @@ class _NewHinooPageState extends State<NewHinooPage> {
     final user = SupabaseProvider.client.auth.currentUser;
     if (user == null) {
       if (!mounted) return;
+
       final bool? goLogin = await showDialog<bool>(
         context: context,
         barrierDismissible: true,
         builder: (_) => const HonooConfirmDialog(
-          title: 'Devi accedere',
+          title: 'Devi accedere prima',
           message:
-              'Per salvare questo hinoo, devi fare prima il log in. Vuoi andare alla pagina di login?',
+              'Per salvare questo hinoo,\ndevi fare prima il login.\nVuoi andare alla pagina di login?',
           confirmLabel: 'Vai al login',
         ),
       );
+
       if (goLogin == true && mounted) {
-        Navigator.push(
+        // ✅ aspetta il risultato, ma NON salvare in automatico
+        final ok = await Navigator.push<bool>(
           context,
           MaterialPageRoute(
-            builder: (_) =>
-                EmailLoginPage(pendingHinooDraft: hinooDraft.toJson()),
+            builder: (_) => EmailLoginPage(
+              pendingHinooDraft: hinooDraft.toJson(),
+            ),
           ),
         );
+
+        if (!mounted) return;
+
+        if (ok == true) {
+          showHonooToast(
+            context,
+            message: 'Accesso completato. Ora puoi salvare lo hinoo.',
+          );
+        }
       }
+      return;
+    }
+
+// Se il builder sta ancora caricando lo sfondo, fermati
+    if (rawDraft['isUploadingBg'] == true || _bgUploadInProgress) {
+      if (!mounted) return;
+      showHonooToast(
+        context,
+        message: 'Attendi il caricamento dello sfondo prima di continuare.',
+      );
+      return;
+    }
+
+// ✅ SALVATAGGIO OGGETTO: bgUrl obbligatorio (persistenza)
+// (La preview serve per download/UX, ma non basta per creare l'oggetto persistente)
+    final bool missingPersistedBg = hinooDraft.pages.any(
+      (slide) =>
+          slide.backgroundImage == null || slide.backgroundImage!.isEmpty,
+    );
+
+    if (missingPersistedBg) {
+      if (!mounted) return;
+      showHonooToast(
+        context,
+        message:
+            'Per salvare lo hinoo nello Scrigno, conferma prima il caricamento dello sfondo (pulsante OK nello step sfondo).',
+      );
       return;
     }
 
@@ -160,10 +200,15 @@ class _NewHinooPageState extends State<NewHinooPage> {
           (slide.backgroundImage == null || slide.backgroundImage!.isEmpty),
     );
     if (hasMissingBg) {
-      final bool hadLocalBg = (rawDraft['hasBg'] as bool?) ?? false;
-      final bool hadPreview = rawDraft['bgPreviewBytes'] != null;
-      if (hadLocalBg || hadPreview) {
-        if (!mounted) return;
+      final bool hasPreview = rawDraft['bgPreviewBytes'] != null;
+
+      //  se ho preview, l'immagine ESISTE → NON errore
+      if (hasPreview) {
+        // qui non fare nulla: l'utente può
+        // - salvare più tardi
+        // - oppure scaricare
+      } else {
+        // ❌ qui sì: manca davvero lo sfondo
         showHonooToast(
           context,
           message:

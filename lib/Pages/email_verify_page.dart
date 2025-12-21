@@ -7,7 +7,6 @@ import '../Services/honoo_service.dart';
 import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/loading_spinner.dart';
 import '../Widgets/honoo_scaffold.dart';
-import 'chest_page.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -85,11 +84,8 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
         }
 
         if (!mounted) return;
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => const ChestPage()),
-          (route) => false,
-        );
+        Navigator.pop(
+            context, true); // torna alla pagina precedente e segnala "success"
       }
     });
   }
@@ -134,8 +130,8 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
   @override
   Widget build(BuildContext context) {
     final inputDecoration = InputDecoration(
-      labelText: 'Codice di verifica',
-      labelStyle: GoogleFonts.lora(color: Colors.white70),
+      hintText: 'Codice di verifica',
+      hintStyle: GoogleFonts.lora(color: Colors.white70),
       filled: true,
       fillColor: Colors.white.withOpacity(0.08),
       border: OutlineInputBorder(
@@ -184,12 +180,12 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
             children: [
               Text(
                 'Inserisci il codice',
-                style: GoogleFonts.libreFranklin(
+                textAlign: TextAlign.center,
+                style: GoogleFonts.arvo(
                   color: HonooColor.onBackground,
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
                 ),
-                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
               Text(
@@ -205,6 +201,7 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
               const SizedBox(height: 32),
               TextField(
                 controller: _codeController,
+                textAlign: TextAlign.center,
                 keyboardType: TextInputType.number,
                 style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
                 cursorColor: Colors.white,
@@ -218,6 +215,21 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
                       child: LoadingSpinner(color: Colors.white),
                     )
                   : button,
+              const SizedBox(height: 8),
+              InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Email sbagliata? Modificala',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.lora(
+                    color: HonooColor.onBackground.withOpacity(0.8),
+                    fontSize: 14,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
             ],
           ),
         ),

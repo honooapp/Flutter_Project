@@ -829,12 +829,6 @@ class _HinooBuilderState extends State<HinooBuilder> {
       final client = SupabaseProvider.client;
       final user = client.auth.currentUser;
       if (user == null) {
-        if (mounted) {
-          showHonooToast(
-            context,
-            message: 'Accedi per caricare lo sfondo del tuo hinoo.',
-          );
-        }
         setState(() {
           _bgPublicUrl = null;
           _isUploadingBg = false;
