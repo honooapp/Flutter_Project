@@ -242,6 +242,26 @@ class _NewHonooPageState extends State<NewHonooPage> {
       return;
     }
 
+    final user = SupabaseProvider.client.auth.currentUser;
+    if (user == null) {
+      if (!mounted) return;
+      final bool? goLogin = await showDialog<bool>(
+        context: context,
+        barrierDismissible: true,
+        builder: (_) => const HonooConfirmDialog(
+          title: 'Devi accedere prima',
+          message:
+              'Per scaricare questo honoo,\ndevi fare prima il login.\nVuoi andare alla pagina di login?',
+          confirmLabel: 'Vai al login',
+        ),
+      );
+      if (goLogin == true && mounted) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => const EmailLoginPage()));
+      }
+      return;
+    }
+
     final String? desiredName = await showDialog<String>(
       context: context,
       barrierDismissible: true,

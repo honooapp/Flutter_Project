@@ -358,9 +358,9 @@ class _NewHinooPageState extends State<NewHinooPage> {
         context: context,
         barrierDismissible: true,
         builder: (_) => const HonooConfirmDialog(
-          title: 'Devi accedere',
+          title: 'Devi accedere prima',
           message:
-              'Per scaricare questo hinoo, devi fare prima il log in. Vuoi andare alla pagina di login?',
+              'Per scaricare questo hinoo,\ndevi fare prima il login.\nVuoi andare alla pagina di login?',
           confirmLabel: 'Vai al login',
         ),
       );
