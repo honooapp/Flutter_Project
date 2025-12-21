@@ -8,13 +8,14 @@ import 'package:honoo/IsolaDelleStorie/Entities/exercise.dart';
 import 'package:honoo/Utility/formatted_text.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:honoo/Services/dice/dice_dispatcher.dart';
+import 'package:honoo/Utility/random_picker.dart';
+import 'package:honoo/Widgets/dice/dice_animator.dart';
+import 'package:honoo/Widgets/dice/dice_result.dart';
 
 import 'package:sizer/sizer.dart';
 
-import '../../Pages/coming_soon_page.dart';
 import '../../Pages/home_page.dart';
-import '../../Utility/utility.dart';
-import '../Utility/isola_delle_storie_content_manager.dart';
 import '../../Widgets/map/responsive_track_with_pins.dart';
 
 class ExercisePage extends StatefulWidget {
@@ -29,6 +30,9 @@ class ExercisePage extends StatefulWidget {
 class _ExercisePageState extends State<ExercisePage> {
   late Exercise _exercise;
   bool uiVisible = true;
+
+  final DiceDispatcher _diceDispatcher = DiceDispatcher();
+  final RandomPicker<DiceResult> _dicePicker = RandomPicker<DiceResult>();
 
   static const double _iconButtonSize = 40.0;
   static const double _trackAspectRatio = 257 / 59;
@@ -164,6 +168,7 @@ class _ExercisePageState extends State<ExercisePage> {
     setState(() {
       _exercise = next;
     });
+    _dicePicker.reset();
   }
 
   Widget _buildDescriptionCard(BuildContext context) {
@@ -191,45 +196,76 @@ class _ExercisePageState extends State<ExercisePage> {
             color: HonooColor.onBackground,
             fontSize: 18,
           ),
-          if (_exercise.exerciseIcon != null)
-            IconButton(
-                icon: SvgPicture.asset(
-                  _exercise.exerciseIcon ?? "",
-                  colorFilter: const ColorFilter.mode(
-                    HonooColor.onBackground,
-                    BlendMode.srcIn,
-                  ),
-                  semanticsLabel: _exercise.exerciseIconName,
+          if (_exercise.exerciseIcon != null &&
+              _exercise.exerciseIconName == "Dado")
+            SizedBox(
+              width: 72,
+              height: 72,
+              child: DiceAnimator(
+                resultTextStyle: GoogleFonts.arvo(
+                  color: HonooColor.onBackground,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700, // GRASSETTO
                 ),
-                iconSize: 70,
-                splashRadius: 40,
-                tooltip: _exercise.exerciseIconName ?? '',
-                onPressed: () {
-                  if (_exercise.exerciseIconName == "Dado") {
-                    String header;
+                diceChild: SizedBox(
+                  width: 72,
+                  height: 72,
+                  child: SvgPicture.asset(
+                    _exercise.exerciseIcon!,
+                    fit: BoxFit.contain,
+                    colorFilter: const ColorFilter.mode(
+                      HonooColor.onBackground,
+                      BlendMode.srcIn,
+                    ),
+                    semanticsLabel: _exercise.exerciseIconName,
+                  ),
+                ),
+                options: _diceDispatcher.optionsForExercise(_exercise.id),
+                onPick: (opts) => _dicePicker.pickOne(opts) ?? opts.first,
+                fadeDuration: const Duration(milliseconds: 1500),
+                resultVisibleDuration: const Duration(seconds: 3),
+              ),
+            ),
 
-                    if (_exercise.exerciseTitle ==
-                        IsolaDelleStoreContentManager.e31Title) {
-                      header = Utility().dadoTemporaryM;
-                    } else if (_exercise.exerciseTitle ==
-                        IsolaDelleStoreContentManager.e53Title) {
-                      header = Utility().dadoTemporaryL;
-                    } else {
-                      header = Utility().dadoTemporary;
-                    }
+          // if (_exercise.exerciseIcon != null)
+          // IconButton(
+          // icon: SvgPicture.asset(
+          //   _exercise.exerciseIcon ?? "",
+          //   colorFilter: const ColorFilter.mode(
+          //     HonooColor.onBackground,
+          //     BlendMode.srcIn,
+          //   ),
+          //   semanticsLabel: _exercise.exerciseIconName,
+          // ),
+          // iconSize: 70,
+          // splashRadius: 40,
+          // tooltip: _exercise.exerciseIconName ?? '',
+          // onPressed: () {
+          //   if (_exercise.exerciseIconName == "Dado") {
+          //     String header;
 
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ComingSoonPage(
-                          header: header,
-                          quote: Utility().shakespeare,
-                          bibliography: Utility().bibliography,
-                        ),
-                      ),
-                    );
-                  }
-                }),
+          //     if (_exercise.exerciseTitle ==
+          //         IsolaDelleStoreContentManager.e31Title) {
+          //       header = Utility().dadoTemporaryM;
+          //     } else if (_exercise.exerciseTitle ==
+          //         IsolaDelleStoreContentManager.e53Title) {
+          //       header = Utility().dadoTemporaryL;
+          //     } else {
+          //       header = Utility().dadoTemporary;
+          //     }
+
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => ComingSoonPage(
+          //           header: header,
+          //           quote: Utility().shakespeare,
+          //           bibliography: Utility().bibliography,
+          //         ),
+          //       ),
+          //     );
+          //   }
+          // }),
           if (_exercise.exerciseDescriptionMore != null)
             FormattedText(
               inputText: _exercise.exerciseDescriptionMore ?? "",
@@ -440,6 +476,7 @@ class _ExercisePageState extends State<ExercisePage> {
         setState(() {
           _exercise = method();
         });
+        _dicePicker.reset();
       } else {
         debugPrint('Invalid method name: $buttonText');
       }
