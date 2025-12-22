@@ -15,7 +15,9 @@ import 'package:honoo/Widgets/dice/dice_result.dart';
 
 import 'package:sizer/sizer.dart';
 
+import '../../Pages/ching_page.dart';
 import '../../Pages/home_page.dart';
+import '../../Services/ching_catalog.dart';
 import '../../Widgets/map/responsive_track_with_pins.dart';
 
 class ExercisePage extends StatefulWidget {
@@ -201,30 +203,45 @@ class _ExercisePageState extends State<ExercisePage> {
             SizedBox(
               width: 72,
               height: 72,
-              child: DiceAnimator(
-                resultTextStyle: GoogleFonts.arvo(
-                  color: HonooColor.onBackground,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700, // GRASSETTO
-                ),
-                diceChild: SizedBox(
-                  width: 72,
-                  height: 72,
-                  child: SvgPicture.asset(
-                    _exercise.exerciseIcon!,
-                    fit: BoxFit.contain,
-                    colorFilter: const ColorFilter.mode(
-                      HonooColor.onBackground,
-                      BlendMode.srcIn,
+              child: _exercise.id == '3.3'
+                  ? GestureDetector(
+                      onTap: () {
+                        final entry = ChingCatalog.pickRandom();
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (_) => ChingPage(entry: entry)),
+                        );
+                      },
+                      child: SvgPicture.asset(
+                        _exercise.exerciseIcon!,
+                        fit: BoxFit.contain,
+                        semanticsLabel: _exercise.exerciseIconName,
+                      ),
+                    )
+                  : DiceAnimator(
+                      resultTextStyle: GoogleFonts.arvo(
+                        color: HonooColor.onBackground,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      diceChild: SizedBox(
+                        width: 72,
+                        height: 72,
+                        child: SvgPicture.asset(
+                          _exercise.exerciseIcon!,
+                          fit: BoxFit.contain,
+                          colorFilter: const ColorFilter.mode(
+                            HonooColor.onBackground,
+                            BlendMode.srcIn,
+                          ),
+                          semanticsLabel: _exercise.exerciseIconName,
+                        ),
+                      ),
+                      options: _diceDispatcher.optionsForExercise(_exercise.id),
+                      onPick: (opts) => _dicePicker.pickOne(opts) ?? opts.first,
+                      fadeDuration: const Duration(milliseconds: 1500),
+                      resultVisibleDuration: const Duration(seconds: 3),
                     ),
-                    semanticsLabel: _exercise.exerciseIconName,
-                  ),
-                ),
-                options: _diceDispatcher.optionsForExercise(_exercise.id),
-                onPick: (opts) => _dicePicker.pickOne(opts) ?? opts.first,
-                fadeDuration: const Duration(milliseconds: 1500),
-                resultVisibleDuration: const Duration(seconds: 3),
-              ),
             ),
 
           // if (_exercise.exerciseIcon != null)

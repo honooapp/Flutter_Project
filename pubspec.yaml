@@ -90,6 +90,9 @@ flutter:
     - assets/images/
     - assets/
     - assets/icons/isoladellestorie/
+    - assets/icons/ching/
+    - assets/icons/ching/png/
+    - assets/icons/ching/svg/
     - assets/icons/isoladellestorie/backgrounds/
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -21,6 +21,8 @@ class DiceDispatcher {
         return _builder.fromNumberedBoldMissions(
           IsolaDelleStoreContentManager.e31Second,
         );
+      case '3.2':
+        return _builder.numbers(max: 144);
       case '5.1':
         return _builder.fromNumberedBoldMissions(
           IsolaDelleStoreContentManager.e51First,

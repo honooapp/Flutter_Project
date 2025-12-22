@@ -139,9 +139,17 @@ class DiceOptionsBuilder {
         .trim();
   }
 
-  /// Caso 3: immagini da asset
-  List<DiceResult> fromAssets(List<String> assetPaths) {
-    // IMPLEMENTEREMO DOPO
-    return [];
+  /// Genera numeri da 1 a [max] (incluso).
+  List<DiceResult> numbers({
+    required int max,
+    int min = 1,
+  }) {
+    final List<DiceResult> results = [];
+
+    for (int i = min; i <= max; i++) {
+      results.add(TextDiceResult(i.toString()));
+    }
+
+    return results;
   }
 }
