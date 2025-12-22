@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../Utility/honoo_colors.dart';
 import '../honoo_app_title.dart';
@@ -11,8 +10,6 @@ class ChingScaffold extends StatelessWidget {
   });
 
   final Widget body;
-
-  static const String _honooLogo = 'assets/icons/honoo_logo.svg';
 
   @override
   Widget build(BuildContext context) {

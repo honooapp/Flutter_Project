@@ -34,7 +34,7 @@ class ChingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final numberHanziStyle = GoogleFonts.arvo(
       color: _red,
-      fontSize: 18,
+      fontSize: 20,
       fontWeight: FontWeight.w600,
     );
 
@@ -59,16 +59,16 @@ class ChingPage extends StatelessWidget {
                   // "2. 坤"
                   Text(
                     '${entry.number}.',
-                    style: numberHanziStyle,
+                    style: titleStyle,
                     textAlign: TextAlign.center,
                   ),
+                  const SizedBox(height: 14),
                   Text(
                     entry.hanzi,
                     style: numberHanziStyle,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 14),
-
                   // Titolo (anche su 2 righe se serve)
                   Text(
                     entry.titleIt,
