@@ -23,6 +23,9 @@ class HinooTypography {
   /// Baseline canvas width for reference (360px = 9:16 aspect)
   static const double baselineCanvasWidth = 360.0;
 
+  /// Baseline canvas height for reference (640px = 9:16 aspect)
+  static const double baselineCanvasHeight = 640.0;
+
   /// Vertical padding - can be proportional or fixed
   static const double verticalPaddingBase = 40.0;
 

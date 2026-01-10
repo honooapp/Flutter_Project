@@ -7,6 +7,7 @@
 
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -23,6 +24,7 @@ import 'package:honoo/UI/HinooBuilder/dialogs/anteprima_png.dart';
 import 'package:honoo/UI/HinooBuilder/dialogs/download_hinoo_dialog.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
 import 'package:honoo/UI/HinooBuilder/dialogs/name_hinoo_dialog.dart';
+import 'package:honoo/UI/hinoo_typography.dart';
 
 // Import coerenti con la struttura HinooBuilder
 
@@ -329,20 +331,13 @@ class _HinooBuilderState extends State<HinooBuilder> {
     }
   }
 
-  Future<Uint8List?> _captureCurrentCanvasBytes(
-      {double pixelRatio = 3.0}) async {
+  Future<Uint8List?> _captureCurrentCanvasBytes() async {
     try {
       final RenderRepaintBoundary? boundary = _captureKey.currentContext
           ?.findRenderObject() as RenderRepaintBoundary?;
       if (boundary == null) return null;
-      double effectivePixelRatio = pixelRatio;
-      final Size logicalSize = boundary.size;
-      const double targetHeight = 1920.0;
-      if (logicalSize.width > 0 && logicalSize.height > 0) {
-        final double ratioH = targetHeight / logicalSize.height;
-        effectivePixelRatio =
-            ratioH.isFinite && ratioH > 0 ? ratioH : effectivePixelRatio;
-      }
+      final double effectivePixelRatio =
+          HinooTypography.exportHeight / HinooTypography.baselineCanvasHeight;
       final ui.Image image =
           await boundary.toImage(pixelRatio: effectivePixelRatio);
       final ByteData? byteData =
@@ -457,48 +452,50 @@ class _HinooBuilderState extends State<HinooBuilder> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        const double ar = 9 / 16;
         final double maxW = constraints.maxWidth;
         final double maxH = constraints.maxHeight;
+        final double baselineW = HinooTypography.baselineCanvasWidth;
+        final double baselineH = HinooTypography.baselineCanvasHeight;
 
-        double targetW = maxW.isFinite && maxW > 0 ? maxW : 0;
-        double targetH = targetW / ar;
-
-        if (!targetH.isFinite || targetH <= 0) {
-          targetH = maxH.isFinite && maxH > 0 ? maxH : 0;
-          targetW = targetH * ar;
+        double scale = 1.0;
+        if (maxW.isFinite && maxW > 0 && maxH.isFinite && maxH > 0) {
+          scale = math.min(maxW / baselineW, maxH / baselineH);
+        } else if (maxW.isFinite && maxW > 0) {
+          scale = maxW / baselineW;
+        } else if (maxH.isFinite && maxH > 0) {
+          scale = maxH / baselineH;
+        }
+        if (!scale.isFinite || scale <= 0) {
+          scale = 1.0;
         }
 
-        if (targetH > maxH && maxH.isFinite && maxH > 0) {
-          targetH = maxH;
-          targetW = targetH * ar;
-        }
-        if ((targetW <= 0 || !targetW.isFinite) && maxH.isFinite && maxH > 0) {
-          targetH = maxH;
-          targetW = targetH * ar;
-        }
-        if (targetW <= 0 || !targetW.isFinite) {
-          targetW = 360;
-          targetH = targetW / ar;
-        }
+        final double displayW = baselineW * scale;
+        final double displayH = baselineH * scale;
 
-        _canvasHeight = targetH;
+        _canvasHeight = baselineH;
 
         const BorderRadius canvasRadius = BorderRadius.all(Radius.circular(5));
 
         return Center(
           child: SizedBox(
-            width: targetW,
-            height: targetH,
-            child: Card(
-              elevation: 0,
-              margin: EdgeInsets.zero,
-              color: Colors.black,
-              shape: const RoundedRectangleBorder(
-                borderRadius: canvasRadius,
+            width: displayW,
+            height: displayH,
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: SizedBox(
+                width: baselineW,
+                height: baselineH,
+                child: Card(
+                  elevation: 0,
+                  margin: EdgeInsets.zero,
+                  color: Colors.black,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: canvasRadius,
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: _buildCanvas(context),
+                ),
               ),
-              clipBehavior: Clip.antiAlias,
-              child: _buildCanvas(context),
             ),
           ),
         );

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../Entities/hinoo.dart';
 import 'hinoo_typography.dart';
 import '../Utility/honoo_colors.dart';
-import '../Utility/responsive_layout.dart';
 
 class HinooViewer extends StatefulWidget {
   final HinooDraft draft;
@@ -43,74 +42,98 @@ class _HinooViewerState extends State<HinooViewer> {
 
   @override
   Widget build(BuildContext context) {
-    const double ar = 9 / 16;
-    final Size canvasSize = ResponsiveLayout.fitAspectRatio(
-      widget.maxWidth,
-      widget.maxHeight,
-      ar,
-    );
-    final double w = canvasSize.width;
-    final double h = canvasSize.height;
+    final double baselineW = HinooTypography.baselineCanvasWidth;
+    final double baselineH = HinooTypography.baselineCanvasHeight;
+
+    double scale = 1.0;
+    if (widget.maxWidth.isFinite &&
+        widget.maxWidth > 0 &&
+        widget.maxHeight.isFinite &&
+        widget.maxHeight > 0) {
+      scale =
+          (widget.maxWidth / baselineW).clamp(0.0, double.infinity);
+      final double scaleH =
+          (widget.maxHeight / baselineH).clamp(0.0, double.infinity);
+      scale = scale < scaleH ? scale : scaleH;
+    } else if (widget.maxWidth.isFinite && widget.maxWidth > 0) {
+      scale = widget.maxWidth / baselineW;
+    } else if (widget.maxHeight.isFinite && widget.maxHeight > 0) {
+      scale = widget.maxHeight / baselineH;
+    }
+    if (!scale.isFinite || scale <= 0) {
+      scale = 1.0;
+    }
+    final double displayW = baselineW * scale;
+    final double displayH = baselineH * scale;
 
     return Center(
       child: SizedBox(
-        width: w,
-        height: h,
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(5),
-              child: Listener(
-                onPointerSignal: (event) {
-                  if (event is PointerScrollEvent &&
-                      widget.draft.pages.length > 1 &&
-                      _vController.hasClients &&
-                      _vController.position.haveDimensions) {
-                    final position = _vController.position;
-                    if ((position.maxScrollExtent - position.minScrollExtent)
-                            .abs() <
-                        0.5) {
-                      return;
-                    }
-                    final double target =
-                        (position.pixels + event.scrollDelta.dy).clamp(
-                            position.minScrollExtent, position.maxScrollExtent);
-                    if ((target - position.pixels).abs() > 0.5) {
-                      _vController.jumpTo(target);
-                      _scheduleSnap();
-                    }
-                  }
-                },
-                child: ScrollConfiguration(
-                  behavior: ScrollConfiguration.of(context).copyWith(
-                    dragDevices: {
-                      PointerDeviceKind.touch,
-                      PointerDeviceKind.mouse,
-                      PointerDeviceKind.stylus,
-                      PointerDeviceKind.trackpad,
+        width: displayW,
+        height: displayH,
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: SizedBox(
+            width: baselineW,
+            height: baselineH,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(5),
+                  child: Listener(
+                    onPointerSignal: (event) {
+                      if (event is PointerScrollEvent &&
+                          widget.draft.pages.length > 1 &&
+                          _vController.hasClients &&
+                          _vController.position.haveDimensions) {
+                        final position = _vController.position;
+                        if ((position.maxScrollExtent -
+                                    position.minScrollExtent)
+                                .abs() <
+                            0.5) {
+                          return;
+                        }
+                        final double target =
+                            (position.pixels + event.scrollDelta.dy).clamp(
+                                position.minScrollExtent,
+                                position.maxScrollExtent);
+                        if ((target - position.pixels).abs() > 0.5) {
+                          _vController.jumpTo(target);
+                          _scheduleSnap();
+                        }
+                      }
                     },
-                  ),
-                  child: PageView.builder(
-                    scrollDirection: Axis.vertical,
-                    controller: _vController,
-                    physics: const PageScrollPhysics(),
-                    allowImplicitScrolling: true,
-                    itemCount: widget.draft.pages.length,
-                    itemBuilder: (context, index) {
-                      return HinooSlideView(
-                        slide: widget.draft.pages[index],
-                        width: w,
-                        height: h,
-                        gap: 0,
-                        gapColor: widget.gapColor,
-                      );
-                    },
+                    child: ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context).copyWith(
+                        dragDevices: {
+                          PointerDeviceKind.touch,
+                          PointerDeviceKind.mouse,
+                          PointerDeviceKind.stylus,
+                          PointerDeviceKind.trackpad,
+                        },
+                      ),
+                      child: PageView.builder(
+                        scrollDirection: Axis.vertical,
+                        controller: _vController,
+                        physics: const PageScrollPhysics(),
+                        allowImplicitScrolling: true,
+                        itemCount: widget.draft.pages.length,
+                        itemBuilder: (context, index) {
+                          return HinooSlideView(
+                            slide: widget.draft.pages[index],
+                            width: baselineW,
+                            height: baselineH,
+                            gap: 0,
+                            gapColor: widget.gapColor,
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

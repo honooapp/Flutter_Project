@@ -12,6 +12,7 @@ import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
 
 import 'package:honoo/Controller/hinoo_controller.dart';
+import 'package:honoo/UI/hinoo_typography.dart';
 
 import '../UI/hinoo_builder.dart';
 import '../Widgets/white_icon_button.dart';
@@ -494,7 +495,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
               canvasH = availableH;
               canvasW = canvasH * ar;
             }
-            _lastCanvasHeight = canvasH;
+            _lastCanvasHeight = HinooTypography.baselineCanvasHeight;
 
             final Widget mainColumn = Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
