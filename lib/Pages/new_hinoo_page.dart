@@ -15,7 +15,6 @@ import 'package:honoo/Controller/hinoo_controller.dart';
 import 'package:honoo/UI/hinoo_typography.dart';
 
 import '../UI/hinoo_builder.dart';
-import '../Widgets/white_icon_button.dart';
 
 import 'chest_page.dart';
 import 'email_login_page.dart';
@@ -378,25 +377,6 @@ class _NewHinooPageState extends State<NewHinooPage> {
   void _warnMissingApi(String what) {
     if (!mounted) return;
     showHonooToast(context, message: 'Collega API del builder: $what');
-  }
-
-  Widget _tightIcon({
-    required IconData icon,
-    required String tooltip,
-    required VoidCallback onPressed,
-  }) {
-    const double s = 26; // dimensione icona
-    const double box = 32; // dimensione box cliccabile
-
-    return IconButton(
-      tooltip: tooltip,
-      onPressed: onPressed,
-      icon: Icon(icon, size: s, color: Colors.white),
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints.tightFor(width: box, height: box),
-      splashRadius: box / 2,
-      visualDensity: VisualDensity.compact,
-    );
   }
 
   Widget _buildCanvasControls() {
