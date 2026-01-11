@@ -9,6 +9,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -24,6 +25,7 @@ import 'package:honoo/UI/HinooBuilder/dialogs/anteprima_png.dart';
 import 'package:honoo/UI/HinooBuilder/dialogs/download_hinoo_dialog.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
 import 'package:honoo/UI/HinooBuilder/dialogs/name_hinoo_dialog.dart';
+import 'package:honoo/UI/hinoo_export_spec.dart';
 import 'package:honoo/UI/hinoo_typography.dart';
 
 // Import coerenti con la struttura HinooBuilder
@@ -244,6 +246,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
     String? baseName,
   }) async {
     if (!mounted) return;
+    final HinooExportMode exportMode = _resolveExportMode();
     bool progressVisible = false;
     final NavigatorState rootNavigator =
         Navigator.of(context, rootNavigator: true);
@@ -284,7 +287,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
         if (switched) indexChanged = true;
         await _waitForNextFrame();
 
-        final Uint8List? bytes = await _captureCurrentCanvasBytes();
+        final Uint8List? bytes =
+            await _captureCurrentCanvasBytes(exportMode: exportMode);
         if (bytes != null) {
           final String filename = _resolveFileName(
             baseName: fileBaseName,
@@ -331,15 +335,32 @@ class _HinooBuilderState extends State<HinooBuilder> {
     }
   }
 
-  Future<Uint8List?> _captureCurrentCanvasBytes() async {
+  Future<Uint8List?> _captureCurrentCanvasBytes({
+    HinooExportMode exportMode = HinooExportMode.mobile,
+  }) async {
     try {
       final RenderRepaintBoundary? boundary = _captureKey.currentContext
           ?.findRenderObject() as RenderRepaintBoundary?;
       if (boundary == null) return null;
-      final double effectivePixelRatio =
-          HinooTypography.exportHeight / HinooTypography.baselineCanvasHeight;
+      final HinooExportSpec exportSpec = getHinooExportSpec(exportMode);
+      final double effectivePixelRatio = exportSpec.pixelRatio;
+      assert(() {
+        debugPrint(
+          'Hinoo export boundary size: ${boundary.size.width}x${boundary.size.height}',
+        );
+        debugPrint(
+          'Hinoo export mode: ${exportSpec.mode} ratio: $effectivePixelRatio',
+        );
+        return true;
+      }());
       final ui.Image image =
           await boundary.toImage(pixelRatio: effectivePixelRatio);
+      assert(() {
+        debugPrint(
+          'Hinoo export image size: ${image.width}x${image.height}',
+        );
+        return true;
+      }());
       final ByteData? byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);
       return byteData?.buffer.asUint8List();
@@ -347,6 +368,14 @@ class _HinooBuilderState extends State<HinooBuilder> {
       debugPrint('capture canvas error: $e');
       return null;
     }
+  }
+
+  HinooExportMode _resolveExportMode() {
+    final double logicalWidth = MediaQuery.of(context).size.width;
+    return resolveHinooExportMode(
+      logicalWidth: logicalWidth,
+      isWeb: kIsWeb,
+    );
   }
 
   Future<void> _waitForNextFrame() async {
@@ -482,19 +511,10 @@ class _HinooBuilderState extends State<HinooBuilder> {
             height: displayH,
             child: FittedBox(
               fit: BoxFit.contain,
-              child: SizedBox(
-                width: baselineW,
-                height: baselineH,
-                child: Card(
-                  elevation: 0,
-                  margin: EdgeInsets.zero,
-                  color: Colors.black,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: canvasRadius,
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: _buildCanvas(context),
-                ),
+              child: _buildLogicalCanvas(
+                context,
+                key: _captureKey,
+                canvasRadius: canvasRadius,
               ),
             ),
           ),
@@ -506,95 +526,116 @@ class _HinooBuilderState extends State<HinooBuilder> {
   // ========================================================================
   // Canvas (SOLO contenuto esportabile) — dentro la Card
   // ========================================================================
-  Widget _buildCanvas(BuildContext context) {
+  Widget _buildLogicalCanvas(
+    BuildContext context, {
+    required Key key,
+    required BorderRadius canvasRadius,
+  }) {
     return RepaintBoundary(
-      key: _captureKey,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Sfondo: usa sempre un unico percorso (asset di default oppure preview selezionata)
-          Builder(
-            builder: (_) {
-              final ImageProvider provider = _localBgPreview ??
-                  const AssetImage('assets/images/hinoo_default_1080x1920.png');
-              final Widget fitted = FittedBox(
-                fit: BoxFit.cover,
-                child: Image(image: provider),
-              );
-              final bool interactive = (_step == _WizardStep.changeBg &&
-                  _bgChosen &&
-                  _localBgPreview != null);
-              if (!interactive && _bgLockedMatrix != null) {
-                _bgController.value = _bgLockedMatrix!.clone();
-              }
-              return ClipRect(
-                child: InteractiveViewer(
-                  transformationController: _bgController,
-                  panEnabled: interactive,
-                  scaleEnabled: interactive,
-                  minScale: _bgMinScale,
-                  maxScale: _bgMaxScale,
-                  boundaryMargin: const EdgeInsets.all(200),
-                  child: fitted,
-                ),
-              );
-            },
+      key: key,
+      child: SizedBox(
+        width: HinooTypography.baselineCanvasWidth,
+        height: HinooTypography.baselineCanvasHeight,
+        child: Card(
+          elevation: 0,
+          margin: EdgeInsets.zero,
+          color: Colors.black,
+          shape: RoundedRectangleBorder(
+            borderRadius: canvasRadius,
           ),
-
-          // Overlays sequenziali: uno solo alla volta
-          if (_step == _WizardStep.changeBg) ...[
-            CambiaSfondoOverlay(
-              onTapChange: _pickAndUploadBackground,
-              showControls: _bgChosen && _localBgPreview != null,
-              isUploading: _isUploadingBg,
-              currentScale: _bgScale,
-              minScale: _bgMinScale,
-              maxScale: _bgMaxScale,
-              onScaleChanged: _bgChosen ? _updateBgScale : null,
-              onZoomIn: _bgChosen && _bgScale < _bgMaxScale
-                  ? () => _nudgeBgScale(0.1)
-                  : null,
-              onZoomOut: _bgChosen && _bgScale > _bgMinScale
-                  ? () => _nudgeBgScale(-0.1)
-                  : null,
-              onResetTransform: _bgChosen ? _resetBgTransform : null,
-            ),
-            if (_bgChosen && !_isUploadingBg)
-              Positioned(
-                bottom: 12,
-                right: 12,
-                child: IconButton(
-                  iconSize: 44,
-                  onPressed: _confirmBgAndLock,
-                  icon: SvgPicture.asset('assets/icons/ok.svg',
-                      width: 44, height: 44),
-                  tooltip: 'Conferma sfondo',
-                ),
-              ),
-          ] else if (_step == _WizardStep.pickColor)
-            ColoreTestoOverlay(
-              onPick: (c) {
-                setState(() {
-                  _txtColor = c;
-                  // Propaga il colore su TUTTE le pagine per anteprime fedeli
-                  for (var i = 0; i < _pages.length; i++) {
-                    _pages[i] =
-                        _copySlideWithTextColor(_pages[i], _txtColor.value);
-                  }
-                  _step = _WizardStep.writeText;
-                });
-                FocusScope.of(context).requestFocus(_textFocus);
-                _notifyChanged();
-              },
-            )
-          else if (_step == _WizardStep.writeText)
-            ScriviHinooOverlay(
-              controller: _textController,
-              focusNode: _textFocus,
-              textColor: _txtColor,
-            ),
-        ],
+          clipBehavior: Clip.antiAlias,
+          child: _buildCanvasContents(context),
+        ),
       ),
+    );
+  }
+
+  Widget _buildCanvasContents(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // Sfondo: usa sempre un unico percorso (asset di default oppure preview selezionata)
+        Builder(
+          builder: (_) {
+            final ImageProvider provider = _localBgPreview ??
+                const AssetImage('assets/images/hinoo_default_1080x1920.png');
+            final Widget fitted = FittedBox(
+              fit: BoxFit.cover,
+              child: Image(image: provider),
+            );
+            final bool interactive = (_step == _WizardStep.changeBg &&
+                _bgChosen &&
+                _localBgPreview != null);
+            if (!interactive && _bgLockedMatrix != null) {
+              _bgController.value = _bgLockedMatrix!.clone();
+            }
+            return ClipRect(
+              child: InteractiveViewer(
+                transformationController: _bgController,
+                panEnabled: interactive,
+                scaleEnabled: interactive,
+                minScale: _bgMinScale,
+                maxScale: _bgMaxScale,
+                boundaryMargin: const EdgeInsets.all(200),
+                child: fitted,
+              ),
+            );
+          },
+        ),
+
+        // Overlays sequenziali: uno solo alla volta
+        if (_step == _WizardStep.changeBg) ...[
+          CambiaSfondoOverlay(
+            onTapChange: _pickAndUploadBackground,
+            showControls: _bgChosen && _localBgPreview != null,
+            isUploading: _isUploadingBg,
+            currentScale: _bgScale,
+            minScale: _bgMinScale,
+            maxScale: _bgMaxScale,
+            onScaleChanged: _bgChosen ? _updateBgScale : null,
+            onZoomIn: _bgChosen && _bgScale < _bgMaxScale
+                ? () => _nudgeBgScale(0.1)
+                : null,
+            onZoomOut: _bgChosen && _bgScale > _bgMinScale
+                ? () => _nudgeBgScale(-0.1)
+                : null,
+            onResetTransform: _bgChosen ? _resetBgTransform : null,
+          ),
+          if (_bgChosen && !_isUploadingBg)
+            Positioned(
+              bottom: 12,
+              right: 12,
+              child: IconButton(
+                iconSize: 44,
+                onPressed: _confirmBgAndLock,
+                icon: SvgPicture.asset('assets/icons/ok.svg',
+                    width: 44, height: 44),
+                tooltip: 'Conferma sfondo',
+              ),
+            ),
+        ] else if (_step == _WizardStep.pickColor)
+          ColoreTestoOverlay(
+            onPick: (c) {
+              setState(() {
+                _txtColor = c;
+                // Propaga il colore su TUTTE le pagine per anteprime fedeli
+                for (var i = 0; i < _pages.length; i++) {
+                  _pages[i] =
+                      _copySlideWithTextColor(_pages[i], _txtColor.value);
+                }
+                _step = _WizardStep.writeText;
+              });
+              FocusScope.of(context).requestFocus(_textFocus);
+              _notifyChanged();
+            },
+          )
+        else if (_step == _WizardStep.writeText)
+          ScriviHinooOverlay(
+            controller: _textController,
+            focusNode: _textFocus,
+            textColor: _txtColor,
+          ),
+      ],
     );
   }
 
@@ -694,7 +735,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
   }
 
   Future<void> _renderCanvasAsPng() async {
-    final Uint8List? bytes = await _captureCurrentCanvasBytes();
+    final Uint8List? bytes =
+        await _captureCurrentCanvasBytes(exportMode: _resolveExportMode());
     if (bytes == null) return;
     setState(() {
       _lastPreviewBytes = bytes;
