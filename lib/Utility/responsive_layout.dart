@@ -1,14 +1,44 @@
 import 'dart:ui';
 
+enum ResponsiveLayoutMode {
+  mobile,
+  tablet,
+  desktop,
+  wideDesktop,
+  largeDesktop,
+}
+
 class ResponsiveLayout {
   const ResponsiveLayout._();
 
+  static ResponsiveLayoutMode modeForWidth(double width) {
+    if (width < 480) return ResponsiveLayoutMode.mobile;
+    if (width < 768) return ResponsiveLayoutMode.tablet;
+    if (width < 1024) return ResponsiveLayoutMode.desktop;
+    if (width < 1440) return ResponsiveLayoutMode.wideDesktop;
+    return ResponsiveLayoutMode.largeDesktop;
+  }
+
   static double contentMaxWidth(double width) {
-    if (width < 480) return width * 0.94;
-    if (width < 768) return width * 0.92;
-    if (width < 1024) return width * 0.84;
-    if (width < 1440) return width * 0.70;
-    return width * 0.58;
+    return contentMaxWidthForMode(modeForWidth(width), width);
+  }
+
+  static double contentMaxWidthForMode(
+    ResponsiveLayoutMode mode,
+    double width,
+  ) {
+    switch (mode) {
+      case ResponsiveLayoutMode.mobile:
+        return width * 0.94;
+      case ResponsiveLayoutMode.tablet:
+        return width * 0.92;
+      case ResponsiveLayoutMode.desktop:
+        return width * 0.84;
+      case ResponsiveLayoutMode.wideDesktop:
+        return width * 0.70;
+      case ResponsiveLayoutMode.largeDesktop:
+        return width * 0.58;
+    }
   }
 
   static Size fitAspectRatio(

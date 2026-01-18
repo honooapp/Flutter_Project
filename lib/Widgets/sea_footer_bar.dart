@@ -64,8 +64,15 @@ class SeaFooterBar extends StatelessWidget {
                 bottom: 10,
                 left: bottleX,
                 child: IconButton(
+                  constraints: BoxConstraints.tightFor(
+                    width: bottleSize,
+                    height: bottleSize,
+                  ),
+                  padding: EdgeInsets.zero,
                   icon: SvgPicture.asset(
                     "assets/icons/bottle.svg",
+                    width: bottleSize,
+                    height: bottleSize,
                     semanticsLabel: 'Bottle',
                   ),
                   iconSize: bottleSize,
@@ -109,6 +116,11 @@ class SeaFooterBar extends StatelessWidget {
                 bottom: -16,
                 left: islandX,
                 child: IconButton(
+                  constraints: BoxConstraints.tightFor(
+                    width: islandSize,
+                    height: islandSize,
+                  ),
+                  padding: EdgeInsets.zero,
                   icon: SvgPicture.asset(
                     "assets/icons/isoladellestorie/island.svg",
                     theme:
@@ -139,8 +151,17 @@ class SeaFooterBar extends StatelessWidget {
                 bottom: -20,
                 left: chestX,
                 child: IconButton(
-                  icon: SvgPicture.asset("assets/icons/chest.svg",
-                      semanticsLabel: 'Chest'),
+                  constraints: BoxConstraints.tightFor(
+                    width: chestSize,
+                    height: chestSize,
+                  ),
+                  padding: EdgeInsets.zero,
+                  icon: SvgPicture.asset(
+                    "assets/icons/chest.svg",
+                    width: chestSize,
+                    height: chestSize,
+                    semanticsLabel: 'Chest',
+                  ),
                   iconSize: chestSize,
                   splashRadius: 40,
                   tooltip: 'Apri il tuo Cuore',

@@ -9,7 +9,6 @@ import 'package:honoo/Services/supabase_provider.dart';
 import '../Entities/honoo.dart';
 import '../Services/honoo_image_uploader.dart';
 import '../UI/honoo_builder.dart';
-import 'package:sizer/sizer.dart';
 import 'package:honoo/Services/honoo_service.dart';
 
 import '../Widgets/luna_fissa.dart';
@@ -22,6 +21,8 @@ import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/honoo_app_title.dart';
 import '../UI/HonooBuilder/dialogs/name_honoo_dialog.dart';
 import 'placeholder_page.dart';
+import '../Utility/responsive_layout.dart';
+import '../Widgets/responsive_footer_bar.dart';
 
 class NewHonooPage extends StatefulWidget {
   const NewHonooPage({super.key});
@@ -333,19 +334,13 @@ class _NewHonooPageState extends State<NewHonooPage> {
     return slug.length > 32 ? slug.substring(0, 32) : slug;
   }
 
-  // Larghezza massima fluida del contenuto (breakpoints morbidi)
-  double _contentMaxWidth(double w) {
-    if (w < 480) return w * 0.94;
-    if (w < 768) return w * 0.92;
-    if (w < 1024) return w * 0.84;
-    if (w < 1440) return w * 0.70;
-    return w * 0.58;
-  }
-
   @override
   Widget build(BuildContext context) {
     // Header compatto per ridurre il gap sopra l’honoo
     const double headerH = 52;
+    const double footerContentH = 60;
+    const double footerBottomPadding = 12;
+    final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
 
     // Padding superiore: solo la parte che serve oltre l’header per non far coprire la luna.
     final double lunaReserve = LunaFissa.reserveTopPadding(context);
@@ -359,20 +354,37 @@ class _NewHonooPageState extends State<NewHonooPage> {
         child: LayoutBuilder(
           builder: (context, viewport) {
             final double viewW = viewport.maxWidth;
+            final double footerGap =
+                (viewW * 0.08).clamp(28.0, 48.0).toDouble();
 
             _initialViewH ??= viewport.maxHeight;
             final double viewH = _initialViewH!;
 
-            final double targetMaxW = _contentMaxWidth(viewW);
+            final ResponsiveLayoutMode layoutMode =
+                ResponsiveLayout.modeForWidth(viewW);
+            final double targetMaxW =
+                ResponsiveLayout.contentMaxWidthForMode(layoutMode, viewW);
+            final double footerIconSize =
+                layoutMode.index >= ResponsiveLayoutMode.desktop.index
+                    ? 48
+                    : 60;
+            final double footerSmallIconSize =
+                layoutMode.index >= ResponsiveLayoutMode.desktop.index
+                    ? 26
+                    : 32;
 
             // Altezza riservata al footer (3 pulsanti)
-            const double footerH = 100.0;
+            final double footerReserved =
+                footerContentH + footerBottomPadding + safeBottom;
             const double controlsH = 44.0;
 
             // Altezza disponibile per il box honoo
-            final double availableH =
-                (viewH - headerH - controlsH - contentTopPadding - footerH)
-                    .clamp(0.0, double.infinity);
+            final double availableH = (viewH -
+                    headerH -
+                    controlsH -
+                    contentTopPadding -
+                    footerReserved)
+                .clamp(0.0, double.infinity);
 
             const double gap = 9.0;
             const double builderRatio = 1.5; // totale = imageSize * 1.5 + gap
@@ -467,96 +479,76 @@ class _NewHonooPageState extends State<NewHonooPage> {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // HOME
-                        IconButton(
-                          icon: SvgPicture.asset(
-                            "assets/icons/home.svg",
-                            semanticsLabel: 'Home',
-                            colorFilter: const ColorFilter.mode(
-                              HonooColor.onBackground,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                          iconSize: 60,
+                  child: ResponsiveFooterBar(
+                    bottomPadding: footerBottomPadding,
+                    desiredGap: footerGap,
+                    minGap: 24,
+                    actions: [
+                      ResponsiveFooterAction(
+                        asset: "assets/icons/home.svg",
+                        semanticsLabel: 'Home',
+                        colorFilter: const ColorFilter.mode(
+                          HonooColor.onBackground,
+                          BlendMode.srcIn,
+                        ),
+                        size: footerIconSize,
+                        splashRadius: 25,
+                        tooltip: 'Home',
+                        onPressed: () {
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (_) => const HomePage()),
+                            (route) => false,
+                          );
+                        },
+                      ),
+                      ResponsiveFooterAction(
+                        asset: "assets/icons/chest.svg",
+                        semanticsLabel: 'Chest',
+                        size: footerIconSize,
+                        splashRadius: 40,
+                        tooltip: 'Apri il tuo Cuore',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const ChestPage()),
+                          );
+                        },
+                      ),
+                      if (_savedToChest)
+                        ResponsiveFooterAction(
+                          asset: "assets/icons/moon.svg",
+                          semanticsLabel: 'Luna',
+                          size: footerSmallIconSize,
                           splashRadius: 25,
-                          tooltip: 'Home',
-                          onPressed: () {
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (_) => const HomePage()),
-                              (route) => false,
-                            );
-                          },
-                        ),
-                        SizedBox(width: 5.w),
-
-                        // CHEST
-                        IconButton(
-                          icon: SvgPicture.asset(
-                            "assets/icons/chest.svg",
-                            semanticsLabel: 'Chest',
-                          ),
-                          iconSize: 60,
-                          splashRadius: 40,
-                          tooltip: 'Apri il tuo Cuore',
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const ChestPage()),
-                            );
-                          },
-                        ),
-                        SizedBox(width: 5.w),
-
-                        // OK → LUNA (switch basato su _savedToChest)
-                        _savedToChest
-                            ? IconButton(
-                                icon: SvgPicture.asset(
-                                  "assets/icons/moon.svg",
-                                  semanticsLabel: 'Luna',
-                                ),
-                                iconSize: 32,
-                                splashRadius: 25,
-                                tooltip: 'Spedisci sulla Luna',
-                                onPressed: _submitToMoon,
-                              )
-                            : IconButton(
-                                icon: SvgPicture.asset(
-                                  "assets/icons/ok.svg",
-                                  semanticsLabel: 'OK',
-                                ),
-                                iconSize: 60,
-                                splashRadius: 25,
-                                tooltip: 'Salva honoo',
-                                onPressed: _submitHonoo,
-                              ),
-                        SizedBox(width: 5.w),
-
-                        // PIUMA
-                        IconButton(
-                          icon: SvgPicture.asset(
-                            "assets/icons/piuma.svg",
-                            semanticsLabel: 'Piuma',
-                          ),
-                          iconSize: 60,
+                          tooltip: 'Spedisci sulla Luna',
+                          onPressed: _submitToMoon,
+                        )
+                      else
+                        ResponsiveFooterAction(
+                          asset: "assets/icons/ok.svg",
+                          semanticsLabel: 'OK',
+                          size: footerIconSize,
                           splashRadius: 25,
-                          tooltip: 'Scrivi hinoo',
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const NewHinooPage()),
-                            );
-                          },
+                          tooltip: 'Salva honoo',
+                          onPressed: _submitHonoo,
                         ),
-                      ],
-                    ),
+                      ResponsiveFooterAction(
+                        asset: "assets/icons/piuma.svg",
+                        semanticsLabel: 'Piuma',
+                        size: footerIconSize,
+                        splashRadius: 25,
+                        tooltip: 'Scrivi hinoo',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const NewHinooPage()),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
 
