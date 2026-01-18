@@ -3,7 +3,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 
 import '../Entities/honoo.dart';
