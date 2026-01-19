@@ -33,6 +33,7 @@ class WidthLimitedMultilineField extends StatefulWidget {
     this.cursorColor,
     this.cursorWidth,
     this.cursorRadius,
+    this.allowFontShrink = false,
   });
 
   final TextEditingController controller;
@@ -62,6 +63,7 @@ class WidthLimitedMultilineField extends StatefulWidget {
   final Color? cursorColor;
   final double? cursorWidth;
   final Radius? cursorRadius;
+  final bool allowFontShrink;
 
   @override
   State<WidthLimitedMultilineField> createState() =>
@@ -158,6 +160,7 @@ class _WidthLimitedMultilineFieldState
   }
 
   void _maybeGrowFont(double maxWidth, String fullText) {
+    if (!widget.allowFontShrink) return;
     // chiamata quando cancelli: se il testo è diventato "corto", torna verso il font base
     if (fullText.isEmpty) {
       if (_currentFontSize != _baseFontSize) {
@@ -181,10 +184,12 @@ class _WidthLimitedMultilineFieldState
       final bool isDeletion = newValue.text.length < oldValue.text.length;
       if (isDeletion) {
         // mai bloccare il backspace
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
-          _maybeGrowFont(maxWidth, newValue.text);
-        });
+        if (widget.allowFontShrink) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            _maybeGrowFont(maxWidth, newValue.text);
+          });
+        }
         return newValue;
       }
 
@@ -204,7 +209,7 @@ class _WidthLimitedMultilineFieldState
         final lineWidth = _measureLineWidth(line);
         if (lineWidth > maxWidth) {
           // se posso, riduco il font e ACCETTO il carattere
-          if (_currentFontSize > _minFontSize) {
+          if (widget.allowFontShrink && _currentFontSize > _minFontSize) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!mounted) return;
               setState(() {
