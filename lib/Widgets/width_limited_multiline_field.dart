@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:characters/characters.dart';
 
 class WidthLimitedMultilineField extends StatefulWidget {
   const WidthLimitedMultilineField({
@@ -200,8 +201,8 @@ class _WidthLimitedMultilineFieldState
       }
 
       for (final line in lines) {
-        // 1) limite caratteri rigido
-        if (line.length > widget.maxCharsPerLine) {
+        // 1) limite caratteri rigido (conta i caratteri visivi)
+        if (line.characters.length > widget.maxCharsPerLine) {
           return oldValue;
         }
 
