@@ -4,9 +4,7 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sizer/sizer.dart';
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 
 import 'package:honoo/Services/supabase_provider.dart';
@@ -27,6 +25,7 @@ import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/loading_spinner.dart';
 import '../Widgets/honoo_app_title.dart';
 import '../Widgets/luna_fissa.dart';
+import '../Widgets/responsive_footer_bar.dart';
 
 import 'reply_honoo_page.dart';
 import 'home_page.dart';
@@ -153,55 +152,60 @@ class _ChestPageState extends State<ChestPage> {
   bool _hasReplies(Honoo h) => h.hasReplies == true;
   bool _isFromMoonSaved(Honoo h) => h.isFromMoonSaved == true;
 
-  Widget _footerForHonoo(Honoo? current) {
+  Widget _footerForHonoo(
+    Honoo? current, {
+    required double iconSize,
+    required double gap,
+    required double bottomPadding,
+  }) {
+
     if (current == null) {
-      return SizedBox(
-        height: 60,
-        child: Center(
-          child: IconButton(
-            icon: SvgPicture.asset("assets/icons/home.svg",
-                semanticsLabel: 'Home'),
-            iconSize: 60,
+      return ResponsiveFooterBar(
+        useSafeArea: false,
+        bottomPadding: bottomPadding,
+        desiredGap: gap,
+        minGap: 16,
+        height: iconSize,
+        actions: [
+          ResponsiveFooterAction(
+            asset: "assets/icons/home.svg",
+            semanticsLabel: 'Home',
+            size: iconSize,
             splashRadius: 25,
             tooltip: 'Home',
             onPressed: _goHome,
           ),
-        ),
+        ],
       );
     }
 
-    final actions = <Widget>[
-      IconButton(
-        icon: SvgPicture.asset(
-          "assets/icons/home.svg",
-          semanticsLabel: 'Home',
-          colorFilter: const ColorFilter.mode(
-            HonooColor.onBackground,
-            BlendMode.srcIn,
-          ),
+    final actions = <ResponsiveFooterAction>[
+      ResponsiveFooterAction(
+        asset: "assets/icons/home.svg",
+        semanticsLabel: 'Home',
+        colorFilter: const ColorFilter.mode(
+          HonooColor.onBackground,
+          BlendMode.srcIn,
         ),
-        iconSize: 60,
+        size: iconSize,
         splashRadius: 25,
         tooltip: 'Home',
         onPressed: _goHome,
       ),
-      SizedBox(width: 5.w),
     ];
 
     if (_isPersonal(current) &&
         !_hasReplies(current) &&
         !_isFromMoonSaved(current)) {
       actions.add(
-        IconButton(
-          icon: SvgPicture.asset(
-            "assets/icons/moon.svg",
-            semanticsLabel: 'Luna',
-            colorFilter: const ColorFilter.mode(
-              HonooColor.onBackground,
-              BlendMode.srcIn,
-            ),
+        ResponsiveFooterAction(
+          asset: "assets/icons/moon.svg",
+          semanticsLabel: 'Luna',
+          colorFilter: const ColorFilter.mode(
+            HonooColor.onBackground,
+            BlendMode.srcIn,
           ),
-          iconSize: 32,
+          size: iconSize,
           splashRadius: 25,
           tooltip: 'Spedisci sulla Luna',
           onPressed: () async {
@@ -216,10 +220,10 @@ class _ChestPageState extends State<ChestPage> {
       );
     } else if (_hasReplies(current) && !_isFromMoonSaved(current)) {
       actions.add(
-        IconButton(
-          icon: SvgPicture.asset("assets/icons/reply.svg",
-              semanticsLabel: 'Reply'),
-          iconSize: 60,
+        ResponsiveFooterAction(
+          asset: "assets/icons/reply.svg",
+          semanticsLabel: 'Reply',
+          size: iconSize,
           splashRadius: 25,
           tooltip: 'Vedi risposte',
           onPressed: () {},
@@ -227,16 +231,14 @@ class _ChestPageState extends State<ChestPage> {
       );
     } else if (_isFromMoonSaved(current)) {
       actions.add(
-        IconButton(
-          icon: SvgPicture.asset(
-            "assets/icons/reply.svg",
-            semanticsLabel: 'Rispondi',
-            colorFilter: const ColorFilter.mode(
-              HonooColor.onBackground,
-              BlendMode.srcIn,
-            ),
+        ResponsiveFooterAction(
+          asset: "assets/icons/reply.svg",
+          semanticsLabel: 'Rispondi',
+          colorFilter: const ColorFilter.mode(
+            HonooColor.onBackground,
+            BlendMode.srcIn,
           ),
-          iconSize: 60,
+          size: iconSize,
           splashRadius: 25,
           tooltip: 'Rispondi',
           onPressed: () {
@@ -255,18 +257,15 @@ class _ChestPageState extends State<ChestPage> {
       );
     }
 
-    actions.addAll([
-      SizedBox(width: 5.w),
-      IconButton(
-        icon: SvgPicture.asset(
-          "assets/icons/cancella.svg",
-          semanticsLabel: 'Cancella',
-          colorFilter: const ColorFilter.mode(
-            HonooColor.onBackground,
-            BlendMode.srcIn,
-          ),
+    actions.add(
+      ResponsiveFooterAction(
+        asset: "assets/icons/cancella.svg",
+        semanticsLabel: 'Cancella',
+        colorFilter: const ColorFilter.mode(
+          HonooColor.onBackground,
+          BlendMode.srcIn,
         ),
-        iconSize: 60,
+        size: iconSize,
         splashRadius: 25,
         tooltip: 'Cancella',
         onPressed: () async {
@@ -289,54 +288,61 @@ class _ChestPageState extends State<ChestPage> {
           showHonooToast(context, message: 'honoo eliminato.');
         },
       ),
-    ]);
+    );
 
-    return SizedBox(
-      height: 60,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: actions,
-      ),
+    return ResponsiveFooterBar(
+      useSafeArea: false,
+      bottomPadding: bottomPadding,
+      desiredGap: gap,
+      minGap: 16,
+      height: iconSize,
+      actions: actions,
     );
   }
 
-  Widget _footerForHinoo(_HinooRow? current) {
-    if (current == null) return _footerForHonoo(null);
+  Widget _footerForHinoo(
+    _HinooRow? current, {
+    required double iconSize,
+    required double gap,
+    required double bottomPadding,
+  }) {
+    if (current == null) {
+      return _footerForHonoo(
+        null,
+        iconSize: iconSize,
+        gap: gap,
+        bottomPadding: bottomPadding,
+      );
+    }
 
     final draft = current.draft;
     final bool isPersonal = draft.type == HinooType.personal;
     final bool isFromMoonSaved = draft.type == HinooType.moon;
-
-    final actions = <Widget>[
-      IconButton(
-        icon: SvgPicture.asset(
-          "assets/icons/home.svg",
-          semanticsLabel: 'Home',
-          colorFilter: const ColorFilter.mode(
-            HonooColor.onBackground,
-            BlendMode.srcIn,
-          ),
+    final actions = <ResponsiveFooterAction>[
+      ResponsiveFooterAction(
+        asset: "assets/icons/home.svg",
+        semanticsLabel: 'Home',
+        colorFilter: const ColorFilter.mode(
+          HonooColor.onBackground,
+          BlendMode.srcIn,
         ),
-        iconSize: 60,
+        size: iconSize,
         splashRadius: 25,
         tooltip: 'Home',
         onPressed: _goHome,
       ),
-      SizedBox(width: 5.w),
     ];
 
     if (isPersonal && !isFromMoonSaved) {
       actions.add(
-        IconButton(
-          icon: SvgPicture.asset(
-            "assets/icons/moon.svg",
-            semanticsLabel: 'Luna',
-            colorFilter: const ColorFilter.mode(
-              HonooColor.onBackground,
-              BlendMode.srcIn,
-            ),
+        ResponsiveFooterAction(
+          asset: "assets/icons/moon.svg",
+          semanticsLabel: 'Luna',
+          colorFilter: const ColorFilter.mode(
+            HonooColor.onBackground,
+            BlendMode.srcIn,
           ),
-          iconSize: 32,
+          size: iconSize,
           splashRadius: 25,
           tooltip: 'Spedisci sulla Luna',
           onPressed: () async {
@@ -356,38 +362,58 @@ class _ChestPageState extends State<ChestPage> {
       );
     }
 
-    actions.addAll([
-      SizedBox(width: 5.w),
-      IconButton(
-        icon: SvgPicture.asset(
-          "assets/icons/cancella.svg",
-          semanticsLabel: 'Cancella',
-          colorFilter: const ColorFilter.mode(
-            HonooColor.onBackground,
-            BlendMode.srcIn,
-          ),
+    actions.add(
+      ResponsiveFooterAction(
+        asset: "assets/icons/cancella.svg",
+        semanticsLabel: 'Cancella',
+        colorFilter: const ColorFilter.mode(
+          HonooColor.onBackground,
+          BlendMode.srcIn,
         ),
-        iconSize: 60,
+        size: iconSize,
         splashRadius: 25,
         tooltip: 'Cancella',
         onPressed: () => _deleteHinoo(current),
       ),
-    ]);
+    );
 
-    return SizedBox(
-      height: 60,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: actions,
-      ),
+    return ResponsiveFooterBar(
+      useSafeArea: false,
+      bottomPadding: bottomPadding,
+      desiredGap: gap,
+      minGap: 16,
+      height: iconSize,
+      actions: actions,
     );
   }
 
-  Widget _footerForItem(_ChestItem? item) {
-    if (item == null) return _footerForHonoo(null);
+  Widget _footerForItem(
+    _ChestItem? item, {
+    required double iconSize,
+    required double gap,
+    required double bottomPadding,
+  }) {
+    if (item == null) {
+      return _footerForHonoo(
+        null,
+        iconSize: iconSize,
+        gap: gap,
+        bottomPadding: bottomPadding,
+      );
+    }
     return item.when(
-      honoo: (h) => _footerForHonoo(h),
-      hinoo: (row) => _footerForHinoo(row),
+      honoo: (h) => _footerForHonoo(
+        h,
+        iconSize: iconSize,
+        gap: gap,
+        bottomPadding: bottomPadding,
+      ),
+      hinoo: (row) => _footerForHinoo(
+        row,
+        iconSize: iconSize,
+        gap: gap,
+        bottomPadding: bottomPadding,
+      ),
     );
   }
 
@@ -630,7 +656,6 @@ class _ChestPageState extends State<ChestPage> {
   @override
   Widget build(BuildContext context) {
     const headerH = 52.0;
-    const footerH = 60.0;
 
     final double lunaReserve = LunaFissa.reserveTopPadding(context);
     final double extraTop = (lunaReserve - headerH);
@@ -652,9 +677,19 @@ class _ChestPageState extends State<ChestPage> {
 
                 final double targetMaxW =
                     ResponsiveLayout.contentMaxWidth(constraints.maxWidth);
+                final ResponsiveLayoutMode layoutMode =
+                    ResponsiveLayout.modeForWidth(constraints.maxWidth);
+                final double footerIconSize =
+                    ResponsiveLayout.footerIconSizeForMode(layoutMode);
+                final double footerGap =
+                    ResponsiveLayout.footerGapForMode(layoutMode);
+                final double footerBottomPadding =
+                    ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
+                final double footerReserved =
+                    footerIconSize + footerBottomPadding;
 
                 final double availableCenterH =
-                    (availH - headerH - contentTopPadding - footerH)
+                    (availH - headerH - contentTopPadding - footerReserved)
                         .clamp(0.0, double.infinity);
 
                 return Stack(
@@ -750,7 +785,12 @@ class _ChestPageState extends State<ChestPage> {
                             ),
                           ),
                         ),
-                        _footerForItem(current),
+                        _footerForItem(
+                          current,
+                          iconSize: footerIconSize,
+                          gap: footerGap,
+                          bottomPadding: footerBottomPadding,
+                        ),
                       ],
                     ),
                     const LunaFissa(),

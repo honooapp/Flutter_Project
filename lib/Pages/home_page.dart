@@ -84,9 +84,6 @@ class _HomePageState extends State<HomePage> {
                                                           FontWeight.w700,
                                                     ),
                                                     textAlign: TextAlign.center,
-                                                    maxLines: 6,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
                                                   ),
                                                   const SizedBox(height: 24),
                                                   Text(
@@ -99,9 +96,6 @@ class _HomePageState extends State<HomePage> {
                                                           FontWeight.w400,
                                                     ),
                                                     textAlign: TextAlign.center,
-                                                    maxLines: 6,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
                                                   ),
                                                 ],
                                               ),

@@ -1,7 +1,6 @@
 
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 
@@ -12,6 +11,8 @@ import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
+import 'package:honoo/Widgets/responsive_footer_bar.dart';
+import 'package:honoo/Utility/responsive_layout.dart';
 
 import '../Entities/honoo.dart';
 import 'reply_honoo_page.dart';
@@ -63,6 +64,13 @@ class _ConversationPageState extends State<ConversationPage> {
   @override
   Widget build(BuildContext context) {
     final isPhone = DeviceController().isPhone();
+    final ResponsiveLayoutMode layoutMode =
+        ResponsiveLayout.modeForWidth(MediaQuery.of(context).size.width);
+    final double footerIconSize =
+        ResponsiveLayout.footerIconSizeForMode(layoutMode);
+    final double footerGap = ResponsiveLayout.footerGapForMode(layoutMode);
+    final double footerBottomPadding =
+        ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
 
     final constraints = isPhone
         ? BoxConstraints(maxWidth: 85.w, maxHeight: 100.h - 120)
@@ -129,102 +137,95 @@ class _ConversationPageState extends State<ConversationPage> {
                     ),
 
                     // FOOTER
-                    SizedBox(
-                      height: 60,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            icon: SvgPicture.asset(
-                              "assets/icons/home.svg",
-                              colorFilter: const ColorFilter.mode(
-                                HonooColor.onBackground,
-                                BlendMode.srcIn,
-                              ),
-                              semanticsLabel: 'Home',
-                            ),
-                            iconSize: 60,
-                            splashRadius: 25,
-                            tooltip: 'Home',
-                            onPressed: () {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (_) => const HomePage()),
-                                (route) => false,
-                              );
-                            },
+                    ResponsiveFooterBar(
+                      useSafeArea: false,
+                      bottomPadding: footerBottomPadding,
+                      desiredGap: footerGap,
+                      minGap: 16,
+                      height: footerIconSize,
+                      actions: [
+                        ResponsiveFooterAction(
+                          asset: "assets/icons/home.svg",
+                          semanticsLabel: 'Home',
+                          colorFilter: const ColorFilter.mode(
+                            HonooColor.onBackground,
+                            BlendMode.srcIn,
                           ),
-                          SizedBox(width: 5.w),
-                         IconButton(
-                           icon: SvgPicture.asset(
-                             "assets/icons/broken_heart.svg",
-                             semanticsLabel: 'Broken heart',
-                           ),
-                           iconSize: 60,
-                           splashRadius: 25,
-                           tooltip: 'Cuore spezzato',
-                            onPressed: (_thread.isEmpty || _savingToChest)
-                                ? null
-                                : () async {
-                                    setState(() => _savingToChest = true);
-                                    try {
-                                      final honoo = _thread[_currentIndex];
-                                      final saved = await HonooController()
-                                          .saveToChest(honoo);
-                                      if (!mounted) return;
-                                      showHonooToast(
-                                        context,
-                                        message: saved
-                                            ? 'honoo salvato nel tuo Scrigno.'
-                                            : 'Era già nel tuo Scrigno.',
-                                      );
-                                    } catch (e) {
-                                      if (!mounted) return;
-                                      showHonooToast(
-                                        context,
-                                        message:
-                                            'Errore durante il salvataggio: $e',
-                                      );
-                                    } finally {
-                                      if (mounted) {
-                                        setState(() => _savingToChest = false);
-                                      }
-                                    }
-                                  },
-                          ),
-                          SizedBox(width: 5.w),
-                          IconButton(
-                            icon: SvgPicture.asset(
-                              "assets/icons/reply.svg",
-                              colorFilter: const ColorFilter.mode(
-                                HonooColor.onBackground,
-                                BlendMode.srcIn,
-                              ),
-                              semanticsLabel: 'Reply',
-                            ),
-                            iconSize: 60,
-                            splashRadius: 25,
-                            tooltip: 'Rispondi',
-                            onPressed: (_thread.isEmpty || _savingToChest)
-                                ? null
-                                : () {
+                          size: footerIconSize,
+                          splashRadius: 25,
+                          tooltip: 'Home',
+                          onPressed: () {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (_) => const HomePage()),
+                              (route) => false,
+                            );
+                          },
+                        ),
+                        ResponsiveFooterAction(
+                          asset: "assets/icons/broken_heart.svg",
+                          semanticsLabel: 'Broken heart',
+                          size: footerIconSize,
+                          splashRadius: 25,
+                          tooltip: 'Cuore spezzato',
+                          onPressed: (_thread.isEmpty || _savingToChest)
+                              ? null
+                              : () async {
+                                  setState(() => _savingToChest = true);
+                                  try {
                                     final honoo = _thread[_currentIndex];
-                                    Navigator.push(
+                                    final saved = await HonooController()
+                                        .saveToChest(honoo);
+                                    if (!mounted) return;
+                                    showHonooToast(
                                       context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ReplyHonooPage(
-                                          originalHonoo: honoo,
-                                          initialHintText:
-                                              'Scrivi la tua risposta...',
-                                          initialImageHint:
-                                              'Aggiungi un’immagine (opzionale)',
-                                        ),
-                                      ),
+                                      message: saved
+                                          ? 'honoo salvato nel tuo Scrigno.'
+                                          : 'Era già nel tuo Scrigno.',
                                     );
-                                  },
+                                  } catch (e) {
+                                    if (!mounted) return;
+                                    showHonooToast(
+                                      context,
+                                      message:
+                                          'Errore durante il salvataggio: $e',
+                                    );
+                                  } finally {
+                                    if (mounted) {
+                                      setState(() => _savingToChest = false);
+                                    }
+                                  }
+                                },
+                        ),
+                        ResponsiveFooterAction(
+                          asset: "assets/icons/reply.svg",
+                          semanticsLabel: 'Reply',
+                          colorFilter: const ColorFilter.mode(
+                            HonooColor.onBackground,
+                            BlendMode.srcIn,
                           ),
-                        ],
-                      ),
+                          size: footerIconSize,
+                          splashRadius: 25,
+                          tooltip: 'Rispondi',
+                          onPressed: (_thread.isEmpty || _savingToChest)
+                              ? null
+                              : () {
+                                  final honoo = _thread[_currentIndex];
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ReplyHonooPage(
+                                        originalHonoo: honoo,
+                                        initialHintText:
+                                            'Scrivi la tua risposta...',
+                                        initialImageHint:
+                                            'Aggiungi un’immagine (opzionale)',
+                                      ),
+                                    ),
+                                  );
+                                },
+                        ),
+                      ],
                     ),
                   ],
                 ),

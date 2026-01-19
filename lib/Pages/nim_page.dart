@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:honoo/Controller/nim_controller.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:honoo/Widgets/responsive_footer_bar.dart';
+import 'package:honoo/Utility/responsive_layout.dart';
 
 import '../Controller/device_controller.dart';
 import '../Widgets/honoo_app_title.dart';
@@ -24,6 +25,14 @@ class _NimPageState extends State<NimPage> {
   @override
   Widget build(BuildContext context) {
     _controller.text = NimController().drawGame();
+    final double viewWidth = MediaQuery.of(context).size.width;
+    final ResponsiveLayoutMode layoutMode =
+        ResponsiveLayout.modeForWidth(viewWidth);
+    final double footerIconSize =
+        ResponsiveLayout.footerIconSizeForMode(layoutMode);
+    final double footerBottomPadding =
+        ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
+    final double footerGap = ResponsiveLayout.footerGapForMode(layoutMode);
 
     return Scaffold(
       backgroundColor: const Color(0xFF000026),
@@ -165,28 +174,29 @@ class _NimPageState extends State<NimPage> {
                         ),
                       ],
                     ),
-                    SizedBox(
-                      height: 60,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          IconButton(
-                            icon: SvgPicture.asset(
-                              "assets/icons/home.svg",
-                              semanticsLabel: 'Home',
-                            ),
-                            iconSize: 60,
-                            tooltip: 'Home',
-                            onPressed: () {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (_) => const HomePage()),
-                                (route) => false,
-                              );
-                            },
-                          ),
-                        ],
-                      ),
+                    ResponsiveFooterBar(
+                      useSafeArea: false,
+                      bottomPadding: footerBottomPadding,
+                      desiredGap: footerGap,
+                      minGap: 16,
+                      height: footerIconSize,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      alignment: Alignment.centerLeft,
+                      actions: [
+                        ResponsiveFooterAction(
+                          asset: "assets/icons/home.svg",
+                          semanticsLabel: 'Home',
+                          size: footerIconSize,
+                          tooltip: 'Home',
+                          onPressed: () {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (_) => const HomePage()),
+                              (route) => false,
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ],
                 ),

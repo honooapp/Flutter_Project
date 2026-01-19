@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:honoo/Utility/formatted_text.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
+import 'package:honoo/Widgets/responsive_footer_bar.dart';
+import 'package:honoo/Utility/responsive_layout.dart';
 import 'package:sizer/sizer.dart';
 
 import '../Controller/device_controller.dart';
@@ -30,6 +31,12 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
   Widget build(BuildContext context) {
     final bool isPhone = DeviceController().isPhone();
     final double deviceWidth = MediaQuery.of(context).size.width;
+    final ResponsiveLayoutMode layoutMode =
+        ResponsiveLayout.modeForWidth(deviceWidth);
+    final double footerIconSize =
+        ResponsiveLayout.footerIconSizeForMode(layoutMode);
+    final double footerBottomPadding =
+        ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
 
     return Scaffold(
       backgroundColor: HonooColor.background,
@@ -91,29 +98,30 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
                     ),
                   ),
                   const Spacer(),
-                  SizedBox(
-                    height: 60,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        IconButton(
-                          icon: SvgPicture.asset(
-                            "assets/icons/home.svg",
-                            semanticsLabel: 'Home',
-                          ),
-                          iconSize: 60,
-                          splashRadius: 25,
-                          tooltip: 'Home',
-                          onPressed: () {
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (_) => const HomePage()),
-                              (route) => false,
-                            );
-                          },
-                        ),
-                      ],
-                    ),
+                  ResponsiveFooterBar(
+                    useSafeArea: false,
+                    bottomPadding: footerBottomPadding,
+                    desiredGap: ResponsiveLayout.footerGapForMode(layoutMode),
+                    minGap: 16,
+                    height: footerIconSize,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    alignment: Alignment.centerLeft,
+                    actions: [
+                      ResponsiveFooterAction(
+                        asset: "assets/icons/home.svg",
+                        semanticsLabel: 'Home',
+                        size: footerIconSize,
+                        splashRadius: 25,
+                        tooltip: 'Home',
+                        onPressed: () {
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (_) => const HomePage()),
+                            (route) => false,
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),

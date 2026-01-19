@@ -337,8 +337,6 @@ class _NewHonooPageState extends State<NewHonooPage> {
   Widget build(BuildContext context) {
     // Header compatto per ridurre il gap sopra l’honoo
     const double headerH = 52;
-    const double footerContentH = 60;
-    const double footerBottomPadding = 12;
     final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
 
     // Padding superiore: solo la parte che serve oltre l’header per non far coprire la luna.
@@ -353,8 +351,6 @@ class _NewHonooPageState extends State<NewHonooPage> {
         child: LayoutBuilder(
           builder: (context, viewport) {
             final double viewW = viewport.maxWidth;
-            final double footerGap =
-                (viewW * 0.08).clamp(28.0, 48.0).toDouble();
 
             _initialViewH ??= viewport.maxHeight;
             final double viewH = _initialViewH!;
@@ -364,13 +360,12 @@ class _NewHonooPageState extends State<NewHonooPage> {
             final double targetMaxW =
                 ResponsiveLayout.contentMaxWidthForMode(layoutMode, viewW);
             final double footerIconSize =
-                layoutMode.index >= ResponsiveLayoutMode.desktop.index
-                    ? 48
-                    : 60;
-            final double footerSmallIconSize =
-                layoutMode.index >= ResponsiveLayoutMode.desktop.index
-                    ? 26
-                    : 32;
+                ResponsiveLayout.footerIconSizeForMode(layoutMode);
+            final double footerGap =
+                ResponsiveLayout.footerGapForMode(layoutMode);
+            final double footerBottomPadding =
+                ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
+            final double footerContentH = footerIconSize;
 
             // Altezza riservata al footer (3 pulsanti)
             final double footerReserved =
@@ -481,7 +476,9 @@ class _NewHonooPageState extends State<NewHonooPage> {
                   child: ResponsiveFooterBar(
                     bottomPadding: footerBottomPadding,
                     desiredGap: footerGap,
-                    minGap: 24,
+                    minGap: 16,
+                    height: footerContentH,
+                    lockGapWhenPossible: true,
                     actions: [
                       ResponsiveFooterAction(
                         asset: "assets/icons/home.svg",
@@ -519,7 +516,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                         ResponsiveFooterAction(
                           asset: "assets/icons/moon.svg",
                           semanticsLabel: 'Luna',
-                          size: footerSmallIconSize,
+                          size: footerIconSize,
                           splashRadius: 25,
                           tooltip: 'Spedisci sulla Luna',
                           onPressed: _submitToMoon,

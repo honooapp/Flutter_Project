@@ -3,13 +3,14 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/luna_fissa.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
+import 'package:honoo/Widgets/responsive_footer_bar.dart';
+import 'package:honoo/Utility/responsive_layout.dart';
 
 import 'package:honoo/Controller/hinoo_controller.dart';
 import 'package:honoo/UI/hinoo_typography.dart';
@@ -48,7 +49,6 @@ class _NewHinooPageState extends State<NewHinooPage> {
 
   static const double _titleH = 65;
   static const double _controlsH = 44;
-  static const double _footerH = 50.0;
 
   @override
   void initState() {
@@ -459,13 +459,28 @@ class _NewHinooPageState extends State<NewHinooPage> {
           builder: (context, viewport) {
             final double keyboard = MediaQuery.of(context).viewInsets.bottom;
             final bool kbOpen = keyboard > 0;
+            final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
 
             final double viewW = viewport.maxWidth;
             final double viewH = viewport.maxHeight;
             final double targetMaxW = _contentMaxWidth(viewW);
+            final ResponsiveLayoutMode layoutMode =
+                ResponsiveLayout.modeForWidth(viewW);
+            final double footerIconSize =
+                ResponsiveLayout.footerIconSizeForMode(layoutMode);
+            final double footerGap =
+                ResponsiveLayout.footerGapForMode(layoutMode);
+            final double footerBottomPadding =
+                ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
+            final double footerReserved =
+                footerIconSize + footerBottomPadding + safeBottom;
 
             final double availableH =
-                (viewH - _titleH - contentTopPadding - _controlsH - _footerH)
+                (viewH -
+                        _titleH -
+                        contentTopPadding -
+                        _controlsH -
+                        footerReserved)
                     .clamp(0.0, double.infinity);
 
             const double ar = 9 / 16;
@@ -529,7 +544,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: _footerH),
+                SizedBox(height: footerReserved),
               ],
             );
 
@@ -557,75 +572,63 @@ class _NewHinooPageState extends State<NewHinooPage> {
                   right: 0,
                   child: IgnorePointer(
                     ignoring: kbOpen,
-                    child: SafeArea(
-                      top: false,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                              icon: SvgPicture.asset(
-                                "assets/icons/home.svg",
-                                semanticsLabel: 'Home',
-                                colorFilter: const ColorFilter.mode(
-                                  HonooColor.onBackground,
-                                  BlendMode.srcIn,
-                                ),
-                              ),
-                              iconSize: 60,
-                              splashRadius: 25,
-                              tooltip: 'Home',
-                              onPressed: () {
-                                Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                      builder: (_) => const HomePage()),
-                                  (route) => false,
-                                );
-                              },
-                            ),
-                            const SizedBox(width: 24),
-                            IconButton(
-                              icon: SvgPicture.asset(
-                                "assets/icons/chest.svg",
-                                semanticsLabel: 'Chest',
-                              ),
-                              iconSize: 60,
-                              splashRadius: 40,
-                              tooltip: 'Apri il tuo Cuore',
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => const ChestPage()),
-                                );
-                              },
-                            ),
-                            const SizedBox(width: 24),
-                            _savedToChest
-                                ? IconButton(
-                                    icon: SvgPicture.asset(
-                                      "assets/icons/moon.svg",
-                                      semanticsLabel: 'Luna',
-                                    ),
-                                    iconSize: 32,
-                                    splashRadius: 25,
-                                    tooltip: 'Spedisci sulla Luna',
-                                    onPressed: _submitToMoon,
-                                  )
-                                : IconButton(
-                                    icon: SvgPicture.asset(
-                                      "assets/icons/ok.svg",
-                                      semanticsLabel: 'OK',
-                                    ),
-                                    iconSize: 60,
-                                    splashRadius: 25,
-                                    tooltip: 'Salva hinoo',
-                                    onPressed: _submitHinoo,
-                                  ),
-                          ],
+                    child: ResponsiveFooterBar(
+                      bottomPadding: footerBottomPadding,
+                      desiredGap: footerGap,
+                      minGap: 16,
+                      height: footerIconSize,
+                      actions: [
+                        ResponsiveFooterAction(
+                          asset: "assets/icons/home.svg",
+                          semanticsLabel: 'Home',
+                          colorFilter: const ColorFilter.mode(
+                            HonooColor.onBackground,
+                            BlendMode.srcIn,
+                          ),
+                          size: footerIconSize,
+                          splashRadius: 25,
+                          tooltip: 'Home',
+                          onPressed: () {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (_) => const HomePage()),
+                              (route) => false,
+                            );
+                          },
                         ),
-                      ),
+                        ResponsiveFooterAction(
+                          asset: "assets/icons/chest.svg",
+                          semanticsLabel: 'Chest',
+                          size: footerIconSize,
+                          splashRadius: 40,
+                          tooltip: 'Apri il tuo Cuore',
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const ChestPage()),
+                            );
+                          },
+                        ),
+                        if (_savedToChest)
+                          ResponsiveFooterAction(
+                            asset: "assets/icons/moon.svg",
+                            semanticsLabel: 'Luna',
+                            size: footerIconSize,
+                            splashRadius: 25,
+                            tooltip: 'Spedisci sulla Luna',
+                            onPressed: _submitToMoon,
+                          )
+                        else
+                          ResponsiveFooterAction(
+                            asset: "assets/icons/ok.svg",
+                            semanticsLabel: 'OK',
+                            size: footerIconSize,
+                            splashRadius: 25,
+                            tooltip: 'Salva hinoo',
+                            onPressed: _submitHinoo,
+                          ),
+                      ],
                     ),
                   ),
                 ),

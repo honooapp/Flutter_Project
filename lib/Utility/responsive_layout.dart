@@ -56,4 +56,44 @@ class ResponsiveLayout {
 
     return Size(width, height);
   }
+
+  static double footerIconSizeForMode(ResponsiveLayoutMode mode) {
+    switch (mode) {
+      case ResponsiveLayoutMode.mobile:
+        return 56;
+      case ResponsiveLayoutMode.tablet:
+        return 52;
+      case ResponsiveLayoutMode.desktop:
+        return 44;
+      case ResponsiveLayoutMode.wideDesktop:
+      case ResponsiveLayoutMode.largeDesktop:
+        return 40;
+    }
+  }
+
+  static double footerGapForMode(ResponsiveLayoutMode mode) {
+    switch (mode) {
+      case ResponsiveLayoutMode.mobile:
+        return 44;
+      case ResponsiveLayoutMode.tablet:
+        return 40;
+      case ResponsiveLayoutMode.desktop:
+      case ResponsiveLayoutMode.wideDesktop:
+      case ResponsiveLayoutMode.largeDesktop:
+        return 40;
+    }
+  }
+
+  static double footerBottomPaddingForMode(ResponsiveLayoutMode mode) {
+    switch (mode) {
+      case ResponsiveLayoutMode.mobile:
+        return 14;
+      case ResponsiveLayoutMode.tablet:
+        return 12;
+      case ResponsiveLayoutMode.desktop:
+      case ResponsiveLayoutMode.wideDesktop:
+      case ResponsiveLayoutMode.largeDesktop:
+        return 10;
+    }
+  }
 }

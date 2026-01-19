@@ -22,6 +22,7 @@ class SeaFooterBar extends StatelessWidget {
       width: double.infinity,
       child: LayoutBuilder(
         builder: (context, constraints) {
+          final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
           final w = constraints.maxWidth;
 
           // Dimensioni icone (coerenti con HomePage)
@@ -30,9 +31,9 @@ class SeaFooterBar extends StatelessWidget {
           const double islandSize = 180; // isola
 
           // Posizioni "storiche" rispetto al centro (coerenti con HomePage)
-          final double chestCenterX = w / 2 - chestSize / 2;
+          final double chestCenterX = (w / 2) - chestSize / 2 + 36;
           final double islandTargetX = (w / 2) - 200;
-          final double bottleTargetX = (w / 2) + 80;
+          final double bottleTargetX = (w / 2) + 104;
 
           // Clamp per evitare tagli laterali
           final double islandX =
@@ -48,130 +49,140 @@ class SeaFooterBar extends StatelessWidget {
               // Onde (non bloccano i tap)
               // 2) Onde in MEZZO (sopra la bottiglia) ma non bloccano i tap
               Positioned(
-                bottom: 50,
+                bottom: safeBottom + height * 0.0,
                 left: 0,
                 right: 0,
                 child: IgnorePointer(
                   child: SizedBox(
-                    height: 10,
+                    height: height * 0.285,
+                    child: Container(color: HonooColor.wave3),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: safeBottom + height * 0.48,
+                left: 0,
+                right: 0,
+                child: IgnorePointer(
+                  child: SizedBox(
+                    height: height * 0.16,
                     child: Container(color: HonooColor.wave1),
                   ),
                 ),
               ),
 
-              // 1) Bottiglia PRIMA (così è sotto graficamente)
+              // Bottiglia tra seconda e terza onda
               Positioned(
-                bottom: 10,
+                bottom: safeBottom,
                 left: bottleX,
-                child: IconButton(
-                  constraints: BoxConstraints.tightFor(
-                    width: bottleSize,
-                    height: bottleSize,
+                child: Transform.translate(
+                  offset: Offset(0, -height * 0.24),
+                  child: IconButton(
+                    constraints: BoxConstraints.tightFor(
+                      width: bottleSize,
+                      height: bottleSize,
+                    ),
+                    padding: EdgeInsets.zero,
+                    icon: SvgPicture.asset(
+                      "assets/icons/bottle.svg",
+                      width: bottleSize,
+                      height: bottleSize,
+                      semanticsLabel: 'Bottle',
+                    ),
+                    iconSize: bottleSize,
+                    splashRadius: 40,
+                    tooltip: 'Scrivi',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const NewHonooPage()),
+                      );
+                    },
                   ),
-                  padding: EdgeInsets.zero,
-                  icon: SvgPicture.asset(
-                    "assets/icons/bottle.svg",
-                    width: bottleSize,
-                    height: bottleSize,
-                    semanticsLabel: 'Bottle',
-                  ),
-                  iconSize: bottleSize,
-                  splashRadius: 40,
-                  tooltip: 'Scrivi',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const NewHonooPage()),
-                    );
-                  },
                 ),
               ),
 
               Positioned(
-                bottom: 30,
+                bottom: safeBottom + height * 0.29,
                 left: 0,
                 right: 0,
                 child: IgnorePointer(
                   child: SizedBox(
-                    height: 20,
+                    height: height * 0.26,
                     child: Container(color: HonooColor.wave2),
                   ),
                 ),
               ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: IgnorePointer(
-                  child: SizedBox(
-                    height: 30,
-                    child: Container(color: HonooColor.wave3),
-                  ),
-                ),
-              ),
+
 
               // Isola (sx)
               Positioned(
-                bottom: -16,
+                bottom: safeBottom,
                 left: islandX,
-                child: IconButton(
-                  constraints: BoxConstraints.tightFor(
-                    width: islandSize,
-                    height: islandSize,
-                  ),
-                  padding: EdgeInsets.zero,
-                  icon: SvgPicture.asset(
-                    "assets/icons/isoladellestorie/island.svg",
-                    theme:
-                        const SvgTheme(currentColor: HonooColor.onBackground),
-                    colorFilter: const ColorFilter.mode(
-                      HonooColor.onBackground,
-                      BlendMode.srcIn,
+                child: Transform.translate(
+                  offset: Offset(0, height * 0.15),
+                  child: IconButton(
+                    constraints: BoxConstraints.tightFor(
+                      width: islandSize,
+                      height: islandSize,
                     ),
-                    width: islandSize,
-                    height: islandSize,
-                    semanticsLabel: 'Island',
+                    padding: EdgeInsets.zero,
+                    icon: SvgPicture.asset(
+                      "assets/icons/isoladellestorie/island.svg",
+                      theme:
+                          const SvgTheme(currentColor: HonooColor.onBackground),
+                      colorFilter: const ColorFilter.mode(
+                        HonooColor.onBackground,
+                        BlendMode.srcIn,
+                      ),
+                      width: islandSize,
+                      height: islandSize,
+                      semanticsLabel: 'Island',
+                    ),
+                    iconSize: islandSize,
+                    splashRadius: 1,
+                    tooltip: "Vai all'Isola delle Storie",
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const IslandPage()),
+                      );
+                    },
                   ),
-                  iconSize: islandSize,
-                  splashRadius: 1,
-                  tooltip: "Vai all'Isola delle Storie",
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const IslandPage()),
-                    );
-                  },
                 ),
               ),
 
               // Scrigno (centro)
               Positioned(
-                bottom: -20,
+                bottom: safeBottom,
                 left: chestX,
-                child: IconButton(
-                  constraints: BoxConstraints.tightFor(
-                    width: chestSize,
-                    height: chestSize,
+                child: Transform.translate(
+                  offset: Offset(0, height * 0.01),
+                  child: IconButton(
+                    constraints: BoxConstraints.tightFor(
+                      width: chestSize,
+                      height: chestSize,
+                    ),
+                    padding: EdgeInsets.zero,
+                    icon: SvgPicture.asset(
+                      "assets/icons/chest.svg",
+                      width: chestSize,
+                      height: chestSize,
+                      semanticsLabel: 'Chest',
+                    ),
+                    iconSize: chestSize,
+                    splashRadius: 40,
+                    tooltip: 'Apri il tuo Cuore',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ChestPage()),
+                      );
+                    },
                   ),
-                  padding: EdgeInsets.zero,
-                  icon: SvgPicture.asset(
-                    "assets/icons/chest.svg",
-                    width: chestSize,
-                    height: chestSize,
-                    semanticsLabel: 'Chest',
-                  ),
-                  iconSize: chestSize,
-                  splashRadius: 40,
-                  tooltip: 'Apri il tuo Cuore',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ChestPage()),
-                    );
-                  },
                 ),
               ),
             ],

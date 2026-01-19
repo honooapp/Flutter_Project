@@ -30,54 +30,76 @@ class ResponsiveFooterBar extends StatelessWidget {
     this.bottomPadding = 12,
     this.desiredGap = 24,
     this.minGap = 12,
+    this.height = 60,
+    this.lockGapWhenPossible = false,
+    this.useSafeArea = true,
+    this.mainAxisAlignment = MainAxisAlignment.center,
+    this.alignment = Alignment.center,
   });
 
   final List<ResponsiveFooterAction> actions;
   final double bottomPadding;
   final double desiredGap;
   final double minGap;
+  final double height;
+  final bool lockGapWhenPossible;
+  final bool useSafeArea;
+  final MainAxisAlignment mainAxisAlignment;
+  final AlignmentGeometry alignment;
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: EdgeInsets.only(bottom: bottomPadding),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final double availableWidth = constraints.maxWidth.isFinite
-                ? constraints.maxWidth
-                : double.infinity;
-            final double totalIconWidth = actions.fold(
-              0,
-              (sum, action) => sum + action.size,
-            );
-            final int gapCount = math.max(0, actions.length - 1);
-            double gap = desiredGap;
+    final Widget bar = Padding(
+      padding: EdgeInsets.only(bottom: bottomPadding),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final double availableWidth = constraints.maxWidth.isFinite
+              ? constraints.maxWidth
+              : double.infinity;
+          final double totalIconWidth = actions.fold(
+            0,
+            (sum, action) => sum + action.size,
+          );
+          final int gapCount = math.max(0, actions.length - 1);
+          double gap = desiredGap;
 
-            if (availableWidth.isFinite && gapCount > 0) {
-              final double maxGap =
-                  (availableWidth - totalIconWidth) / gapCount;
-              if (maxGap <= minGap) {
-                gap = math.max(0, maxGap);
-              } else {
-                gap = math.max(minGap, math.min(desiredGap, maxGap));
-              }
+          if (availableWidth.isFinite && gapCount > 0) {
+            final double maxGap =
+                (availableWidth - totalIconWidth) / gapCount;
+            if (lockGapWhenPossible && maxGap >= desiredGap) {
+              gap = desiredGap;
+            } else if (maxGap <= minGap) {
+              gap = math.max(0, maxGap);
+            } else {
+              gap = math.max(minGap, math.min(desiredGap, maxGap));
             }
+          }
 
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                for (int index = 0; index < actions.length; index++) ...[
-                  _FooterIconButton(action: actions[index]),
-                  if (index < actions.length - 1) SizedBox(width: gap),
+          return SizedBox(
+            height: height,
+            child: Align(
+              alignment: alignment,
+              child: Row(
+                mainAxisAlignment: mainAxisAlignment,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (int index = 0; index < actions.length; index++) ...[
+                    _FooterIconButton(action: actions[index]),
+                    if (index < actions.length - 1) SizedBox(width: gap),
+                  ],
                 ],
-              ],
-            );
-          },
-        ),
+              ),
+            ),
+          );
+        },
       ),
     );
+
+    if (!useSafeArea) {
+      return bar;
+    }
+
+    return SafeArea(top: false, child: bar);
   }
 }
 

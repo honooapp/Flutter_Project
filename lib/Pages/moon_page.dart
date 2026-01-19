@@ -1,8 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sizer/sizer.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 
 import '../Entities/hinoo.dart';
@@ -19,6 +17,7 @@ import '../Utility/responsive_layout.dart';
 import '../Widgets/loading_spinner.dart';
 import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/honoo_app_title.dart';
+import '../Widgets/responsive_footer_bar.dart';
 import 'placeholder_page.dart';
 
 class MoonPage extends StatefulWidget {
@@ -95,15 +94,24 @@ class _MoonPageState extends State<MoonPage> {
   @override
   Widget build(BuildContext context) {
     const double headerHeight = 52;
-    const double footerHeight = 60;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
             final double availHeight = constraints.maxHeight;
+            final ResponsiveLayoutMode layoutMode =
+                ResponsiveLayout.modeForWidth(constraints.maxWidth);
+            final double footerIconSize =
+                ResponsiveLayout.footerIconSizeForMode(layoutMode);
+            final double footerGap =
+                ResponsiveLayout.footerGapForMode(layoutMode);
+            final double footerBottomPadding =
+                ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
+            final double footerReserved =
+                footerIconSize + footerBottomPadding;
             final double centerHeight =
-                (availHeight - headerHeight - footerHeight)
+                (availHeight - headerHeight - footerReserved)
                     .clamp(0.0, double.infinity);
             final double targetMaxWidth =
                 ResponsiveLayout.contentMaxWidth(constraints.maxWidth);
@@ -140,69 +148,62 @@ class _MoonPageState extends State<MoonPage> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: footerHeight,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: SvgPicture.asset(
-                          'assets/icons/home_onTertiary.svg',
-                          semanticsLabel: 'Home',
-                        ),
-                        iconSize: 60,
-                        splashRadius: 25,
-                        tooltip: 'Home',
-                        onPressed: () {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (_) => const HomePage()),
-                            (route) => false,
-                          );
-                        },
-                      ),
-                      SizedBox(width: 5.w),
-                      IconButton(
-                        icon: SvgPicture.asset(
-                          'assets/icons/heart.svg',
-                          semanticsLabel: 'Heart',
-                        ),
-                        iconSize: 60,
-                        splashRadius: 25,
-                        tooltip: 'Salva nel tuo Cuore',
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ChestPage(),
+                ResponsiveFooterBar(
+                  useSafeArea: false,
+                  bottomPadding: footerBottomPadding,
+                  desiredGap: footerGap,
+                  minGap: 16,
+                  height: footerIconSize,
+                  actions: [
+                    ResponsiveFooterAction(
+                      asset: 'assets/icons/home_onTertiary.svg',
+                      semanticsLabel: 'Home',
+                      size: footerIconSize,
+                      splashRadius: 25,
+                      tooltip: 'Home',
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (_) => const HomePage()),
+                          (route) => false,
+                        );
+                      },
+                    ),
+                    ResponsiveFooterAction(
+                      asset: 'assets/icons/heart.svg',
+                      semanticsLabel: 'Heart',
+                      size: footerIconSize,
+                      splashRadius: 25,
+                      tooltip: 'Salva nel tuo Cuore',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ChestPage(),
+                          ),
+                        );
+                      },
+                    ),
+                    ResponsiveFooterAction(
+                      asset: 'assets/icons/reply.svg',
+                      semanticsLabel: 'Reply',
+                      size: footerIconSize,
+                      splashRadius: 25,
+                      tooltip: 'Rispondi',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ComingSoonPage(
+                              header: Utility().replyMoonHeader,
+                              quote: Utility().shakespeare,
+                              bibliography: Utility().bibliography,
                             ),
-                          );
-                        },
-                      ),
-                      SizedBox(width: 5.w),
-                      IconButton(
-                        icon: SvgPicture.asset(
-                          'assets/icons/reply.svg',
-                          semanticsLabel: 'Reply',
-                        ),
-                        iconSize: 60,
-                        splashRadius: 25,
-                        tooltip: 'Rispondi',
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ComingSoonPage(
-                                header: Utility().replyMoonHeader,
-                                quote: Utility().shakespeare,
-                                bibliography: Utility().bibliography,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ],
             );
