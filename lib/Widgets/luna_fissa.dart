@@ -9,6 +9,7 @@ class LunaFissa extends StatelessWidget {
 
   /// Margine standard attorno alla luna
   static const double _margin = 8.0;
+  static const double _largeDesktopMargin = 16.0;
 
   /// Dimensione icona in base alla larghezza schermo (phone/tablet/web)
   static double iconSizeForWidth(double w) {
@@ -33,11 +34,12 @@ class LunaFissa extends StatelessWidget {
     final w = MediaQuery.of(context).size.width;
     final topSafe = MediaQuery.of(context).viewPadding.top;
     final iconSize = iconSizeForWidth(w);
+    final double margin = w >= 1200 ? _largeDesktopMargin : _margin;
 
     return Positioned(
       // entro i limiti visivi: safe-area top + margine
-      top: topSafe + _margin,
-      right: _margin,
+      top: topSafe + margin,
+      right: margin,
       child: IgnorePointer(
         // il bottone deve essere cliccabile, ma non deve bloccare altre aree:
         // usiamo un Material "shrink-wrapped" e riabilitiamo i pointer solo sul bottone

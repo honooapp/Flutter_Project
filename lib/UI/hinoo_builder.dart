@@ -5,7 +5,6 @@
 // Nessun overlay sopra il canvas o le anteprime.
 // ============================================================================
 
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:math' as math;
 

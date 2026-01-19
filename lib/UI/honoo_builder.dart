@@ -39,6 +39,8 @@ class HonooBuilder extends StatefulWidget {
 
 class HonooBuilderState extends State<HonooBuilder> {
   static const double framePadding = 12.0;
+  static const double _baselineImageSize = 360.0;
+  static const double _baselineGap = 9.0;
 
   final TextEditingController _textCtrl = TextEditingController();
   final FocusNode _textFocus = FocusNode();
@@ -369,44 +371,55 @@ class HonooBuilderState extends State<HonooBuilder> {
 
         if (availW <= 0 || availH <= 0) return const SizedBox.shrink();
 
-        const double gap = 9.0;
         const double eps = 0.5;
+        final double baselineTextHeight = _baselineImageSize / 2;
+        final double baselineTotalHeight =
+            _baselineImageSize + _baselineGap + baselineTextHeight;
 
-        final double maxByH = (availH - gap - eps) / 1.5;
-        final double imageSize = math.min(availW, maxByH);
-        final double textHeight = imageSize / 2;
-        final double totalHeight = textHeight + gap + imageSize;
+        final double scaleW = availW / _baselineImageSize;
+        final double scaleH = (availH - eps) / baselineTotalHeight;
+        final double scale =
+            math.min(scaleW, scaleH).clamp(0.0, double.infinity);
+
+        final double displayW = _baselineImageSize * scale;
+        final double displayH = baselineTotalHeight * scale;
 
         return Center(
-          child: RepaintBoundary(
-            key: _captureKey,
-            child: SizedBox(
-              width: imageSize,
-              height: totalHeight,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // ===== TEXT AREA =====
-                  SizedBox(
-                    height: textHeight,
-                    width: imageSize,
-                    child: _buildTextArea(imageSize),
-                  ),
+          child: SizedBox(
+            width: displayW,
+            height: displayH,
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: RepaintBoundary(
+                key: _captureKey,
+                child: SizedBox(
+                  width: _baselineImageSize,
+                  height: baselineTotalHeight,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // ===== TEXT AREA =====
+                      SizedBox(
+                        height: baselineTextHeight,
+                        width: _baselineImageSize,
+                        child: _buildTextArea(_baselineImageSize),
+                      ),
 
-                  const SizedBox(height: gap),
+                      const SizedBox(height: _baselineGap),
 
-                  // ===== IMAGE AREA =====
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(5),
-                    child: Container(
-                      width: imageSize,
-                      height: imageSize,
-                      color: Colors.white, // cornice neutra come “foglio”
-                      child:
-                          _buildImageArea(), // qui resta il fix del no-doppio-zoom
-                    ),
+                      // ===== IMAGE AREA =====
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(5),
+                        child: Container(
+                          width: _baselineImageSize,
+                          height: _baselineImageSize,
+                          color: Colors.white, // cornice neutra come “foglio”
+                          child: _buildImageArea(),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
