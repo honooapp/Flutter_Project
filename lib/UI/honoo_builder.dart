@@ -20,6 +20,12 @@ import '../Services/honoo_image_uploader.dart';
 import '../UI/HinooBuilder/overlays/cambia_sfondo.dart';
 
 class HonooBuilder extends StatefulWidget {
+  static const double baselineImageSize = 360.0;
+  static const double baselineGap = 9.0;
+  static const double baselineTextHeight = baselineImageSize / 2;
+  static const double baselineTotalHeight =
+      baselineImageSize + baselineGap + baselineTextHeight;
+
   final void Function(String text, String imageUrl)? onHonooChanged;
   final ValueChanged<bool>? onFocusChanged;
   final String? initialText;
@@ -39,8 +45,6 @@ class HonooBuilder extends StatefulWidget {
 
 class HonooBuilderState extends State<HonooBuilder> {
   static const double framePadding = 12.0;
-  static const double _baselineImageSize = 360.0;
-  static const double _baselineGap = 9.0;
 
   final TextEditingController _textCtrl = TextEditingController();
   final FocusNode _textFocus = FocusNode();
@@ -372,16 +376,16 @@ class HonooBuilderState extends State<HonooBuilder> {
         if (availW <= 0 || availH <= 0) return const SizedBox.shrink();
 
         const double eps = 0.5;
-        final double baselineTextHeight = _baselineImageSize / 2;
+        final double baselineTextHeight = HonooBuilder.baselineTextHeight;
         final double baselineTotalHeight =
-            _baselineImageSize + _baselineGap + baselineTextHeight;
+            HonooBuilder.baselineTotalHeight;
 
-        final double scaleW = availW / _baselineImageSize;
+        final double scaleW = availW / HonooBuilder.baselineImageSize;
         final double scaleH = (availH - eps) / baselineTotalHeight;
         final double scale =
             math.min(scaleW, scaleH).clamp(0.0, double.infinity);
 
-        final double displayW = _baselineImageSize * scale;
+        final double displayW = HonooBuilder.baselineImageSize * scale;
         final double displayH = baselineTotalHeight * scale;
 
         return Center(
@@ -393,7 +397,7 @@ class HonooBuilderState extends State<HonooBuilder> {
               child: RepaintBoundary(
                 key: _captureKey,
                 child: SizedBox(
-                  width: _baselineImageSize,
+                  width: HonooBuilder.baselineImageSize,
                   height: baselineTotalHeight,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -401,18 +405,18 @@ class HonooBuilderState extends State<HonooBuilder> {
                       // ===== TEXT AREA =====
                       SizedBox(
                         height: baselineTextHeight,
-                        width: _baselineImageSize,
-                        child: _buildTextArea(_baselineImageSize),
+                        width: HonooBuilder.baselineImageSize,
+                        child: _buildTextArea(HonooBuilder.baselineImageSize),
                       ),
 
-                      const SizedBox(height: _baselineGap),
+                      const SizedBox(height: HonooBuilder.baselineGap),
 
                       // ===== IMAGE AREA =====
                       ClipRRect(
                         borderRadius: BorderRadius.circular(5),
                         child: Container(
-                          width: _baselineImageSize,
-                          height: _baselineImageSize,
+                          width: HonooBuilder.baselineImageSize,
+                          height: HonooBuilder.baselineImageSize,
                           color: Colors.white, // cornice neutra come “foglio”
                           child: _buildImageArea(),
                         ),

@@ -60,7 +60,7 @@ class ResponsiveLayout {
   static double footerIconSizeForMode(ResponsiveLayoutMode mode) {
     switch (mode) {
       case ResponsiveLayoutMode.mobile:
-        return 45;
+        return 42;
       case ResponsiveLayoutMode.tablet:
         return 52;
       case ResponsiveLayoutMode.desktop:
@@ -87,7 +87,7 @@ class ResponsiveLayout {
   static double footerBottomPaddingForMode(ResponsiveLayoutMode mode) {
     switch (mode) {
       case ResponsiveLayoutMode.mobile:
-        return 14;
+        return 10;
       case ResponsiveLayoutMode.tablet:
         return 12;
       case ResponsiveLayoutMode.desktop:

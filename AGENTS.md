@@ -231,7 +231,7 @@ WidthLimitedMultilineField(
   controller: controller,
   style: textStyle,
   maxLines: 5,              // or 20 for Hinoo
-  maxCharsPerLine: 36,      // same for both
+  maxCharsPerLine: 32,      // same for both
   // ... other parameters
 )
 ```

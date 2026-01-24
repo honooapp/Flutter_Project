@@ -380,7 +380,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                     footerReserved)
                 .clamp(0.0, double.infinity);
 
-            const double gap = 9.0;
+            const double gap = HonooBuilder.baselineGap;
             const double builderRatio = 1.5; // totale = imageSize * 1.5 + gap
 
             final double maxImageByWidth = targetMaxW;
@@ -388,8 +388,16 @@ class _NewHonooPageState extends State<NewHonooPage> {
                 ((availableH - gap) / builderRatio).clamp(0.0, double.infinity);
 
             double imageSize = math.min(maxImageByWidth, maxImageByHeight);
+            if (layoutMode != ResponsiveLayoutMode.mobile) {
+              imageSize =
+                  math.max(imageSize, HonooBuilder.baselineImageSize);
+            }
             if (!imageSize.isFinite || imageSize <= 0) {
               imageSize = math.min(targetMaxW, viewW);
+              if (layoutMode != ResponsiveLayoutMode.mobile) {
+                imageSize =
+                    math.max(imageSize, HonooBuilder.baselineImageSize);
+              }
             }
 
             final double builderWidth = imageSize;
