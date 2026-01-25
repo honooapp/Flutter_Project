@@ -32,6 +32,10 @@ class _NimPageState extends State<NimPage> {
         ResponsiveLayout.footerIconSizeForMode(layoutMode);
     final double footerBottomPadding =
         ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
+    final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
+    final double footerSpacing = footerBottomPadding + safeBottom;
+    final double footerTopSpacing = footerSpacing / 2;
+    final double footerBottomSpacing = footerSpacing - footerTopSpacing;
     final double footerGap = ResponsiveLayout.footerGapForMode(layoutMode);
 
     return Scaffold(
@@ -174,9 +178,10 @@ class _NimPageState extends State<NimPage> {
                         ),
                       ],
                     ),
+                    SizedBox(height: footerTopSpacing),
                     ResponsiveFooterBar(
                       useSafeArea: false,
-                      bottomPadding: footerBottomPadding,
+                      bottomPadding: footerBottomSpacing,
                       desiredGap: footerGap,
                       minGap: 16,
                       height: footerIconSize,

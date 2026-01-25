@@ -33,11 +33,10 @@ class HonooCard extends StatelessWidget {
         final double availW = constraints.maxWidth.isFinite
             ? constraints.maxWidth
             : media.size.width;
-        final double rawH = constraints.maxHeight.isFinite
+        final double availH = constraints.maxHeight.isFinite
             ? constraints.maxHeight
-            : media.size.height;
-        final double availH =
-            (rawH - media.padding.vertical).clamp(0.0, double.infinity);
+            : (media.size.height - media.padding.vertical)
+                .clamp(0.0, double.infinity);
 
         if (availW <= 0 || availH <= 0) {
           return const SizedBox.shrink();

@@ -37,6 +37,10 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
         ResponsiveLayout.footerIconSizeForMode(layoutMode);
     final double footerBottomPadding =
         ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
+    final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
+    final double footerSpacing = footerBottomPadding + safeBottom;
+    final double footerTopSpacing = footerSpacing / 2;
+    final double footerBottomSpacing = footerSpacing - footerTopSpacing;
 
     return Scaffold(
       backgroundColor: HonooColor.background,
@@ -98,9 +102,10 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
                     ),
                   ),
                   const Spacer(),
+                  SizedBox(height: footerTopSpacing),
                   ResponsiveFooterBar(
                     useSafeArea: false,
-                    bottomPadding: footerBottomPadding,
+                    bottomPadding: footerBottomSpacing,
                     desiredGap: ResponsiveLayout.footerGapForMode(layoutMode),
                     minGap: 16,
                     height: footerIconSize,

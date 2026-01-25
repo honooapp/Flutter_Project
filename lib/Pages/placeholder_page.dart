@@ -29,6 +29,10 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     final double footerBottomPadding =
         ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
     final double footerGap = ResponsiveLayout.footerGapForMode(layoutMode);
+    final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
+    final double footerSpacing = footerBottomPadding + safeBottom;
+    final double footerTopSpacing = footerSpacing / 2;
+    final double footerBottomSpacing = footerSpacing - footerTopSpacing;
     final double footerSidePadding;
     switch (layoutMode) {
       case ResponsiveLayoutMode.mobile:
@@ -132,11 +136,12 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
               ),
             ),
           ),
+          SizedBox(height: footerTopSpacing),
           Padding(
             padding: EdgeInsets.only(left: footerSidePadding),
             child: ResponsiveFooterBar(
               useSafeArea: false,
-              bottomPadding: footerBottomPadding,
+              bottomPadding: footerBottomSpacing,
               desiredGap: footerGap,
               minGap: 16,
               height: footerIconSize,

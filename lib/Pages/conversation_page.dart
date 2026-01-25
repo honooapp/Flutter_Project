@@ -2,9 +2,6 @@
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sizer/sizer.dart';
-
-import 'package:honoo/Controller/device_controller.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
 import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
@@ -63,177 +60,200 @@ class _ConversationPageState extends State<ConversationPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isPhone = DeviceController().isPhone();
-    final ResponsiveLayoutMode layoutMode =
-        ResponsiveLayout.modeForWidth(MediaQuery.of(context).size.width);
-    final double footerIconSize =
-        ResponsiveLayout.footerIconSizeForMode(layoutMode);
-    final double footerGap = ResponsiveLayout.footerGapForMode(layoutMode);
-    final double footerBottomPadding =
-        ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
-
-    final constraints = isPhone
-        ? BoxConstraints(maxWidth: 85.w, maxHeight: 100.h - 120)
-        : BoxConstraints(maxWidth: 50.w, maxHeight: 100.h - 120);
-
     return Scaffold(
       backgroundColor: HonooColor.background,
-      body: Column(
-        children: [
-          // HEADER
-          SizedBox(
-            height: 52,
-            child: Center(
-              child: HonooAppTitle(
-                onTap: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                        builder: (_) => const PlaceholderPage()),
-                    (route) => false,
-                  );
-                },
-              ),
-            ),
-          ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final double viewW = constraints.maxWidth;
+          final double viewH = constraints.maxHeight;
+          final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
+          final ResponsiveLayoutMode layoutMode =
+              ResponsiveLayout.modeForWidth(viewW);
+          final double footerIconSize =
+              ResponsiveLayout.footerIconSizeForMode(layoutMode);
+          final double footerGap = ResponsiveLayout.footerGapForMode(layoutMode);
+          final double footerBottomPadding =
+              ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
+          final double footerSpacing = footerBottomPadding + safeBottom;
+          final double footerTopSpacing = footerSpacing / 2;
+          final double footerBottomSpacing =
+              footerSpacing - footerTopSpacing;
+          const double headerH = 52;
+          final double targetMaxW = ResponsiveLayout.contentMaxWidth(viewW);
+          final double footerReserved =
+              footerIconSize + footerTopSpacing + footerBottomSpacing;
+          final double availableH =
+              (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
+          final HonooBuilderMetrics honooMetrics =
+              ResponsiveLayout.honooBuilderMetrics(
+            availableHeight: availableH,
+            maxWidth: targetMaxW,
+            mode: layoutMode,
+          );
+          final double horizontalPadding = layoutMode == ResponsiveLayoutMode.mobile ||
+                  layoutMode == ResponsiveLayoutMode.tablet
+              ? 0
+              : 16;
 
-          // CONTENUTO
-          Row(
+          final Widget carousel = _isLoading
+              ? const Center(child: LoadingSpinner())
+              : (_thread.isEmpty
+                  ? Center(
+                      child: Text(
+                        'Nessuna conversazione',
+                        style: GoogleFonts.libreFranklin(
+                          color: HonooColor.onBackground,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    )
+                  : cs.CarouselSlider(
+                      carouselController: _carouselController,
+                      options: cs.CarouselOptions(
+                        scrollDirection: Axis.vertical,
+                        height: honooMetrics.height,
+                        viewportFraction: 1.0,
+                        enlargeCenterPage: false,
+                        enableInfiniteScroll: false,
+                        onPageChanged: (index, reason) {
+                          setState(() => _currentIndex = index);
+                        },
+                      ),
+                      items: _thread
+                          .map(
+                            (h) => SizedBox(
+                              width: honooMetrics.width,
+                              height: honooMetrics.height,
+                              child: HonooCard(honoo: h),
+                            ),
+                          )
+                          .toList(),
+                    ));
+
+          return Column(
             children: [
-              const Expanded(child: SizedBox()),
-              Container(
-                constraints: constraints,
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: _isLoading
-                          ? const Center(child: LoadingSpinner())
-                          : (_thread.isEmpty
-                              ? Center(
-                                  child: Text(
-                                    'Nessuna conversazione',
-                                    style: GoogleFonts.libreFranklin(
-                                      color: HonooColor.onBackground,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                )
-                              : cs.CarouselSlider(
-                                  carouselController: _carouselController,
-                                  options: cs.CarouselOptions(
-                                    scrollDirection: Axis.vertical,
-                                    height: 100.h,
-                                    aspectRatio: 9 / 16,
-                                    enlargeCenterPage: true,
-                                    enableInfiniteScroll: false,
-                                    onPageChanged: (index, reason) {
-                                      setState(() => _currentIndex = index);
-                                    },
-                                  ),
-                                  items: _thread
-                                      .map((h) => HonooCard(honoo: h))
-                                      .toList(),
-                                )),
-                    ),
-
-                    // FOOTER
-                    ResponsiveFooterBar(
-                      useSafeArea: false,
-                      bottomPadding: footerBottomPadding,
-                      desiredGap: footerGap,
-                      minGap: 16,
-                      height: footerIconSize,
-                      actions: [
-                        ResponsiveFooterAction(
-                          asset: "assets/icons/home.svg",
-                          semanticsLabel: 'Home',
-                          colorFilter: const ColorFilter.mode(
-                            HonooColor.onBackground,
-                            BlendMode.srcIn,
-                          ),
-                          size: footerIconSize,
-                          splashRadius: 25,
-                          tooltip: 'Home',
-                          onPressed: () {
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (_) => const HomePage()),
-                              (route) => false,
-                            );
-                          },
-                        ),
-                        ResponsiveFooterAction(
-                          asset: "assets/icons/broken_heart.svg",
-                          semanticsLabel: 'Broken heart',
-                          size: footerIconSize,
-                          splashRadius: 25,
-                          tooltip: 'Cuore spezzato',
-                          onPressed: (_thread.isEmpty || _savingToChest)
-                              ? null
-                              : () async {
-                                  setState(() => _savingToChest = true);
-                                  try {
-                                    final honoo = _thread[_currentIndex];
-                                    final saved = await HonooController()
-                                        .saveToChest(honoo);
-                                    if (!mounted) return;
-                                    showHonooToast(
-                                      context,
-                                      message: saved
-                                          ? 'honoo salvato nel tuo Scrigno.'
-                                          : 'Era già nel tuo Scrigno.',
-                                    );
-                                  } catch (e) {
-                                    if (!mounted) return;
-                                    showHonooToast(
-                                      context,
-                                      message:
-                                          'Errore durante il salvataggio: $e',
-                                    );
-                                  } finally {
-                                    if (mounted) {
-                                      setState(() => _savingToChest = false);
-                                    }
-                                  }
-                                },
-                        ),
-                        ResponsiveFooterAction(
-                          asset: "assets/icons/reply.svg",
-                          semanticsLabel: 'Reply',
-                          colorFilter: const ColorFilter.mode(
-                            HonooColor.onBackground,
-                            BlendMode.srcIn,
-                          ),
-                          size: footerIconSize,
-                          splashRadius: 25,
-                          tooltip: 'Rispondi',
-                          onPressed: (_thread.isEmpty || _savingToChest)
-                              ? null
-                              : () {
-                                  final honoo = _thread[_currentIndex];
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ReplyHonooPage(
-                                        originalHonoo: honoo,
-                                        initialHintText:
-                                            'Scrivi la tua risposta...',
-                                        initialImageHint:
-                                            'Aggiungi un’immagine (opzionale)',
-                                      ),
-                                    ),
-                                  );
-                                },
-                        ),
-                      ],
-                    ),
-                  ],
+              SizedBox(
+                height: headerH,
+                child: Center(
+                  child: HonooAppTitle(
+                    onTap: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                            builder: (_) => const PlaceholderPage()),
+                        (route) => false,
+                      );
+                    },
+                  ),
                 ),
               ),
-              const Expanded(child: SizedBox()),
+              Expanded(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: targetMaxW),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: horizontalPadding),
+                      child: SizedBox(
+                        width: honooMetrics.width,
+                        height: honooMetrics.height,
+                        child: carousel,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: footerTopSpacing),
+              ResponsiveFooterBar(
+                useSafeArea: false,
+                bottomPadding: footerBottomSpacing,
+                desiredGap: footerGap,
+                minGap: 16,
+                height: footerIconSize,
+                actions: [
+                  ResponsiveFooterAction(
+                    asset: "assets/icons/home.svg",
+                    semanticsLabel: 'Home',
+                    colorFilter: const ColorFilter.mode(
+                      HonooColor.onBackground,
+                      BlendMode.srcIn,
+                    ),
+                    size: footerIconSize,
+                    splashRadius: 25,
+                    tooltip: 'Home',
+                    onPressed: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => const HomePage()),
+                        (route) => false,
+                      );
+                    },
+                  ),
+                  ResponsiveFooterAction(
+                    asset: "assets/icons/broken_heart.svg",
+                    semanticsLabel: 'Broken heart',
+                    size: footerIconSize,
+                    splashRadius: 25,
+                    tooltip: 'Cuore spezzato',
+                    onPressed: (_thread.isEmpty || _savingToChest)
+                        ? null
+                        : () async {
+                            setState(() => _savingToChest = true);
+                            try {
+                              final honoo = _thread[_currentIndex];
+                              final saved =
+                                  await HonooController().saveToChest(honoo);
+                              if (!mounted) return;
+                              showHonooToast(
+                                context,
+                                message: saved
+                                    ? 'honoo salvato nel tuo Scrigno.'
+                                    : 'Era già nel tuo Scrigno.',
+                              );
+                            } catch (e) {
+                              if (!mounted) return;
+                              showHonooToast(
+                                context,
+                                message: 'Errore durante il salvataggio: $e',
+                              );
+                            } finally {
+                              if (mounted) {
+                                setState(() => _savingToChest = false);
+                              }
+                            }
+                          },
+                  ),
+                  ResponsiveFooterAction(
+                    asset: "assets/icons/reply.svg",
+                    semanticsLabel: 'Reply',
+                    colorFilter: const ColorFilter.mode(
+                      HonooColor.onBackground,
+                      BlendMode.srcIn,
+                    ),
+                    size: footerIconSize,
+                    splashRadius: 25,
+                    tooltip: 'Rispondi',
+                    onPressed: (_thread.isEmpty || _savingToChest)
+                        ? null
+                        : () {
+                            final honoo = _thread[_currentIndex];
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ReplyHonooPage(
+                                  originalHonoo: honoo,
+                                  initialHintText: 'Scrivi la tua risposta...',
+                                  initialImageHint:
+                                      'Aggiungi un’immagine (opzionale)',
+                                ),
+                              ),
+                            );
+                          },
+                  ),
+                ],
+              ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }

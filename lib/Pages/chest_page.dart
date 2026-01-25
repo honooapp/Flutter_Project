@@ -546,6 +546,7 @@ class _ChestPageState extends State<ChestPage> {
     double availableCenterH,
     double targetMaxW,
     HonooBuilderMetrics honooMetrics,
+    ResponsiveLayoutMode layoutMode,
   ) {
     final String identity = item.when(
       honoo: (h) {
@@ -562,9 +563,11 @@ class _ChestPageState extends State<ChestPage> {
     final GlobalKey repaintKey = _keyFor(identity);
     final bool isHonoo = item.honoo != null;
 
+    final bool isCompact = layoutMode == ResponsiveLayoutMode.mobile ||
+        layoutMode == ResponsiveLayoutMode.tablet;
     final double cardW = isHonoo
         ? honooMetrics.width
-        : targetMaxW.clamp(0.0, 360.0);
+        : (isCompact ? targetMaxW : targetMaxW.clamp(0.0, 360.0));
     final double cardMaxH = isHonoo ? honooMetrics.height : availableCenterH;
 
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
@@ -577,7 +580,11 @@ class _ChestPageState extends State<ChestPage> {
         isDesktop ? topDesktop : (isHonoo ? honooTopMobile : hinooTopMobile);
 
     final Widget content = item.when(
-      honoo: (h) => HonooThreadView(root: h),
+      honoo: (h) => SizedBox(
+        width: honooMetrics.width,
+        height: honooMetrics.height,
+        child: HonooThreadView(root: h),
+      ),
       hinoo: (row) => HinooViewer(
         draft: row.draft,
         maxHeight: availableCenterH,
@@ -704,6 +711,14 @@ class _ChestPageState extends State<ChestPage> {
                   maxWidth: targetMaxW,
                   mode: layoutMode,
                 );
+                final double horizontalPadding =
+                    layoutMode == ResponsiveLayoutMode.mobile ||
+                            layoutMode == ResponsiveLayoutMode.tablet
+                        ? 0
+                        : 16;
+                final double displayHeight = current?.honoo != null
+                    ? honooMetrics.height
+                    : availableCenterH;
 
                 return Stack(
                   clipBehavior: Clip.none,
@@ -730,73 +745,74 @@ class _ChestPageState extends State<ChestPage> {
                               0,
                               contentTopPadding,
                               0,
-                              20,
+                              0,
                             ),
-                            child: Center(
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 90),
-                                curve: Curves.easeOutCubic,
-                                constraints:
-                                    BoxConstraints(maxWidth: targetMaxW),
-                                child: SizedBox(
-                                  height: availableCenterH,
-                                  width: double.infinity,
-                                  child: () {
-                                    if (ctrl.isLoading.value ||
-                                        _isHinooLoading) {
-                                      return const Center(
-                                        child:
-                                            LoadingSpinner(color: Colors.white),
-                                      );
-                                    }
+                          child: Center(
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 90),
+                              curve: Curves.easeOutCubic,
+                              constraints:
+                                  BoxConstraints(maxWidth: targetMaxW),
+                              child: SizedBox(
+                                height: displayHeight,
+                                width: double.infinity,
+                                child: () {
+                                  if (ctrl.isLoading.value ||
+                                      _isHinooLoading) {
+                                    return const Center(
+                                      child:
+                                          LoadingSpinner(color: Colors.white),
+                                    );
+                                  }
 
-                                    if (_items.isEmpty) {
-                                      return Center(
-                                        child: Text(
-                                          'Nessun contenuto nello scrigno',
-                                          style: GoogleFonts.libreFranklin(
-                                            color: HonooColor.onBackground,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w400,
-                                          ),
+                                  if (_items.isEmpty) {
+                                    return Center(
+                                      child: Text(
+                                        'Nessun contenuto nello scrigno',
+                                        style: GoogleFonts.libreFranklin(
+                                          color: HonooColor.onBackground,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w400,
                                         ),
-                                      );
-                                    }
+                                      ),
+                                    );
+                                  }
 
                                     return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: horizontalPadding),
                                       child: cs.CarouselSlider.builder(
                                         itemCount: _items.length,
                                         options: cs.CarouselOptions(
-                                          height: availableCenterH,
-                                          viewportFraction: 1.0,
-                                          enableInfiniteScroll: false,
-                                          padEnds: true,
-                                          enlargeCenterPage: false,
-                                          scrollPhysics:
-                                              const BouncingScrollPhysics(),
-                                          onPageChanged: (i, _) =>
-                                              setState(() => _currentIndex = i),
-                                        ),
+                                          height: displayHeight,
+                                        viewportFraction: 1.0,
+                                        enableInfiniteScroll: false,
+                                        padEnds: true,
+                                        enlargeCenterPage: false,
+                                        scrollPhysics:
+                                            const BouncingScrollPhysics(),
+                                        onPageChanged: (i, _) =>
+                                            setState(() => _currentIndex = i),
+                                      ),
                                         itemBuilder: (context, index, realIdx) {
                                           return Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 16),
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: horizontalPadding),
                                             child: _buildChestItem(
                                               _items[index],
                                               availableCenterH,
                                               targetMaxW,
                                               honooMetrics,
+                                              layoutMode,
                                             ),
-                                          );
-                                        },
-                                      ),
-                                    );
-                                  }(),
-                                ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }(),
                               ),
                             ),
+                          ),
                           ),
                         ),
                         SizedBox(height: footerTopSpacing),

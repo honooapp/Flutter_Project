@@ -30,6 +30,7 @@ class MoonPage extends StatefulWidget {
 class _MoonPageState extends State<MoonPage> {
   bool _isLoading = true;
   List<_MoonItem> _items = [];
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -119,12 +120,20 @@ class _MoonPageState extends State<MoonPage> {
                     .clamp(0.0, double.infinity);
             final double targetMaxWidth =
                 ResponsiveLayout.contentMaxWidth(constraints.maxWidth);
+            final bool isCompact = layoutMode == ResponsiveLayoutMode.mobile ||
+                layoutMode == ResponsiveLayoutMode.tablet;
             final HonooBuilderMetrics honooMetrics =
                 ResponsiveLayout.honooBuilderMetrics(
               availableHeight: centerHeight,
               maxWidth: targetMaxWidth,
               mode: layoutMode,
             );
+            final _MoonItem? current =
+                _items.isEmpty ? null : _items[_currentIndex];
+            final double displayHeight = current?.honoo != null
+                ? honooMetrics.height
+                : centerHeight;
+            final double horizontalPadding = isCompact ? 0 : 16;
 
             return Column(
               children: [
@@ -152,11 +161,14 @@ class _MoonPageState extends State<MoonPage> {
                       ),
                       child: SizedBox(
                         width: double.infinity,
-                        height: centerHeight,
+                        height: displayHeight,
                         child: _buildBody(
+                          displayHeight,
                           centerHeight,
                           targetMaxWidth,
                           honooMetrics,
+                          isCompact,
+                          horizontalPadding,
                         ),
                       ),
                     ),
@@ -229,9 +241,12 @@ class _MoonPageState extends State<MoonPage> {
   }
 
   Widget _buildBody(
-    double maxHeight,
+    double bodyHeight,
+    double availableHeight,
     double maxWidth,
     HonooBuilderMetrics honooMetrics,
+    bool isCompact,
+    double horizontalPadding,
   ) {
     Widget child;
     if (_isLoading) {
@@ -255,28 +270,32 @@ class _MoonPageState extends State<MoonPage> {
     } else {
       child = SizedBox(
         key: ValueKey('moon_content_${_items.length}'),
-        height: maxHeight,
+        height: bodyHeight,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
           child: cs.CarouselSlider.builder(
             itemCount: _items.length,
             options: cs.CarouselOptions(
-              height: maxHeight,
+              height: bodyHeight,
               viewportFraction: 1.0,
               enableInfiniteScroll: false,
               padEnds: true,
               enlargeCenterPage: false,
               scrollPhysics: const BouncingScrollPhysics(),
+              onPageChanged: (index, _) {
+                setState(() => _currentIndex = index);
+              },
             ),
             itemBuilder: (context, index, realIndex) {
               final item = _items[index];
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                 child: _buildMoonItem(
                   item,
-                  maxHeight,
+                  availableHeight,
                   maxWidth,
                   honooMetrics,
+                  isCompact,
                 ),
               );
             },
@@ -298,6 +317,7 @@ class _MoonPageState extends State<MoonPage> {
     double maxHeight,
     double maxWidth,
     HonooBuilderMetrics honooMetrics,
+    bool isCompact,
   ) {
     final String identity;
     final Widget content;
@@ -321,7 +341,7 @@ class _MoonPageState extends State<MoonPage> {
       content = HinooViewer(
         draft: draft,
         maxHeight: maxHeight,
-        maxWidth: maxWidth,
+        maxWidth: isCompact ? maxWidth : maxWidth.clamp(0.0, 360.0),
         gapColor: Colors.white,
       );
     }

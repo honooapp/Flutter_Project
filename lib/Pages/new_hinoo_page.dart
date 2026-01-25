@@ -472,8 +472,12 @@ class _NewHinooPageState extends State<NewHinooPage> {
                 ResponsiveLayout.footerGapForMode(layoutMode);
             final double footerBottomPadding =
                 ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
+            final double footerSpacing = footerBottomPadding + safeBottom;
+            final double footerTopSpacing = footerSpacing / 2;
+            final double footerBottomSpacing =
+                footerSpacing - footerTopSpacing;
             final double footerReserved =
-                footerIconSize + footerBottomPadding + safeBottom;
+                footerIconSize + footerTopSpacing + footerBottomSpacing;
 
             final double availableH =
                 (viewH -
@@ -573,7 +577,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
                   child: IgnorePointer(
                     ignoring: kbOpen,
                     child: ResponsiveFooterBar(
-                      bottomPadding: footerBottomPadding,
+                      bottomPadding: footerBottomSpacing,
                       desiredGap: footerGap,
                       minGap: 16,
                       height: footerIconSize,
