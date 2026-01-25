@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 
 import 'package:honoo/Utility/honoo_colors.dart';
-import 'package:honoo/Widgets/luna_fissa.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
@@ -447,9 +446,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double lunaReserve = LunaFissa.reserveTopPadding(context);
-    final double extraTop = (lunaReserve - _titleH);
-    final double contentTopPadding = extraTop > 0 ? extraTop : 0;
+    final double contentTopPadding = 0;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,

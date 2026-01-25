@@ -8,7 +8,6 @@ import '../Services/honoo_image_uploader.dart';
 import '../UI/honoo_builder.dart';
 import 'package:honoo/Services/honoo_service.dart';
 
-import '../Widgets/luna_fissa.dart';
 import 'email_login_page.dart';
 import 'chest_page.dart';
 import 'new_hinoo_page.dart';
@@ -337,10 +336,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
     const double headerH = 52;
     final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
 
-    // Padding superiore: solo la parte che serve oltre l’header per non far coprire la luna.
-    final double lunaReserve = LunaFissa.reserveTopPadding(context);
-    final double extraTop = (lunaReserve - headerH);
-    final double contentTopPadding = extraTop > 0 ? extraTop : 0;
+    final double contentTopPadding = 0;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
