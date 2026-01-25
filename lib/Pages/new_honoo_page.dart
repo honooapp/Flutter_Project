@@ -544,7 +544,6 @@ class _NewHonooPageState extends State<NewHonooPage> {
                   ),
                 ),
 
-                const LunaFissa(),
               ],
             );
           },

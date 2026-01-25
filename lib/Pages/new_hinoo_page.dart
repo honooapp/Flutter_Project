@@ -569,7 +569,6 @@ class _NewHinooPageState extends State<NewHinooPage> {
               clipBehavior: Clip.none,
               children: [
                 content,
-                const LunaFissa(),
                 Positioned(
                   bottom: 0,
                   left: 0,
