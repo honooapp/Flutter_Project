@@ -545,6 +545,7 @@ class _ChestPageState extends State<ChestPage> {
     _ChestItem item,
     double availableCenterH,
     double targetMaxW,
+    HonooBuilderMetrics honooMetrics,
   ) {
     final String identity = item.when(
       honoo: (h) {
@@ -561,8 +562,10 @@ class _ChestPageState extends State<ChestPage> {
     final GlobalKey repaintKey = _keyFor(identity);
     final bool isHonoo = item.honoo != null;
 
-    final double cardW =
-        isHonoo ? targetMaxW.clamp(0.0, 420.0) : targetMaxW.clamp(0.0, 360.0);
+    final double cardW = isHonoo
+        ? honooMetrics.width
+        : targetMaxW.clamp(0.0, 360.0);
+    final double cardMaxH = isHonoo ? honooMetrics.height : availableCenterH;
 
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
 
@@ -603,7 +606,7 @@ class _ChestPageState extends State<ChestPage> {
           child: ConstrainedBox(
             constraints: BoxConstraints(
               maxHeight:
-                  availableCenterH, // ✅ limite massimo, ma altezza reale libera
+                  cardMaxH, // ✅ limite massimo, ma altezza reale libera
               maxWidth: cardW,
             ),
             child: Stack(
@@ -685,12 +688,22 @@ class _ChestPageState extends State<ChestPage> {
                     ResponsiveLayout.footerGapForMode(layoutMode);
                 final double footerBottomPadding =
                     ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
+                final double footerSpacing = footerBottomPadding;
+                final double footerTopSpacing = footerSpacing / 2;
+                final double footerBottomSpacing =
+                    footerSpacing - footerTopSpacing;
                 final double footerReserved =
-                    footerIconSize + footerBottomPadding;
+                    footerIconSize + footerTopSpacing + footerBottomSpacing;
 
                 final double availableCenterH =
                     (availH - headerH - contentTopPadding - footerReserved)
                         .clamp(0.0, double.infinity);
+                final HonooBuilderMetrics honooMetrics =
+                    ResponsiveLayout.honooBuilderMetrics(
+                  availableHeight: availableCenterH,
+                  maxWidth: targetMaxW,
+                  mode: layoutMode,
+                );
 
                 return Stack(
                   clipBehavior: Clip.none,
@@ -774,6 +787,7 @@ class _ChestPageState extends State<ChestPage> {
                                               _items[index],
                                               availableCenterH,
                                               targetMaxW,
+                                              honooMetrics,
                                             ),
                                           );
                                         },
@@ -785,11 +799,12 @@ class _ChestPageState extends State<ChestPage> {
                             ),
                           ),
                         ),
+                        SizedBox(height: footerTopSpacing),
                         _footerForItem(
                           current,
                           iconSize: footerIconSize,
                           gap: footerGap,
-                          bottomPadding: footerBottomPadding,
+                          bottomPadding: footerBottomSpacing,
                         ),
                       ],
                     ),

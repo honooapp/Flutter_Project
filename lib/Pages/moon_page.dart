@@ -108,13 +108,23 @@ class _MoonPageState extends State<MoonPage> {
                 ResponsiveLayout.footerGapForMode(layoutMode);
             final double footerBottomPadding =
                 ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
+            final double footerSpacing = footerBottomPadding;
+            final double footerTopSpacing = footerSpacing / 2;
+            final double footerBottomSpacing =
+                footerSpacing - footerTopSpacing;
             final double footerReserved =
-                footerIconSize + footerBottomPadding;
+                footerIconSize + footerTopSpacing + footerBottomSpacing;
             final double centerHeight =
                 (availHeight - headerHeight - footerReserved)
                     .clamp(0.0, double.infinity);
             final double targetMaxWidth =
                 ResponsiveLayout.contentMaxWidth(constraints.maxWidth);
+            final HonooBuilderMetrics honooMetrics =
+                ResponsiveLayout.honooBuilderMetrics(
+              availableHeight: centerHeight,
+              maxWidth: targetMaxWidth,
+              mode: layoutMode,
+            );
 
             return Column(
               children: [
@@ -143,14 +153,19 @@ class _MoonPageState extends State<MoonPage> {
                       child: SizedBox(
                         width: double.infinity,
                         height: centerHeight,
-                        child: _buildBody(centerHeight, targetMaxWidth),
+                        child: _buildBody(
+                          centerHeight,
+                          targetMaxWidth,
+                          honooMetrics,
+                        ),
                       ),
                     ),
                   ),
                 ),
+                SizedBox(height: footerTopSpacing),
                 ResponsiveFooterBar(
                   useSafeArea: false,
-                  bottomPadding: footerBottomPadding,
+                  bottomPadding: footerBottomSpacing,
                   desiredGap: footerGap,
                   minGap: 16,
                   height: footerIconSize,
@@ -213,7 +228,11 @@ class _MoonPageState extends State<MoonPage> {
     );
   }
 
-  Widget _buildBody(double maxHeight, double maxWidth) {
+  Widget _buildBody(
+    double maxHeight,
+    double maxWidth,
+    HonooBuilderMetrics honooMetrics,
+  ) {
     Widget child;
     if (_isLoading) {
       child = const Center(
@@ -253,7 +272,12 @@ class _MoonPageState extends State<MoonPage> {
               final item = _items[index];
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _buildMoonItem(item, maxHeight, maxWidth),
+                child: _buildMoonItem(
+                  item,
+                  maxHeight,
+                  maxWidth,
+                  honooMetrics,
+                ),
               );
             },
           ),
@@ -269,7 +293,12 @@ class _MoonPageState extends State<MoonPage> {
     );
   }
 
-  Widget _buildMoonItem(_MoonItem item, double maxHeight, double maxWidth) {
+  Widget _buildMoonItem(
+    _MoonItem item,
+    double maxHeight,
+    double maxWidth,
+    HonooBuilderMetrics honooMetrics,
+  ) {
     final String identity;
     final Widget content;
 
@@ -280,7 +309,11 @@ class _MoonPageState extends State<MoonPage> {
       final String fallback =
           localId != 0 ? localId.toString() : item.createdAt.toIso8601String();
       identity = 'moon_honoo_${dbId ?? fallback}';
-      content = HonooThreadView(root: honoo);
+      content = SizedBox(
+        width: honooMetrics.width,
+        height: honooMetrics.height,
+        child: HonooThreadView(root: honoo),
+      );
     } else {
       final draft = item.hinoo!;
       identity =

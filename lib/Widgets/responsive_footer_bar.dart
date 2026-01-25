@@ -49,6 +49,9 @@ class ResponsiveFooterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isPhone = MediaQuery.of(context).size.shortestSide < 600;
+    final double effectiveDesiredGap = isPhone ? desiredGap + 4 : desiredGap;
+    final double effectiveMinGap = isPhone ? minGap + 2 : minGap;
     final Widget bar = Padding(
       padding: EdgeInsets.only(bottom: bottomPadding),
       child: LayoutBuilder(
@@ -61,17 +64,20 @@ class ResponsiveFooterBar extends StatelessWidget {
             (sum, action) => sum + action.size,
           );
           final int gapCount = math.max(0, actions.length - 1);
-          double gap = desiredGap;
+          double gap = effectiveDesiredGap;
 
           if (availableWidth.isFinite && gapCount > 0) {
             final double maxGap =
                 (availableWidth - totalIconWidth) / gapCount;
-            if (lockGapWhenPossible && maxGap >= desiredGap) {
-              gap = desiredGap;
-            } else if (maxGap <= minGap) {
+            if (lockGapWhenPossible && maxGap >= effectiveDesiredGap) {
+              gap = effectiveDesiredGap;
+            } else if (maxGap <= effectiveMinGap) {
               gap = math.max(0, maxGap);
             } else {
-              gap = math.max(minGap, math.min(desiredGap, maxGap));
+              gap = math.max(
+                effectiveMinGap,
+                math.min(effectiveDesiredGap, maxGap),
+              );
             }
           }
 

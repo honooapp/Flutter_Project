@@ -29,6 +29,20 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     final double footerBottomPadding =
         ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
     final double footerGap = ResponsiveLayout.footerGapForMode(layoutMode);
+    final double footerSidePadding;
+    switch (layoutMode) {
+      case ResponsiveLayoutMode.mobile:
+        footerSidePadding = 16;
+        break;
+      case ResponsiveLayoutMode.tablet:
+        footerSidePadding = 20;
+        break;
+      case ResponsiveLayoutMode.desktop:
+      case ResponsiveLayoutMode.wideDesktop:
+      case ResponsiveLayoutMode.largeDesktop:
+        footerSidePadding = 24;
+        break;
+    }
     final double contentWidth;
     if (isPhone) {
       contentWidth = screenWidth;
@@ -118,28 +132,31 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
               ),
             ),
           ),
-          ResponsiveFooterBar(
-            useSafeArea: false,
-            bottomPadding: footerBottomPadding,
-            desiredGap: footerGap,
-            minGap: 16,
-            height: footerIconSize,
-            mainAxisAlignment: MainAxisAlignment.start,
-            alignment: Alignment.centerLeft,
-            actions: [
-              ResponsiveFooterAction(
-                asset: "assets/icons/home.svg",
-                semanticsLabel: 'Home',
-                size: footerIconSize,
-                tooltip: 'Home',
-                onPressed: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (_) => const HomePage()),
-                    (route) => false,
-                  );
-                },
-              ),
-            ],
+          Padding(
+            padding: EdgeInsets.only(left: footerSidePadding),
+            child: ResponsiveFooterBar(
+              useSafeArea: false,
+              bottomPadding: footerBottomPadding,
+              desiredGap: footerGap,
+              minGap: 16,
+              height: footerIconSize,
+              mainAxisAlignment: MainAxisAlignment.start,
+              alignment: Alignment.centerLeft,
+              actions: [
+                ResponsiveFooterAction(
+                  asset: "assets/icons/home.svg",
+                  semanticsLabel: 'Home',
+                  size: footerIconSize,
+                  tooltip: 'Home',
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const HomePage()),
+                      (route) => false,
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),

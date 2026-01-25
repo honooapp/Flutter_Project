@@ -1,4 +1,7 @@
+import 'dart:math' as math;
 import 'dart:ui';
+
+import 'package:honoo/UI/honoo_builder.dart';
 
 enum ResponsiveLayoutMode {
   mobile,
@@ -60,7 +63,7 @@ class ResponsiveLayout {
   static double footerIconSizeForMode(ResponsiveLayoutMode mode) {
     switch (mode) {
       case ResponsiveLayoutMode.mobile:
-        return 42;
+        return 39;
       case ResponsiveLayoutMode.tablet:
         return 52;
       case ResponsiveLayoutMode.desktop:
@@ -96,4 +99,49 @@ class ResponsiveLayout {
         return 10;
     }
   }
+
+  static HonooBuilderMetrics honooBuilderMetrics({
+    required double availableHeight,
+    required double maxWidth,
+    required ResponsiveLayoutMode mode,
+  }) {
+    const double builderRatio = 1.5;
+    final double gap = HonooBuilder.baselineGap;
+    final double maxImageByWidth = maxWidth;
+    final double maxImageByHeight =
+        ((availableHeight - gap) / builderRatio).clamp(0.0, double.infinity);
+
+    double imageSize = math.min(maxImageByWidth, maxImageByHeight);
+    if (mode != ResponsiveLayoutMode.mobile) {
+      imageSize = math.max(imageSize, HonooBuilder.baselineImageSize);
+    }
+
+    if (!imageSize.isFinite || imageSize <= 0) {
+      imageSize = maxWidth;
+      if (mode != ResponsiveLayoutMode.mobile) {
+        imageSize = math.max(imageSize, HonooBuilder.baselineImageSize);
+      }
+    }
+
+    final double builderWidth = imageSize;
+    final double builderHeight = imageSize * builderRatio + gap;
+
+    return HonooBuilderMetrics(
+      imageSize: imageSize,
+      width: builderWidth,
+      height: builderHeight,
+    );
+  }
+}
+
+class HonooBuilderMetrics {
+  final double imageSize;
+  final double width;
+  final double height;
+
+  const HonooBuilderMetrics({
+    required this.imageSize,
+    required this.width,
+    required this.height,
+  });
 }

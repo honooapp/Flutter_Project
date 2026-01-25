@@ -1,6 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Services/supabase_provider.dart';
@@ -366,10 +364,14 @@ class _NewHonooPageState extends State<NewHonooPage> {
             final double footerBottomPadding =
                 ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
             final double footerContentH = footerIconSize;
+            final double footerSpacing = footerBottomPadding + safeBottom;
+            final double footerTopSpacing = footerSpacing / 2;
+            final double footerBottomSpacing =
+                footerSpacing - footerTopSpacing;
 
             // Altezza riservata al footer (3 pulsanti)
             final double footerReserved =
-                footerContentH + footerBottomPadding + safeBottom;
+                footerContentH + footerTopSpacing + footerBottomSpacing;
             const double controlsH = 44.0;
 
             // Altezza disponibile per il box honoo
@@ -380,28 +382,14 @@ class _NewHonooPageState extends State<NewHonooPage> {
                     footerReserved)
                 .clamp(0.0, double.infinity);
 
-            const double gap = HonooBuilder.baselineGap;
-            const double builderRatio = 1.5; // totale = imageSize * 1.5 + gap
-
-            final double maxImageByWidth = targetMaxW;
-            final double maxImageByHeight =
-                ((availableH - gap) / builderRatio).clamp(0.0, double.infinity);
-
-            double imageSize = math.min(maxImageByWidth, maxImageByHeight);
-            if (layoutMode != ResponsiveLayoutMode.mobile) {
-              imageSize =
-                  math.max(imageSize, HonooBuilder.baselineImageSize);
-            }
-            if (!imageSize.isFinite || imageSize <= 0) {
-              imageSize = math.min(targetMaxW, viewW);
-              if (layoutMode != ResponsiveLayoutMode.mobile) {
-                imageSize =
-                    math.max(imageSize, HonooBuilder.baselineImageSize);
-              }
-            }
-
-            final double builderWidth = imageSize;
-            final double builderHeight = imageSize * builderRatio + gap;
+            final HonooBuilderMetrics metrics =
+                ResponsiveLayout.honooBuilderMetrics(
+              availableHeight: availableH,
+              maxWidth: targetMaxW,
+              mode: layoutMode,
+            );
+            final double builderWidth = metrics.width;
+            final double builderHeight = metrics.height;
 
             return Stack(
               clipBehavior: Clip.none,
@@ -482,7 +470,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                   left: 0,
                   right: 0,
                   child: ResponsiveFooterBar(
-                    bottomPadding: footerBottomPadding,
+                    bottomPadding: footerBottomSpacing,
                     desiredGap: footerGap,
                     minGap: 16,
                     height: footerContentH,
