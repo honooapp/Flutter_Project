@@ -336,7 +336,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
     const double headerH = 52;
     final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
 
-    final double contentTopPadding = 0;
+    const double contentTopPadding = 0;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -407,7 +407,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: contentTopPadding),
+                    const SizedBox(height: contentTopPadding),
                     SizedBox(
                       height: controlsH,
                       child: Center(

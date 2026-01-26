@@ -42,8 +42,8 @@ class _HinooViewerState extends State<HinooViewer> {
 
   @override
   Widget build(BuildContext context) {
-    final double baselineW = HinooTypography.baselineCanvasWidth;
-    final double baselineH = HinooTypography.baselineCanvasHeight;
+    const double baselineW = HinooTypography.baselineCanvasWidth;
+    const double baselineH = HinooTypography.baselineCanvasHeight;
 
     double scale = 1.0;
     if (widget.maxWidth.isFinite &&

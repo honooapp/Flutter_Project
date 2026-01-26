@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:characters/characters.dart';
 
 class WidthLimitedMultilineField extends StatefulWidget {
   const WidthLimitedMultilineField({

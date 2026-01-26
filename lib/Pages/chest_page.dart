@@ -467,7 +467,7 @@ class _ChestPageState extends State<ChestPage> {
       honoo: (_) => true,
       hinoo: (row) {
         final int totalChars = row.draft.pages
-            .map((p) => (p.text ?? '').trim().length)
+            .map((p) => p.text.trim().length)
             .fold<int>(0, (a, b) => a + b);
         return totalChars >= 1;
       },
@@ -595,7 +595,7 @@ class _ChestPageState extends State<ChestPage> {
     // ✅ La "card reale" (bianca) è questa:
     final Widget card = ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child: Container(
+      child: SizedBox(
         width: cardW,
         // niente height fissa qui!
         child: RepaintBoundary(

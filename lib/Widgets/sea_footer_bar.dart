@@ -76,9 +76,9 @@ class SeaFooterBar extends StatelessWidget {
                 bottom: safeBottom,
                 left: bottleX,
                 child: Transform.translate(
-                  offset: Offset(0, -height * 0.24),
+                  offset: const Offset(0, -height * 0.24),
                   child: IconButton(
-                    constraints: BoxConstraints.tightFor(
+                    constraints: const BoxConstraints.tightFor(
                       width: bottleSize,
                       height: bottleSize,
                     ),
@@ -121,9 +121,9 @@ class SeaFooterBar extends StatelessWidget {
                 bottom: safeBottom,
                 left: islandX,
                 child: Transform.translate(
-                  offset: Offset(0, height * 0.15),
+                  offset: const Offset(0, height * 0.15),
                   child: IconButton(
-                    constraints: BoxConstraints.tightFor(
+                    constraints: const BoxConstraints.tightFor(
                       width: islandSize,
                       height: islandSize,
                     ),
@@ -159,9 +159,9 @@ class SeaFooterBar extends StatelessWidget {
                 bottom: safeBottom,
                 left: chestX,
                 child: Transform.translate(
-                  offset: Offset(0, height * 0.01),
+                  offset: const Offset(0, height * 0.01),
                   child: IconButton(
-                    constraints: BoxConstraints.tightFor(
+                    constraints: const BoxConstraints.tightFor(
                       width: chestSize,
                       height: chestSize,
                     ),

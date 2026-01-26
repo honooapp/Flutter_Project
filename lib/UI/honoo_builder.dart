@@ -317,7 +317,7 @@ class HonooBuilderState extends State<HonooBuilder> {
 
     final Uint8List? bytes = await _captureHonooAsPng();
     if (bytes == null || bytes.isEmpty) {
-      if (!mounted) return;
+      if (!context.mounted) return;
       showHonooToast(context, message: 'Impossibile generare il file PNG.');
       return;
     }
@@ -335,7 +335,7 @@ class HonooBuilderState extends State<HonooBuilder> {
       [DownloadImage(filename: '$rawName.png', bytes: bytes)],
     );
 
-    if (!mounted) return;
+    if (!context.mounted) return;
     showHonooToast(context, message: 'Download avviato.');
   }
 
@@ -376,9 +376,8 @@ class HonooBuilderState extends State<HonooBuilder> {
         if (availW <= 0 || availH <= 0) return const SizedBox.shrink();
 
         const double eps = 0.5;
-        final double baselineTextHeight = HonooBuilder.baselineTextHeight;
-        final double baselineTotalHeight =
-            HonooBuilder.baselineTotalHeight;
+        const double baselineTextHeight = HonooBuilder.baselineTextHeight;
+        const double baselineTotalHeight = HonooBuilder.baselineTotalHeight;
 
         final double scaleW = availW / HonooBuilder.baselineImageSize;
         final double scaleH = (availH - eps) / baselineTotalHeight;

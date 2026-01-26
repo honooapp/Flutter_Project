@@ -446,7 +446,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double contentTopPadding = 0;
+    const double contentTopPadding = 0;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -514,7 +514,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
                     ),
                   ),
                 ),
-                SizedBox(height: contentTopPadding),
+                const SizedBox(height: contentTopPadding),
                 SizedBox(
                   height: availableH,
                   child: Center(

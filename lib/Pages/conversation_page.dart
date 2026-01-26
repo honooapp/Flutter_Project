@@ -202,7 +202,7 @@ class _ConversationPageState extends State<ConversationPage> {
                               final honoo = _thread[_currentIndex];
                               final saved =
                                   await HonooController().saveToChest(honoo);
-                              if (!mounted) return;
+                              if (!context.mounted) return;
                               showHonooToast(
                                 context,
                                 message: saved
@@ -210,7 +210,7 @@ class _ConversationPageState extends State<ConversationPage> {
                                     : 'Era già nel tuo Scrigno.',
                               );
                             } catch (e) {
-                              if (!mounted) return;
+                              if (!context.mounted) return;
                               showHonooToast(
                                 context,
                                 message: 'Errore durante il salvataggio: $e',

@@ -245,10 +245,11 @@ class _HinooBuilderState extends State<HinooBuilder> {
     String? baseName,
   }) async {
     if (!mounted) return;
+    final BuildContext currentContext = context;
     final HinooExportMode exportMode = _resolveExportMode();
     bool progressVisible = false;
     final NavigatorState rootNavigator =
-        Navigator.of(context, rootNavigator: true);
+        Navigator.of(currentContext, rootNavigator: true);
     Future<void> dismissProgressDialogIfNeeded() async {
       if (!mounted || !progressVisible) {
         return;
@@ -263,7 +264,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
       progressVisible = true;
       // ignore: unawaited_futures
       showDialog(
-        context: context,
+        context: currentContext,
         barrierDismissible: false,
         builder: (_) => const DownloadProgressDialog(),
       ).whenComplete(() => progressVisible = false);
@@ -306,20 +307,18 @@ class _HinooBuilderState extends State<HinooBuilder> {
         images,
         message: 'hinoo creati con honoo',
       );
-      if (!mounted) return;
       await dismissProgressDialogIfNeeded();
-      if (!mounted) return;
-      // ignore: use_build_context_synchronously
+      if (!context.mounted) return;
       showHonooToast(
-        context,
+        currentContext,
         message: message,
       );
     } catch (e) {
-      if (mounted) {
+      if (context.mounted) {
         await dismissProgressDialogIfNeeded();
-        // ignore: use_build_context_synchronously
+        if (!context.mounted) return;
         showHonooToast(
-          context,
+          currentContext,
           message: 'Errore download: $e',
         );
       }
@@ -482,8 +481,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
       builder: (context, constraints) {
         final double maxW = constraints.maxWidth;
         final double maxH = constraints.maxHeight;
-        final double baselineW = HinooTypography.baselineCanvasWidth;
-        final double baselineH = HinooTypography.baselineCanvasHeight;
+        const double baselineW = HinooTypography.baselineCanvasWidth;
+        const double baselineH = HinooTypography.baselineCanvasHeight;
 
         double scale = 1.0;
         if (maxW.isFinite && maxW > 0 && maxH.isFinite && maxH > 0) {

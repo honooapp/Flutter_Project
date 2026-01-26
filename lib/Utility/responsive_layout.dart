@@ -106,7 +106,7 @@ class ResponsiveLayout {
     required ResponsiveLayoutMode mode,
   }) {
     const double builderRatio = 1.5;
-    final double gap = HonooBuilder.baselineGap;
+    const double gap = HonooBuilder.baselineGap;
     final double maxImageByWidth = maxWidth;
     final double maxImageByHeight =
         ((availableHeight - gap) / builderRatio).clamp(0.0, double.infinity);
