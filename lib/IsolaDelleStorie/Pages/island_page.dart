@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/IsolaDelleStorie/Controller/exercise_controller.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/exercise_page.dart';
-import 'package:honoo/IsolaDelleStorie/Pages/campanelli_page.dart';
+import 'package:honoo/IsolaDelleStorie/Pages/full_island_page.dart';
 import 'package:honoo/IsolaDelleStorie/Utility/isola_delle_storie_content_manager.dart';
 import 'package:honoo/Pages/chest_page.dart';
 import 'package:honoo/Utility/formatted_text.dart';
@@ -309,7 +309,7 @@ class _IslandPageState extends State<IslandPage> {
                                                       .pushAndRemoveUntil(
                                                     MaterialPageRoute(
                                                         builder: (_) =>
-                                                            const CampanelliPage()),
+                                                            const FullIslandPage()),
                                                     (route) => false,
                                                   );
                                                 },

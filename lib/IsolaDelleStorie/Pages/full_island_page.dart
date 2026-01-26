@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:honoo/IsolaDelleStorie/Pages/campanelli_page.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/island_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/IsolaDelleStorie/Utility/isola_delle_storie_content_manager.dart';
@@ -208,6 +209,29 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                                 fontSize: 18,
                                               ),
                                               const SizedBox(height: 0),
+                                              InkWell(
+                                                onTap: () {
+                                                  Navigator.of(context)
+                                                      .pushAndRemoveUntil(
+                                                    MaterialPageRoute(
+                                                        builder: (_) =>
+                                                            const CampanelliPage()),
+                                                    (route) => false,
+                                                  );
+                                                },
+                                                child: Text(
+                                                  'clicca qui',
+                                                  style: GoogleFonts.arvo(
+                                                    color:
+                                                        HonooColor.onBackground,
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w700,
+                                                    decoration: TextDecoration
+                                                        .underline,
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
                                               InkWell(
                                                 onTap: () {
                                                   Navigator.of(context)
