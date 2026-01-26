@@ -317,7 +317,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
   }
 
   double _contentMaxWidth(double w) {
-    if (w < 480) return w * 0.94;
+    if (w < 480) return w;
     if (w < 768) return w * 0.92;
     if (w < 1024) return w * 0.84;
     if (w < 1440) return w * 0.70;

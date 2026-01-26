@@ -11,6 +11,7 @@ class ResponsiveFooterAction {
   final String? semanticsLabel;
   final ColorFilter? colorFilter;
   final double? splashRadius;
+  final Widget? icon;
 
   const ResponsiveFooterAction({
     required this.asset,
@@ -20,6 +21,7 @@ class ResponsiveFooterAction {
     this.semanticsLabel,
     this.colorFilter,
     this.splashRadius,
+    this.icon,
   });
 }
 
@@ -116,19 +118,22 @@ class _FooterIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Widget iconWidget = action.icon ??
+        SvgPicture.asset(
+          action.asset,
+          semanticsLabel: action.semanticsLabel,
+          colorFilter: action.colorFilter,
+          width: action.size,
+          height: action.size,
+        );
+
     return IconButton(
       constraints: BoxConstraints.tightFor(
         width: action.size,
         height: action.size,
       ),
       padding: EdgeInsets.zero,
-      icon: SvgPicture.asset(
-        action.asset,
-        semanticsLabel: action.semanticsLabel,
-        colorFilter: action.colorFilter,
-        width: action.size,
-        height: action.size,
-      ),
+      icon: iconWidget,
       iconSize: action.size,
       splashRadius: action.splashRadius ?? action.size * 0.5,
       tooltip: action.tooltip,

@@ -61,8 +61,8 @@ class HinooTypography {
 
   /// Calculate vertical padding (can scale slightly for very large/small screens)
   static double verticalPadding(double canvasWidth) {
-    // Keep it mostly fixed, but allow some scaling for extreme sizes
-    final scale = (canvasWidth / baselineCanvasWidth).clamp(0.8, 2.0);
+    // Keep it consistent with smartphone proportions
+    final scale = (canvasWidth / baselineCanvasWidth).clamp(0.8, 1.0);
     return verticalPaddingBase * scale;
   }
 

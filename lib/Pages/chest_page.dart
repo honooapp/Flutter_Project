@@ -685,10 +685,12 @@ class _ChestPageState extends State<ChestPage> {
               builder: (context, constraints) {
                 final availH = constraints.maxHeight;
 
-                final double targetMaxW =
-                    ResponsiveLayout.contentMaxWidth(constraints.maxWidth);
                 final ResponsiveLayoutMode layoutMode =
                     ResponsiveLayout.modeForWidth(constraints.maxWidth);
+                final double targetMaxW =
+                    layoutMode == ResponsiveLayoutMode.mobile
+                        ? constraints.maxWidth
+                        : ResponsiveLayout.contentMaxWidth(constraints.maxWidth);
                 final double footerIconSize =
                     ResponsiveLayout.footerIconSizeForMode(layoutMode);
                 final double footerGap =

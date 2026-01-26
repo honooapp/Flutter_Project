@@ -54,6 +54,9 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
               maxLines: HinooTypography.maxLines,
               maxCharsPerLine: HinooTypography.maxCharsPerLine,
               horizontalPadding: EdgeInsets.zero,
+              scrollPadding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+              ),
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 isCollapsed: true,

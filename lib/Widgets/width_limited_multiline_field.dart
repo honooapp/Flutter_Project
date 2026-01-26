@@ -34,6 +34,7 @@ class WidthLimitedMultilineField extends StatefulWidget {
     this.cursorColor,
     this.cursorWidth,
     this.cursorRadius,
+    this.scrollPadding,
     this.allowFontShrink = false,
   });
 
@@ -64,6 +65,7 @@ class WidthLimitedMultilineField extends StatefulWidget {
   final Color? cursorColor;
   final double? cursorWidth;
   final Radius? cursorRadius;
+  final EdgeInsets? scrollPadding;
   final bool allowFontShrink;
 
   @override
@@ -318,6 +320,8 @@ class _WidthLimitedMultilineFieldState
           textAlign: TextAlign.center,
           textAlignVertical: TextAlignVertical.top,
           inputFormatters: allFormatters,
+          scrollPadding:
+              widget.scrollPadding ?? const EdgeInsets.only(bottom: 24),
           scrollController: _scrollController,
           scrollPhysics: widget.scrollPhysics ?? const ClampingScrollPhysics(),
           decoration: effectiveDecoration,

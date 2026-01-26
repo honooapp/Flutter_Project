@@ -118,8 +118,9 @@ class _MoonPageState extends State<MoonPage> {
             final double centerHeight =
                 (availHeight - headerHeight - footerReserved)
                     .clamp(0.0, double.infinity);
-            final double targetMaxWidth =
-                ResponsiveLayout.contentMaxWidth(constraints.maxWidth);
+            final double targetMaxWidth = layoutMode == ResponsiveLayoutMode.mobile
+                ? constraints.maxWidth
+                : ResponsiveLayout.contentMaxWidth(constraints.maxWidth);
             final bool isCompact = layoutMode == ResponsiveLayoutMode.mobile ||
                 layoutMode == ResponsiveLayoutMode.tablet;
             final HonooBuilderMetrics honooMetrics =
