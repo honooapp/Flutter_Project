@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:honoo/Utility/honoo_colors.dart';
@@ -18,23 +17,65 @@ class CampanelliPage extends StatefulWidget {
 }
 
 class _CampanelliPageState extends State<CampanelliPage> {
-  int _currentIndex = 0;
+  int _campanelloIndex = 0;
+  final PageController _pageController = PageController();
 
-  static const String _example1Bg = 'assets/campanello1.png';
-  static const String _example2Bg = 'assets/campanello2.png';
+  static const String campanelloSirenaId = 'campanello_sirena';
+  static const String campanelloPalombaroId = 'campanello_palombaro';
+  static const String casaSirenaId = 'casa_sirena';
+  static const String casaPalombaroId = 'casa_palombaro';
+  static const String campanelloSirenaBg = 'assets/campanello1.png';
+  static const String campanelloPalombaroBg = 'assets/campanello2.png';
+  static const String casaSirenaBg =
+      'assets/images/casa_sirena_con_scrigno.png';
+  static const String casaPalombaroBg =
+      'assets/images/casa_palombaro_con_scrigno.png';
+  static const String scrignoOverlay = 'assets/icons/scrigno_di_carta.png';
 
-  List<_CampanelloCardData> _buildPages() {
+  List<CampanelloData> _buildCampanelli() {
     return [
-      _CampanelloCardData.intro(Utility().campanelliText),
-      _CampanelloCardData.example(
-        backgroundAsset: _example1Bg,
+      CampanelloData(
+        id: campanelloSirenaId,
+        backgroundAsset: campanelloSirenaBg,
         text: Utility().campanelloExample1Text,
+        linkedHouseId: casaSirenaId,
       ),
-      _CampanelloCardData.example(
-        backgroundAsset: _example2Bg,
+      CampanelloData(
+        id: campanelloPalombaroId,
+        backgroundAsset: campanelloPalombaroBg,
         text: Utility().campanelloExample2Text,
+        linkedHouseId: casaPalombaroId,
       ),
     ];
+  }
+
+  Map<String, CasaData> _buildCase() {
+    return {
+      casaSirenaId: const CasaData(
+        id: casaSirenaId,
+        backgroundAsset: casaSirenaBg,
+      ),
+      casaPalombaroId: const CasaData(
+        id: casaPalombaroId,
+        backgroundAsset: casaPalombaroBg,
+      ),
+    };
+  }
+
+  List<_CampanelloPageData> _buildCampanelloPages(
+    List<CampanelloData> campanelli,
+  ) {
+    return [
+      _CampanelloPageData.intro(Utility().campanelliText),
+      for (final campanello in campanelli)
+        _CampanelloPageData.campanello(campanello),
+    ];
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -72,92 +113,120 @@ class _CampanelliPageState extends State<CampanelliPage> {
             availableHeight,
             HinooTypography.aspectRatio,
           );
-          final List<_CampanelloCardData> pages = _buildPages();
+          final List<CampanelloData> campanelli = _buildCampanelli();
+          final Map<String, CasaData> caseMap = _buildCase();
+          final List<_CampanelloPageData> campanelloPages =
+              _buildCampanelloPages(campanelli);
 
-          final bool showCampanello = _currentIndex > 0;
+          final bool showCampanello = _campanelloIndex > 0;
+          final bool showFooter = _pageController.hasClients
+              ? (_pageController.page?.round() ?? 0) == 0
+              : true;
+          final ScrollPhysics pagePhysics = const PageScrollPhysics()
+              .applyTo(const BouncingScrollPhysics());
 
           return Stack(
             fit: StackFit.expand,
             clipBehavior: Clip.none,
             children: [
-              Center(
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 90),
-                  curve: Curves.easeOutCubic,
-                  constraints: BoxConstraints(maxWidth: targetMaxWidth),
-                  child: SizedBox(
-                    width: canvasSize.width,
-                    height: canvasSize.height,
-                    child: cs.CarouselSlider.builder(
-                      itemCount: pages.length,
-                      options: cs.CarouselOptions(
-                        height: canvasSize.height,
-                        viewportFraction: 1.0,
-                        enableInfiniteScroll: false,
-                        padEnds: true,
-                        enlargeCenterPage: false,
-                        scrollPhysics: const BouncingScrollPhysics(),
-                        onPageChanged: (index, _) {
-                          setState(() => _currentIndex = index);
-                        },
-                      ),
-                      itemBuilder: (context, index, realIdx) {
-                        return _CampanelloCard(
-                          data: pages[index],
-                          width: canvasSize.width,
-                          height: canvasSize.height,
-                        );
-                      },
-                    ),
-                  ),
+              SizedBox(
+                height: availableHeight,
+                child: PageView.builder(
+                  controller: _pageController,
+                  scrollDirection: Axis.vertical,
+                  physics: pagePhysics,
+                  itemCount: 1 + campanelli.length,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return Center(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 90),
+                          curve: Curves.easeOutCubic,
+                          constraints: BoxConstraints(maxWidth: targetMaxWidth),
+                          child: SizedBox(
+                            width: canvasSize.width,
+                            height: canvasSize.height,
+                            child: PageView.builder(
+                              scrollDirection: Axis.horizontal,
+                              physics: pagePhysics,
+                              itemCount: campanelloPages.length,
+                              onPageChanged: (index) {
+                                setState(() => _campanelloIndex = index);
+                              },
+                              itemBuilder: (context, pageIndex) {
+                                return _CampanelloCard(
+                                  data: campanelloPages[pageIndex],
+                                  width: canvasSize.width,
+                                  height: canvasSize.height,
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+
+                    final campanello = campanelli[index - 1];
+                    return _CasaSection(
+                      casa: caseMap[campanello.linkedHouseId]!,
+                      scrignoAsset: scrignoOverlay,
+                      footerIconSize: footerIconSize,
+                      footerBottomSpacing: footerBottomSpacing,
+                      width: maxWidth,
+                      height: availableHeight,
+                    );
+                  },
+                  onPageChanged: (_) => setState(() {}),
                 ),
               ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: ResponsiveFooterBar(
-                  useSafeArea: false,
-                  bottomPadding: footerBottomSpacing,
-                  desiredGap: footerGap,
-                  minGap: 16,
-                  height: footerIconSize,
-                  actions: [
-                    ResponsiveFooterAction(
-                      asset: "assets/icons/home.svg",
-                      semanticsLabel: 'Home',
-                      colorFilter: const ColorFilter.mode(
-                        HonooColor.onBackground,
-                        BlendMode.srcIn,
-                      ),
-                      size: footerIconSize,
-                      splashRadius: 25,
-                      tooltip: 'Home',
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (_) => const HomePage()),
-                          (route) => false,
-                        );
-                      },
-                    ),
-                    if (showCampanello)
+              if (showFooter)
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: ResponsiveFooterBar(
+                    useSafeArea: false,
+                    bottomPadding: footerBottomSpacing,
+                    desiredGap: footerGap,
+                    minGap: 16,
+                    height: footerIconSize,
+                    actions: [
                       ResponsiveFooterAction(
-                        asset: "assets/icons/campanello_bianco.png",
-                        semanticsLabel: 'Campanello',
+                        asset: "assets/icons/home.svg",
+                        semanticsLabel: 'Home',
+                        colorFilter: const ColorFilter.mode(
+                          HonooColor.onBackground,
+                          BlendMode.srcIn,
+                        ),
                         size: footerIconSize,
                         splashRadius: 25,
-                        tooltip: 'Campanello',
-                        onPressed: () {},
-                        icon: Image.asset(
-                          "assets/icons/campanello_bianco.png",
-                          width: footerIconSize,
-                          height: footerIconSize,
-                          fit: BoxFit.contain,
-                        ),
+                        tooltip: 'Home',
+                        onPressed: () {
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (_) => const HomePage()),
+                            (route) => false,
+                          );
+                        },
                       ),
-                  ],
+                      if (showCampanello)
+                        ResponsiveFooterAction(
+                          asset: "assets/icons/campanello_bianco.png",
+                          semanticsLabel: 'Campanello',
+                          size: footerIconSize,
+                          splashRadius: 25,
+                          tooltip: 'Campanello',
+                          onPressed: () {},
+                          icon: Image.asset(
+                            "assets/icons/campanello_bianco.png",
+                            width: footerIconSize,
+                            height: footerIconSize,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
             ],
           );
         },
@@ -166,32 +235,54 @@ class _CampanelliPageState extends State<CampanelliPage> {
   }
 }
 
-class _CampanelloCardData {
-  final String? backgroundAsset;
+class CampanelloData {
+  final String id;
+  final String backgroundAsset;
   final String text;
-  final bool isIntro;
+  final String linkedHouseId;
 
-  const _CampanelloCardData._({
+  const CampanelloData({
+    required this.id,
+    required this.backgroundAsset,
     required this.text,
+    required this.linkedHouseId,
+  });
+}
+
+class CasaData {
+  final String id;
+  final String backgroundAsset;
+
+  const CasaData({
+    required this.id,
+    required this.backgroundAsset,
+  });
+}
+
+class _CampanelloPageData {
+  final bool isIntro;
+  final String text;
+  final CampanelloData? campanello;
+
+  const _CampanelloPageData._({
     required this.isIntro,
-    this.backgroundAsset,
+    required this.text,
+    this.campanello,
   });
 
-  factory _CampanelloCardData.intro(String text) {
-    return _CampanelloCardData._(text: text, isIntro: true);
+  factory _CampanelloPageData.intro(String text) {
+    return _CampanelloPageData._(isIntro: true, text: text);
   }
 
-  factory _CampanelloCardData.example({
-    required String backgroundAsset,
-    required String text,
-  }) {
-    return _CampanelloCardData._(
-      text: text,
+  factory _CampanelloPageData.campanello(CampanelloData campanello) {
+    return _CampanelloPageData._(
       isIntro: false,
-      backgroundAsset: backgroundAsset,
+      text: campanello.text,
+      campanello: campanello,
     );
   }
 }
+
 
 class _CampanelloCard extends StatelessWidget {
   const _CampanelloCard({
@@ -200,7 +291,7 @@ class _CampanelloCard extends StatelessWidget {
     required this.height,
   });
 
-  final _CampanelloCardData data;
+  final _CampanelloPageData data;
   final double width;
   final double height;
 
@@ -248,13 +339,61 @@ class _CampanelloCard extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               Image.asset(
-                data.backgroundAsset!,
+                data.campanello!.backgroundAsset,
                 fit: BoxFit.cover,
               ),
               text,
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _CasaSection extends StatelessWidget {
+  const _CasaSection({
+    required this.casa,
+    required this.scrignoAsset,
+    required this.footerIconSize,
+    required this.footerBottomSpacing,
+    required this.width,
+    required this.height,
+  });
+
+  final CasaData casa;
+  final String scrignoAsset;
+  final double footerIconSize;
+  final double footerBottomSpacing;
+  final double width;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      height: height,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            casa.backgroundAsset,
+            fit: BoxFit.cover,
+          ),
+          Positioned(
+            bottom: footerBottomSpacing,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Image.asset(
+                scrignoAsset,
+                width: footerIconSize,
+                height: footerIconSize,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
