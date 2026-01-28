@@ -185,7 +185,7 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                               child: AspectRatio(
                                                 aspectRatio: 7 / 5,
                                                 child: Image.asset(
-                                                  "assets/icons/isoladellestorie/islandmap.jpg",
+                                                  "assets/icons/isoladellestorie/islandmap.jpeg",
                                                   fit: BoxFit.cover,
                                                 ),
                                               ),
@@ -232,10 +232,24 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                                 ),
                                               ),
                                               const SizedBox(height: 8),
+                                              Text(
+                                                'o',
+                                                style: GoogleFonts.arvo(
+                                                  color: HonooColor.onBackground,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
                                               InkWell(
-                                                onTap: () {
-                                                  Navigator.of(context)
-                                                      .pushAndRemoveUntil(
+                                                onTap: () async {
+                                                  final navigator =
+                                                      Navigator.of(context);
+                                                  if (navigator.canPop()) {
+                                                    navigator.pop();
+                                                    return;
+                                                  }
+                                                  navigator.pushAndRemoveUntil(
                                                     MaterialPageRoute(
                                                         builder: (_) =>
                                                             const IslandPage()),
