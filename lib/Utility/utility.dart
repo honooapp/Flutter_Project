@@ -24,7 +24,7 @@ class Utility {
   final String textHome1 = 'Ti regaliamo la Luna.\nPer sempre.';
   final String textHome2 =
       'Niente è per sempre,\ne nessuno può regalarti la Luna.\n\nÈ vero,\nma non per i poeti.\n\nVuoi essere un poeta di honoo?\n\nClicca sulla Bottiglia,\ne componi i tuoi honoo e hinoo.\n\nOppure sulla Luna,\ne guarda gli honoo\ne gli hinoo degli altri.\n\nO sull’Isola,\ne inizia il viaggio\nverso le tue storie.';
-  final String campanelliText = 'In questa parte dell’Isola\nci sono case.\n\nVuoi scoprire chi ci abita?\n\nSe scorri verso destra\puoi vedere quello che\nchi abita in una casa\ndice di sé.\n\n\E se vuoi\npuoi anche provare a bussare\nal suo campanello.\n\nMagari ti fa entrare.\n\n\';
+  final String campanelliText = 'In questa parte dell’Isola\nci sono case.\n\nVuoi scoprire chi ci abita?\n\nSe scorri verso destra\puoi vedere quello che\ndice di sé\nchi abita in una casa\n\n\E se vuoi\npuoi anche provare a bussare\nal suo campanello.\n\nMagari ti fa entrare.\n\n\';
   final String campanelloExample1Text = 'Ti piace\nascoltare musica\nin compagnia?\n\nE ballare in casa,\ncome si fa alle feste?\n\nQuesto è il campanello\ndi casa mia.\n\nPuoi bussare,\nse vuoi.\n\nMagari sono a casa.\nMagari sto ascoltando musica.\nMagari è musica che ti piace.';
   final String campanelloExample2Text = 'Ti piace\nfare colazione in compagnia,\nin un terrazzo esposto a Sud?\n\nQuesto è il campanello di casa mia.\n\nPuoi bussare,\nse vuoi.\n\nMagari sono sul terrazzo.\nMagari c’è il sole.\nMagari sto facendo colazione.';
   final String chestHeader = 'Il tuo Cuore custodisce';
