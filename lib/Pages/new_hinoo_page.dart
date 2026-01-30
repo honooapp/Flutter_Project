@@ -23,7 +23,9 @@ import 'placeholder_page.dart';
 import '../Entities/hinoo.dart';
 
 class NewHinooPage extends StatefulWidget {
-  const NewHinooPage({super.key});
+  const NewHinooPage({super.key, this.isReply = false});
+
+  final bool isReply;
 
   @override
   State<NewHinooPage> createState() => _NewHinooPageState();
@@ -230,6 +232,18 @@ class _NewHinooPageState extends State<NewHinooPage> {
       if (!mounted) return;
       setState(() => _savedToChest = true);
       showHonooToast(context, message: 'salvato nello Scrigno.');
+
+      if (widget.isReply && mounted) {
+        await showDialog<bool>(
+          context: context,
+          barrierDismissible: true,
+          builder: (_) => const HonooConfirmDialog(
+            title: 'Vuoi inserire il campanello di casa tua?',
+            confirmLabel: 'Si',
+            cancelLabel: 'No',
+          ),
+        );
+      }
     } catch (e) {
       if (!mounted) return;
       showHonooToast(context, message: 'Errore: $e');
@@ -287,7 +301,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
 
     return HinooDraft(
       pages: slides,
-      type: HinooType.personal,
+      type: widget.isReply ? HinooType.answer : HinooType.personal,
       baseCanvasHeight: _lastCanvasHeight > 0 ? _lastCanvasHeight : null,
     );
   }

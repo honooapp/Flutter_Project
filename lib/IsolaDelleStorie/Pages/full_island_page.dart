@@ -208,28 +208,43 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                                 color: HonooColor.onBackground,
                                                 fontSize: 18,
                                               ),
-                                              const SizedBox(height: 0),
-                                              InkWell(
-                                                onTap: () {
-                                                  Navigator.of(context)
-                                                      .pushAndRemoveUntil(
-                                                    MaterialPageRoute(
-                                                        builder: (_) =>
-                                                            const CampanelliPage()),
-                                                    (route) => false,
-                                                  );
-                                                },
-                                                child: Text(
-                                                  'clicca qui',
-                                                  style: GoogleFonts.arvo(
-                                                    color:
-                                                        HonooColor.onBackground,
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w700,
-                                                    decoration: TextDecoration
-                                                        .underline,
+                                              const SizedBox(height: 8),
+                                              Wrap(
+                                                alignment: WrapAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    'Se sei interessato ',
+                                                    style: GoogleFonts.arvo(
+                                                      color:
+                                                          HonooColor.onBackground,
+                                                      fontSize: 18,
+                                                      fontWeight: FontWeight.w700,
+                                                    ),
                                                   ),
-                                                ),
+                                                  InkWell(
+                                                    onTap: () {
+                                                      Navigator.of(context)
+                                                          .pushAndRemoveUntil(
+                                                        MaterialPageRoute(
+                                                            builder: (_) =>
+                                                                const CampanelliPage()),
+                                                        (route) => false,
+                                                      );
+                                                    },
+                                                    child: Text(
+                                                      'clicca qui',
+                                                      style: GoogleFonts.arvo(
+                                                        color: HonooColor
+                                                            .onBackground,
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        decoration: TextDecoration
+                                                            .underline,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                               const SizedBox(height: 8),
                                               Text(
