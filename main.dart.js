@@ -90640,7 +90640,7 @@ A.aH(s,!1).ck(r)
 return}},
 a9D(a){var s,r,q,p
 $.A7()
-s=A.b([new A.Hg(!0,"In questa parte dell\u2019Isola\nci sono case.\n\nVuoi scoprire chi ci abita?\n\nScorrendo verso sinistra\npuoi leggere\nci\xf2 che ogni abitante\nha scelto di raccontarti.\n\nSe vuoi,\nprova a bussare:\nmagari ti fa entrare.",null)],t.M2)
+s=A.b([new A.Hg(!0,"In questa parte dell\u2019Isola\nci sono case.\n\nVuoi scoprire chi ci abita?\n\nScorrendo verso destra\npuoi leggere\nci\xf2 che ogni abitante\nha scelto di raccontarti.\n\nSe vuoi,\nprova a bussare:\nmagari ti fa entrare.",null)],t.M2)
 for(r=a.length,q=0;q<a.length;a.length===r||(0,A.M)(a),++q){p=a[q].a
 s.push(new A.Hg(!1,p.e,p))}return s},
 agS(a){if(a!=null&&a.length!==0)return new A.pg(a)
