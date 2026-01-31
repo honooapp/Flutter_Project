@@ -27,7 +27,7 @@ class Utility {
   final String campanelliText = 'In questa parte dell’Isola\n'
     'ci sono case.\n\n'
     'Vuoi scoprire chi ci abita?\n\n'
-    'Scorrendo verso sinistra\n'
+    'Scorrendo verso destra\n'
     'puoi leggere\n'
     'ciò che ogni abitante\n'
     'ha scelto di raccontarti.\n\n'
