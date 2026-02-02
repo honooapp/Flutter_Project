@@ -156,7 +156,7 @@ ogni settimana ti assegnerò\nun esercizio,\nda svolgere nelle tre fasi,\n<b>scr
 
   static const String fullIslandDescription =
       """Nella parte occidentale\ndell'Isola\nnon ci sono veramente\ni leoni,\nma qualcuno che conosci\no che vorrebbe conoscerti.""";
-  static const String fullIslandHeadDescription = "L’Isola intera";
+  static const String fullIslandHeadDescription = "L’Isola delle Storie";
 
   static RichText getRichText(String text) {
     List<String> splitted = text.split("<b>");

@@ -213,7 +213,7 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                                 alignment: WrapAlignment.center,
                                                 children: [
                                                   Text(
-                                                    'Se sei interessato ',
+                                                    'Se sei interessato, ',
                                                     style: GoogleFonts.arvo(
                                                       color:
                                                           HonooColor.onBackground,
