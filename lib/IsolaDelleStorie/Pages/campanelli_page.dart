@@ -140,6 +140,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
       final selected = await _showShareModeDialog();
       if (selected == null || !mounted) return;
       await _saveShareMode(campanello, selected);
+      if (!mounted) return;
       mode = selected;
     }
 
@@ -236,9 +237,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
           text: Utility().campanelloExample1Text,
           linkedHouseId: casaSirenaId,
         ),
-        casa: CasaData(
+        casa: const CasaData(
           id: casaSirenaId,
-          backgroundImage: const AssetImage(casaSirenaBg),
+          backgroundImage: AssetImage(casaSirenaBg),
         ),
       ),
       _CampanelloEntry(
@@ -250,9 +251,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
           text: Utility().campanelloExample2Text,
           linkedHouseId: casaPalombaroId,
         ),
-        casa: CasaData(
+        casa: const CasaData(
           id: casaPalombaroId,
-          backgroundImage: const AssetImage(casaPalombaroBg),
+          backgroundImage: AssetImage(casaPalombaroBg),
         ),
       ),
     ];

@@ -308,15 +308,15 @@ class _HinooBuilderState extends State<HinooBuilder> {
         message: 'hinoo creati con honoo',
       );
       await dismissProgressDialogIfNeeded();
-      if (!context.mounted) return;
+      if (!currentContext.mounted) return;
       showHonooToast(
         currentContext,
         message: message,
       );
     } catch (e) {
-      if (context.mounted) {
+      if (currentContext.mounted) {
         await dismissProgressDialogIfNeeded();
-        if (!context.mounted) return;
+        if (!currentContext.mounted) return;
         showHonooToast(
           currentContext,
           message: 'Errore download: $e',
