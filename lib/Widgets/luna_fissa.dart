@@ -98,7 +98,7 @@ class _LunaFissaState extends State<LunaFissa> {
       actions.add(
         IconButton(
           icon: Image.asset(
-            'assets/images/venceslao.png',
+            'assets/icons/venceslao.png',
             width: iconSize,
             height: iconSize,
           ),
