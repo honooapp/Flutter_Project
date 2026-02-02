@@ -37,14 +37,31 @@ class LunaFissa extends StatefulWidget {
   State<LunaFissa> createState() => _LunaFissaState();
 }
 
-class _LunaFissaState extends State<LunaFissa> {
+class _LunaFissaState extends State<LunaFissa>
+    with WidgetsBindingObserver {
   final AdminService _adminService = AdminService();
   bool _isAdmin = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     if (widget.showAdminEntry) {
+      _loadAdminStatus();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant LunaFissa oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!oldWidget.showAdminEntry && widget.showAdminEntry) {
+      _loadAdminStatus();
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && widget.showAdminEntry) {
       _loadAdminStatus();
     }
   }
@@ -53,6 +70,12 @@ class _LunaFissaState extends State<LunaFissa> {
     final isAdmin = await _adminService.isCurrentUserAdmin();
     if (!mounted) return;
     setState(() => _isAdmin = isAdmin);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
