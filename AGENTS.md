@@ -227,7 +227,7 @@ Both Honoo and Hinoo use the same `WidthLimitedMultilineField` widget (`lib/Widg
 - **Hinoo**: 20 lines maximum (`maxLines: 20`), Lora font, 18pt, 1.375 line height
 
 **Implementation:**
-```dart
+```text
 WidthLimitedMultilineField(
   controller: controller,
   style: textStyle,
