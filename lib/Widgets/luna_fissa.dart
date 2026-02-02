@@ -94,7 +94,7 @@ class _LunaFissaState extends State<LunaFissa> {
     ];
 
     if (widget.showAdminEntry && _isAdmin) {
-      actions.add(const SizedBox(height: 12));
+      actions.add(SizedBox(height: iconSize * 0.35));
       actions.add(
         IconButton(
           icon: Image.asset(
