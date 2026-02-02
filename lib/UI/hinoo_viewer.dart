@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../Entities/hinoo.dart';
 import 'hinoo_typography.dart';
 import '../Utility/honoo_colors.dart';
@@ -66,72 +67,98 @@ class _HinooViewerState extends State<HinooViewer> {
     final double displayW = baselineW * scale;
     final double displayH = baselineH * scale;
 
-    return Center(
-      child: SizedBox(
-        width: displayW,
-        height: displayH,
-        child: FittedBox(
-          fit: BoxFit.contain,
-          child: SizedBox(
-            width: baselineW,
-            height: baselineH,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(5),
-                  child: Listener(
-                    onPointerSignal: (event) {
-                      if (event is PointerScrollEvent &&
-                          widget.draft.pages.length > 1 &&
-                          _vController.hasClients &&
-                          _vController.position.haveDimensions) {
-                        final position = _vController.position;
-                        if ((position.maxScrollExtent -
-                                    position.minScrollExtent)
-                                .abs() <
-                            0.5) {
-                          return;
+    return FocusableActionDetector(
+      autofocus: true,
+      shortcuts: {
+        LogicalKeySet(LogicalKeyboardKey.arrowUp): const _ArrowIntent(-1),
+        LogicalKeySet(LogicalKeyboardKey.arrowDown): const _ArrowIntent(1),
+      },
+      actions: {
+        _ArrowIntent: CallbackAction<_ArrowIntent>(
+          onInvoke: (intent) {
+            if (!_vController.hasClients) return null;
+            final double? page = _vController.page;
+            final int current = page?.round() ?? _vController.initialPage;
+            final int maxIndex = widget.draft.pages.length - 1;
+            final int target =
+                (current + intent.delta).clamp(0, maxIndex);
+            if (target == current) return null;
+            _vController.animateToPage(
+              target,
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+            );
+            return null;
+          },
+        ),
+      },
+      child: Center(
+        child: SizedBox(
+          width: displayW,
+          height: displayH,
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: SizedBox(
+              width: baselineW,
+              height: baselineH,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(5),
+                    child: Listener(
+                      onPointerSignal: (event) {
+                        if (event is PointerScrollEvent &&
+                            widget.draft.pages.length > 1 &&
+                            _vController.hasClients &&
+                            _vController.position.haveDimensions) {
+                          final position = _vController.position;
+                          if ((position.maxScrollExtent -
+                                      position.minScrollExtent)
+                                  .abs() <
+                              0.5) {
+                            return;
+                          }
+                          final double target =
+                              (position.pixels + event.scrollDelta.dy).clamp(
+                                  position.minScrollExtent,
+                                  position.maxScrollExtent);
+                          if ((target - position.pixels).abs() > 0.5) {
+                            _vController.jumpTo(target);
+                            _scheduleSnap();
+                          }
                         }
-                        final double target =
-                            (position.pixels + event.scrollDelta.dy).clamp(
-                                position.minScrollExtent,
-                                position.maxScrollExtent);
-                        if ((target - position.pixels).abs() > 0.5) {
-                          _vController.jumpTo(target);
-                          _scheduleSnap();
-                        }
-                      }
-                    },
-                    child: ScrollConfiguration(
-                      behavior: ScrollConfiguration.of(context).copyWith(
-                        dragDevices: {
-                          PointerDeviceKind.touch,
-                          PointerDeviceKind.mouse,
-                          PointerDeviceKind.stylus,
-                          PointerDeviceKind.trackpad,
-                        },
-                      ),
-                      child: PageView.builder(
-                        scrollDirection: Axis.vertical,
-                        controller: _vController,
-                        physics: const PageScrollPhysics(),
-                        allowImplicitScrolling: true,
-                        itemCount: widget.draft.pages.length,
-                        itemBuilder: (context, index) {
-                          return HinooSlideView(
-                            slide: widget.draft.pages[index],
-                            width: baselineW,
-                            height: baselineH,
-                            gap: 0,
-                            gapColor: widget.gapColor,
-                          );
-                        },
+                      },
+                      child: ScrollConfiguration(
+                        behavior: ScrollConfiguration.of(context).copyWith(
+                          dragDevices: {
+                            PointerDeviceKind.touch,
+                            PointerDeviceKind.mouse,
+                            PointerDeviceKind.stylus,
+                            PointerDeviceKind.trackpad,
+                          },
+                        ),
+                        child: PageView.builder(
+                          scrollDirection: Axis.vertical,
+                          controller: _vController,
+                          physics: const PageScrollPhysics(),
+                          allowImplicitScrolling: true,
+                          itemCount: widget.draft.pages.length,
+                          itemBuilder: (context, index) {
+                            return HinooSlideView(
+                              slide: widget.draft.pages[index],
+                              width: baselineW,
+                              height: baselineH,
+                              gap: 0,
+                              gapColor: widget.gapColor,
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -160,6 +187,12 @@ class _HinooViewerState extends State<HinooViewer> {
       curve: Curves.easeOut,
     );
   }
+}
+
+class _ArrowIntent extends Intent {
+  const _ArrowIntent(this.delta);
+
+  final int delta;
 }
 
 class HinooSlideView extends StatelessWidget {

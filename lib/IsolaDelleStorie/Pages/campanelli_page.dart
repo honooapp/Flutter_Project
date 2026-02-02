@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:honoo/Entities/hinoo.dart';
@@ -31,6 +33,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
   final PageController _campanelloPageController = PageController();
   List<_CampanelloEntry> _userEntries = const [];
   bool _isLoadingUserEntries = false;
+  bool _isHoveringCampanelli = false;
   final Map<String, _CasaShareMode> _shareModesByCampanello = {
     campanelloSirenaId: _CasaShareMode.honoo,
     campanelloPalombaroId: _CasaShareMode.hinoo,
@@ -59,6 +62,50 @@ class _CampanelliPageState extends State<CampanelliPage> {
   }
 
   bool _isCampanelloUnlocked(String id) => _unlockedCampanelli.contains(id);
+
+  void _handlePointerScroll(
+    PageController controller,
+    PointerScrollEvent event,
+    Axis axis,
+  ) {
+    if (!controller.hasClients || !controller.position.haveDimensions) {
+      return;
+    }
+    final position = controller.position;
+    if ((position.maxScrollExtent - position.minScrollExtent).abs() < 0.5) {
+      return;
+    }
+    final double delta = axis == Axis.vertical
+        ? event.scrollDelta.dy
+        : (event.scrollDelta.dy.abs() > 0
+            ? event.scrollDelta.dy
+            : event.scrollDelta.dx);
+    if (delta.abs() < 0.5) {
+      return;
+    }
+    final double target = (position.pixels + delta)
+        .clamp(position.minScrollExtent, position.maxScrollExtent);
+    if ((target - position.pixels).abs() > 0.5) {
+      controller.jumpTo(target);
+    }
+  }
+
+  void _animatePage(
+    PageController controller, {
+    required int delta,
+    required int maxIndex,
+  }) {
+    if (!controller.hasClients) return;
+    final double? page = controller.page;
+    final int current = page?.round() ?? controller.initialPage;
+    final int target = (current + delta).clamp(0, maxIndex);
+    if (target == current) return;
+    controller.animateToPage(
+      target,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
+    );
+  }
 
   Future<void> _handleKnock(CampanelloData campanello) async {
     if (_isCampanelloUnlocked(campanello.id)) {
@@ -442,152 +489,249 @@ class _CampanelliPageState extends State<CampanelliPage> {
               : () => _handleScrigno(activeCampanello);
           final ScrollPhysics pagePhysics = const PageScrollPhysics()
               .applyTo(const BouncingScrollPhysics());
+          const int verticalPages = 2;
+          final int maxCampanelloIndex =
+              math.max(0, campanelloPages.length - 1);
+          const int maxVerticalIndex = verticalPages - 1;
 
-          return Stack(
-            fit: StackFit.expand,
-            clipBehavior: Clip.none,
-            children: [
-              SizedBox(
-                height: availableHeight,
-                child: PageView(
-                  controller: _pageController,
-                  scrollDirection: Axis.vertical,
-                  physics: pagePhysics,
-                  onPageChanged: (index) {
-                    setState(() => _verticalPageIndex = index);
-                  },
-                  children: [
-                    Center(
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 90),
-                        curve: Curves.easeOutCubic,
-                        constraints: BoxConstraints(maxWidth: targetMaxWidth),
-                        child: SizedBox(
-                          width: canvasSize.width,
-                          height: canvasSize.height,
-                          child: PageView.builder(
-                            controller: _campanelloPageController,
-                            scrollDirection: Axis.horizontal,
-                            physics: pagePhysics,
-                            itemCount: campanelloPages.length,
-                            onPageChanged: (index) {
-                              setState(() => _campanelloIndex = index);
-                            },
-                            itemBuilder: (context, pageIndex) {
-                              return _CampanelloCard(
-                                data: campanelloPages[pageIndex],
-                                width: canvasSize.width,
-                                height: canvasSize.height,
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                    casaUnlocked
-                        ? AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 280),
-                            switchInCurve: Curves.easeOutCubic,
-                            switchOutCurve: Curves.easeOutCubic,
-                            transitionBuilder: (child, animation) {
-                              final offsetAnimation = Tween<Offset>(
-                                begin: const Offset(0, 0.08),
-                                end: Offset.zero,
-                              ).animate(animation);
-                              return SlideTransition(
-                                position: offsetAnimation,
-                                child: FadeTransition(
-                                  opacity: animation,
-                                  child: child,
-                                ),
-                              );
-                            },
-                            child: _CasaSection(
-                              key: ValueKey(
-                                '${campanelli[casaIndex].casa.id}_open',
-                              ),
-                              casa: campanelli[casaIndex].casa,
-                              isUnlocked: casaUnlocked,
-                              scrignoAsset: scrignoOverlay,
-                              onScrignoTap: scrignoTap,
-                              footerIconSize: footerIconSize,
-                              scrignoSize: scrignoSize,
-                              footerBottomSpacing: footerBottomSpacing,
-                              width: maxWidth,
-                              height: availableHeight,
-                            ),
-                          )
-                        : _CasaSection(
-                            key: ValueKey(
-                              '${campanelli[casaIndex].casa.id}_closed',
-                            ),
-                            casa: campanelli[casaIndex].casa,
-                            isUnlocked: casaUnlocked,
-                            scrignoAsset: scrignoOverlay,
-                            onScrignoTap: scrignoTap,
-                            footerIconSize: footerIconSize,
-                            scrignoSize: scrignoSize,
-                            footerBottomSpacing: footerBottomSpacing,
-                            width: maxWidth,
-                            height: availableHeight,
-                          ),
-                  ],
-                ),
+          return FocusableActionDetector(
+            autofocus: true,
+            shortcuts: {
+              LogicalKeySet(LogicalKeyboardKey.arrowLeft):
+                  const _ArrowIntent(Axis.horizontal, -1),
+              LogicalKeySet(LogicalKeyboardKey.arrowRight):
+                  const _ArrowIntent(Axis.horizontal, 1),
+              LogicalKeySet(LogicalKeyboardKey.arrowUp):
+                  const _ArrowIntent(Axis.vertical, -1),
+              LogicalKeySet(LogicalKeyboardKey.arrowDown):
+                  const _ArrowIntent(Axis.vertical, 1),
+            },
+            actions: {
+              _ArrowIntent: CallbackAction<_ArrowIntent>(
+                onInvoke: (intent) {
+                  if (intent.axis == Axis.horizontal &&
+                      _verticalPageIndex == 0) {
+                    _animatePage(
+                      _campanelloPageController,
+                      delta: intent.delta,
+                      maxIndex: maxCampanelloIndex,
+                    );
+                  } else if (intent.axis == Axis.vertical) {
+                    _animatePage(
+                      _pageController,
+                      delta: intent.delta,
+                      maxIndex: maxVerticalIndex,
+                    );
+                  }
+                  return null;
+                },
               ),
-              if (showFooter)
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: ResponsiveFooterBar(
-                    useSafeArea: false,
-                    bottomPadding: footerBottomSpacing,
-                    desiredGap: footerGap,
-                    minGap: 16,
-                    height: footerIconSize,
-                    actions: [
-                      ResponsiveFooterAction(
-                        asset: "assets/icons/home.svg",
-                        semanticsLabel: 'Home',
-                        colorFilter: const ColorFilter.mode(
-                          HonooColor.onBackground,
-                          BlendMode.srcIn,
-                        ),
-                        size: footerIconSize,
-                        splashRadius: 25,
-                        tooltip: 'Home',
-                        onPressed: () {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (_) => const HomePage()),
-                            (route) => false,
-                          );
+            },
+            child: Stack(
+              fit: StackFit.expand,
+              clipBehavior: Clip.none,
+              children: [
+                SizedBox(
+                  height: availableHeight,
+                  child: Listener(
+                    onPointerSignal: (event) {
+                      if (event is PointerScrollEvent &&
+                          !_isHoveringCampanelli) {
+                        _handlePointerScroll(
+                          _pageController,
+                          event,
+                          Axis.vertical,
+                        );
+                      }
+                    },
+                    child: ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context).copyWith(
+                        dragDevices: {
+                          PointerDeviceKind.touch,
+                          PointerDeviceKind.mouse,
+                          PointerDeviceKind.stylus,
+                          PointerDeviceKind.trackpad,
                         },
                       ),
-                      if (showCampanello)
-                        ResponsiveFooterAction(
-                          asset: "assets/icons/campanello_bianco.png",
-                          semanticsLabel: 'Campanello',
-                          size: footerIconSize,
-                          splashRadius: 25,
-                          tooltip: 'Campanello',
-                          onPressed: () => _handleKnock(activeCampanello!),
-                          icon: Image.asset(
-                            "assets/icons/campanello_bianco.png",
-                            width: footerIconSize,
-                            height: footerIconSize,
-                            fit: BoxFit.contain,
+                      child: PageView(
+                        controller: _pageController,
+                        scrollDirection: Axis.vertical,
+                        physics: pagePhysics,
+                        onPageChanged: (index) {
+                          setState(() => _verticalPageIndex = index);
+                        },
+                        children: [
+                          Center(
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 90),
+                              curve: Curves.easeOutCubic,
+                              constraints:
+                                  BoxConstraints(maxWidth: targetMaxWidth),
+                              child: SizedBox(
+                                width: canvasSize.width,
+                                height: canvasSize.height,
+                                child: MouseRegion(
+                                  onEnter: (_) => _isHoveringCampanelli = true,
+                                  onExit: (_) =>
+                                      _isHoveringCampanelli = false,
+                                  child: Listener(
+                                    onPointerSignal: (event) {
+                                      if (event is PointerScrollEvent) {
+                                        _handlePointerScroll(
+                                          _campanelloPageController,
+                                          event,
+                                          Axis.horizontal,
+                                        );
+                                      }
+                                    },
+                                    child: ScrollConfiguration(
+                                      behavior:
+                                          ScrollConfiguration.of(context)
+                                              .copyWith(
+                                        dragDevices: {
+                                          PointerDeviceKind.touch,
+                                          PointerDeviceKind.mouse,
+                                          PointerDeviceKind.stylus,
+                                          PointerDeviceKind.trackpad,
+                                        },
+                                      ),
+                                      child: PageView.builder(
+                                        controller: _campanelloPageController,
+                                        scrollDirection: Axis.horizontal,
+                                        physics: pagePhysics,
+                                        itemCount: campanelloPages.length,
+                                        onPageChanged: (index) {
+                                          setState(
+                                              () => _campanelloIndex = index);
+                                        },
+                                        itemBuilder: (context, pageIndex) {
+                                          return _CampanelloCard(
+                                            data: campanelloPages[pageIndex],
+                                            width: canvasSize.width,
+                                            height: canvasSize.height,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                    ],
+                          casaUnlocked
+                              ? AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 280),
+                                  switchInCurve: Curves.easeOutCubic,
+                                  switchOutCurve: Curves.easeOutCubic,
+                                  transitionBuilder: (child, animation) {
+                                    final offsetAnimation = Tween<Offset>(
+                                      begin: const Offset(0, 0.08),
+                                      end: Offset.zero,
+                                    ).animate(animation);
+                                    return SlideTransition(
+                                      position: offsetAnimation,
+                                      child: FadeTransition(
+                                        opacity: animation,
+                                        child: child,
+                                      ),
+                                    );
+                                  },
+                                  child: _CasaSection(
+                                    key: ValueKey(
+                                      '${campanelli[casaIndex].casa.id}_open',
+                                    ),
+                                    casa: campanelli[casaIndex].casa,
+                                    isUnlocked: casaUnlocked,
+                                    scrignoAsset: scrignoOverlay,
+                                    onScrignoTap: scrignoTap,
+                                    footerIconSize: footerIconSize,
+                                    scrignoSize: scrignoSize,
+                                    footerBottomSpacing: footerBottomSpacing,
+                                    width: maxWidth,
+                                    height: availableHeight,
+                                  ),
+                                )
+                              : _CasaSection(
+                                  key: ValueKey(
+                                    '${campanelli[casaIndex].casa.id}_closed',
+                                  ),
+                                  casa: campanelli[casaIndex].casa,
+                                  isUnlocked: casaUnlocked,
+                                  scrignoAsset: scrignoOverlay,
+                                  onScrignoTap: scrignoTap,
+                                  footerIconSize: footerIconSize,
+                                  scrignoSize: scrignoSize,
+                                  footerBottomSpacing: footerBottomSpacing,
+                                  width: maxWidth,
+                                  height: availableHeight,
+                                ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-            ],
+                if (showFooter)
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: ResponsiveFooterBar(
+                      useSafeArea: false,
+                      bottomPadding: footerBottomSpacing,
+                      desiredGap: footerGap,
+                      minGap: 16,
+                      height: footerIconSize,
+                      actions: [
+                        ResponsiveFooterAction(
+                          asset: "assets/icons/home.svg",
+                          semanticsLabel: 'Home',
+                          colorFilter: const ColorFilter.mode(
+                            HonooColor.onBackground,
+                            BlendMode.srcIn,
+                          ),
+                          size: footerIconSize,
+                          splashRadius: 25,
+                          tooltip: 'Home',
+                          onPressed: () {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (_) => const HomePage()),
+                              (route) => false,
+                            );
+                          },
+                        ),
+                        if (showCampanello)
+                          ResponsiveFooterAction(
+                            asset: "assets/icons/campanello_bianco.png",
+                            semanticsLabel: 'Campanello',
+                            size: footerIconSize,
+                            splashRadius: 25,
+                            tooltip: 'Campanello',
+                            onPressed: () => _handleKnock(activeCampanello!),
+                            icon: Image.asset(
+                              "assets/icons/campanello_bianco.png",
+                              width: footerIconSize,
+                              height: footerIconSize,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
           );
         },
       ),
     );
   }
+}
+
+class _ArrowIntent extends Intent {
+  const _ArrowIntent(this.axis, this.delta);
+
+  final Axis axis;
+  final int delta;
 }
 
 class CampanelloData {
