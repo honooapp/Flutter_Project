@@ -24,6 +24,36 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final ResponsiveLayoutMode layoutMode =
         ResponsiveLayout.modeForWidth(screenWidth);
+    const String performanceLine = 'performance\n';
+    const String laboratoriLine = 'e laboratori teatrali\n';
+    const String venceslaoLine = 'Venceslao Cembalo\n';
+    final String text1First = Utility().text1First;
+    final int performanceIndex = text1First.indexOf(performanceLine);
+    final int laboratoriIndex = text1First.indexOf(laboratoriLine);
+    String textBeforePerformance = text1First;
+    String textBetweenPerformance = '';
+    String textAfterLaboratori = '';
+    if (performanceIndex != -1 &&
+        laboratoriIndex != -1 &&
+        performanceIndex < laboratoriIndex) {
+      textBeforePerformance = text1First.substring(0, performanceIndex);
+      textBetweenPerformance = text1First.substring(
+        performanceIndex + performanceLine.length,
+        laboratoriIndex,
+      );
+      textAfterLaboratori =
+          text1First.substring(laboratoriIndex + laboratoriLine.length);
+    }
+    final String text1Fifth = Utility().text1Fifth;
+    final int venceslaoIndex = text1Fifth.indexOf(venceslaoLine);
+    String textBeforeVenceslao = text1Fifth;
+    String textAfterVenceslao = '';
+    if (venceslaoIndex != -1) {
+      textBeforeVenceslao = text1Fifth.substring(0, venceslaoIndex);
+      textAfterVenceslao = text1Fifth.substring(
+        venceslaoIndex + venceslaoLine.length,
+      );
+    }
     final double footerIconSize =
         ResponsiveLayout.footerIconSizeForMode(layoutMode);
     final double footerBottomPadding =
@@ -80,7 +110,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                       fontWeight: FontWeight.w200,
                     ),
                     children: [
-                      TextSpan(text: Utility().text1First),
+                      TextSpan(text: textBeforePerformance),
+                      const TextSpan(text: performanceLine),
                       WidgetSpan(
                         child: Padding(
                           padding: const EdgeInsets.only(bottom: 3),
@@ -89,6 +120,20 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                         ),
                         alignment: PlaceholderAlignment.middle,
                       ),
+                      const TextSpan(text: '\n'),
+                      TextSpan(text: textBetweenPerformance),
+                      const TextSpan(text: laboratoriLine),
+                      WidgetSpan(
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 3),
+                          child: Image.asset(
+                            "assets/icons/laboratori_teatrali.png",
+                            height: 70,
+                          ),
+                        ),
+                        alignment: PlaceholderAlignment.middle,
+                      ),
+                      TextSpan(text: textAfterLaboratori),
                       TextSpan(text: Utility().text1Second),
                       WidgetSpan(
                         child: Padding(
@@ -108,15 +153,20 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                         alignment: PlaceholderAlignment.middle,
                       ),
                       TextSpan(text: Utility().text1Fourth),
+                      TextSpan(text: textBeforeVenceslao),
+                      const TextSpan(text: venceslaoLine),
                       WidgetSpan(
                         child: Padding(
                           padding: const EdgeInsets.only(bottom: 3),
-                          child: Image.asset("assets/icons/performance.png",
-                              height: 70),
+                          child: Image.asset(
+                            "assets/icons/venceslao.png",
+                            height: 70,
+                          ),
                         ),
                         alignment: PlaceholderAlignment.middle,
                       ),
-                      TextSpan(text: Utility().text1Fifth),
+                      const TextSpan(text: '\n'),
+                      TextSpan(text: textAfterVenceslao),
                       WidgetSpan(
                         child: Text(
                           Utility().appName,

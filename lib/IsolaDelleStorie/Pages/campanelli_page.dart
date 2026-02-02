@@ -468,6 +468,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
             availableHeight,
             HinooTypography.aspectRatio,
           );
+          final bool isMobile = layoutMode == ResponsiveLayoutMode.mobile;
+          final double casaWidth = isMobile ? maxWidth : canvasSize.width;
+          final double casaHeight =
+              isMobile ? availableHeight : canvasSize.height;
           final List<_CampanelloEntry> campanelli = _buildCampanelli();
           final List<_CampanelloPageData> campanelloPages =
               _buildCampanelloPages(campanelli);
@@ -637,9 +641,27 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                       ),
                                     );
                                   },
+                                  child: Center(
+                                    child: _CasaSection(
+                                      key: ValueKey(
+                                        '${campanelli[casaIndex].casa.id}_open',
+                                      ),
+                                      casa: campanelli[casaIndex].casa,
+                                      isUnlocked: casaUnlocked,
+                                      scrignoAsset: scrignoOverlay,
+                                      onScrignoTap: scrignoTap,
+                                      footerIconSize: footerIconSize,
+                                      scrignoSize: scrignoSize,
+                                      footerBottomSpacing: footerBottomSpacing,
+                                      width: casaWidth,
+                                      height: casaHeight,
+                                    ),
+                                  ),
+                                )
+                              : Center(
                                   child: _CasaSection(
                                     key: ValueKey(
-                                      '${campanelli[casaIndex].casa.id}_open',
+                                      '${campanelli[casaIndex].casa.id}_closed',
                                     ),
                                     casa: campanelli[casaIndex].casa,
                                     isUnlocked: casaUnlocked,
@@ -648,23 +670,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                     footerIconSize: footerIconSize,
                                     scrignoSize: scrignoSize,
                                     footerBottomSpacing: footerBottomSpacing,
-                                    width: maxWidth,
-                                    height: availableHeight,
+                                    width: casaWidth,
+                                    height: casaHeight,
                                   ),
-                                )
-                              : _CasaSection(
-                                  key: ValueKey(
-                                    '${campanelli[casaIndex].casa.id}_closed',
-                                  ),
-                                  casa: campanelli[casaIndex].casa,
-                                  isUnlocked: casaUnlocked,
-                                  scrignoAsset: scrignoOverlay,
-                                  onScrignoTap: scrignoTap,
-                                  footerIconSize: footerIconSize,
-                                  scrignoSize: scrignoSize,
-                                  footerBottomSpacing: footerBottomSpacing,
-                                  width: maxWidth,
-                                  height: availableHeight,
                                 ),
                         ],
                       ),
