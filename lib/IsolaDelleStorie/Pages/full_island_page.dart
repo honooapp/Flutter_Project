@@ -209,42 +209,53 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                                 fontSize: 18,
                                               ),
                                               const SizedBox(height: 8),
-                                              Wrap(
-                                                alignment: WrapAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    'Se sei interessato, ',
-                                                    style: GoogleFonts.arvo(
-                                                      color:
-                                                          HonooColor.onBackground,
-                                                      fontSize: 18,
-                                                      fontWeight: FontWeight.w700,
-                                                    ),
+                                              RichText(
+                                                textAlign: TextAlign.center,
+                                                text: TextSpan(
+                                                  style: GoogleFonts.arvo(
+                                                    color:
+                                                        HonooColor.onBackground,
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w400,
                                                   ),
-                                                  InkWell(
-                                                    onTap: () {
-                                                      Navigator.of(context)
-                                                          .pushAndRemoveUntil(
-                                                        MaterialPageRoute(
-                                                            builder: (_) =>
-                                                                const CampanelliPage()),
-                                                        (route) => false,
-                                                      );
-                                                    },
-                                                    child: Text(
-                                                      'clicca qui',
-                                                      style: GoogleFonts.arvo(
-                                                        color: HonooColor
-                                                            .onBackground,
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                        decoration: TextDecoration
-                                                            .underline,
+                                                  children: [
+                                                    const TextSpan(
+                                                      text:
+                                                          'Se sei interessato, ',
+                                                    ),
+                                                    WidgetSpan(
+                                                      alignment:
+                                                          PlaceholderAlignment
+                                                              .baseline,
+                                                      baseline:
+                                                          TextBaseline.alphabetic,
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          Navigator.of(context)
+                                                              .pushAndRemoveUntil(
+                                                            MaterialPageRoute(
+                                                                builder: (_) =>
+                                                                    const CampanelliPage()),
+                                                            (route) => false,
+                                                          );
+                                                        },
+                                                        child: Text(
+                                                          'clicca qui',
+                                                          style: GoogleFonts.arvo(
+                                                            color: HonooColor
+                                                                .onBackground,
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                            decoration:
+                                                                TextDecoration
+                                                                    .underline,
+                                                          ),
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
                                               ),
                                               const SizedBox(height: 8),
                                               Text(
