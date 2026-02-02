@@ -65,6 +65,48 @@ class HinooService {
     }
   }
 
+  static Future<String> publishHinooAndReturnId(HinooDraft draft) async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) throw 'Utente non autenticato';
+
+    final data = {
+      'user_id': userId,
+      'type': _toDbType(draft.type),
+      'pages': draft.toJson()['pages'],
+      'recipient_tag': draft.recipientTag,
+      'fingerprint': (draft.type == HinooType.moon) ? fingerprint(draft) : null,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+
+    try {
+      debugPrint('[HinooService] publishHinoo data=$data');
+      final res =
+          await _client.from(_table).insert(data).select().maybeSingle();
+      if (res == null) throw 'publishHinoo: insert fallita';
+      final id = res['id']?.toString() ?? '';
+      if (id.isEmpty) throw 'publishHinoo: id mancante';
+      return id;
+    } on PostgrestException catch (e) {
+      debugPrint(
+          '[HinooService] publishHinoo error: ${e.message} details=${e.details} hint=${e.hint} code=${e.code}');
+      String msg = e.message;
+      final details = e.details;
+      final hint = e.hint;
+      final code = e.code;
+      if (msg.isEmpty && code != null && code.isNotEmpty) {
+        msg = code;
+      }
+      if (msg.isEmpty) {
+        msg = 'sconosciuto';
+      }
+      final extra = [
+        if (details != null && details.isNotEmpty) details,
+        if (hint != null && hint.isNotEmpty) 'hint: $hint',
+      ].join(' — ');
+      throw 'Errore salvataggio hinoo: $msg${extra.isNotEmpty ? ' ($extra)' : ''}';
+    }
+  }
+
   /// Inserisce un record type='moon' se non già presente (dedup su fingerprint)
   static Future<bool> duplicateToMoon(HinooDraft draft) async {
     final userId = _client.auth.currentUser?.id;

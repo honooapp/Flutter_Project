@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:honoo/Pages/admin_menu_page.dart';
 import 'package:honoo/Pages/email_login_page.dart';
 import 'package:honoo/Pages/moon_page.dart';
+import 'package:honoo/Services/admin_service.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 
-class LunaFissa extends StatelessWidget {
-  const LunaFissa({super.key});
+class LunaFissa extends StatefulWidget {
+  const LunaFissa({super.key, this.showAdminEntry = false});
+
+  final bool showAdminEntry;
 
   /// Margine standard attorno alla luna
   static const double _margin = 8.0;
@@ -30,11 +34,88 @@ class LunaFissa extends StatelessWidget {
   }
 
   @override
+  State<LunaFissa> createState() => _LunaFissaState();
+}
+
+class _LunaFissaState extends State<LunaFissa> {
+  final AdminService _adminService = AdminService();
+  bool _isAdmin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.showAdminEntry) {
+      _loadAdminStatus();
+    }
+  }
+
+  Future<void> _loadAdminStatus() async {
+    final isAdmin = await _adminService.isCurrentUserAdmin();
+    if (!mounted) return;
+    setState(() => _isAdmin = isAdmin);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
     final topSafe = MediaQuery.of(context).viewPadding.top;
-    final iconSize = iconSizeForWidth(w);
-    final double margin = w >= 1200 ? _largeDesktopMargin : _margin;
+    final iconSize = LunaFissa.iconSizeForWidth(w);
+    final double margin =
+        w >= 1200 ? LunaFissa._largeDesktopMargin : LunaFissa._margin;
+
+    final List<Widget> actions = [
+      IconButton(
+        icon: SvgPicture.asset(
+          "assets/icons/moon.svg",
+          semanticsLabel: 'Moon',
+        ),
+        iconSize: iconSize,
+        splashRadius: (iconSize / 2) + 6,
+        tooltip: 'Vai sulla Luna',
+        onPressed: () {
+          final user = SupabaseProvider.client.auth.currentUser;
+          if (user == null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const EmailLoginPage(),
+              ),
+            );
+            return;
+          }
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MoonPage(),
+            ),
+          );
+        },
+      ),
+    ];
+
+    if (widget.showAdminEntry && _isAdmin) {
+      actions.add(const SizedBox(height: 12));
+      actions.add(
+        IconButton(
+          icon: Image.asset(
+            'assets/images/venceslao.png',
+            width: iconSize,
+            height: iconSize,
+          ),
+          iconSize: iconSize,
+          splashRadius: (iconSize / 2) + 6,
+          tooltip: 'Admin',
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AdminMenuPage(),
+              ),
+            );
+          },
+        ),
+      );
+    }
 
     return Positioned(
       // entro i limiti visivi: safe-area top + margine
@@ -46,32 +127,10 @@ class LunaFissa extends StatelessWidget {
         ignoring: false,
         child: Material(
           color: Colors.transparent,
-          child: IconButton(
-            icon: SvgPicture.asset(
-              "assets/icons/moon.svg",
-              semanticsLabel: 'Moon',
-            ),
-            iconSize: iconSize,
-            splashRadius: (iconSize / 2) + 6,
-            tooltip: 'Vai sulla Luna',
-            onPressed: () {
-              final user = SupabaseProvider.client.auth.currentUser;
-              if (user == null) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const EmailLoginPage(),
-                  ),
-                );
-                return;
-              }
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const MoonPage(),
-                ),
-              );
-            },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: actions,
           ),
         ),
       ),

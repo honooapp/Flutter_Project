@@ -67,6 +67,20 @@ class HinooController {
     return fp;
   }
 
+  Future<String> saveToChestAndReturnId(HinooDraft draft) async {
+    _ensureLoggedIn();
+
+    final errors = validateDraft(draft);
+    if (errors.isNotEmpty) {
+      throw 'Draft non valido:\n- ${errors.join('\n- ')}';
+    }
+
+    final id = await HinooService.publishHinooAndReturnId(draft);
+    final fp = fingerprint(draft);
+    lastSavedFingerprint = fp;
+    return id;
+  }
+
   /// Pubblicazione su Luna (o already present)
   Future<HinooMoonResult> sendToMoon(HinooDraft draft) async {
     _ensureLoggedIn();

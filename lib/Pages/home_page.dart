@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:honoo/Services/house_invite_service.dart';
+import 'package:honoo/Services/supabase_provider.dart';
+import 'package:honoo/Widgets/honoo_dialogs.dart';
 import '../Utility/utility.dart';
 import '../Widgets/honoo_app_title.dart';
 import 'placeholder_page.dart';
+import 'new_hinoo_page.dart';
 
 // Widgets riutilizzabili
 import '../Widgets/sea_footer_bar.dart';
@@ -17,6 +21,89 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final HouseInviteService _inviteService = HouseInviteService();
+  bool _inviteFlowChecked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkInviteFlow());
+  }
+
+  Future<void> _checkInviteFlow() async {
+    if (_inviteFlowChecked) return;
+    _inviteFlowChecked = true;
+
+    final user = SupabaseProvider.client.auth.currentUser;
+    if (user == null) return;
+
+    final hasCasa = await _inviteService.hasCasa(user.id);
+    if (hasCasa) return;
+
+    final hasInvite =
+        await _inviteService.hasPendingOrAcceptedInvite(user.id);
+    if (!hasInvite || !mounted) return;
+
+    await _showCasaInviteDialog();
+    if (!mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const NewHinooPage(isCampanello: true),
+      ),
+    );
+  }
+
+  Future<void> _showCasaInviteDialog() {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => HonooDialogShell(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Complimenti!',
+                style: HonooDialogStyles.title(),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Ecco la tua casa sull\'Isola, crea il tuo campanello!',
+                style: HonooDialogStyles.body(),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Crea il campanello',
+                    style: HonooDialogStyles.primaryAction(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,7 +208,7 @@ class _HomePageState extends State<HomePage> {
               ),
 
               // 🌙 LUNA FISSA (riutilizzabile ovunque)
-              const LunaFissa(),
+              const LunaFissa(showAdminEntry: true),
             ],
           );
         },

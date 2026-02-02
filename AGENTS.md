@@ -74,6 +74,7 @@ live.env             // Local helper values for live integration tests (keep pri
 * Respect Row Level Security (RLS). Builders assume:
   - Authenticated user can insert/update their own honoo/hinoo rows.
   - Anonymous actions are limited (moon/public fetch).
+* Admin-only email lookup uses the `admin_find_user_by_email` RPC (security definer); do not query `auth.users` directly from the client.
 * `HinooService` and `HonooService` centralise network calls — extend them instead of scattering `Supabase.instance.client` usage.
 * Storage uploads:
   - Hinoo backgrounds via `HinooStorageUploader.uploadBackground`.

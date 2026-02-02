@@ -21,11 +21,13 @@ import 'email_login_page.dart';
 import 'home_page.dart';
 import 'placeholder_page.dart';
 import '../Entities/hinoo.dart';
+import 'casa_builder_page.dart';
 
 class NewHinooPage extends StatefulWidget {
-  const NewHinooPage({super.key, this.isReply = false});
+  const NewHinooPage({super.key, this.isReply = false, this.isCampanello = false});
 
   final bool isReply;
+  final bool isCampanello;
 
   @override
   State<NewHinooPage> createState() => _NewHinooPageState();
@@ -228,6 +230,17 @@ class _NewHinooPageState extends State<NewHinooPage> {
     }
 
     try {
+      if (widget.isCampanello) {
+        final hinooId = await _controller.saveToChestAndReturnId(hinooDraft);
+        if (!mounted) return;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => CasaBuilderPage(campanelloHinooId: hinooId),
+          ),
+        );
+        return;
+      }
+
       await _controller.saveToChest(hinooDraft);
       if (!mounted) return;
       setState(() => _savedToChest = true);
