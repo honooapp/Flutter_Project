@@ -191,6 +191,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
       mode = selected;
     }
 
+    if (!mounted) return;
     if (mode == null) {
       showHonooToast(
         context,

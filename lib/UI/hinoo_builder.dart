@@ -314,7 +314,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
         message: message,
       );
     } catch (e) {
-      if (currentContext.mounted) {
+      if (mounted) {
         await dismissProgressDialogIfNeeded();
         if (!currentContext.mounted) return;
         showHonooToast(
