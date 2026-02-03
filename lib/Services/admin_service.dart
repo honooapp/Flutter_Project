@@ -15,31 +15,30 @@ class AdminService {
   final SupabaseClient _client;
 
   Future<bool> isCurrentUserAdmin() async {
-    final user = _client.auth.currentUser;
-    if (user == null) return false;
-
-    final res = await _client
-        .from('users')
-        .select('is_admin')
-        .eq('auth_user_id', user.id)
-        .limit(1)
-        .maybeSingle();
-    if (res == null) return false;
-    return res['is_admin'] == true;
+    final res = await _client.rpc('admin_is_admin');
+    if (res is bool) return res;
+    if (res is Map && res['admin_is_admin'] is bool) {
+      return res['admin_is_admin'] as bool;
+    }
+    return res == true;
   }
 
   Future<List<AdminUserRecord>> fetchAllUsers() async {
-    final rows = await _client
-        .from('users')
-        .select('auth_user_id,email');
+    final rows = await _client.rpc('admin_list_users');
 
     final users = <AdminUserRecord>[];
-    for (final row in (rows as List)) {
-      if (row is! Map) continue;
-      final String id = row['auth_user_id']?.toString() ?? '';
-      if (id.isEmpty) continue;
-      final String? email = row['email']?.toString();
-      users.add(AdminUserRecord(authUserId: id, email: email));
+    if (rows is List) {
+      for (final row in rows) {
+        if (row is! Map) continue;
+        final String id = row['auth_user_id']?.toString() ?? '';
+        if (id.isEmpty) continue;
+        users.add(AdminUserRecord(authUserId: id));
+      }
+    } else if (rows is Map) {
+      final String id = rows['auth_user_id']?.toString() ?? '';
+      if (id.isNotEmpty) {
+        users.add(AdminUserRecord(authUserId: id));
+      }
     }
     return users;
   }

@@ -67,7 +67,9 @@ class _LunaFissaState extends State<LunaFissa>
   }
 
   Future<void> _loadAdminStatus() async {
+    final user = SupabaseProvider.client.auth.currentUser;
     final isAdmin = await _adminService.isCurrentUserAdmin();
+    debugPrint('[LunaFissa] uid=${user?.id} admin=$isAdmin');
     if (!mounted) return;
     setState(() => _isAdmin = isAdmin);
   }
