@@ -73,7 +73,7 @@ live.env             // Local helper values for live integration tests (keep pri
 * Only use the **anon key** in Flutter code (already public). Anything requiring elevated privileges belongs in server-side tooling.
 * Respect Row Level Security (RLS). Builders assume:
   - Authenticated user can insert/update their own honoo/hinoo rows.
-  - Anonymous actions are limited (moon/public fetch).
+  - Moon visibility is authenticated-only (see `hinoo moon authenticated` policy).
 * Admin-only email lookup uses the `admin_find_user_by_email` RPC (security definer); do not query `auth.users` directly from the client.
 * `HinooService` and `HonooService` centralise network calls — extend them instead of scattering `Supabase.instance.client` usage.
 * Storage uploads:

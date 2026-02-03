@@ -1,11 +1,21 @@
+import 'dart:math' as math;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:honoo/Services/hinoo_storage_uploader.dart';
 import 'package:honoo/Services/house_invite_service.dart';
 import 'package:honoo/Services/supabase_provider.dart';
+import 'package:honoo/UI/HinooBuilder/overlays/cambia_sfondo.dart';
+import 'package:honoo/UI/hinoo_typography.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Utility/responsive_layout.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
-import 'package:honoo/Widgets/honoo_scaffold.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'home_page.dart';
 
@@ -20,17 +30,117 @@ class CasaBuilderPage extends StatefulWidget {
 
 class _CasaBuilderPageState extends State<CasaBuilderPage> {
   final HouseInviteService _inviteService = HouseInviteService();
+  final TransformationController _imageController = TransformationController();
+  final GlobalKey _captureKey = GlobalKey();
+  ImageProvider? _imageProvider;
   bool _isSaving = false;
+  bool _isUploadingImage = false;
+  double _imageScale = 1.0;
+  static const double _imageMinScale = 1.0;
+  static const double _imageMaxScale = 5.0;
   String? _error;
 
   @override
   void initState() {
     super.initState();
-    _createCasa();
+    _imageController.addListener(_handleImageTransform);
   }
 
-  Future<void> _createCasa() async {
-    if (_isSaving) return;
+  @override
+  void dispose() {
+    _imageController.removeListener(_handleImageTransform);
+    _imageController.dispose();
+    super.dispose();
+  }
+
+  void _handleImageTransform() {
+    final Matrix4 currentMatrix = _imageController.value.clone();
+    final double newScale = _extractScaleFromMatrix(currentMatrix);
+    if ((newScale - _imageScale).abs() > 0.005) {
+      setState(() => _imageScale = newScale);
+    }
+  }
+
+  double _extractScaleFromMatrix(Matrix4 matrix) {
+    final Float64List values = matrix.storage;
+    final double sx = values[0].abs();
+    final double sy = values[5].abs();
+    if (sx > 0 && sy > 0) {
+      return ((sx + sy) / 2).clamp(_imageMinScale, _imageMaxScale).toDouble();
+    }
+    if (sx > 0) return sx.clamp(_imageMinScale, _imageMaxScale).toDouble();
+    if (sy > 0) return sy.clamp(_imageMinScale, _imageMaxScale).toDouble();
+    return _imageMinScale;
+  }
+
+  void _updateImageScale(double scale) {
+    final double clamped = scale.clamp(_imageMinScale, _imageMaxScale).toDouble();
+    final Matrix4 current = _imageController.value.clone();
+    final Float64List values = current.storage;
+    final double currentScale = _extractScaleFromMatrix(current);
+    final double safeScale = currentScale <= 0 ? _imageMinScale : currentScale;
+    final double tx = values[12];
+    final double ty = values[13];
+    final double adjustedTx = tx * (safeScale / clamped);
+    final double adjustedTy = ty * (safeScale / clamped);
+    _imageController.value = Matrix4.identity()
+      ..translate(adjustedTx, adjustedTy)
+      ..scale(clamped);
+  }
+
+  void _nudgeImageScale(double delta) {
+    _updateImageScale(_imageScale + delta);
+  }
+
+  void _resetImageTransform() {
+    _imageController.value = Matrix4.identity();
+    setState(() => _imageScale = _imageMinScale);
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final picker = ImagePicker();
+      final XFile? selected =
+          await picker.pickImage(source: ImageSource.gallery);
+      if (selected == null) return;
+
+      final Uint8List bytes = await selected.readAsBytes();
+      setState(() {
+        _imageProvider = MemoryImage(bytes);
+        _imageScale = _imageMinScale;
+      });
+      _resetImageTransform();
+    } catch (e) {
+      if (!mounted) return;
+      showHonooToast(context, message: 'Errore immagine: $e');
+    }
+  }
+
+  Future<Uint8List?> _captureCasaImage() async {
+    try {
+      final RenderRepaintBoundary? boundary =
+          _captureKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
+      if (boundary == null) return null;
+      final double pixelRatio = MediaQuery.of(context).devicePixelRatio;
+      final ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
+      final ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      return byteData?.buffer.asUint8List();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<void> _saveCasa() async {
+    if (_isSaving || _isUploadingImage) return;
+    if (_imageProvider == null) {
+      showHonooToast(
+        context,
+        message: 'Carica prima un\'immagine per la tua casa.',
+      );
+      return;
+    }
     setState(() {
       _isSaving = true;
       _error = null;
@@ -40,6 +150,42 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
       if (user == null) {
         throw Exception('Utente non autenticato.');
       }
+
+      setState(() => _isUploadingImage = true);
+      final Uint8List? pngBytes = await _captureCasaImage();
+      if (pngBytes == null || pngBytes.isEmpty) {
+        throw Exception('Impossibile generare l\'immagine della casa.');
+      }
+      final imageUrl = await HinooStorageUploader.uploadBackground(
+        bytes: pngBytes,
+        ext: 'png',
+        userId: user.id,
+      );
+      setState(() => _isUploadingImage = false);
+
+      final pagesRow = await SupabaseProvider.client
+          .from('hinoo')
+          .select('pages')
+          .eq('id', widget.campanelloHinooId)
+          .maybeSingle();
+      if (pagesRow == null || pagesRow['pages'] is! List) {
+        throw Exception('Campanello non trovato.');
+      }
+      final List<dynamic> pages = List<dynamic>.from(pagesRow['pages'] as List);
+      if (pages.isEmpty || pages.first is! Map) {
+        throw Exception('Campanello non valido.');
+      }
+      final Map<String, dynamic> firstPage =
+          Map<String, dynamic>.from(pages.first as Map);
+      pages[0] = {
+        ...firstPage,
+        'backgroundImage': imageUrl,
+        'bgTransform': _imageController.value.storage.toList(),
+      };
+      await SupabaseProvider.client
+          .from('hinoo')
+          .update({'pages': pages})
+          .eq('id', widget.campanelloHinooId);
 
       final existing = await SupabaseProvider.client
           .from('case')
@@ -68,65 +214,225 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
       if (!mounted) return;
       setState(() => _error = 'Errore creazione casa: $e');
     } finally {
-      if (mounted) setState(() => _isSaving = false);
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+          _isUploadingImage = false;
+        });
+      }
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return HonooScaffold(
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
+  Widget _buildEmptyOverlay() {
+    return Align(
+      alignment: Alignment.center,
+      child: GestureDetector(
+        onTap: _pickImage,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Sto costruendo la tua casa…',
+                'Carica la tua immagine',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.arvo(
-                  color: HonooColor.onBackground,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
               ),
-              const SizedBox(height: 16),
-              if (_isSaving) const LoadingSpinner() else const SizedBox.shrink(),
-              if (_error != null) ...[
-                const SizedBox(height: 16),
-                Text(
-                  _error!,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.lora(
-                    color: HonooColor.onBackground.withOpacity(0.8),
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: _createCasa,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 14,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  child: Text(
-                    'Riprova',
-                    style: GoogleFonts.libreFranklin(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
+              const SizedBox(height: 22),
+              const Icon(
+                Icons.photo,
+                size: 48,
+                color: Colors.white,
+              ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: HonooColor.background,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final double maxWidth = constraints.maxWidth;
+          final double maxHeight = constraints.maxHeight;
+          final ResponsiveLayoutMode layoutMode =
+              ResponsiveLayout.modeForWidth(maxWidth);
+          final bool isMobile = layoutMode == ResponsiveLayoutMode.mobile;
+          final double targetMaxWidth = isMobile
+              ? maxWidth
+              : ResponsiveLayout.contentMaxWidth(maxWidth);
+          final double footerIconSize =
+              ResponsiveLayout.footerIconSizeForMode(layoutMode);
+          final double footerBottomPadding =
+              ResponsiveLayout.footerBottomPaddingForMode(layoutMode) +
+                  (isMobile ? 0 : 12);
+          final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
+          final double footerSpacing = footerBottomPadding + safeBottom;
+          final double footerTopSpacing = footerSpacing / 2;
+          final double footerBottomSpacing = footerSpacing - footerTopSpacing;
+          final double footerReserved = isMobile
+              ? 0
+              : footerIconSize + footerTopSpacing + footerBottomSpacing;
+          final double availableHeight = isMobile
+              ? maxHeight
+              : (maxHeight - footerReserved)
+                  .clamp(0.0, double.infinity);
+          final Size canvasSize = isMobile
+              ? Size(maxWidth, availableHeight)
+              : ResponsiveLayout.fitAspectRatio(
+                  targetMaxWidth,
+                  availableHeight,
+                  HinooTypography.aspectRatio,
+                );
+          final double scrignoSize = math.min(
+            footerIconSize * 2,
+            math.min(canvasSize.width, canvasSize.height) * 0.5,
+          );
+          final double topSafe = MediaQuery.of(context).viewPadding.top;
+
+          final Widget content = SizedBox(
+            width: canvasSize.width,
+            height: canvasSize.height,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Center(
+                  child: SizedBox(
+                    width: canvasSize.width,
+                    height: canvasSize.height,
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: SizedBox(
+                        width: HinooTypography.baselineCanvasWidth,
+                        height: HinooTypography.baselineCanvasHeight,
+                        child: RepaintBoundary(
+                          key: _captureKey,
+                          child: ClipRect(
+                            child: InteractiveViewer(
+                              transformationController: _imageController,
+                              panEnabled: true,
+                              scaleEnabled: true,
+                              minScale: _imageMinScale,
+                              maxScale: _imageMaxScale,
+                              boundaryMargin: const EdgeInsets.all(200),
+                              child: SizedBox.expand(
+                                child: _imageProvider == null
+                                    ? Container(color: HonooColor.background)
+                                    : Image(
+                                        image: _imageProvider!,
+                                        fit: BoxFit.cover,
+                                        alignment: Alignment.center,
+                                      ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                IgnorePointer(
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: footerBottomSpacing),
+                      child: SizedBox(
+                        width: scrignoSize,
+                        height: scrignoSize,
+                        child: Image.asset(
+                          'assets/icons/scrigno_di_carta.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                if (_imageProvider == null)
+                  _buildEmptyOverlay()
+                else
+                  CambiaSfondoOverlay(
+                    onTapChange: _pickImage,
+                    showControls: true,
+                    isUploading: _isUploadingImage,
+                    currentScale: _imageScale,
+                    minScale: _imageMinScale,
+                    maxScale: _imageMaxScale,
+                    onScaleChanged: _updateImageScale,
+                    onZoomIn: _imageScale < _imageMaxScale
+                        ? () => _nudgeImageScale(0.1)
+                        : null,
+                    onZoomOut: _imageScale > _imageMinScale
+                        ? () => _nudgeImageScale(-0.1)
+                        : null,
+                    onResetTransform: _resetImageTransform,
+                  ),
+                Positioned(
+                  top: topSafe + 12,
+                  right: 12,
+                  child: _isSaving
+                      ? const SizedBox(
+                          width: 44,
+                          height: 44,
+                          child: LoadingSpinner(color: Colors.white),
+                        )
+                      : IconButton(
+                          iconSize: 44,
+                          tooltip: 'Salva casa',
+                          onPressed: _saveCasa,
+                          icon: SvgPicture.asset(
+                            'assets/icons/ok.svg',
+                            width: 44,
+                            height: 44,
+                            colorFilter: const ColorFilter.mode(
+                              HonooColor.onBackground,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ),
+                ),
+              ],
+            ),
+          );
+
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              Center(child: content),
+              if (_error != null)
+                Positioned(
+                  left: 24,
+                  right: 24,
+                  bottom: footerBottomSpacing + 24,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      _error!,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.lora(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }

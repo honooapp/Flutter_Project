@@ -17,6 +17,7 @@ import '../Entities/hinoo.dart';
 
 import '../UI/honoo_thread_view.dart';
 import '../UI/hinoo_viewer.dart';
+import '../UI/hinoo_typography.dart';
 
 import '../Utility/honoo_colors.dart';
 import '../Utility/responsive_layout.dart';
@@ -563,12 +564,13 @@ class _ChestPageState extends State<ChestPage> {
     final GlobalKey repaintKey = _keyFor(identity);
     final bool isHonoo = item.honoo != null;
 
-    final bool isCompact = layoutMode == ResponsiveLayoutMode.mobile ||
-        layoutMode == ResponsiveLayoutMode.tablet;
-    final double cardW = isHonoo
-        ? honooMetrics.width
-        : (isCompact ? targetMaxW : targetMaxW.clamp(0.0, 360.0));
-    final double cardMaxH = isHonoo ? honooMetrics.height : availableCenterH;
+    final Size hinooSize = ResponsiveLayout.fitAspectRatio(
+      targetMaxW,
+      availableCenterH,
+      HinooTypography.aspectRatio,
+    );
+    final double cardW = isHonoo ? honooMetrics.width : hinooSize.width;
+    final double cardMaxH = isHonoo ? honooMetrics.height : hinooSize.height;
 
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
 
@@ -587,7 +589,7 @@ class _ChestPageState extends State<ChestPage> {
       ),
       hinoo: (row) => HinooViewer(
         draft: row.draft,
-        maxHeight: availableCenterH,
+        maxHeight: cardMaxH,
         maxWidth: cardW,
       ),
     );

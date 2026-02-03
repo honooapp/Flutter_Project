@@ -1,5 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart' as cs;
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 
@@ -8,8 +10,8 @@ import '../Entities/honoo.dart';
 import 'chest_page.dart';
 import 'coming_soon_page.dart';
 import 'home_page.dart';
-import '../Services/honoo_service.dart';
 import '../UI/hinoo_viewer.dart';
+import '../UI/hinoo_typography.dart';
 import '../UI/honoo_thread_view.dart';
 import '../Utility/honoo_colors.dart';
 import '../Utility/utility.dart';
@@ -31,6 +33,8 @@ class _MoonPageState extends State<MoonPage> {
   bool _isLoading = true;
   List<_MoonItem> _items = [];
   int _currentIndex = 0;
+  final cs.CarouselController _carouselController = cs.CarouselController();
+  DateTime? _lastScroll;
 
   @override
   void initState() {
@@ -40,37 +44,35 @@ class _MoonPageState extends State<MoonPage> {
 
   Future<void> _loadMoonContent() async {
     try {
-      final honoo = await HonooService.fetchPublicHonoo();
-
       final rows = await SupabaseProvider.client
-          .from('hinoo')
-          .select('pages,recipient_tag,created_at')
-          .eq('type', 'moon')
+          .from('moon_public')
+          .select('kind,pages,text,image_url,recipient_tag,created_at')
           .order('created_at', ascending: false);
 
       final List<_MoonItem> items = [];
 
-      for (final h in honoo) {
-        final created = DateTime.tryParse(h.createdAt) ??
-            DateTime.fromMillisecondsSinceEpoch(0);
-        items.add(_MoonItem.honoo(h, created));
-      }
-
       for (final row in (rows as List)) {
-        final pages = row['pages'];
-        if (pages is List) {
-          final draft = HinooDraft(
-            pages: pages
-                .whereType<Map<String, dynamic>>()
-                .map(HinooSlide.fromJson)
-                .toList(),
-            type: HinooType.moon,
-            recipientTag: row['recipient_tag'] as String?,
-          );
-          final created =
-              DateTime.tryParse((row['created_at'] ?? '').toString()) ??
-                  DateTime.fromMillisecondsSinceEpoch(0);
-          items.add(_MoonItem.hinoo(draft, created));
+        if (row is! Map) continue;
+        final String kind = row['kind']?.toString() ?? '';
+        final created =
+            DateTime.tryParse((row['created_at'] ?? '').toString()) ??
+                DateTime.fromMillisecondsSinceEpoch(0);
+        if (kind == 'honoo') {
+          final honoo = Honoo.fromMap(row.cast<String, dynamic>());
+          items.add(_MoonItem.honoo(honoo, created));
+        } else if (kind == 'hinoo') {
+          final pages = row['pages'];
+          if (pages is List) {
+            final draft = HinooDraft(
+              pages: pages
+                  .whereType<Map<String, dynamic>>()
+                  .map(HinooSlide.fromJson)
+                  .toList(),
+              type: HinooType.moon,
+              recipientTag: row['recipient_tag'] as String?,
+            );
+            items.add(_MoonItem.hinoo(draft, created));
+          }
         }
       }
 
@@ -269,37 +271,72 @@ class _MoonPageState extends State<MoonPage> {
         ),
       );
     } else {
-      child = SizedBox(
-        key: ValueKey('moon_content_${_items.length}'),
-        height: bodyHeight,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-          child: cs.CarouselSlider.builder(
-            itemCount: _items.length,
-            options: cs.CarouselOptions(
-              height: bodyHeight,
-              viewportFraction: 1.0,
-              enableInfiniteScroll: false,
-              padEnds: true,
-              enlargeCenterPage: false,
-              scrollPhysics: const BouncingScrollPhysics(),
-              onPageChanged: (index, _) {
-                setState(() => _currentIndex = index);
-              },
-            ),
-            itemBuilder: (context, index, realIndex) {
-              final item = _items[index];
-              return Padding(
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: _buildMoonItem(
-                  item,
-                  availableHeight,
-                  maxWidth,
-                  honooMetrics,
-                  isCompact,
-                ),
-              );
+      child = FocusableActionDetector(
+        autofocus: true,
+        shortcuts: {
+          LogicalKeySet(LogicalKeyboardKey.arrowLeft):
+              const _ArrowIntent(-1),
+          LogicalKeySet(LogicalKeyboardKey.arrowRight):
+              const _ArrowIntent(1),
+        },
+        actions: {
+          _ArrowIntent: CallbackAction<_ArrowIntent>(
+            onInvoke: (intent) {
+              _animateToIndex(_currentIndex + intent.delta);
+              return null;
             },
+          ),
+        },
+        child: SizedBox(
+          key: ValueKey('moon_content_${_items.length}'),
+          height: bodyHeight,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: Listener(
+              onPointerSignal: (event) {
+                if (event is PointerScrollEvent) {
+                  _handlePointerScroll(event);
+                }
+              },
+              child: ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(
+                  dragDevices: {
+                    PointerDeviceKind.touch,
+                    PointerDeviceKind.mouse,
+                    PointerDeviceKind.stylus,
+                    PointerDeviceKind.trackpad,
+                  },
+                ),
+                child: cs.CarouselSlider.builder(
+                  carouselController: _carouselController,
+                  itemCount: _items.length,
+                  options: cs.CarouselOptions(
+                    height: bodyHeight,
+                    viewportFraction: 1.0,
+                    enableInfiniteScroll: false,
+                    padEnds: true,
+                    enlargeCenterPage: false,
+                    scrollPhysics: const BouncingScrollPhysics(),
+                    onPageChanged: (index, _) {
+                      setState(() => _currentIndex = index);
+                    },
+                  ),
+                  itemBuilder: (context, index, realIndex) {
+                    final item = _items[index];
+                    return Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: horizontalPadding),
+                      child: _buildMoonItem(
+                        item,
+                        availableHeight,
+                        maxWidth,
+                        honooMetrics,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
           ),
         ),
       );
@@ -318,7 +355,6 @@ class _MoonPageState extends State<MoonPage> {
     double maxHeight,
     double maxWidth,
     HonooBuilderMetrics honooMetrics,
-    bool isCompact,
   ) {
     final String identity;
     final Widget content;
@@ -339,11 +375,34 @@ class _MoonPageState extends State<MoonPage> {
       final draft = item.hinoo!;
       identity =
           'moon_hinoo_${draft.hashCode}_${item.createdAt.toIso8601String()}';
-      content = HinooViewer(
+    final Size hinooSize = ResponsiveLayout.fitAspectRatio(
+      maxWidth,
+      maxHeight,
+      HinooTypography.aspectRatio,
+    );
+      final double cardW = hinooSize.width;
+      final double cardH = hinooSize.height;
+      final Widget viewer = HinooViewer(
         draft: draft,
-        maxHeight: maxHeight,
-        maxWidth: isCompact ? maxWidth : maxWidth.clamp(0.0, 360.0),
+        maxHeight: cardH,
+        maxWidth: cardW,
         gapColor: Colors.white,
+      );
+      content = Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: cardH,
+            maxWidth: cardW,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: SizedBox(
+              width: cardW,
+              height: cardH,
+              child: viewer,
+            ),
+          ),
+        ),
       );
     }
 
@@ -357,6 +416,39 @@ class _MoonPageState extends State<MoonPage> {
       ),
     );
   }
+
+  void _handlePointerScroll(PointerScrollEvent event) {
+    if (_items.isEmpty) return;
+    final now = DateTime.now();
+    if (_lastScroll != null &&
+        now.difference(_lastScroll!) < const Duration(milliseconds: 200)) {
+      return;
+    }
+    _lastScroll = now;
+    final delta = event.scrollDelta.dy;
+    if (delta > 0) {
+      _animateToIndex(_currentIndex + 1);
+    } else if (delta < 0) {
+      _animateToIndex(_currentIndex - 1);
+    }
+  }
+
+  void _animateToIndex(int target) {
+    if (_items.isEmpty) return;
+    final int clamped = target.clamp(0, _items.length - 1);
+    if (clamped == _currentIndex) return;
+    _carouselController.animateToPage(
+      clamped,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
+    );
+  }
+}
+
+class _ArrowIntent extends Intent {
+  const _ArrowIntent(this.delta);
+
+  final int delta;
 }
 
 class _MoonItem {

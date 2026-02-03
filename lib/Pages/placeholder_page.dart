@@ -138,8 +138,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                       WidgetSpan(
                         child: Padding(
                           padding: const EdgeInsets.only(bottom: 3),
-                          child:
-                              Image.asset("assets/icons/luna.png", height: 70),
+                          child: Image.asset("assets/icons/luna.png",
+                              height: 70),
                         ),
                         alignment: PlaceholderAlignment.middle,
                       ),
@@ -147,8 +147,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                       WidgetSpan(
                         child: Padding(
                           padding: const EdgeInsets.only(bottom: 3),
-                          child:
-                              Image.asset("assets/icons/isola.png", height: 70),
+                          child: Image.asset("assets/icons/isola.png",
+                              height: 70),
                         ),
                         alignment: PlaceholderAlignment.middle,
                       ),

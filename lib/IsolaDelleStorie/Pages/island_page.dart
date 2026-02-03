@@ -303,26 +303,48 @@ class _IslandPageState extends State<IslandPage> {
                                           child: Column(
                                             children: [
                                               const SizedBox(height: 4),
-                                              InkWell(
-                                                onTap: () {
-                                                  Navigator.of(context)
-                                                      .pushAndRemoveUntil(
-                                                    MaterialPageRoute(
-                                                        builder: (_) =>
-                                                            const FullIslandPage()),
-                                                    (route) => false,
-                                                  );
-                                                },
-                                                child: Text(
-                                                  'Se vuoi di più, clicca qui',
+                                              RichText(
+                                                textAlign: TextAlign.center,
+                                                text: TextSpan(
                                                   style: GoogleFonts.arvo(
                                                     color:
                                                         HonooColor.onBackground,
                                                     fontSize: 18,
-                                                    fontWeight: FontWeight.w700,
-                                                    decoration: TextDecoration
-                                                        .underline,
+                                                    fontWeight: FontWeight.w400,
                                                   ),
+                                                  children: [
+                                                    const TextSpan(
+                                                      text: 'Se vuoi di più, ',
+                                                    ),
+                                                    WidgetSpan(
+                                                      alignment:
+                                                          PlaceholderAlignment
+                                                              .baseline,
+                                                      baseline:
+                                                          TextBaseline.alphabetic,
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          Navigator.of(context)
+                                                              .pushAndRemoveUntil(
+                                                            MaterialPageRoute(
+                                                                builder: (_) =>
+                                                                    const FullIslandPage()),
+                                                            (route) => false,
+                                                          );
+                                                        },
+                                                        child: Text(
+                                                          'clicca qui',
+                                                          style: GoogleFonts.arvo(
+                                                            color: HonooColor
+                                                                .onBackground,
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
                                             ],

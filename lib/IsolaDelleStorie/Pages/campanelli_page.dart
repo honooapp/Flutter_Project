@@ -29,11 +29,14 @@ class CampanelliPage extends StatefulWidget {
 class _CampanelliPageState extends State<CampanelliPage> {
   int _campanelloIndex = 0;
   int _verticalPageIndex = 0;
+  int _lastHouseCampanelloIndex = 1;
   final PageController _pageController = PageController();
   final PageController _campanelloPageController = PageController();
   List<_CampanelloEntry> _userEntries = const [];
   bool _isLoadingUserEntries = false;
   bool _isHoveringCampanelli = false;
+  bool _checkedKnocks = false;
+  final Set<String> _pendingKnockTags = {};
   final Map<String, _CasaShareMode> _shareModesByCampanello = {
     campanelloSirenaId: _CasaShareMode.honoo,
     campanelloPalombaroId: _CasaShareMode.hinoo,
@@ -126,9 +129,24 @@ class _CampanelliPageState extends State<CampanelliPage> {
     if (shouldKnock != true || !mounted) return;
 
     showHonooToast(context, message: 'Bussata inviata.');
+    await _sendHouseKnock(campanello);
     await Future.delayed(const Duration(milliseconds: 400));
     if (!mounted) return;
     await _showEnterDialog(campanello.id);
+  }
+
+  Future<void> _sendHouseKnock(CampanelloData campanello) async {
+    final user = SupabaseProvider.client.auth.currentUser;
+    final String? targetTag = campanello.campanelloHinooId;
+    if (user == null || targetTag == null || targetTag.isEmpty) return;
+    if (campanello.ownerId == user.id) return;
+
+    try {
+      await SupabaseProvider.client.from('house_access').insert({
+        'target_house_tag': targetTag,
+        'visitor_id': user.id,
+      });
+    } catch (_) {}
   }
 
   Future<void> _showEnterDialog(String campanelloId) async {
@@ -288,6 +306,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
         casa: const CasaData(
           id: casaSirenaId,
           backgroundImage: AssetImage(casaSirenaBg),
+          bgScale: 1.0,
+          bgOffsetX: 0.0,
+          bgOffsetY: 0.0,
         ),
       ),
       _CampanelloEntry(
@@ -302,6 +323,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
         casa: const CasaData(
           id: casaPalombaroId,
           backgroundImage: AssetImage(casaPalombaroBg),
+          bgScale: 1.0,
+          bgOffsetX: 0.0,
+          bgOffsetY: 0.0,
         ),
       ),
     ];
@@ -403,6 +427,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
             casa: CasaData(
               id: casaId,
               backgroundImage: _houseBackgroundProvider(slide.backgroundImage),
+              bgTransform: slide.bgTransform,
+              bgScale: slide.bgScale,
+              bgOffsetX: slide.bgOffsetX,
+              bgOffsetY: slide.bgOffsetY,
             ),
           ),
         );
@@ -410,6 +438,14 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
       if (mounted) {
         setState(() => _userEntries = entries);
+      }
+      if (!_checkedKnocks) {
+        _checkedKnocks = true;
+        final List<String> hinooIds = entries
+            .map((entry) => entry.campanello.campanelloHinooId)
+            .whereType<String>()
+            .toList();
+        await _checkPendingKnocks(hinooIds);
       }
     } catch (_) {
       if (mounted) {
@@ -420,6 +456,70 @@ class _CampanelliPageState extends State<CampanelliPage> {
         setState(() => _isLoadingUserEntries = false);
       }
     }
+  }
+
+  Future<void> _checkPendingKnocks(List<String> hinooIds) async {
+    if (hinooIds.isEmpty) return;
+    try {
+      final rows = await SupabaseProvider.client
+          .from('house_access')
+          .select('id,target_house_tag')
+          .in_('target_house_tag', hinooIds)
+          .is_('granted_at', null);
+      if (rows is! List || rows.isEmpty) return;
+      _pendingKnockTags
+        ..clear()
+        ..addAll(rows
+            .whereType<Map>()
+            .map((row) => row['target_house_tag']?.toString() ?? '')
+            .where((tag) => tag.isNotEmpty));
+      final row = rows.first;
+      if (row is! Map) return;
+      final String targetTag = row['target_house_tag']?.toString() ?? '';
+      if (targetTag.isEmpty || !mounted) return;
+
+      final _CampanelloEntry entry = _userEntries.firstWhere(
+        (item) => item.campanello.campanelloHinooId == targetTag,
+        orElse: () => _CampanelloEntry(
+          campanello: CampanelloData(
+            id: '',
+            campanelloHinooId: targetTag,
+            ownerId: SupabaseProvider.client.auth.currentUser?.id,
+            backgroundImage: const AssetImage(userCampanelloBg),
+            text: '',
+            linkedHouseId: '',
+          ),
+          casa: const CasaData(
+            id: '',
+            backgroundImage: AssetImage(defaultCasaBg),
+            bgScale: 1.0,
+            bgOffsetX: 0.0,
+            bgOffsetY: 0.0,
+          ),
+        ),
+      );
+
+      final bool? openHouse = await showDialog<bool>(
+        context: context,
+        barrierDismissible: true,
+        builder: (_) => const HonooConfirmDialog(
+          title: 'Qualcuno ha bussato alla tua casa',
+          confirmLabel: 'Apri',
+          cancelLabel: 'Non ora',
+        ),
+      );
+
+      if (openHouse != true || !mounted) return;
+      final _CasaShareMode? mode = await _showShareModeDialog();
+      if (mode == null || !mounted) return;
+      await _saveShareMode(entry.campanello, mode);
+      await SupabaseProvider.client.from('house_access').update({
+        'granted_at': DateTime.now().toIso8601String(),
+      }).eq('target_house_tag', targetTag);
+      _pendingKnockTags.remove(targetTag);
+      if (!mounted) return;
+      showHonooToast(context, message: 'Casa aperta.');
+    } catch (_) {}
   }
 
   @override
@@ -446,8 +546,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
           final double footerIconSize =
               ResponsiveLayout.footerIconSizeForMode(layoutMode);
           final double footerGap = ResponsiveLayout.footerGapForMode(layoutMode);
+          final bool isMobile = layoutMode == ResponsiveLayoutMode.mobile;
           final double footerBottomPadding =
-              ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
+              ResponsiveLayout.footerBottomPaddingForMode(layoutMode) +
+                  (isMobile ? 0 : 12);
           final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
           final double footerSpacing = footerBottomPadding + safeBottom;
           final double footerTopSpacing = footerSpacing / 2;
@@ -468,7 +570,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
             availableHeight,
             HinooTypography.aspectRatio,
           );
-          final bool isMobile = layoutMode == ResponsiveLayoutMode.mobile;
           final double casaWidth = isMobile ? maxWidth : canvasSize.width;
           final double casaHeight =
               isMobile ? availableHeight : canvasSize.height;
@@ -486,6 +587,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
           final CampanelloData? activeCampanello = showCampanello
               ? campanelli[casaIndex].campanello
               : null;
+          final String? activeCampanelloId =
+              activeCampanello?.campanelloHinooId;
+          final bool hasPendingKnock = activeCampanelloId != null &&
+              _pendingKnockTags.contains(activeCampanelloId);
           final bool casaUnlocked = activeCampanello == null
               ? false
               : _isCampanelloUnlocked(activeCampanello.id);
@@ -563,6 +668,21 @@ class _CampanelliPageState extends State<CampanelliPage> {
                         scrollDirection: Axis.vertical,
                         physics: pagePhysics,
                         onPageChanged: (index) {
+                          if (index == 1) {
+                            _lastHouseCampanelloIndex =
+                                _campanelloIndex == 0 ? 1 : _campanelloIndex;
+                          }
+                          if (index == 0 && _campanelloIndex == 0) {
+                            final target = _lastHouseCampanelloIndex;
+                            if (_campanelloPageController.hasClients) {
+                              _campanelloPageController.jumpToPage(target);
+                            }
+                            setState(() {
+                              _verticalPageIndex = index;
+                              _campanelloIndex = target;
+                            });
+                            return;
+                          }
                           setState(() => _verticalPageIndex = index);
                         },
                         children: [
@@ -717,11 +837,33 @@ class _CampanelliPageState extends State<CampanelliPage> {
                             splashRadius: 25,
                             tooltip: 'Campanello',
                             onPressed: () => _handleKnock(activeCampanello!),
-                            icon: Image.asset(
-                              "assets/icons/campanello_bianco.png",
-                              width: footerIconSize,
-                              height: footerIconSize,
-                              fit: BoxFit.contain,
+                            icon: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Image.asset(
+                                  "assets/icons/campanello_bianco.png",
+                                  width: footerIconSize,
+                                  height: footerIconSize,
+                                  fit: BoxFit.contain,
+                                ),
+                                if (hasPendingKnock)
+                                  Positioned(
+                                    top: -2,
+                                    right: -2,
+                                    child: Container(
+                                      width: 12,
+                                      height: 12,
+                                      decoration: BoxDecoration(
+                                        color: Colors.redAccent,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: HonooColor.background,
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                       ],
@@ -764,10 +906,18 @@ class CampanelloData {
 class CasaData {
   final String id;
   final ImageProvider backgroundImage;
+  final List<double>? bgTransform;
+  final double bgScale;
+  final double bgOffsetX;
+  final double bgOffsetY;
 
   const CasaData({
     required this.id,
     required this.backgroundImage,
+    this.bgTransform,
+    required this.bgScale,
+    required this.bgOffsetX,
+    required this.bgOffsetY,
   });
 }
 
@@ -899,6 +1049,29 @@ class _CasaSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const double designWidth = 1080;
+    const double designHeight = 1920;
+    final double scaleX = width / designWidth;
+    final double scaleY = height / designHeight;
+
+    Matrix4 buildTransform() {
+      final List<double>? transform = casa.bgTransform;
+      if (transform != null && transform.length == 16) {
+        final List<double> m = List<double>.from(transform);
+        m[12] *= scaleX;
+        m[13] *= scaleY;
+        return Matrix4.fromList(m);
+      }
+
+      final double tx = casa.bgOffsetX * scaleX;
+      final double ty = casa.bgOffsetY * scaleY;
+      return Matrix4.identity()
+        ..translate(tx, ty)
+        ..scale(casa.bgScale);
+    }
+
+    final Matrix4 transform = buildTransform();
+
     return SizedBox(
       width: width,
       height: height,
@@ -906,9 +1079,15 @@ class _CasaSection extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           if (isUnlocked)
-            Image(
-              image: casa.backgroundImage,
-              fit: BoxFit.cover,
+            ClipRect(
+              child: Transform(
+                transform: transform,
+                alignment: Alignment.center,
+                child: Image(
+                  image: casa.backgroundImage,
+                  fit: BoxFit.cover,
+                ),
+              ),
             )
           else
             Container(color: HonooColor.background),
