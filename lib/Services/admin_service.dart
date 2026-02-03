@@ -43,6 +43,22 @@ class AdminService {
     return users;
   }
 
+  Future<List<String>> fetchUserEmails() async {
+    final rows = await _client.rpc('admin_list_user_emails');
+    final emails = <String>[];
+    if (rows is List) {
+      for (final row in rows) {
+        if (row is! Map) continue;
+        final String email = row['email']?.toString() ?? '';
+        if (email.isNotEmpty) emails.add(email);
+      }
+    } else if (rows is Map) {
+      final String email = rows['email']?.toString() ?? '';
+      if (email.isNotEmpty) emails.add(email);
+    }
+    return emails;
+  }
+
   Future<AdminUserRecord?> findUserByEmail(String email) async {
     final res = await _client
         .rpc('admin_find_user_by_email', params: {'p_email': email});

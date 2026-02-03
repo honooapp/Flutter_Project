@@ -22,17 +22,34 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
   late final Future<bool> _adminCheck;
   bool _invitingAll = false;
   bool _invitingEmail = false;
+  bool _loadingEmails = false;
+  List<String> _emailHints = const [];
 
   @override
   void initState() {
     super.initState();
     _adminCheck = _adminService.isCurrentUserAdmin();
+    _adminCheck.then((isAdmin) {
+      if (isAdmin) _loadEmailHints();
+    });
   }
 
   @override
   void dispose() {
     _emailController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadEmailHints() async {
+    if (_loadingEmails) return;
+    setState(() => _loadingEmails = true);
+    try {
+      final emails = await _adminService.fetchUserEmails();
+      if (!mounted) return;
+      setState(() => _emailHints = emails);
+    } finally {
+      if (mounted) setState(() => _loadingEmails = false);
+    }
   }
 
   Future<void> _inviteAll() async {
@@ -204,13 +221,91 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    TextField(
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
-                      cursorColor: Colors.white,
-                      decoration: inputDecoration,
+                    Autocomplete<String>(
+                      optionsBuilder: (value) {
+                        if (value.text.trim().isEmpty) {
+                          return const Iterable<String>.empty();
+                        }
+                        final query = value.text.toLowerCase();
+                        return _emailHints.where(
+                            (email) => email.toLowerCase().contains(query));
+                      },
+                      onSelected: (selection) {
+                        _emailController.text = selection;
+                      },
+                      fieldViewBuilder: (
+                        context,
+                        textController,
+                        focusNode,
+                        onFieldSubmitted,
+                      ) {
+                        if (textController.text != _emailController.text) {
+                          textController.text = _emailController.text;
+                          textController.selection =
+                              TextSelection.collapsed(
+                            offset: textController.text.length,
+                          );
+                        }
+                        return TextField(
+                          controller: textController,
+                          focusNode: focusNode,
+                          keyboardType: TextInputType.emailAddress,
+                          textAlign: TextAlign.center,
+                          style:
+                              GoogleFonts.lora(color: Colors.white, fontSize: 16),
+                          cursorColor: Colors.white,
+                          decoration: inputDecoration.copyWith(
+                            suffixIcon: _loadingEmails
+                                ? const Padding(
+                                    padding: EdgeInsets.all(12),
+                                    child: SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                : null,
+                          ),
+                          onChanged: (value) {
+                            _emailController.text = value;
+                          },
+                        );
+                      },
+                      optionsViewBuilder:
+                          (context, onSelected, options) {
+                        return Align(
+                          alignment: Alignment.topCenter,
+                          child: Material(
+                            color: Colors.black.withOpacity(0.85),
+                            borderRadius: BorderRadius.circular(12),
+                            child: ConstrainedBox(
+                              constraints:
+                                  const BoxConstraints(maxHeight: 220, maxWidth: 420),
+                              child: ListView.builder(
+                                padding: const EdgeInsets.all(8),
+                                itemCount: options.length,
+                                itemBuilder: (context, index) {
+                                  final option = options.elementAt(index);
+                                  return ListTile(
+                                    dense: true,
+                                    title: Text(
+                                      option,
+                                      style: GoogleFonts.lora(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    onTap: () => onSelected(option),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(

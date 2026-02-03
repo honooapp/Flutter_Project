@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:honoo/Pages/admin_menu_page.dart';
@@ -5,6 +7,7 @@ import 'package:honoo/Pages/email_login_page.dart';
 import 'package:honoo/Pages/moon_page.dart';
 import 'package:honoo/Services/admin_service.dart';
 import 'package:honoo/Services/supabase_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LunaFissa extends StatefulWidget {
   const LunaFissa({super.key, this.showAdminEntry = false});
@@ -41,6 +44,7 @@ class _LunaFissaState extends State<LunaFissa>
     with WidgetsBindingObserver {
   final AdminService _adminService = AdminService();
   bool _isAdmin = false;
+  StreamSubscription<AuthState>? _authSub;
 
   @override
   void initState() {
@@ -49,6 +53,10 @@ class _LunaFissaState extends State<LunaFissa>
     if (widget.showAdminEntry) {
       _loadAdminStatus();
     }
+    _authSub = SupabaseProvider.client.auth.onAuthStateChange.listen((_) {
+      if (!mounted || !widget.showAdminEntry) return;
+      _loadAdminStatus();
+    });
   }
 
   @override
@@ -77,6 +85,7 @@ class _LunaFissaState extends State<LunaFissa>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _authSub?.cancel();
     super.dispose();
   }
 
