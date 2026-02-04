@@ -163,42 +163,13 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
       );
       setState(() => _isUploadingImage = false);
 
-      final pagesRow = await SupabaseProvider.client
-          .from('hinoo')
-          .select('pages')
-          .eq('id', widget.campanelloHinooId)
-          .maybeSingle();
-      if (pagesRow == null || pagesRow['pages'] is! List) {
-        throw Exception('Campanello non trovato.');
-      }
-      final List<dynamic> pages = List<dynamic>.from(pagesRow['pages'] as List);
-      if (pages.isEmpty || pages.first is! Map) {
-        throw Exception('Campanello non valido.');
-      }
-      final Map<String, dynamic> firstPage =
-          Map<String, dynamic>.from(pages.first as Map);
-      pages[0] = {
-        ...firstPage,
-        'backgroundImage': imageUrl,
-        'bgTransform': _imageController.value.storage.toList(),
-      };
-      await SupabaseProvider.client
-          .from('hinoo')
-          .update({'pages': pages})
-          .eq('id', widget.campanelloHinooId);
-
-      final existing = await SupabaseProvider.client
-          .from('case')
-          .select('id')
-          .eq('owner_id', user.id)
-          .limit(1);
-      if (existing is List && existing.isEmpty) {
-        await SupabaseProvider.client.from('case').insert({
-          'owner_id': user.id,
-          'campanello_hinoo_id': widget.campanelloHinooId,
-          'created_at': DateTime.now().toIso8601String(),
-        });
-      }
+      await SupabaseProvider.client.from('case').upsert({
+        'owner_id': user.id,
+        'campanello_hinoo_id': widget.campanelloHinooId,
+        'house_image_url': imageUrl,
+        'bg_transform': _imageController.value.storage.toList(),
+        'created_at': DateTime.now().toIso8601String(),
+      }, onConflict: 'owner_id');
 
       try {
         await _inviteService.markInvitesAccepted(user.id);
@@ -325,7 +296,7 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
                               boundaryMargin: const EdgeInsets.all(200),
                               child: SizedBox.expand(
                                 child: _imageProvider == null
-                                    ? Container(color: HonooColor.background)
+                                    ? Container(color: Colors.white)
                                     : Image(
                                         image: _imageProvider!,
                                         fit: BoxFit.cover,

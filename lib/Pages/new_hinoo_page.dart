@@ -652,7 +652,9 @@ class _NewHinooPageState extends State<NewHinooPage> {
                             semanticsLabel: 'OK',
                             size: footerIconSize,
                             splashRadius: 25,
-                            tooltip: 'Salva hinoo',
+                            tooltip: widget.isCampanello
+                                ? 'Salva il campanello'
+                                : 'Salva hinoo',
                             onPressed: _submitHinoo,
                           ),
                       ],

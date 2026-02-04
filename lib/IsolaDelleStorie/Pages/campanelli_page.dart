@@ -348,11 +348,26 @@ class _CampanelliPageState extends State<CampanelliPage> {
     ];
   }
 
-  ImageProvider _houseBackgroundProvider(String? backgroundUrl) {
-    if (backgroundUrl != null && backgroundUrl.isNotEmpty) {
-      return NetworkImage(backgroundUrl);
+  ImageProvider _houseBackgroundProvider(
+    String? houseUrl,
+    String? fallbackUrl,
+  ) {
+    if (houseUrl != null && houseUrl.isNotEmpty) {
+      return NetworkImage(houseUrl);
+    }
+    if (fallbackUrl != null && fallbackUrl.isNotEmpty) {
+      return NetworkImage(fallbackUrl);
     }
     return const AssetImage(defaultCasaBg);
+  }
+
+  List<double>? _parseTransform(dynamic raw) {
+    if (raw is! List) return null;
+    try {
+      return raw.map((e) => (e as num).toDouble()).toList();
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> _loadUserEntries() async {
@@ -364,13 +379,25 @@ class _CampanelliPageState extends State<CampanelliPage> {
     try {
       final rows = await SupabaseProvider.client
           .from('case')
-          .select('campanello_hinoo_id')
-          .eq('owner_id', user.id);
+          .select('campanello_hinoo_id,owner_id,house_image_url,bg_transform');
 
-      final List<String> hinooIds = (rows as List)
-          .map((row) => row is Map ? row['campanello_hinoo_id'] : null)
-          .whereType<String>()
-          .toList();
+      final Map<String, String> ownerByHinooId = {};
+      final Map<String, Map<String, dynamic>> casaByHinooId = {};
+      final List<String> ownedHinooIds = [];
+      for (final row in (rows as List)) {
+        if (row is! Map) continue;
+        final String? hinooId = row['campanello_hinoo_id'] as String?;
+        final String? ownerId = row['owner_id'] as String?;
+        if (hinooId == null || hinooId.isEmpty) continue;
+        if (ownerId == null || ownerId.isEmpty) continue;
+        ownerByHinooId[hinooId] = ownerId;
+        casaByHinooId[hinooId] = Map<String, dynamic>.from(row);
+        if (ownerId == user.id) {
+          ownedHinooIds.add(hinooId);
+        }
+      }
+
+      final List<String> hinooIds = ownerByHinooId.keys.toList();
 
       if (hinooIds.isEmpty) {
         if (mounted) {
@@ -382,7 +409,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
       final shareRows = await SupabaseProvider.client
           .from('house_share_settings')
           .select('campanello_hinoo_id,share_mode')
-          .eq('owner_id', user.id)
           .in_('campanello_hinoo_id', hinooIds);
 
       for (final row in (shareRows as List)) {
@@ -413,21 +439,29 @@ class _CampanelliPageState extends State<CampanelliPage> {
         final String text = slide.text.trim();
         if (text.isEmpty) continue;
 
+        final String? ownerId = ownerByHinooId[id];
+        if (ownerId == null) continue;
         final String casaId = 'casa_$id';
+        final Map<String, dynamic> casaRow =
+            casaByHinooId[id] ?? const <String, dynamic>{};
+        final String? houseImageUrl = casaRow['house_image_url'] as String?;
+        final List<double>? bgTransform =
+            _parseTransform(casaRow['bg_transform']);
         entries.add(
           _CampanelloEntry(
             campanello: CampanelloData(
               id: 'campanello_$id',
               campanelloHinooId: id,
-              ownerId: user.id,
+              ownerId: ownerId,
               backgroundImage: const AssetImage(userCampanelloBg),
               text: text,
               linkedHouseId: casaId,
             ),
             casa: CasaData(
               id: casaId,
-              backgroundImage: _houseBackgroundProvider(slide.backgroundImage),
-              bgTransform: slide.bgTransform,
+              backgroundImage:
+                  _houseBackgroundProvider(houseImageUrl, slide.backgroundImage),
+              bgTransform: bgTransform,
               bgScale: slide.bgScale,
               bgOffsetX: slide.bgOffsetX,
               bgOffsetY: slide.bgOffsetY,
@@ -437,15 +471,18 @@ class _CampanelliPageState extends State<CampanelliPage> {
       }
 
       if (mounted) {
-        setState(() => _userEntries = entries);
+        setState(() {
+          _userEntries = entries;
+          _unlockedCampanelli.addAll(
+            entries
+                .where((entry) => entry.campanello.ownerId == user.id)
+                .map((entry) => entry.campanello.id),
+          );
+        });
       }
       if (!_checkedKnocks) {
         _checkedKnocks = true;
-        final List<String> hinooIds = entries
-            .map((entry) => entry.campanello.campanelloHinooId)
-            .whereType<String>()
-            .toList();
-        await _checkPendingKnocks(hinooIds);
+        await _checkPendingKnocks(ownedHinooIds);
       }
     } catch (_) {
       if (mounted) {
@@ -587,6 +624,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
           final CampanelloData? activeCampanello = showCampanello
               ? campanelli[casaIndex].campanello
               : null;
+          final user = SupabaseProvider.client.auth.currentUser;
           final String? activeCampanelloId =
               activeCampanello?.campanelloHinooId;
           final bool hasPendingKnock = activeCampanelloId != null &&
@@ -597,6 +635,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
           final VoidCallback? scrignoTap = activeCampanello == null
               ? null
               : () => _handleScrigno(activeCampanello);
+          final bool isOwnCampanello = activeCampanello != null &&
+              user != null &&
+              activeCampanello.ownerId == user.id;
           final ScrollPhysics pagePhysics = const PageScrollPhysics()
               .applyTo(const BouncingScrollPhysics());
           const int verticalPages = 2;
@@ -829,7 +870,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
                             );
                           },
                         ),
-                        if (showCampanello)
+                        if (showCampanello && !isOwnCampanello)
                           ResponsiveFooterAction(
                             asset: "assets/icons/campanello_bianco.png",
                             semanticsLabel: 'Campanello',
