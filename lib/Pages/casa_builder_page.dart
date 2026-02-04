@@ -293,8 +293,8 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
                   HinooTypography.aspectRatio,
                 );
           final double scrignoSize = math.min(
-            footerIconSize * 2,
-            math.min(canvasSize.width, canvasSize.height) * 0.5,
+            footerIconSize * 4,
+            math.min(canvasSize.width, canvasSize.height),
           );
           final double topSafe = MediaQuery.of(context).viewPadding.top;
 

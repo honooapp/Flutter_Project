@@ -18,31 +18,47 @@ class PlaceholderPage extends StatefulWidget {
 }
 
 class _PlaceholderPageState extends State<PlaceholderPage> {
+  WidgetSpan _inlineIcon(
+    String asset, {
+    required double iconHeight,
+    double topPadding = 3,
+    double bottomPadding = 3,
+  }) {
+    return WidgetSpan(
+      child: SizedBox(
+        height: iconHeight + topPadding + bottomPadding,
+        child: Padding(
+          padding: EdgeInsets.only(top: topPadding, bottom: bottomPadding),
+          child: Image.asset(asset, height: iconHeight),
+        ),
+      ),
+      alignment: PlaceholderAlignment.middle,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isPhone = DeviceController().isPhone();
     final screenWidth = MediaQuery.of(context).size.width;
     final ResponsiveLayoutMode layoutMode =
         ResponsiveLayout.modeForWidth(screenWidth);
-    const String performanceLine = 'performance\n';
-    const String laboratoriLine = 'e laboratori teatrali\n';
+    const String performanceLine = 'performance';
+    const String laboratoriLine = 'laboratori teatrali';
+    const String esplorazioniLine = 'esplorazioni lunari';
+    const String festeLine = 'feste';
+    const String viaggiLine = "viaggi sull'Isola delle Storie.";
     const String venceslaoLine = 'Venceslao Cembalo\n';
     final String text1First = Utility().text1First;
-    final int performanceIndex = text1First.indexOf(performanceLine);
-    final int laboratoriIndex = text1First.indexOf(laboratoriLine);
-    String textBeforePerformance = text1First;
-    String textBetweenPerformance = '';
-    String textAfterLaboratori = '';
-    if (performanceIndex != -1 &&
-        laboratoriIndex != -1 &&
-        performanceIndex < laboratoriIndex) {
-      textBeforePerformance = text1First.substring(0, performanceIndex);
-      textBetweenPerformance = text1First.substring(
-        performanceIndex + performanceLine.length,
-        laboratoriIndex,
-      );
-      textAfterLaboratori =
-          text1First.substring(laboratoriIndex + laboratoriLine.length);
+    const String performanceMarker = 'che ci siamo visti\n\n';
+    final String text1Fourth = Utility().text1Fourth;
+    final int performanceMarkerIndex = text1Fourth.indexOf(performanceMarker);
+    String textBeforePerformanceMarker = text1Fourth;
+    String textAfterPerformanceMarker = '';
+    if (performanceMarkerIndex != -1) {
+      textBeforePerformanceMarker =
+          text1Fourth.substring(0, performanceMarkerIndex + performanceMarker.length);
+      textAfterPerformanceMarker =
+          text1Fourth.substring(performanceMarkerIndex + performanceMarker.length);
     }
     final String text1Fifth = Utility().text1Fifth;
     final int venceslaoIndex = text1Fifth.indexOf(venceslaoLine);
@@ -63,6 +79,20 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     final double footerSpacing = footerBottomPadding + safeBottom;
     final double footerTopSpacing = footerSpacing / 2;
     final double footerBottomSpacing = footerSpacing - footerTopSpacing;
+    final double inlineIconHeight;
+    switch (layoutMode) {
+      case ResponsiveLayoutMode.mobile:
+        inlineIconHeight = 60;
+        break;
+      case ResponsiveLayoutMode.tablet:
+        inlineIconHeight = 66;
+        break;
+      case ResponsiveLayoutMode.desktop:
+      case ResponsiveLayoutMode.wideDesktop:
+      case ResponsiveLayoutMode.largeDesktop:
+        inlineIconHeight = 70;
+        break;
+    }
     final double footerSidePadding;
     switch (layoutMode) {
       case ResponsiveLayoutMode.mobile:
@@ -110,60 +140,48 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                       fontWeight: FontWeight.w200,
                     ),
                     children: [
-                      TextSpan(text: textBeforePerformance),
-                      const TextSpan(text: performanceLine),
-                      WidgetSpan(
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 3),
-                          child: Image.asset("assets/icons/performance.png",
-                              height: 70),
-                        ),
-                        alignment: PlaceholderAlignment.middle,
+                      TextSpan(text: text1First),
+                      const TextSpan(text: '$performanceLine\n'),
+                      _inlineIcon(
+                        "assets/icons/performance.png",
+                        iconHeight: inlineIconHeight,
                       ),
                       const TextSpan(text: '\n'),
-                      TextSpan(text: textBetweenPerformance),
-                      const TextSpan(text: laboratoriLine),
-                      WidgetSpan(
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 3),
-                          child: Image.asset(
-                            "assets/icons/laboratori_teatrali.png",
-                            height: 70,
-                          ),
-                        ),
-                        alignment: PlaceholderAlignment.middle,
+                      const TextSpan(text: '$laboratoriLine\n'),
+                      _inlineIcon(
+                        "assets/icons/laboratori_teatrali.png",
+                        iconHeight: inlineIconHeight,
                       ),
-                      TextSpan(text: textAfterLaboratori),
-                      TextSpan(text: Utility().text1Second),
-                      WidgetSpan(
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 3),
-                          child: Image.asset("assets/icons/luna.png",
-                              height: 70),
-                        ),
-                        alignment: PlaceholderAlignment.middle,
+                      const TextSpan(text: '\n'),
+                      const TextSpan(text: '$esplorazioniLine\n'),
+                      _inlineIcon(
+                        "assets/icons/luna.png",
+                        iconHeight: inlineIconHeight,
                       ),
-                      TextSpan(text: Utility().text1Third),
-                      WidgetSpan(
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 3),
-                          child: Image.asset("assets/icons/isola.png",
-                              height: 70),
-                        ),
-                        alignment: PlaceholderAlignment.middle,
+                      const TextSpan(text: '\n'),
+                      const TextSpan(text: '$festeLine\n'),
+                      _inlineIcon(
+                        "assets/icons/feste.png",
+                        iconHeight: inlineIconHeight,
                       ),
-                      TextSpan(text: Utility().text1Fourth),
+                      const TextSpan(text: '\n'),
+                      const TextSpan(text: '$viaggiLine\n'),
+                      _inlineIcon(
+                        "assets/icons/isola.png",
+                        iconHeight: inlineIconHeight,
+                      ),
+                      TextSpan(text: textBeforePerformanceMarker),
+                      if (performanceMarkerIndex != -1)
+                        _inlineIcon(
+                          "assets/icons/performance.png",
+                          iconHeight: inlineIconHeight,
+                        ),
+                      TextSpan(text: textAfterPerformanceMarker),
                       TextSpan(text: textBeforeVenceslao),
                       const TextSpan(text: venceslaoLine),
-                      WidgetSpan(
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 3),
-                          child: Image.asset(
-                            "assets/icons/venceslao.png",
-                            height: 70,
-                          ),
-                        ),
-                        alignment: PlaceholderAlignment.middle,
+                      _inlineIcon(
+                        "assets/icons/venceslao.png",
+                        iconHeight: inlineIconHeight,
                       ),
                       const TextSpan(text: '\n'),
                       TextSpan(text: textAfterVenceslao),

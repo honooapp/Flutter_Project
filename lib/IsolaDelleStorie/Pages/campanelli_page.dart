@@ -562,8 +562,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
               (maxHeight - footerReserved)
                   .clamp(0.0, double.infinity);
           final double scrignoSize = math.min(
-            footerIconSize * 2,
-            math.min(maxWidth, availableHeight) * 0.5,
+            footerIconSize * 4,
+            math.min(maxWidth, availableHeight),
           );
           final Size canvasSize = ResponsiveLayout.fitAspectRatio(
             targetMaxWidth,
