@@ -22,7 +22,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final HouseInviteService _inviteService = HouseInviteService();
-  bool _inviteFlowChecked = false;
+  bool _checkingInviteFlow = false;
 
   @override
   void initState() {
@@ -31,30 +31,52 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _checkInviteFlow() async {
-    if (_inviteFlowChecked) return;
-    _inviteFlowChecked = true;
+    if (_checkingInviteFlow) return;
+    _checkingInviteFlow = true;
 
     final user = SupabaseProvider.client.auth.currentUser;
-    if (user == null) return;
+    if (user == null) {
+      _checkingInviteFlow = false;
+      return;
+    }
 
     final hasCasa = await _inviteService.hasCasa(user.id);
-    if (hasCasa) return;
+    if (hasCasa) {
+      _checkingInviteFlow = false;
+      return;
+    }
 
     final hasInvite =
         await _inviteService.hasPendingOrAcceptedInvite(user.id);
-    if (!hasInvite || !mounted) return;
+    if (!hasInvite || !mounted) {
+      _checkingInviteFlow = false;
+      return;
+    }
 
-    await _showCasaInviteDialog();
-    if (!mounted) return;
-    Navigator.of(context).push(
+    final bool? accepted = await _showCasaInviteDialog();
+    if (!mounted) {
+      _checkingInviteFlow = false;
+      return;
+    }
+    if (accepted != true) {
+      await _inviteService.markInvitesDeclined(user.id);
+      _checkingInviteFlow = false;
+      return;
+    }
+
+    await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => const NewHinooPage(isCampanello: true),
       ),
     );
+    _checkingInviteFlow = false;
+    if (mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _checkInviteFlow());
+    }
   }
 
-  Future<void> _showCasaInviteDialog() {
-    return showDialog<void>(
+  Future<bool?> _showCasaInviteDialog() {
+    return showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (_) => HonooDialogShell(
@@ -77,24 +99,39 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
+                child: Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'Crea il campanello',
+                        style: HonooDialogStyles.primaryAction(),
+                      ),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                    const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white70,
+                      ),
+                      child: Text(
+                        'Non ora',
+                        style: HonooDialogStyles.tertiaryAction(),
+                      ),
                     ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    'Crea il campanello',
-                    style: HonooDialogStyles.primaryAction(),
-                  ),
+                  ],
                 ),
               ),
             ],

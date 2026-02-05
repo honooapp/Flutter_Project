@@ -35,4 +35,11 @@ class HouseInviteService {
         .update({'status': 'accepted'})
         .eq('user_id', userId);
   }
+
+  Future<void> markInvitesDeclined(String userId) async {
+    await _client
+        .from('house_invites')
+        .update({'status': 'declined'})
+        .eq('user_id', userId);
+  }
 }
