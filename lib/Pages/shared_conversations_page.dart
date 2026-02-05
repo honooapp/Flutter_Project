@@ -114,7 +114,7 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
               footerIconSize + footerTopSpacing + footerBottomSpacing;
           final double availableH =
               (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
-          final double gap = 12;
+          const double gap = 12;
           final double topHeight = availableH * 0.4;
           final double bottomHeight = availableH - topHeight - gap;
           final topMetrics = ResponsiveLayout.honooBuilderMetrics(
@@ -238,7 +238,7 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
                               height: topMetrics.height,
                               child: rootCarousel,
                             ),
-                            SizedBox(height: gap),
+                            const SizedBox(height: gap),
                             Expanded(
                               child: SizedBox(
                                 width: bottomMetrics.width,

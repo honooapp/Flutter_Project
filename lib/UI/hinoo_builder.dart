@@ -220,12 +220,12 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
   Future<void> _openDownloadDialog() async {
     if (!mounted || _pages.isEmpty) return;
-    final DownloadChoice? choice = await showDialog<DownloadChoice>(
+    final bool? confirmed = await showDialog<bool>(
       context: context,
       barrierDismissible: true,
-      builder: (_) => DownloadHinooDialog(pageCount: _pages.length),
+      builder: (_) => const DownloadHinooDialog(),
     );
-    if (choice == null) return;
+    if (confirmed != true) return;
     if (!mounted) return;
     final String? chosenName = await showDialog<String>(
       context: context,
@@ -238,16 +238,10 @@ class _HinooBuilderState extends State<HinooBuilder> {
     }
     if (!mounted) return;
     _lastFileBaseName = trimmed;
-    await _downloadHinoo(
-      allPages: choice == DownloadChoice.allPages,
-      baseName: trimmed,
-    );
+    await _downloadHinoo(baseName: trimmed);
   }
 
-  Future<void> _downloadHinoo({
-    required bool allPages,
-    String? baseName,
-  }) async {
+  Future<void> _downloadHinoo({String? baseName}) async {
     if (!mounted) return;
     final BuildContext currentContext = context;
     final HinooExportMode exportMode = _resolveExportMode();
@@ -274,33 +268,17 @@ class _HinooBuilderState extends State<HinooBuilder> {
       ).whenComplete(() => progressVisible = false);
     }
 
-    final List<int> indices = allPages
-        ? List<int>.generate(_pages.length, (int i) => i)
-        : <int>[_current];
-    final int previousIndex = _current;
-    bool indexChanged = false;
     final List<DownloadImage> images = <DownloadImage>[];
     final DownloadSaver saver = getDownloadSaver();
     final String fileBaseName = _prepareFileBaseName(baseName);
 
     try {
-      for (int pos = 0; pos < indices.length; pos++) {
-        final int pageIndex = indices[pos];
-        final bool switched = _current != pageIndex;
-        _goTo(pageIndex);
-        if (switched) indexChanged = true;
-        await _waitForNextFrame();
-
-        final Uint8List? bytes =
-            await _captureCurrentCanvasBytes(exportMode: exportMode);
-        if (bytes != null) {
-          final String filename = _resolveFileName(
-            baseName: fileBaseName,
-            isMulti: indices.length > 1,
-            pageNumber: pageIndex + 1,
-          );
-          images.add(DownloadImage(filename: filename, bytes: bytes));
-        }
+      await _waitForNextFrame();
+      final Uint8List? bytes =
+          await _captureCurrentCanvasBytes(exportMode: exportMode);
+      if (bytes != null) {
+        final String filename = _resolveFileName(fileBaseName);
+        images.add(DownloadImage(filename: filename, bytes: bytes));
       }
 
       if (images.isEmpty) {
@@ -327,10 +305,6 @@ class _HinooBuilderState extends State<HinooBuilder> {
         );
       }
     } finally {
-      if (indexChanged && mounted && _current != previousIndex) {
-        _goTo(previousIndex);
-        await _waitForNextFrame();
-      }
       if (mounted) {
         await dismissProgressDialogIfNeeded();
       }
@@ -416,15 +390,14 @@ class _HinooBuilderState extends State<HinooBuilder> {
   // Helpers / API pubbliche
   // ========================================================================
   void goToPublic(int index) => _goTo(index); // vai alla pagina i
-  void addPagePublic() => _addPage(); // aggiungi pagina
-  void reorderPagesPublic(int oldIndex, int newIndex) =>
-      _onReorder(oldIndex, newIndex);
+  void addPagePublic() {} // hinoo a pagina singola
+  void reorderPagesPublic(int oldIndex, int newIndex) {}
 
   void deleteCurrentPagePublic() => _deleteCurrentPage(); // già usata
   Future<void> openPreviewDialogPublic() => _openPreviewDialog();
   Future<void> openDownloadDialogPublic() => _openDownloadDialog();
   Future<void> downloadAllPagesPublic({String? baseName}) =>
-      _downloadHinoo(allPages: true, baseName: baseName);
+      _downloadHinoo(baseName: baseName);
 
   String _prepareFileBaseName(String? raw) {
     const String fallback = 'hinoo';
@@ -438,16 +411,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
     return base;
   }
 
-  String _resolveFileName({
-    required String baseName,
-    required bool isMulti,
-    required int pageNumber,
-  }) {
-    if (!isMulti) {
-      return '$baseName.png';
-    }
-    final String suffix = pageNumber.toString().padLeft(2, '0');
-    return '${baseName}_$suffix.png';
+  String _resolveFileName(String baseName) {
+    return '$baseName.png';
   }
 
   dynamic exportDraft() {
@@ -662,33 +627,6 @@ class _HinooBuilderState extends State<HinooBuilder> {
     });
   }
 
-  void _addPage() {
-    setState(() {
-      _pages.add(_createEmptySlide());
-      _current = _pages.length - 1;
-      _textController.clear();
-      // mantieni anteprima sfondo globale
-    });
-    _scheduleAutosave();
-    _notifyChanged();
-  }
-
-  void _onReorder(int oldIndex, int newIndex) {
-    setState(() {
-      if (newIndex > oldIndex) newIndex -= 1;
-      final item = _pages.removeAt(oldIndex);
-      _pages.insert(newIndex, item);
-      if (_current == oldIndex) {
-        _current = newIndex;
-      } else if (oldIndex < _current && newIndex >= _current) {
-        _current -= 1;
-      } else if (oldIndex > _current && newIndex <= _current) {
-        _current += 1;
-      }
-    });
-    _scheduleAutosave();
-    _notifyChanged();
-  }
 
   // Elimina pagina corrente (con conferma)
   Future<void> _deleteCurrentPage() async {

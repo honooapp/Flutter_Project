@@ -113,7 +113,7 @@ class _ReplyTimestamp extends StatelessWidget {
       child: Text(
         label,
         textAlign: TextAlign.center,
-        style: TextStyle(
+        style: const TextStyle(
           color: HonooColor.onBackground,
           fontSize: 12,
           fontWeight: FontWeight.w600,

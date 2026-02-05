@@ -2,22 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 
-enum DownloadChoice { firstOnly, allPages }
-
 class DownloadHinooDialog extends StatelessWidget {
   const DownloadHinooDialog({
     super.key,
-    required this.pageCount,
   });
-
-  final int pageCount;
 
   @override
   Widget build(BuildContext context) {
-    final bool multiplePages = pageCount > 1;
-    final String bodyText = multiplePages
-        ? 'Scegli se scaricare questa versione o tutte le pagine disponibili.'
-        : 'Scarica il tuo hinoo in formato .png.';
+    const String bodyText = 'Scarica il tuo hinoo in formato .png.';
 
     return HonooDialogShell(
       child: Padding(
@@ -34,8 +26,7 @@ class DownloadHinooDialog extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () =>
-                    Navigator.of(context).pop(DownloadChoice.firstOnly),
+                onPressed: () => Navigator.of(context).pop(true),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black,
@@ -45,30 +36,10 @@ class DownloadHinooDialog extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
-                child: Text(multiplePages ? 'Scarica questa versione' : 'Scarica',
+                child: Text('Scarica',
                     style: HonooDialogStyles.primaryAction()),
               ),
             ),
-            if (multiplePages) ...[
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () =>
-                      Navigator.of(context).pop(DownloadChoice.allPages),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: const BorderSide(color: Colors.white70),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
-                  ),
-                  child: Text('Scarica tutte le pagine',
-                      style: HonooDialogStyles.secondaryAction()),
-                ),
-              ),
-            ],
             const SizedBox(height: 16),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),

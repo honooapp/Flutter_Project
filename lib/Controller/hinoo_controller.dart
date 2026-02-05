@@ -16,7 +16,7 @@ class HinooController {
     final errors = <String>[];
     final n = draft.pages.length;
     if (n < 1) errors.add('Devi completare l\'hinoo.');
-    if (n > 9) errors.add('Puoi creare al massimo 9 pagine per un hinoo.');
+    if (n > 1) errors.add('Puoi creare un solo hinoo alla volta.');
     for (var i = 0; i < n; i++) {
       final slide = draft.pages[i];
       final index = i + 1;

@@ -641,9 +641,9 @@ class _ChestPageState extends State<ChestPage> {
     final _ReplyChoice? choice = await _showReplyChoice();
     if (choice == null || !mounted) return;
     if (choice == _ReplyChoice.honoo) {
-      final String? replyTo = current.id;
-      final String? recipient = current.ownerId ?? current.draft.recipientTag;
-      if (recipient == null || recipient.isEmpty) return;
+      final String replyTo = current.id;
+      final String recipient = current.ownerId ?? current.draft.recipientTag ?? '';
+      if (recipient.isEmpty) return;
       Navigator.push(
         context,
         MaterialPageRoute(
