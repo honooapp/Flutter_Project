@@ -82,13 +82,31 @@ class AdminService {
     if (userIds.isEmpty) return {};
     final rows = await _client
         .from('house_invites')
-        .select('user_id')
+        .select('user_id,status')
         .in_('user_id', userIds);
 
     final existing = <String>{};
     for (final row in (rows as List)) {
       if (row is! Map) continue;
       final String id = row['user_id']?.toString() ?? '';
+      final String status = row['status']?.toString() ?? '';
+      if (status == 'declined') continue;
+      if (id.isNotEmpty) existing.add(id);
+    }
+    return existing;
+  }
+
+  Future<Set<String>> fetchExistingCaseOwners(List<String> userIds) async {
+    if (userIds.isEmpty) return {};
+    final rows = await _client
+        .from('case')
+        .select('owner_id')
+        .in_('owner_id', userIds);
+
+    final existing = <String>{};
+    for (final row in (rows as List)) {
+      if (row is! Map) continue;
+      final String id = row['owner_id']?.toString() ?? '';
       if (id.isNotEmpty) existing.add(id);
     }
     return existing;
@@ -102,7 +120,10 @@ class AdminService {
     if (filtered.isEmpty) return 0;
 
     final existing = await fetchExistingInvites(filtered);
-    final toInsert = filtered.where((id) => !existing.contains(id)).toList();
+    final existingCases = await fetchExistingCaseOwners(filtered);
+    final toInsert = filtered
+        .where((id) => !existing.contains(id) && !existingCases.contains(id))
+        .toList();
     if (toInsert.isEmpty) return 0;
 
     final payload = toInsert

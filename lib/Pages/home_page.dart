@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,11 +25,49 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final HouseInviteService _inviteService = HouseInviteService();
   bool _checkingInviteFlow = false;
+  int _replyCount = 0;
+  Timer? _replyRefreshTimer;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkInviteFlow());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkInviteFlow();
+      _loadReplyCount();
+    });
+    _replyRefreshTimer = Timer.periodic(
+      const Duration(seconds: 60),
+      (_) => _loadReplyCount(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _replyRefreshTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadReplyCount() async {
+    final user = SupabaseProvider.client.auth.currentUser;
+    if (user == null) return;
+    try {
+      final honooRows = await SupabaseProvider.client
+          .from('honoo')
+          .select('id')
+          .eq('destination', 'reply')
+          .eq('recipient_tag', user.id);
+      final hinooRows = await SupabaseProvider.client
+          .from('hinoo')
+          .select('id')
+          .eq('type', 'answer')
+          .eq('recipient_tag', user.id);
+      final int count =
+          (honooRows as List).length + (hinooRows as List).length;
+      if (!mounted) return;
+      if (count != _replyCount) {
+        setState(() => _replyCount = count);
+      }
+    } catch (_) {}
   }
 
   Future<void> _checkInviteFlow() async {
@@ -240,7 +280,7 @@ class _HomePageState extends State<HomePage> {
                   ),
 
                   // FOOTER sostituito col widget riutilizzabile
-                  const SeaFooterBar(),
+                  SeaFooterBar(replyCount: _replyCount),
                 ],
               ),
 

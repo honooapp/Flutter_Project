@@ -21,7 +21,16 @@ import '../Utility/responsive_layout.dart';
 import '../Widgets/responsive_footer_bar.dart';
 
 class NewHonooPage extends StatefulWidget {
-  const NewHonooPage({super.key});
+  const NewHonooPage({
+    super.key,
+    this.forcedType,
+    this.recipientTag,
+    this.returnSavedId = false,
+  });
+
+  final HonooType? forcedType;
+  final String? recipientTag;
+  final bool returnSavedId;
 
   @override
   State<NewHonooPage> createState() => _NewHonooPageState();
@@ -146,6 +155,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
     }
 
     // 4) Crea e salva
+    final HonooType type = widget.forcedType ?? HonooType.personal;
     final newHonoo = Honoo(
       0,
       _text,
@@ -153,12 +163,20 @@ class _NewHonooPageState extends State<NewHonooPage> {
       DateTime.now().toIso8601String(),
       DateTime.now().toIso8601String(),
       user.id,
-      HonooType.personal, // scrigno
+      type,
       null,
-      null,
+      widget.recipientTag,
     );
 
     try {
+      if (widget.returnSavedId) {
+        final id = await HonooService.publishHonooAndReturnId(newHonoo);
+        if (!mounted) return;
+        showHonooToast(context, message: 'honoo salvato.');
+        Navigator.of(context).pop(id);
+        return;
+      }
+
       await HonooService.publishHonoo(newHonoo);
 
       if (!mounted) return;

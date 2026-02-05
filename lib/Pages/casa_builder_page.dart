@@ -209,7 +209,10 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Carica la tua immagine',
+                'Carica qui\n'
+                'l\'immagine\n'
+                'della tua stanza\n'
+                'più bella',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
               ),

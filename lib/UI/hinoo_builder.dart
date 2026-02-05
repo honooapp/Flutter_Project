@@ -40,10 +40,14 @@ class HinooBuilder extends StatefulWidget {
     super.key,
     this.onHinooChanged, // notifica il draft quando cambia qualcosa
     this.onPngExported, // PNG generato (anteprima)
+    this.hintText,
+    this.backgroundPromptText,
   });
 
   final ValueChanged<dynamic>? onHinooChanged;
   final ValueChanged<Uint8List>? onPngExported;
+  final String? hintText;
+  final String? backgroundPromptText;
 
   @override
   State<HinooBuilder> createState() => _HinooBuilderState();
@@ -585,6 +589,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
         if (_step == _WizardStep.changeBg) ...[
           CambiaSfondoOverlay(
             onTapChange: _pickAndUploadBackground,
+            promptText: widget.backgroundPromptText,
             showControls: _bgChosen && _localBgPreview != null,
             isUploading: _isUploadingBg,
             currentScale: _bgScale,
@@ -632,6 +637,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
             controller: _textController,
             focusNode: _textFocus,
             textColor: _txtColor,
+            hintText: widget.hintText,
           ),
       ],
     );

@@ -7,20 +7,21 @@ import 'package:honoo/Services/supabase_provider.dart';
 
 import '../Entities/hinoo.dart';
 import '../Entities/honoo.dart';
-import 'chest_page.dart';
-import 'coming_soon_page.dart';
 import 'home_page.dart';
 import '../UI/hinoo_viewer.dart';
 import '../UI/hinoo_typography.dart';
 import '../UI/honoo_thread_view.dart';
 import '../Utility/honoo_colors.dart';
-import '../Utility/utility.dart';
 import '../Utility/responsive_layout.dart';
 import '../Widgets/loading_spinner.dart';
 import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/honoo_app_title.dart';
 import '../Widgets/responsive_footer_bar.dart';
 import 'placeholder_page.dart';
+import 'reply_honoo_page.dart';
+import 'new_hinoo_page.dart';
+import '../Controller/honoo_controller.dart';
+import '../Controller/hinoo_controller.dart';
 
 class MoonPage extends StatefulWidget {
   const MoonPage({super.key});
@@ -46,7 +47,7 @@ class _MoonPageState extends State<MoonPage> {
     try {
       final rows = await SupabaseProvider.client
           .from('moon_public')
-          .select('kind,pages,text,image_url,recipient_tag,created_at')
+          .select('id,user_id,kind,pages,text,image_url,recipient_tag,created_at')
           .order('created_at', ascending: false);
 
       final List<_MoonItem> items = [];
@@ -59,6 +60,10 @@ class _MoonPageState extends State<MoonPage> {
                 DateTime.fromMillisecondsSinceEpoch(0);
         if (kind == 'honoo') {
           final honoo = Honoo.fromMap(row.cast<String, dynamic>());
+          final String? ownerId = row['user_id']?.toString();
+          if ((honoo.recipientTag ?? '').isEmpty && ownerId != null) {
+            honoo.recipientTag = ownerId;
+          }
           items.add(_MoonItem.honoo(honoo, created));
         } else if (kind == 'hinoo') {
           final pages = row['pages'];
@@ -71,7 +76,10 @@ class _MoonPageState extends State<MoonPage> {
               type: HinooType.moon,
               recipientTag: row['recipient_tag'] as String?,
             );
-            items.add(_MoonItem.hinoo(draft, created));
+            final String? hinooId = row['id']?.toString();
+            final String? ownerId = row['user_id']?.toString();
+            items.add(_MoonItem.hinoo(draft, created,
+                hinooId: hinooId, ownerId: ownerId));
           }
         }
       }
@@ -205,14 +213,7 @@ class _MoonPageState extends State<MoonPage> {
                       size: footerIconSize,
                       splashRadius: 25,
                       tooltip: 'Salva nel tuo Cuore',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ChestPage(),
-                          ),
-                        );
-                      },
+                      onPressed: _saveCurrentToChest,
                     ),
                     ResponsiveFooterAction(
                       asset: 'assets/icons/reply.svg',
@@ -220,18 +221,7 @@ class _MoonPageState extends State<MoonPage> {
                       size: footerIconSize,
                       splashRadius: 25,
                       tooltip: 'Rispondi',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ComingSoonPage(
-                              header: Utility().replyMoonHeader,
-                              quote: Utility().shakespeare,
-                              bibliography: Utility().bibliography,
-                            ),
-                          ),
-                        );
-                      },
+                      onPressed: () => _showReplyChoice(),
                     ),
                   ],
                 ),
@@ -443,6 +433,138 @@ class _MoonPageState extends State<MoonPage> {
       curve: Curves.easeOutCubic,
     );
   }
+
+  Future<void> _saveCurrentToChest() async {
+    if (_items.isEmpty) return;
+    final _MoonItem current = _items[_currentIndex];
+    try {
+      if (current.honoo != null) {
+        final honoo = current.honoo!.copyWith(isFromMoonSaved: true);
+        final saved = await HonooController().saveToChest(honoo);
+        if (!mounted) return;
+        showHonooToast(
+          context,
+          message: saved
+              ? 'honoo salvato nello Scrigno.'
+              : 'Era già nel tuo Scrigno.',
+        );
+        return;
+      }
+      if (current.hinoo != null) {
+        final draft = current.hinoo!.copyWith(
+          type: HinooType.personal,
+          isFromMoonSaved: true,
+        );
+        await HinooController().saveToChest(draft);
+        if (!mounted) return;
+        showHonooToast(context, message: 'hinoo salvato nello Scrigno.');
+      }
+    } catch (e) {
+      if (!mounted) return;
+      showHonooToast(context, message: 'Errore: $e');
+    }
+  }
+
+  Future<void> _showReplyChoice() async {
+    if (_items.isEmpty) return;
+    final _MoonItem current = _items[_currentIndex];
+    final _ReplyChoice? choice = await showDialog<_ReplyChoice>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => HonooDialogShell(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Vuoi rispondere con\n un honoo o un hinoo?',
+                style: HonooDialogStyles.title(),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(_ReplyChoice.honoo),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Honoo',
+                    style: HonooDialogStyles.primaryAction(),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(_ReplyChoice.hinoo),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Hinoo',
+                    style: HonooDialogStyles.primaryAction(),
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: TextButton.styleFrom(foregroundColor: Colors.white54),
+                child: Text(
+                  'Annulla',
+                  style: HonooDialogStyles.tertiaryAction(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (choice == null || !mounted) return;
+    if (choice == _ReplyChoice.honoo && current.honoo != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ReplyHonooPage(
+            originalHonoo: current.honoo!,
+            initialHintText: 'Scrivi la tua risposta...',
+            initialImageHint: 'Aggiungi un’immagine (opzionale)',
+          ),
+        ),
+      );
+    } else if (choice == _ReplyChoice.hinoo && current.hinoo != null) {
+      final String? replyTo = current.hinooId;
+      if (replyTo == null || replyTo.isEmpty) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => NewHinooPage(
+            forcedType: HinooType.answer,
+            recipientTag: current.ownerId,
+            replyTo: replyTo,
+          ),
+        ),
+      );
+    }
+  }
 }
 
 class _ArrowIntent extends Intent {
@@ -455,12 +577,33 @@ class _MoonItem {
   final Honoo? honoo;
   final HinooDraft? hinoo;
   final DateTime createdAt;
+  final String? hinooId;
+  final String? ownerId;
 
-  const _MoonItem._(this.honoo, this.hinoo, this.createdAt);
+  const _MoonItem._(
+    this.honoo,
+    this.hinoo,
+    this.createdAt, {
+    this.hinooId,
+    this.ownerId,
+  });
 
   factory _MoonItem.honoo(Honoo h, DateTime createdAt) =>
       _MoonItem._(h, null, createdAt);
 
-  factory _MoonItem.hinoo(HinooDraft h, DateTime createdAt) =>
-      _MoonItem._(null, h, createdAt);
+  factory _MoonItem.hinoo(
+    HinooDraft h,
+    DateTime createdAt, {
+    String? hinooId,
+    String? ownerId,
+  }) =>
+      _MoonItem._(
+        null,
+        h,
+        createdAt,
+        hinooId: hinooId,
+        ownerId: ownerId,
+      );
 }
+
+enum _ReplyChoice { honoo, hinoo }

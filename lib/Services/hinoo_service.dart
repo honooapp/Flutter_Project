@@ -35,6 +35,8 @@ class HinooService {
       'type': _toDbType(draft.type),
       'pages': draft.toJson()['pages'],
       'recipient_tag': draft.recipientTag,
+      'reply_to': draft.replyTo,
+      'is_from_moon_saved': draft.isFromMoonSaved,
       'fingerprint': (draft.type == HinooType.moon) ? fingerprint(draft) : null,
       'created_at': DateTime.now().toIso8601String(),
     };
@@ -74,6 +76,8 @@ class HinooService {
       'type': _toDbType(draft.type),
       'pages': draft.toJson()['pages'],
       'recipient_tag': draft.recipientTag,
+      'reply_to': draft.replyTo,
+      'is_from_moon_saved': draft.isFromMoonSaved,
       'fingerprint': (draft.type == HinooType.moon) ? fingerprint(draft) : null,
       'created_at': DateTime.now().toIso8601String(),
     };
@@ -134,6 +138,8 @@ class HinooService {
       'pages': sanitized.toJson()['pages'],
       'fingerprint': fp,
       'recipient_tag': sanitized.recipientTag,
+      'reply_to': sanitized.replyTo,
+      'is_from_moon_saved': sanitized.isFromMoonSaved,
       'created_at': DateTime.now().toIso8601String(),
     };
 

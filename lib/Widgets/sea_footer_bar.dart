@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 
 // Pagine per la navigazione (come in HomePage)
@@ -10,7 +11,9 @@ import 'package:honoo/Pages/chest_page.dart';
 /// Barra “mare” riutilizzabile con onde + isola (sx) + scrigno (centro) + bottiglia (dx)
 /// Posizioni, dimensioni e z-order identici alla HomePage.
 class SeaFooterBar extends StatelessWidget {
-  const SeaFooterBar({super.key});
+  const SeaFooterBar({super.key, this.replyCount = 0});
+
+  final int replyCount;
 
   /// Altezza fissa come in HomePage
   static const double height = 105;
@@ -160,34 +163,79 @@ class SeaFooterBar extends StatelessWidget {
                 left: chestX,
                 child: Transform.translate(
                   offset: const Offset(0, height * 0.01),
-                  child: IconButton(
-                    constraints: const BoxConstraints.tightFor(
-                      width: chestSize,
-                      height: chestSize,
-                    ),
-                    padding: EdgeInsets.zero,
-                    icon: SvgPicture.asset(
-                      "assets/icons/chest.svg",
-                      width: chestSize,
-                      height: chestSize,
-                      semanticsLabel: 'Chest',
-                    ),
-                    iconSize: chestSize,
-                    splashRadius: 40,
-                    tooltip: 'Apri il tuo Cuore',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ChestPage()),
-                      );
-                    },
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      IconButton(
+                        constraints: const BoxConstraints.tightFor(
+                          width: chestSize,
+                          height: chestSize,
+                        ),
+                        padding: EdgeInsets.zero,
+                        icon: SvgPicture.asset(
+                          "assets/icons/chest.svg",
+                          width: chestSize,
+                          height: chestSize,
+                          semanticsLabel: 'Chest',
+                        ),
+                        iconSize: chestSize,
+                        splashRadius: 40,
+                        tooltip: 'Apri il tuo Cuore',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  ChestPage(focusReplies: replyCount > 0),
+                            ),
+                          );
+                        },
+                      ),
+                      if (replyCount > 0)
+                        Positioned(
+                          top: -2,
+                          right: -2,
+                          child: _ReplyBadge(count: replyCount),
+                        ),
+                    ],
                   ),
                 ),
               ),
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _ReplyBadge extends StatelessWidget {
+  const _ReplyBadge({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final String label = count > 99 ? '99+' : count.toString();
+    final double size = count > 9 ? 20 : 18;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      height: size,
+      constraints: BoxConstraints(minWidth: size),
+      decoration: BoxDecoration(
+        color: Colors.redAccent,
+        borderRadius: BorderRadius.circular(size / 2),
+        border: Border.all(color: HonooColor.background, width: 1.5),
+      ),
+      child: Center(
+        child: Text(
+          label,
+          style: GoogleFonts.libreFranklin(
+            color: Colors.white,
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
     );
   }

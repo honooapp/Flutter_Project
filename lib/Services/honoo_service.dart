@@ -54,6 +54,19 @@ class HonooService {
     await _client.from('honoo').insert(honoo.toInsertMap());
   }
 
+  static Future<String> publishHonooAndReturnId(Honoo honoo) async {
+    final row = await _client
+        .from('honoo')
+        .insert(honoo.toInsertMap())
+        .select('id')
+        .maybeSingle();
+    final id = row?['id']?.toString() ?? '';
+    if (id.isEmpty) {
+      throw Exception('publishHonoo: id mancante');
+    }
+    return id;
+  }
+
   /// Aggiorna la destination (chest|moon|reply) per id (UUID DB)
   static Future<void> updateDestination({
     required String id,
@@ -93,6 +106,7 @@ class HonooService {
       'reply_to': h.replyTo,
       'recipient_tag': h.recipientTag,
       'user_id': uid,
+      if (h.isFromMoonSaved) 'is_from_moon_saved': true,
     };
 
     final inserted = await _client

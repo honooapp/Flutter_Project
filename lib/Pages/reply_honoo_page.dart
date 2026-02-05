@@ -46,15 +46,17 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
 
     final now = DateTime.now().toIso8601String();
 
+    final String replyTarget =
+        widget.originalHonoo.dbId ?? widget.originalHonoo.id.toString();
     final newHonoo = Honoo(
-        0, // ID locale, ignorato da Supabase
-        _text, // text
-        _imageUrl ?? '', // image
-        now, // created_at
-        now, // updated_at
+        0,
+        _text,
+        _imageUrl ?? '',
+        now,
+        now,
         SupabaseProvider.client.auth.currentUser!.id,
-        HonooType.answer, // destination: reply
-        widget.originalHonoo.id.toString(), // replyTo
+        HonooType.answer,
+        replyTarget,
         widget.originalHonoo.recipientTag);
 
     try {

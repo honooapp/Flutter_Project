@@ -5,6 +5,7 @@ class CambiaSfondoOverlay extends StatelessWidget {
   const CambiaSfondoOverlay({
     super.key,
     required this.onTapChange,
+    this.promptText,
     this.showControls = false,
     this.isUploading = false,
     this.currentScale = 1.0,
@@ -17,6 +18,7 @@ class CambiaSfondoOverlay extends StatelessWidget {
   });
 
   final VoidCallback onTapChange;
+  final String? promptText;
   final bool showControls;
   final bool isUploading;
   final double currentScale;
@@ -44,7 +46,8 @@ class CambiaSfondoOverlay extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Carica prima la tua immagine,\n e poi scrivi il tuo testo',
+                  promptText ??
+                      'Carica prima la tua immagine,\n e poi scrivi il tuo testo',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
                 ),

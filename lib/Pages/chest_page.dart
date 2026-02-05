@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:ui' show ImageFilter;
@@ -17,6 +18,7 @@ import '../Entities/hinoo.dart';
 
 import '../UI/honoo_thread_view.dart';
 import '../UI/hinoo_viewer.dart';
+import '../UI/hinoo_thread_view.dart';
 import '../UI/hinoo_typography.dart';
 
 import '../Utility/honoo_colors.dart';
@@ -29,11 +31,14 @@ import '../Widgets/luna_fissa.dart';
 import '../Widgets/responsive_footer_bar.dart';
 
 import 'reply_honoo_page.dart';
+import 'new_hinoo_page.dart';
 import 'home_page.dart';
 import 'placeholder_page.dart';
 
 class ChestPage extends StatefulWidget {
-  const ChestPage({super.key});
+  const ChestPage({super.key, this.focusReplies = false});
+
+  final bool focusReplies;
 
   @override
   State<ChestPage> createState() => _ChestPageState();
@@ -46,7 +51,12 @@ class _ChestPageState extends State<ChestPage> {
   int _currentIndex = 0;
   List<_ChestItem> _items = const [];
   List<_HinooRow> _hinoo = const [];
+  final Map<String, DateTime> _honooLatestReplies = {};
+  final Map<String, DateTime> _hinooLatestReplies = {};
+  final Map<String, List<HinooThreadEntry>> _hinooRepliesByRoot = {};
   bool _isHinooLoading = true;
+  bool _isRefreshingReplies = false;
+  Timer? _replyRefreshTimer;
 
   // Desktop
   static const double honooRightDesktop = 40;
@@ -73,11 +83,40 @@ class _ChestPageState extends State<ChestPage> {
   @override
   void initState() {
     super.initState();
-    ctrl.loadChest();
-    _loadHinoo();
+    _loadAll();
+    _replyRefreshTimer = Timer.periodic(
+      const Duration(seconds: 60),
+      (_) => _refreshReplies(),
+    );
   }
 
-  Future<void> _loadHinoo() async {
+  @override
+  void dispose() {
+    _replyRefreshTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadAll() async {
+    await ctrl.loadChest();
+    await _loadHinoo(rebuild: false);
+    await _loadReplyData();
+    if (!mounted) return;
+    setState(_rebuildItems);
+  }
+
+  Future<void> _refreshReplies() async {
+    if (_isRefreshingReplies) return;
+    _isRefreshingReplies = true;
+    try {
+      await _loadReplyData();
+      if (!mounted) return;
+      setState(_rebuildItems);
+    } finally {
+      _isRefreshingReplies = false;
+    }
+  }
+
+  Future<void> _loadHinoo({bool rebuild = true}) async {
     final uid = SupabaseProvider.client.auth.currentUser?.id;
     if (uid == null) {
       if (mounted) setState(() => _isHinooLoading = false);
@@ -90,9 +129,9 @@ class _ChestPageState extends State<ChestPage> {
       final client = SupabaseProvider.client;
       final rows = await client
           .from('hinoo')
-          .select('id,pages,type,recipient_tag,created_at')
+          .select('id,pages,type,reply_to,recipient_tag,created_at,is_from_moon_saved,user_id')
           .eq('user_id', uid)
-          .eq('type', 'personal')
+          .in_('type', ['personal', 'moon'])
           .order('created_at', ascending: false);
 
       final list = <_HinooRow>[];
@@ -105,8 +144,10 @@ class _ChestPageState extends State<ChestPage> {
               .whereType<Map<String, dynamic>>()
               .map((e) => HinooSlide.fromJson(e))
               .toList(),
-          type: HinooType.personal,
+          type: _hinooTypeFrom(r['type'] as String?),
           recipientTag: r['recipient_tag'] as String?,
+          replyTo: r['reply_to'] as String?,
+          isFromMoonSaved: (r['is_from_moon_saved'] as bool?) ?? false,
         );
 
         final created = DateTime.tryParse((r['created_at'] ?? '').toString()) ??
@@ -114,7 +155,17 @@ class _ChestPageState extends State<ChestPage> {
 
         final String? id = r['id']?.toString();
         if (id != null && id.isNotEmpty) {
-          list.add(_HinooRow(id: id, draft: draft, createdAt: created));
+          final bool isFromMoonSaved =
+              (r['is_from_moon_saved'] as bool?) ?? false;
+          list.add(
+            _HinooRow(
+              id: id,
+              draft: draft,
+              createdAt: created,
+              isFromMoonSaved: isFromMoonSaved,
+              ownerId: r['user_id']?.toString(),
+            ),
+          );
         }
       }
 
@@ -122,7 +173,7 @@ class _ChestPageState extends State<ChestPage> {
       setState(() {
         _hinoo = list;
         _isHinooLoading = false;
-        _rebuildItems();
+        if (rebuild) _rebuildItems();
       });
     } catch (_) {
       if (!mounted) return;
@@ -140,11 +191,116 @@ class _ChestPageState extends State<ChestPage> {
     final hinooItems =
         _hinoo.map<_ChestItem>((r) => _ChestItem.hinoo(r)).toList();
 
-    _items = [...honooItems, ...hinooItems]
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    final items = [...honooItems, ...hinooItems];
+    final List<_ChestItem> conversationItems = [];
+    final List<_ChestItem> otherItems = [];
+    for (final item in items) {
+      final DateTime? replyAt = item.when(
+        honoo: (h) => _honooLatestReplies[h.dbId ?? ''],
+        hinoo: (row) => _hinooLatestReplies[row.id],
+      );
+      if (replyAt != null) {
+        conversationItems.add(item);
+      } else {
+        otherItems.add(item);
+      }
+    }
 
-    if (_currentIndex >= _items.length) {
+    conversationItems.sort((a, b) {
+      final DateTime? aReply = a.when(
+        honoo: (h) => _honooLatestReplies[h.dbId ?? ''],
+        hinoo: (row) => _hinooLatestReplies[row.id],
+      );
+      final DateTime? bReply = b.when(
+        honoo: (h) => _honooLatestReplies[h.dbId ?? ''],
+        hinoo: (row) => _hinooLatestReplies[row.id],
+      );
+      if (aReply == null && bReply == null) return 0;
+      if (aReply == null) return 1;
+      if (bReply == null) return -1;
+      return bReply.compareTo(aReply);
+    });
+
+    otherItems.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    _items = [...conversationItems, ...otherItems];
+
+    if (widget.focusReplies && conversationItems.isNotEmpty) {
+      _currentIndex = 0;
+    } else if (_currentIndex >= _items.length) {
       _currentIndex = _items.isEmpty ? 0 : _items.length - 1;
+    }
+  }
+
+  Future<void> _loadReplyData() async {
+    final uid = SupabaseProvider.client.auth.currentUser?.id;
+    if (uid == null) return;
+    final client = SupabaseProvider.client;
+
+    _honooLatestReplies.clear();
+    _hinooLatestReplies.clear();
+    _hinooRepliesByRoot.clear();
+
+    final honooReplies = await client
+        .from('honoo')
+        .select('reply_to,created_at')
+        .eq('destination', 'reply')
+        .eq('recipient_tag', uid);
+
+    for (final row in (honooReplies as List)) {
+      if (row is! Map) continue;
+      final String rootId = row['reply_to']?.toString() ?? '';
+      if (rootId.isEmpty) continue;
+      final DateTime created = DateTime.tryParse(
+              (row['created_at'] ?? '').toString()) ??
+          DateTime.now();
+      final DateTime? existing = _honooLatestReplies[rootId];
+      if (existing == null || created.isAfter(existing)) {
+        _honooLatestReplies[rootId] = created;
+      }
+    }
+
+    final List<String> rootHinooIds = _hinoo.map((row) => row.id).toList();
+    if (rootHinooIds.isEmpty) return;
+
+    final hinooReplies = await client
+        .from('hinoo')
+        .select('reply_to,pages,type,recipient_tag,created_at,user_id')
+        .eq('type', 'answer')
+        .eq('recipient_tag', uid)
+        .in_('reply_to', rootHinooIds)
+        .order('created_at', ascending: true);
+
+    for (final row in (hinooReplies as List)) {
+      if (row is! Map) continue;
+      final String rootId = row['reply_to']?.toString() ?? '';
+      if (rootId.isEmpty) continue;
+      final pages = row['pages'];
+      if (pages is! List) continue;
+      final DateTime created = DateTime.tryParse(
+              (row['created_at'] ?? '').toString()) ??
+          DateTime.now();
+      final draft = HinooDraft(
+        pages: pages
+            .whereType<Map<String, dynamic>>()
+            .map(HinooSlide.fromJson)
+            .toList(),
+        type: HinooType.answer,
+        recipientTag: row['recipient_tag'] as String?,
+        replyTo: rootId,
+      );
+      _hinooRepliesByRoot
+          .putIfAbsent(rootId, () => [])
+          .add(HinooThreadEntry(
+            draft: draft,
+            authorId: row['user_id']?.toString(),
+            isReply: true,
+            createdAt: created,
+          ));
+      final DateTime? existing = _hinooLatestReplies[rootId];
+      if (existing == null || created.isAfter(existing)) {
+        _hinooLatestReplies[rootId] = created;
+      }
     }
   }
 
@@ -152,6 +308,12 @@ class _ChestPageState extends State<ChestPage> {
   bool _isPersonal(Honoo h) => h.type == HonooType.personal;
   bool _hasReplies(Honoo h) => h.hasReplies == true;
   bool _isFromMoonSaved(Honoo h) => h.isFromMoonSaved == true;
+  bool _isHinooFromMoon(_HinooRow row) => row.isFromMoonSaved;
+  HinooType _hinooTypeFrom(String? value) {
+    if (value == 'moon' || value == 'public') return HinooType.moon;
+    if (value == 'answer') return HinooType.answer;
+    return HinooType.personal;
+  }
 
   Widget _footerForHonoo(
     Honoo? current, {
@@ -242,18 +404,7 @@ class _ChestPageState extends State<ChestPage> {
           size: iconSize,
           splashRadius: 25,
           tooltip: 'Rispondi',
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ReplyHonooPage(
-                  originalHonoo: current,
-                  initialHintText: 'Scrivi la tua risposta...',
-                  initialImageHint: 'Aggiungi un’immagine (opzionale)',
-                ),
-              ),
-            );
-          },
+          onPressed: () => _showReplyChoiceForHonoo(current),
         ),
       );
     }
@@ -361,6 +512,21 @@ class _ChestPageState extends State<ChestPage> {
           },
         ),
       );
+    } else if (isFromMoonSaved) {
+      actions.add(
+        ResponsiveFooterAction(
+          asset: "assets/icons/reply.svg",
+          semanticsLabel: 'Rispondi',
+          colorFilter: const ColorFilter.mode(
+            HonooColor.onBackground,
+            BlendMode.srcIn,
+          ),
+          size: iconSize,
+          splashRadius: 25,
+          tooltip: 'Rispondi',
+          onPressed: () => _showReplyChoiceForHinoo(current),
+        ),
+      );
     }
 
     actions.add(
@@ -439,6 +605,177 @@ class _ChestPageState extends State<ChestPage> {
       if (!mounted) return;
       showHonooToast(context, message: 'Errore durante l\'eliminazione: $e');
     }
+  }
+
+  Future<void> _showReplyChoiceForHonoo(Honoo current) async {
+    final _ReplyChoice? choice = await _showReplyChoice();
+    if (choice == null || !mounted) return;
+    if (choice == _ReplyChoice.honoo) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ReplyHonooPage(
+            originalHonoo: current,
+            initialHintText: 'Scrivi la tua risposta...',
+            initialImageHint: 'Aggiungi un’immagine (opzionale)',
+          ),
+        ),
+      );
+    } else {
+      final String? replyTo = current.dbId;
+      if (replyTo == null || replyTo.isEmpty) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NewHinooPage(
+            forcedType: HinooType.answer,
+            recipientTag: current.recipientTag,
+            replyTo: replyTo,
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _showReplyChoiceForHinoo(_HinooRow current) async {
+    final _ReplyChoice? choice = await _showReplyChoice();
+    if (choice == null || !mounted) return;
+    if (choice == _ReplyChoice.honoo) {
+      final String? replyTo = current.id;
+      final String? recipient = current.ownerId ?? current.draft.recipientTag;
+      if (recipient == null || recipient.isEmpty) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ReplyHonooPage(
+            originalHonoo: Honoo(
+              0,
+              '',
+              '',
+              current.createdAt.toIso8601String(),
+              current.createdAt.toIso8601String(),
+              recipient,
+              HonooType.personal,
+              replyTo,
+              recipient,
+            )..dbId = replyTo,
+            initialHintText: 'Scrivi la tua risposta...',
+            initialImageHint: 'Aggiungi un’immagine (opzionale)',
+          ),
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NewHinooPage(
+            forcedType: HinooType.answer,
+            recipientTag: current.draft.recipientTag,
+            replyTo: current.id,
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<_ReplyChoice?> _showReplyChoice() {
+    return showDialog<_ReplyChoice>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => HonooDialogShell(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Vuoi rispondere con\n un honoo o un hinoo?',
+                style: HonooDialogStyles.title(),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(_ReplyChoice.honoo),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Honoo',
+                    style: HonooDialogStyles.primaryAction(),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(_ReplyChoice.hinoo),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Hinoo',
+                    style: HonooDialogStyles.primaryAction(),
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: TextButton.styleFrom(foregroundColor: Colors.white54),
+                child: Text(
+                  'Annulla',
+                  style: HonooDialogStyles.tertiaryAction(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _wrapWithMoonFrame(Widget child, {required bool isMoonSaved}) {
+    if (!isMoonSaved) return child;
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: child,
+    );
+  }
+
+  Widget _wrapHonooWithReplyBorder(Widget child, Honoo honoo) {
+    if (honoo.type != HonooType.answer) return child;
+    final String? uid = SupabaseProvider.client.auth.currentUser?.id;
+    final bool isOwnReply = uid != null && honoo.userId == uid;
+    final Color borderColor =
+        isOwnReply ? HonooColor.wave2 : HonooColor.secondary;
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: borderColor, width: 2),
+      ),
+      child: child,
+    );
   }
 
   // =========================
@@ -587,11 +924,23 @@ class _ChestPageState extends State<ChestPage> {
         height: honooMetrics.height,
         child: HonooThreadView(root: h),
       ),
-      hinoo: (row) => HinooViewer(
-        draft: row.draft,
-        maxHeight: cardMaxH,
-        maxWidth: cardW,
-      ),
+      hinoo: (row) {
+        final replies = _hinooRepliesByRoot[row.id] ?? const [];
+        if (replies.isEmpty) {
+          return HinooViewer(
+            draft: row.draft,
+            maxHeight: cardMaxH,
+            maxWidth: cardW,
+          );
+        }
+        return HinooThreadView(
+          root: row.draft,
+          rootAuthorId: row.ownerId,
+          replies: replies,
+          maxHeight: cardMaxH,
+          maxWidth: cardW,
+        );
+      },
     );
 
     // ✅ La "card reale" (bianca) è questa:
@@ -599,11 +948,21 @@ class _ChestPageState extends State<ChestPage> {
       borderRadius: BorderRadius.circular(12),
       child: SizedBox(
         width: cardW,
-        // niente height fissa qui!
         child: RepaintBoundary(
           key: repaintKey,
           child: content,
         ),
+      ),
+    );
+
+    final Widget styledCard = item.when(
+      honoo: (h) => _wrapWithMoonFrame(
+        _wrapHonooWithReplyBorder(card, h),
+        isMoonSaved: _isFromMoonSaved(h),
+      ),
+      hinoo: (row) => _wrapWithMoonFrame(
+        card,
+        isMoonSaved: _isHinooFromMoon(row),
       ),
     );
 
@@ -621,7 +980,7 @@ class _ChestPageState extends State<ChestPage> {
             child: Stack(
               clipBehavior: Clip.hardEdge, // 🔒 sempre dentro
               children: [
-                card,
+                styledCard,
                 Positioned(
                   top: topPad,
                   right: rightPad,
@@ -870,10 +1229,16 @@ class _HinooRow {
   final String id;
   final HinooDraft draft;
   final DateTime createdAt;
+  final bool isFromMoonSaved;
+  final String? ownerId;
 
   const _HinooRow({
     required this.id,
     required this.draft,
     required this.createdAt,
+    required this.isFromMoonSaved,
+    required this.ownerId,
   });
 }
+
+enum _ReplyChoice { honoo, hinoo }

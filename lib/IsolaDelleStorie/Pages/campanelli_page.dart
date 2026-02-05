@@ -7,17 +7,25 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Services/supabase_provider.dart';
+import 'package:honoo/Controller/hinoo_controller.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
 import 'package:honoo/Utility/utility.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/UI/hinoo_typography.dart';
+import 'package:honoo/UI/hinoo_viewer.dart';
+import 'package:honoo/Widgets/honoo_app_title.dart';
+import 'package:honoo/UI/honoo_card.dart';
+import 'package:honoo/Entities/honoo.dart';
+import 'package:honoo/Controller/honoo_controller.dart';
 
 import '../../Pages/home_page.dart';
 import '../../Pages/shared_conversations_page.dart';
 import '../../Pages/shared_hinoo_page.dart';
 import '../../Pages/shared_honoo_page.dart';
+import '../../Pages/new_hinoo_page.dart';
+import '../../Pages/new_honoo_page.dart';
 
 class CampanelliPage extends StatefulWidget {
   const CampanelliPage({super.key});
@@ -37,6 +45,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
   bool _isHoveringCampanelli = false;
   bool _checkedKnocks = false;
   final Set<String> _pendingKnockTags = {};
+  final List<_PendingKnock> _pendingKnocks = [];
   final Map<String, _CasaShareMode> _shareModesByCampanello = {
     campanelloSirenaId: _CasaShareMode.honoo,
     campanelloPalombaroId: _CasaShareMode.hinoo,
@@ -116,26 +125,55 @@ class _CampanelliPageState extends State<CampanelliPage> {
       return;
     }
 
-    final bool? shouldKnock = await showDialog<bool>(
-      context: context,
-      barrierDismissible: true,
-      builder: (_) => const HonooConfirmDialog(
-        title: 'Vuoi bussare al campanello?',
-        confirmLabel: 'Bussa',
-        cancelLabel: 'Non ora',
-      ),
-    );
+    final _KnockMessageChoice? choice = await _showKnockMessageDialog();
+    if (choice == null || !mounted) return;
 
-    if (shouldKnock != true || !mounted) return;
+    String? hinooId;
+    String? honooId;
+    if (choice == _KnockMessageChoice.hinoo) {
+      final String? result = await Navigator.of(context).push<String>(
+        MaterialPageRoute(
+          builder: (_) => NewHinooPage(
+            forcedType: HinooType.answer,
+            recipientTag: campanello.ownerId,
+            returnSavedId: true,
+          ),
+        ),
+      );
+      if (!mounted) return;
+      if (result == null || result.isEmpty) return;
+      hinooId = result;
+    } else if (choice == _KnockMessageChoice.honoo) {
+      final String? result = await Navigator.of(context).push<String>(
+        MaterialPageRoute(
+          builder: (_) => NewHonooPage(
+            forcedType: HonooType.answer,
+            recipientTag: campanello.ownerId,
+            returnSavedId: true,
+          ),
+        ),
+      );
+      if (!mounted) return;
+      if (result == null || result.isEmpty) return;
+      honooId = result;
+    }
 
     showHonooToast(context, message: 'Bussata inviata.');
-    await _sendHouseKnock(campanello);
+    await _sendHouseKnock(
+      campanello,
+      hinooId: hinooId,
+      honooId: honooId,
+    );
     await Future.delayed(const Duration(milliseconds: 400));
     if (!mounted) return;
     await _showEnterDialog(campanello.id);
   }
 
-  Future<void> _sendHouseKnock(CampanelloData campanello) async {
+  Future<void> _sendHouseKnock(
+    CampanelloData campanello, {
+    String? hinooId,
+    String? honooId,
+  }) async {
     final user = SupabaseProvider.client.auth.currentUser;
     final String? targetTag = campanello.campanelloHinooId;
     if (user == null || targetTag == null || targetTag.isEmpty) return;
@@ -145,6 +183,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
       await SupabaseProvider.client.from('house_access').insert({
         'target_house_tag': targetTag,
         'visitor_id': user.id,
+        if (hinooId != null && hinooId.isNotEmpty) 'hinoo_id': hinooId,
+        if (honooId != null && honooId.isNotEmpty) 'honoo_id': honooId,
       });
     } catch (_) {}
   }
@@ -500,42 +540,136 @@ class _CampanelliPageState extends State<CampanelliPage> {
     try {
       final rows = await SupabaseProvider.client
           .from('house_access')
-          .select('id,target_house_tag')
+          .select('id,target_house_tag,created_at,hinoo_id,honoo_id')
           .in_('target_house_tag', hinooIds)
           .is_('granted_at', null);
       if (rows is! List || rows.isEmpty) return;
+      final List<_PendingKnock> knocks = [];
+      for (final row in rows.whereType<Map>()) {
+        final String id = row['id']?.toString() ?? '';
+        final String tag = row['target_house_tag']?.toString() ?? '';
+        if (id.isEmpty || tag.isEmpty) continue;
+        final String? raw = row['created_at']?.toString();
+        final DateTime createdAt =
+            raw == null || raw.isEmpty ? DateTime.now() : DateTime.parse(raw);
+        final String? hinooId = row['hinoo_id']?.toString();
+        final String? honooId = row['honoo_id']?.toString();
+        knocks.add(
+          _PendingKnock(
+            id: id,
+            targetTag: tag,
+            createdAt: createdAt,
+            hinooId: hinooId,
+            honooId: honooId,
+          ),
+        );
+      }
+
+      if (!mounted) return;
+      setState(() {
+        _pendingKnocks
+          ..clear()
+          ..addAll(knocks);
+        _pendingKnockTags
+          ..clear()
+          ..addAll(knocks.map((k) => k.targetTag));
+      });
+    } catch (_) {}
+  }
+
+  _CampanelloEntry? _entryForTag(String? tag) {
+    if (tag == null || tag.isEmpty) return null;
+    for (final entry in _userEntries) {
+      if (entry.campanello.campanelloHinooId == tag) return entry;
+    }
+    return null;
+  }
+
+  String _pendingLabelForTag(String? tag) {
+    final entry = _entryForTag(tag);
+    if (entry == null) return 'Campanello';
+    final String raw = entry.campanello.text.trim();
+    if (raw.isEmpty) return 'Campanello';
+    final String firstLine = raw.split('\n').first.trim();
+    return firstLine.isEmpty ? 'Campanello' : firstLine;
+  }
+
+  String _formatPendingTimestamp(DateTime ts) {
+    final DateTime local = ts.toLocal();
+    String two(int value) => value.toString().padLeft(2, '0');
+    return '${two(local.day)}/${two(local.month)}/${local.year} '
+        '${two(local.hour)}:${two(local.minute)}';
+  }
+
+  Future<HinooDraft?> _fetchHinooDraft(String hinooId) async {
+    final row = await SupabaseProvider.client
+        .from('hinoo')
+        .select('pages,type,recipient_tag,created_at')
+        .eq('id', hinooId)
+        .maybeSingle();
+    if (row == null || row['pages'] is! List) return null;
+    final List<dynamic> pages = row['pages'] as List;
+    return HinooDraft(
+      pages: pages
+          .whereType<Map<String, dynamic>>()
+          .map((entry) => HinooSlide.fromJson(entry))
+          .toList(),
+      type: HinooType.answer,
+      recipientTag: row['recipient_tag'] as String?,
+    );
+  }
+
+  Future<Honoo?> _fetchHonoo(String honooId) async {
+    final row = await SupabaseProvider.client
+        .from('honoo')
+        .select('id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id')
+        .eq('id', honooId)
+        .maybeSingle();
+    if (row == null) return null;
+    return Honoo.fromMap(row.cast<String, dynamic>());
+  }
+
+  Future<void> _approvePendingKnock(
+    _PendingKnock knock,
+    _CampanelloEntry entry, {
+    HinooDraft? draft,
+    Honoo? honoo,
+  }) async {
+    final _CasaShareMode? mode = await _showShareModeDialog();
+    if (mode == null || !mounted) return;
+    await _saveShareMode(entry.campanello, mode);
+    await SupabaseProvider.client.from('house_access').update({
+      'granted_at': DateTime.now().toIso8601String(),
+    }).eq('id', knock.id);
+
+    if (draft != null) {
+      try {
+        final HinooDraft personalDraft =
+            draft.copyWith(type: HinooType.personal, recipientTag: null);
+        await HinooController().saveToChest(personalDraft);
+      } catch (_) {}
+    }
+
+    if (honoo != null) {
+      try {
+        await HonooController().saveToChest(honoo);
+      } catch (_) {}
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _pendingKnocks.removeWhere((item) => item.id == knock.id);
       _pendingKnockTags
         ..clear()
-        ..addAll(rows
-            .whereType<Map>()
-            .map((row) => row['target_house_tag']?.toString() ?? '')
-            .where((tag) => tag.isNotEmpty));
-      final row = rows.first;
-      if (row is! Map) return;
-      final String targetTag = row['target_house_tag']?.toString() ?? '';
-      if (targetTag.isEmpty || !mounted) return;
+        ..addAll(_pendingKnocks.map((item) => item.targetTag));
+    });
+    showHonooToast(context, message: 'Casa aperta.');
+  }
 
-      final _CampanelloEntry entry = _userEntries.firstWhere(
-        (item) => item.campanello.campanelloHinooId == targetTag,
-        orElse: () => _CampanelloEntry(
-          campanello: CampanelloData(
-            id: '',
-            campanelloHinooId: targetTag,
-            ownerId: SupabaseProvider.client.auth.currentUser?.id,
-            backgroundImage: const AssetImage(userCampanelloBg),
-            text: '',
-            linkedHouseId: '',
-          ),
-          casa: const CasaData(
-            id: '',
-            backgroundImage: AssetImage(defaultCasaBg),
-            bgScale: 1.0,
-            bgOffsetX: 0.0,
-            bgOffsetY: 0.0,
-          ),
-        ),
-      );
-
+  Future<void> _openPendingKnock(_PendingKnock knock) async {
+    final entry = _entryForTag(knock.targetTag);
+    if (entry == null) return;
+    if (knock.hinooId == null && knock.honooId == null) {
       final bool? openHouse = await showDialog<bool>(
         context: context,
         barrierDismissible: true,
@@ -546,17 +680,207 @@ class _CampanelliPageState extends State<CampanelliPage> {
         ),
       );
 
-      if (openHouse != true || !mounted) return;
-      final _CasaShareMode? mode = await _showShareModeDialog();
-      if (mode == null || !mounted) return;
-      await _saveShareMode(entry.campanello, mode);
-      await SupabaseProvider.client.from('house_access').update({
-        'granted_at': DateTime.now().toIso8601String(),
-      }).eq('target_house_tag', targetTag);
-      _pendingKnockTags.remove(targetTag);
-      if (!mounted) return;
-      showHonooToast(context, message: 'Casa aperta.');
-    } catch (_) {}
+      if (openHouse == true && mounted) {
+        await _approvePendingKnock(knock, entry);
+      }
+      return;
+    }
+
+    if (knock.hinooId != null && knock.hinooId!.isNotEmpty) {
+      final draft = await _fetchHinooDraft(knock.hinooId!);
+      if (draft == null || !mounted) return;
+      final bool? approved = await Navigator.of(context).push<bool>(
+        MaterialPageRoute(
+          builder: (_) => _PendingHinooPage(draft: draft),
+        ),
+      );
+
+      if (approved == true && mounted) {
+        await _approvePendingKnock(knock, entry, draft: draft);
+      }
+      return;
+    }
+
+    if (knock.honooId != null && knock.honooId!.isNotEmpty) {
+      final honoo = await _fetchHonoo(knock.honooId!);
+      if (honoo == null || !mounted) return;
+      final bool? approved = await Navigator.of(context).push<bool>(
+        MaterialPageRoute(
+          builder: (_) => _PendingHonooPage(honoo: honoo),
+        ),
+      );
+
+      if (approved == true && mounted) {
+        await _approvePendingKnock(knock, entry, honoo: honoo);
+      }
+    }
+  }
+
+  Future<_KnockMessageChoice?> _showKnockMessageDialog() {
+    return showDialog<_KnockMessageChoice>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => HonooDialogShell(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Vuoi inviare un messaggio\nprima di bussare?',
+                style: HonooDialogStyles.title(),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () =>
+                      Navigator.of(context).pop(_KnockMessageChoice.hinoo),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Scrivi un hinoo',
+                    style: HonooDialogStyles.primaryAction(),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () =>
+                      Navigator.of(context).pop(_KnockMessageChoice.honoo),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Scrivi un honoo',
+                    style: HonooDialogStyles.primaryAction(),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () =>
+                    Navigator.of(context).pop(_KnockMessageChoice.none),
+                style: TextButton.styleFrom(foregroundColor: Colors.white70),
+                child: Text(
+                  'No, bussa e basta',
+                  style: HonooDialogStyles.tertiaryAction(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openPendingKnocksDialog() async {
+    if (_pendingKnocks.isEmpty) return;
+    final List<_PendingKnock> sorted = List<_PendingKnock>.from(_pendingKnocks)
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => HonooDialogShell(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Bussate in attesa',
+                style: HonooDialogStyles.title(),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 260),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      for (final knock in sorted)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                Navigator.of(context).pop();
+                                await _openPendingKnock(knock);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    _pendingLabelForTag(knock.targetTag),
+                                    style: HonooDialogStyles.primaryAction(),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      Navigator.of(context).pop();
+                                      await _openPendingKnock(knock);
+                                    },
+                                    child: Text(
+                                      _formatPendingTimestamp(knock.createdAt),
+                                      style:
+                                          HonooDialogStyles.tertiaryAction(),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: TextButton.styleFrom(foregroundColor: Colors.white54),
+                child: Text(
+                  'Chiudi',
+                  style: HonooDialogStyles.tertiaryAction(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -629,6 +953,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
               activeCampanello?.campanelloHinooId;
           final bool hasPendingKnock = activeCampanelloId != null &&
               _pendingKnockTags.contains(activeCampanelloId);
+          final bool hasAnyPendingKnock = _pendingKnockTags.isNotEmpty;
+          final int pendingKnockCount = _pendingKnocks.length;
           final bool casaUnlocked = activeCampanello == null
               ? false
               : _isCampanelloUnlocked(activeCampanello.id);
@@ -889,21 +1215,39 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                 ),
                                 if (hasPendingKnock)
                                   Positioned(
-                                    top: -2,
-                                    right: -2,
-                                    child: Container(
-                                      width: 12,
-                                      height: 12,
-                                      decoration: BoxDecoration(
-                                        color: Colors.redAccent,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: HonooColor.background,
-                                          width: 1.5,
-                                        ),
-                                      ),
+                                    top: -4,
+                                    right: -4,
+                                    child: _PendingKnockBadge(
+                                      count: pendingKnockCount,
                                     ),
                                   ),
+                              ],
+                            ),
+                          ),
+                        if (!showCampanello && hasAnyPendingKnock)
+                          ResponsiveFooterAction(
+                            asset: "assets/icons/campanello_bianco.png",
+                            semanticsLabel: 'Campanelli',
+                            size: footerIconSize,
+                            splashRadius: 25,
+                            tooltip: 'Bussate in attesa',
+                            onPressed: _openPendingKnocksDialog,
+                            icon: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Image.asset(
+                                  "assets/icons/campanello_bianco.png",
+                                  width: footerIconSize,
+                                  height: footerIconSize,
+                                  fit: BoxFit.contain,
+                                ),
+                                Positioned(
+                                  top: -4,
+                                  right: -4,
+                                  child: _PendingKnockBadge(
+                                    count: pendingKnockCount,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -919,11 +1263,240 @@ class _CampanelliPageState extends State<CampanelliPage> {
   }
 }
 
+class _PendingHinooPage extends StatelessWidget {
+  const _PendingHinooPage({required this.draft});
+
+  final HinooDraft draft;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: HonooColor.background,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final double viewW = constraints.maxWidth;
+          final double viewH = constraints.maxHeight;
+          final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
+          final layoutMode = ResponsiveLayout.modeForWidth(viewW);
+          final double footerIconSize =
+              ResponsiveLayout.footerIconSizeForMode(layoutMode);
+          final double footerGap = ResponsiveLayout.footerGapForMode(layoutMode);
+          final double footerBottomPadding =
+              ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
+          final double footerSpacing = footerBottomPadding + safeBottom;
+          final double footerTopSpacing = footerSpacing / 2;
+          final double footerBottomSpacing = footerSpacing - footerTopSpacing;
+          const double headerH = 52;
+          final double targetMaxW = ResponsiveLayout.contentMaxWidth(viewW);
+          final double footerReserved =
+              footerIconSize + footerTopSpacing + footerBottomSpacing;
+          final double availableH =
+              (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
+
+          return Column(
+            children: [
+              SizedBox(
+                height: headerH,
+                child: Center(
+                  child: HonooAppTitle(
+                    onTap: () => Navigator.of(context).pop(false),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: SizedBox(
+                    width: targetMaxW,
+                    height: availableH,
+                    child: HinooViewer(
+                      draft: draft,
+                      maxHeight: availableH,
+                      maxWidth: targetMaxW,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: footerTopSpacing),
+              ResponsiveFooterBar(
+                useSafeArea: false,
+                bottomPadding: footerBottomSpacing,
+                desiredGap: footerGap,
+                minGap: 16,
+                height: footerIconSize,
+                actions: [
+                  ResponsiveFooterAction(
+                    asset: "assets/icons/cancella.svg",
+                    semanticsLabel: 'Annulla',
+                    size: footerIconSize,
+                    splashRadius: 25,
+                    tooltip: 'Non ora',
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                  ResponsiveFooterAction(
+                    asset: "assets/icons/ok.svg",
+                    semanticsLabel: 'OK',
+                    size: footerIconSize,
+                    splashRadius: 25,
+                    tooltip: 'Apri',
+                    onPressed: () => Navigator.of(context).pop(true),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _PendingHonooPage extends StatelessWidget {
+  const _PendingHonooPage({required this.honoo});
+
+  final Honoo honoo;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: HonooColor.background,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final double viewW = constraints.maxWidth;
+          final double viewH = constraints.maxHeight;
+          final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
+          final layoutMode = ResponsiveLayout.modeForWidth(viewW);
+          final double footerIconSize =
+              ResponsiveLayout.footerIconSizeForMode(layoutMode);
+          final double footerGap = ResponsiveLayout.footerGapForMode(layoutMode);
+          final double footerBottomPadding =
+              ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
+          final double footerSpacing = footerBottomPadding + safeBottom;
+          final double footerTopSpacing = footerSpacing / 2;
+          final double footerBottomSpacing = footerSpacing - footerTopSpacing;
+          const double headerH = 52;
+          final double targetMaxW = ResponsiveLayout.contentMaxWidth(viewW);
+          final double footerReserved =
+              footerIconSize + footerTopSpacing + footerBottomSpacing;
+          final double availableH =
+              (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
+          final HonooBuilderMetrics metrics =
+              ResponsiveLayout.honooBuilderMetrics(
+            availableHeight: availableH,
+            maxWidth: targetMaxW,
+            mode: layoutMode,
+          );
+
+          return Column(
+            children: [
+              SizedBox(
+                height: headerH,
+                child: Center(
+                  child: HonooAppTitle(
+                    onTap: () => Navigator.of(context).pop(false),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: SizedBox(
+                    width: metrics.width,
+                    height: metrics.height,
+                    child: HonooCard(honoo: honoo),
+                  ),
+                ),
+              ),
+              SizedBox(height: footerTopSpacing),
+              ResponsiveFooterBar(
+                useSafeArea: false,
+                bottomPadding: footerBottomSpacing,
+                desiredGap: footerGap,
+                minGap: 16,
+                height: footerIconSize,
+                actions: [
+                  ResponsiveFooterAction(
+                    asset: "assets/icons/cancella.svg",
+                    semanticsLabel: 'Annulla',
+                    size: footerIconSize,
+                    splashRadius: 25,
+                    tooltip: 'Non ora',
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                  ResponsiveFooterAction(
+                    asset: "assets/icons/ok.svg",
+                    semanticsLabel: 'OK',
+                    size: footerIconSize,
+                    splashRadius: 25,
+                    tooltip: 'Apri',
+                    onPressed: () => Navigator.of(context).pop(true),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _PendingKnock {
+  final String id;
+  final String targetTag;
+  final DateTime createdAt;
+  final String? hinooId;
+  final String? honooId;
+
+  const _PendingKnock({
+    required this.id,
+    required this.targetTag,
+    required this.createdAt,
+    this.hinooId,
+    this.honooId,
+  });
+}
+
+enum _KnockMessageChoice { none, honoo, hinoo }
+
 class _ArrowIntent extends Intent {
   const _ArrowIntent(this.axis, this.delta);
 
   final Axis axis;
   final int delta;
+}
+
+class _PendingKnockBadge extends StatelessWidget {
+  const _PendingKnockBadge({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final String label = count > 99 ? '99+' : count.toString();
+    final double size = count > 9 ? 18 : 16;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      height: size,
+      constraints: BoxConstraints(minWidth: size),
+      decoration: BoxDecoration(
+        color: Colors.redAccent,
+        borderRadius: BorderRadius.circular(size / 2),
+        border: Border.all(
+          color: HonooColor.background,
+          width: 1.5,
+        ),
+      ),
+      child: Center(
+        child: Text(
+          label,
+          style: GoogleFonts.libreFranklin(
+            color: Colors.white,
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class CampanelloData {

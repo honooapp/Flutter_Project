@@ -24,10 +24,22 @@ import '../Entities/hinoo.dart';
 import 'casa_builder_page.dart';
 
 class NewHinooPage extends StatefulWidget {
-  const NewHinooPage({super.key, this.isReply = false, this.isCampanello = false});
+  const NewHinooPage({
+    super.key,
+    this.isReply = false,
+    this.isCampanello = false,
+    this.forcedType,
+    this.recipientTag,
+    this.returnSavedId = false,
+    this.replyTo,
+  });
 
   final bool isReply;
   final bool isCampanello;
+  final HinooType? forcedType;
+  final String? recipientTag;
+  final bool returnSavedId;
+  final String? replyTo;
 
   @override
   State<NewHinooPage> createState() => _NewHinooPageState();
@@ -230,6 +242,14 @@ class _NewHinooPageState extends State<NewHinooPage> {
     }
 
     try {
+      if (widget.returnSavedId) {
+        final hinooId = await _controller.saveToChestAndReturnId(hinooDraft);
+        if (!mounted) return;
+        showHonooToast(context, message: 'hinoo salvato.');
+        Navigator.of(context).pop(hinooId);
+        return;
+      }
+
       if (widget.isCampanello) {
         final hinooId = await _controller.saveToChestAndReturnId(hinooDraft);
         if (!mounted) return;
@@ -312,9 +332,14 @@ class _NewHinooPageState extends State<NewHinooPage> {
       }
     }
 
+    final HinooType type = widget.forcedType ??
+        (widget.isReply ? HinooType.answer : HinooType.personal);
+
     return HinooDraft(
       pages: slides,
-      type: widget.isReply ? HinooType.answer : HinooType.personal,
+      type: type,
+      recipientTag: widget.recipientTag,
+      replyTo: widget.replyTo,
       baseCanvasHeight: _lastCanvasHeight > 0 ? _lastCanvasHeight : null,
     );
   }
@@ -558,6 +583,15 @@ class _NewHinooPageState extends State<NewHinooPage> {
                                   key: _builderKey,
                                   onHinooChanged: _onHinooChanged,
                                   onPngExported: _onPngExported,
+                                  hintText: widget.isCampanello
+                                      ? 'Scrivi qui tutto quello che vuoi per la pagina del tuo campanello'
+                                      : null,
+                                  backgroundPromptText: widget.isCampanello
+                                      ? 'Scrivi qui\n'
+                                          'tutto quello che vuoi\n'
+                                          'per la pagina\n'
+                                          'del tuo campanello'
+                                      : null,
                                 ),
                               ),
                             ),

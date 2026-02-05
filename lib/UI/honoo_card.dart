@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../Entities/honoo.dart';
 import '../Utility/honoo_colors.dart';
+import '../Services/supabase_provider.dart';
 
 class HonooCard extends StatelessWidget {
   final Honoo honoo;
@@ -27,6 +28,12 @@ class HonooCard extends StatelessWidget {
         cardBg = HonooColor.background;
         break;
     }
+
+    final String? uid = SupabaseProvider.client.auth.currentUser?.id;
+    final bool isOwnReply = uid != null && honoo.userId == uid;
+    final Color? replyBorder = honoo.type == HonooType.answer
+        ? (isOwnReply ? HonooColor.wave2 : HonooColor.secondary)
+        : null;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -55,109 +62,118 @@ class HonooCard extends StatelessWidget {
 
         const double cornerRadius = 5;
 
-        return Center(
-          child: Card(
-            color: cardBg,
-            elevation: 0,
-            margin: EdgeInsets.zero,
-            clipBehavior: Clip.antiAlias,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(cornerRadius),
-            ),
-            child: SizedBox(
-              width: imageSize,
-              height: totalHeight,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // ======== BOX TESTO ========
-                  SizedBox(
-                    width: imageSize,
-                    height: textHeight,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: HonooColor.tertiary,
-                        border: Border.all(color: Colors.black12),
-                        borderRadius: BorderRadius.circular(cornerRadius),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          honoo.text, // se non-nullable nel modello
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.arvo(
-                            color: HonooColor.onTertiary,
-                            fontSize: 18,
-                            height: 1.4,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          maxLines: 5,
-                          overflow: TextOverflow.visible,
+        final Widget content = Card(
+          color: cardBg,
+          elevation: 0,
+          margin: EdgeInsets.zero,
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(cornerRadius),
+          ),
+          child: SizedBox(
+            width: imageSize,
+            height: totalHeight,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: imageSize,
+                  height: textHeight,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: HonooColor.tertiary,
+                      border: Border.all(color: Colors.black12),
+                      borderRadius: BorderRadius.circular(cornerRadius),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
                         ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Text(
+                        honoo.text,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.arvo(
+                          color: HonooColor.onTertiary,
+                          fontSize: 18,
+                          height: 1.4,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        maxLines: 5,
+                        overflow: TextOverflow.visible,
                       ),
                     ),
                   ),
+                ),
 
-                  const SizedBox(height: gap),
+                const SizedBox(height: gap),
 
-                  // ======== BOX IMMAGINE (stesso stile del box testo) ========
-                  SizedBox(
-                    width: imageSize,
-                    height: imageSize,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: HonooColor.tertiary,
-                        border: Border.all(color: Colors.black12),
-                        borderRadius: BorderRadius.circular(cornerRadius),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
+                SizedBox(
+                  width: imageSize,
+                  height: imageSize,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: HonooColor.tertiary,
+                      border: Border.all(color: Colors.black12),
+                      borderRadius: BorderRadius.circular(cornerRadius),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                      image: hasImage
+                          ? DecorationImage(
+                              image: NetworkImage(imageUrl),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
+                    child: hasImage
+                        ? const SizedBox.shrink()
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Carica qui la tua immagine',
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.libreFranklin(
+                                  color: HonooColor.onSecondary,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              const SizedBox(height: 22),
+                              const Icon(
+                                Icons.photo,
+                                size: 48,
+                                color: HonooColor.primary,
+                              ),
+                            ],
                           ),
-                        ],
-                        image: hasImage
-                            ? DecorationImage(
-                                image: NetworkImage(imageUrl),
-                                fit: BoxFit.cover,
-                              )
-                            : null,
-                      ),
-                      child: hasImage
-                          ? const SizedBox.shrink()
-                          : Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Carica qui la tua immagine',
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.libreFranklin(
-                                    color: HonooColor.onSecondary,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                                const SizedBox(height: 22),
-                                const Icon(
-                                  Icons.photo,
-                                  size: 48,
-                                  color: HonooColor.primary,
-                                ),
-                              ],
-                            ),
-                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
+
+        final Widget wrapped = replyBorder == null
+            ? content
+            : Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(cornerRadius + 6),
+                  border: Border.all(color: replyBorder, width: 2),
+                ),
+                child: content,
+              );
+
+        return Center(child: wrapped);
       },
     );
   }

@@ -1,6 +1,7 @@
 enum HouseInviteStatus {
   pending,
   accepted,
+  declined,
 }
 
 class HouseInviteModel {

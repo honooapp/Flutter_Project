@@ -10,11 +10,13 @@ class ScriviHinooOverlay extends StatefulWidget {
     required this.controller,
     required this.focusNode,
     required this.textColor,
+    this.hintText,
   });
 
   final TextEditingController controller;
   final FocusNode focusNode;
   final Color textColor;
+  final String? hintText;
 
   @override
   State<ScriviHinooOverlay> createState() => _ScriviHinooOverlayState();
@@ -57,9 +59,13 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
               scrollPadding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom + 24,
               ),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: InputBorder.none,
                 isCollapsed: true,
+                hintText: widget.hintText,
+                hintStyle: effectiveStyle.copyWith(
+                  color: widget.textColor.withOpacity(0.5),
+                ),
               ),
               keyboardType: TextInputType.multiline,
               textInputAction: TextInputAction.newline,
