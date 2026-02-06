@@ -729,7 +729,7 @@ class _ChestPageState extends State<ChestPage> {
                     elevation: 0,
                   ),
                   child: Text(
-                    'Honoo',
+                    'honoo',
                     style: HonooDialogStyles.primaryAction(),
                   ),
                 ),
@@ -750,7 +750,7 @@ class _ChestPageState extends State<ChestPage> {
                     elevation: 0,
                   ),
                   child: Text(
-                    'Hinoo',
+                    'hinoo',
                     style: HonooDialogStyles.primaryAction(),
                   ),
                 ),

@@ -22,7 +22,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     String asset, {
     required double iconHeight,
     double topPadding = 3,
-    double bottomPadding = 3,
+    double bottomPadding = 10,
   }) {
     return WidgetSpan(
       child: SizedBox(
@@ -145,43 +145,51 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
                       _inlineIcon(
                         "assets/icons/performance.png",
                         iconHeight: inlineIconHeight,
+                        bottomPadding: 14,
                       ),
-                      const TextSpan(text: '\n'),
+                      const TextSpan(text: '\n\n'),
                       const TextSpan(text: '$laboratoriLine\n'),
                       _inlineIcon(
                         "assets/icons/laboratori_teatrali.png",
                         iconHeight: inlineIconHeight,
+                        bottomPadding: 14,
                       ),
-                      const TextSpan(text: '\n'),
+                      const TextSpan(text: '\n\n'),
                       const TextSpan(text: '$esplorazioniLine\n'),
                       _inlineIcon(
                         "assets/icons/luna.png",
                         iconHeight: inlineIconHeight,
+                        bottomPadding: 14,
                       ),
-                      const TextSpan(text: '\n'),
+                      const TextSpan(text: '\n\n'),
                       const TextSpan(text: '$festeLine\n'),
                       _inlineIcon(
                         "assets/icons/feste.png",
                         iconHeight: inlineIconHeight,
+                        bottomPadding: 14,
                       ),
-                      const TextSpan(text: '\n'),
+                      const TextSpan(text: '\n\n'),
                       const TextSpan(text: '$viaggiLine\n'),
                       _inlineIcon(
                         "assets/icons/isola.png",
                         iconHeight: inlineIconHeight,
+                        bottomPadding: 6,
                       ),
                       TextSpan(text: textBeforePerformanceMarker),
                       if (performanceMarkerIndex != -1)
                         _inlineIcon(
                           "assets/icons/performance.png",
                           iconHeight: inlineIconHeight,
+                          bottomPadding: 14,
                         ),
                       TextSpan(text: textAfterPerformanceMarker),
                       TextSpan(text: textBeforeVenceslao),
+                      const TextSpan(text: '\n\n'),
                       const TextSpan(text: venceslaoLine),
                       _inlineIcon(
                         "assets/icons/venceslao.png",
                         iconHeight: inlineIconHeight,
+                        bottomPadding: 14,
                       ),
                       const TextSpan(text: '\n'),
                       TextSpan(text: textAfterVenceslao),

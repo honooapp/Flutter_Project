@@ -498,7 +498,7 @@ class _MoonPageState extends State<MoonPage> {
                     elevation: 0,
                   ),
                   child: Text(
-                    'Honoo',
+                    'honoo',
                     style: HonooDialogStyles.primaryAction(),
                   ),
                 ),
@@ -519,7 +519,7 @@ class _MoonPageState extends State<MoonPage> {
                     elevation: 0,
                   ),
                   child: Text(
-                    'Hinoo',
+                    'hinoo',
                     style: HonooDialogStyles.primaryAction(),
                   ),
                 ),
