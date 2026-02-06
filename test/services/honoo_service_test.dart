@@ -48,6 +48,7 @@ void main() {
     when(() => client.from('honoo')).thenAnswer((_) => chain);
 
     when(() => chain.select(any())).thenAnswer((_) => chain);
+    when(() => chain.insert(any())).thenAnswer((_) => chain);
     when(() => chain.delete()).thenAnswer((_) => chain);
     when(() => chain.eq(any(), any())).thenAnswer((_) => chain);
     when(() => chain.order(any(), ascending: any(named: 'ascending')))
@@ -103,5 +104,31 @@ void main() {
     verify(() => client.from('honoo')).called(1);
     verify(() => chain.delete()).called(1);
     verify(() => chain.eq('id', '123')).called(1);
+  });
+
+  test('publishHonoo: reply inserisce reply_to e recipient_tag', () async {
+    chain.queueResponse(<String, dynamic>{});
+
+    final honoo = Honoo(
+      1,
+      'testo',
+      '',
+      '2024-01-01T00:00:00Z',
+      '2024-01-01T00:00:00Z',
+      'user-1',
+      HonooType.answer,
+      'root-1',
+      'recipient-1',
+    );
+
+    await HonooService.publishHonoo(honoo);
+
+    final captured =
+        verify(() => chain.insert(captureAny())).captured.single
+            as Map<String, dynamic>;
+    expect(captured['destination'], 'reply');
+    expect(captured['reply_to'], 'root-1');
+    expect(captured['recipient_tag'], 'recipient-1');
+    expect(captured['image_url'], isNull);
   });
 }

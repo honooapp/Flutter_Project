@@ -47,6 +47,10 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<!-- Accesso alla libreria Foto (per scegliere sfondi) -->
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Carico uno sfondo per creare gli hinoo.</string>

@@ -62,6 +62,10 @@ class HonooCard extends StatelessWidget {
 
         const double cornerRadius = 5;
 
+        final Color gapColor = honoo.type == HonooType.moon
+            ? HonooColor.background
+            : cardBg;
+
         final Widget content = Card(
           color: cardBg,
           elevation: 0,
@@ -110,7 +114,11 @@ class HonooCard extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: gap),
+                SizedBox(
+                  width: imageSize,
+                  height: gap,
+                  child: ColoredBox(color: gapColor),
+                ),
 
                 SizedBox(
                   width: imageSize,

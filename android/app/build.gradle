@@ -1,57 +1,39 @@
-def loadLocalProperties() {
-    def props = [:]
-    def propertiesFile = rootProject.file('local.properties')
-    if (!propertiesFile.exists()) {
-        return props
-    }
-
-    propertiesFile.eachLine { rawLine ->
-        def line = rawLine.trim()
-        if (line.isEmpty() || line.startsWith('#') || !line.contains('=')) {
-            return
-        }
-
-        def separatorIndex = line.indexOf('=')
-        def key = line.substring(0, separatorIndex).trim()
-        def value = line.substring(separatorIndex + 1).trim()
-        props[key] = value
-    }
-
-    return props
+plugins {
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
+    id "dev.flutter.flutter-gradle-plugin"
 }
 
-def localProperties = loadLocalProperties()
-
-def flutterRoot = localProperties['flutter.sdk']
-if (flutterRoot == null) {
-    throw new IllegalStateException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
 }
 
-def flutterVersionCode = localProperties['flutter.versionCode']
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
     flutterVersionCode = '1'
 }
 
-def flutterVersionName = localProperties['flutter.versionName']
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
-
 android {
+    namespace "dev.lucagaudino.honoo"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
 
     sourceSets {
@@ -60,18 +42,14 @@ android {
 
     defaultConfig {
         applicationId "dev.lucagaudino.honoo"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        minSdkVersion 19        
     }
 
     buildTypes {
         release {
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
         }
     }
@@ -82,5 +60,5 @@ flutter {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10"
 }

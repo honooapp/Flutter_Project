@@ -21,6 +21,7 @@ class HouseInviteService {
         .from('house_invites')
         .select('status')
         .eq('user_id', userId)
+        .in_('status', ['pending', 'accepted'])
         .limit(1);
     if (rows is! List || rows.isEmpty) return false;
     final row = rows.first;

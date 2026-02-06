@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:carousel_slider/carousel_slider.dart' as cs;
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
@@ -126,16 +127,10 @@ class _ChestPageState extends State<ChestPage> {
     if (mounted) setState(() => _isHinooLoading = true);
 
     try {
-      final client = SupabaseProvider.client;
-      final rows = await client
-          .from('hinoo')
-          .select('id,pages,type,reply_to,recipient_tag,created_at,is_from_moon_saved,user_id')
-          .eq('user_id', uid)
-          .in_('type', ['personal', 'moon'])
-          .order('created_at', ascending: false);
+      final rows = await _fetchHinooRows(uid);
 
       final list = <_HinooRow>[];
-      for (final r in (rows as List)) {
+      for (final r in rows) {
         final pages = r['pages'];
         if (pages is! List) continue;
 
@@ -178,6 +173,31 @@ class _ChestPageState extends State<ChestPage> {
     } catch (_) {
       if (!mounted) return;
       setState(() => _isHinooLoading = false);
+    }
+  }
+
+  Future<List<dynamic>> _fetchHinooRows(String uid) async {
+    final client = SupabaseProvider.client;
+    try {
+      final rows = await client
+          .from('hinoo')
+          .select('id,pages,type,reply_to,recipient_tag,created_at,is_from_moon_saved,user_id')
+          .eq('user_id', uid)
+          .in_('type', ['personal', 'moon'])
+          .order('created_at', ascending: false);
+      return rows as List<dynamic>;
+    } on PostgrestException catch (e) {
+      if (e.code != 'PGRST204' ||
+          !e.message.contains('is_from_moon_saved')) {
+        rethrow;
+      }
+      final rows = await client
+          .from('hinoo')
+          .select('id,pages,type,reply_to,recipient_tag,created_at,user_id')
+          .eq('user_id', uid)
+          .in_('type', ['personal', 'moon'])
+          .order('created_at', ascending: false);
+      return rows as List<dynamic>;
     }
   }
 
@@ -911,7 +931,7 @@ class _ChestPageState extends State<ChestPage> {
 
     final bool isDesktop = MediaQuery.of(context).size.width >= 900;
 
-    final double rightPad = isDesktop
+    final double horizontalPad = isDesktop
         ? (isHonoo ? honooRightDesktop : hinooRightDesktop)
         : rightMobile;
 
@@ -983,7 +1003,7 @@ class _ChestPageState extends State<ChestPage> {
                 styledCard,
                 Positioned(
                   top: topPad,
-                  right: rightPad,
+                  left: horizontalPad,
                   child: Material(
                     color: Colors.transparent,
                     child: ClipRRect(

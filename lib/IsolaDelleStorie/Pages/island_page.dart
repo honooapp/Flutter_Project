@@ -339,7 +339,10 @@ class _IslandPageState extends State<IslandPage> {
                                                                 .onBackground,
                                                             fontSize: 18,
                                                             fontWeight:
-                                                                FontWeight.w400,
+                                                                FontWeight.w700,
+                                                            decoration:
+                                                                TextDecoration
+                                                                    .underline,
                                                           ),
                                                         ),
                                                       ),
