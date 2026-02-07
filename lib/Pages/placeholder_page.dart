@@ -18,22 +18,50 @@ class PlaceholderPage extends StatefulWidget {
 }
 
 class _PlaceholderPageState extends State<PlaceholderPage> {
-  WidgetSpan _inlineIcon(
-    String asset, {
-    required double iconHeight,
-    double topPadding = 3,
-    double bottomPadding = 10,
+  // Regola qui gli spazi sopra/sotto le icone (valori in pixel).
+  static const double _performanceTopSpacing = 5;
+  static const double _performanceBottomSpacing = 30;
+  static const double _laboratoriTopSpacing = 5;
+  static const double _laboratoriBottomSpacing = 30;
+  static const double _lunaTopSpacing = -5;
+  static const double _lunaBottomSpacing = 30;
+  static const double _festeTopSpacing = 5;
+  static const double _festeBottomSpacing = 30;
+  static const double _isolaTopSpacing = -5;
+  static const double _isolaBottomSpacing = 20;
+  static const double _performanceSecondTopSpacing = 15;
+  static const double _performanceSecondBottomSpacing = 15;
+  static const double _venceslaoTopSpacing = 15;
+  static const double _venceslaoBottomSpacing = 15;
+  static const double _honooTopSpacing = 15;
+  static const double _honooBottomSpacing = 15;
+
+  List<Widget> _iconBlockWithSpacing(
+    String asset,
+    double size, {
+    double topSpacing = 0,
+    double bottomSpacing = 0,
   }) {
-    return WidgetSpan(
-      child: SizedBox(
-        height: iconHeight + topPadding + bottomPadding,
-        child: Padding(
-          padding: EdgeInsets.only(top: topPadding, bottom: bottomPadding),
-          child: Image.asset(asset, height: iconHeight),
-        ),
-      ),
-      alignment: PlaceholderAlignment.middle,
+    return [
+      if (topSpacing > 0) SizedBox(height: topSpacing),
+      Image.asset(asset, height: size),
+      if (bottomSpacing > 0) SizedBox(height: bottomSpacing),
+    ];
+  }
+
+  Widget _textBlock(String text, TextStyle style, {double? height}) {
+    if (text.trim().isEmpty) return const SizedBox.shrink();
+    return Text(
+      text,
+      style: height == null ? style : style.copyWith(height: height),
+      textAlign: TextAlign.center,
     );
+  }
+
+  String _trimInlineText(String text) {
+    return text
+        .replaceAll(RegExp(r'^\n+'), '')
+        .replaceAll(RegExp(r'\n+$'), '');
   }
 
   @override
@@ -46,8 +74,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     const String laboratoriLine = 'laboratori teatrali';
     const String esplorazioniLine = 'esplorazioni lunari';
     const String festeLine = 'feste';
-    const String viaggiLine = "viaggi sull'Isola delle Storie.";
-    const String venceslaoLine = 'Venceslao Cembalo\n';
+    const String viaggiLine = "viaggi sull'Isola delle Storie";
+    const String venceslaoLine = 'Venceslao Cembalo';
     final String text1First = Utility().text1First;
     const String performanceMarker = 'che ci siamo visti\n\n';
     final String text1Fourth = Utility().text1Fourth;
@@ -60,6 +88,10 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
       textAfterPerformanceMarker =
           text1Fourth.substring(performanceMarkerIndex + performanceMarker.length);
     }
+    final String textBeforePerformanceMarkerDisplay =
+        _trimInlineText(textBeforePerformanceMarker);
+    final String textAfterPerformanceMarkerDisplay =
+        _trimInlineText(textAfterPerformanceMarker);
     final String text1Fifth = Utility().text1Fifth;
     final int venceslaoIndex = text1Fifth.indexOf(venceslaoLine);
     String textBeforeVenceslao = text1Fifth;
@@ -70,6 +102,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         venceslaoIndex + venceslaoLine.length,
       );
     }
+    final String textBeforeVenceslaoDisplay = _trimInlineText(textBeforeVenceslao);
+    final String textAfterVenceslaoDisplay = _trimInlineText(textAfterVenceslao);
     final double footerIconSize =
         ResponsiveLayout.footerIconSizeForMode(layoutMode);
     final double footerBottomPadding =
@@ -117,6 +151,81 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     }
 
     // Contenuto principale, usato in entrambi i layout
+    final TextStyle baseTextStyle = GoogleFonts.arvo(
+      color: HonooColor.onBackground,
+      fontSize: 18,
+      fontWeight: FontWeight.w200,
+      height: 1.3,
+    );
+
+    final TextStyle titleStyle = GoogleFonts.libreFranklin(
+      color: HonooColor.secondary,
+      fontSize: 28,
+      fontWeight: FontWeight.w600,
+    );
+
+    // Sequenza dei testi e delle icone in ordine di apparizione.
+    final List<Widget> blocks = [
+      _textBlock('${_trimInlineText(text1First)}\n', baseTextStyle),
+      _textBlock(performanceLine, baseTextStyle),
+      ..._iconBlockWithSpacing(
+        "assets/icons/performance.png",
+        inlineIconHeight,
+        topSpacing: _performanceTopSpacing,
+        bottomSpacing: _performanceBottomSpacing,
+      ),
+      _textBlock(laboratoriLine, baseTextStyle),
+      ..._iconBlockWithSpacing(
+        "assets/icons/laboratori_teatrali.png",
+        inlineIconHeight,
+        topSpacing: _laboratoriTopSpacing,
+        bottomSpacing: _laboratoriBottomSpacing,
+      ),
+      _textBlock(esplorazioniLine, baseTextStyle, height: 0.9),
+      ..._iconBlockWithSpacing(
+        "assets/icons/luna.png",
+        inlineIconHeight,
+        topSpacing: _lunaTopSpacing,
+        bottomSpacing: _lunaBottomSpacing,
+      ),
+      _textBlock(festeLine, baseTextStyle),
+      ..._iconBlockWithSpacing(
+        "assets/icons/feste.png",
+        inlineIconHeight,
+        topSpacing: _festeTopSpacing,
+        bottomSpacing: _festeBottomSpacing,
+      ),
+      _textBlock(viaggiLine, baseTextStyle, height: 0.9),
+      ..._iconBlockWithSpacing(
+        "assets/icons/isola.png",
+        inlineIconHeight,
+        topSpacing: _isolaTopSpacing,
+        bottomSpacing: _isolaBottomSpacing,
+      ),
+      _textBlock(textBeforePerformanceMarkerDisplay, baseTextStyle, height: 0.9),
+      if (performanceMarkerIndex != -1)
+        ..._iconBlockWithSpacing(
+          "assets/icons/performance.png",
+          inlineIconHeight,
+          topSpacing: _performanceSecondTopSpacing,
+          bottomSpacing: _performanceSecondBottomSpacing,
+        ),
+      _textBlock(textAfterPerformanceMarkerDisplay, baseTextStyle),
+      _textBlock(textBeforeVenceslaoDisplay, baseTextStyle),
+      _textBlock(venceslaoLine, baseTextStyle, height: 0.9),
+      ..._iconBlockWithSpacing(
+        "assets/icons/venceslao.png",
+        inlineIconHeight,
+        topSpacing: _venceslaoTopSpacing,
+        bottomSpacing: _venceslaoBottomSpacing,
+      ),
+      _textBlock(textAfterVenceslaoDisplay, baseTextStyle),
+      SizedBox(height: _honooTopSpacing),
+      _textBlock(Utility().appName, titleStyle),
+      SizedBox(height: _honooBottomSpacing),
+      _textBlock(_trimInlineText(Utility().text1Six), baseTextStyle),
+    ];
+
     final Widget content = Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -131,83 +240,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
             child: SingleChildScrollView(
               child: SizedBox(
                 width: contentWidth,
-                child: RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                    style: GoogleFonts.arvo(
-                      color: HonooColor.onBackground,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w200,
-                    ),
-                    children: [
-                      TextSpan(text: text1First),
-                      const TextSpan(text: '$performanceLine\n'),
-                      _inlineIcon(
-                        "assets/icons/performance.png",
-                        iconHeight: inlineIconHeight,
-                        bottomPadding: 14,
-                      ),
-                      const TextSpan(text: '\n\n'),
-                      const TextSpan(text: '$laboratoriLine\n'),
-                      _inlineIcon(
-                        "assets/icons/laboratori_teatrali.png",
-                        iconHeight: inlineIconHeight,
-                        bottomPadding: 14,
-                      ),
-                      const TextSpan(text: '\n\n'),
-                      const TextSpan(text: '$esplorazioniLine\n'),
-                      _inlineIcon(
-                        "assets/icons/luna.png",
-                        iconHeight: inlineIconHeight,
-                        bottomPadding: 14,
-                      ),
-                      const TextSpan(text: '\n\n'),
-                      const TextSpan(text: '$festeLine\n'),
-                      _inlineIcon(
-                        "assets/icons/feste.png",
-                        iconHeight: inlineIconHeight,
-                        bottomPadding: 14,
-                      ),
-                      const TextSpan(text: '\n\n'),
-                      const TextSpan(text: '$viaggiLine\n'),
-                      _inlineIcon(
-                        "assets/icons/isola.png",
-                        iconHeight: inlineIconHeight,
-                        bottomPadding: 6,
-                      ),
-                      TextSpan(text: textBeforePerformanceMarker),
-                      if (performanceMarkerIndex != -1)
-                        _inlineIcon(
-                          "assets/icons/performance.png",
-                          iconHeight: inlineIconHeight,
-                          bottomPadding: 14,
-                        ),
-                      TextSpan(text: textAfterPerformanceMarker),
-                      TextSpan(text: textBeforeVenceslao),
-                      const TextSpan(text: '\n\n'),
-                      const TextSpan(text: venceslaoLine),
-                      _inlineIcon(
-                        "assets/icons/venceslao.png",
-                        iconHeight: inlineIconHeight,
-                        bottomPadding: 14,
-                      ),
-                      const TextSpan(text: '\n'),
-                      TextSpan(text: textAfterVenceslao),
-                      WidgetSpan(
-                        child: Text(
-                          Utility().appName,
-                          style: GoogleFonts.libreFranklin(
-                            color: HonooColor.secondary,
-                            fontSize: 28,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        alignment: PlaceholderAlignment.middle,
-                      ),
-                      TextSpan(text: Utility().text1Six),
-                    ],
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: blocks,
                 ),
               ),
             ),

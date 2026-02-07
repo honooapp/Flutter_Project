@@ -98,7 +98,9 @@ class _ChestPageState extends State<ChestPage> {
   }
 
   Future<void> _loadAll() async {
-    await ctrl.loadChest();
+    try {
+      await ctrl.loadChest();
+    } catch (_) {}
     await _loadHinoo(rebuild: false);
     await _loadReplyData();
     if (!mounted) return;
@@ -256,72 +258,73 @@ class _ChestPageState extends State<ChestPage> {
     final uid = SupabaseProvider.client.auth.currentUser?.id;
     if (uid == null) return;
     final client = SupabaseProvider.client;
+    try {
+      _honooLatestReplies.clear();
+      _hinooLatestReplies.clear();
+      _hinooRepliesByRoot.clear();
 
-    _honooLatestReplies.clear();
-    _hinooLatestReplies.clear();
-    _hinooRepliesByRoot.clear();
+      final honooReplies = await client
+          .from('honoo')
+          .select('reply_to,created_at')
+          .eq('destination', 'reply')
+          .eq('recipient_tag', uid);
 
-    final honooReplies = await client
-        .from('honoo')
-        .select('reply_to,created_at')
-        .eq('destination', 'reply')
-        .eq('recipient_tag', uid);
-
-    for (final row in (honooReplies as List)) {
-      if (row is! Map) continue;
-      final String rootId = row['reply_to']?.toString() ?? '';
-      if (rootId.isEmpty) continue;
-      final DateTime created = DateTime.tryParse(
-              (row['created_at'] ?? '').toString()) ??
-          DateTime.now();
-      final DateTime? existing = _honooLatestReplies[rootId];
-      if (existing == null || created.isAfter(existing)) {
-        _honooLatestReplies[rootId] = created;
+      for (final row in (honooReplies as List)) {
+        if (row is! Map) continue;
+        final String rootId = row['reply_to']?.toString() ?? '';
+        if (rootId.isEmpty) continue;
+        final DateTime created = DateTime.tryParse(
+                (row['created_at'] ?? '').toString()) ??
+            DateTime.now();
+        final DateTime? existing = _honooLatestReplies[rootId];
+        if (existing == null || created.isAfter(existing)) {
+          _honooLatestReplies[rootId] = created;
+        }
       }
-    }
 
-    final List<String> rootHinooIds = _hinoo.map((row) => row.id).toList();
-    if (rootHinooIds.isEmpty) return;
+      final List<String> rootHinooIds = _hinoo.map((row) => row.id).toList();
+      if (rootHinooIds.isEmpty) return;
 
-    final hinooReplies = await client
-        .from('hinoo')
-        .select('reply_to,pages,type,recipient_tag,created_at,user_id')
-        .eq('type', 'answer')
-        .eq('recipient_tag', uid)
-        .in_('reply_to', rootHinooIds)
-        .order('created_at', ascending: true);
+      final hinooReplies = await client
+          .from('hinoo')
+          .select('reply_to,pages,type,recipient_tag,created_at,user_id')
+          .eq('type', 'answer')
+          .eq('recipient_tag', uid)
+          .in_('reply_to', rootHinooIds)
+          .order('created_at', ascending: true);
 
-    for (final row in (hinooReplies as List)) {
-      if (row is! Map) continue;
-      final String rootId = row['reply_to']?.toString() ?? '';
-      if (rootId.isEmpty) continue;
-      final pages = row['pages'];
-      if (pages is! List) continue;
-      final DateTime created = DateTime.tryParse(
-              (row['created_at'] ?? '').toString()) ??
-          DateTime.now();
-      final draft = HinooDraft(
-        pages: pages
-            .whereType<Map<String, dynamic>>()
-            .map(HinooSlide.fromJson)
-            .toList(),
-        type: HinooType.answer,
-        recipientTag: row['recipient_tag'] as String?,
-        replyTo: rootId,
-      );
-      _hinooRepliesByRoot
-          .putIfAbsent(rootId, () => [])
-          .add(HinooThreadEntry(
-            draft: draft,
-            authorId: row['user_id']?.toString(),
-            isReply: true,
-            createdAt: created,
-          ));
-      final DateTime? existing = _hinooLatestReplies[rootId];
-      if (existing == null || created.isAfter(existing)) {
-        _hinooLatestReplies[rootId] = created;
+      for (final row in (hinooReplies as List)) {
+        if (row is! Map) continue;
+        final String rootId = row['reply_to']?.toString() ?? '';
+        if (rootId.isEmpty) continue;
+        final pages = row['pages'];
+        if (pages is! List) continue;
+        final DateTime created = DateTime.tryParse(
+                (row['created_at'] ?? '').toString()) ??
+            DateTime.now();
+        final draft = HinooDraft(
+          pages: pages
+              .whereType<Map<String, dynamic>>()
+              .map(HinooSlide.fromJson)
+              .toList(),
+          type: HinooType.answer,
+          recipientTag: row['recipient_tag'] as String?,
+          replyTo: rootId,
+        );
+        _hinooRepliesByRoot
+            .putIfAbsent(rootId, () => [])
+            .add(HinooThreadEntry(
+              draft: draft,
+              authorId: row['user_id']?.toString(),
+              isReply: true,
+              createdAt: created,
+            ));
+        final DateTime? existing = _hinooLatestReplies[rootId];
+        if (existing == null || created.isAfter(existing)) {
+          _hinooLatestReplies[rootId] = created;
+        }
       }
-    }
+    } catch (_) {}
   }
 
   // --- helper menu
@@ -1003,7 +1006,7 @@ class _ChestPageState extends State<ChestPage> {
                 styledCard,
                 Positioned(
                   top: topPad,
-                  left: horizontalPad,
+                  right: horizontalPad,
                   child: Material(
                     color: Colors.transparent,
                     child: ClipRRect(
