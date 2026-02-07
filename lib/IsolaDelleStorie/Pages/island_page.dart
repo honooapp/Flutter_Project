@@ -338,11 +338,14 @@ class _IslandPageState extends State<IslandPage> {
                                                             color: HonooColor
                                                                 .onBackground,
                                                             fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight.w700,
                                                             decoration:
                                                                 TextDecoration
                                                                     .underline,
+                                                            decorationColor:
+                                                                HonooColor
+                                                                    .onBackground,
+                                                            decorationThickness:
+                                                                1.4,
                                                           ),
                                                         ),
                                                       ),

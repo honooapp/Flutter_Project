@@ -58,6 +58,32 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     );
   }
 
+  Widget _linkTextBlock(
+    BuildContext context,
+    String text,
+    TextStyle style, {
+    double? height,
+  }) {
+    final linkStyle = (height == null ? style : style.copyWith(height: height))
+        .copyWith(
+          decoration: TextDecoration.underline,
+          decorationColor: style.color,
+          decorationThickness: 1.4,
+        );
+    return InkWell(
+      onTap: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sezione in arrivo')),
+        );
+      },
+      child: Text(
+        text,
+        style: linkStyle,
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
   String _trimInlineText(String text) {
     return text
         .replaceAll(RegExp(r'^\n+'), '')
@@ -167,42 +193,42 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     // Sequenza dei testi e delle icone in ordine di apparizione.
     final List<Widget> blocks = [
       _textBlock('${_trimInlineText(text1First)}\n', baseTextStyle),
-      _textBlock(performanceLine, baseTextStyle),
+      _linkTextBlock(context, performanceLine, baseTextStyle),
       ..._iconBlockWithSpacing(
         "assets/icons/performance.png",
         inlineIconHeight,
         topSpacing: _performanceTopSpacing,
         bottomSpacing: _performanceBottomSpacing,
       ),
-      _textBlock(laboratoriLine, baseTextStyle),
+      _linkTextBlock(context, laboratoriLine, baseTextStyle),
       ..._iconBlockWithSpacing(
         "assets/icons/laboratori_teatrali.png",
         inlineIconHeight,
         topSpacing: _laboratoriTopSpacing,
         bottomSpacing: _laboratoriBottomSpacing,
       ),
-      _textBlock(esplorazioniLine, baseTextStyle, height: 0.9),
+      _linkTextBlock(context, esplorazioniLine, baseTextStyle, height: 0.9),
       ..._iconBlockWithSpacing(
         "assets/icons/luna.png",
         inlineIconHeight,
         topSpacing: _lunaTopSpacing,
         bottomSpacing: _lunaBottomSpacing,
       ),
-      _textBlock(festeLine, baseTextStyle),
+      _linkTextBlock(context, festeLine, baseTextStyle),
       ..._iconBlockWithSpacing(
         "assets/icons/feste.png",
         inlineIconHeight,
         topSpacing: _festeTopSpacing,
         bottomSpacing: _festeBottomSpacing,
       ),
-      _textBlock(viaggiLine, baseTextStyle, height: 0.9),
+      _linkTextBlock(context, viaggiLine, baseTextStyle, height: 0.9),
       ..._iconBlockWithSpacing(
         "assets/icons/isola.png",
         inlineIconHeight,
         topSpacing: _isolaTopSpacing,
         bottomSpacing: _isolaBottomSpacing,
       ),
-      _textBlock(textBeforePerformanceMarkerDisplay, baseTextStyle, height: 0.9),
+      _textBlock(textBeforePerformanceMarkerDisplay, baseTextStyle),
       if (performanceMarkerIndex != -1)
         ..._iconBlockWithSpacing(
           "assets/icons/performance.png",
