@@ -345,7 +345,7 @@ class _IslandPageState extends State<IslandPage> {
                                                                 HonooColor
                                                                     .onBackground,
                                                             decorationThickness:
-                                                                1.4,
+                                                                3.0,
                                                           ),
                                                         ),
                                                       ),

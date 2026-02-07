@@ -20,18 +20,20 @@ class DiceDispatcher {
       case '3.1':
         return _builder.fromNumberedBoldMissions(
           IsolaDelleStoreContentManager.e31Second,
+          includeNumber: false,
         );
       case '3.2':
-        return _builder.numbers(max: 144);
+        return _builder.missionNumbers(max: 144);
       case '5.1':
         return _builder.fromNumberedBoldMissions(
           IsolaDelleStoreContentManager.e51First,
+          includeNumber: false,
         );
       case '5.2':
-        return _builder.letters();
+        return _builder.letters(prefix: 'Lettera\n');
 
       case '5.3':
-        return _builder.letters();
+        return _builder.letters(prefix: 'Lettera\n');
 
       default:
         return const <DiceResult>[];

@@ -30,11 +30,44 @@ class ExercisePage extends StatefulWidget {
 }
 
 class _ExercisePageState extends State<ExercisePage> {
+  static const double _diceContainerSize = 140;
+  static const double _diceIconSize = 72;
+  static const double _diceVerticalPadding = 8;
+  static const List<String> _alphabetExtended = [
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'O',
+    'P',
+    'Q',
+    'R',
+    'S',
+    'T',
+    'U',
+    'V',
+    'W',
+    'X',
+    'Y',
+    'Z',
+  ];
+
   late Exercise _exercise;
   bool uiVisible = true;
 
   final DiceDispatcher _diceDispatcher = DiceDispatcher();
   final RandomPicker<DiceResult> _dicePicker = RandomPicker<DiceResult>();
+  final math.Random _letterRandom = math.Random();
 
   static const double _iconButtonSize = 40.0;
   static const double _trackAspectRatio = 257 / 59;
@@ -173,6 +206,11 @@ class _ExercisePageState extends State<ExercisePage> {
     _dicePicker.reset();
   }
 
+  String _pickAlphabetLetter() {
+    if (_alphabetExtended.isEmpty) return 'A';
+    return _alphabetExtended[_letterRandom.nextInt(_alphabetExtended.length)];
+  }
+
   Widget _buildDescriptionCard(BuildContext context) {
     final media = MediaQuery.of(context);
     final double bottomPadding = media.size.height > media.size.width
@@ -200,48 +238,69 @@ class _ExercisePageState extends State<ExercisePage> {
           ),
           if (_exercise.exerciseIcon != null &&
               _exercise.exerciseIconName == "Dado")
-            SizedBox(
-              width: 72,
-              height: 72,
-              child: _exercise.id == '3.3'
-                  ? GestureDetector(
-                      onTap: () {
-                        final entry = ChingCatalog.pickRandom();
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                              builder: (_) => ChingPage(entry: entry)),
-                        );
-                      },
-                      child: SvgPicture.asset(
-                        _exercise.exerciseIcon!,
-                        fit: BoxFit.contain,
-                        semanticsLabel: _exercise.exerciseIconName,
-                      ),
-                    )
-                  : DiceAnimator(
-                      resultTextStyle: GoogleFonts.arvo(
-                        color: HonooColor.onBackground,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                      diceChild: SizedBox(
-                        width: 72,
-                        height: 72,
+            Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: _exercise.id == '3.3' ? 0 : _diceVerticalPadding,
+              ),
+              child: SizedBox(
+                width: _exercise.id == '3.3' ? _diceIconSize : _diceContainerSize,
+                height:
+                    _exercise.id == '3.3' ? _diceIconSize : _diceContainerSize,
+                child: _exercise.id == '3.3'
+                    ? GestureDetector(
+                        onTap: () {
+                          final entry = ChingCatalog.pickRandom();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (_) => ChingPage(entry: entry)),
+                          );
+                        },
                         child: SvgPicture.asset(
                           _exercise.exerciseIcon!,
                           fit: BoxFit.contain,
-                          colorFilter: const ColorFilter.mode(
-                            HonooColor.onBackground,
-                            BlendMode.srcIn,
-                          ),
                           semanticsLabel: _exercise.exerciseIconName,
                         ),
+                      )
+                    : DiceAnimator(
+                        resultTextStyle: GoogleFonts.arvo(
+                          color: HonooColor.secondary,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        diceChild: SizedBox(
+                          width: _diceIconSize,
+                          height: _diceIconSize,
+                          child: SvgPicture.asset(
+                            _exercise.exerciseIcon!,
+                            fit: BoxFit.contain,
+                            colorFilter: const ColorFilter.mode(
+                              HonooColor.onBackground,
+                              BlendMode.srcIn,
+                            ),
+                            semanticsLabel: _exercise.exerciseIconName,
+                          ),
+                        ),
+                        options:
+                            _diceDispatcher.optionsForExercise(_exercise.id),
+                        onPick: (opts) {
+                          if (_exercise.id != '2.5') {
+                            return _dicePicker.pickOne(opts) ?? opts.first;
+                          }
+
+                          final picked =
+                              _dicePicker.pickOne(opts) ?? opts.first;
+                          if (picked is TextDiceResult) {
+                            final letter = _pickAlphabetLetter();
+                            return TextDiceResult(
+                              '${picked.text}\n\nLettera\n$letter',
+                            );
+                          }
+                          return picked;
+                        },
+                        fadeDuration: const Duration(milliseconds: 1500),
+                        resultVisibleDuration: const Duration(seconds: 3),
                       ),
-                      options: _diceDispatcher.optionsForExercise(_exercise.id),
-                      onPick: (opts) => _dicePicker.pickOne(opts) ?? opts.first,
-                      fadeDuration: const Duration(milliseconds: 1500),
-                      resultVisibleDuration: const Duration(seconds: 3),
-                    ),
+              ),
             ),
 
           // if (_exercise.exerciseIcon != null)

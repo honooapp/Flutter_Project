@@ -68,7 +68,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         .copyWith(
           decoration: TextDecoration.underline,
           decorationColor: style.color,
-          decorationThickness: 1.4,
+          decorationThickness: 3.0,
         );
     return InkWell(
       onTap: () {

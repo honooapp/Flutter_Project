@@ -29,11 +29,10 @@ class DiceOptionsBuilder {
     final matches = categoryRegex.allMatches(rawText);
 
     for (final match in matches) {
-      final String number = match.group(1)!.trim();
       final String label = match.group(2)!.trim();
 
       results.add(
-        TextDiceResult('$number\n$label'),
+        TextDiceResult(label),
       );
     }
 
@@ -68,7 +67,10 @@ class DiceOptionsBuilder {
   ///
   /// Output esempio:
   /// "21\nCamminare mano\nnella mano"
-  List<DiceResult> fromNumberedBoldMissions(String rawText) {
+  List<DiceResult> fromNumberedBoldMissions(
+    String rawText, {
+    bool includeNumber = true,
+  }) {
     final List<DiceResult> results = [];
 
     // Normalizziamo newline
@@ -88,7 +90,11 @@ class DiceOptionsBuilder {
       if (currentNumber == null || currentParts.isEmpty) return;
 
       final text = currentParts.join('\n');
-      results.add(TextDiceResult('$currentNumber\n$text'));
+      results.add(
+        includeNumber
+            ? TextDiceResult('$currentNumber\n$text')
+            : TextDiceResult(text),
+      );
     }
 
     for (final line in lines) {
@@ -116,17 +122,30 @@ class DiceOptionsBuilder {
     return results;
   }
 
+  List<DiceResult> missionNumbers({
+    required int max,
+  }) {
+    final List<DiceResult> results = [];
+
+    for (int i = 1; i <= max; i++) {
+      results.add(TextDiceResult('Missione\n$i'));
+    }
+
+    return results;
+  }
+
   /// Caso 2: genera un array di lettere (A–Z).
   /// Utile per esercizi che richiedono una lettera casuale.
   List<DiceResult> letters({
     bool uppercase = true,
+    String prefix = '',
   }) {
     final List<DiceResult> results = [];
 
     for (int i = 0; i < 26; i++) {
       final String letter = String.fromCharCode((uppercase ? 65 : 97) + i);
 
-      results.add(TextDiceResult(letter));
+      results.add(TextDiceResult(prefix.isEmpty ? letter : '$prefix$letter'));
     }
 
     return results;

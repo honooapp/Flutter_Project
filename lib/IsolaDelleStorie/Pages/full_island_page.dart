@@ -252,7 +252,7 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                                                 HonooColor
                                                                     .onBackground,
                                                             decorationThickness:
-                                                                1.4,
+                                                                3.0,
                                                           ),
                                                         ),
                                                       ),
@@ -266,7 +266,6 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                                 style: GoogleFonts.arvo(
                                                   color: HonooColor.onBackground,
                                                   fontSize: 18,
-                                                  fontWeight: FontWeight.w700,
                                                 ),
                                               ),
                                               const SizedBox(height: 8),
@@ -291,9 +290,11 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                                     color:
                                                         HonooColor.onBackground,
                                                     fontSize: 18,
-                                                    fontWeight: FontWeight.w700,
-                                                    decoration: TextDecoration
-                                                        .underline,
+                                                    decoration:
+                                                        TextDecoration.underline,
+                                                    decorationColor:
+                                                        HonooColor.onBackground,
+                                                    decorationThickness: 3.0,
                                                   ),
                                                 ),
                                               ),
