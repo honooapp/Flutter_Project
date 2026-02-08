@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> {
   bool _checkingInviteFlow = false;
   int _replyCount = 0;
   Timer? _replyRefreshTimer;
+  Timer? _inviteRefreshTimer;
 
   @override
   void initState() {
@@ -39,11 +40,16 @@ class _HomePageState extends State<HomePage> {
       const Duration(seconds: 60),
       (_) => _loadReplyCount(),
     );
+    _inviteRefreshTimer = Timer.periodic(
+      const Duration(seconds: 60),
+      (_) => _checkInviteFlow(),
+    );
   }
 
   @override
   void dispose() {
     _replyRefreshTimer?.cancel();
+    _inviteRefreshTimer?.cancel();
     super.dispose();
   }
 
@@ -78,6 +84,13 @@ class _HomePageState extends State<HomePage> {
     if (user == null) {
       _checkingInviteFlow = false;
       return;
+    }
+
+    final email = user.email;
+    if (email != null && email.isNotEmpty) {
+      try {
+        await _inviteService.syncInvitesForEmail(email);
+      } catch (_) {}
     }
 
     final hasCasa = await _inviteService.hasCasa(user.id);

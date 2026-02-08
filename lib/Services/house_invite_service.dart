@@ -30,6 +30,14 @@ class HouseInviteService {
     return status == 'pending' || status == 'accepted';
   }
 
+  Future<void> syncInvitesForEmail(String email) async {
+    if (email.trim().isEmpty) return;
+    await _client.rpc(
+      'claim_house_invite_by_email',
+      params: {'p_email': email},
+    );
+  }
+
   Future<void> markInvitesAccepted(String userId) async {
     await _client
         .from('house_invites')

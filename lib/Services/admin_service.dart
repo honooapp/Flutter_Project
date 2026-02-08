@@ -43,6 +43,35 @@ class AdminService {
     return users;
   }
 
+  Future<List<AdminUserRecord>> fetchAllUsersWithEmails() async {
+    final rows = await _client.rpc('admin_list_user_emails');
+    final users = <AdminUserRecord>[];
+    if (rows is List) {
+      for (final row in rows) {
+        if (row is! Map) continue;
+        final String id = row['auth_user_id']?.toString() ?? '';
+        if (id.isEmpty) continue;
+        users.add(
+          AdminUserRecord(
+            authUserId: id,
+            email: row['email']?.toString(),
+          ),
+        );
+      }
+    } else if (rows is Map) {
+      final String id = rows['auth_user_id']?.toString() ?? '';
+      if (id.isNotEmpty) {
+        users.add(
+          AdminUserRecord(
+            authUserId: id,
+            email: rows['email']?.toString(),
+          ),
+        );
+      }
+    }
+    return users;
+  }
+
   Future<List<String>> fetchUserEmails() async {
     final rows = await _client.rpc('admin_list_user_emails');
     final emails = <String>[];
@@ -115,6 +144,7 @@ class AdminService {
   Future<int> inviteUsers({
     required String adminUid,
     required List<String> userIds,
+    Map<String, String>? userEmails,
   }) async {
     final filtered = userIds.where((id) => id.trim().isNotEmpty).toList();
     if (filtered.isEmpty) return 0;
@@ -133,11 +163,35 @@ class AdminService {
             'invited_by': adminUid,
             'status': 'pending',
             'created_at': DateTime.now().toIso8601String(),
+            if (userEmails != null && userEmails[id] != null)
+              'email': userEmails[id],
           },
         )
         .toList();
 
     await _client.from('house_invites').insert(payload);
+    if (userEmails != null) {
+      for (final id in toInsert) {
+        final email = userEmails[id];
+        if (email == null || email.isEmpty) continue;
+        await _sendInviteEmail(email);
+      }
+    }
     return toInsert.length;
+  }
+
+  Future<void> _sendInviteEmail(String email) async {
+    for (int attempt = 0; attempt < 2; attempt++) {
+      try {
+        await _client.auth.signInWithOtp(
+          email: email,
+          shouldCreateUser: false,
+        );
+        return;
+      } catch (e) {
+        if (attempt == 1) rethrow;
+        await Future.delayed(const Duration(milliseconds: 300));
+      }
+    }
   }
 }

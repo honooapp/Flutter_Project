@@ -61,10 +61,14 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
       if (user == null) {
         throw Exception('Utente non autenticato.');
       }
-      final users = await _adminService.fetchAllUsers();
+      final users = await _adminService.fetchAllUsersWithEmails();
       final count = await _adminService.inviteUsers(
         adminUid: user.id,
         userIds: users.map((u) => u.authUserId).toList(),
+        userEmails: {
+          for (final u in users)
+            if ((u.email ?? '').isNotEmpty) u.authUserId: u.email!,
+        },
       );
       if (!mounted) return;
       final message = count == 0
@@ -101,6 +105,10 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
       final inserted = await _adminService.inviteUsers(
         adminUid: user.id,
         userIds: [target.authUserId],
+        userEmails: {
+          if ((target.email ?? '').isNotEmpty)
+            target.authUserId: target.email!,
+        },
       );
       if (!mounted) return;
       if (inserted == 0) {
