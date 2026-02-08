@@ -238,7 +238,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         ),
       _textBlock(textAfterPerformanceMarkerDisplay, baseTextStyle),
       _textBlock(textBeforeVenceslaoDisplay, baseTextStyle),
-      _textBlock(venceslaoLine, baseTextStyle, height: 0.9),
+      _linkTextBlock(context, venceslaoLine, baseTextStyle, height: 0.9),
       ..._iconBlockWithSpacing(
         "assets/icons/venceslao.png",
         inlineIconHeight,
