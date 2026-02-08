@@ -263,11 +263,22 @@ class _ChestPageState extends State<ChestPage> {
       _hinooLatestReplies.clear();
       _hinooRepliesByRoot.clear();
 
-      final honooReplies = await client
+      final honooRepliesToMe = await client
           .from('honoo')
           .select('reply_to,created_at')
           .eq('destination', 'reply')
           .eq('recipient_tag', uid);
+
+      final honooRepliesFromMe = await client
+          .from('honoo')
+          .select('reply_to,created_at')
+          .eq('destination', 'reply')
+          .eq('user_id', uid);
+
+      final honooReplies = <dynamic>[
+        ...((honooRepliesToMe as List?) ?? const []),
+        ...((honooRepliesFromMe as List?) ?? const []),
+      ];
 
       for (final row in (honooReplies as List)) {
         if (row is! Map) continue;
@@ -285,16 +296,32 @@ class _ChestPageState extends State<ChestPage> {
       final List<String> rootHinooIds = _hinoo.map((row) => row.id).toList();
       if (rootHinooIds.isEmpty) return;
 
-      final hinooReplies = await client
+      final hinooRepliesToMe = await client
           .from('hinoo')
-          .select('reply_to,pages,type,recipient_tag,created_at,user_id')
+          .select('id,reply_to,pages,type,recipient_tag,created_at,user_id')
           .eq('type', 'answer')
           .eq('recipient_tag', uid)
           .in_('reply_to', rootHinooIds)
           .order('created_at', ascending: true);
 
-      for (final row in (hinooReplies as List)) {
+      final hinooRepliesFromMe = await client
+          .from('hinoo')
+          .select('id,reply_to,pages,type,recipient_tag,created_at,user_id')
+          .eq('type', 'answer')
+          .eq('user_id', uid)
+          .in_('reply_to', rootHinooIds)
+          .order('created_at', ascending: true);
+
+      final hinooReplies = <dynamic>[
+        ...((hinooRepliesToMe as List?) ?? const []),
+        ...((hinooRepliesFromMe as List?) ?? const []),
+      ];
+      final seenHinooIds = <String>{};
+
+      for (final row in hinooReplies) {
         if (row is! Map) continue;
+        final String id = row['id']?.toString() ?? '';
+        if (id.isNotEmpty && !seenHinooIds.add(id)) continue;
         final String rootId = row['reply_to']?.toString() ?? '';
         if (rootId.isEmpty) continue;
         final pages = row['pages'];

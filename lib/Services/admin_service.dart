@@ -72,6 +72,74 @@ class AdminService {
     return users;
   }
 
+  Future<Map<DateTime, int>> fetchRecentVisits({int days = 3}) async {
+    final res = await _client.rpc(
+      'admin_list_site_visits',
+      params: {'p_days': days},
+    );
+    final Map<DateTime, int> visits = {};
+    if (res is List) {
+      for (final row in res) {
+        if (row is! Map) continue;
+        final dateValue = row['visit_date']?.toString() ?? '';
+        final countValue = row['count'];
+        if (dateValue.isEmpty) continue;
+        final date = DateTime.tryParse(dateValue);
+        if (date == null) continue;
+        visits[DateTime(date.year, date.month, date.day)] =
+            (countValue as num?)?.toInt() ?? 0;
+      }
+    }
+    return visits;
+  }
+
+  Future<Map<String, int>> fetchTodayMoonCounts() async {
+    final res = await _client.rpc('admin_moon_counts_today');
+    int honooCount = 0;
+    int hinooCount = 0;
+    if (res is List && res.isNotEmpty) {
+      final row = res.first;
+      if (row is Map) {
+        honooCount = (row['honoo_count'] as num?)?.toInt() ?? 0;
+        hinooCount = (row['hinoo_count'] as num?)?.toInt() ?? 0;
+      }
+    } else if (res is Map) {
+      honooCount = (res['honoo_count'] as num?)?.toInt() ?? 0;
+      hinooCount = (res['hinoo_count'] as num?)?.toInt() ?? 0;
+    }
+    return {
+      'honoo': honooCount,
+      'hinoo': hinooCount,
+    };
+  }
+
+  Future<Map<String, int>> fetchDailyContentCounts() async {
+    final res = await _client.rpc('admin_daily_content_counts');
+    final Map<String, int> counts = {
+      'chest_honoo': 0,
+      'chest_hinoo': 0,
+      'moon_honoo': 0,
+      'moon_hinoo': 0,
+      'reply_honoo': 0,
+      'reply_hinoo': 0,
+    };
+    Map? row;
+    if (res is List && res.isNotEmpty && res.first is Map) {
+      row = res.first as Map;
+    } else if (res is Map) {
+      row = res;
+    }
+    if (row != null) {
+      counts['chest_honoo'] = (row['chest_honoo'] as num?)?.toInt() ?? 0;
+      counts['chest_hinoo'] = (row['chest_hinoo'] as num?)?.toInt() ?? 0;
+      counts['moon_honoo'] = (row['moon_honoo'] as num?)?.toInt() ?? 0;
+      counts['moon_hinoo'] = (row['moon_hinoo'] as num?)?.toInt() ?? 0;
+      counts['reply_honoo'] = (row['reply_honoo'] as num?)?.toInt() ?? 0;
+      counts['reply_hinoo'] = (row['reply_hinoo'] as num?)?.toInt() ?? 0;
+    }
+    return counts;
+  }
+
   Future<List<String>> fetchUserEmails() async {
     final rows = await _client.rpc('admin_list_user_emails');
     final emails = <String>[];

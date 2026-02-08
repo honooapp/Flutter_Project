@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Services/admin_service.dart';
@@ -6,6 +8,7 @@ import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Widgets/honoo_scaffold.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'home_page.dart';
 
@@ -23,7 +26,22 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
   bool _invitingAll = false;
   bool _invitingEmail = false;
   bool _loadingEmails = false;
+  bool _loadingVisits = false;
+  bool _loadingMoonCounts = false;
+  bool _loadingDailyCounts = false;
   List<String> _emailHints = const [];
+  Map<DateTime, int> _visits = const {};
+  Map<String, int> _moonCounts = const {'honoo': 0, 'hinoo': 0};
+  Map<String, int> _dailyCounts = const {
+    'chest_honoo': 0,
+    'chest_hinoo': 0,
+    'moon_honoo': 0,
+    'moon_hinoo': 0,
+    'reply_honoo': 0,
+    'reply_hinoo': 0,
+  };
+  Timer? _statsRefreshTimer;
+  RealtimeChannel? _statsChannel;
 
 
   @override
@@ -31,14 +49,58 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
     super.initState();
     _adminCheck = _adminService.isCurrentUserAdmin();
     _adminCheck.then((isAdmin) {
-      if (isAdmin) _loadEmailHints();
+      if (isAdmin) {
+        _loadEmailHints();
+        _loadVisits();
+        _loadMoonCounts();
+        _loadDailyCounts();
+        _subscribeStats();
+        _statsRefreshTimer = Timer.periodic(
+          const Duration(seconds: 30),
+          (_) {
+            _loadVisits();
+            _loadMoonCounts();
+            _loadDailyCounts();
+          },
+        );
+      }
     });
   }
 
   @override
   void dispose() {
+    _statsRefreshTimer?.cancel();
+    _statsChannel?.unsubscribe();
     _emailController.dispose();
     super.dispose();
+  }
+
+  void _subscribeStats() {
+    if (_statsChannel != null) return;
+    _statsChannel = SupabaseProvider.client.channel('admin-stats');
+    void refresh(dynamic _, [dynamic __]) {
+      _loadVisits();
+      _loadMoonCounts();
+      _loadDailyCounts();
+    }
+
+    _statsChannel!
+        .on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(event: '*', schema: 'public', table: 'honoo'),
+          refresh,
+        )
+        .on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(event: '*', schema: 'public', table: 'hinoo'),
+          refresh,
+        )
+        .on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(event: '*', schema: 'public', table: 'site_visits'),
+          refresh,
+        );
+    _statsChannel!.subscribe();
   }
 
   Future<void> _loadEmailHints() async {
@@ -50,6 +112,42 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
       setState(() => _emailHints = emails);
     } finally {
       if (mounted) setState(() => _loadingEmails = false);
+    }
+  }
+
+  Future<void> _loadVisits() async {
+    if (_loadingVisits) return;
+    setState(() => _loadingVisits = true);
+    try {
+      final visits = await _adminService.fetchRecentVisits();
+      if (!mounted) return;
+      setState(() => _visits = visits);
+    } finally {
+      if (mounted) setState(() => _loadingVisits = false);
+    }
+  }
+
+  Future<void> _loadMoonCounts() async {
+    if (_loadingMoonCounts) return;
+    setState(() => _loadingMoonCounts = true);
+    try {
+      final counts = await _adminService.fetchTodayMoonCounts();
+      if (!mounted) return;
+      setState(() => _moonCounts = counts);
+    } finally {
+      if (mounted) setState(() => _loadingMoonCounts = false);
+    }
+  }
+
+  Future<void> _loadDailyCounts() async {
+    if (_loadingDailyCounts) return;
+    setState(() => _loadingDailyCounts = true);
+    try {
+      final counts = await _adminService.fetchDailyContentCounts();
+      if (!mounted) return;
+      setState(() => _dailyCounts = counts);
+    } finally {
+      if (mounted) setState(() => _loadingDailyCounts = false);
     }
   }
 
@@ -337,6 +435,48 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                               ),
                             ),
                     ),
+                    const SizedBox(height: 32),
+                    Text(
+                      'Visite',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.arvo(
+                        color: HonooColor.onBackground,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _loadingVisits
+                        ? const Center(child: LoadingSpinner())
+                        : _VisitsSummary(visits: _visits),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Luna oggi',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.arvo(
+                        color: HonooColor.onBackground,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _loadingMoonCounts
+                        ? const Center(child: LoadingSpinner())
+                        : _MoonCountsSummary(counts: _moonCounts),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Oggi',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.arvo(
+                        color: HonooColor.onBackground,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _loadingDailyCounts
+                        ? const Center(child: LoadingSpinner())
+                        : _DailyCountsSummary(counts: _dailyCounts),
                   ],
                 ),
               ),
@@ -344,6 +484,166 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
           ),
         );
       },
+    );
+  }
+}
+
+class _VisitsSummary extends StatelessWidget {
+  const _VisitsSummary({required this.visits});
+
+  final Map<DateTime, int> visits;
+
+  @override
+  Widget build(BuildContext context) {
+    final DateTime today = DateTime.now();
+    final DateTime day0 = DateTime(today.year, today.month, today.day);
+    final DateTime day1 = day0.subtract(const Duration(days: 1));
+    final DateTime day2 = day0.subtract(const Duration(days: 2));
+
+    final rows = [
+      _VisitRow(label: 'Oggi', count: visits[day0] ?? 0),
+      _VisitRow(label: 'Ieri', count: visits[day1] ?? 0),
+      _VisitRow(label: "L'altro ieri", count: visits[day2] ?? 0),
+    ];
+
+    return Column(
+      children: rows,
+    );
+  }
+}
+
+class _VisitRow extends StatelessWidget {
+  const _VisitRow({required this.label, required this.count});
+
+  final String label;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Text(
+        '$label: $count',
+        textAlign: TextAlign.center,
+        style: GoogleFonts.lora(
+          color: HonooColor.onBackground.withOpacity(0.85),
+          fontSize: 16,
+        ),
+      ),
+    );
+  }
+}
+
+class _MoonCountsSummary extends StatelessWidget {
+  const _MoonCountsSummary({required this.counts});
+
+  final Map<String, int> counts;
+
+  @override
+  Widget build(BuildContext context) {
+    final honoo = counts['honoo'] ?? 0;
+    final hinoo = counts['hinoo'] ?? 0;
+    return Column(
+      children: [
+        _RollingCount(label: 'honoo', count: honoo),
+        _RollingCount(label: 'hinoo', count: hinoo),
+      ],
+    );
+  }
+}
+
+class _RollingCount extends StatelessWidget {
+  const _RollingCount({required this.label, required this.count});
+
+  final String label;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '$label: ',
+            style: GoogleFonts.lora(
+              color: HonooColor.onBackground.withOpacity(0.85),
+              fontSize: 16,
+            ),
+          ),
+          _RollingNumber(value: count),
+        ],
+      ),
+    );
+  }
+}
+
+class _RollingNumber extends StatelessWidget {
+  const _RollingNumber({required this.value});
+
+  final int value;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 350),
+      transitionBuilder: (child, animation) {
+        final offset = Tween<Offset>(
+          begin: const Offset(0, -0.6),
+          end: Offset.zero,
+        ).animate(animation);
+        return ClipRect(
+          child: SlideTransition(position: offset, child: child),
+        );
+      },
+      child: Text(
+        '$value',
+        key: ValueKey(value),
+        style: GoogleFonts.libreFranklin(
+          color: HonooColor.onBackground,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+class _DailyCountsSummary extends StatelessWidget {
+  const _DailyCountsSummary({required this.counts});
+
+  final Map<String, int> counts;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _RollingCount(
+          label: 'honoo nello scrigno',
+          count: counts['chest_honoo'] ?? 0,
+        ),
+        _RollingCount(
+          label: 'hinoo nello scrigno',
+          count: counts['chest_hinoo'] ?? 0,
+        ),
+        _RollingCount(
+          label: 'honoo sulla luna',
+          count: counts['moon_honoo'] ?? 0,
+        ),
+        _RollingCount(
+          label: 'hinoo sulla luna',
+          count: counts['moon_hinoo'] ?? 0,
+        ),
+        _RollingCount(
+          label: 'honoo in risposta',
+          count: counts['reply_honoo'] ?? 0,
+        ),
+        _RollingCount(
+          label: 'hinoo in risposta',
+          count: counts['reply_hinoo'] ?? 0,
+        ),
+      ],
     );
   }
 }

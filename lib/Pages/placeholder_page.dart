@@ -281,9 +281,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         },
       ),
       _textBlock(textAfterVenceslaoDisplay, baseTextStyle),
-      SizedBox(height: _honooTopSpacing),
+      const SizedBox(height: _honooTopSpacing),
       _textBlock(Utility().appName, titleStyle),
-      SizedBox(height: _honooBottomSpacing),
+      const SizedBox(height: _honooBottomSpacing),
       _textBlock(_trimInlineText(Utility().text1Six), baseTextStyle),
     ];
 

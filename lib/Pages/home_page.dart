@@ -28,6 +28,7 @@ class _HomePageState extends State<HomePage> {
   int _replyCount = 0;
   Timer? _replyRefreshTimer;
   Timer? _inviteRefreshTimer;
+  bool _visitRecorded = false;
 
   @override
   void initState() {
@@ -35,6 +36,7 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkInviteFlow();
       _loadReplyCount();
+      _recordVisit();
     });
     _replyRefreshTimer = Timer.periodic(
       const Duration(seconds: 60),
@@ -125,6 +127,16 @@ class _HomePageState extends State<HomePage> {
     _checkingInviteFlow = false;
     if (mounted) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _checkInviteFlow());
+    }
+  }
+
+  Future<void> _recordVisit() async {
+    if (_visitRecorded) return;
+    _visitRecorded = true;
+    try {
+      await SupabaseProvider.client.rpc('increment_site_visit');
+    } catch (_) {
+      _visitRecorded = false;
     }
   }
 

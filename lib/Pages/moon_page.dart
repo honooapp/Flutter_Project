@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Services/supabase_provider.dart';
+import 'package:honoo/Services/admin_service.dart';
+import 'package:honoo/Services/honoo_service.dart';
+import 'package:honoo/Services/hinoo_service.dart';
 
 import '../Entities/hinoo.dart';
 import '../Entities/honoo.dart';
@@ -18,6 +21,7 @@ import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/honoo_app_title.dart';
 import '../Widgets/responsive_footer_bar.dart';
 import 'placeholder_page.dart';
+import 'chest_page.dart';
 import 'reply_honoo_page.dart';
 import 'new_hinoo_page.dart';
 import '../Controller/honoo_controller.dart';
@@ -32,15 +36,29 @@ class MoonPage extends StatefulWidget {
 
 class _MoonPageState extends State<MoonPage> {
   bool _isLoading = true;
+  bool _isAdmin = false;
   List<_MoonItem> _items = [];
   int _currentIndex = 0;
   final cs.CarouselController _carouselController = cs.CarouselController();
   DateTime? _lastScroll;
+  final AdminService _adminService = AdminService();
 
   @override
   void initState() {
     super.initState();
     _loadMoonContent();
+    _loadAdminStatus();
+  }
+
+  Future<void> _loadAdminStatus() async {
+    try {
+      final isAdmin = await _adminService.isCurrentUserAdmin();
+      if (!mounted) return;
+      setState(() => _isAdmin = isAdmin);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isAdmin = false);
+    }
   }
 
   Future<void> _loadMoonContent() async {
@@ -223,6 +241,19 @@ class _MoonPageState extends State<MoonPage> {
                       tooltip: 'Rispondi',
                       onPressed: () => _showReplyChoice(),
                     ),
+                    if (_isAdmin)
+                      ResponsiveFooterAction(
+                        asset: 'assets/icons/cancella.svg',
+                        semanticsLabel: 'Elimina',
+                        size: footerIconSize,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.black,
+                          BlendMode.srcIn,
+                        ),
+                        splashRadius: 25,
+                        tooltip: 'Elimina',
+                        onPressed: _deleteCurrentFromMoon,
+                      ),
                   ],
                 ),
               ],
@@ -465,6 +496,46 @@ class _MoonPageState extends State<MoonPage> {
     }
   }
 
+  Future<void> _deleteCurrentFromMoon() async {
+    if (_items.isEmpty) return;
+    final _MoonItem current = _items[_currentIndex];
+    final bool isHonoo = current.honoo != null;
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => const HonooConfirmDialog(
+        title: 'Sei sicuro di voler eliminare?',
+        message: '',
+        confirmLabel: 'Sì',
+        cancelLabel: 'No',
+      ),
+    );
+    if (confirmed != true) return;
+
+    try {
+      if (isHonoo) {
+        final id = current.honoo!.dbId;
+        if (id == null || id.isEmpty) return;
+        await HonooService.deleteHonooById(id);
+      } else {
+        final id = current.hinooId;
+        if (id == null || id.isEmpty) return;
+        await HinooService.deleteHinooById(id);
+      }
+      if (!mounted) return;
+      setState(() {
+        _items.removeAt(_currentIndex);
+        if (_currentIndex >= _items.length) {
+          _currentIndex = _items.isEmpty ? 0 : _items.length - 1;
+        }
+      });
+      showHonooToast(context, message: 'Eliminato dalla Luna.');
+    } catch (e) {
+      if (!mounted) return;
+      showHonooToast(context, message: 'Errore eliminazione: $e');
+    }
+  }
+
   Future<void> _showReplyChoice() async {
     if (_items.isEmpty) return;
     final _MoonItem current = _items[_currentIndex];
@@ -540,7 +611,8 @@ class _MoonPageState extends State<MoonPage> {
 
     if (choice == null || !mounted) return;
     if (choice == _ReplyChoice.honoo && current.honoo != null) {
-      Navigator.push(
+      await _ensureMoonItemInChest(current);
+      final sent = await Navigator.push<bool>(
         context,
         MaterialPageRoute(
           builder: (_) => ReplyHonooPage(
@@ -550,10 +622,19 @@ class _MoonPageState extends State<MoonPage> {
           ),
         ),
       );
+      if (sent == true) {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ChestPage(focusReplies: true),
+          ),
+        );
+      }
     } else if (choice == _ReplyChoice.hinoo && current.hinoo != null) {
       final String? replyTo = current.hinooId;
       if (replyTo == null || replyTo.isEmpty) return;
-      Navigator.push(
+      await _ensureMoonItemInChest(current);
+      await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) => NewHinooPage(
@@ -562,6 +643,31 @@ class _MoonPageState extends State<MoonPage> {
             replyTo: replyTo,
           ),
         ),
+      );
+      if (!mounted) return;
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const ChestPage(focusReplies: true),
+        ),
+      );
+    }
+  }
+
+  Future<void> _ensureMoonItemInChest(_MoonItem current) async {
+    try {
+      if (current.honoo != null) {
+        await HonooService.duplicateToChest(
+          current.honoo!.copyWith(isFromMoonSaved: true),
+        );
+      } else if (current.hinoo != null) {
+        await HinooService.duplicateMoonToChest(current.hinoo!);
+      }
+    } catch (_) {
+      if (!mounted) return;
+      showHonooToast(
+        context,
+        message: 'Errore salvataggio nello scrigno.',
       );
     }
   }

@@ -204,6 +204,58 @@ class HinooService {
     }
   }
 
+  static Future<bool> duplicateMoonToChest(HinooDraft draft) async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) throw 'Utente non autenticato';
+
+    final sanitized = draft.copyWith(
+      type: HinooType.personal,
+      isFromMoonSaved: true,
+    );
+    final fp = fingerprint(sanitized);
+
+    final existing = await _client
+        .from(_table)
+        .select('id')
+        .eq('user_id', userId)
+        .eq('type', 'personal')
+        .eq('fingerprint', fp)
+        .limit(1);
+
+    if (existing is List && existing.isNotEmpty) {
+      return false;
+    }
+
+    final data = {
+      'user_id': userId,
+      'type': _toDbType(HinooType.personal),
+      'pages': sanitized.toJson()['pages'],
+      'recipient_tag': sanitized.recipientTag,
+      'reply_to': sanitized.replyTo,
+      'is_from_moon_saved': true,
+      'fingerprint': fp,
+      'created_at': DateTime.now().toIso8601String(),
+    };
+
+    try {
+      await _client.from(_table).insert(data);
+      return true;
+    } on PostgrestException catch (e) {
+      if (_isMissingMoonSavedColumn(e)) {
+        final fallback = Map<String, dynamic>.from(data)
+          ..remove('is_from_moon_saved');
+        await _client.from(_table).insert(fallback);
+        return true;
+      }
+      rethrow;
+    }
+  }
+
+  static Future<void> deleteHinooById(String id) async {
+    if (id.trim().isEmpty) return;
+    await _client.from(_table).delete().eq('id', id);
+  }
+
   static String fingerprint(HinooDraft d) {
     final parts = <String>[
       'type=${d.type.name}',
