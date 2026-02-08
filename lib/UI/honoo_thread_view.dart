@@ -91,13 +91,29 @@ class _HonooThreadViewState extends State<HonooThreadView> {
               child: HonooCard(honoo: widget.root),
             );
           } else {
+            final Honoo root = thread.firstWhere(
+              (h) => h.replyTo == null || h.replyTo!.isEmpty,
+              orElse: () => widget.root,
+            );
+            final List<Honoo> replies = thread
+                .where((h) => h.replyTo != null && h.replyTo!.isNotEmpty)
+                .toList();
+            replies.sort((a, b) {
+              final DateTime? aTime = DateTime.tryParse(a.createdAt);
+              final DateTime? bTime = DateTime.tryParse(b.createdAt);
+              if (aTime == null && bTime == null) return 0;
+              if (aTime == null) return 1;
+              if (bTime == null) return -1;
+              return bTime.compareTo(aTime);
+            });
+            final List<Honoo> ordered = [...replies, root];
             child = Padding(
               key: ValueKey(
                   'thread_list_${thread.length}_${_honooIdentity(thread.first)}'),
               padding: const EdgeInsets.symmetric(horizontal: 16),
             child: cs.CarouselSlider.builder(
               carouselController: _vController,
-              itemCount: thread.length,
+              itemCount: ordered.length,
               options: cs.CarouselOptions(
                 scrollDirection: Axis.vertical,
                 viewportFraction: 1.0,
@@ -107,8 +123,9 @@ class _HonooThreadViewState extends State<HonooThreadView> {
                 scrollPhysics: const BouncingScrollPhysics(),
               ),
               itemBuilder: (context, index, realIdx) {
-                  final honoo = thread[index];
-                  final bool isReply = index > 0;
+                  final honoo = ordered[index];
+                  final bool isReply = honoo.replyTo != null &&
+                      honoo.replyTo!.isNotEmpty;
                   final String timestamp = _formatTimestamp(honoo.createdAt);
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),

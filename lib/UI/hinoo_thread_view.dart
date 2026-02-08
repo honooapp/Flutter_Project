@@ -23,9 +23,16 @@ class HinooThreadView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<HinooThreadEntry> sortedReplies = [...replies];
+    sortedReplies.sort((a, b) {
+      if (a.createdAt == null && b.createdAt == null) return 0;
+      if (a.createdAt == null) return 1;
+      if (b.createdAt == null) return -1;
+      return b.createdAt!.compareTo(a.createdAt!);
+    });
     final List<HinooThreadEntry> items = [
+      ...sortedReplies,
       HinooThreadEntry(draft: root, authorId: rootAuthorId, isReply: false),
-      ...replies,
     ];
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
