@@ -9,6 +9,7 @@ import '../Utility/utility.dart';
 import '../Widgets/background.dart';
 import '../Widgets/honoo_app_title.dart';
 import 'home_page.dart';
+import 'venceslao_page.dart';
 
 class PlaceholderPage extends StatefulWidget {
   const PlaceholderPage({super.key});
@@ -41,10 +42,14 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     double size, {
     double topSpacing = 0,
     double bottomSpacing = 0,
+    VoidCallback? onTap,
   }) {
     return [
       if (topSpacing > 0) SizedBox(height: topSpacing),
-      Image.asset(asset, height: size),
+      GestureDetector(
+        onTap: onTap,
+        child: Image.asset(asset, height: size),
+      ),
       if (bottomSpacing > 0) SizedBox(height: bottomSpacing),
     ];
   }
@@ -79,6 +84,31 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
       child: Text(
         text,
         style: linkStyle,
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _venceslaoLink(
+    BuildContext context,
+    String text,
+    TextStyle style, {
+    double? height,
+  }) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const VenceslaoPage()),
+        );
+      },
+      child: Text(
+        text,
+        style: (height == null ? style : style.copyWith(height: height))
+            .copyWith(
+              decoration: TextDecoration.underline,
+              decorationColor: style.color,
+              decorationThickness: 3.0,
+            ),
         textAlign: TextAlign.center,
       ),
     );
@@ -238,12 +268,17 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         ),
       _textBlock(textAfterPerformanceMarkerDisplay, baseTextStyle),
       _textBlock(textBeforeVenceslaoDisplay, baseTextStyle),
-      _linkTextBlock(context, venceslaoLine, baseTextStyle, height: 0.9),
+      _venceslaoLink(context, venceslaoLine, baseTextStyle, height: 0.9),
       ..._iconBlockWithSpacing(
         "assets/icons/venceslao.png",
         inlineIconHeight,
         topSpacing: _venceslaoTopSpacing,
         bottomSpacing: _venceslaoBottomSpacing,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const VenceslaoPage()),
+          );
+        },
       ),
       _textBlock(textAfterVenceslaoDisplay, baseTextStyle),
       SizedBox(height: _honooTopSpacing),
