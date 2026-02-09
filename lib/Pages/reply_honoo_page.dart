@@ -70,7 +70,7 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
       );
       await Future.delayed(const Duration(seconds: 1));
       if (!mounted) return;
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     } catch (e) {
       debugPrint('Errore invio reply: $e');
       if (!mounted) return;

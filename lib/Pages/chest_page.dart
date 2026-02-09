@@ -8,6 +8,7 @@ import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
@@ -46,6 +47,65 @@ class ChestPage extends StatefulWidget {
 }
 
 class _ChestPageState extends State<ChestPage> {
+  static const String _scrignoInfoPrefKey = 'scrigno_info_seen_v1';
+  static const String scrignoText =
+      "Questo è il tuo Scrigno.\n\n"
+      "Custodisce\n"
+      "gli honoo e gli hinoo\n"
+      "che hai scritto,\n\n"
+      "quelli degli altri\n"
+      "che hai salvato dalla Luna,\n\n"
+      "e quelli\n"
+      "che hai ricevuto in risposta.\n\n"
+      "Ogni honoo\n"
+      "che entra nello Scrigno\n"
+      "lascia una traccia.\n\n"
+      "I tuoi honoo\n"
+      "hanno un bordino blu.\n\n"
+      "Quelli salvati dalla Luna\n"
+      "hanno un bordino bianco.\n\n"
+      "Quelli che hai ricevuto\n"
+      "in risposta\n"
+      "hanno un bordino rosso.\n\n"
+      "Scorrendo lo schermo\n"
+      "verso destra,\n"
+      "puoi rivedere\n"
+      "i tuoi honoo\n"
+      "e quelli\n"
+      "che hai salvato dalla Luna.\n\n"
+      "Se rispondi\n"
+      "a un honoo\n"
+      "che era sulla Luna,\n\n"
+      "nel tuo Scrigno\n"
+      "potrai rivedere\n"
+      "l’honoo della Luna\n"
+      "e la tua risposta,\n\n"
+      "scorrendo lo schermo\n"
+      "dall’alto\n"
+      "verso il basso:\n\n"
+      "in alto,\n"
+      "con il bordino bianco,\n"
+      "l’honoo che era sulla Luna,\n\n"
+      "sotto,\n"
+      "con il bordino blu,\n"
+      "la tua risposta.\n\n"
+      "Se chi riceve\n"
+      "la tua risposta\n"
+      "decide di scriverti\n"
+      "un honoo\n"
+      "o un hinoo,\n\n"
+      "lo troverai\n"
+      "con un bordino rosso,\n"
+      "sotto il tuo.\n\n"
+      "In questo modo,\n"
+      "scorrendo lo schermo\n"
+      "dall’alto\n"
+      "verso il basso,\n\n"
+      "puoi ripercorrere\n"
+      "tutta la storia\n"
+      "delle conversazioni\n"
+      "fra honoo\n"
+      "e hinoo.\n";
   final HonooController ctrl = HonooController();
   final HinooController _hinooController = HinooController();
 
@@ -85,6 +145,7 @@ class _ChestPageState extends State<ChestPage> {
   void initState() {
     super.initState();
     _loadAll();
+    _maybeShowScrignoHint();
     _replyRefreshTimer = Timer.periodic(
       const Duration(seconds: 60),
       (_) => _refreshReplies(),
@@ -95,6 +156,74 @@ class _ChestPageState extends State<ChestPage> {
   void dispose() {
     _replyRefreshTimer?.cancel();
     super.dispose();
+  }
+
+  Future<void> _maybeShowScrignoHint() async {
+    final prefs = await SharedPreferences.getInstance();
+    final seen = prefs.getBool(_scrignoInfoPrefKey) ?? false;
+    if (seen) return;
+    await prefs.setBool(_scrignoInfoPrefKey, true);
+    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      showHonooMessageDialog(
+        context,
+        title: 'Scrigno',
+        message: 'Clicca su Info per la spiegazione.',
+        duration: const Duration(milliseconds: 2200),
+      );
+    });
+  }
+
+  void _showScrignoInfo() {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => HonooDialogShell(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Scrigno',
+                style: HonooDialogStyles.title(),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                scrignoText,
+                style: HonooDialogStyles.body(),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Chiudi',
+                    style: HonooDialogStyles.primaryAction(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _loadAll() async {
@@ -388,6 +517,18 @@ class _ChestPageState extends State<ChestPage> {
             tooltip: 'Home',
             onPressed: _goHome,
           ),
+          ResponsiveFooterAction(
+            asset: "assets/icons/info.svg",
+            semanticsLabel: 'Info',
+            colorFilter: const ColorFilter.mode(
+              HonooColor.onBackground,
+              BlendMode.srcIn,
+            ),
+            size: iconSize,
+            splashRadius: 25,
+            tooltip: 'Info',
+            onPressed: _showScrignoInfo,
+          ),
         ],
       );
     }
@@ -404,6 +545,18 @@ class _ChestPageState extends State<ChestPage> {
         splashRadius: 25,
         tooltip: 'Home',
         onPressed: _goHome,
+      ),
+      ResponsiveFooterAction(
+        asset: "assets/icons/info.svg",
+        semanticsLabel: 'Info',
+        colorFilter: const ColorFilter.mode(
+          HonooColor.onBackground,
+          BlendMode.srcIn,
+        ),
+        size: iconSize,
+        splashRadius: 25,
+        tooltip: 'Info',
+        onPressed: _showScrignoInfo,
       ),
     ];
 
@@ -532,6 +685,18 @@ class _ChestPageState extends State<ChestPage> {
         splashRadius: 25,
         tooltip: 'Home',
         onPressed: _goHome,
+      ),
+      ResponsiveFooterAction(
+        asset: "assets/icons/info.svg",
+        semanticsLabel: 'Info',
+        colorFilter: const ColorFilter.mode(
+          HonooColor.onBackground,
+          BlendMode.srcIn,
+        ),
+        size: iconSize,
+        splashRadius: 25,
+        tooltip: 'Info',
+        onPressed: _showScrignoInfo,
       ),
     ];
 
