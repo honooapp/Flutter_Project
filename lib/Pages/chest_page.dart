@@ -409,7 +409,7 @@ class _ChestPageState extends State<ChestPage> {
         ...((honooRepliesFromMe as List?) ?? const []),
       ];
 
-      for (final row in (honooReplies as List)) {
+      for (final row in honooReplies) {
         if (row is! Map) continue;
         final String rootId = row['reply_to']?.toString() ?? '';
         if (rootId.isEmpty) continue;
