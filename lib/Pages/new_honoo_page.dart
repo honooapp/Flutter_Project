@@ -188,6 +188,21 @@ class _NewHonooPageState extends State<NewHonooPage> {
       });
 
       showHonooToast(context, message: 'salvato nello Scrigno.');
+      if (widget.forcedType != HonooType.answer) {
+        final bool? sendToMoon = await showDialog<bool>(
+          context: context,
+          barrierDismissible: true,
+          builder: (_) => const HonooConfirmDialog(
+            title:
+                'Il tuo honoo è stato salvato nello Scrigno, vuoi inviarlo anche sulla Luna?',
+            confirmLabel: 'Sì',
+            cancelLabel: 'Non ora',
+          ),
+        );
+        if (sendToMoon == true && mounted) {
+          await _submitToMoon();
+        }
+      }
     } catch (e, st) {
       debugPrint('publishHonoo failed: $e\n$st');
       if (!mounted) return;

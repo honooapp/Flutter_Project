@@ -266,6 +266,32 @@ class _NewHinooPageState extends State<NewHinooPage> {
       setState(() => _savedToChest = true);
       showHonooToast(context, message: 'salvato nello Scrigno.');
 
+      if (!widget.isReply && !widget.isCampanello) {
+        final bool? sendToMoon = await showDialog<bool>(
+          context: context,
+          barrierDismissible: true,
+          builder: (_) => const HonooConfirmDialog(
+            title:
+                'Il tuo hinoo è stato salvato nello Scrigno, vuoi inviarlo anche sulla Luna?',
+            confirmLabel: 'Sì',
+            cancelLabel: 'Non ora',
+          ),
+        );
+        if (sendToMoon == true && mounted) {
+          try {
+            final result = await _controller.sendToMoon(hinooDraft);
+            if (!mounted) return;
+            final text = result == HinooMoonResult.published
+                ? 'hinoo spedito sulla Luna.'
+                : 'hinoo già presente sulla Luna.';
+            showHonooToast(context, message: text);
+          } catch (e) {
+            if (!mounted) return;
+            showHonooToast(context, message: 'Errore: $e');
+          }
+        }
+      }
+
       if (widget.isReply && mounted) {
         await showDialog<bool>(
           context: context,
