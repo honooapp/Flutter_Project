@@ -101,8 +101,14 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
-    final hasInvite =
+    var hasInvite =
         await _inviteService.hasPendingOrAcceptedInvite(user.id);
+    if (!hasInvite && email != null && email.isNotEmpty) {
+      try {
+        await _inviteService.syncInvitesForEmail(email);
+      } catch (_) {}
+      hasInvite = await _inviteService.hasPendingOrAcceptedInvite(user.id);
+    }
     if (!hasInvite || !mounted) {
       _checkingInviteFlow = false;
       return;

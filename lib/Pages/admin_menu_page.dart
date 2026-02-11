@@ -196,8 +196,15 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
       }
       final target = await _adminService.findUserByEmail(email);
       if (target == null) {
+        final inserted = await _adminService.inviteByEmailOnly(
+          adminUid: user.id,
+          email: email,
+        );
         if (!mounted) return;
-        showHonooToast(context, message: 'Nessun utente trovato.');
+        showHonooToast(
+          context,
+          message: inserted ? 'Invito inviato.' : 'Invito già presente.',
+        );
         return;
       }
       final inserted = await _adminService.inviteUsers(

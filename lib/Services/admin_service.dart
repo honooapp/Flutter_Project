@@ -193,6 +193,18 @@ class AdminService {
     return existing;
   }
 
+  Future<bool> hasPendingInviteForEmail(String email) async {
+    if (email.trim().isEmpty) return false;
+    final rows = await _client
+        .from('house_invites')
+        .select('id,status')
+        .ilike('email', email)
+        .in_('status', ['pending', 'accepted'])
+        .limit(1);
+    if (rows is! List || rows.isEmpty) return false;
+    return true;
+  }
+
   Future<Set<String>> fetchExistingCaseOwners(List<String> userIds) async {
     if (userIds.isEmpty) return {};
     final rows = await _client
@@ -246,6 +258,23 @@ class AdminService {
       }
     }
     return toInsert.length;
+  }
+
+  Future<bool> inviteByEmailOnly({
+    required String adminUid,
+    required String email,
+  }) async {
+    if (email.trim().isEmpty) return false;
+    final exists = await hasPendingInviteForEmail(email);
+    if (exists) return false;
+    await _client.from('house_invites').insert({
+      'user_id': null,
+      'email': email,
+      'invited_by': adminUid,
+      'status': 'pending',
+      'created_at': DateTime.now().toIso8601String(),
+    });
+    return true;
   }
 
   Future<void> _sendInviteEmail(String email) async {
