@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
@@ -44,8 +45,11 @@ class _CampanelliPageState extends State<CampanelliPage> {
   bool _isLoadingUserEntries = false;
   bool _isHoveringCampanelli = false;
   bool _checkedKnocks = false;
+  bool _checkingPendingKnocks = false;
   final Set<String> _pendingKnockTags = {};
   final List<_PendingKnock> _pendingKnocks = [];
+  List<String> _ownedHinooIds = const [];
+  Timer? _pendingKnockRefreshTimer;
   final Map<String, _CasaShareMode> _shareModesByCampanello = {
     campanelloSirenaId: _CasaShareMode.honoo,
     campanelloPalombaroId: _CasaShareMode.hinoo,
@@ -71,6 +75,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
   void initState() {
     super.initState();
     _loadUserEntries();
+    _pendingKnockRefreshTimer = Timer.periodic(
+      const Duration(seconds: 60),
+      (_) => _refreshPendingKnocks(),
+    );
   }
 
   bool _isCampanelloUnlocked(String id) => _unlockedCampanelli.contains(id);
@@ -441,7 +449,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
       if (hinooIds.isEmpty) {
         if (mounted) {
-          setState(() => _userEntries = const []);
+          setState(() {
+            _userEntries = const [];
+            _ownedHinooIds = const [];
+          });
         }
         return;
       }
@@ -513,6 +524,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
       if (mounted) {
         setState(() {
           _userEntries = entries;
+          _ownedHinooIds = List<String>.from(ownedHinooIds);
           _unlockedCampanelli.addAll(
             entries
                 .where((entry) => entry.campanello.ownerId == user.id)
@@ -526,7 +538,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
       }
     } catch (_) {
       if (mounted) {
-        setState(() => _userEntries = const []);
+        setState(() {
+          _userEntries = const [];
+          _ownedHinooIds = const [];
+        });
       }
     } finally {
       if (mounted) {
@@ -543,7 +558,15 @@ class _CampanelliPageState extends State<CampanelliPage> {
           .select('id,target_house_tag,created_at,hinoo_id,honoo_id')
           .in_('target_house_tag', hinooIds)
           .is_('granted_at', null);
-      if (rows is! List || rows.isEmpty) return;
+      if (rows is! List) return;
+      if (rows.isEmpty) {
+        if (!mounted) return;
+        setState(() {
+          _pendingKnocks.clear();
+          _pendingKnockTags.clear();
+        });
+        return;
+      }
       final List<_PendingKnock> knocks = [];
       for (final row in rows.whereType<Map>()) {
         final String id = row['id']?.toString() ?? '';
@@ -575,6 +598,17 @@ class _CampanelliPageState extends State<CampanelliPage> {
           ..addAll(knocks.map((k) => k.targetTag));
       });
     } catch (_) {}
+  }
+
+  Future<void> _refreshPendingKnocks() async {
+    if (_checkingPendingKnocks) return;
+    if (_ownedHinooIds.isEmpty) return;
+    _checkingPendingKnocks = true;
+    try {
+      await _checkPendingKnocks(_ownedHinooIds);
+    } finally {
+      _checkingPendingKnocks = false;
+    }
   }
 
   _CampanelloEntry? _entryForTag(String? tag) {
@@ -885,6 +919,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
   @override
   void dispose() {
+    _pendingKnockRefreshTimer?.cancel();
     _pageController.dispose();
     _campanelloPageController.dispose();
     super.dispose();

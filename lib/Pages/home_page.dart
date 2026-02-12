@@ -95,44 +95,44 @@ class _HomePageState extends State<HomePage> {
       } catch (_) {}
     }
 
-    final hasCasa = await _inviteService.hasCasa(user.id);
-    if (hasCasa) {
-      _checkingInviteFlow = false;
-      return;
-    }
+    try {
+      final hasCasa = await _inviteService.hasCasa(user.id);
+      if (hasCasa) {
+        return;
+      }
 
-    var hasInvite =
-        await _inviteService.hasPendingOrAcceptedInvite(user.id);
-    if (!hasInvite && email != null && email.isNotEmpty) {
-      try {
-        await _inviteService.syncInvitesForEmail(email);
-      } catch (_) {}
-      hasInvite = await _inviteService.hasPendingOrAcceptedInvite(user.id);
-    }
-    if (!hasInvite || !mounted) {
-      _checkingInviteFlow = false;
-      return;
-    }
+      var hasInvite =
+          await _inviteService.hasPendingOrAcceptedInvite(user.id);
+      if (!hasInvite && email != null && email.isNotEmpty) {
+        try {
+          await _inviteService.syncInvitesForEmail(email);
+        } catch (_) {}
+        hasInvite = await _inviteService.hasPendingOrAcceptedInvite(user.id);
+      }
+      if (!hasInvite || !mounted) {
+        return;
+      }
 
-    final bool? accepted = await _showCasaInviteDialog();
-    if (!mounted) {
-      _checkingInviteFlow = false;
-      return;
-    }
-    if (accepted != true) {
-      await _inviteService.markInvitesDeclined(user.id);
-      _checkingInviteFlow = false;
-      return;
-    }
+      final bool? accepted = await _showCasaInviteDialog();
+      if (!mounted) {
+        return;
+      }
+      if (accepted != true) {
+        await _inviteService.markInvitesDeclined(user.id);
+        return;
+      }
 
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const NewHinooPage(isCampanello: true),
-      ),
-    );
-    _checkingInviteFlow = false;
-    if (mounted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _checkInviteFlow());
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const NewHinooPage(isCampanello: true),
+        ),
+      );
+      if (mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => _checkInviteFlow());
+      }
+    } catch (_) {
+    } finally {
+      _checkingInviteFlow = false;
     }
   }
 
