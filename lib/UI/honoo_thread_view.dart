@@ -14,9 +14,14 @@ import '../Utility/honoo_colors.dart';
 /// Se il root honoo ha risposte, mostra un CarouselSlider verticale senza peek,
 /// con gutter laterale fisso, così i box non toccano mai i bordi.
 class HonooThreadView extends StatefulWidget {
-  const HonooThreadView({super.key, required this.root});
+  const HonooThreadView({
+    super.key,
+    required this.root,
+    this.onDownloadTap,
+  });
 
   final Honoo root;
+  final VoidCallback? onDownloadTap;
 
   @override
   State<HonooThreadView> createState() => _HonooThreadViewState();
@@ -88,7 +93,10 @@ class _HonooThreadViewState extends State<HonooThreadView> {
           if (thread.length <= 1) {
             child = Center(
               key: ValueKey('thread_single_${_honooIdentity(widget.root)}'),
-              child: HonooCard(honoo: widget.root),
+              child: HonooCard(
+                honoo: widget.root,
+                onDownloadTap: widget.onDownloadTap,
+              ),
             );
           } else {
             final Honoo root = thread.firstWhere(
@@ -131,7 +139,10 @@ class _HonooThreadViewState extends State<HonooThreadView> {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Stack(
                       children: [
-                        HonooCard(honoo: honoo),
+                        HonooCard(
+                          honoo: honoo,
+                          onDownloadTap: widget.onDownloadTap,
+                        ),
                         if (isReply)
                           Positioned(
                             left: 12,

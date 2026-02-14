@@ -187,7 +187,10 @@ class _NewHonooPageState extends State<NewHonooPage> {
         _lastSavedRawImage = _imageUrl;
       });
 
-      showHonooToast(context, message: 'salvato nello Scrigno.');
+      showHonooToast(
+        context,
+        message: 'Questo honoo è stato salvato nel tuo Scrigno.',
+      );
       if (widget.forcedType != HonooType.answer) {
         final bool? sendToMoon = await showDialog<bool>(
           context: context,
@@ -453,7 +456,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                               if (_hasMinTextForDownload ||
                                   _hasImageForDownload) ...[
                                 WhiteIconButton(
-                                  tooltip: 'Scarica honoo',
+                                  tooltip: 'Salva sul dispositivo',
                                   icon: Icons.download_outlined,
                                   onPressed: _handleDownloadTap,
                                 ),

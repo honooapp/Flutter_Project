@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 
 import 'package:honoo/Utility/honoo_colors.dart';
@@ -45,11 +46,14 @@ class NewHinooPage extends StatefulWidget {
   State<NewHinooPage> createState() => _NewHinooPageState();
 }
 
-class _NewHinooPageState extends State<NewHinooPage> {
+class _NewHinooPageState extends State<NewHinooPage>
+    with SingleTickerProviderStateMixin {
   final GlobalKey _builderKey = GlobalKey();
 
   final _controller = HinooController();
   bool _savedToChest = false;
+  late final AnimationController _chestBounceController;
+  late final Animation<double> _chestBounce;
 
   double _lastCanvasHeight = 0;
   String _builderStep = 'changeBg';
@@ -63,17 +67,43 @@ class _NewHinooPageState extends State<NewHinooPage> {
   bool get _hasMinTextForDownload => _currentTextLength >= 1;
 
   static const double _titleH = 65;
-  static const double _controlsH = 44;
 
   @override
   void initState() {
     super.initState();
+    _chestBounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 420),
+    );
+    _chestBounce = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.0, end: 1.18)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 45,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.18, end: 0.95)
+            .chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 25,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.95, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 30,
+      ),
+    ]).animate(_chestBounceController);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final dyn = _builderKey.currentState as dynamic;
       final draft = dyn?.exportDraft?.call();
       if (!mounted) return;
       setState(() => _applyDraftToLocalState(draft));
     });
+  }
+
+  @override
+  void dispose() {
+    _chestBounceController.dispose();
+    super.dispose();
   }
 
   void _onHinooChanged(dynamic draft) {
@@ -264,7 +294,11 @@ class _NewHinooPageState extends State<NewHinooPage> {
       await _controller.saveToChest(hinooDraft);
       if (!mounted) return;
       setState(() => _savedToChest = true);
-      showHonooToast(context, message: 'salvato nello Scrigno.');
+      _chestBounceController.forward(from: 0);
+      showHonooToast(
+        context,
+        message: 'Questo hinoo è stato salvato nel tuo Scrigno.',
+      );
 
       if (!widget.isReply && !widget.isCampanello) {
         final bool? sendToMoon = await showDialog<bool>(
@@ -490,7 +524,7 @@ class _NewHinooPageState extends State<NewHinooPage> {
         children: [
           if (_isWriteStep) ...[
             iconBtn(
-              tooltip: 'download',
+              tooltip: 'Salva sul dispositivo',
               icon: Icons.download_outlined,
               onPressed: _handleDownloadTap,
             ),
@@ -554,7 +588,6 @@ class _NewHinooPageState extends State<NewHinooPage> {
                 (viewH -
                         _titleH -
                         contentTopPadding -
-                        _controlsH -
                         footerReserved)
                     .clamp(0.0, double.infinity);
 
@@ -685,6 +718,18 @@ class _NewHinooPageState extends State<NewHinooPage> {
                           size: footerIconSize,
                           splashRadius: 40,
                           tooltip: 'Apri il tuo Cuore',
+                          icon: AnimatedBuilder(
+                            animation: _chestBounce,
+                            builder: (context, child) => Transform.scale(
+                              scale: _chestBounce.value,
+                              child: child,
+                            ),
+                            child: SvgPicture.asset(
+                              "assets/icons/chest.svg",
+                              width: footerIconSize,
+                              height: footerIconSize,
+                            ),
+                          ),
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -701,8 +746,8 @@ class _NewHinooPageState extends State<NewHinooPage> {
                             splashRadius: 25,
                             tooltip: 'Spedisci sulla Luna',
                             onPressed: _submitToMoon,
-                          )
-                        else
+                          ),
+                        if (!_savedToChest)
                           ResponsiveFooterAction(
                             asset: "assets/icons/ok.svg",
                             semanticsLabel: 'OK',

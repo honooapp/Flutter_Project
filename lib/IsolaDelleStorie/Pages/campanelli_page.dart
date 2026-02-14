@@ -1322,7 +1322,7 @@ class _PendingHinooPage extends StatelessWidget {
           final double footerTopSpacing = footerSpacing / 2;
           final double footerBottomSpacing = footerSpacing - footerTopSpacing;
           const double headerH = 52;
-          final double targetMaxW = ResponsiveLayout.contentMaxWidth(viewW);
+          final double targetMaxW = viewW;
           final double footerReserved =
               footerIconSize + footerTopSpacing + footerBottomSpacing;
           final double availableH =

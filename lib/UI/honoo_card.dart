@@ -5,11 +5,17 @@ import 'package:google_fonts/google_fonts.dart';
 import '../Entities/honoo.dart';
 import '../Utility/honoo_colors.dart';
 import '../Services/supabase_provider.dart';
+import '../Widgets/text_box_download_button.dart';
 
 class HonooCard extends StatelessWidget {
   final Honoo honoo;
+  final VoidCallback? onDownloadTap;
 
-  const HonooCard({super.key, required this.honoo});
+  const HonooCard({
+    super.key,
+    required this.honoo,
+    this.onDownloadTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -97,19 +103,32 @@ class HonooCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: Center(
-                      child: Text(
-                        honoo.text,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.arvo(
-                          color: HonooColor.onTertiary,
-                          fontSize: 18,
-                          height: 1.4,
-                          fontWeight: FontWeight.w400,
+                    child: Stack(
+                      children: [
+                        Center(
+                          child: Text(
+                            honoo.text,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.arvo(
+                              color: HonooColor.onTertiary,
+                              fontSize: 18,
+                              height: 1.4,
+                              fontWeight: FontWeight.w400,
+                            ),
+                            maxLines: 5,
+                            overflow: TextOverflow.visible,
+                          ),
                         ),
-                        maxLines: 5,
-                        overflow: TextOverflow.visible,
-                      ),
+                        if (onDownloadTap != null)
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: TextBoxDownloadButton(
+                              onPressed: onDownloadTap!,
+                              tooltip: 'download',
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ),

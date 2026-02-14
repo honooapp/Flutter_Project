@@ -6,18 +6,21 @@ import 'package:flutter/services.dart';
 import '../Entities/hinoo.dart';
 import 'hinoo_typography.dart';
 import '../Utility/honoo_colors.dart';
+import '../Widgets/text_box_download_button.dart';
 
 class HinooViewer extends StatefulWidget {
   final HinooDraft draft;
   final double maxHeight;
   final double maxWidth;
   final Color gapColor;
+  final VoidCallback? onDownloadTap;
   const HinooViewer({
     super.key,
     required this.draft,
     required this.maxHeight,
     required this.maxWidth,
     this.gapColor = HonooColor.background,
+    this.onDownloadTap,
   });
 
   @override
@@ -151,6 +154,7 @@ class _HinooViewerState extends State<HinooViewer> {
                               height: baselineH,
                               gap: 0,
                               gapColor: widget.gapColor,
+                              onDownloadTap: widget.onDownloadTap,
                             );
                           },
                         ),
@@ -201,6 +205,7 @@ class HinooSlideView extends StatelessWidget {
   final double height;
   final double gap;
   final Color gapColor;
+  final VoidCallback? onDownloadTap;
   const HinooSlideView({
     super.key,
     required this.slide,
@@ -208,6 +213,7 @@ class HinooSlideView extends StatelessWidget {
     required this.height,
     required this.gap,
     required this.gapColor,
+    this.onDownloadTap,
   });
 
   @override
@@ -247,6 +253,13 @@ class HinooSlideView extends StatelessWidget {
       color: textColor,
     );
     final double halfGap = gap / 2;
+    const double actionInset = 8;
+    final Widget? downloadOverlay = onDownloadTap == null
+        ? null
+        : TextBoxDownloadButton(
+            onPressed: onDownloadTap!,
+            tooltip: 'download',
+          );
 
     return SizedBox(
       width: width,
@@ -279,6 +292,12 @@ class HinooSlideView extends StatelessWidget {
               ),
             ),
           ),
+          if (downloadOverlay != null)
+            Positioned(
+              top: halfGap + verticalPadding + actionInset,
+              right: horizontalPadding + actionInset,
+              child: downloadOverlay,
+            ),
           if (halfGap > 0.05)
             Positioned(
               top: 0,

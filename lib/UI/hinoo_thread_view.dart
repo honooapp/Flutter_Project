@@ -13,6 +13,7 @@ class HinooThreadView extends StatelessWidget {
     required this.maxHeight,
     required this.maxWidth,
     this.rootAuthorId,
+    this.onDownloadTap,
   });
 
   final HinooDraft root;
@@ -20,6 +21,7 @@ class HinooThreadView extends StatelessWidget {
   final double maxHeight;
   final double maxWidth;
   final String? rootAuthorId;
+  final VoidCallback? onDownloadTap;
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +66,7 @@ class HinooThreadView extends StatelessWidget {
             draft: entry.draft,
             maxHeight: maxHeight,
             maxWidth: maxWidth,
+            onDownloadTap: onDownloadTap,
           );
           if (!entry.isReply) return viewer;
           final String? uid = SupabaseProvider.client.auth.currentUser?.id;

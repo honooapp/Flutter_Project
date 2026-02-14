@@ -14,6 +14,7 @@ import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
 import 'package:honoo/Widgets/width_limited_multiline_field.dart';
+import 'package:honoo/Widgets/text_box_download_button.dart';
 
 import '../Pages/email_login_page.dart';
 import '../Services/honoo_image_uploader.dart';
@@ -30,6 +31,8 @@ class HonooBuilder extends StatefulWidget {
   final ValueChanged<bool>? onFocusChanged;
   final String? initialText;
   final String? imageHint;
+  final VoidCallback? onDownloadTap;
+  final bool showDownloadButton;
 
   const HonooBuilder({
     super.key,
@@ -37,6 +40,8 @@ class HonooBuilder extends StatefulWidget {
     this.onFocusChanged,
     this.initialText,
     this.imageHint,
+    this.onDownloadTap,
+    this.showDownloadButton = true,
   });
 
   @override
@@ -454,29 +459,44 @@ class HonooBuilderState extends State<HonooBuilder> {
             height: 1.4,
           );
 
-          return WidthLimitedMultilineField(
-            controller: _textCtrl,
-            focusNode: _textFocus,
-            style: textStyle,
-            maxLines: 5,
-            maxCharsPerLine: 32,
-            horizontalPadding: const EdgeInsets.symmetric(horizontal: 22),
-            decoration: InputDecoration(
-              hintText: 'Scrivi qui il tuo testo',
-              hintStyle: textStyle.copyWith(
-                color: HonooColor.background,
-                height: 1.2,
+          return Stack(
+            children: [
+              Positioned.fill(
+                child: WidthLimitedMultilineField(
+                  controller: _textCtrl,
+                  focusNode: _textFocus,
+                  style: textStyle,
+                  maxLines: 5,
+                  maxCharsPerLine: 32,
+                  horizontalPadding: const EdgeInsets.symmetric(horizontal: 22),
+                  decoration: InputDecoration(
+                    hintText: 'Scrivi qui il tuo testo',
+                    hintStyle: textStyle.copyWith(
+                      color: HonooColor.background,
+                      height: 1.2,
+                    ),
+                    border: InputBorder.none,
+                    isCollapsed: true,
+                  ),
+                  keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.newline,
+                  expands: true,
+                  scrollPhysics: const ClampingScrollPhysics(),
+                  cursorColor: Colors.black,
+                  cursorWidth: 3,
+                  cursorRadius: const Radius.circular(0),
+                ),
               ),
-              border: InputBorder.none,
-              isCollapsed: true,
-            ),
-            keyboardType: TextInputType.multiline,
-            textInputAction: TextInputAction.newline,
-            expands: true,
-            scrollPhysics: const ClampingScrollPhysics(),
-            cursorColor: Colors.black,
-            cursorWidth: 3,
-            cursorRadius: const Radius.circular(0),
+              if (widget.onDownloadTap != null && widget.showDownloadButton)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: TextBoxDownloadButton(
+                    onPressed: widget.onDownloadTap!,
+                    tooltip: 'download',
+                  ),
+                ),
+            ],
           );
         },
       ),

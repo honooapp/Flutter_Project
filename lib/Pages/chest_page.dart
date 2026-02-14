@@ -50,62 +50,31 @@ class _ChestPageState extends State<ChestPage> {
   static const String _scrignoInfoPrefKey = 'scrigno_info_seen_v1';
   static const String scrignoText =
       "Questo è il tuo Scrigno.\n\n"
-      "Custodisce\n"
+      "Qui sono custoditi\n"
       "gli honoo e gli hinoo\n"
       "che hai scritto,\n\n"
-      "quelli degli altri\n"
-      "che hai salvato dalla Luna,\n\n"
-      "e quelli\n"
-      "che hai ricevuto in risposta.\n\n"
-      "Ogni honoo\n"
-      "che entra nello Scrigno\n"
-      "lascia una traccia.\n\n"
-      "I tuoi honoo\n"
-      "hanno un bordino blu.\n\n"
-      "Quelli salvati dalla Luna\n"
-      "hanno un bordino bianco.\n\n"
-      "Quelli che hai ricevuto\n"
-      "in risposta\n"
-      "hanno un bordino rosso.\n\n"
-      "Scorrendo lo schermo\n"
-      "verso destra,\n"
-      "puoi rivedere\n"
-      "i tuoi honoo\n"
-      "e quelli\n"
-      "che hai salvato dalla Luna.\n\n"
-      "Se rispondi\n"
-      "a un honoo\n"
-      "che era sulla Luna,\n\n"
-      "nel tuo Scrigno\n"
-      "potrai rivedere\n"
-      "l’honoo della Luna\n"
-      "e la tua risposta,\n\n"
-      "scorrendo lo schermo\n"
-      "dall’alto\n"
-      "verso il basso:\n\n"
-      "in alto,\n"
-      "con il bordino bianco,\n"
-      "l’honoo che era sulla Luna,\n\n"
-      "sotto,\n"
-      "con il bordino blu,\n"
+      "quelli che hai salvato dalla Luna,\n\n"
+      "e quelli che hai ricevuto.\n\n"
+      "Blu\n"
+      "sono i tuoi.\n\n"
+      "Bianco\n"
+      "quelli della Luna.\n\n"
+      "Rosso\n"
+      "quelli che ti sono stati inviati.\n\n"
+      "Scorri verso destra\n"
+      "per rivedere ciò che hai scritto\n"
+      "e ciò che hai salvato.\n\n"
+      "Scorri dall’alto verso il basso\n"
+      "per seguire\n"
+      "le conversazioni.\n\n"
+      "In alto\n"
+      "l’honoo della Luna.\n\n"
+      "Sotto\n"
       "la tua risposta.\n\n"
-      "Se chi riceve\n"
-      "la tua risposta\n"
-      "decide di scriverti\n"
-      "un honoo\n"
-      "o un hinoo,\n\n"
-      "lo troverai\n"
-      "con un bordino rosso,\n"
-      "sotto il tuo.\n\n"
-      "In questo modo,\n"
-      "scorrendo lo schermo\n"
-      "dall’alto\n"
-      "verso il basso,\n\n"
-      "puoi ripercorrere\n"
-      "tutta la storia\n"
-      "delle conversazioni\n"
-      "fra honoo\n"
-      "e hinoo.\n";
+      "E, sotto ancora,\n"
+      "se arriva,\n"
+      "la risposta\n"
+      "alla tua risposta.\n";
   final HonooController ctrl = HonooController();
   final HinooController _hinooController = HinooController();
 
@@ -118,16 +87,6 @@ class _ChestPageState extends State<ChestPage> {
   bool _isHinooLoading = true;
   bool _isRefreshingReplies = false;
   Timer? _replyRefreshTimer;
-
-  // Desktop
-  static const double honooRightDesktop = 40;
-  static const double hinooRightDesktop = 30;
-  static const double topDesktop = 10;
-
-  // Mobile
-  static const double rightMobile = 8;
-  static const double honooTopMobile = 45;
-  static const double hinooTopMobile = 10;
 
   // Key stabili per cattura PNG
   final Map<String, GlobalKey> _captureKeys = <String, GlobalKey>{};
@@ -179,48 +138,59 @@ class _ChestPageState extends State<ChestPage> {
     showDialog<void>(
       context: context,
       barrierDismissible: true,
-      builder: (_) => HonooDialogShell(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Scrigno',
-                style: HonooDialogStyles.title(),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                scrignoText,
-                style: HonooDialogStyles.body(),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
+      builder: (_) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final double maxWidth =
+                (constraints.maxWidth * 0.8).clamp(0.0, constraints.maxWidth);
+            return Stack(
+              children: [
+                Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: maxWidth),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Container(
+                          width: maxWidth,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: HonooColor.wave1.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: SingleChildScrollView(
+                            child: Text(
+                              scrignoText,
+                              style: HonooDialogStyles.body(
+                                color: HonooColor.onBackground,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    'Chiudi',
-                    style: HonooDialogStyles.primaryAction(),
                   ),
                 ),
-              ),
-            ],
-          ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.close,
+                      color: HonooColor.onBackground,
+                    ),
+                    iconSize: 40,
+                    tooltip: 'Chiudi',
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -1124,20 +1094,14 @@ class _ChestPageState extends State<ChestPage> {
     final double cardW = isHonoo ? honooMetrics.width : hinooSize.width;
     final double cardMaxH = isHonoo ? honooMetrics.height : hinooSize.height;
 
-    final bool isDesktop = MediaQuery.of(context).size.width >= 900;
-
-    final double horizontalPad = isDesktop
-        ? (isHonoo ? honooRightDesktop : hinooRightDesktop)
-        : rightMobile;
-
-    final double topPad =
-        isDesktop ? topDesktop : (isHonoo ? honooTopMobile : hinooTopMobile);
-
     final Widget content = item.when(
       honoo: (h) => SizedBox(
         width: honooMetrics.width,
         height: honooMetrics.height,
-        child: HonooThreadView(root: h),
+        child: HonooThreadView(
+          root: h,
+          onDownloadTap: () => _handleDownloadForItem(item, repaintKey),
+        ),
       ),
       hinoo: (row) {
         final replies = _hinooRepliesByRoot[row.id] ?? const [];
@@ -1146,6 +1110,7 @@ class _ChestPageState extends State<ChestPage> {
             draft: row.draft,
             maxHeight: cardMaxH,
             maxWidth: cardW,
+            onDownloadTap: () => _handleDownloadForItem(item, repaintKey),
           );
         }
         return HinooThreadView(
@@ -1154,6 +1119,7 @@ class _ChestPageState extends State<ChestPage> {
           replies: replies,
           maxHeight: cardMaxH,
           maxWidth: cardW,
+          onDownloadTap: () => _handleDownloadForItem(item, repaintKey),
         );
       },
     );
@@ -1196,41 +1162,6 @@ class _ChestPageState extends State<ChestPage> {
               clipBehavior: Clip.hardEdge, // 🔒 sempre dentro
               children: [
                 styledCard,
-                Positioned(
-                  top: topPad,
-                  right: horizontalPad,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-                        child: Container(
-                          height: 40,
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.55),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: IconButton(
-                            tooltip: 'download',
-                            icon: const Icon(
-                              Icons.download_outlined,
-                              size: 22,
-                              color: Colors.white,
-                            ),
-                            onPressed: () =>
-                                _handleDownloadForItem(item, repaintKey),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            splashRadius: 17,
-                            visualDensity: VisualDensity.compact,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
@@ -1263,8 +1194,11 @@ class _ChestPageState extends State<ChestPage> {
 
                 final ResponsiveLayoutMode layoutMode =
                     ResponsiveLayout.modeForWidth(constraints.maxWidth);
-                final double targetMaxW =
-                    layoutMode == ResponsiveLayoutMode.mobile
+                final bool currentIsHinoo =
+                    current != null && current.honoo == null;
+                final double targetMaxW = currentIsHinoo
+                    ? constraints.maxWidth
+                    : layoutMode == ResponsiveLayoutMode.mobile
                         ? constraints.maxWidth
                         : ResponsiveLayout.contentMaxWidth(constraints.maxWidth);
                 final double footerIconSize =
@@ -1289,8 +1223,9 @@ class _ChestPageState extends State<ChestPage> {
                   maxWidth: targetMaxW,
                   mode: layoutMode,
                 );
-                final double horizontalPadding =
-                    layoutMode == ResponsiveLayoutMode.mobile ||
+                final double horizontalPadding = currentIsHinoo
+                    ? 0
+                    : layoutMode == ResponsiveLayoutMode.mobile ||
                             layoutMode == ResponsiveLayoutMode.tablet
                         ? 0
                         : 16;

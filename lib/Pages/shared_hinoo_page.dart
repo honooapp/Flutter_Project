@@ -97,7 +97,7 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
           final double footerTopSpacing = footerSpacing / 2;
           final double footerBottomSpacing = footerSpacing - footerTopSpacing;
           const double headerH = 52;
-          final double targetMaxW = ResponsiveLayout.contentMaxWidth(viewW);
+          final double targetMaxW = viewW;
           final double footerReserved =
               footerIconSize + footerTopSpacing + footerBottomSpacing;
           final double availableH =
@@ -160,13 +160,10 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
               ),
               Expanded(
                 child: Center(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: targetMaxW),
-                    child: SizedBox(
-                      width: targetMaxW,
-                      height: availableH,
-                      child: content,
-                    ),
+                  child: SizedBox(
+                    width: targetMaxW,
+                    height: availableH,
+                    child: content,
                   ),
                 ),
               ),

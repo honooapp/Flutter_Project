@@ -146,9 +146,14 @@ class _MoonPageState extends State<MoonPage> {
             final double centerHeight =
                 (availHeight - headerHeight - footerReserved)
                     .clamp(0.0, double.infinity);
-            final double targetMaxWidth = layoutMode == ResponsiveLayoutMode.mobile
+            final _MoonItem? current =
+                _items.isEmpty ? null : _items[_currentIndex];
+            final bool currentIsHinoo = current != null && current.honoo == null;
+            final double targetMaxWidth = currentIsHinoo
                 ? constraints.maxWidth
-                : ResponsiveLayout.contentMaxWidth(constraints.maxWidth);
+                : layoutMode == ResponsiveLayoutMode.mobile
+                    ? constraints.maxWidth
+                    : ResponsiveLayout.contentMaxWidth(constraints.maxWidth);
             final bool isCompact = layoutMode == ResponsiveLayoutMode.mobile ||
                 layoutMode == ResponsiveLayoutMode.tablet;
             final HonooBuilderMetrics honooMetrics =
@@ -157,12 +162,11 @@ class _MoonPageState extends State<MoonPage> {
               maxWidth: targetMaxWidth,
               mode: layoutMode,
             );
-            final _MoonItem? current =
-                _items.isEmpty ? null : _items[_currentIndex];
             final double displayHeight = current?.honoo != null
                 ? honooMetrics.height
                 : centerHeight;
-            final double horizontalPadding = isCompact ? 0 : 16;
+            final double horizontalPadding =
+                currentIsHinoo ? 0 : (isCompact ? 0 : 16);
 
             return Column(
               children: [
