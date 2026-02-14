@@ -652,7 +652,7 @@ class _NewHinooPageState extends State<NewHinooPage>
                             ),
                             Positioned(
                               top: 8,
-                              right: 8,
+                              left: 8,
                               child: _buildCanvasControls(),
                             ),
                           ],

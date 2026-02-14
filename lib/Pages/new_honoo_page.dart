@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'dart:ui' show ImageFilter;
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 
@@ -12,7 +13,6 @@ import 'email_login_page.dart';
 import 'chest_page.dart';
 import 'new_hinoo_page.dart';
 import 'home_page.dart';
-import '../Widgets/white_icon_button.dart';
 import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/honoo_app_title.dart';
 import '../UI/HonooBuilder/dialogs/name_honoo_dialog.dart';
@@ -57,6 +57,66 @@ class _NewHonooPageState extends State<NewHonooPage> {
   bool _hasMinTextForDownload = false;
 
   bool get _hasImageForDownload => _imageUrl.trim().isNotEmpty;
+  bool get _shouldShowCanvasControls =>
+      _hasMinTextForDownload || _hasImageForDownload;
+
+  Widget _buildCanvasControls() {
+    const double iconSize = 22;
+    const double buttonBox = 34;
+    const double pillHeight = 40;
+
+    Widget iconBtn({
+      required IconData icon,
+      required String tooltip,
+      required VoidCallback onPressed,
+    }) {
+      return SizedBox(
+        width: buttonBox,
+        height: buttonBox,
+        child: IconButton(
+          tooltip: tooltip,
+          onPressed: onPressed,
+          icon: Icon(icon, size: iconSize, color: Colors.white),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+          splashRadius: buttonBox / 2,
+          visualDensity: VisualDensity.compact,
+        ),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(pillHeight / 2),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+        child: Container(
+          height: pillHeight,
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.55),
+            borderRadius: BorderRadius.circular(pillHeight / 2),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              iconBtn(
+                tooltip: 'Salva sul dispositivo',
+                icon: Icons.download_outlined,
+                onPressed: _handleDownloadTap,
+              ),
+              const SizedBox(width: 6),
+              iconBtn(
+                tooltip: 'Elimina honoo',
+                icon: Icons.delete_outline,
+                onPressed: _handleDeleteTap,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   /// Aggiorna solo se cambia DAVVERO e non è identico all’ultimo SALVATO.
   void _onHonooChanged(String text, String imageUrl) {
@@ -404,14 +464,10 @@ class _NewHonooPageState extends State<NewHonooPage> {
             // Altezza riservata al footer (3 pulsanti)
             final double footerReserved =
                 footerContentH + footerTopSpacing + footerBottomSpacing;
-            const double controlsH = 44.0;
 
             // Altezza disponibile per il box honoo
-            final double availableH = (viewH -
-                    headerH -
-                    controlsH -
-                    contentTopPadding -
-                    footerReserved)
+            final double availableH =
+                (viewH - headerH - contentTopPadding - footerReserved)
                 .clamp(0.0, double.infinity);
 
             final HonooBuilderMetrics metrics =
@@ -445,34 +501,6 @@ class _NewHonooPageState extends State<NewHonooPage> {
                     ),
                     const SizedBox(height: contentTopPadding),
                     SizedBox(
-                      height: controlsH,
-                      child: Center(
-                        child: SizedBox(
-                          width: builderWidth,
-                          height: controlsH,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              if (_hasMinTextForDownload ||
-                                  _hasImageForDownload) ...[
-                                WhiteIconButton(
-                                  tooltip: 'Salva sul dispositivo',
-                                  icon: Icons.download_outlined,
-                                  onPressed: _handleDownloadTap,
-                                ),
-                                const SizedBox(width: 12),
-                                WhiteIconButton(
-                                  tooltip: 'Elimina honoo',
-                                  icon: Icons.delete_outline,
-                                  onPressed: _handleDeleteTap,
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
                       height: availableH,
                       child: Center(
                         child: AnimatedContainer(
@@ -482,12 +510,22 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           child: SizedBox(
                             width: builderWidth,
                             height: builderHeight,
-                            child: ClipRect(
-                              child: HonooBuilder(
-                                key: _builderKey,
-                                onHonooChanged: _onHonooChanged,
-                                onFocusChanged: _onBuilderFocusChanged,
-                              ),
+                            child: Stack(
+                              children: [
+                                ClipRect(
+                                  child: HonooBuilder(
+                                    key: _builderKey,
+                                    onHonooChanged: _onHonooChanged,
+                                    onFocusChanged: _onBuilderFocusChanged,
+                                  ),
+                                ),
+                                if (_shouldShowCanvasControls)
+                                  Positioned(
+                                    top: 8,
+                                    left: 8,
+                                    child: _buildCanvasControls(),
+                                  ),
+                              ],
                             ),
                           ),
                         ),

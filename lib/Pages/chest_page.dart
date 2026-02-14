@@ -145,12 +145,12 @@ class _ChestPageState extends State<ChestPage> {
           builder: (context, constraints) {
             final double maxWidth =
                 (constraints.maxWidth * 0.8).clamp(0.0, constraints.maxWidth);
-            return Stack(
-              children: [
-                Center(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: maxWidth),
-                    child: ClipRRect(
+            return Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: maxWidth),
+                child: Stack(
+                  children: [
+                    ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -173,22 +173,22 @@ class _ChestPageState extends State<ChestPage> {
                         ),
                       ),
                     ),
-                  ),
-                ),
-                Positioned(
-                  top: 0,
-                  right: 0,
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.close,
-                      color: HonooColor.onBackground,
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.close,
+                          color: HonooColor.onBackground,
+                        ),
+                        iconSize: 40,
+                        tooltip: 'Chiudi',
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
                     ),
-                    iconSize: 40,
-                    tooltip: 'Chiudi',
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             );
           },
         ),

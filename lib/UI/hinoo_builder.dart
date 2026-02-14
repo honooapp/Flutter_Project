@@ -71,13 +71,13 @@ class _HinooBuilderState extends State<HinooBuilder> {
   double _canvasHeight = 0;
 
   // Stato UI
-  ImageProvider? _localBgPreview; // preview locale dello sfondo
+  Uint8List? _localBgPreviewBytes; // preview locale dello sfondo
   String? _bgPublicUrl; // URL pubblico su storage
   Color _txtColor = Colors.white;
   _WizardStep _step = _WizardStep.changeBg;
   bool _bgChosen = false; // abilita bottone OK per procedere
   bool _isUploadingBg = false;
-  static const double _bgMinScale = 1.0;
+  static const double _bgMinScale = 0.5;
   static const double _bgMaxScale = 5.0;
   final TransformationController _bgController = TransformationController();
   Matrix4? _bgLockedMatrix;
@@ -202,14 +202,14 @@ class _HinooBuilderState extends State<HinooBuilder> {
     }
 
     _bgScale = _extractScaleFromMatrix(_bgController.value);
-    _bgChosen = _localBgPreview != null ||
+    _bgChosen = _localBgPreviewBytes != null ||
         (_bgPublicUrl != null && _bgPublicUrl!.isNotEmpty);
   }
 
   void _resetToBlankState() {
     _textController.clear();
     _txtColor = Colors.white;
-    _localBgPreview = null;
+    _localBgPreviewBytes = null;
     _bgPublicUrl = null;
     _bgLockedMatrix = null;
     _bgController.value = Matrix4.identity();
@@ -423,16 +423,14 @@ class _HinooBuilderState extends State<HinooBuilder> {
       'text': _textController.text,
       'textLength': _textController.text.trim().length,
       'textColor': _txtColor.value,
-      'hasBg': _localBgPreview != null || _bgPublicUrl != null,
+      'hasBg': _localBgPreviewBytes != null || _bgPublicUrl != null,
       'bgUrl': _bgPublicUrl,
       'bgTransform': currentTransform?.storage.toList(),
       'canvasHeight': _canvasHeight,
       'step': _step.name,
       'isUploadingBg': _isUploadingBg,
       // preview immediata per thumbnails quando non c'è ancora un URL pubblico
-      'bgPreviewBytes': _localBgPreview is MemoryImage
-          ? (_localBgPreview as MemoryImage).bytes
-          : null,
+      'bgPreviewBytes': _localBgPreviewBytes,
     };
   }
 
@@ -524,15 +522,20 @@ class _HinooBuilderState extends State<HinooBuilder> {
         // Sfondo: usa sempre un unico percorso (asset di default oppure preview selezionata)
         Builder(
           builder: (_) {
-            final ImageProvider provider = _localBgPreview ??
-                const AssetImage('assets/images/hinoo_default_1080x1920.png');
-            final Widget fitted = FittedBox(
-              fit: BoxFit.cover,
-              child: Image(image: provider),
+            final Widget fitted = SizedBox.expand(
+              child: _localBgPreviewBytes != null
+                  ? Image.memory(
+                      _localBgPreviewBytes!,
+                      fit: BoxFit.contain,
+                    )
+                  : const Image(
+                    image: AssetImage('assets/images/hinoo_default_1080x1920.png'),
+                    fit: BoxFit.contain,
+                  ),
             );
             final bool interactive = (_step == _WizardStep.changeBg &&
                 _bgChosen &&
-                _localBgPreview != null);
+                _localBgPreviewBytes != null);
             if (!interactive && _bgLockedMatrix != null) {
               _bgController.value = _bgLockedMatrix!.clone();
             }
@@ -555,7 +558,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
           CambiaSfondoOverlay(
             onTapChange: _pickAndUploadBackground,
             promptText: widget.backgroundPromptText,
-            showControls: _bgChosen && _localBgPreview != null,
+            showControls: _bgChosen && _localBgPreviewBytes != null,
             isUploading: _isUploadingBg,
             currentScale: _bgScale,
             minScale: _bgMinScale,
@@ -741,7 +744,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
       return;
     }
     if (!_bgChosen &&
-        _localBgPreview == null &&
+        _localBgPreviewBytes == null &&
         (_bgPublicUrl == null || _bgPublicUrl!.isEmpty)) {
       showHonooToast(
         context,
@@ -775,7 +778,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
       // Preview locale immediata
       final Uint8List bytes = await selected.readAsBytes();
       setState(() {
-        _localBgPreview = MemoryImage(bytes);
+        _localBgPreviewBytes = bytes;
         _bgChosen = true; // abilita OK per procedere
         _bgLockedMatrix = null;
         _bgScale = _bgMinScale;
@@ -901,7 +904,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
     if (_bgLockedMatrix != null) {
       return _bgLockedMatrix!.clone();
     }
-    if (!_bgChosen && _bgPublicUrl == null && _localBgPreview == null) {
+    if (!_bgChosen && _bgPublicUrl == null && _localBgPreviewBytes == null) {
       return null;
     }
     return _bgController.value.clone();

@@ -54,21 +54,21 @@ class HonooBuilderState extends State<HonooBuilder> {
   final TextEditingController _textCtrl = TextEditingController();
   final FocusNode _textFocus = FocusNode();
 
-  ImageProvider? _imageProvider;
+  Uint8List? _imageBytes;
 
   // preview zoommata “confermata”
   Uint8List? _confirmedPreviewBytes;
 
   // trasformazioni zoom/pan
   final TransformationController _imageController = TransformationController();
-  static const double _imageMinScale = 1.0;
+  static const double _imageMinScale = 0.5;
   static const double _imageMaxScale = 5.0;
   double _imageScale = _imageMinScale;
 
   bool _imageConfirmed = false;
   bool _isUploadingFinal = false;
 
-  bool get hasImage => _imageProvider != null;
+  bool get hasImage => _imageBytes != null;
 
   // url pubblico su supabase della PNG zoommata
   String _publicImageUrl = '';
@@ -178,7 +178,7 @@ class HonooBuilderState extends State<HonooBuilder> {
       _imageController.value = Matrix4.identity();
 
       setState(() {
-        _imageProvider = MemoryImage(bytes);
+        _imageBytes = bytes;
 
         // reset stato
         _publicImageUrl = '';
@@ -347,7 +347,7 @@ class HonooBuilderState extends State<HonooBuilder> {
   void resetContent() {
     setState(() {
       _textCtrl.clear();
-      _imageProvider = null;
+      _imageBytes = null;
 
       _publicImageUrl = '';
       _imageController.value = Matrix4.identity();
@@ -510,7 +510,7 @@ class HonooBuilderState extends State<HonooBuilder> {
         borderRadius: BorderRadius.circular(5),
         child: Container(
           color: HonooColor.tertiary,
-          child: _imageProvider == null
+          child: _imageBytes == null
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -537,7 +537,7 @@ class HonooBuilderState extends State<HonooBuilder> {
                     if (_imageConfirmed && _confirmedPreviewBytes != null)
                       Image.memory(
                         _confirmedPreviewBytes!,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.contain,
                         alignment: Alignment.center,
                       )
                     else
@@ -556,8 +556,8 @@ class HonooBuilderState extends State<HonooBuilder> {
                             boundaryMargin: const EdgeInsets.all(200),
                             child: SizedBox.expand(
                               child: Image(
-                                image: _imageProvider!,
-                                fit: BoxFit.cover,
+                                image: MemoryImage(_imageBytes!),
+                                fit: BoxFit.contain,
                                 alignment: Alignment.center,
                               ),
                             ),
