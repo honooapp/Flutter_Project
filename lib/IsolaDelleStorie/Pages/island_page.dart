@@ -453,7 +453,7 @@ class _IslandPageState extends State<IslandPage> {
                               left: homeX,
                               child: IconButton(
                                 icon: SvgPicture.asset(
-                                  "assets/icons/info.svg",
+                                  "assets/icons/home.svg",
                                   colorFilter: const ColorFilter.mode(
                                     HonooColor.onBackground,
                                     BlendMode.srcIn,
@@ -498,8 +498,8 @@ class _IslandPageState extends State<IslandPage> {
                               left: logoX,
                               child: IconButton(
                                 icon: SvgPicture.asset(
-                                    "assets/icons/honoo_logo.svg",
-                                    semanticsLabel: 'Logo'),
+                                    "assets/icons/info.svg",
+                                    semanticsLabel: 'Info'),
                                 iconSize: logoSize,
                                 splashRadius: 30,
                                 tooltip: 'Info',
