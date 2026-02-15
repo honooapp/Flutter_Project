@@ -55,3 +55,15 @@ flutter run -d chrome \
 ```
 
 Se l’app parte senza l’errore “Unsupported operation: Platform.environment”, il fix è applicato correttamente.
+
+## Release (GitHub Pages)
+
+Usa lo script `tool/release.sh` per creare commit, tag e release GitHub.
+
+```bash
+./tool/release.sh "Messaggio commit" vYYYY-MM-DD[.N] "Note release facoltative"
+```
+
+Note:
+- Serve `gh` installato e autenticato (`gh auth login`).
+- Se le note non sono fornite, viene usato `--generate-notes`.
