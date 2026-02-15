@@ -28,6 +28,10 @@ git push
 git push origin "$tag"
 
 if command -v gh >/dev/null; then
+  if ! gh auth status >/dev/null 2>&1; then
+    echo "gh not authenticated. Run: gh auth login" >&2
+    exit 1
+  fi
   if [[ -n "$release_notes" ]]; then
     gh release create "$tag" --title "$tag" --notes "$release_notes"
   else
