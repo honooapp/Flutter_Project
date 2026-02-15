@@ -156,34 +156,40 @@ class _ChestPageState extends State<ChestPage> {
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: Container(
                           width: maxWidth,
-                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: HonooColor.wave1.withOpacity(0.6),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: SingleChildScrollView(
-                            child: Text(
-                              scrignoText,
-                              style: HonooDialogStyles.body(
-                                color: HonooColor.onBackground,
+                          child: Stack(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(16, 40, 16, 16),
+                                child: SingleChildScrollView(
+                                  child: Text(
+                                    scrignoText,
+                                    style: HonooDialogStyles.body(
+                                      color: HonooColor.onBackground,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
                               ),
-                              textAlign: TextAlign.center,
-                            ),
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: IconButton(
+                                  icon: const Icon(
+                                    Icons.close,
+                                    color: HonooColor.onBackground,
+                                  ),
+                                  iconSize: 40,
+                                  tooltip: 'Chiudi',
+                                  onPressed: () => Navigator.of(context).pop(),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.close,
-                          color: HonooColor.onBackground,
-                        ),
-                        iconSize: 40,
-                        tooltip: 'Chiudi',
-                        onPressed: () => Navigator.of(context).pop(),
                       ),
                     ),
                   ],
