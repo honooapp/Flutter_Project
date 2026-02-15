@@ -9,6 +9,7 @@ import '../Utility/utility.dart';
 import '../Widgets/background.dart';
 import '../Widgets/honoo_app_title.dart';
 import 'home_page.dart';
+import 'performance_page.dart';
 import 'venceslao_page.dart';
 
 class PlaceholderPage extends StatefulWidget {
@@ -229,6 +230,11 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         inlineIconHeight,
         topSpacing: _performanceTopSpacing,
         bottomSpacing: _performanceBottomSpacing,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const PerformancePage()),
+          );
+        },
       ),
       _linkTextBlock(context, laboratoriLine, baseTextStyle),
       ..._iconBlockWithSpacing(
@@ -265,6 +271,11 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           inlineIconHeight,
           topSpacing: _performanceSecondTopSpacing,
           bottomSpacing: _performanceSecondBottomSpacing,
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const PerformancePage()),
+            );
+          },
         ),
       _textBlock(textAfterPerformanceMarkerDisplay, baseTextStyle),
       _textBlock(textBeforeVenceslaoDisplay, baseTextStyle),
