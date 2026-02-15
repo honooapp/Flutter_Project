@@ -94519,7 +94519,7 @@ $1(a){return!1},
 $S:5}
 A.aC6.prototype={
 $2(a,b){var s=null,r=b.b,q=r/2,p=new A.aC9(r),o=p.$2(q+60,70),n=p.$2(q-35,70),m=p.$2(q-190,40),l=p.$2(q+110,70)
-return A.bW(B.E,A.b([A.bH(50,new A.V(s,10,A.bw(s,s,B.j,B.hg,s,s,s,s,s,s,s,s,s,s),s),s,s,0,0,s,s),A.bH(10,A.df(s,s,A.dM("assets/icons/bottle.svg",s,B.J,s,"Bottle",s,s),70,new A.aBY(a),s,40,"Scrivi",s),s,s,o,s,s,s),A.bH(30,new A.e_(!0,s,new A.V(s,20,A.bw(s,s,B.j,B.dL,s,s,s,s,s,s,s,s,s,s),s),s),s,s,0,0,s,s),A.bH(0,new A.e_(!0,s,new A.V(s,30,A.bw(s,s,B.j,B.jP,s,s,s,s,s,s,s,s,s,s),s),s),s,s,0,0,s,s),A.bH(0,A.df(s,s,A.dM("assets/icons/info.svg",B.aj,B.J,40,"Home",s,40),40,new A.aBZ(a),s,1,"Home",s),s,s,m,s,s,s),A.bH(-20,A.df(s,s,A.dM("assets/icons/chest.svg",s,B.J,s,"Chest",s,s),70,new A.aC_(a),s,40,"Apri il tuo Cuore",s),s,s,n,s,s,s),A.bH(-15,A.df(s,s,A.dM("assets/icons/honoo_logo.svg",s,B.J,s,"Logo",s,s),70,new A.aC0(this.a),s,30,"Info",s),s,s,l,s,s,s)],t.p),B.j,B.Q)},
+return A.bW(B.E,A.b([A.bH(50,new A.V(s,10,A.bw(s,s,B.j,B.hg,s,s,s,s,s,s,s,s,s,s),s),s,s,0,0,s,s),A.bH(10,A.df(s,s,A.dM("assets/icons/bottle.svg",s,B.J,s,"Bottle",s,s),70,new A.aBY(a),s,40,"Scrivi",s),s,s,o,s,s,s),A.bH(30,new A.e_(!0,s,new A.V(s,20,A.bw(s,s,B.j,B.dL,s,s,s,s,s,s,s,s,s,s),s),s),s,s,0,0,s,s),A.bH(0,new A.e_(!0,s,new A.V(s,30,A.bw(s,s,B.j,B.jP,s,s,s,s,s,s,s,s,s,s),s),s),s,s,0,0,s,s),A.bH(0,A.df(s,s,A.dM("assets/icons/home.svg",B.aj,B.J,40,"Home",s,40),40,new A.aBZ(a),s,1,"Home",s),s,s,m,s,s,s),A.bH(-20,A.df(s,s,A.dM("assets/icons/chest.svg",s,B.J,s,"Chest",s,s),70,new A.aC_(a),s,40,"Apri il tuo Cuore",s),s,s,n,s,s,s),A.bH(-15,A.df(s,s,A.dM("assets/icons/info.svg",s,B.J,s,"Info",s,s),70,new A.aC0(this.a),s,30,"Info",s),s,s,l,s,s,s)],t.p),B.j,B.Q)},
 $S:31}
 A.aC9.prototype={
 $2(a,b){return B.d.b_(a,0,this.a-b)},
