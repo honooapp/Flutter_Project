@@ -271,9 +271,11 @@ class HinooService {
   }
 
   static bool _isMissingMoonSavedColumn(PostgrestException e) {
-    return e.code == 'PGRST204' &&
-        (e.message.contains('is_from_moon_saved') ||
-            e.details?.contains('is_from_moon_saved') == true);
+    final message = e.message;
+    final details = e.details ?? '';
+    final hint = e.hint ?? '';
+    final combined = '$message $details $hint';
+    return combined.contains('is_from_moon_saved');
   }
 
   static Future<void> saveDraft(HinooDraft draft) async {

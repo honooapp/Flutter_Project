@@ -288,8 +288,8 @@ class _ChestPageState extends State<ChestPage> {
           .order('created_at', ascending: false);
       return rows as List<dynamic>;
     } on PostgrestException catch (e) {
-      if (e.code != 'PGRST204' ||
-          !e.message.contains('is_from_moon_saved')) {
+      final combined = '${e.message} ${e.details ?? ''} ${e.hint ?? ''}';
+      if (!combined.contains('is_from_moon_saved')) {
         rethrow;
       }
       final rows = await client
