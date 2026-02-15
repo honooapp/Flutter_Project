@@ -295,20 +295,16 @@ class _NewHinooPageState extends State<NewHinooPage>
       if (!mounted) return;
       setState(() => _savedToChest = true);
       _chestBounceController.forward(from: 0);
-      showHonooToast(
-        context,
-        message: 'Questo hinoo è stato salvato nel tuo Scrigno.',
-      );
-
       if (!widget.isReply && !widget.isCampanello) {
         final bool? sendToMoon = await showDialog<bool>(
           context: context,
           barrierDismissible: true,
           builder: (_) => const HonooConfirmDialog(
-            title:
-                'Il tuo hinoo è stato salvato nello Scrigno, vuoi inviarlo anche sulla Luna?',
+            title: "L'hinoo è stato salvato nel tuo Scrigno.",
+            message:
+                'Vuoi spedirlo anche sulla Luna, per mostrarlo a tutti?',
             confirmLabel: 'Sì',
-            cancelLabel: 'Non ora',
+            cancelLabel: 'No',
           ),
         );
         if (sendToMoon == true && mounted) {
@@ -326,17 +322,6 @@ class _NewHinooPageState extends State<NewHinooPage>
         }
       }
 
-      if (widget.isReply && mounted) {
-        await showDialog<bool>(
-          context: context,
-          barrierDismissible: true,
-          builder: (_) => const HonooConfirmDialog(
-            title: 'Vuoi inserire il campanello di casa tua?',
-            confirmLabel: 'Si',
-            cancelLabel: 'No',
-          ),
-        );
-      }
     } catch (e) {
       if (!mounted) return;
       showHonooToast(context, message: 'Errore: $e');

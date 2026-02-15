@@ -247,19 +247,16 @@ class _NewHonooPageState extends State<NewHonooPage> {
         _lastSavedRawImage = _imageUrl;
       });
 
-      showHonooToast(
-        context,
-        message: 'Questo honoo è stato salvato nel tuo Scrigno.',
-      );
       if (widget.forcedType != HonooType.answer) {
         final bool? sendToMoon = await showDialog<bool>(
           context: context,
           barrierDismissible: true,
           builder: (_) => const HonooConfirmDialog(
-            title:
-                'Il tuo honoo è stato salvato nello Scrigno, vuoi inviarlo anche sulla Luna?',
+            title: "L'honoo è stato salvato nel tuo Scrigno.",
+            message:
+                'Vuoi spedirlo anche sulla Luna, per mostrarlo a tutti?',
             confirmLabel: 'Sì',
-            cancelLabel: 'Non ora',
+            cancelLabel: 'No',
           ),
         );
         if (sendToMoon == true && mounted) {
