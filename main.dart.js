@@ -255,8 +255,8 @@ bbz(a){var s,r,q,p,o,n=A.bG(self.document,"script")
 n.src=A.bdW(a)
 s=new A.af($.ae,t.tq)
 r=new A.aR(s,t.VY)
-q=A.aY("loadCallback")
-p=A.aY("errorCallback")
+q=A.aX("loadCallback")
+p=A.aX("errorCallback")
 o=t.e
 q.sci(o.a(A.bB(new A.aJz(n,r))))
 p.sci(o.a(A.bB(new A.aJy(n,r))))
@@ -5641,8 +5641,8 @@ _.d=null},
 bg6(a){return A.P(A.aTm(a))},
 a(){return A.P(A.kN(""))},
 cb(){return A.P(A.b5L(""))},
-aZ(){return A.P(A.aTm(""))},
-aY(a){var s=new A.awN(a)
+aY(){return A.P(A.aTm(""))},
+aX(a){var s=new A.awN(a)
 return s.b=s},
 aW5(a,b){var s=new A.aBt(a,b)
 return s.b=s},
@@ -6623,8 +6623,8 @@ return s},
 pJ(a,b){var s,r,q,p,o,n,m,l,k,j,i={},h=null,g=!1,f=new A.af($.ae,b.h("af<x<0>>"))
 i.a=null
 i.b=0
-s=A.aY("error")
-r=A.aY("stackTrace")
+s=A.aX("error")
+r=A.aX("stackTrace")
 q=new A.adX(i,h,g,f,s,r)
 try{for(l=J.ab(a),k=t.a;l.p();){p=l.gG(l)
 o=i.b
@@ -9324,7 +9324,7 @@ jn:function jn(){},
 T0:function T0(){},
 TR:function TR(){},
 Wu:function Wu(){},
-b_:function b_(){},
+aZ:function aZ(){},
 jF:function jF(){},
 Xb:function Xb(){},
 a0a:function a0a(){},
@@ -10135,7 +10135,7 @@ pg:function pg(){},
 jG(a,b,c){return new A.aK(a,b,c.h("aK<0>"))},
 ir(a){return new A.iq(a)},
 aM:function aM(){},
-aX:function aX(a,b,c){this.a=a
+aW:function aW(a,b,c){this.a=a
 this.b=b
 this.$ti=c},
 h5:function h5(a,b,c){this.a=a
@@ -10283,7 +10283,7 @@ r=$.b0B()
 m.a(s)
 p=p?c:A.dd(B.oy,c,null)
 q=$.b_Q()
-return new A.PM(new A.aX(o,n,n.$ti.h("aX<aM.T>")),new A.aX(s,r,r.$ti.h("aX<aM.T>")),new A.aX(m.a(p),q,A.m(q).h("aX<aM.T>")),new A.zY(e,new A.aaf(a),new A.aag(a,f),null,f.h("zY<0>")),null)},
+return new A.PM(new A.aW(o,n,n.$ti.h("aW<aM.T>")),new A.aW(s,r,r.$ti.h("aW<aM.T>")),new A.aW(m.a(p),q,A.m(q).h("aW<aM.T>")),new A.zY(e,new A.aaf(a),new A.aag(a,f),null,f.h("zY<0>")),null)},
 ay9(a,b,c){var s,r,q,p,o,n,m
 if(a==b)return a
 if(a==null){s=b.a
@@ -11973,7 +11973,7 @@ _.as=m
 _.at=n
 _.ax=o},
 Yj:function Yj(){},
-bcv(a,b){var s,r,q,p,o=A.aY("maxValue")
+bcv(a,b){var s,r,q,p,o=A.aX("maxValue")
 for(s=null,r=0;r<4;++r){q=a[r]
 p=b.$1(q)
 if(s==null||p>s){o.b=q
@@ -17392,7 +17392,7 @@ break}while(!0){if(!!1)break
 s.i(a,r)
 n=b[-1]
 n.gye(n)
-break}m=A.aY("oldKeyedChildren")
+break}m=A.aX("oldKeyedChildren")
 if(p){m.sci(A.v(t.D2,t.bu))
 for(l=m.a,k=0;k<=r;){j=s.i(a,k)
 i=j.d
@@ -20602,7 +20602,7 @@ this.b=b},
 Xk:function Xk(){this.a=$
 this.b=null},
 asA:function asA(){},
-bc1(a){var s=A.aY("parent")
+bc1(a){var s=A.aX("parent")
 a.o9(new A.aJP(s))
 return s.av()},
 rA(a,b){return new A.n7(a,b,null)},
@@ -22921,7 +22921,7 @@ _.$ti=d},
 aNJ(a,b){var s
 if(a.j(0,b))return new A.Os(B.NC)
 s=A.b([],t.fJ)
-a.o9(new A.agV(b,A.aY("debugDidFindAncestor"),A.aO(t.n),s))
+a.o9(new A.agV(b,A.aX("debugDidFindAncestor"),A.aO(t.n),s))
 return new A.Os(s)},
 eh:function eh(){},
 agV:function agV(a,b,c,d){var _=this
@@ -22943,7 +22943,7 @@ b5v(a,b){var s,r,q,p,o,n,m,l=b.a,k=a.R(0,l),j=b.b,i=j.R(0,l),h=b.d,g=h.R(0,l),f=
 if(0<=f&&f<=e&&0<=d&&d<=c)return a
 s=b.c
 r=[A.ah1(a,l,j),A.ah1(a,j,s),A.ah1(a,s,h),A.ah1(a,h,l)]
-q=A.aY("closestOverall")
+q=A.aX("closestOverall")
 for(l=a.a,p=1/0,o=0;o<4;++o){n=r[o]
 j=n.a
 m=Math.sqrt(Math.pow(l[0]-j[0],2)+Math.pow(l[1]-j[1],2))
@@ -23720,11 +23720,11 @@ m.b=l
 r=A.dd(B.d7,l,q)
 r.a.S(0,m.gfF())
 t.m.a(r)
-p=p.h("aX<aM.T>")
+p=p.h("aW<aM.T>")
 m.r!==$&&A.cb()
-m.r=new A.aX(r,o,p)
+m.r=new A.aW(r,o,p)
 m.x!==$&&A.cb()
-m.x=new A.aX(r,n,p)
+m.x=new A.aW(r,n,p)
 p=c.xj(m.gaqZ())
 m.y!==$&&A.cb()
 m.y=p
@@ -25565,7 +25565,7 @@ _.c=c
 _.a=d},
 bd0(a,b,c){var s={}
 s.a=null
-return new A.aKw(s,A.aY("arg"),a,b,c)},
+return new A.aKw(s,A.aX("arg"),a,b,c)},
 zB:function zB(a,b,c,d,e,f,g,h){var _=this
 _.c=a
 _.d=b
@@ -27532,7 +27532,7 @@ qM:function qM(a){this.a=a},
 fO:function fO(a,b){this.c=a
 this.a=b},
 aQi(a,b,c,d,e,f){return A.es(!0,new A.aLZ(e,f,d,c),a,!0,t.H)},
-aW(a,b){A.aQi(a,!0,B.oK,null,b,null)},
+b_(a,b){A.aQi(a,!0,B.oK,null,b,null)},
 aLX(a,b){var s={}
 s.a=null
 switch(b.a){case 0:s.a="Vuoi davvero eliminare questa pagina?"
@@ -30969,7 +30969,7 @@ s=4
 return A.j(o.EB(0),$async$B5)
 case 4:case 1:return A.r(q,r)}})
 return A.t($async$B5,r)},
-bbj(a,b){var s,r,q,p,o=A.aY("bestMatch")
+bbj(a,b){var s,r,q,p,o=A.aX("bestMatch")
 for(s=b.a,s=A.fV(s,s.r,b.$ti.c),r=null;s.p();){q=s.d
 p=A.bbm(a,q)
 if(r==null||p<r){o.b=q
@@ -33835,7 +33835,7 @@ if(h==null?$.c5==null:h===$.c5)A.P(A.kN($.c5.a))
 g=h.a
 if(g===$){f=A.b([],p)
 e=A.b([],l)
-h.a!==$&&A.aZ()
+h.a!==$&&A.aY()
 g=h.a=new A.yZ(A.aO(q),f,e,A.v(q,k))}d=g.d.i(0,i)
 if(d!=null)B.b.A(m,d)}a1=n.length
 c=A.bg(a1,!1,!1,t.y)
@@ -33865,7 +33865,7 @@ if(f==null?$.c5==null:f===$.c5)A.P(A.kN($.c5.a))
 e=f.a
 if(e===$){d=A.b([],k)
 c=A.b([],j)
-f.a!==$&&A.aZ()
+f.a!==$&&A.aY()
 e=f.a=new A.yZ(A.aO(l),d,c,A.v(l,i))}b=e.d.i(0,g)
 if(b==null){$.eG().$1("A fallback font was registered but we cannot retrieve the typeface for it.")
 continue}for(f=J.ab(b);f.p();){d=f.gG(f).getGlyphIDs(p)
@@ -34672,7 +34672,7 @@ A.PD.prototype={}
 A.nZ.prototype={
 gJw(){var s,r=this,q=r.d
 if(q===$){s=A.bdb(r.c)
-r.d!==$&&A.aZ()
+r.d!==$&&A.aY()
 r.d=s
 q=s}return q},
 v(a,b){var s,r,q,p=this.gJw().length-1
@@ -34865,7 +34865,7 @@ case 1:return A.r(q,r)}})
 return A.t($async$lq,r)},
 uz(a,b){var s,r,q,p=A.mD(),o=p.c
 if(o===$){s=A.bG(self.document,"flt-canvas-container")
-p.c!==$&&A.aZ()
+p.c!==$&&A.aY()
 o=p.c=new A.mC(s)}p=o.Lu(new A.T(a,b)).a
 s=p.getCanvas()
 s.clear(A.aKd($.a7b(),B.Y))
@@ -34926,13 +34926,13 @@ gagg(){var s,r,q,p=this.a
 if(p===$){s=t.N
 r=A.b([],t.LX)
 q=A.b([],t.Pc)
-this.a!==$&&A.aZ()
+this.a!==$&&A.aY()
 p=this.a=new A.yZ(A.aO(s),r,q,A.v(s,t.gS))}return p},
 gtK(){var s,r,q,p=this.a
 if(p===$){s=t.N
 r=A.b([],t.LX)
 q=A.b([],t.Pc)
-this.a!==$&&A.aZ()
+this.a!==$&&A.aY()
 p=this.a=new A.yZ(A.aO(s),r,q,A.v(s,t.gS))}return p},
 gFi(){var s=this.c
 return s===$?this.c=new A.akW(new A.aa0(),A.b([],t.b)):s},
@@ -35284,7 +35284,7 @@ A.P6.prototype={}
 A.Ca.prototype={
 gPF(){var s,r=this,q=r.dy
 if(q===$){s=new A.a9y(r).$0()
-r.dy!==$&&A.aZ()
+r.dy!==$&&A.aY()
 r.dy=s
 q=s}return q},
 ghm(a){return this.f},
@@ -35313,7 +35313,7 @@ case B.m6:A.aUU(b2,!1)
 break}if(a6!=null){s=a6.Jx("-")
 b2.locale=s}q=g.dx
 if(q===$){p=A.aPE(g.x,g.y)
-g.dx!==$&&A.aZ()
+g.dx!==$&&A.aY()
 g.dx=p
 q=p}A.aUS(b2,q)
 if(a!=null||a0!=null)b2.fontStyle=A.aQm(a,a0)
@@ -36397,7 +36397,7 @@ else n.fillText(a,b,c)}n.restore()}if(e===B.ae)n.strokeText(a,b,c)
 else A.b40(n,a,b,c)},
 ix(a,b){var s,r,q,p,o,n,m,l,k=this
 if(a.d&&k.d.y!=null&&!k.as&&!k.ch.d){s=a.w
-if(s===$){s!==$&&A.aZ()
+if(s===$){s!==$&&A.aY()
 s=a.w=new A.as7(a)}s.aK(k,b)
 return}r=A.aYd(a,b,null)
 q=k.d
@@ -38894,7 +38894,7 @@ break}}}}
 A.ag2.prototype={
 ga28(){return"html"},
 gtK(){var s=this.a
-if(s===$){s!==$&&A.aZ()
+if(s===$){s!==$&&A.aY()
 s=this.a=new A.ag1()}return s},
 mi(a){A.hM(new A.ag3())
 $.b5g.b=this},
@@ -39742,7 +39742,7 @@ s=1
 break
 case 1:return A.r(q,r)}})
 return A.t($async$jw,r)},
-S9(a){var s,r,q={},p=A.bG(self.document,"img"),o=A.aY("errorListener")
+S9(a){var s,r,q={},p=A.bG(self.document,"img"),o=A.aX("errorListener")
 q.a=null
 s=t.e
 o.b=s.a(A.bB(new A.afY(q,p,o,a)))
@@ -39908,7 +39908,7 @@ if(o===$){s=$.eQ()
 r=t.S
 q=s===B.c8||s===B.aW
 s=A.b5J(s)
-p.a!==$&&A.aZ()
+p.a!==$&&A.aY()
 o=p.a=new A.ahs(p.gams(),q,s,A.v(r,r),A.v(r,t.M))}return o},
 QJ(a,b,c){var s=t.e.a(A.bB(new A.ahp(c)))
 this.b.l(0,b,s)
@@ -40251,7 +40251,7 @@ if(s==null)s=t.K.a(s)}A.H(q,"replaceState",[s,c,r])},
 uW(a,b){var s=self.window.history
 s.go(b)
 return this.as7()},
-as7(){var s=new A.af($.ae,t.V),r=A.aY("unsubscribe")
+as7(){var s=new A.af($.ae,t.V),r=A.aX("unsubscribe")
 r.b=this.Ct(0,new A.aeK(r,new A.aR(s,t.gR)))
 return s}}
 A.aeL.prototype={
@@ -40317,11 +40317,11 @@ n.width=a
 n.height=b
 o=new A.af($.ae,t.NT)
 m=new A.oV(o,t.C8)
-l=A.aY("errorListener")
+l=A.aX("errorListener")
 k=t.e
 l.sci(k.a(A.bB(new A.acp(m,n,l))))
 A.d7(n,"error",l.av(),null)
-j=A.aY("loadListener")
+j=A.aX("loadListener")
 j.sci(k.a(A.bB(new A.acq(m,n,a,b,j))))
 A.d7(n,"load",j.av(),null)
 q=o
@@ -40343,7 +40343,7 @@ $S:1}
 A.Rl.prototype={
 gUK(){var s,r=this,q=r.c
 if(q===$){s=t.e.a(A.bB(r.gamm()))
-r.c!==$&&A.aZ()
+r.c!==$&&A.aY()
 r.c=s
 q=s}return q},
 amn(a){var s,r,q,p=a.matches
@@ -40628,7 +40628,7 @@ A.H(o,"setAttribute",["slot",n==null?t.K.a(n):n])
 n=p.c
 s=p.a.a.i(0,n)
 s.toString
-r=A.aY("content")
+r=A.aX("content")
 q=p.d
 if(t._X.b(s))r.b=s.$2$params(q,p.e)
 else r.b=t.Ek.a(s).$1(q)
@@ -41765,7 +41765,7 @@ g=q==null
 p=g||A.aM6(q)===B.C4
 if(r&&p&&i.p3===0&&i.p4===0){A.ap8(h)
 if(s!=null)A.ap8(s)
-return}o=A.aY("effectiveTransform")
+return}o=A.aX("effectiveTransform")
 if(!r)if(g){g=i.y
 n=g.a
 m=g.b
@@ -42021,7 +42021,7 @@ if((s==null?$.fg=A.ny():s).w)return!0
 if(++j.c>=20)return j.d=!0
 if(!J.eR(B.U2.a,a.type))return!0
 if(j.a!=null)return!1
-r=A.aY("activationPoint")
+r=A.aX("activationPoint")
 switch(a.type){case"click":r.sci(new A.CM(a.offsetX,a.offsetY))
 break
 case"touchstart":case"touchend":s=t.VA
@@ -42554,12 +42554,12 @@ ga06(a){return this.ghe().w},
 gZH(){return this.ghe().x},
 ghe(){var s,r=this,q=r.r
 if(q===$){s=A.b([],t.OB)
-r.r!==$&&A.aZ()
+r.r!==$&&A.aY()
 q=r.r=new A.qQ(r,s,B.G)}return q},
 h1(a){var s=this
 a=new A.qb(Math.floor(a.a))
 if(a.j(0,s.f))return
-A.aY("stopwatch")
+A.aX("stopwatch")
 s.ghe().aB7(a)
 s.e=!0
 s.f=a
@@ -42575,13 +42575,13 @@ s=t.OB
 r=0
 while(!0){q=a7.r
 if(q===$){p=A.b([],s)
-a7.r!==$&&A.aZ()
+a7.r!==$&&A.aY()
 o=a7.r=new A.qQ(a7,p,B.G)
 n=o
 q=n}else n=q
 if(!(r<q.y.length))break
 if(n===$){p=A.b([],s)
-a7.r!==$&&A.aZ()
+a7.r!==$&&A.aY()
 q=a7.r=new A.qQ(a7,p,B.G)}else q=n
 for(p=q.y[r].w,m=p.length,l=0;l<p.length;p.length===m||(0,A.L)(p),++l){k=p[l]
 if(k.gmk())continue
@@ -42668,13 +42668,13 @@ return new A.cw(A.aVI(B.a1N,r,s+1),A.aVI(B.a1M,r,s))},
 G7(a){var s,r,q,p,o,n=this,m=a.a,l=t.OB,k=0
 while(!0){s=n.r
 if(s===$){r=A.b([],l)
-n.r!==$&&A.aZ()
+n.r!==$&&A.aY()
 q=n.r=new A.qQ(n,r,B.G)
 p=q
 s=p}else p=s
 if(!(k<s.y.length-1))break
 if(p===$){r=A.b([],l)
-n.r!==$&&A.aZ()
+n.r!==$&&A.aY()
 s=n.r=new A.qQ(n,r,B.G)}else s=p
 o=s.y[k]
 if(m>=o.b&&m<o.c)break;++k}o=n.ghe().y[k]
@@ -43033,7 +43033,7 @@ m=k.nx$
 m===$&&A.a()
 l=k.d
 l.toString
-k.nz$!==$&&A.aZ()
+k.nz$!==$&&A.aY()
 j=k.nz$=new A.h0(s.a.r+r,q.w-p,q.r+o,n.a.w+m,l)}return j},
 a2B(){var s,r,q,p,o,n,m,l,k,j,i=this,h=i.hk$
 h===$&&A.a()
@@ -43154,7 +43154,7 @@ return s},
 lB(a,b){throw A.c(A.bJ("Cannot split an EllipsisFragment"))}}
 A.qQ.prototype={
 gPI(){var s=this.Q
-if(s===$){s!==$&&A.aZ()
+if(s===$){s!==$&&A.aY()
 s=this.Q=new A.Wm(this.a)}return s},
 aB7(a2){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0=this,a1=a2.a
 a0.b=a1
@@ -43169,7 +43169,7 @@ q=A.aTq(r,a0.gPI(),0,A.b([],t.cN),0,a1)
 p=a0.as
 if(p===$){a1=r.c
 a1===$&&A.a()
-p!==$&&A.aZ()
+p!==$&&A.aY()
 p=a0.as=new A.ahK(r.a,a1)}o=p.E1()
 B.b.ab(o,a0.gPI().gazC())
 $label0$0:for(n=0;n<o.length;++n){m=o[n]
@@ -43493,7 +43493,7 @@ r=s.dy
 if(r===$){q=s.gZX()
 p=s.at
 if(p==null)p=14
-s.dy!==$&&A.aZ()
+s.dy!==$&&A.aY()
 r=s.dy=new A.vk(q,p,s.ch,null,null)}o=$.aq5.i(0,r)
 if(o==null){o=new A.zt(r,$.b_h(),new A.arx(A.bG(self.document,"flt-paragraph")))
 $.aq5.l(0,r,o)}this.b=o},
@@ -43522,7 +43522,7 @@ j=i==null?j.b=j.a.getBoundingClientRect():i
 l=j.height
 j=$.cW()
 if(j===B.c0&&!0)++l
-p.r!==$&&A.aZ()
+p.r!==$&&A.aY()
 m=p.r=l}j=k.b
 a.zD(k,s,m-j.grK(j),o,n)}},
 a_A(a,b,c,d){var s,r,q,p,o,n,m
@@ -43708,7 +43708,7 @@ if(this===b)return!0
 return b instanceof A.vk&&b.gt(b)===this.gt(this)},
 gt(a){var s,r=this,q=r.f
 if(q===$){s=A.N(r.a,r.b,r.c,null,null,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a)
-r.f!==$&&A.aZ()
+r.f!==$&&A.aY()
 r.f=s
 q=s}return q}}
 A.arx.prototype={}
@@ -43746,17 +43746,17 @@ A.aSt(o," ")
 s.append(o)
 r.b=null
 j.b.a.append(s)
-j.d!==$&&A.aZ()
+j.d!==$&&A.aY()
 j.d=s
 i=s}return i},
 grK(a){var s,r=this,q=r.f
 if(q===$){q=r.c
 if(q===$){s=A.bG(self.document,"div")
 r.gTN().append(s)
-r.c!==$&&A.aZ()
+r.c!==$&&A.aY()
 r.c=s
 q=s}q=q.getBoundingClientRect().bottom
-r.f!==$&&A.aZ()
+r.f!==$&&A.aY()
 r.f=q}return q}}
 A.xl.prototype={
 H(){return"FragmentFlow."+this.b}}
@@ -43798,17 +43798,17 @@ A.a8x.prototype={}
 A.Py.prototype={
 gRO(){var s,r=this,q=r.cL$
 if(q===$){s=t.e.a(A.bB(r.gahs()))
-r.cL$!==$&&A.aZ()
+r.cL$!==$&&A.aY()
 r.cL$=s
 q=s}return q},
 gRP(){var s,r=this,q=r.cu$
 if(q===$){s=t.e.a(A.bB(r.gahu()))
-r.cu$!==$&&A.aZ()
+r.cu$!==$&&A.aY()
 r.cu$=s
 q=s}return q},
 gRN(){var s,r=this,q=r.E$
 if(q===$){s=t.e.a(A.bB(r.gahq()))
-r.E$!==$&&A.aZ()
+r.E$!==$&&A.aY()
 r.E$=s
 q=s}return q},
 Co(a){A.d7(a,"compositionstart",this.gRO(),null)
@@ -44459,7 +44459,7 @@ $0(){$.bu().h5(this.a,B.ai.cQ([!0]))},
 $S:0}
 A.agi.prototype={
 gx3(a){var s=this.a
-if(s===$){s!==$&&A.aZ()
+if(s===$){s!==$&&A.aY()
 s=this.a=new A.ary(this)}return s},
 glC(){var s,r,q,p,o=this,n=null,m=o.f
 if(m===$){s=$.fg
@@ -44472,7 +44472,7 @@ else if(s===B.T)p=new A.anP(o,A.b([],t.Up),$,$,$,n)
 else{if(s===B.c_){q=$.eQ()
 q=q===B.ii}else q=!1
 if(q)p=new A.a7D(o,A.b([],t.Up),$,$,$,n)
-else p=s===B.c0?new A.ad0(o,A.b([],t.Up),$,$,$,n):A.b4Y(o)}r=p}o.f!==$&&A.aZ()
+else p=s===B.c0?new A.ad0(o,A.b([],t.Up),$,$,$,n):A.b4Y(o)}r=p}o.f!==$&&A.aY()
 m=o.f=r}return m},
 aqs(){var s,r,q=this
 q.c=!0
@@ -44724,7 +44724,7 @@ s.b.removeEventListener(s.a,s.c)
 this.b.aW(0)},
 ga1c(a){var s=this.b
 return new A.ic(s,A.m(s).h("ic<1>"))},
-t2(){var s,r=null,q=A.aY("windowInnerWidth"),p=A.aY("windowInnerHeight"),o=self.window.visualViewport,n=$.d4().x
+t2(){var s,r=null,q=A.aX("windowInnerWidth"),p=A.aX("windowInnerHeight"),o=self.window.visualViewport,n=$.d4().x
 if(n==null){s=self.window.devicePixelRatio
 n=s===0?1:s}if(o!=null){s=$.eQ()
 if(s===B.aW){o=self.document.documentElement.clientWidth
@@ -44748,7 +44748,7 @@ p.b=o*n}return new A.T(q.av(),p.av())},
 YN(a,b){var s,r,q,p=$.d4().x
 if(p==null){s=self.window.devicePixelRatio
 p=s===0?1:s}s=self.window.visualViewport
-r=A.aY("windowInnerHeight")
+r=A.aX("windowInnerHeight")
 if(s!=null){q=$.eQ()
 if(q===B.aW&&!b)r.b=self.document.documentElement.clientHeight*p
 else{s=s.height
@@ -49904,28 +49904,28 @@ r=o.f
 if(r!=null)s=s+"?"+r
 r=o.r
 if(r!=null)s=s+"#"+r
-n!==$&&A.aZ()
+n!==$&&A.aY()
 n=o.w=s.charCodeAt(0)==0?s:s}return n},
 guh(){var s,r,q=this,p=q.x
 if(p===$){s=q.e
 if(s.length!==0&&B.c.af(s,0)===47)s=B.c.bx(s,1)
 r=s.length===0?B.aK:A.Er(new A.Z(A.b(s.split("/"),t.s),A.bdN(),t.cj),t.N)
-q.x!==$&&A.aZ()
+q.x!==$&&A.aY()
 p=q.x=r}return p},
 gt(a){var s,r=this,q=r.y
 if(q===$){s=B.c.gt(r.grz())
-r.y!==$&&A.aZ()
+r.y!==$&&A.aY()
 r.y=s
 q=s}return q},
 gi1(){var s,r=this,q=r.z
 if(q===$){s=r.f
 s=A.aVv(s==null?"":s)
-r.z!==$&&A.aZ()
+r.z!==$&&A.aY()
 q=r.z=new A.lj(s,t.G5)}return q},
 gyO(){var s,r,q=this,p=q.Q
 if(p===$){s=q.f
 r=A.baQ(s==null?"":s)
-q.Q!==$&&A.aZ()
+q.Q!==$&&A.aY()
 q.Q=r
 p=r}return p},
 gze(){return this.b},
@@ -51907,7 +51907,7 @@ bk(a,b){return this.i(a,b)},
 $iac:1,
 $io:1,
 $ix:1}
-A.b_.prototype={
+A.aZ.prototype={
 gdu(a){return new A.QP(a,new A.zU(a))}}
 A.jF.prototype={$ijF:1}
 A.Xb.prototype={
@@ -52544,7 +52544,7 @@ dL(a,b){this.a.dL(a,b)},
 aW(a){return this.a.aW(0)},
 $idH:1}
 A.GY.prototype={
-lZ(a){var s=A.aY("subscription"),r=A.mB(new A.apH(s),null,null,!0,this.$ti.z[1])
+lZ(a){var s=A.aX("subscription"),r=A.mB(new A.apH(s),null,null,!0,this.$ti.z[1])
 s.b=a.h2(new A.apI(this,r),r.gno(r),r.gKN())
 return new A.cT(r,A.m(r).h("cT<1>"))}}
 A.apH.prototype={
@@ -53060,7 +53060,7 @@ j.toString
 if(j==="Apple Computer, Inc."){j=n.d
 j=j!=null&&j>=4294967296}else j=!1
 if(j)throw A.c(A.bJ("Safari cannot handle XFiles larger than 4GB."))
-m=A.aY("request")
+m=A.aX("request")
 p=4
 j=n.c
 j===$&&A.a()
@@ -53645,7 +53645,7 @@ m=$.ks()
 if(m!=null)m.$1(new A.c9(r,q,"animation library",n,null,!1))}}}}
 A.aM.prototype={
 j3(a){return new A.h5(a,this,A.m(this).h("h5<aM.T>"))}}
-A.aX.prototype={
+A.aW.prototype={
 gm(a){var s=this.a
 return this.b.a5(0,s.gm(s))},
 k(a){var s=this.a,r=this.b
@@ -53710,7 +53710,7 @@ s=A.cc(null,B.a6,null,0,p)
 p.e=s
 r=t.m
 q=p.d
-p.f=new A.aX(r.a(new A.aX(r.a(s),new A.iq(B.d7),t.HY.h("aX<aM.T>"))),q,q.$ti.h("aX<aM.T>"))
+p.f=new A.aW(r.a(new A.aW(r.a(s),new A.iq(B.d7),t.HY.h("aW<aM.T>"))),q,q.$ti.h("aW<aM.T>"))
 p.W6()},
 aR(a){this.b0(a)
 this.W6()},
@@ -53871,7 +53871,7 @@ r.w.S(0,q.gJ8())
 r=t.Y
 s=q.f
 q.a.toString
-q.r=new A.aX(A.dd(B.dM,s,null),new A.aK(0,1,r),r.h("aX<aM.T>"))},
+q.r=new A.aW(A.dd(B.dM,s,null),new A.aK(0,1,r),r.h("aW<aM.T>"))},
 n(){var s,r=this
 r.a.d.a=null
 s=r.f
@@ -54026,7 +54026,7 @@ q.toString
 q=A.cO(0,B.d.ea(q),0)
 r.z=B.iX
 r.jB(0,B.ox,q)}}q=r.r
-if(q!=null&&q.a!=null){p=A.aY("animationStatusCallback")
+if(q!=null&&q.a!=null){p=A.aX("animationStatusCallback")
 p.b=new A.ay5(o,p)
 q=p.av()
 r.bf()
@@ -54449,9 +54449,9 @@ s.c7(new A.aj(0,q.b,0,q.d),!0)
 q=k.ae.k3.a
 s=k.aJ.k3.a
 j.a=0
-p=A.aY("toolbarWidth")
+p=A.aX("toolbarWidth")
 o=A.aW5("greatestHeight",new A.aFq())
-n=A.aY("firstPageWidth")
+n=A.aX("firstPageWidth")
 j.b=0
 j.c=-1
 k.b2(new A.aFr(j,k,q+s,n,o,p))
@@ -54936,7 +54936,7 @@ if(this.b!=null)a.ai(0)}}
 A.bn.prototype={
 gB5(){var s,r=this,q=r.c
 if(q===$){s=A.dn(r.$ti.c)
-r.c!==$&&A.aZ()
+r.c!==$&&A.aY()
 r.c=s
 q=s}return q},
 u(a,b){this.b=!0
@@ -55271,7 +55271,7 @@ else if(t.ks.b(a))s.R8$.a3(a)},
 aj8(){if(this.c<=0)this.gVx().eJ(0)},
 gVx(){var s=this,r=s.rx$
 if(r===$){$.a73()
-r!==$&&A.aZ()
+r!==$&&A.aY()
 r=s.rx$=new A.aFX(A.v(t.S,t.GG),B.C,new A.Hh(),B.C,B.C,s.gaiP(),s.gaj7(),B.J7)}return r},
 $iax:1}
 A.ae3.prototype={
@@ -55423,7 +55423,7 @@ gOe(){return this.gcf().dx},
 gou(){return this.gcf().fr},
 gd1(){var s,r=this,q=r.a
 if(q===$){s=A.FC(r.gbK(r),r.gcf().f)
-r.a!==$&&A.aZ()
+r.a!==$&&A.aY()
 r.a=s
 q=s}return q},
 glb(){var s,r,q,p,o=this,n=o.b
@@ -55431,7 +55431,7 @@ if(n===$){s=o.gbK(o)
 r=o.gcf()
 q=o.gcf()
 p=A.uA(s,o.gd1(),r.r,q.f)
-o.b!==$&&A.aZ()
+o.b!==$&&A.aY()
 o.b=p
 n=p}return n}}
 A.YY.prototype={}
@@ -55564,14 +55564,14 @@ A.a4G.prototype={
 gyG(a){return this.e.go},
 gN5(){var s,r=this,q=r.c
 if(q===$){s=A.FC(r.f,r.e.go)
-r.c!==$&&A.aZ()
+r.c!==$&&A.aY()
 r.c=s
 q=s}return q},
 ga1l(){return this.e.id},
 ga0R(){var s,r,q=this,p=q.d
 if(p===$){s=q.e
 r=A.uA(q.f,q.gN5(),s.id,s.go)
-q.d!==$&&A.aZ()
+q.d!==$&&A.aY()
 q.d=r
 p=r}return p},
 gi9(a){return this.e.k1},
@@ -56825,7 +56825,7 @@ lu(a){return A.ao(a).r},
 CJ(a,b,c){switch(A.bR(c.a)){case B.a1:return b
 case B.a5:switch(A.ao(a).r.a){case 3:case 4:case 5:return new A.VC(b,c.b,null)
 case 0:case 1:case 2:return b}break}},
-CI(a,b,c){var s=A.aY("indicator")
+CI(a,b,c){var s=A.aX("indicator")
 A.ao(a)
 A.ao(a)
 s.sci(B.jg)
@@ -58223,7 +58223,7 @@ h.cx=p
 n=c.gm(c)
 m=t.m
 l=t.gD
-h.CW=new A.aX(m.a(p),new A.pS(0,n>>>24&255),l.h("aX<aM.T>"))
+h.CW=new A.aW(m.a(p),new A.pS(0,n>>>24&255),l.h("aW<aM.T>"))
 n=A.cc(i,B.eS,i,i,q)
 n.bf()
 p=n.cB$
@@ -58234,7 +58234,7 @@ h.ch=n
 p=t.Y
 k=$.aZW()
 j=p.h("h5<aM.T>")
-h.ay=new A.aX(m.a(n),new A.h5(k,new A.aK(s*0.3,s+5,p),j),j.h("aX<aM.T>"))
+h.ay=new A.aW(m.a(n),new A.h5(k,new A.aK(s*0.3,s+5,p),j),j.h("aW<aM.T>"))
 q=A.cc(i,B.oQ,i,i,q)
 q.bf()
 j=q.cB$
@@ -58248,7 +58248,7 @@ h.db=q
 o=c.gm(c)
 j=$.aZX()
 l=l.h("h5<aM.T>")
-h.cy=new A.aX(m.a(q),new A.h5(j,new A.pS(o>>>24&255,0),l),l.h("aX<aM.T>"))
+h.cy=new A.aW(m.a(q),new A.h5(j,new A.pS(o>>>24&255,0),l),l.h("aW<aM.T>"))
 e.Cp(h)
 return h}}
 A.DZ.prototype={
@@ -58330,7 +58330,7 @@ r.bG(0)
 m.CW=r
 p=t.Y
 o=t.m
-m.ch=new A.aX(o.a(r),new A.aK(0,l,p),p.h("aX<aM.T>"))
+m.ch=new A.aW(o.a(r),new A.aK(0,l,p),p.h("aW<aM.T>"))
 s=A.cc(n,B.a6,n,n,s)
 s.bf()
 p=s.cB$
@@ -58342,7 +58342,7 @@ q.b=!0
 q.a.push(m.gaku())
 m.cy=s
 q=c.gm(c)
-m.cx=new A.aX(o.a(s),new A.pS(q>>>24&255,0),t.gD.h("aX<aM.T>"))
+m.cx=new A.aW(o.a(s),new A.pS(q>>>24&255,0),t.gD.h("aW<aM.T>"))
 e.Cp(m)
 return m}}
 A.E_.prototype={
@@ -58535,7 +58535,7 @@ h.bG(0)
 s.ch=h
 j=s.e
 j=j.gm(j)
-s.ay=new A.aX(t.m.a(h),new A.pS(0,j>>>24&255),t.gD.h("aX<aM.T>"))
+s.ay=new A.aW(t.m.a(h),new A.pS(0,j>>>24&255),t.gD.h("aW<aM.T>"))
 q.Cp(s)
 e.l(0,a,s)
 g.o7()}else{d.CW=!0
@@ -58674,7 +58674,7 @@ o.b=!1
 B.b.Z(o.a)
 n=o.c
 if(n===$){m=A.dn(o.$ti.c)
-o.c!==$&&A.aZ()
+o.c!==$&&A.aY()
 o.c=m
 n=m}if(n.a>0){n.b=n.c=n.d=n.e=null
 n.a=0}o=p.cB$
@@ -58682,7 +58682,7 @@ o.b=!1
 B.b.Z(o.a)
 n=o.c
 if(n===$){m=A.dn(o.$ti.c)
-o.c!==$&&A.aZ()
+o.c!==$&&A.aY()
 o.c=m
 n=m}if(n.a>0){n.b=n.c=n.d=n.e=null
 n.a=0}p.zN()
@@ -58727,7 +58727,7 @@ if(m===$){r=d.gPC()
 q=t.g
 p=t._
 l=A.a8([B.a_n,new A.cy(r,new A.bn(A.b([],q),p),t.wY),B.a_p,new A.cy(r,new A.bn(A.b([],q),p),t.nz)],t.n,t.od)
-d.w!==$&&A.aZ()
+d.w!==$&&A.aY()
 d.w=l
 m=l}r=d.a.k4
 q=d.gakw()
@@ -59066,7 +59066,7 @@ return B.a7}}q=r.e
 if(q==null&&r.a.r!=null)return r.vx()
 if(r.f==null)r.a.toString
 if(r.a.r!=null){s=t.Y
-return A.bW(B.E,A.b([new A.eZ(new A.aX(r.d,new A.aK(1,0,s),s.h("aX<aM.T>")),!1,q,null),r.vx()],t.p),B.t,B.Q)}return B.a7}}
+return A.bW(B.E,A.b([new A.eZ(new A.aW(r.d,new A.aK(1,0,s),s.h("aW<aM.T>")),!1,q,null),r.vx()],t.p),B.t,B.Q)}return B.a7}}
 A.aAq.prototype={
 $0(){},
 $S:0}
@@ -59365,9 +59365,9 @@ q.toString}d7=q.a
 break
 default:d7=e9}q=d6.e
 q.toString
-t.q.a(q).a=new A.l(d7,0)}d8=A.aY("height")
+t.q.a(q).a=new A.l(d7,0)}d8=A.aX("height")
 d9=new A.aFz(d8)
-e0=A.aY("baseline")
+e0=A.aX("baseline")
 e1=new A.aFy(e0,new A.aFv(s,c8,c9,d4,c1,d5))
 q=e8.E.a
 e2=q.a
@@ -60270,12 +60270,12 @@ $S:12}
 A.aCp.prototype={
 gK8(){var s,r=this,q=r.db
 if(q===$){s=A.ao(r.cy)
-r.db!==$&&A.aZ()
+r.db!==$&&A.aY()
 r.db=s
 q=s}return q},
 gBY(){var s,r=this,q=r.dx
 if(q===$){s=r.gK8()
-r.dx!==$&&A.aZ()
+r.dx!==$&&A.aY()
 q=r.dx=s.p3}return q},
 gz4(){return B.Y},
 glp(){switch(this.c.a){case 1:return this.gBY().y
@@ -60715,10 +60715,10 @@ gOz(){return!1},
 wd(){var s,r=this,q=r.a,p=q.f
 if(p)s=B.eC
 else{s=$.b00()
-s=new A.aX(q.c,s,A.m(s).h("aX<aM.T>"))}r.mc$=s
+s=new A.aW(q.c,s,A.m(s).h("aW<aM.T>"))}r.mc$=s
 p=p?$.b01():$.b02()
 q=q.c
-r.nA$=new A.aX(q,p,A.m(p).h("aX<aM.T>"))
+r.nA$=new A.aW(q,p,A.m(p).h("aW<aM.T>"))
 q.S(0,r.gue())
 r.a.c.fS(r.gud())},
 ao(){var s,r,q,p,o=this
@@ -60762,11 +60762,11 @@ A.a5i.prototype={
 gOz(){return!1},
 wd(){var s,r=this,q=r.a,p=q.e
 if(p){s=$.b04()
-s=new A.aX(q.c,s,A.m(s).h("aX<aM.T>"))}else s=B.eC
+s=new A.aW(q.c,s,A.m(s).h("aW<aM.T>"))}else s=B.eC
 r.mc$=s
 p=p?$.b05():$.b06()
 q=q.c
-r.nA$=new A.aX(q,p,A.m(p).h("aX<aM.T>"))
+r.nA$=new A.aW(q,p,A.m(p).h("aW<aM.T>"))
 q.S(0,r.gue())
 r.a.c.fS(r.gud())},
 ao(){var s,r,q,p,o=this
@@ -61020,7 +61020,7 @@ $S:94}
 A.axW.prototype={
 gar(a){var s,r=this,q=r.r
 if(q===$){s=A.ao(r.f)
-r.r!==$&&A.aZ()
+r.r!==$&&A.aY()
 q=r.r=s.ax}return q.b}}
 A.Mz.prototype={
 n(){var s=this,r=s.c_$
@@ -61086,7 +61086,7 @@ q.b=!0
 q.a.push(n.gajB())
 n.w=m}q=n.r
 if(q.b===q.c)m.bG(0)
-s=A.aY("controller")
+s=A.aX("controller")
 m=n.w
 m.toString
 q=new A.ov()
@@ -61221,22 +61221,22 @@ m=t.m
 m.a(o)
 p=p.d
 m.a(p)
-l=t.HY.h("aX<aM.T>")
+l=t.HY.h("aW<aM.T>")
 k=t.x8
 j=t.jc
 i=t.i
-h=A.aVL(new A.l1(new A.aX(p,new A.iq(new A.pF(B.pG)),l),new A.bn(A.b([],k),j),0),new A.aX(p,new A.iq(B.pG),l),p,0.5,i)
+h=A.aVL(new A.l1(new A.aW(p,new A.iq(new A.pF(B.pG)),l),new A.bn(A.b([],k),j),0),new A.aW(p,new A.iq(B.pG),l),p,0.5,i)
 p=d.a.d
 g=$.b_W()
 m.a(p)
 f=$.b_X()
-e=A.aVL(new A.aX(p,g,g.$ti.h("aX<aM.T>")),new A.l1(new A.aX(p,f,A.m(f).h("aX<aM.T>")),new A.bn(A.b([],k),j),0),p,0.5,i)
+e=A.aVL(new A.aW(p,g,g.$ti.h("aW<aM.T>")),new A.l1(new A.aW(p,f,A.m(f).h("aW<aM.T>")),new A.bn(A.b([],k),j),0),p,0.5,i)
 d.e=A.aRy(h,s,i)
 i=A.aRy(h,q,i)
 d.r=i
-d.w=new A.aX(m.a(i),new A.iq(B.Lk),l)
-d.f=A.aOO(new A.aX(r,new A.aK(1,1,b),b.h("aX<aM.T>")),e,c)
-d.x=A.aOO(new A.aX(o,n,n.$ti.h("aX<aM.T>")),e,c)
+d.w=new A.aW(m.a(i),new A.iq(B.Lk),l)
+d.f=A.aOO(new A.aW(r,new A.aK(1,1,b),b.h("aW<aM.T>")),e,c)
+d.x=A.aOO(new A.aW(o,n,n.$ti.h("aW<aM.T>")),e,c)
 n=d.r
 o=d.gamv()
 n.bf()
@@ -61528,9 +61528,9 @@ return s},
 gaqX(){var s,r,q,p,o,n,m,l=this,k=l.dy
 k===$&&A.a()
 s=k.db
-r=A.aY("dragColor")
-q=A.aY("hoverColor")
-p=A.aY("idleColor")
+r=A.aX("dragColor")
+q=A.aX("hoverColor")
+p=A.aX("idleColor")
 switch(k.a.a){case 1:k=s.a
 o=k>>>16&255
 n=k>>>8&255
@@ -65246,7 +65246,7 @@ h=g}catch(o){s=A.a0(o)
 r=A.aI(o)
 if(d!=null){d.$2(s,r)
 return k}else throw o}j.b=!1
-n=A.aY("pendingImage")
+n=A.aX("pendingImage")
 m=new A.hn(new A.agv(j,l,b,!0,k,n),k,k)
 n.b=new A.a1d(h,m)
 i.l(0,b,n.av())
@@ -66289,7 +66289,7 @@ s=A.f2(r)
 q=!q.b.test(s)}else q=!0
 return q},
 ga1_(){var s=this,r=s.c
-if(r===$){r!==$&&A.aZ()
+if(r===$){r!==$&&A.aY()
 r=s.c=new A.a4W(s.gaqb(),s)}return r}}
 A.a4W.prototype={
 fK(a){var s
@@ -67251,7 +67251,7 @@ a7.jl(B.j7,new A.l(0,i))}if(a7.b.i(0,B.j9)!=null){a7.iD(B.j9,new A.aj(0,l.b,0,e)
 a7.jl(B.j9,B.i)}c=a7.b.i(0,B.ez)!=null&&!a7.at?a7.iD(B.ez,l):B.w
 if(a7.b.i(0,B.ja)!=null){b=a7.iD(B.ja,new A.aj(0,l.b,0,Math.max(0,e-i)))
 a7.jl(B.ja,new A.l((r-b.a)/2,e-b.b))}else b=B.w
-a=A.aY("floatingActionButtonRect")
+a=A.aX("floatingActionButtonRect")
 if(a7.b.i(0,B.jc)!=null){a0=a7.iD(B.jc,m)
 a1=new A.anZ(a0,b,e,q,a7.r,a9,c,a7.w)
 a2=a7.z.oe(a1)
@@ -67357,7 +67357,7 @@ bS(){this.zU()
 this.b5()},
 x7(a){return a.bF(this.aC)},
 UW(a,b,c){var s
-A.aY("debugPreviousCanvasSaveCount")
+A.aX("debugPreviousCanvasSaveCount")
 a.bO(0)
 if(!b.j(0,B.i))a.aB(0,b.a,b.b)
 s=this.k3
@@ -67482,7 +67482,7 @@ r.aJ=a},
 geK(){var s,r,q=this,p=q.ap
 if(p===$){s=$.ai().b3()
 r=$.ba()
-q.ap!==$&&A.aZ()
+q.ap!==$&&A.aY()
 p=q.ap=new A.Jz(q.gam3(),s,B.i,r)}return p},
 gad1(){var s=this,r=s.bR
 if(r==null){r=A.b([],t.xT)
@@ -67738,7 +67738,7 @@ a7.by(B.lF,!0)}}b8=b9.y
 if(b8!=null){b0=b8.er(a6)
 if(b0.a>=b0.c||b0.b>=b0.d)b8=!(a4>=d||a5>=a)
 else b8=!1
-a7.by(B.iC,b8)}b1=A.aY("newChild")
+a7.by(B.iC,b8)}b1=A.aX("newChild")
 b8=b4.nu
 d=b8==null?b5:b8.a!==0
 if(d===!0){b8.toString
@@ -68302,7 +68302,7 @@ l=A.ah(191,o>>>16&255,o>>>8&255,o&255)}if(r||l==null||!i.r)return
 r=A.o9(s,B.SU)
 k=i.z
 if(k===$){j=$.ai().b3()
-i.z!==$&&A.aZ()
+i.z!==$&&A.aY()
 i.z=j
 k=j}k.sar(0,l)
 a.cs(r,k)},
@@ -68435,7 +68435,7 @@ k=s.a(l).e
 if(k==null)k=0
 if(k>0){if(a0)e=a1===p?h-f:g*k
 else e=1/0
-d=A.aY("minChildExtent")
+d=A.aX("minChildExtent")
 l=a1.e
 l.toString
 l=s.a(l).f
@@ -68487,8 +68487,8 @@ a3=r.a
 break}l=a2-a1.c
 a.b4=Math.max(0,-l)
 k=Math.max(0,l)
-j=A.aY("leadingSpace")
-i=A.aY("betweenSpace")
+j=A.aX("leadingSpace")
+i=A.aX("betweenSpace")
 r=A.aXE(a.E,a.aJ,a.ap)
 h=r===!1
 switch(a.N.a){case 0:j.sci(0)
@@ -70271,7 +70271,7 @@ return new A.wv(i,new A.Ov(i,h).b)},
 S6(a,b){var s,r,q,p=this.N
 if(p==null)p=this.N=A.b([],t.NS)
 s=p.length
-r=A.aY("attributedLabel")
+r=A.aX("attributedLabel")
 if(b<s)r.b=p[b]
 else{s=a.b
 if(s==null)s=a.a
@@ -70349,7 +70349,7 @@ a7.by(B.lF,!0)}}b8=b9.y
 if(b8!=null){b0=b8.er(a6)
 if(b0.a>=b0.c||b0.b>=b0.d)b8=!(a4>=d||a5>=a)
 else b8=!1
-a7.by(B.iC,b8)}b1=A.aY("newChild")
+a7.by(B.iC,b8)}b1=A.aX("newChild")
 b8=b4.dw
 d=b8==null?b5:b8.a!==0
 if(d===!0){b8.toString
@@ -70436,7 +70436,7 @@ f=f.gdl()
 i=n?B.iN:B.iO
 h=g.d.a===g.e.a?B.Tx:B.lC
 return new A.qw(new A.v1(o,l,k),new A.v1(j,f,i),h,!0)},
-tm(a){var s=this,r=A.aY("result"),q=s.d,p=s.e,o=a.a
+tm(a){var s=this,r=A.aX("result"),q=s.d,p=s.e,o=a.a
 switch(o.a){case 0:case 1:r.sci(s.arL(t.mb.a(a).b,o===B.fz))
 break
 case 2:s.e=s.d=null
@@ -70487,8 +70487,8 @@ ajc(a){var s,r,q,p,o=this,n=o.b,m=n.eZ(n.hz(a))
 if(o.anN(m))return B.bf
 n.n1(t.k.a(A.B.prototype.ga6.call(n)))
 s=n.E.a.lv(m)
-r=A.aY("start")
-q=A.aY("end")
+r=A.aX("start")
+q=A.aX("end")
 n=m.a
 p=s.b
 if(n>=p)r.b=q.b=new A.bt(n,B.m)
@@ -70589,8 +70589,8 @@ else o=m===j.b?B.cb:B.bf
 return new A.b6(p,o,t.UH)},
 anN(a){var s,r,q,p,o=this
 if(o.d==null||o.e==null)return!1
-s=A.aY("currentStart")
-r=A.aY("currentEnd")
+s=A.aX("currentStart")
+r=A.aX("currentEnd")
 q=o.d
 q.toString
 p=o.e
@@ -73659,7 +73659,7 @@ $ibx:1}
 A.VI.prototype={
 gwq(){var s,r=this.Me$
 if(r===$){s=A.f6($.bu().a.c,t.y)
-this.Me$!==$&&A.aZ()
+this.Me$!==$&&A.aY()
 this.Me$=s
 r=s}return r},
 aeT(){--this.Mf$
@@ -74383,7 +74383,7 @@ break}s=1
 break
 case 1:return A.r(q,r)}})
 return A.t($async$nH,r)},
-abZ(){var s=A.aY("controller")
+abZ(){var s=A.aX("controller")
 s.sci(A.mB(null,new A.api(s),null,!1,t.hz))
 return J.b1R(s.av())},
 aBA(){if(this.z$!=null)return
@@ -74426,7 +74426,7 @@ $ifF:1}
 A.api.prototype={
 $0(){var s=0,r=A.u(t.H),q=this,p,o,n
 var $async$$0=A.p(function(a,b){if(a===1)return A.q(b,r)
-while(true)switch(s){case 0:o=A.aY("rawLicenses")
+while(true)switch(s){case 0:o=A.aX("rawLicenses")
 n=o
 s=2
 return A.j($.w7().pM("NOTICES",!1),$async$$0)
@@ -76191,7 +76191,7 @@ q.b=!1
 B.b.Z(q.a)
 p=q.c
 if(p===$){o=A.dn(q.$ti.c)
-q.c!==$&&A.aZ()
+q.c!==$&&A.aY()
 q.c=o
 p=o}if(p.a>0){p.b=p.c=p.d=p.e=null
 p.a=0}q=r.cB$
@@ -76199,7 +76199,7 @@ q.b=!1
 B.b.Z(q.a)
 p=q.c
 if(p===$){o=A.dn(q.$ti.c)
-q.c!==$&&A.aZ()
+q.c!==$&&A.aY()
 q.c=o
 p=o}if(p.a>0){p.b=p.c=p.d=p.e=null
 p.a=0}r.zN()}this.aaz()},
@@ -76618,7 +76618,7 @@ s=this.f
 r=this.e
 r===$&&A.a()
 a.R1(t.Fw.a(A.b5B(r,s)))},
-aem(a){var s=A.aY("callback"),r=new A.auS(this,a,s)
+aem(a){var s=A.aX("callback"),r=new A.auS(this,a,s)
 s.sci(r)
 return r},
 I(a){var s=this.f,r=this.e
@@ -77460,7 +77460,7 @@ s=n.y1$
 p=n.x1$
 if(p===$){o=new A.Iy(n,r)
 n.gwq().S(0,o.gfF())
-n.x1$!==$&&A.aZ()
+n.x1$!==$&&A.aY()
 n.x1$=o
 p=o}s.aj(p)},
 pD(){this.aat()},
@@ -77691,7 +77691,7 @@ r=q.a
 if(s){r.toString
 s=new A.l(p,0)}else{r.toString
 s=new A.l(0,p)}r=t.Ni
-q.e=new A.aX(t.m.a(o),new A.aK(B.i,s,r),r.h("aX<aM.T>"))},
+q.e=new A.aW(t.m.a(o),new A.aK(B.i,s,r),r.h("aW<aM.T>"))},
 aeQ(a){var s,r,q,p,o=this
 if(o.w===0)return B.mz
 s=a.a
@@ -77933,7 +77933,7 @@ s.b=!0
 s.a.push(r.gama())
 r.e=p}return p},
 gU2(){var s=this.f
-if(s===$){s!==$&&A.aZ()
+if(s===$){s!==$&&A.aY()
 s=this.f=new A.ayH(1,B.Mq,B.cf)}return s},
 giS(){var s=this.y
 s=s==null?null:$.cV().d===s
@@ -78705,7 +78705,7 @@ gX(){var s,r=this,q=r.rx
 if(q===$){s=$.aq.a4$.z.i(0,r.w).ga7()
 s.toString
 t.DW.a(s)
-r.rx!==$&&A.aZ()
+r.rx!==$&&A.aY()
 r.rx=s
 q=s}return q},
 h8(a,b){var s=this,r=s.a,q=r.x
@@ -78934,7 +78934,7 @@ this.j2(s.gdO())
 this.h8(a.a.iv(s),a.c)},
 gKD(){var s,r=this,q=r.y1
 if(q===$){s=A.b([],t.g)
-r.y1!==$&&A.aZ()
+r.y1!==$&&A.aY()
 q=r.y1=new A.Mb(r,new A.bn(s,t._),t.Wp)}return q},
 ak5(a){var s=this.z
 if(s==null)s=null
@@ -78957,10 +78957,10 @@ r=A.b([],s)
 q=t._
 b1=b0.x2
 if(b1===$){p=A.b([],s)
-b0.x2!==$&&A.aZ()
+b0.x2!==$&&A.aY()
 b1=b0.x2=new A.cy(b0.gaoq(),new A.bn(p,q),t.Tx)}o=b0.xr
 if(o===$){p=A.b([],s)
-b0.xr!==$&&A.aZ()
+b0.xr!==$&&A.aY()
 o=b0.xr=new A.cy(b0.garJ(),new A.bn(p,q),t.ZQ)}p=A.b([],s)
 n=A.b([],s)
 m=b0.gadl()
@@ -79049,11 +79049,11 @@ a7.toString
 a7=new A.cy(new A.abz(b0),new A.bn(g,q),t.gv).dX(a7)
 a8=b0.x1
 if(a8===$){s=A.b([],s)
-b0.x1!==$&&A.aZ()
+b0.x1!==$&&A.aY()
 a8=b0.x1=new A.cy(b0.gar9(),new A.bn(s,q),t.j5)}s=b0.c
 s.toString
 a9=A.a8([B.a0p,new A.CJ(!1,new A.bn(r,q)),B.a_V,b1,B.a08,o,B.C7,new A.CG(!0,new A.bn(p,q)),B.iR,new A.cy(b0.gak4(),new A.bn(n,q),t.P0),B.a_u,j,B.a0u,h,B.a_v,e,B.a_j,f,B.a_z,d,B.a_f,c,B.a_l,a,B.a_h,a0,B.a0l,a1,B.a0m,a2,B.a0s,b,B.a_g,a4,B.a0q,k,B.a_k,a3,B.me,new A.cy(b0.gafm(),new A.bn(l,q),t.fn),B.a0r,a5,B.a0o,m,B.a_Y,i,B.a_s,a6,B.a_O,a7,B.a02,a8.dX(s)],t.n,t.od)
-b0.y2!==$&&A.aZ()
+b0.y2!==$&&A.aY()
 b0.y2=a9
 b1=a9}return b1},
 I(a){var s,r,q,p,o,n,m,l,k,j,i,h,g,f=this,e=null
@@ -80347,7 +80347,7 @@ gcv(a){var s,r,q,p=this,o=p.d
 if(o===$){s=p.a.c
 r=A.b([],t.bp)
 q=$.ba()
-p.d!==$&&A.aZ()
+p.d!==$&&A.aY()
 o=p.d=new A.JB(s,!1,!0,!0,!0,null,null,r,q)}return o},
 n(){this.gcv(this).n()
 this.aF()},
@@ -81342,14 +81342,14 @@ ga_G(){var s,r,q=this,p=q.Q
 if(p===$){s=q.f.c
 s.toString
 r=A.aW3(s,$.aq.a4$.z.i(0,q.d.k3))
-q.Q!==$&&A.aZ()
+q.Q!==$&&A.aY()
 q.Q=r
 p=r}return p},
 gFA(){var s,r,q=this,p=q.as
 if(p===$){s=q.r.c
 s.toString
 r=A.aW3(s,$.aq.a4$.z.i(0,q.e.k3))
-q.as!==$&&A.aZ()
+q.as!==$&&A.aY()
 q.as=r
 p=r}return p},
 gcj(){var s,r,q=this,p=q.at
@@ -81358,7 +81358,7 @@ if(s.gEs(s))if(!q.z){s=q.ga_G()
 s=s.gEs(s)
 r=s}else r=!0
 else r=!1
-q.at!==$&&A.aZ()
+q.at!==$&&A.aY()
 p=q.at=r}return p},
 k(a){var s,r,q=this,p=q.a.k(0),o=q.f,n=A.e(o.a.c),m=q.d.b.k(0),l=q.e.b.k(0)
 o=o.k(0)
@@ -81431,7 +81431,7 @@ p===$&&A.a()
 o=$.b_T()
 n=p.gm(p)
 m=A.m(o).h("h5<aM.T>")
-h.d=new A.aX(t.m.a(p),new A.h5(new A.iq(new A.hV(n,1,B.a9)),o,m),m.h("aX<aM.T>"))}}if(s)s=!(isFinite(q.a)&&isFinite(q.b))
+h.d=new A.aW(t.m.a(p),new A.h5(new A.iq(new A.hV(n,1,B.a9)),o,m),m.h("aW<aM.T>"))}}if(s)s=!(isFinite(q.a)&&isFinite(q.b))
 else s=!0
 h.w=s},
 zJ(a,b){var s,r,q,p=this
@@ -81525,7 +81525,7 @@ n=$.aq.a4$.z.i(0,b0.k3)
 m=n!=null?A.aSZ(n,b3,s):B.w4
 l=$.aq.a4$.z.i(0,b1.k3)
 k=l!=null?A.aSZ(l,b3,s):B.w4
-for(s=m.gfa(m),s=s.gah(s),r=a9.gaeF(),p=a9.a,j=a9.b,i=a9.gahW(),h=t.x8,g=t.jc,f=t.b,e=t.fy,d=t.Y,c=t.m,b=d.h("aX<aM.T>"),a=t.k2;s.p();){a0=s.gG(s)
+for(s=m.gfa(m),s=s.gah(s),r=a9.gaeF(),p=a9.a,j=a9.b,i=a9.gahW(),h=t.x8,g=t.jc,f=t.b,e=t.fy,d=t.Y,c=t.m,b=d.h("aW<aM.T>"),a=t.k2;s.p();){a0=s.gG(s)
 a1=a0.a
 a2=a0.b
 a3=k.i(0,a1)
@@ -81551,7 +81551,7 @@ a0=a5.gjQ(a5)
 a6=a4.f
 a6=a6.gjQ(a6)
 a6=a6.gm(a6)
-a7.saG(0,new A.aX(c.a(a0),new A.aK(a6,1,d),b))
+a7.saG(0,new A.aW(c.a(a0),new A.aK(a6,1,d),b))
 a0=a4.f
 a6=a0.f
 a7=a5.r
@@ -81901,7 +81901,7 @@ A.RN.prototype={}
 A.xC.prototype={
 goD(){var s,r=this,q=r.d
 if(q===$){s=A.cc(null,r.a.d,null,null,r)
-r.d!==$&&A.aZ()
+r.d!==$&&A.aY()
 r.d=s
 q=s}return q},
 geA(){var s,r=this,q=r.e
@@ -82112,7 +82112,7 @@ A.Y8.prototype={
 mh(a){this.z=t.ir.a(a.$3(this.z,this.a.w,new A.auf()))},
 LT(){var s=this.geA(),r=this.z
 r.toString
-this.Q=new A.aX(t.m.a(s),r,A.m(r).h("aX<aM.T>"))},
+this.Q=new A.aW(t.m.a(s),r,A.m(r).h("aW<aM.T>"))},
 I(a){var s=this.Q
 s===$&&A.a()
 return new A.eZ(s,!1,this.a.r,null)}}
@@ -82256,7 +82256,7 @@ return new A.C(0,0,0+s.a,0+s.b)},
 rd(a3,a4){var s,r,q,p,o,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2=this
 if(a4.j(0,B.i)){s=new A.aC(new Float64Array(16))
 s.az(a3)
-return s}r=A.aY("alignedTranslation")
+return s}r=A.aX("alignedTranslation")
 if(a2.Q!=null){a2.a.toString
 switch(3){case 3:r.sci(a4)
 break}}else r.sci(a4)
@@ -82478,7 +82478,7 @@ s=p.gtG()
 m=o.gtG()
 l=t.Ni
 k=A.dd(B.d7,h.y,null)
-h.r=new A.aX(k,new A.aK(new A.l(q,r),new A.l(s,m),l),l.h("aX<aM.T>"))
+h.r=new A.aW(k,new A.aK(new A.l(q,r),new A.l(s,m),l),l.h("aW<aM.T>"))
 h.y.e=A.cO(0,B.d.aL(n*1000),0)
 k.S(0,h.gB6())
 h.y.bG(0)}else if(s===B.j2){s=a.b
@@ -82492,7 +82492,7 @@ n=A.aX6(r,0.0000135,0.1)
 s=i.ex(0,n)
 r=t.Y
 q=A.dd(B.d7,h.z,null)
-h.w=new A.aX(q,new A.aK(j,s,r),r.h("aX<aM.T>"))
+h.w=new A.aW(q,new A.aK(j,s,r),r.h("aW<aM.T>"))
 h.z.e=A.cO(0,B.d.aL(n*1000),0)
 q.S(0,h.gBa())
 h.z.bG(0)}},
@@ -83279,7 +83279,7 @@ o=new A.aT(r,q,p.h("aT<1>"))
 if(!o.gah(o).p())s.n()
 else{m.a=o.gq(o)
 for(s=B.b.gah(r),p=new A.hz(s,q,p.h("hz<1>"));p.p();){r=s.gG(s)
-n=A.aY("listener")
+n=A.aX("listener")
 q=new A.aGb(m,this,r,n)
 n.b=q
 r.d.S(0,q)}}},
@@ -83843,7 +83843,7 @@ ac(){return new A.At(B.k)}}
 A.At.prototype={
 gwf(){var s,r=this,q=r.f
 if(q===$){s=r.HO(!1)
-r.f!==$&&A.aZ()
+r.f!==$&&A.aY()
 r.f=s
 q=s}return q},
 HO(a){return this.aen(a)},
@@ -84084,7 +84084,7 @@ if(m==null)l=null
 else{m=m.d.a
 k=m.r
 if(k===$){j=m.HO(!0)
-m.r!==$&&A.aZ()
+m.r!==$&&A.aY()
 m.r=j
 k=j}l=new A.e4(k.a(),k.$ti.h("e4<1>"))}r=l!=null?4:5
 break
@@ -84430,8 +84430,8 @@ n=A.dd(B.d7,p,l)
 n.a.S(0,q.gfF())
 t.m.a(n)
 q.b!==$&&A.cb()
-q.b=new A.aX(n,r,s.h("aX<aM.T>"))
-m.d!==$&&A.aZ()
+q.b=new A.aW(n,r,s.h("aW<aM.T>"))
+m.d!==$&&A.aY()
 m.d=q
 k=q}return k},
 IH(a){var s,r,q,p,o,n,m,l=this
@@ -85477,7 +85477,7 @@ r=A.ah(0,r>>>16&255,r>>>8&255,r&255)
 q=n.gwU()
 p=t.IC.h("h5<aM.T>")
 t.m.a(s)
-o=new A.NE(n.gwV(),n.gL3(),!0,new A.aX(s,new A.h5(new A.iq(B.b8),new A.fe(r,q),p),p.h("aX<aM.T>")),m)}else o=A.aO2(!0,m,m,n.gwV(),m,n.gL3(),m)
+o=new A.NE(n.gwV(),n.gL3(),!0,new A.aW(s,new A.h5(new A.iq(B.b8),new A.fe(r,q),p),p.h("aW<aM.T>")),m)}else o=A.aO2(!0,m,m,n.gwV(),m,n.gL3(),m)
 s=n.go
 if(s.gbh(s)!==B.b0){s=n.go
 s=s.gbh(s)===B.N}else s=!0
@@ -86801,7 +86801,7 @@ s=Math.max(q+a,s)
 r=r.Q
 r.toString
 return Math.min(s,r)},
-V6(a){var s,r,q=A.aY("delta"),p=$.i0.U$
+V6(a){var s,r,q=A.aX("delta"),p=$.i0.U$
 p===$&&A.a()
 p=p.a
 p=p.gaU(p)
@@ -87848,7 +87848,7 @@ s.z=B.aq
 s.jB(1,B.a9,null)}else{s=r.x
 s===$&&A.a()
 s.dd(0)}}},
-arI(a){var s,r,q,p,o,n=this,m=B.b.gbC(n.r.d),l=A.aY("primaryDeltaFromDragStart"),k=A.aY("primaryDeltaFromLastDragUpdate")
+arI(a){var s,r,q,p,o,n=this,m=B.b.gbC(n.r.d),l=A.aX("primaryDeltaFromDragStart"),k=A.aX("primaryDeltaFromLastDragUpdate")
 switch(m.w.a.c.a){case 0:s=a.b
 l.b=n.d.b-s
 k.b=n.e.b-s
@@ -88314,7 +88314,7 @@ tm(a){var s,r,q,p=this,o=!(a instanceof A.Cd)
 if(!p.z&&o)B.b.ds(p.b,p.gHE())
 p.z=o
 p.x=!0
-s=A.aY("result")
+s=A.aX("result")
 switch(a.a.a){case 0:case 1:p.as=!1
 s.b=p.MA(t.mb.a(a))
 break
@@ -88382,7 +88382,7 @@ break}++n}if(q===-1)return B.ei
 if(b)r.c=q
 else r.d=q
 return o==null?B.cb:o},
-QR(a,b){var s,r,q=this,p=b?q.c:q.d,o=A.aY("currentSelectableResult"),n=null,m=null
+QR(a,b){var s,r,q=this,p=b?q.c:q.d,o=A.aX("currentSelectableResult"),n=null,m=null
 while(!0){s=q.b
 if(!(p<s.length&&p>=0&&n==null))break
 r=o.b=q.hS(s[p],a)
@@ -88487,7 +88487,7 @@ if(J.a_(b)!==A.F(this))return!1
 return A.m(this).h("tY<tY.T>").b(b)&&A.Ng(b.a,this.a)},
 gt(a){var s,r=this,q=r.b
 if(q===$){s=A.b5E(r.a)
-r.b!==$&&A.aZ()
+r.b!==$&&A.aY()
 r.b=s
 q=s}return q}}
 A.Sj.prototype={
@@ -88496,7 +88496,7 @@ gard(){var s,r,q,p=this,o=p.c
 if(o===$){s=p.a.i6(0)
 r=A.m(s).h("j6<1,k>")
 q=A.hq(new A.j6(s,new A.ahV(),r),r.h("o.E"))
-p.c!==$&&A.aZ()
+p.c!==$&&A.aY()
 p.c=q
 o=q}return o},
 XR(a,b){var s,r,q
@@ -90126,7 +90126,7 @@ l.toString
 l=s.hz(l.R(0,s.gf3()))
 k=q.a.eZ(l)
 j=q.a.lv(k)
-i=A.aY("newSelection")
+i=A.aX("newSelection")
 q=j.a
 if(k.a<=q)i.b=A.kb(B.m,q)
 else i.b=A.kb(B.ah,j.b)
@@ -91200,7 +91200,7 @@ H(){return"SignOutScope."+this.b}}
 A.V4.prototype={
 H(){return"RequestMethodType."+this.b}}
 A.Re.prototype={
-ahU(a){var s,r,q,p,o,n,m="charset",l=A.aY("errorRes")
+ahU(a){var s,r,q,p,o,n,m="charset",l=A.aX("errorRes")
 try{q=a.e
 p=a.w
 s=t.P.a(B.a2.bj(0,A.jL(J.a1(A.jJ(q).c.a,m)).bj(0,p)))
@@ -91219,7 +91219,7 @@ if(j!=null)k.l(0,"Authorization","Bearer "+A.e(j))
 o=d.f
 if(o==null){j=t.N
 o=A.v(j,j)}n=A.eA(b,0,null).o_(0,o)
-m=A.aY("response")
+m=A.aX("response")
 j=d.e
 if(j==null){j=t.z
 j=A.v(j,j)}l=B.a2.iy(j)
@@ -91269,7 +91269,7 @@ case 1:return A.r(q,r)}})
 return A.t($async$jp,r)}}
 A.aeq.prototype={
 gTe(){var s=this.d
-if(s===$){s!==$&&A.aZ()
+if(s===$){s!==$&&A.aY()
 s=this.d=new A.Re(this.c)}return s},
 zI(a,b){return this.a6a(a,b)},
 a6a(a,b){var s=0,r=A.u(t.H),q=this,p,o
@@ -91283,7 +91283,7 @@ return A.t($async$zI,r)}}
 A.aer.prototype={}
 A.aes.prototype={
 gqU(){var s=this.w
-if(s===$){s!==$&&A.aZ()
+if(s===$){s!==$&&A.aY()
 s=this.w=new A.Re(this.r)}return s},
 tt(a){return this.awq(a)},
 awq(a){var s=0,r=A.u(t.W8),q,p=this,o,n,m,l,k,j
@@ -93250,7 +93250,7 @@ case 13:k=null
 case 12:l=null
 case 8:n=p.c
 n.toString
-A.aW(n,"Bussata inviata.")
+A.b_(n,"Bussata inviata.")
 s=15
 return A.j(p.BC(a,l,k),$async$kE)
 case 15:s=16
@@ -93335,7 +93335,7 @@ var $async$vY=A.p(function(b,c){if(b===1)return A.q(c,r)
 while(true)switch(s){case 0:i=a.a
 if(!p.cx.v(0,i)){o=p.c
 o.toString
-A.aW(o,"Casa chiusa.")
+A.b_(o,"Casa chiusa.")
 s=1
 break}n=a.b
 i=n==null?i:n
@@ -93359,7 +93359,7 @@ case 6:if(p.c==null){s=1
 break}m=j
 case 4:o=p.c
 if(o==null){s=1
-break}if(m==null){A.aW(o,"Il padrone di casa non ha ancora scelto cosa condividere.")
+break}if(m==null){A.b_(o,"Il padrone di casa non ha ancora scelto cosa condividere.")
 s=1
 break}p.amT(m,a)
 case 1:return A.r(q,r)}})
@@ -93682,7 +93682,7 @@ case 18:case 14:if(n.c==null){s=1
 break}n.J(new A.avC(n,a))
 l=n.c
 l.toString
-A.aW(l,"Casa aperta.")
+A.b_(l,"Casa aperta.")
 case 1:return A.r(q,r)
 case 2:return A.q(o,r)}})
 return A.t($async$kC,r)},
@@ -94045,7 +94045,7 @@ return new A.zR(this.a[b],s.a,s.b,null)},
 $S:538}
 A.awo.prototype={
 $2(a,b){var s=t.Ni
-return A.z2(new A.eZ(b,!1,a,null),new A.aX(b,new A.aK(B.RE,B.i,s),s.h("aX<aM.T>")),null,!0)},
+return A.z2(new A.eZ(b,!1,a,null),new A.aW(b,new A.aK(B.RE,B.i,s),s.h("aW<aM.T>")),null,!0)},
 $S:140}
 A.awr.prototype={
 $0(){A.am(this.a,!1).d2(A.b9(new A.awb(),null,t.z),new A.awc())},
@@ -94444,7 +94444,7 @@ m=s.d
 return A.fi(B.P,new A.cE(new A.aCa(s,A.bH(r,A.bW(B.E,A.b([n,A.bH(r,A.Ie(A.df(r,r,B.ky,40,new A.aCb(s),r,r,"Chiudi",r),m),r,r,r,0,0,r)],t.p),B.t,B.Q),80*o/100,r,10*q/100,10*p/100,0,r)),r),r)},
 amO(a){var s,r,q,p=null,o="1.Grotta delle Rondini",n=u.H,m=u.Z
 $.Nm()
-s=A.aY("page")
+s=A.aX("page")
 switch(a){case 1:s.b=new A.hg(new A.bz("1",o,n,m,1,p,p,p),p)
 break
 case 2:s.b=new A.hg(new A.bz("2","2.Radura delle Bacche",u.s,u.d,2,p,p,p),p)
@@ -94519,7 +94519,7 @@ $1(a){return!1},
 $S:5}
 A.aC6.prototype={
 $2(a,b){var s=null,r=b.b,q=r/2,p=new A.aC9(r),o=p.$2(q+60,70),n=p.$2(q-35,70),m=p.$2(q-190,40),l=p.$2(q+110,70)
-return A.bW(B.E,A.b([A.bH(50,new A.V(s,10,A.bw(s,s,B.j,B.hg,s,s,s,s,s,s,s,s,s,s),s),s,s,0,0,s,s),A.bH(10,A.df(s,s,A.dM("assets/icons/bottle.svg",s,B.J,s,"Bottle",s,s),70,new A.aBY(a),s,40,"Scrivi",s),s,s,o,s,s,s),A.bH(30,new A.e_(!0,s,new A.V(s,20,A.bw(s,s,B.j,B.dL,s,s,s,s,s,s,s,s,s,s),s),s),s,s,0,0,s,s),A.bH(0,new A.e_(!0,s,new A.V(s,30,A.bw(s,s,B.j,B.jP,s,s,s,s,s,s,s,s,s,s),s),s),s,s,0,0,s,s),A.bH(0,A.df(s,s,A.dM("assets/icons/home.svg",B.aj,B.J,40,"Home",s,40),40,new A.aBZ(a),s,1,"Home",s),s,s,m,s,s,s),A.bH(-20,A.df(s,s,A.dM("assets/icons/chest.svg",s,B.J,s,"Chest",s,s),70,new A.aC_(a),s,40,"Apri il tuo Cuore",s),s,s,n,s,s,s),A.bH(-15,A.df(s,s,A.dM("assets/icons/honoo_logo.svg",s,B.J,s,"Logo",s,s),70,new A.aC0(this.a),s,30,"Info",s),s,s,l,s,s,s)],t.p),B.j,B.Q)},
+return A.bW(B.E,A.b([A.bH(50,new A.V(s,10,A.bw(s,s,B.j,B.hg,s,s,s,s,s,s,s,s,s,s),s),s,s,0,0,s,s),A.bH(10,A.df(s,s,A.dM("assets/icons/bottle.svg",s,B.J,s,"Bottle",s,s),70,new A.aBY(a),s,40,"Scrivi",s),s,s,o,s,s,s),A.bH(30,new A.e_(!0,s,new A.V(s,20,A.bw(s,s,B.j,B.dL,s,s,s,s,s,s,s,s,s,s),s),s),s,s,0,0,s,s),A.bH(0,new A.e_(!0,s,new A.V(s,30,A.bw(s,s,B.j,B.jP,s,s,s,s,s,s,s,s,s,s),s),s),s,s,0,0,s,s),A.bH(0,A.df(s,s,A.dM("assets/icons/info.svg",B.aj,B.J,40,"Home",s,40),40,new A.aBZ(a),s,1,"Home",s),s,s,m,s,s,s),A.bH(-20,A.df(s,s,A.dM("assets/icons/chest.svg",s,B.J,s,"Chest",s,s),70,new A.aC_(a),s,40,"Apri il tuo Cuore",s),s,s,n,s,s,s),A.bH(-15,A.df(s,s,A.dM("assets/icons/honoo_logo.svg",s,B.J,s,"Logo",s,s),70,new A.aC0(this.a),s,30,"Info",s),s,s,l,s,s,s)],t.p),B.j,B.Q)},
 $S:31}
 A.aC9.prototype={
 $2(a,b){return B.d.b_(a,0,this.a-b)},
@@ -94734,7 +94734,7 @@ s=5
 break}g=J.d(h,0)?"Nessun nuovo invito da inviare.":"Inviti inviati: "+A.e(h)+"."
 j=m.c
 j.toString
-A.aW(j,g)
+A.b_(j,g)
 n.push(6)
 s=5
 break
@@ -94744,7 +94744,7 @@ f=A.a0(a2)
 j=m.c
 if(j==null){n=[1]
 s=5
-break}A.aW(j,"Errore inviti: "+A.e(f))
+break}A.b_(j,"Errore inviti: "+A.e(f))
 n.push(6)
 s=5
 break
@@ -94762,7 +94762,7 @@ s=p}while(true)switch(s){case 0:if(m.w){s=1
 break}l=B.c.bc(m.d.a.a)
 if(J.aA(l)===0){h=m.c
 h.toString
-A.aW(h,"Inserisci una email.")
+A.b_(h,"Inserisci una email.")
 s=1
 break}m.J(new A.atE(m))
 p=4
@@ -94785,7 +94785,7 @@ case 10:i=a3
 h=m.c
 if(h==null){n=[1]
 s=5
-break}A.aW(h,i?"Invito inviato.":"Invito gi\xe0 presente.")
+break}A.b_(h,i?"Invito inviato.":"Invito gi\xe0 presente.")
 n=[1]
 s=5
 break
@@ -94805,8 +94805,8 @@ s=5
 break}h=J.d(g,0)
 e=m.c
 if(h){e.toString
-A.aW(e,"Invito gi\xe0 presente.")}else{e.toString
-A.aW(e,"Invito inviato.")}n.push(6)
+A.b_(e,"Invito gi\xe0 presente.")}else{e.toString
+A.b_(e,"Invito inviato.")}n.push(6)
 s=5
 break
 case 4:p=3
@@ -94815,7 +94815,7 @@ f=A.a0(a1)
 h=m.c
 if(h==null){n=[1]
 s=5
-break}A.aW(h,"Errore invito: "+A.e(f))
+break}A.b_(h,"Errore invito: "+A.e(f))
 n.push(6)
 s=5
 break
@@ -94997,7 +94997,7 @@ I(a){var s=null,r=this.c
 return A.rE(A.as(""+r,new A.cs(r,t.f3),s,s,s,s,A.eH(B.f,18,B.K),s,s),B.oP,A.B3(),B.a9,B.a9,new A.aG2())}}
 A.aG2.prototype={
 $2(a,b){var s=t.Ni
-return A.hR(A.z2(a,new A.aX(b,new A.aK(B.RL,B.i,s),s.h("aX<aM.T>")),null,!0),B.t,null)},
+return A.hR(A.z2(a,new A.aW(b,new A.aK(B.RL,B.i,s),s.h("aW<aM.T>")),null,!0),B.t,null)},
 $S:568}
 A.Zv.prototype={
 I(a){var s,r,q,p,o=null,n=this.c,m=J.a6(n),l=m.i(n,"chest_honoo")
@@ -95128,7 +95128,7 @@ g=o
 j=A.a0(g)
 h=n.c
 if(h==null){s=1
-break}A.aW(h,"Errore immagine: "+A.e(j))
+break}A.b_(h,"Errore immagine: "+A.e(j))
 s=6
 break
 case 3:s=2
@@ -95178,7 +95178,7 @@ var $async$oQ=A.p(function(a,b){if(a===1){o=b
 s=p}while(true)switch(s){case 0:if(m.w||m.x){s=1
 break}if(m.r==null){h=m.c
 h.toString
-A.aW(h,"Carica prima un'immagine per la tua casa.")
+A.b_(h,"Carica prima un'immagine per la tua casa.")
 s=1
 break}m.J(new A.awy(m))
 p=4
@@ -95217,7 +95217,7 @@ break
 case 13:h=m.c
 if(h==null){n=[1]
 s=5
-break}A.aW(h,"Casa creata.")
+break}A.b_(h,"Casa creata.")
 h=m.c
 h.toString
 A.am(h,!1).d2(A.b9(new A.awB(),null,t.z),new A.awC())
@@ -95643,7 +95643,7 @@ case 8:if(n.c==null){s=1
 break}n.J(new A.awZ(n,a))
 j=n.c
 j.toString
-A.aW(j,"hinoo eliminato.")
+A.b_(j,"hinoo eliminato.")
 p=2
 s=7
 break
@@ -95652,7 +95652,7 @@ i=o
 l=A.a0(i)
 j=n.c
 if(j==null){s=1
-break}A.aW(j,"Errore durante l'eliminazione: "+A.e(l))
+break}A.b_(j,"Errore durante l'eliminazione: "+A.e(l))
 s=7
 break
 case 4:s=2
@@ -95732,7 +95732,7 @@ case 5:s=1
 break
 case 4:if(!a.mG(new A.axd(),new A.axe())){o=p.c
 if(o==null){s=1
-break}A.aW(o,u.o)
+break}A.b_(o,u.o)
 s=1
 break}s=6
 return A.j(p.qQ(a.mG(new A.axf(),new A.axg()),b),$async$oG)
@@ -95767,7 +95767,7 @@ return A.j(J.aRo(f,A.b([new A.x2(e,g)],t.hu),"creato con honoo"),$async$qQ)
 case 9:d=a4
 b=n.c
 if(b==null){s=1
-break}A.aW(b,J.aA(d)!==0?d:"Download avviato.")
+break}A.b_(b,J.aA(d)!==0?d:"Download avviato.")
 p=2
 s=6
 break
@@ -95776,7 +95776,7 @@ a0=o
 c=A.a0(a0)
 b=n.c
 if(b==null){s=1
-break}A.aW(b,"Errore download: "+A.e(c))
+break}A.b_(b,"Errore download: "+A.e(c))
 s=6
 break
 case 3:s=2
@@ -95894,7 +95894,7 @@ return A.j($.Bb().jz(p.b),$async$$0)
 case 3:o=b
 n=p.a.c
 if(n==null){s=1
-break}A.aW(n,o?"Spedito sulla Luna":"Gi\xe0 presente sulla Luna")
+break}A.b_(n,o?"Spedito sulla Luna":"Gi\xe0 presente sulla Luna")
 case 1:return A.r(q,r)}})
 return A.t($async$$0,r)},
 $S:2}
@@ -95919,13 +95919,13 @@ break}if(o!==!0){s=1
 break}n=p.b
 m=n.b
 l=A.be(m==null?n.a:m)
-if(l.length===0){A.aW(j,"Impossibile cancellare: id mancante.")
+if(l.length===0){A.b_(j,"Impossibile cancellare: id mancante.")
 s=1
 break}s=4
 return A.j(k.d.Dm(l),$async$$0)
 case 4:k=k.c
 if(k==null){s=1
-break}A.aW(k,"honoo eliminato.")
+break}A.b_(k,"honoo eliminato.")
 case 1:return A.r(q,r)}})
 return A.t($async$$0,r)},
 $S:2}
@@ -95940,7 +95940,7 @@ case 7:m=b
 j=j.c
 if(j==null){s=1
 break}l=m===B.hK?"hinoo spedito sulla Luna.":"hinoo gi\xe0 presente sulla Luna."
-A.aW(j,l)
+A.b_(j,l)
 p=2
 s=6
 break
@@ -95949,7 +95949,7 @@ h=o
 k=A.a0(h)
 j=n.a.c
 if(j==null){s=1
-break}A.aW(j,"Errore: "+A.e(k))
+break}A.b_(j,"Errore: "+A.e(k))
 s=6
 break
 case 3:s=2
@@ -96152,7 +96152,7 @@ l=B.c.bc(m.d.a.a)
 if(J.aA(l)===0){m.J(new A.ayM(m))
 i=m.c
 if(i==null){s=1
-break}A.aW(i,"Inserisci prima la tua email")
+break}A.b_(i,"Inserisci prima la tua email")
 s=1
 break}p=4
 i=$.aF()
@@ -96182,7 +96182,7 @@ j=A.a0(f)
 i=m.c
 if(i==null){n=[1]
 s=5
-break}A.aW(i,"Errore invio OTP: "+A.e(j))
+break}A.b_(i,"Errore invio OTP: "+A.e(j))
 n.push(6)
 s=5
 break
@@ -96257,14 +96257,14 @@ return A.j(j.FO(n.a.c,m,B.RY),$async$Cf)
 case 6:l=b
 if(l.b==null&&n.c!=null){j=n.c
 j.toString
-A.aW(j,"Codice non valido.")}o.push(5)
+A.b_(j,"Codice non valido.")}o.push(5)
 s=4
 break
 case 3:q=2
 h=p
 k=A.a0(h)
 j=n.c
-if(j!=null)A.aW(j,"Errore verifica: "+A.e(k))
+if(j!=null)A.b_(j,"Errore verifica: "+A.e(k))
 o.push(5)
 s=4
 break
@@ -96319,7 +96319,7 @@ case 11:p=10
 d=o
 k=A.a0(d)
 i=j.c
-if(i!=null)A.aW(i,"Errore salvataggio hinoo: "+A.e(k))
+if(i!=null)A.b_(i,"Errore salvataggio hinoo: "+A.e(k))
 s=13
 break
 case 10:s=2
@@ -96636,7 +96636,7 @@ a9=p
 c=A.a0(a9)
 A.dW().$1("Errore caricamento Moon: "+A.e(c))
 b=o.c
-if(b!=null)A.aW(b,"Errore caricamento Moon: "+A.e(c))
+if(b!=null)A.b_(b,"Errore caricamento Moon: "+A.e(c))
 o.J(new A.aDc(o))
 s=5
 break
@@ -96683,7 +96683,7 @@ return A.j($.Bb().i8(l),$async$wo)
 case 9:k=b
 g=n.c
 if(g==null){s=1
-break}A.aW(g,k?"honoo salvato nello Scrigno.":"Era gi\xe0 nel tuo Scrigno.")
+break}A.b_(g,k?"honoo salvato nello Scrigno.":"Era gi\xe0 nel tuo Scrigno.")
 s=1
 break
 case 8:s=m.b!=null?10:11
@@ -96693,7 +96693,7 @@ s=12
 return A.j(new A.xs().i8(j),$async$wo)
 case 12:g=n.c
 if(g==null){s=1
-break}A.aW(g,"hinoo salvato nello Scrigno.")
+break}A.b_(g,"hinoo salvato nello Scrigno.")
 case 11:p=2
 s=6
 break
@@ -96702,7 +96702,7 @@ f=o
 i=A.a0(f)
 g=n.c
 if(g==null){s=1
-break}A.aW(g,"Errore: "+A.e(i))
+break}A.b_(g,"Errore: "+A.e(i))
 s=6
 break
 case 3:s=2
@@ -96738,7 +96738,7 @@ case 12:case 9:if(n.c==null){s=1
 break}n.J(new A.aD7(n))
 g=n.c
 g.toString
-A.aW(g,"Eliminato dalla Luna.")
+A.b_(g,"Eliminato dalla Luna.")
 p=2
 s=7
 break
@@ -96747,7 +96747,7 @@ f=o
 i=A.a0(f)
 g=n.c
 if(g==null){s=1
-break}A.aW(g,"Errore eliminazione: "+A.e(i))
+break}A.b_(g,"Errore eliminazione: "+A.e(i))
 s=7
 break
 case 4:s=2
@@ -96827,7 +96827,7 @@ case 4:p=3
 k=o
 m=n.c
 if(m==null){s=1
-break}A.aW(m,"Errore salvataggio nello scrigno.")
+break}A.b_(m,"Errore salvataggio nello scrigno.")
 s=6
 break
 case 3:s=2
@@ -96919,7 +96919,7 @@ l=n.b
 o=A.bk(new A.d6(new A.aj(0,m,0,l),A.nm(A.b8(12),new A.V(m,l,new A.nK(g,l,m,B.f,j,j),j)),j),j,j,j)}return new A.b3(new A.an(h,0,h,0),A.rE(new A.iA(o,new A.cs(p,t.kK)),B.c3,A.B3(),B.aJ,B.eO,A.aPU()),j)},
 $S:124}
 A.aD6.prototype={
-$1(a){return B.Kz},
+$1(a){return B.Ky},
 $S:22}
 A.aD7.prototype={
 $0(){var s,r,q=this.a
@@ -96982,7 +96982,7 @@ q=r.h("h5<aM.T>")
 p=t.Ml
 p=A.aVq(A.b([new A.mK(new A.h5(new A.iq(B.dM),new A.aK(1,1.18,r),q),45,p),new A.mK(new A.h5(new A.iq(B.eP),new A.aK(1.18,0.95,r),q),25,p),new A.mK(new A.h5(new A.iq(B.dM),new A.aK(0.95,1,r),q),30,p)],t.x0),t.i)
 o.w!==$&&A.cb()
-o.w=new A.aX(s,p,p.$ti.h("aX<aM.T>"))
+o.w=new A.aW(s,p,p.$ti.h("aW<aM.T>"))
 $.aq.cx$.push(new A.aEa(o))},
 n(){var s=this.r
 s===$&&A.a()
@@ -97013,7 +97013,7 @@ a0=a==null?null:a.pq()
 a1=t.f.b(a0)?t.kc.a(a0.i(0,"pages")):null
 if(a0==null||a1==null||J.dE(a1)){a=n.c
 if(a==null){s=1
-break}A.aW(a,"Completa il tuo hinoo caricando l\u2019immagine e il testo.")
+break}A.b_(a,"Completa il tuo hinoo caricando l\u2019immagine e il testo.")
 s=1
 break}m=n.RY(a0)
 a=$.aF()
@@ -97038,24 +97038,24 @@ return A.j(A.am(a,!1).bv(e),$async$kO)
 case 8:d=a5
 a=n.c
 if(a==null){s=1
-break}if(d===!0)A.aW(a,"Accesso completato. Ora puoi salvare lo hinoo.")
+break}if(d===!0)A.b_(a,"Accesso completato. Ora puoi salvare lo hinoo.")
 case 6:s=1
 break
 case 4:if(J.d(a0.i(0,"isUploadingBg"),!0)||n.Q){a=n.c
 if(a==null){s=1
-break}A.aW(a,u.R)
+break}A.b_(a,u.R)
 s=1
 break}if(B.b.eL(m.a,new A.aDV())){a=n.c
 if(a==null){s=1
-break}A.aW(a,"Per salvare lo hinoo nello Scrigno, conferma prima il caricamento dello sfondo (pulsante OK nello step sfondo).")
+break}A.b_(a,"Per salvare lo hinoo nello Scrigno, conferma prima il caricamento dello sfondo (pulsante OK nello step sfondo).")
 s=1
 break}if(J.d(a0.i(0,"isUploadingBg"),!0)||n.Q){a=n.c
 if(a==null){s=1
-break}A.aW(a,u.R)
+break}A.b_(a,u.R)
 s=1
 break}if(B.b.eL(m.a,new A.aDW()))if(a0.i(0,"bgPreviewBytes")==null){a=n.c
 a.toString
-A.aW(a,"Non siamo riusciti a salvare lo sfondo. Riprova a caricare l'immagine.")
+A.b_(a,"Non siamo riusciti a salvare lo sfondo. Riprova a caricare l'immagine.")
 s=1
 break}a=n.e
 c=a.FM(m)
@@ -97063,7 +97063,7 @@ if(c.length!==0){if(n.c==null){s=1
 break}a=B.b.bg(c,"\n- ")
 e=n.c
 e.toString
-A.aW(e,"Bozza non valida:\n- "+a)
+A.b_(e,"Bozza non valida:\n- "+a)
 s=1
 break}p=10
 e=n.a
@@ -97074,7 +97074,7 @@ return A.j(a.uY(m),$async$kO)
 case 15:l=a5
 a=n.c
 if(a==null){s=1
-break}A.aW(a,"hinoo salvato.")
+break}A.b_(a,"hinoo salvato.")
 a=n.c
 a.toString
 A.am(a,!1).dc(l)
@@ -97102,9 +97102,6 @@ break}n.J(new A.aDY(n))
 e=n.r
 e===$&&A.a()
 e.ka(0,0)
-e=n.c
-e.toString
-A.aW(e,"Questo hinoo \xe8 stato salvato nel tuo Scrigno.")
 e=n.a.d
 s=!e?20:21
 break
@@ -97122,7 +97119,7 @@ case 29:i=a5
 a=n.c
 if(a==null){s=1
 break}h=i===B.hK?"hinoo spedito sulla Luna.":"hinoo gi\xe0 presente sulla Luna."
-A.aW(a,h)
+A.b_(a,h)
 p=10
 s=28
 break
@@ -97131,13 +97128,12 @@ a2=o
 g=A.a0(a2)
 a=n.c
 if(a==null){s=1
-break}A.aW(a,"Errore: "+A.e(g))
+break}A.b_(a,"Errore: "+A.e(g))
 s=28
 break
 case 25:s=10
 break
-case 28:case 24:case 21:n.a.toString
-p=2
+case 28:case 24:case 21:p=2
 s=12
 break
 case 10:p=9
@@ -97145,7 +97141,7 @@ a3=o
 f=A.a0(a3)
 a=n.c
 if(a==null){s=1
-break}A.aW(a,"Errore: "+A.e(f))
+break}A.b_(a,"Errore: "+A.e(f))
 s=12
 break
 case 9:s=2
@@ -97192,7 +97188,7 @@ g=h==null?null:h.pq()
 f=t.f.b(g)?t.kc.a(J.a1(g,"pages")):null
 if(g==null||f==null||J.dE(f)){h=n.c
 if(h==null){s=1
-break}A.aW(h,"Nessun contenuto da pubblicare sulla Luna.")
+break}A.b_(h,"Nessun contenuto da pubblicare sulla Luna.")
 s=1
 break}p=4
 m=n.RY(g)
@@ -97202,7 +97198,7 @@ case 7:l=b
 h=n.c
 if(h==null){s=1
 break}k=l===B.hK?"Pubblicato sulla Luna.":"hinoo gi\xe0 presente sulla Luna."
-A.aW(h,k)
+A.b_(h,k)
 p=2
 s=6
 break
@@ -97211,7 +97207,7 @@ e=o
 j=A.a0(e)
 h=n.c
 if(h==null){s=1
-break}A.aW(h,"Errore: "+A.e(j))
+break}A.b_(h,"Errore: "+A.e(j))
 s=6
 break
 case 3:s=2
@@ -97226,7 +97222,7 @@ AA(){var s=0,r=A.u(t.H),q,p=this,o,n,m
 var $async$AA=A.p(function(a,b){if(a===1)return A.q(b,r)
 while(true)switch(s){case 0:if(p.z<1){o=p.c
 if(o==null){s=1
-break}A.aW(o,u.o)
+break}A.b_(o,u.o)
 s=1
 break}o=$.aF()
 o=o.b
@@ -97251,7 +97247,7 @@ case 1:return A.r(q,r)}})
 return A.t($async$AA,r)},
 XI(a){var s=this.c
 if(s==null)return
-A.aW(s,"Collega API del builder: "+a)},
+A.b_(s,"Collega API del builder: "+a)},
 acC(){var s,r=this,q=null,p=new A.aDO(),o=A.ah(140,0,0,0),n=A.b8(20),m=t.p,l=A.b([],m)
 if(r.y==="writeText")B.b.A(l,A.b([p.$3$icon$onPressed$tooltip(B.kx,r.gahG(),"Salva sul dispositivo"),B.Br],m))
 l.push(p.$3$icon$onPressed$tooltip(B.pw,r.gaeM(),"Svuota hinoo"))
@@ -97295,7 +97291,7 @@ A.aDY.prototype={
 $0(){return this.a.f=!0},
 $S:0}
 A.aDZ.prototype={
-$1(a){return B.KF},
+$1(a){return B.Kz},
 $S:22}
 A.aDP.prototype={
 $1(a){return A.ii(a)},
@@ -97411,17 +97407,17 @@ return A.j(A.am(a2,!1).bv(f),$async$kP)
 case 6:e=a5
 a2=n.c
 if(a2==null){s=1
-break}if(e===!0)A.aW(a2,"Accesso completato. Premi di nuovo OK per salvare.")
+break}if(e===!0)A.b_(a2,"Accesso completato. Premi di nuovo OK per salvare.")
 s=1
 break
 case 4:if(B.c.bc(n.f).length===0){a2=n.c
 if(a2==null){s=1
-break}A.aW(a2,"Scrivi qualcosa prima di salvare.")
+break}A.b_(a2,"Scrivi qualcosa prima di salvare.")
 s=1
 break}a2=n.r
 if(B.c.bc(a2).length===0){a2=n.c
 if(a2==null){s=1
-break}A.aW(a2,"Carica un\u2019immagine prima di salvare.")
+break}A.b_(a2,"Carica un\u2019immagine prima di salvare.")
 s=1
 break}d=n.x
 s=d==null?7:9
@@ -97434,7 +97430,7 @@ case 9:a5=d
 case 8:m=a5
 if(m==null||J.aA(m)===0){a2=n.c
 if(a2==null){s=1
-break}A.aW(a2,"Immagine non valida. Ricaricala e riprova.")
+break}A.b_(a2,"Immagine non valida. Ricaricala e riprova.")
 s=1
 break}c=n.a.c
 if(c==null)c=B.dT
@@ -97452,7 +97448,7 @@ return A.j(A.afV(l),$async$kP)
 case 17:k=a5
 a2=n.c
 if(a2==null){s=1
-break}A.aW(a2,"honoo salvato.")
+break}A.b_(a2,"honoo salvato.")
 a2=n.c
 a2.toString
 A.am(a2,!1).dc(k)
@@ -97462,9 +97458,6 @@ case 16:s=18
 return A.j(A.DJ(l),$async$kP)
 case 18:if(n.c==null){s=1
 break}n.J(new A.aEk(n,m))
-a2=n.c
-a2.toString
-A.aW(a2,"Questo honoo \xe8 stato salvato nel tuo Scrigno.")
 s=n.a.c!==B.dU?19:20
 break
 case 19:a2=n.c
@@ -97486,7 +97479,7 @@ h=A.aI(a3)
 A.dW().$1("publishHonoo failed: "+A.e(i)+"\n"+A.e(h))
 a2=n.c
 if(a2==null){s=1
-break}A.aW(a2,"Errore: "+A.e(i))
+break}A.b_(a2,"Errore: "+A.e(i))
 s=14
 break
 case 11:s=2
@@ -97524,7 +97517,7 @@ return A.j(A.DH(l),$async$rg)
 case 11:k=a1
 g=n.c
 if(g==null){s=1
-break}A.aW(g,k?"Pubblicato sulla Luna.":"Gi\xe0 presente sulla Luna.")
+break}A.b_(g,k?"Pubblicato sulla Luna.":"Gi\xe0 presente sulla Luna.")
 p=2
 s=6
 break
@@ -97534,7 +97527,7 @@ j=A.a0(a)
 i=A.aI(a)
 A.dW().$1("duplicateToMoon failed: "+A.e(j)+"\n"+A.e(i))
 g=n.c
-if(g!=null)A.aW(g,"Errore: "+A.e(j))
+if(g!=null)A.b_(g,"Errore: "+A.e(j))
 s=6
 break
 case 3:s=2
@@ -97546,16 +97539,16 @@ rf(){var s=0,r=A.u(t.H),q,p=this,o,n,m,l,k
 var $async$rf=A.p(function(a,b){if(a===1)return A.q(b,r)
 while(true)switch(s){case 0:if(!p.Q){o=p.c
 if(o==null){s=1
-break}A.aW(o,u.o)
+break}A.b_(o,u.o)
 s=1
 break}n=p.d.gT()
 if(n==null){o=p.c
 o.toString
-A.aW(o,"Impossibile avviare il download.")
+A.b_(o,"Impossibile avviare il download.")
 s=1
 break}if(n.f==null){o=p.c
 o.toString
-A.aW(o,"Inserisci prima un'immagine")
+A.b_(o,"Inserisci prima un'immagine")
 s=1
 break}o=$.aF()
 o=o.b
@@ -97611,7 +97604,7 @@ break}if(B.c.bn(n,"http://")||B.c.bn(n,"https://")){q=n
 s=1
 break}o=B.c.bn(n,"blob:")
 if(o){o=p.c
-if(o!=null)A.aW(o,"Immagine locale (blob) non caricabile dal browser.")
+if(o!=null)A.b_(o,"Immagine locale (blob) non caricabile dal browser.")
 q=null
 s=1
 break}s=3
@@ -97660,7 +97653,7 @@ s.y=s.f
 s.z=s.r},
 $S:0}
 A.aEl.prototype={
-$1(a){return B.Ky},
+$1(a){return B.KF},
 $S:22}
 A.aEd.prototype={
 $1(a){return B.KC},
@@ -97873,7 +97866,7 @@ return A.j(A.DJ(l),$async$wt)
 case 7:i=m.c
 if(i==null){n=[1]
 s=5
-break}A.aW(i,"La tua risposta \xe8 partita.")
+break}A.b_(i,"La tua risposta \xe8 partita.")
 s=8
 return A.j(A.ja(B.eS,t.z),$async$wt)
 case 8:i=m.c
@@ -97890,7 +97883,7 @@ A.dW().$1("Errore invio reply: "+A.e(k))
 i=m.c
 if(i==null){n=[1]
 s=5
-break}A.aW(i,"Errore. Riprova pi\xf9 tardi.")
+break}A.b_(i,"Errore. Riprova pi\xf9 tardi.")
 n.push(6)
 s=5
 break
@@ -98996,7 +98989,7 @@ s=10
 return A.j(j.$0(),$async$lK)
 case 10:if(l.f==null){n=[1]
 s=5
-break}A.aW(l,d)
+break}A.b_(l,d)
 n.push(6)
 s=5
 break
@@ -99009,7 +99002,7 @@ case 11:s=13
 return A.j(j.$0(),$async$lK)
 case 13:if(l.f==null){n=[1]
 s=5
-break}A.aW(l,"Errore download: "+A.e(c))
+break}A.b_(l,"Errore download: "+A.e(c))
 case 12:n.push(6)
 s=5
 break
@@ -99131,13 +99124,13 @@ return A.t($async$Ah,r)},
 ae4(){var s,r=this
 if(r.ax){s=r.c
 s.toString
-A.aW(s,"Attendi il caricamento dello sfondo.")
+A.b_(s,"Attendi il caricamento dello sfondo.")
 return}if(!r.at)if(r.y==null){s=r.z
 s=s==null||s.length===0}else s=!1
 else s=!1
 if(s){s=r.c
 s.toString
-A.aW(s,"Carica l'immagine dello sfondo prima di proseguire.")
+A.b_(s,"Carica l'immagine dello sfondo prima di proseguire.")
 return}r.J(new A.aAC(r))
 r.oO()},
 rj(){var s=0,r=A.u(t.H),q,p=2,o,n=this,m,l,k,j,i,h,g
@@ -99169,7 +99162,7 @@ j=A.a0(g)
 A.dW().$1("Errore cambio sfondo: "+A.e(j))
 if(n.c!=null)n.J(new A.aAT(n))
 i=n.c
-if(i!=null)A.aW(i,"Errore sfondo: "+A.e(j))
+if(i!=null)A.b_(i,"Errore sfondo: "+A.e(j))
 s=6
 break
 case 3:s=2
@@ -99207,7 +99200,7 @@ A.dW().$1("Upload sfondo fallito: "+A.e(i))
 if(n.c!=null){n.J(new A.aAQ(n))
 h=n.c
 h.toString
-A.aW(h,"Caricamento sfondo fallito. Riprova.")}s=6
+A.b_(h,"Caricamento sfondo fallito. Riprova.")}s=6
 break
 case 3:s=2
 break
@@ -99449,7 +99442,7 @@ return B.e.aY(r.a,s.a)},
 $S:613}
 A.afo.prototype={
 $2(a,b){var s=t.Ni
-return A.z2(a,new A.aX(b,new A.aK(B.wh,B.i,s),s.h("aX<aM.T>")),null,!0)},
+return A.z2(a,new A.aW(b,new A.aK(B.wh,B.i,s),s.h("aW<aM.T>")),null,!0)},
 $S:140}
 A.afn.prototype={
 $3(a,b,c){var s,r,q,p,o=null,n=this.b[b],m=this.a,l=new A.nK(n.a,m.e,m.f,B.P,m.w,o)
@@ -99675,7 +99668,7 @@ g=o
 j=A.a0(g)
 i=n.c
 if(i==null){s=1
-break}A.aW(i,"Errore selezione immagine: "+A.e(j))
+break}A.b_(i,"Errore selezione immagine: "+A.e(j))
 s=6
 break
 case 3:s=2
@@ -99751,7 +99744,7 @@ if(m==null||m.length===0){if(p.c==null){s=1
 break}p.J(new A.afy(p))
 o=p.c
 o.toString
-A.aW(o,"Impossibile confermare: PNG non generato.")
+A.b_(o,"Impossibile confermare: PNG non generato.")
 s=1
 break}s=7
 return A.j(A.afQ(m,".png"),$async$qK)
@@ -99760,7 +99753,7 @@ if(l==null||l.length===0){if(p.c==null){s=1
 break}p.J(new A.afz(p))
 o=p.c
 o.toString
-A.aW(o,"Upload immagine finale fallito.")
+A.b_(o,"Upload immagine finale fallito.")
 s=1
 break}if(p.c==null){s=1
 break}p.J(new A.afA(p,l,m))
@@ -99824,20 +99817,20 @@ return A.t($async$qH,r)},
 xy(a,b){return this.avY(a,b)},
 avY(a,b){var s=0,r=A.u(t.H),q,p=this,o,n,m
 var $async$xy=A.p(function(c,d){if(c===1)return A.q(d,r)
-while(true)switch(s){case 0:if(p.f==null){A.aW(a,"Devi prima caricare un\u2019immagine.")
+while(true)switch(s){case 0:if(p.f==null){A.b_(a,"Devi prima caricare un\u2019immagine.")
 s=1
 break}s=3
 return A.j(p.qH(),$async$xy)
 case 3:o=d
 if(o==null||o.length===0){if(a.f==null){s=1
-break}A.aW(a,"Impossibile generare il file PNG.")
+break}A.b_(a,"Impossibile generare il file PNG.")
 s=1
 break}n="honoo_"+Date.now()
 m=B.c.bc(b)
 s=4
 return A.j(new A.Jc().a5f(0,A.b([new A.x2((m.length!==0?m:n)+".png",o)],t.hu)),$async$xy)
 case 4:if(a.f==null){s=1
-break}A.aW(a,"Download avviato.")
+break}A.b_(a,"Download avviato.")
 case 1:return A.r(q,r)}})
 return A.t($async$xy,r)},
 aCa(){var s,r=this
@@ -100085,7 +100078,7 @@ return new A.b3(B.oU,A.bW(B.E,p,B.t,B.Q),r)},
 $S:124}
 A.aBl.prototype={
 $2(a,b){var s=t.Ni
-return A.z2(a,new A.aX(b,new A.aK(B.wh,B.i,s),s.h("aX<aM.T>")),null,!0)},
+return A.z2(a,new A.aW(b,new A.aK(B.wh,B.i,s),s.h("aW<aM.T>")),null,!0)},
 $S:140}
 A.aBf.prototype={
 $1(a){return B.c.jj(B.e.k(a),2,"0")},
@@ -102335,7 +102328,7 @@ p=4
 g=n.d
 if(g==null){g=A.bO("Missing table operation: select, insert, update or delete",null)
 throw A.c(g)}m=g.toUpperCase()
-l=A.aY("response")
+l=A.aX("response")
 g=n.e
 g===$&&A.a()
 j=B.b.v(A.b(["GET","HEAD"],t.s),n.d)
@@ -102526,7 +102519,7 @@ s=1
 break
 s=4
 break
-case 5:l=A.aY("error")
+case 5:l=A.aX("error")
 if(a1.a.a!=="HEAD")try{j=a1.e
 i=a1.w
 k=t.P.a(B.a2.Dg(0,A.jL(J.a1(A.jJ(j).c.a,"charset")).bj(0,i),null))
@@ -102788,7 +102781,7 @@ H(){return"ChannelStates."+this.b}}
 A.hb.prototype={
 H(){return"ChannelEvents."+this.b}}
 A.SG.prototype={
-dn(){var s,r,q,p,o,n,m,l,k,j,i,h,g=this,f=A.aY("processedPayload"),e=t.N,d=t.z
+dn(){var s,r,q,p,o,n,m,l,k,j,i,h,g=this,f=A.aX("processedPayload"),e=t.N,d=t.z
 f.sci(A.v(e,d))
 for(s=g.c,r=A.fV(s,s.r,A.m(s).c),q=t.f,p=f.a;r.p();){o=r.d
 n=s.i(0,o)
@@ -105139,7 +105132,7 @@ q=$.fC.m9$
 q===$&&A.a()
 s=q.bE(0,A.N(this.a,a,b,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a,B.a),new A.adg(c))
 if(s==null){p.f6("Failed to load image")
-return}r=A.aY("listener")
+return}r=A.aX("listener")
 r.b=new A.hn(new A.adh(this,s,r,a,p),null,new A.adi(p,s,r,null))
 s.S(0,r.av())}}
 A.ade.prototype={
@@ -107966,7 +107959,7 @@ if(q===$){s=r.r.b
 s===$&&A.a()
 s=s.a
 s===$&&A.a()
-q!==$&&A.aZ()
+q!==$&&A.aY()
 q=r.w=new A.a_J(r,s)}return q},
 abj(a){var s=this,r=s.f=new A.aR(new A.af($.ae,t.V),t.gR),q=s.a,p=q.readyState
 p.toString
@@ -108090,18 +108083,18 @@ if(q===$){r.gCF(r)
 r.gbm(r)
 s=A.aVm(r.gCF(r),r.gbm(r))
 s=s
-r.Mm$!==$&&A.aZ()
+r.Mm$!==$&&A.aY()
 q=r.Mm$=s}return q},
 gazo(){var s,r,q,p,o=this
 o.gCF(o)
 o.gbm(o)
 s=o.Mk$
 if(s===$){r=o.gUg()[0]
-o.Mk$!==$&&A.aZ()
+o.Mk$!==$&&A.aY()
 o.Mk$=r
 s=r}q=o.Ml$
 if(q===$){r=o.gUg()[1]
-o.Ml$!==$&&A.aZ()
+o.Ml$!==$&&A.aY()
 o.Ml$=r
 q=r}p=" at "+A.e(s)+":"+A.e(q)
 return p},
@@ -108239,7 +108232,7 @@ A.a5e.prototype={}
 A.zL.prototype={
 gm(a){var s,r=this,q=r.r
 if(q===$){s=r.f.bj(0,r.e)
-r.r!==$&&A.aZ()
+r.r!==$&&A.aY()
 r.r=s
 q=s}return q},
 ng(a,b){b.a.B(0,A.Nh(this.gm(this),$.b1d(),A.be7(),null))
@@ -109927,7 +109920,7 @@ p(A.kv,[A.ys,A.DU])
 q(A.Zx,A.Mc)
 p(A.ap,[A.bm,A.D8,A.QO,A.tK,A.y0,A.i2,A.Lz,A.i7,A.h2,A.LZ,A.Xz,A.zI,A.qW,A.mN,A.t5,A.NQ,A.pl])
 p(A.bm,[A.cz,A.lN,A.nt])
-p(A.cz,[A.b5,A.b_])
+p(A.cz,[A.b5,A.aZ])
 p(A.b5,[A.NC,A.NH,A.BW,A.R4,A.pO,A.tS,A.VE])
 p(A.aG,[A.pt,A.q3,A.jt,A.qU])
 q(A.PF,A.kB)
@@ -110034,7 +110027,7 @@ q(A.wJ,A.IS)
 p(A.wJ,[A.Bu,A.Ir])
 q(A.j0,A.Fm)
 p(A.j0,[A.K6,A.Gk,A.hV,A.HW,A.eW,A.HV,A.pF,A.Zz])
-q(A.aX,A.Mu)
+q(A.aW,A.Mu)
 p(A.aM,[A.h5,A.aK,A.iq,A.I7])
 p(A.aK,[A.Gg,A.fe,A.VX,A.FW,A.pS,A.EJ,A.K_,A.v4,A.vp,A.pf,A.rM,A.nr,A.CW,A.nv,A.rK,A.ua,A.vo])
 q(A.IX,A.MA)
@@ -111029,9 +111022,9 @@ s(A.a5e,A.Ik)
 s(A.a58,A.Ik)
 s(A.a59,A.XW)})()
 var v={typeUniverse:{eC:new Map(),tR:{},eT:{},tPV:{},sEA:[]},mangledGlobalNames:{n:"int",U:"double",ct:"num",h:"String",I:"bool",aJ:"Null",x:"List"},mangledNames:{},types:["~()","~(f)","a7<~>()","~(aS)","bz()","I(di<@>)","~(jO)","aJ()","~(R?)","~(@)","~(qa,l)","i(K)","I(ky,l)","tH(K)","~(I)","~(bL)","aJ(f)","~(B)","aJ(@)","~(bA)","~(lX)","uw(K)","fP(K)","I(h)","~(h,@)","~(n)","x<he>()","I(dY)","~(le,I)","h(h)","~(aG)","mA(K,aj)","I(n)","~(h)","aK<U>(@)","~(lW)","I(bL)","~(c2?)","I(R?)","~(U)","nk(K)","I(lZ)","aJ(~)","~(qh)","~(X3)","aJ(R,dT)","~(j3)","~(ht)","~(zi)","a7<mr>(oy{body:R?,encoding:nx?,headers:ar<h,h>?})","n(dY,dY)","I(nZ)","h()","S(cR<dJ>)","n(R?)","~(R,dT)","@(@)","h(n)","~(@[@])","~(qg)","U(U)","I(iy)","~(f3<R?>,~())","G(cR<dJ>)","I(fs?)","I(iK)","ku(x<U>,ku)","nY(K)","wH(K,aj)","n(n)","I(@)","n()","nw(K)","h(u5)","@()","aD<h>()","jC()","bK<S?>?(cp?)","~(~())","~(fj)","I()","fQ(K)","~(h,h)","fX(le)","U(@)","aJ(aG)","aD<cC<h,dU>>()","aD<@>()","I(hU)","~(tA)","cR<0^>()<R?>","aJ(I)","aJ(@,@)","a7<n>()","i(K,i?)","~(zj)","~(o4)","S(S)","U(U,U)","fe(@)","n(B,B)","aJ(h,@)","h(@)","I(dp)","n(h)","a7<mr>(Ce)","aJ(n,jS)","V(dp)","~(ph)","V(K,aj)","hj(ar<h,@>)","n(@,@)","~(@,@)","q6(K)","~(Hz)","~(uk)","I(fs)","a7<@>(mf)","aV<0^>(aV<0^>,aV<0^>)<R?>","I(ql)","I(kw)","f()","I(hD)","~(h?)","b3(K,n,n)","ob(K)","R?(R?)","i(iT)","~(xU)","n(dv,dv)","I(nG)","bK<T?>?(cp?)","nv(@)","I(uY)","~(Ew)","~(xT)","n(n,n)","~(R?,R?)","a7<I>()","aD<eX>()","z1(i,ch<U>)","~({curve:j0,descendant:B?,duration:aS,rect:C?})","ue(K)","I(R?,R?)","I(iz)","I(eL)","I(dv)","bF?(dp)","~(fR,I)","bF?(iT)","h(iT)","i(dp)","cC<h,dU>(h,h,h)","h(R?)","~(nu)","oG()","jT(K,aj)","I(iT)","fX?(le)","h(dp)","eL(@)","tU(K)","yI(K,aj)","h(eL)","aC()","0&(@)","~(b6<h,h>)","~([~])","mM?(n)","f(f)","I(hj)","h(jI)","@(h)","i({icon!hl,onPressed!~(),tooltip!h})","a7<cI>(FO)","f([f?])","U()","R()","n(hC,hC)","S?(S?)","dp(@)","~(qU)","~(HA)","~(HD)","~(HB)","a7<f>()","oR(K)","oq(K,i?)","T(O,aj)","I(fj,U)","I(jy)","zH(K)","ia(bA)","~(vf,@)","n(h?)","nr(@)","U(vN)","h(h,h)","bo(K,aj)","pf(@)","aK<@>?(aK<@>?,@,aK<@>(@))","~(kI)","kI()","~(jp)","wI(K)","pW(dY,kX)","~(kM)","kM()","~(ll)","bK<U?>?(cp?)","ll()","~(iF)","iF()","~(R[dT?])","~(iN)","iN()","n(eO,eO)","~(tD)","bt(bt,I,jC)","I(ab5)","R?(is)","a7<mr>(oy{headers:ar<h,h>?})","ar<R?,R?>()","~(el)","a7<~>(mf)","a7<c2?>(c2?)","~(h?,@,@)","aJ(R?)","C()","a7<aJ>()","x<dv>(lC)","~(R,dT?)","~(pG)","~(x<nI>)","~(qC)","wv(x<l7>)","U(O,U)","~(O?)","I(ky)","aJ(jt)","ie(l7)","~(cI,h,n)","aJ(@,@,@)","~(C)","bF()","I(n,n)","ri(K,ch<U>,i?)","rj(K,ch<U>,i?)","~(hn)","tO()","iz()","x<f>()","~(h,h?)","~(HC)","U(T)","T()","jp()","S?()","~(jW)","dl(K,i?)","a7<~>(f,f)","~(ls)","U(cR<dJ>)","~(jE,k7?)","tR(K,i?)","yR(K,i?)","vp(@)","kc()","b6<R,mH<@>>(R,mH<@>)","I(b6<R,mH<@>>)","~(n,n)","a7<hd>(cI{allowUpscaling:I,cacheHeight:n?,cacheWidth:n?})","a7<hd>(m1{allowUpscaling:I,cacheHeight:n?,cacheWidth:n?})","a7<hd>(m1{getTargetSize:b8m(n,n)?})","dG(dG,cH)","cH(cH)","h(cH)","I(cR<dJ>)","I(U)","S(U)","Ak()","~(fR?,I)","a7<~>(R,dT?)","n7(K,i?)","aJ(a7Y)","I(jQ)","o0?(f5)","~(fR)","~(m0)","~(R,dT?)?(hn)","~(m0)?(hn)","~(hd)","~(n,I(lZ))","up(eu)","C(eu)","uu(eu)","I(n,I)","v4(@)","~(aOt)","h(U,U,h)","U?()","I(I)","~(jE)","h0(h0)","I(nQ)","C(C?,h0)","ei(nW)","~(nW,aC)","I(nW)","I(iB)","~(x<ie>{isMergeUp:I})","a5?(K,u4,fn<mc>)","S?(S?,S?,S?[S?])","~(oQ)","I(oQ)","mJ?(qa,l)","I(z4{crossAxisPosition!U,mainAxisPosition!U})","x<nn>()","S(r3)","I(O)","kL(l)","I(dh)","I(pR?)","~(n,A6)","~(n,dS,c2?)","~([bl?])","dv(oW)","I(K)","C()?(O)","n(dv)","dv(n)","~(l8)","a7<h>()","c2(c2?)","jQ(ar<R?,R?>)","bX<k_>()","a7<h?>(h?)","i(K,ch<U>,ch<U>)","a7<~>(c2?,~(c2?))","cI(c2)","a7<~>(a7<cI>)","a7<~>(cI)","a7<ar<h,@>>(@)","~(kX)","xF?(cp?)","FR()","il?(cp?)","I?(cp?)","aS?(cp?)","x<el>()","x<el>(x<el>)","U(ct)","x<@>(h)","x<ct>(v2)","~(x<R?>,f)","~(o<mo>)","~(bE<bl>)","u7?(cp?)","~(qY)","i(qY)","I(i)","di<@>?(l3)","di<@>(l3)","~(pj)","~(pi)","oA?(cp?)","I(tW)","vE()","wC(K)","kL()","a7<~>(@)","a7<~>(jO)","S?(cp?)","C(ab5)","~(f_)","~([aS?])","S?(cR<dJ>)","Az()","~(qR)","~(kZ)","~(od)","~(fZ)","~(acJ)","~(kd)","cM(cM,qP)","ei?(cp?)","a7<~>(qc)","~(cM)","I(cM?,cM)","pv(K,hy)","@(@,@)","xD(em)","I(Eg)","~(A4)","I(A0)","yN(em)","I(qS)","cR<jV>(eO)","ei?(cR<dJ>)","x<jV>(K)","C(eO)","n(mU,mU)","x<eO>(eO,o<eO>)","I(eO)","bL?(bL)","R?(n,bL?)","bK<eK?>?(cp?)","bK<d5?>?(cp?)","kC()","~(kC)","bK<dG?>?(cp?)","~(f,f)","bK<G?>?(cp?)","0^?(bK<0^>?(cp?))<R?>","0^?(0^?(cp?))<R?>","U(oI)","u6<0^>(l3,i(K))<R?>","i(K,~())","l4()","~(l4)","xY(C?,C?)","t3(fw)","~(o6)","~(oa)","~(iM,R)","kT(K,i?)","~(oL)","i(K,ch<U>,xr,K,K)","I(oL)","ud(K,i?)","tN(K)","wZ(fw)","t4(fw)","vF()","~(~(bA),aC?)","rM(@)","ua(@)","vo(@)","rK(@)","~(Go)","~(Gp)","~(yM)","xL(em)","a7<@>(Av)","ar<i9,@>(x<@>)","ar<i9,@>(ar<i9,@>)","aJ(ar<i9,@>)","aJ(K,u4,fn<mc>)","zk(em)","I(di<@>?)","I(o_)","ar<~(bA),aC?>()","~(AU)","fs(di<@>)","b6<h?,x<R>>(@,@)","i(K,aj)","zq(em)","lP(K,i?)","vz(K,hy)","aJ(el?)","~(f3<R?>)","cv<I>(I)","qs(K,i?)","n7(K)","e_(K,i?)","tL(bA)","xW(bA)","h(U)","wu(em)","eN?(mo)","i(K,hy)","I(mo)","aJ(x<~>)","~(f?)","~(h,R?)","I(l5?)","mX()","~(mX)","~(yj)","A8()","mY()","~(mY)","~(o5)","n(fj,fj)","I(fj)","x<k>(k)","~(og,bl)","x<vB>()","AK(K,hy)","~(O)","bL?()","h(dI)","~(W)","a7<qy>(h,ar<h,h>)","n(re,re)","xa(h)","mE()","~(mE)","mF()","~(mF)","~(qT)","~(qm)","aJ(c2)","a7<c2>()","a7<~>(h,c2?,~(c2?)?)","I(xc)","I(ts)","oz(@)","nD(@)","ar<h,@>(oz)","ar<h,@>(nD)","f5()","R?(lS)","@(lS)","h?(dp)","f5?()","n(q9,q9)","ar<h,@>(hj)","hj(@)","xA(em)","xR(em)","I(S)","a7<~>(~)","zT(K)","v7(K)","v6(K)","v5(K)","I(lv)","h(lv)","zf()","aJ(~(hd))","I(jI)","Aw(K)","Ax(K)","pC(mn)","n(jI,jI)","nG(K,aj)","aJ(lt)","zR(K,n)","h(h,S)","a7<f?>(f)","n(q8)","~(mn)","~(T?)","b3(mP)","ww(K)","lU(x<lU>)","h?(h)","i({onPressed!~()?,semantics!h,svg!h})","mA(i?,x<i>)","eZ(i,ch<U>)","~(kO)","~(vk,zt)","~(zO)","rO(K)","vq({from:U?})","~(pZ,n)","a7<cI>(hO)","tC(K)","hg(K)","kT(iG)","~(nZ)","h(kt)","i(K,io<I>)","o<h>(cM)","oo(K,vj,dY,~())","dl(K,~(h),o<h>)","xP(K,n)","lP(i,ch<U>)","wb(K,n)","a5(K,io<mt?>)","jX<ag<a5>>()","x_(K)","I(fB)","hC(dp)","hC(iT)","aJ(x<R?>,f)","f?(f)","~(mT)","mT()","x<jb>()","~(jS)","a7<~>([f?])","nS(@)","tV<@>(@)","n(hj)","Eb(@)","cI(R?)","cE(K,i?)","bo()","~(n,jS)","a7<cI>(n)","tg(K)","a7<~>(ph)","n(oN,oN)","aJ(oC)","aJ(n)","~(h,f)","a7<cI>(FO,n)","rQ(K)","aJ(cI)","vO(R?)","uh(K)","~(cz)","a7<aJ>(n,jS)","V(ix)","ar<h,h?>(h)","b3(K,aj)","x1(K)","ug(K)","x3(K)","lP(K)","~(S)","n(jb,jb)","i(K,n,n)","aJ(oD)","xt(K,n)","cz(bm)","mA(K)","rD(K,nM,i?)","dp()","n(dp,dp)","~(x6?,zp?)","tI(K)","rB(K)","kT(iP)","U(U,ca)","cM(cM,cM)","oo(K,aj)","yK(K,q7,CC)","I(bm)","hc(nl)","aJ(h)","I(h,h)","~(jt)","~(hO?)","~(x<n>)","EN()","cI(@,@)","ke(fz)","h(h?)","n(fE,fE)","n(n,fE)","fE(h)","fE(h,h,h)","eT(x<@>)","eT(h?,eT)","a7<0&>(R)","~(n,n,n)","x<h>(x<h>,ar<h,@>)","I(pK)","~(pK)","ar<h,h>(kw)","~(h,n?)","h(hb)","~(@,@(h))","~(h,@(@))","~(h,n)","~(ql)","ar<h,h>(ar<h,h>,h)","~([R?])","~(mC)","~(@,dT)","a7<@>()","af<@>(@)","b6<h,x<eL>>(b6<h,x<eL>>)","eL(eL)","I(yl)","I(du)","I(Ht,hc)","un(K,aj)","i(K,q7)","h?()","n(ly)","aJ(vv<R>)","R(ly)","R(hD)","n(hD,hD)","x<ly>(b6<R,x<hD>>)","ok()","a7<qG>()","I(bx)","tu(@)","I(I?)","a7<jr>()","jr(~)","Fb()","a7<fR>(m1)","af<@>?()","a7<jr>(c2)","oP(jr)","aJ(oP)","U(ci,ci,ci,ci,U)","fL?(h)","x<fX>(h)","~(d2?)","fX(jq)","x<kK>()","x<d2>()","fL()","I(b6<h,h>)","~(d2)","~(q3)","aJ(pt)","aD<dk>()","aD<Il>()","aD<h3>()","aD<x<fp>>()","aD<fp>()","~(n,@)","aD<hA>()","aD<ln>()","aD<kf>()","aD<lo>()","aD<lq>()","aD<lp>()","aJ(@,dT)","~(T)","~(x<f>,f)","zL(h)","h3(h,h,x<fp>,h,h)","fp(h,h,cC<h,dU>)","cC<h,dU>(h,h,h,cC<h,dU>)","~(hc)","cC<h,dU>(h)","hA(h,h,h,h)","ln(h,h,h)","kf(h,h,h)","lo(h,x<fp>,h,h)","aJ(~())","lq(h,h,h,h)","lp(h,h,h,eX?,h,h?,h,h)","eX(h,h,cC<h,dU>)","eX(h,h,cC<h,dU>,h,cC<h,dU>)","h(h,h,h)","aD<dk>(qX)","~(dk)","b6<n,h>(b6<h,h>)","~(vA?,aVK?,vA,~())","n(cd<@>,cd<@>)","x<h>()","x<h>(h,x<h>)","R?(@)","0^(0^,0^)<ct>","T?(T?,T?,U)","U?(ct?,ct?,U)","S?(S?,S?,U)","i(K,l,I,i)","~(c9{forceReport:I})","lc?(h)","U(U,U,U)","i(K,ch<U>,ch<U>,i)","I?(I?,I?,U)","i(K,pB)","i(K,i)","eK?(eK?,eK?,U)","dG?(dG?,dG?,U)","G?(G?,G?,U)","n(a3U<@>,a3U<@>)","I({priority!n,scheduler!fF})","h(c2)","zQ(c2)","x<k_>(h)","i(i,ch<U>)","i(i?,x<i>)","n(bL,bL)","dZ(dZ?,dZ?,U)","x<di<@>>(kR,h)","n(i,n)","a7<h?>()","a7<~>(h)","T(f)","@(@,h)","~(cI)","cz(n)","~(h?{wrapWidth:n?})","a7<ow?>()","yy?(Oj,h,h)","b98(h,ar<h,h>)","cI({seed:n})","I(jc<ax>)"],interceptorsByTag:null,leafTags:null,arrayRti:Symbol("$ti"),rttc:{"2;cacheSize,maxTextLength":(a,b)=>c=>c instanceof A.vP&&a.b(c.a)&&b.b(c.b),"2;key,value":(a,b)=>c=>c instanceof A.KL&&a.b(c.a)&&b.b(c.b),"3;breaks,graphemes,words":(a,b,c)=>d=>d instanceof A.KM&&a.b(d.a)&&b.b(d.b)&&c.b(d.c),"3;large,medium,small":(a,b,c)=>d=>d instanceof A.KN&&a.b(d.a)&&b.b(d.b)&&c.b(d.c)}}
-A.baJ(v.typeUniverse,JSON.parse('{"TO":"iD","mL":"iD","m8":"iD","ahj":"iD","apy":"iD","apx":"iD","a83":"iD","asM":"iD","aiX":"iD","bhN":"f","bhO":"f","bgu":"f","bgo":"aG","bhk":"aG","bgx":"pl","bgp":"ap","bhZ":"ap","bim":"ap","bgn":"b_","bhx":"b_","bjD":"jt","bgy":"b5","bhW":"b5","bin":"bm","bhe":"bm","bhE":"nt","bj6":"h2","bgY":"mN","bgC":"lN","biG":"lN","bhU":"cz","bhH":"tK","bhF":"tJ","bgN":"cY","bgP":"kB","bgS":"h_","bgT":"hS","bgO":"hS","bgQ":"hS","ps":{"DR":[]},"C6":{"hd":[]},"eI":{"ez":["1"]},"f1":{"ek":[]},"wu":{"jx":[]},"xA":{"jx":[]},"xD":{"jx":[]},"xL":{"jx":[]},"xR":{"jx":[]},"yN":{"jx":[]},"zk":{"jx":[]},"zq":{"jx":[]},"pC":{"ahN":[]},"Uf":{"hc":[]},"OC":{"cX":[]},"Pa":{"cX":[]},"P7":{"cX":[]},"P8":{"cX":[]},"Pi":{"cX":[]},"Pe":{"cX":[]},"P9":{"cX":[]},"Ph":{"cX":[]},"OF":{"cX":[]},"OH":{"cX":[]},"OE":{"cX":[]},"OD":{"cX":[]},"OM":{"cX":[]},"OO":{"cX":[]},"OV":{"cX":[]},"OT":{"cX":[]},"OS":{"cX":[]},"OJ":{"cX":[]},"ON":{"cX":[]},"OI":{"cX":[]},"OQ":{"cX":[]},"OU":{"cX":[]},"OK":{"cX":[]},"OL":{"cX":[]},"OP":{"cX":[]},"OR":{"cX":[]},"Pb":{"cX":[]},"Pd":{"cX":[]},"Pc":{"cX":[]},"W0":{"cA":[]},"Ez":{"eI":["f"],"ez":["f"]},"OG":{"lO":[]},"C5":{"lO":[]},"wy":{"lO":[]},"P2":{"lO":[]},"Pf":{"lO":[]},"wx":{"lO":[]},"y3":{"o":["kQ"],"o.E":"kQ"},"RH":{"bx":[]},"Bk":{"Dm":[]},"P_":{"eI":["f"],"lO":[],"ez":["f"]},"IM":{"eI":["f"],"lO":[],"ez":["f"]},"IN":{"eI":["f"],"lO":[],"ez":["f"]},"OA":{"eI":["f"],"ez":["f"],"hd":[]},"wL":{"ho":[]},"Vg":{"ho":[]},"NY":{"ho":[],"a84":[]},"Pk":{"ho":[],"a9G":[]},"Pn":{"ho":[],"a9J":[]},"Pm":{"ho":[],"a9I":[]},"T6":{"ho":[],"ajp":[]},"I5":{"ho":[],"Xa":[]},"T4":{"ho":[],"Xa":[],"ajn":[]},"TL":{"ho":[]},"Pu":{"ho":[],"a9S":[]},"P3":{"eI":["f"],"ez":["f"]},"wz":{"eI":["f"],"ez":["f"],"up":[]},"OW":{"kA":[],"eI":["f"],"ez":["f"],"jA":[]},"wA":{"eI":["f"],"ez":["f"],"uu":[]},"C8":{"eI":["f"],"ez":["f"]},"kA":{"eI":["f"],"ez":["f"],"jA":[]},"OY":{"kA":[],"eI":["f"],"ez":["f"],"jA":[]},"OZ":{"kA":[],"eI":["f"],"ez":["f"],"jA":[]},"OX":{"kA":[],"eI":["f"],"ez":["f"],"jA":[]},"P0":{"kA":[],"eI":["f"],"ez":["f"],"jA":[]},"P1":{"ahN":[]},"On":{"cA":[]},"Cb":{"eI":["f"],"ez":["f"]},"RC":{"aT6":[]},"RB":{"bx":[]},"DN":{"bx":[]},"fq":{"o":["1"],"o.E":"1"},"oJ":{"o":["1"],"o.E":"1"},"Ft":{"f1":[],"ek":[],"a84":[]},"Fv":{"f1":[],"ek":[],"a9J":[]},"TF":{"f1":[],"ek":[],"a9I":[]},"Fu":{"f1":[],"ek":[],"a9G":[]},"Fw":{"f1":[],"ek":[],"a9S":[]},"Fx":{"f1":[],"ek":[],"ajn":[]},"Fy":{"f1":[],"ek":[],"ajp":[]},"ze":{"up":[]},"qI":{"uu":[]},"TI":{"ek":[]},"CT":{"dL":[]},"Fj":{"dL":[]},"Ts":{"dL":[]},"Tw":{"dL":[]},"Tu":{"dL":[]},"Tt":{"dL":[]},"Tv":{"dL":[]},"Td":{"dL":[]},"Tc":{"dL":[]},"Tb":{"dL":[]},"Tj":{"dL":[]},"Tl":{"dL":[]},"Tr":{"dL":[]},"Tp":{"dL":[]},"To":{"dL":[]},"Tg":{"dL":[]},"Tk":{"dL":[]},"Tf":{"dL":[]},"Tn":{"dL":[]},"Tq":{"dL":[]},"Th":{"dL":[]},"Ti":{"dL":[]},"Tm":{"dL":[]},"Fz":{"f1":[],"ek":[]},"ti":{"jA":[]},"x9":{"jA":[]},"Rg":{"jA":[]},"xp":{"jA":[]},"Rf":{"jA":[]},"Iz":{"lY":[]},"Kg":{"lY":[]},"Qx":{"lY":[]},"y1":{"lY":[]},"xZ":{"lY":[]},"TH":{"ek":[]},"FA":{"f1":[],"ek":[],"Xa":[]},"DL":{"hd":[]},"Rz":{"hd":[]},"GX":{"Dm":[]},"DM":{"DR":[]},"VN":{"aOt":[]},"mZ":{"A":["1"],"x":["1"],"ac":["1"],"o":["1"]},"a_Y":{"mZ":["n"],"A":["n"],"x":["n"],"ac":["n"],"o":["n"]},"Xh":{"mZ":["n"],"A":["n"],"x":["n"],"ac":["n"],"o":["n"],"A.E":"n","o.E":"n","mZ.E":"n"},"yh":{"uq":[]},"Ow":{"zc":[]},"Vh":{"zc":[]},"Qs":{"kO":[]},"Qw":{"tx":[]},"QB":{"tx":[]},"f":{"ak":[]},"E7":{"I":[],"d9":[]},"E9":{"aJ":[],"d9":[]},"iD":{"f":[],"ak":[]},"w":{"x":["1"],"f":[],"ac":["1"],"ak":[],"o":["1"],"bP":["1"],"o.E":"1"},"ahe":{"w":["1"],"x":["1"],"f":[],"ac":["1"],"ak":[],"o":["1"],"bP":["1"],"o.E":"1"},"pU":{"U":[],"ct":[],"cd":["ct"]},"xI":{"U":[],"n":[],"ct":[],"cd":["ct"],"d9":[]},"Ea":{"U":[],"ct":[],"cd":["ct"],"d9":[]},"m7":{"h":[],"cd":["h"],"bP":["@"],"d9":[]},"rU":{"eM":["3","4"],"eM.S":"3","eM.T":"4"},"rR":{"bZ":["3","4"],"bZ.S":"3","bZ.T":"4"},"lw":{"o":["2"]},"rS":{"lw":["1","2"],"o":["2"],"o.E":"2"},"Jk":{"rS":["1","2"],"lw":["1","2"],"ac":["2"],"o":["2"],"o.E":"2"},"IJ":{"A":["2"],"x":["2"],"lw":["1","2"],"ac":["2"],"o":["2"]},"dm":{"IJ":["1","2"],"A":["2"],"x":["2"],"lw":["1","2"],"ac":["2"],"o":["2"],"A.E":"2","o.E":"2"},"nj":{"cR":["2"],"lw":["1","2"],"ac":["2"],"o":["2"],"o.E":"2"},"rT":{"bb":["3","4"],"ar":["3","4"],"bb.V":"4","bb.K":"3"},"ni":{"lw":["1","2"],"ac":["2"],"o":["2"],"o.E":"2"},"jZ":{"cA":[]},"fu":{"A":["n"],"x":["n"],"ac":["n"],"o":["n"],"A.E":"n","o.E":"n"},"ac":{"o":["1"]},"aN":{"ac":["1"],"o":["1"]},"al":{"aN":["1"],"ac":["1"],"o":["1"],"o.E":"1","aN.E":"1"},"eJ":{"o":["2"],"o.E":"2"},"kE":{"eJ":["1","2"],"ac":["2"],"o":["2"],"o.E":"2"},"Z":{"aN":["2"],"ac":["2"],"o":["2"],"o.E":"2","aN.E":"2"},"aT":{"o":["1"],"o.E":"1"},"j6":{"o":["2"],"o.E":"2"},"vg":{"o":["1"],"o.E":"1"},"CY":{"vg":["1"],"ac":["1"],"o":["1"],"o.E":"1"},"oh":{"o":["1"],"o.E":"1"},"x7":{"oh":["1"],"ac":["1"],"o":["1"],"o.E":"1"},"H2":{"o":["1"],"o.E":"1"},"j5":{"ac":["1"],"o":["1"],"o.E":"1"},"nH":{"o":["1"],"o.E":"1"},"CX":{"nH":["1"],"ac":["1"],"o":["1"],"o.E":"1"},"ef":{"o":["1"],"o.E":"1"},"zF":{"A":["1"],"x":["1"],"ac":["1"],"o":["1"]},"d8":{"aN":["1"],"ac":["1"],"o":["1"],"o.E":"1","aN.E":"1"},"qJ":{"vf":[]},"vP":{"uN":[]},"KL":{"uN":[]},"KM":{"uN":[]},"KN":{"uN":[]},"t1":{"lj":["1","2"],"ar":["1","2"]},"wK":{"ar":["1","2"]},"aU":{"wK":["1","2"],"ar":["1","2"]},"IT":{"o":["1"],"o.E":"1"},"cq":{"wK":["1","2"],"ar":["1","2"]},"E2":{"kJ":[]},"jf":{"kJ":[]},"F6":{"or":[],"cA":[]},"RX":{"cA":[]},"Xm":{"cA":[]},"T_":{"bx":[]},"LG":{"dT":[]},"pu":{"kJ":[]},"Pr":{"kJ":[]},"Ps":{"kJ":[]},"WK":{"kJ":[]},"Wq":{"kJ":[]},"wj":{"kJ":[]},"Zt":{"cA":[]},"Vo":{"cA":[]},"fS":{"bb":["1","2"],"ar":["1","2"],"bb.V":"2","bb.K":"1"},"b0":{"ac":["1"],"o":["1"],"o.E":"1"},"KI":{"uN":[]},"KJ":{"uN":[]},"KK":{"uN":[]},"nR":{"aUm":[]},"Am":{"Uh":[],"u5":[]},"Y3":{"o":["Uh"],"o.E":"Uh"},"z9":{"u5":[]},"a3C":{"o":["u5"],"o.E":"u5"},"ui":{"f":[],"ak":[],"Oj":[],"d9":[]},"f0":{"f":[],"ak":[],"ee":[]},"ET":{"f0":[],"f":[],"c2":[],"ak":[],"ee":[],"d9":[]},"y4":{"f0":[],"c_":["1"],"f":[],"ak":[],"ee":[],"bP":["1"]},"q5":{"A":["U"],"f0":[],"c_":["U"],"x":["U"],"f":[],"ac":["U"],"ak":[],"ee":[],"bP":["U"],"o":["U"]},"jm":{"A":["n"],"f0":[],"c_":["n"],"x":["n"],"f":[],"ac":["n"],"ak":[],"ee":[],"bP":["n"],"o":["n"]},"EU":{"q5":[],"A":["U"],"ad4":[],"f0":[],"c_":["U"],"x":["U"],"f":[],"ac":["U"],"ak":[],"ee":[],"bP":["U"],"o":["U"],"d9":[],"A.E":"U","o.E":"U"},"EV":{"q5":[],"A":["U"],"ad5":[],"f0":[],"c_":["U"],"x":["U"],"f":[],"ac":["U"],"ak":[],"ee":[],"bP":["U"],"o":["U"],"d9":[],"A.E":"U","o.E":"U"},"SR":{"jm":[],"A":["n"],"agZ":[],"f0":[],"c_":["n"],"x":["n"],"f":[],"ac":["n"],"ak":[],"ee":[],"bP":["n"],"o":["n"],"d9":[],"A.E":"n","o.E":"n"},"EW":{"jm":[],"A":["n"],"ah_":[],"f0":[],"c_":["n"],"x":["n"],"f":[],"ac":["n"],"ak":[],"ee":[],"bP":["n"],"o":["n"],"d9":[],"A.E":"n","o.E":"n"},"SS":{"jm":[],"A":["n"],"ah0":[],"f0":[],"c_":["n"],"x":["n"],"f":[],"ac":["n"],"ak":[],"ee":[],"bP":["n"],"o":["n"],"d9":[],"A.E":"n","o.E":"n"},"EX":{"jm":[],"A":["n"],"asx":[],"f0":[],"c_":["n"],"x":["n"],"f":[],"ac":["n"],"ak":[],"ee":[],"bP":["n"],"o":["n"],"d9":[],"A.E":"n","o.E":"n"},"EY":{"jm":[],"A":["n"],"zA":[],"f0":[],"c_":["n"],"x":["n"],"f":[],"ac":["n"],"ak":[],"ee":[],"bP":["n"],"o":["n"],"d9":[],"A.E":"n","o.E":"n"},"EZ":{"jm":[],"A":["n"],"asy":[],"f0":[],"c_":["n"],"x":["n"],"f":[],"ac":["n"],"ak":[],"ee":[],"bP":["n"],"o":["n"],"d9":[],"A.E":"n","o.E":"n"},"uj":{"jm":[],"A":["n"],"cI":[],"f0":[],"c_":["n"],"x":["n"],"f":[],"ac":["n"],"ak":[],"ee":[],"bP":["n"],"o":["n"],"d9":[],"A.E":"n","o.E":"n"},"a4M":{"i9":[]},"a_8":{"cA":[]},"M3":{"or":[],"cA":[]},"af":{"a7":["1"]},"aiU":{"dH":["1"]},"eB":{"eB.T":"1"},"Aa":{"dH":["1"]},"M1":{"X3":[]},"Is":{"Cl":["1"]},"LP":{"o":["1"],"o.E":"1"},"NN":{"cA":[]},"ic":{"cT":["1"],"AQ":["1"],"bX":["1"],"bX.T":"1"},"vD":{"r_":["1"],"eB":["1"],"eB.T":"1"},"oF":{"dH":["1"]},"oU":{"oF":["1"],"dH":["1"]},"lu":{"oF":["1"],"dH":["1"]},"I_":{"bx":[]},"vG":{"Cl":["1"]},"aR":{"vG":["1"],"Cl":["1"]},"oV":{"vG":["1"],"Cl":["1"]},"Hm":{"bX":["1"]},"rf":{"dH":["1"]},"kg":{"It":["1"],"rf":["1"],"dH":["1"]},"rg":{"rf":["1"],"dH":["1"]},"cT":{"AQ":["1"],"bX":["1"],"bX.T":"1"},"r_":{"eB":["1"],"eB.T":"1"},"vU":{"dH":["1"]},"LJ":{"Y2":["1"]},"AQ":{"bX":["1"]},"Jp":{"bX":["1"],"bX.T":"1"},"Ko":{"bX":["1"],"bX.T":"1"},"Kp":{"kg":["1"],"It":["1"],"rf":["1"],"aiU":["1"],"dH":["1"]},"JE":{"bX":["2"]},"A5":{"eB":["2"],"eB.T":"2"},"oM":{"JE":["1","2"],"bX":["2"],"bX.T":"2"},"Jr":{"dH":["1"]},"AL":{"eB":["2"],"eB.T":"2"},"AR":{"eM":["1","2"]},"IC":{"bX":["2"],"bX.T":"2"},"LK":{"AR":["1","2"],"eM":["1","2"],"eM.S":"1","eM.T":"2"},"a5f":{"vA":[]},"a2J":{"vA":[]},"oK":{"bb":["1","2"],"ar":["1","2"],"bb.V":"2","bb.K":"1"},"r4":{"oK":["1","2"],"bb":["1","2"],"ar":["1","2"],"bb.V":"2","bb.K":"1"},"J3":{"oK":["1","2"],"bb":["1","2"],"ar":["1","2"],"bb.V":"2","bb.K":"1"},"vK":{"ac":["1"],"o":["1"],"o.E":"1"},"K8":{"fS":["1","2"],"bb":["1","2"],"ar":["1","2"],"bb.V":"2","bb.K":"1"},"K7":{"fS":["1","2"],"bb":["1","2"],"ar":["1","2"],"bb.V":"2","bb.K":"1"},"mS":{"vR":["1"],"mu":["1"],"cR":["1"],"ac":["1"],"o":["1"],"o.E":"1"},"iV":{"vR":["1"],"mu":["1"],"b5P":["1"],"cR":["1"],"ac":["1"],"o":["1"],"o.E":"1"},"Eo":{"o":["1"],"o.E":"1"},"A":{"x":["1"],"ac":["1"],"o":["1"]},"bb":{"ar":["1","2"]},"Kb":{"ac":["2"],"o":["2"],"o.E":"2"},"EC":{"ar":["1","2"]},"lj":{"ar":["1","2"]},"Ja":{"Jb":["1"],"aNk":["1"]},"vI":{"Jb":["1"]},"tf":{"ac":["1"],"o":["1"],"o.E":"1"},"Ep":{"aN":["1"],"ac":["1"],"o":["1"],"o.E":"1","aN.E":"1"},"mu":{"cR":["1"],"ac":["1"],"o":["1"]},"vR":{"mu":["1"],"cR":["1"],"ac":["1"],"o":["1"]},"dN":{"vR":["1"],"mu":["1"],"cR":["1"],"ac":["1"],"o":["1"],"o.E":"1"},"Ha":{"bb":["1","2"],"ar":["1","2"],"bb.V":"2","bb.K":"1"},"oS":{"ac":["1"],"o":["1"],"o.E":"1"},"vT":{"ac":["2"],"o":["2"],"o.E":"2"},"LB":{"ac":["b6<1,2>"],"o":["b6<1,2>"],"o.E":"b6<1,2>"},"oT":{"mW":["1","2","1"],"mW.T":"1"},"LF":{"mW":["1","hG<1,2>","2"],"mW.T":"2"},"vS":{"mW":["1","hG<1,2>","b6<1,2>"],"mW.T":"b6<1,2>"},"z8":{"mu":["1"],"cR":["1"],"ac":["1"],"o":["1"],"o.E":"1"},"a02":{"bb":["h","@"],"ar":["h","@"],"bb.V":"@","bb.K":"h"},"a03":{"aN":["h"],"ac":["h"],"o":["h"],"o.E":"h","aN.E":"h"},"NI":{"nx":[]},"a4S":{"bZ":["h","x<n>"]},"NK":{"bZ":["h","x<n>"],"bZ.S":"h","bZ.T":"x<n>"},"a4R":{"bZ":["x<n>","h"]},"NJ":{"bZ":["x<n>","h"],"bZ.S":"x<n>","bZ.T":"h"},"BI":{"bZ":["x<n>","h"],"bZ.S":"x<n>","bZ.T":"h"},"O0":{"bZ":["h","x<n>"],"bZ.S":"h","bZ.T":"x<n>"},"Ec":{"cA":[]},"RY":{"cA":[]},"S_":{"bZ":["R?","h"],"bZ.S":"R?","bZ.T":"h"},"RZ":{"bZ":["h","R?"],"bZ.S":"h","bZ.T":"R?"},"S4":{"nx":[]},"S6":{"bZ":["h","x<n>"],"bZ.S":"h","bZ.T":"x<n>"},"S5":{"bZ":["x<n>","h"],"bZ.S":"x<n>","bZ.T":"h"},"Xt":{"nx":[]},"Xu":{"bZ":["h","x<n>"],"bZ.S":"h","bZ.T":"x<n>"},"Ib":{"bZ":["x<n>","h"],"bZ.S":"x<n>","bZ.T":"h"},"O5":{"cd":["O5"]},"bF":{"cd":["bF"]},"U":{"ct":[],"cd":["ct"]},"aS":{"cd":["aS"]},"n":{"ct":[],"cd":["ct"]},"x":{"ac":["1"],"o":["1"]},"ct":{"cd":["ct"]},"Uh":{"u5":[]},"cR":{"ac":["1"],"o":["1"]},"h":{"cd":["h"]},"h4":{"O5":[],"cd":["O5"]},"rG":{"cA":[]},"or":{"cA":[]},"kv":{"cA":[]},"ys":{"cA":[]},"DU":{"cA":[]},"SX":{"cA":[]},"ox":{"cA":[]},"zE":{"ox":[],"cA":[]},"ka":{"cA":[]},"Pz":{"cA":[]},"T7":{"cA":[]},"He":{"cA":[]},"Js":{"bx":[]},"hh":{"bx":[]},"RR":{"ox":[],"bx":[],"cA":[]},"a3G":{"dT":[]},"Gj":{"o":["n"],"o.E":"n"},"Mc":{"oy":[]},"km":{"oy":[]},"Zx":{"oy":[]},"hO":{"f":[],"ak":[]},"pt":{"aG":[],"f":[],"ak":[]},"cY":{"f":[],"ak":[]},"cz":{"bm":[],"f":[],"ak":[]},"aG":{"f":[],"ak":[]},"fz":{"hO":[],"f":[],"ak":[]},"hT":{"f":[],"ak":[]},"m_":{"f":[],"ak":[]},"pO":{"cz":[],"bm":[],"f":[],"ak":[]},"q3":{"aG":[],"f":[],"ak":[]},"hX":{"f":[],"ak":[]},"bm":{"f":[],"ak":[]},"hY":{"f":[],"ak":[]},"jt":{"aG":[],"f":[],"ak":[]},"i2":{"f":[],"ak":[]},"i3":{"f":[],"ak":[]},"i4":{"f":[],"ak":[]},"h_":{"f":[],"ak":[]},"i7":{"f":[],"ak":[]},"h2":{"f":[],"ak":[]},"i8":{"f":[],"ak":[]},"b5":{"cz":[],"bm":[],"f":[],"ak":[]},"Nw":{"f":[],"ak":[]},"NC":{"cz":[],"bm":[],"f":[],"ak":[]},"NH":{"cz":[],"bm":[],"f":[],"ak":[]},"BW":{"cz":[],"bm":[],"f":[],"ak":[]},"lN":{"bm":[],"f":[],"ak":[]},"PF":{"f":[],"ak":[]},"wP":{"f":[],"ak":[]},"hS":{"f":[],"ak":[]},"kB":{"f":[],"ak":[]},"PG":{"f":[],"ak":[]},"PH":{"f":[],"ak":[]},"PV":{"f":[],"ak":[]},"nt":{"bm":[],"f":[],"ak":[]},"Qj":{"f":[],"ak":[]},"CN":{"A":["ju<ct>"],"bh":["ju<ct>"],"x":["ju<ct>"],"c_":["ju<ct>"],"f":[],"ac":["ju<ct>"],"ak":[],"o":["ju<ct>"],"bP":["ju<ct>"],"bh.E":"ju<ct>","A.E":"ju<ct>","o.E":"ju<ct>"},"CO":{"f":[],"ju":["ct"],"ak":[]},"CP":{"A":["h"],"bh":["h"],"x":["h"],"c_":["h"],"f":[],"ac":["h"],"ak":[],"o":["h"],"bP":["h"],"bh.E":"h","A.E":"h","o.E":"h"},"Qm":{"f":[],"ak":[]},"YL":{"A":["cz"],"x":["cz"],"ac":["cz"],"o":["cz"],"A.E":"cz","o.E":"cz"},"ap":{"f":[],"ak":[]},"xd":{"A":["fz"],"bh":["fz"],"x":["fz"],"c_":["fz"],"f":[],"ac":["fz"],"ak":[],"o":["fz"],"bP":["fz"],"bh.E":"fz","A.E":"fz","o.E":"fz"},"D8":{"f":[],"ak":[]},"QO":{"f":[],"ak":[]},"R4":{"cz":[],"bm":[],"f":[],"ak":[]},"Rq":{"f":[],"ak":[]},"tJ":{"A":["bm"],"bh":["bm"],"x":["bm"],"c_":["bm"],"f":[],"ac":["bm"],"ak":[],"o":["bm"],"bP":["bm"],"bh.E":"bm","A.E":"bm","o.E":"bm"},"tK":{"f":[],"ak":[]},"xy":{"f":[],"ak":[]},"tS":{"aSH":[],"cz":[],"bm":[],"f":[],"ak":[]},"Si":{"f":[],"ak":[]},"SC":{"f":[],"ak":[]},"y0":{"f":[],"ak":[]},"SH":{"f":[],"bb":["h","@"],"ak":[],"ar":["h","@"],"bb.V":"@","bb.K":"h"},"SI":{"f":[],"bb":["h","@"],"ak":[],"ar":["h","@"],"bb.V":"@","bb.K":"h"},"SJ":{"A":["hX"],"bh":["hX"],"x":["hX"],"c_":["hX"],"f":[],"ac":["hX"],"ak":[],"o":["hX"],"bP":["hX"],"bh.E":"hX","A.E":"hX","o.E":"hX"},"zU":{"A":["bm"],"x":["bm"],"ac":["bm"],"o":["bm"],"A.E":"bm","o.E":"bm"},"F4":{"A":["bm"],"bh":["bm"],"x":["bm"],"c_":["bm"],"f":[],"ac":["bm"],"ak":[],"o":["bm"],"bP":["bm"],"bh.E":"bm","A.E":"bm","o.E":"bm"},"TQ":{"A":["hY"],"bh":["hY"],"x":["hY"],"c_":["hY"],"f":[],"ac":["hY"],"ak":[],"o":["hY"],"bP":["hY"],"bh.E":"hY","A.E":"hY","o.E":"hY"},"Vl":{"f":[],"bb":["h","@"],"ak":[],"ar":["h","@"],"bb.V":"@","bb.K":"h"},"VE":{"cz":[],"bm":[],"f":[],"ak":[]},"yW":{"f":[],"ak":[]},"Wh":{"A":["i2"],"bh":["i2"],"x":["i2"],"c_":["i2"],"f":[],"ac":["i2"],"ak":[],"o":["i2"],"bP":["i2"],"bh.E":"i2","A.E":"i2","o.E":"i2"},"Wn":{"A":["i3"],"bh":["i3"],"x":["i3"],"c_":["i3"],"f":[],"ac":["i3"],"ak":[],"o":["i3"],"bP":["i3"],"bh.E":"i3","A.E":"i3","o.E":"i3"},"Hi":{"f":[],"bb":["h","h"],"ak":[],"ar":["h","h"],"bb.V":"h","bb.K":"h"},"X_":{"A":["h2"],"bh":["h2"],"x":["h2"],"c_":["h2"],"f":[],"ac":["h2"],"ak":[],"o":["h2"],"bP":["h2"],"bh.E":"h2","A.E":"h2","o.E":"h2"},"X0":{"A":["i7"],"bh":["i7"],"x":["i7"],"c_":["i7"],"f":[],"ac":["i7"],"ak":[],"o":["i7"],"bP":["i7"],"bh.E":"i7","A.E":"i7","o.E":"i7"},"X2":{"f":[],"ak":[]},"X8":{"A":["i8"],"bh":["i8"],"x":["i8"],"c_":["i8"],"f":[],"ac":["i8"],"ak":[],"o":["i8"],"bP":["i8"],"bh.E":"i8","A.E":"i8","o.E":"i8"},"X9":{"f":[],"ak":[]},"Xp":{"f":[],"ak":[]},"Xz":{"f":[],"ak":[]},"zI":{"f":[],"ak":[]},"qW":{"f":[],"ak":[]},"mN":{"f":[],"ak":[]},"Ze":{"A":["cY"],"bh":["cY"],"x":["cY"],"c_":["cY"],"f":[],"ac":["cY"],"ak":[],"o":["cY"],"bP":["cY"],"bh.E":"cY","A.E":"cY","o.E":"cY"},"J8":{"f":[],"ju":["ct"],"ak":[]},"a_x":{"A":["hT?"],"bh":["hT?"],"x":["hT?"],"c_":["hT?"],"f":[],"ac":["hT?"],"ak":[],"o":["hT?"],"bP":["hT?"],"bh.E":"hT?","A.E":"hT?","o.E":"hT?"},"Kq":{"A":["bm"],"bh":["bm"],"x":["bm"],"c_":["bm"],"f":[],"ac":["bm"],"ak":[],"o":["bm"],"bP":["bm"],"bh.E":"bm","A.E":"bm","o.E":"bm"},"a3v":{"A":["i4"],"bh":["i4"],"x":["i4"],"c_":["i4"],"f":[],"ac":["i4"],"ak":[],"o":["i4"],"bP":["i4"],"bh.E":"i4","A.E":"i4","o.E":"i4"},"a3I":{"A":["h_"],"bh":["h_"],"x":["h_"],"c_":["h_"],"f":[],"ac":["h_"],"ak":[],"o":["h_"],"bP":["h_"],"bh.E":"h_","A.E":"h_","o.E":"h_"},"iR":{"bX":["1"],"bX.T":"1"},"A1":{"iR":["1"],"bX":["1"],"bX.T":"1"},"Zu":{"f":[],"ak":[]},"QP":{"A":["cz"],"x":["cz"],"ac":["cz"],"o":["cz"],"A.E":"cz","o.E":"cz"},"lS":{"f":[],"ak":[]},"t5":{"f":[],"ak":[]},"qU":{"aG":[],"f":[],"ak":[]},"Cs":{"f":[],"ak":[]},"DQ":{"f":[],"ak":[]},"xJ":{"f":[],"ak":[]},"F7":{"f":[],"ak":[]},"vO":{"FO":[]},"T1":{"bx":[]},"nE":{"bx":[]},"Fn":{"bx":[]},"Fo":{"bx":[]},"Fq":{"bx":[]},"tV":{"A":["1"],"x":["1"],"ac":["1"],"o":["1"],"A.E":"1","o.E":"1"},"SZ":{"bx":[]},"ju":{"bjC":["1"]},"jg":{"f":[],"ak":[]},"jn":{"f":[],"ak":[]},"jF":{"f":[],"ak":[]},"Sc":{"A":["jg"],"bh":["jg"],"x":["jg"],"f":[],"ac":["jg"],"ak":[],"o":["jg"],"bh.E":"jg","A.E":"jg","o.E":"jg"},"T0":{"A":["jn"],"bh":["jn"],"x":["jn"],"f":[],"ac":["jn"],"ak":[],"o":["jn"],"bh.E":"jn","A.E":"jn","o.E":"jn"},"TR":{"f":[],"ak":[]},"Wu":{"A":["h"],"bh":["h"],"x":["h"],"f":[],"ac":["h"],"ak":[],"o":["h"],"bh.E":"h","A.E":"h","o.E":"h"},"b_":{"cz":[],"bm":[],"f":[],"ak":[]},"Xb":{"A":["jF"],"bh":["jF"],"x":["jF"],"f":[],"ac":["jF"],"ak":[],"o":["jF"],"bh.E":"jF","A.E":"jF","o.E":"jF"},"c2":{"ee":[]},"ah0":{"x":["n"],"ac":["n"],"o":["n"],"ee":[]},"cI":{"x":["n"],"ac":["n"],"o":["n"],"ee":[]},"asy":{"x":["n"],"ac":["n"],"o":["n"],"ee":[]},"agZ":{"x":["n"],"ac":["n"],"o":["n"],"ee":[]},"asx":{"x":["n"],"ac":["n"],"o":["n"],"ee":[]},"ah_":{"x":["n"],"ac":["n"],"o":["n"],"ee":[]},"zA":{"x":["n"],"ac":["n"],"o":["n"],"ee":[]},"ad4":{"x":["U"],"ac":["U"],"o":["U"],"ee":[]},"ad5":{"x":["U"],"ac":["U"],"o":["U"],"ee":[]},"VV":{"tx":[]},"NO":{"f":[],"ak":[]},"NP":{"f":[],"bb":["h","@"],"ak":[],"ar":["h","@"],"bb.V":"@","bb.K":"h"},"NQ":{"f":[],"ak":[]},"pl":{"f":[],"ak":[]},"T2":{"f":[],"ak":[]},"wY":{"dH":["1"]},"GY":{"eM":["1","2"],"eM.S":"1","eM.T":"2"},"ws":{"a5":[],"i":[]},"mT":{"jp":[],"dz":[],"dI":[]},"C_":{"ag":["ws"]},"fH":{"aRY":[],"o":["h"],"o.E":"h"},"c8":{"ar":["2","3"]},"yV":{"AY":["1","cR<1>"],"AY.E":"1"},"Rj":{"bZ":["x<n>","tc"]},"a37":{"bZ":["x<n>","tc"],"bZ.S":"x<n>","bZ.T":"tc"},"ch":{"aE":[]},"wd":{"ch":["U"],"aE":[]},"Y4":{"ch":["U"],"aE":[]},"Y5":{"ch":["U"],"aE":[]},"FI":{"ch":["U"],"aE":[]},"l1":{"ch":["U"],"aE":[]},"Ct":{"ch":["U"],"aE":[]},"vu":{"ch":["U"],"aE":[]},"wJ":{"ch":["1"],"aE":[]},"Bu":{"ch":["1"],"aE":[]},"K6":{"j0":[]},"Gk":{"j0":[]},"hV":{"j0":[]},"HW":{"j0":[]},"eW":{"j0":[]},"HV":{"j0":[]},"pF":{"j0":[]},"Zz":{"j0":[]},"aK":{"aM":["1"],"aM.T":"1","aK.T":"1"},"fe":{"aK":["S?"],"aM":["S?"],"aM.T":"S?","aK.T":"S?"},"aX":{"ch":["1"],"aE":[]},"h5":{"aM":["1"],"aM.T":"1"},"Gg":{"aK":["1"],"aM":["1"],"aM.T":"1","aK.T":"1"},"VX":{"aK":["T?"],"aM":["T?"],"aM.T":"T?","aK.T":"T?"},"FW":{"aK":["C?"],"aM":["C?"],"aM.T":"C?","aK.T":"C?"},"pS":{"aK":["n"],"aM":["n"],"aM.T":"n","aK.T":"n"},"iq":{"aM":["U"],"aM.T":"U"},"I7":{"aM":["1"],"aM.T":"1"},"Cp":{"a5":[],"i":[]},"IX":{"ag":["Cp"]},"e7":{"S":[]},"Zg":{"lh":[]},"PI":{"av":[],"i":[]},"t3":{"a5":[],"i":[]},"IY":{"ag":["t3"]},"PK":{"dZ":[]},"Zj":{"iE":["Cq"],"iE.T":"Cq"},"Q2":{"Cq":[]},"Cr":{"a5":[],"i":[]},"J_":{"ag":["Cr"]},"PL":{"av":[],"i":[]},"zY":{"a5":[],"i":[]},"PM":{"av":[],"i":[]},"zZ":{"ag":["zY<1>"]},"lx":{"j1":[]},"wQ":{"a5":[],"i":[]},"IZ":{"mq":["wQ"],"ag":["wQ"]},"a44":{"aE":[]},"PO":{"lh":[]},"J0":{"a5":[],"i":[]},"Zr":{"av":[],"i":[]},"PP":{"av":[],"i":[]},"Zm":{"bo":[],"aH":[],"i":[]},"a25":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"J1":{"ag":["J0"]},"J2":{"aH":[],"i":[]},"Zl":{"bQ":[],"bL":[],"K":[]},"KP":{"dA":["O","hx"],"O":[],"az":["O","hx"],"B":[],"W":[],"ax":[],"az.1":"hx","dA.1":"hx","az.0":"O"},"a1_":{"bL":[],"K":[]},"a10":{"i":[]},"t4":{"av":[],"i":[]},"JU":{"bC":[],"bs":[],"i":[]},"PQ":{"av":[],"i":[]},"r1":{"jU":["x<R>"],"he":[]},"xa":{"r1":[],"jU":["x<R>"],"he":[]},"QF":{"r1":[],"jU":["x<R>"],"he":[]},"QD":{"r1":[],"jU":["x<R>"],"he":[]},"nF":{"rG":[],"cA":[]},"a_j":{"tb":["c9"],"he":[]},"hQ":{"aE":[]},"fn":{"aE":[]},"r6":{"aE":[]},"jU":{"he":[]},"tb":{"he":[]},"Qe":{"tb":["Qd"],"he":[]},"cs":{"fT":[],"cs.T":"1"},"Sh":{"fT":[]},"ov":{"fT":[]},"Em":{"k_":[]},"bn":{"o":["1"],"o.E":"1"},"xq":{"o":["1"],"o.E":"1"},"cv":{"a7":["1"]},"xo":{"ax":[]},"Dg":{"c9":[]},"eN":{"bA":[]},"o5":{"bA":[]},"qg":{"bA":[]},"qh":{"bA":[]},"o4":{"bA":[]},"ht":{"bA":[]},"o6":{"bA":[]},"XZ":{"bA":[]},"a4A":{"bA":[]},"uy":{"bA":[]},"a4w":{"uy":[],"bA":[]},"uE":{"bA":[]},"a4H":{"uE":[],"bA":[]},"a4C":{"o5":[],"bA":[]},"a4z":{"qg":[],"bA":[]},"a4B":{"qh":[],"bA":[]},"a4y":{"o4":[],"bA":[]},"uB":{"bA":[]},"a4D":{"uB":[],"bA":[]},"uI":{"bA":[]},"a4L":{"uI":[],"bA":[]},"uG":{"ht":[],"bA":[]},"a4J":{"uG":[],"ht":[],"bA":[]},"uH":{"ht":[],"bA":[]},"a4K":{"uH":[],"ht":[],"bA":[]},"uF":{"ht":[],"bA":[]},"a4I":{"uF":[],"ht":[],"bA":[]},"a4F":{"o6":[],"bA":[]},"uD":{"bA":[]},"a4G":{"uD":[],"bA":[]},"uC":{"bA":[]},"a4E":{"uC":[],"bA":[]},"uz":{"bA":[]},"a4x":{"uz":[],"bA":[]},"kI":{"dz":[],"dI":[]},"Kh":{"AX":[]},"As":{"AX":[]},"iF":{"dz":[],"dI":[]},"ll":{"dz":[],"dI":[]},"kM":{"dz":[],"dI":[]},"jp":{"dz":[],"dI":[]},"CS":{"dz":[],"dI":[]},"kC":{"dz":[],"dI":[]},"dz":{"dI":[]},"Fc":{"dz":[],"dI":[]},"ym":{"dz":[],"dI":[]},"l4":{"dz":[],"dI":[]},"iN":{"dz":[],"dI":[]},"O4":{"dz":[],"dI":[]},"vF":{"dI":[]},"YR":{"xn":[]},"tL":{"ia":[]},"xW":{"ia":[]},"NA":{"av":[],"i":[]},"EG":{"a5":[],"i":[]},"Kc":{"ag":["EG"]},"xY":{"aK":["C?"],"aM":["C?"],"aM.T":"C?","aK.T":"C?"},"EJ":{"aK":["l"],"aM":["l"],"aM.T":"l","aK.T":"l"},"BB":{"av":[],"i":[]},"b61":{"eh":[],"bC":[],"bs":[],"i":[]},"FT":{"a5":[],"i":[]},"a1Y":{"ag":["FT"]},"a_X":{"bo":[],"aH":[],"i":[]},"a2c":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"a0c":{"bK":["d5?"]},"BU":{"a5":[],"i":[]},"ID":{"ag":["BU"]},"a0I":{"ei":[],"bK":["ei"]},"a_W":{"bo":[],"aH":[],"i":[]},"a2b":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Ot":{"av":[],"i":[]},"Ss":{"lQ":["n"],"S":[],"lQ.T":"n"},"Sq":{"lQ":["n"],"S":[],"lQ.T":"n"},"ZH":{"lh":[]},"Qa":{"av":[],"i":[]},"wZ":{"av":[],"i":[]},"x_":{"av":[],"i":[]},"CE":{"kP":["1"],"fm":["1"],"di":["1"]},"Qr":{"a5":[],"i":[]},"Jl":{"bK":["S?"]},"a_4":{"bK":["S?"]},"a_2":{"bK":["U"]},"a_3":{"bK":["ei?"]},"b4q":{"eh":[],"bC":[],"bs":[],"i":[]},"QV":{"av":[],"i":[]},"a_1":{"ei":[],"bK":["ei"]},"YK":{"bo":[],"aH":[],"i":[]},"a23":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Ir":{"ch":["1"],"aE":[]},"RD":{"av":[],"i":[]},"a_K":{"bK":["S?"]},"a_L":{"bK":["S?"]},"RE":{"eh":[],"bC":[],"bs":[],"i":[]},"DX":{"a5":[],"i":[]},"JY":{"ag":["DX"]},"DY":{"m3":[]},"pR":{"pT":[],"m3":[]},"DZ":{"pT":[],"m3":[]},"E_":{"pT":[],"m3":[]},"pT":{"m3":[]},"KF":{"bC":[],"bs":[],"i":[]},"JX":{"a5":[],"i":[]},"xE":{"av":[],"i":[]},"JW":{"ag":["JX"],"aPe":[]},"RQ":{"av":[],"i":[]},"je":{"cH":[]},"a0V":{"je":[],"cH":[]},"li":{"je":[],"cH":[]},"e1":{"je":[],"cH":[]},"IB":{"a5":[],"i":[]},"JL":{"a5":[],"i":[]},"tR":{"a5":[],"i":[]},"JZ":{"aE":[]},"K_":{"aK":["je"],"aM":["je"],"aM.T":"je","aK.T":"je"},"a_U":{"aE":[]},"Yu":{"ag":["IB"]},"JM":{"ag":["JL"]},"KR":{"mx":["fJ"],"O":[],"B":[],"W":[],"ax":[]},"ZD":{"la":["fJ"],"aH":[],"i":[],"la.S":"fJ"},"K0":{"ag":["tR"]},"xP":{"av":[],"i":[]},"a_S":{"bK":["S?"]},"a0h":{"la":["lz"],"aH":[],"i":[],"la.S":"lz"},"a2e":{"mx":["lz"],"O":[],"B":[],"W":[],"ax":[]},"b5S":{"eh":[],"bC":[],"bs":[],"i":[]},"HN":{"a5":[],"i":[]},"LU":{"ag":["HN"]},"Sn":{"av":[],"i":[]},"EF":{"a5":[],"i":[]},"KV":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"v4":{"aK":["cH?"],"aM":["cH?"],"aM.T":"cH?","aK.T":"cH?"},"Kd":{"a5":[],"i":[]},"a0u":{"ag":["EF"]},"a_T":{"bo":[],"aH":[],"i":[]},"a0r":{"ag":["Kd"]},"Lr":{"av":[],"i":[]},"a38":{"aE":[]},"a0s":{"iE":["EI"],"iE.T":"EI"},"Q4":{"EI":[]},"St":{"S":[],"bK":["S"]},"a0v":{"S":[],"bK":["S"]},"Sv":{"ei":[],"bK":["ei"]},"Jq":{"ei":[],"bK":["ei"]},"Sw":{"G":[],"bK":["G"]},"a0w":{"G":[],"bK":["G"]},"K5":{"bK":["1?"]},"jH":{"bK":["1"]},"dg":{"bK":["1"]},"Sx":{"fn":["cR<dJ>"],"aE":[]},"a0e":{"bK":["d5?"]},"u6":{"EK":["1"],"kP":["1"],"fm":["1"],"di":["1"]},"ri":{"a5":[],"i":[]},"rj":{"a5":[],"i":[]},"a5j":{"av":[],"i":[]},"a5h":{"ag":["ri"]},"a5i":{"ag":["rj"]},"XY":{"o0":[]},"PN":{"o0":[]},"Mr":{"aE":[]},"Ms":{"aE":[]},"rX":{"a5":[],"i":[]},"U5":{"a5":[],"i":[]},"YN":{"aE":[]},"YO":{"ag":["rX"]},"b76":{"eh":[],"bC":[],"bs":[],"i":[]},"Gm":{"a5":[],"i":[]},"Lb":{"bC":[],"bs":[],"i":[]},"Jw":{"a5":[],"i":[]},"uV":{"a5":[],"i":[]},"yL":{"ag":["uV"]},"bau":{"a5":[],"i":[]},"Gn":{"ag":["Gm"]},"a2P":{"aE":[]},"IA":{"aj":[]},"Ys":{"av":[],"i":[]},"Jx":{"ag":["Jw"]},"ZL":{"bE":["is"],"bE.T":"is"},"a2Q":{"bC":[],"bs":[],"i":[]},"An":{"a5":[],"i":[]},"VC":{"av":[],"i":[]},"a0t":{"mq":["An"],"ag":["An"]},"b7D":{"eh":[],"bC":[],"bs":[],"i":[]},"a0d":{"bK":["d5?"]},"H3":{"a5":[],"i":[]},"ls":{"bl":[]},"Lx":{"ag":["H3"]},"a3j":{"aH":[],"i":[]},"AD":{"O":[],"B":[],"W":[],"ax":[]},"a4Y":{"aH":[],"i":[]},"a2s":{"O":[],"B":[],"W":[],"ax":[]},"H4":{"eh":[],"bC":[],"bs":[],"i":[]},"vb":{"a5":[],"i":[]},"Ly":{"ag":["vb"]},"zl":{"a5":[],"i":[]},"LR":{"bK":["S?"]},"a3W":{"bK":["S?"]},"a3V":{"bK":["ei"]},"a3Y":{"a5":[],"i":[]},"a3Z":{"av":[],"i":[]},"b8n":{"eh":[],"bC":[],"bs":[],"i":[]},"oo":{"a5":[],"i":[]},"LS":{"ag":["oo"]},"Sy":{"lh":[]},"a43":{"aE":[]},"b8x":{"eh":[],"bC":[],"bs":[],"i":[]},"LX":{"a5":[],"i":[]},"WX":{"av":[],"i":[]},"a4a":{"ag":["LX"]},"a4b":{"bo":[],"aH":[],"i":[]},"a4c":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"a47":{"fW":[],"aH":[],"i":[]},"a48":{"bQ":[],"bL":[],"K":[]},"a2q":{"O":[],"az":["O","hx"],"B":[],"W":[],"ax":[],"az.1":"hx","az.0":"O"},"a46":{"av":[],"i":[]},"a49":{"av":[],"i":[]},"WZ":{"av":[],"i":[]},"JV":{"eh":[],"bC":[],"bs":[],"i":[]},"vp":{"aK":["kc"],"aM":["kc"],"aM.T":"kc","aK.T":"kc"},"Bq":{"a5":[],"i":[]},"zw":{"av":[],"i":[]},"Ye":{"ag":["Bq"]},"I3":{"a5":[],"i":[]},"vt":{"ag":["I3"]},"a4m":{"av":[],"i":[]},"b8S":{"eh":[],"bC":[],"bs":[],"i":[]},"nX":{"hm":["aO8"],"hm.T":"aO8"},"eS":{"il":[]},"hN":{"il":[]},"Kj":{"il":[]},"Fk":{"fF":[]},"a3M":{"aE":[]},"eK":{"cH":[]},"ki":{"cH":[]},"Ob":{"cH":[]},"fd":{"cH":[]},"h9":{"cH":[]},"c4":{"j1":[]},"eu":{"qz":[]},"eU":{"eK":[],"cH":[]},"lQ":{"S":[]},"an":{"dG":[]},"it":{"dG":[]},"r7":{"dG":[]},"aO8":{"hm":["aO8"]},"me":{"hm":["me"],"hm.T":"me"},"NM":{"hm":["lJ"]},"SU":{"bx":[]},"lK":{"hm":["lJ"],"hm.T":"lJ"},"o1":{"iy":[]},"c7":{"eK":[],"cH":[]},"hE":{"eK":[],"cH":[]},"iL":{"j1":[]},"i5":{"eK":[],"cH":[]},"hH":{"eK":[],"cH":[]},"hI":{"eK":[],"cH":[]},"zJ":{"jC":[]},"a4W":{"jC":[]},"mG":{"iy":[],"nW":[],"ax":[]},"Ul":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"yD":{"fF":[],"ax":[]},"Iy":{"aE":[]},"ky":{"kL":[]},"O":{"B":[],"W":[],"ax":[]},"wn":{"jc":["O"]},"ha":{"dt":[]},"Co":{"ha":[],"eV":["1"],"dt":[]},"k2":{"ha":[],"eV":["O"],"dt":[]},"Ut":{"dA":["O","k2"],"O":[],"az":["O","k2"],"B":[],"W":[],"ax":[],"az.1":"k2","dA.1":"k2","az.0":"O"},"PU":{"aE":[]},"Uu":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"qo":{"aE":[]},"uO":{"dA":["O","hw"],"O":[],"az":["O","hw"],"B":[],"W":[],"ax":[],"az.1":"hw","dA.1":"hw","az.0":"O"},"a27":{"O":[],"B":[],"W":[],"ax":[]},"LT":{"qo":[],"aE":[]},"Jz":{"qo":[],"aE":[]},"zV":{"qo":[],"aE":[]},"Ux":{"O":[],"B":[],"W":[],"ax":[]},"iu":{"ha":[],"eV":["O"],"dt":[]},"Uz":{"dA":["O","iu"],"O":[],"az":["O","iu"],"B":[],"W":[],"ax":[],"az.1":"iu","dA.1":"iu","az.0":"O"},"UC":{"O":[],"B":[],"W":[],"ax":[]},"f_":{"W":[]},"fv":{"f_":[],"W":[]},"rZ":{"fv":[],"f_":[],"W":[]},"wD":{"fv":[],"f_":[],"W":[]},"Cj":{"fv":[],"f_":[],"W":[]},"mJ":{"mg":[],"fv":[],"f_":[],"W":[]},"Fd":{"mg":[],"fv":[],"f_":[],"W":[]},"TM":{"f_":[],"W":[]},"mg":{"fv":[],"f_":[],"W":[]},"Cg":{"fv":[],"f_":[],"W":[]},"BF":{"fv":[],"f_":[],"W":[]},"El":{"fv":[],"f_":[],"W":[]},"Dk":{"fv":[],"f_":[],"W":[]},"SM":{"aE":[]},"B":{"W":[],"ax":[]},"eV":{"dt":[]},"a2I":{"ie":[]},"JT":{"ie":[]},"vV":{"ie":[]},"hw":{"ha":[],"eV":["O"],"dt":[]},"o2":{"l8":[]},"oQ":{"fj":[],"aE":[]},"G1":{"dA":["O","hw"],"O":[],"az":["O","hw"],"B":[],"W":[],"ax":[],"az.1":"hw","dA.1":"hw","az.0":"O"},"qA":{"aE":[]},"FX":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"oa":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UQ":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"G2":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Us":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UF":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Um":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UJ":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Uk":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Un":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Cu":{"aE":[]},"AC":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Ur":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Uq":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Up":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"KY":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UL":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UM":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Uw":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UX":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"G_":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UB":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UO":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UH":{"O":[],"bc":["O"],"B":[],"nW":[],"W":[],"ax":[]},"G3":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"G0":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UI":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"G4":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Uo":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UG":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Uy":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UD":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UE":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UA":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"fj":{"aE":[]},"uQ":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UK":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Uj":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UP":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Uv":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"z4":{"kL":[]},"oi":{"qD":[],"eV":["dh"],"dt":[]},"oj":{"qE":[],"eV":["dh"],"dt":[]},"dh":{"B":[],"W":[],"ax":[]},"W6":{"jc":["dh"]},"qD":{"dt":[]},"qE":{"dt":[]},"US":{"qq":[],"dh":[],"az":["O","jB"],"B":[],"W":[],"ax":[],"az.1":"jB","az.0":"O"},"UT":{"qq":[],"dh":[],"az":["O","jB"],"B":[],"W":[],"ax":[]},"UU":{"qq":[],"dh":[],"az":["O","jB"],"B":[],"W":[],"ax":[],"az.1":"jB","az.0":"O"},"m9":{"dt":[]},"jB":{"qD":[],"eV":["O"],"m9":[],"dt":[]},"qq":{"dh":[],"az":["O","jB"],"B":[],"W":[],"ax":[]},"G5":{"dh":[],"bc":["dh"],"B":[],"W":[],"ax":[]},"UV":{"dh":[],"bc":["dh"],"B":[],"W":[],"ax":[]},"fG":{"ha":[],"eV":["O"],"dt":[]},"G6":{"dA":["O","fG"],"O":[],"az":["O","fG"],"B":[],"W":[],"ax":[],"az.1":"fG","dA.1":"fG","az.0":"O"},"pf":{"aK":["il?"],"aM":["il?"],"aM.T":"il?","aK.T":"il?"},"G8":{"bc":["O"],"B":[],"W":[],"ax":[]},"yC":{"kl":["1"],"O":[],"az":["dh","1"],"FY":[],"B":[],"W":[],"ax":[]},"G9":{"kl":["oj"],"O":[],"az":["dh","oj"],"FY":[],"B":[],"W":[],"ax":[],"az.1":"oj","kl.0":"oj","az.0":"dh"},"UR":{"kl":["oi"],"O":[],"az":["dh","oi"],"FY":[],"B":[],"W":[],"ax":[],"az.1":"oi","kl.0":"oi","az.0":"dh"},"hy":{"aE":[]},"mO":{"ha":[],"eV":["O"],"dt":[]},"V0":{"dA":["O","mO"],"O":[],"az":["O","mO"],"B":[],"W":[],"ax":[],"az.1":"mO","dA.1":"mO","az.0":"O"},"vq":{"a7":["~"]},"HX":{"bx":[]},"dv":{"W":[]},"oE":{"cd":["oE"]},"lC":{"cd":["lC"]},"oW":{"cd":["oW"]},"yT":{"cd":["yT"]},"a33":{"tb":["dv"],"he":[]},"yS":{"aE":[]},"um":{"cd":["yT"]},"zQ":{"a7Y":[]},"yU":{"fF":[]},"tX":{"pV":[]},"pX":{"pV":[]},"Eh":{"pV":[]},"yi":{"bx":[]},"EP":{"bx":[]},"ZF":{"ei":[]},"a3N":{"EQ":[]},"qK":{"ei":[]},"kW":{"kX":[]},"yv":{"kX":[]},"Gf":{"aE":[]},"wt":{"jC":[]},"xM":{"jC":[]},"Fl":{"jC":[]},"CL":{"jC":[]},"WO":{"qO":[]},"WN":{"qO":[]},"WP":{"qO":[]},"zo":{"qO":[]},"a3f":{"qP":[]},"QQ":{"qP":[]},"a1h":{"HM":[]},"n7":{"a5":[],"i":[]},"Im":{"bC":[],"bs":[],"i":[]},"nG":{"a5":[],"i":[]},"aOX":{"bl":[]},"b3S":{"bl":[]},"b3R":{"bl":[]},"wa":{"bl":[]},"wo":{"bl":[]},"is":{"bl":[]},"uM":{"bl":[]},"ev":{"bE":["1"]},"cy":{"bE":["1"],"bE.T":"1"},"In":{"ag":["n7"]},"JC":{"ag":["nG"]},"XI":{"bE":["aOX"],"bE.T":"aOX"},"CJ":{"bE":["bl"],"bE.T":"bl"},"Qg":{"bE":["is"]},"U4":{"bE":["uM"],"bE.T":"uM"},"KC":{"MN":["1"],"ev":["1"],"Au":["1"],"bE":["1"],"bE.T":"1","ev.T":"1"},"KD":{"MO":["1"],"ev":["1"],"Au":["1"],"bE":["1"],"bE.T":"1","ev.T":"1"},"IV":{"bE":["1"],"bE.T":"1"},"Bp":{"a5":[],"i":[]},"Yd":{"ag":["Bp"]},"Yc":{"bo":[],"aH":[],"i":[]},"rD":{"a5":[],"i":[]},"Iq":{"ag":["rD"]},"Ig":{"a5":[],"i":[]},"Mh":{"ag":["Ig"],"fI":[]},"xm":{"a5":[],"i":[]},"JF":{"ag":["xm<1>"]},"yt":{"a5":[],"i":[]},"pj":{"bl":[]},"pi":{"bl":[]},"AA":{"ag":["yt<1>"]},"Iu":{"cy":["1"],"bE":["1"],"bE.T":"1"},"NU":{"jY":["fn<n>"],"bC":[],"bs":[],"i":[],"jY.T":"fn<n>"},"wg":{"a5":[],"i":[]},"tW":{"fB":[]},"Iv":{"ag":["wg"]},"Ee":{"aE":[]},"a11":{"av":[],"i":[]},"jV":{"bC":[],"bs":[],"i":[]},"lP":{"bo":[],"aH":[],"i":[]},"wC":{"bo":[],"aH":[],"i":[]},"oq":{"bo":[],"aH":[],"i":[]},"pv":{"bo":[],"aH":[],"i":[]},"wI":{"bo":[],"aH":[],"i":[]},"b3":{"bo":[],"aH":[],"i":[]},"dl":{"bo":[],"aH":[],"i":[]},"jT":{"bo":[],"aH":[],"i":[]},"Ek":{"fD":["k2"],"bs":[],"i":[],"fD.T":"k2"},"V":{"bo":[],"aH":[],"i":[]},"mA":{"fW":[],"aH":[],"i":[]},"kT":{"fD":["fG"],"bs":[],"i":[],"fD.T":"fG"},"yI":{"fW":[],"aH":[],"i":[]},"wH":{"fW":[],"aH":[],"i":[]},"b3w":{"bC":[],"bs":[],"i":[]},"e_":{"bo":[],"aH":[],"i":[]},"yR":{"bo":[],"aH":[],"i":[]},"a4O":{"hU":[],"bL":[],"K":[]},"a4P":{"bC":[],"bs":[],"i":[]},"T5":{"bo":[],"aH":[],"i":[]},"NX":{"bo":[],"aH":[],"i":[]},"Cv":{"bo":[],"aH":[],"i":[]},"Pl":{"bo":[],"aH":[],"i":[]},"TJ":{"bo":[],"aH":[],"i":[]},"TK":{"bo":[],"aH":[],"i":[]},"QR":{"bo":[],"aH":[],"i":[]},"R5":{"bo":[],"aH":[],"i":[]},"px":{"bo":[],"aH":[],"i":[]},"PT":{"fW":[],"aH":[],"i":[]},"d6":{"bo":[],"aH":[],"i":[]},"Sd":{"bo":[],"aH":[],"i":[]},"Fa":{"bo":[],"aH":[],"i":[]},"a17":{"bQ":[],"bL":[],"K":[]},"wf":{"bo":[],"aH":[],"i":[]},"W8":{"bo":[],"aH":[],"i":[]},"TU":{"av":[],"i":[]},"QT":{"fW":[],"aH":[],"i":[]},"Dc":{"fD":["iu"],"bs":[],"i":[],"fD.T":"iu"},"D6":{"fD":["iu"],"bs":[],"i":[],"fD.T":"iu"},"XM":{"fW":[],"aH":[],"i":[]},"Vf":{"fW":[],"aH":[],"i":[]},"Ub":{"aH":[],"i":[]},"Sf":{"bo":[],"aH":[],"i":[]},"SL":{"bo":[],"aH":[],"i":[]},"fY":{"bo":[],"aH":[],"i":[]},"Nv":{"bo":[],"aH":[],"i":[]},"SF":{"bo":[],"aH":[],"i":[]},"O8":{"bo":[],"aH":[],"i":[]},"pD":{"bo":[],"aH":[],"i":[]},"DV":{"bo":[],"aH":[],"i":[]},"iA":{"av":[],"i":[]},"hP":{"av":[],"i":[]},"t_":{"bo":[],"aH":[],"i":[]},"KO":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Ih":{"fF":[],"ax":[]},"uP":{"aH":[],"i":[]},"qp":{"bQ":[],"bL":[],"K":[]},"XK":{"fF":[],"ax":[]},"PY":{"bo":[],"aH":[],"i":[]},"PA":{"av":[],"i":[]},"ZB":{"aE":[]},"wV":{"eh":[],"bC":[],"bs":[],"i":[]},"a12":{"av":[],"i":[]},"Q6":{"av":[],"i":[]},"CH":{"a5":[],"i":[]},"J6":{"ag":["CH"]},"Qh":{"av":[],"i":[]},"x4":{"a5":[],"i":[]},"Jf":{"ag":["x4"]},"vj":{"fn":["cM"],"aE":[]},"x5":{"a5":[],"i":[]},"pB":{"ag":["x5"],"fI":[]},"Lf":{"a5":[],"i":[]},"vQ":{"lm":[],"o1":[],"iy":[]},"YT":{"bo":[],"aH":[],"i":[]},"a24":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Jg":{"fW":[],"aH":[],"i":[]},"a2R":{"ag":["Lf"],"aUz":[]},"oH":{"ev":["1"],"bE":["1"],"bE.T":"1","ev.T":"1"},"Ma":{"ev":["1"],"bE":["1"],"bE.T":"1","ev.T":"1"},"Mb":{"ev":["1"],"bE":["1"],"bE.T":"1","ev.T":"1"},"a30":{"ev":["oe"],"bE":["oe"],"bE.T":"oe","ev.T":"oe"},"Zc":{"ev":["lR"],"bE":["lR"],"bE.T":"lR","ev.T":"lR"},"dY":{"aE":[]},"tz":{"dY":[],"aE":[]},"Di":{"aE":[]},"ty":{"a5":[],"i":[]},"JA":{"jY":["dY"],"bC":[],"bs":[],"i":[],"jY.T":"dY"},"A3":{"ag":["ty"]},"QZ":{"a5":[],"i":[]},"a_q":{"ag":["ty"]},"Dj":{"a5":[],"i":[]},"aOp":{"bl":[]},"ul":{"bl":[]},"uL":{"bl":[]},"aN9":{"bl":[]},"JB":{"dY":[],"aE":[]},"a_r":{"ag":["Dj"]},"V3":{"bE":["aOp"],"bE.T":"aOp"},"SW":{"bE":["ul"],"bE.T":"ul"},"TZ":{"bE":["uL"],"bE.T":"uL"},"CG":{"bE":["aN9"],"bE.T":"aN9"},"jX":{"fT":[]},"bU":{"jX":["1"],"fT":[]},"a5":{"i":[]},"bo":{"aH":[],"i":[]},"bL":{"K":[]},"iM":{"bL":[],"K":[]},"hU":{"bL":[],"K":[]},"nJ":{"jX":["1"],"fT":[]},"av":{"i":[]},"bs":{"i":[]},"fD":{"bs":[],"i":[]},"bC":{"bs":[],"i":[]},"aH":{"i":[]},"Sa":{"aH":[],"i":[]},"fW":{"aH":[],"i":[]},"QG":{"aH":[],"i":[]},"Cm":{"bL":[],"K":[]},"Wp":{"bL":[],"K":[]},"FK":{"bL":[],"K":[]},"ur":{"bL":[],"K":[]},"bQ":{"bL":[],"K":[]},"S9":{"bQ":[],"bL":[],"K":[]},"GU":{"bQ":[],"bL":[],"K":[]},"jl":{"bQ":[],"bL":[],"K":[]},"a0Z":{"bL":[],"K":[]},"a13":{"i":[]},"kV":{"a5":[],"i":[]},"yu":{"ag":["kV"]},"cK":{"tE":["1"]},"R8":{"av":[],"i":[]},"a_z":{"bo":[],"aH":[],"i":[]},"tF":{"a5":[],"i":[]},"Ab":{"ag":["tF"]},"Ds":{"uk":[]},"jd":{"av":[],"i":[]},"tN":{"eh":[],"bC":[],"bs":[],"i":[]},"nO":{"a5":[],"i":[]},"JS":{"ag":["nO"],"fI":[]},"rM":{"aK":["aj"],"aM":["aj"],"aM.T":"aj","aK.T":"aj"},"nr":{"aK":["j1"],"aM":["j1"],"aM.T":"j1","aK.T":"j1"},"nv":{"aK":["dG"],"aM":["dG"],"aM.T":"dG","aK.T":"dG"},"rK":{"aK":["dx?"],"aM":["dx?"],"aM.T":"dx?","aK.T":"dx?"},"ua":{"aK":["aC"],"aM":["aC"],"aM.T":"aC","aK.T":"aC"},"vo":{"aK":["G"],"aM":["G"],"aM.T":"G","aK.T":"G"},"Bi":{"a5":[],"i":[]},"Bm":{"a5":[],"i":[]},"Bo":{"a5":[],"i":[]},"Bl":{"a5":[],"i":[]},"Bj":{"a5":[],"i":[]},"Bn":{"a5":[],"i":[]},"CW":{"aK":["an"],"aM":["an"],"aM.T":"an","aK.T":"an"},"RN":{"a5":[],"i":[]},"xC":{"ag":["1"]},"wc":{"ag":["1"]},"Y6":{"ag":["Bi"]},"Y9":{"ag":["Bm"]},"Yb":{"ag":["Bo"]},"Y8":{"ag":["Bl"]},"Y7":{"ag":["Bj"]},"Ya":{"ag":["Bn"]},"m2":{"bC":[],"bs":[],"i":[]},"DW":{"hU":[],"bL":[],"K":[]},"jY":{"bC":[],"bs":[],"i":[]},"Af":{"hU":[],"bL":[],"K":[]},"eh":{"bC":[],"bs":[],"i":[]},"zS":{"av":[],"i":[]},"E3":{"a5":[],"i":[]},"K1":{"ag":["E3"]},"a00":{"av":[],"i":[]},"Xd":{"fn":["aC"],"aE":[]},"cE":{"pw":["aj"],"aH":[],"i":[],"pw.0":"aj"},"pw":{"aH":[],"i":[]},"Ai":{"bQ":[],"bL":[],"K":[]},"a2d":{"jv":["aj","O"],"O":[],"bc":["O"],"B":[],"W":[],"ax":[],"jv.0":"aj"},"Ka":{"bC":[],"bs":[],"i":[]},"Eu":{"a5":[],"i":[]},"a55":{"iE":["Ii"],"iE.T":"Ii"},"Q8":{"Ii":[]},"a0k":{"ag":["Eu"]},"aTv":{"bC":[],"bs":[],"i":[]},"Ex":{"iL":[],"j1":[]},"FS":{"av":[],"i":[]},"a0o":{"av":[],"i":[]},"ZV":{"aE":[]},"a0n":{"bo":[],"aH":[],"i":[]},"a2f":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"ud":{"m2":["fr"],"bC":[],"bs":[],"i":[],"m2.T":"fr"},"Ki":{"a5":[],"i":[]},"a0y":{"ag":["Ki"],"fI":[]},"zP":{"dz":[],"dI":[]},"SK":{"av":[],"i":[]},"NE":{"a5":[],"i":[]},"Yi":{"tE":["zP"]},"a0G":{"av":[],"i":[]},"aOb":{"l3":[]},"tG":{"bC":[],"bs":[],"i":[]},"F2":{"a5":[],"i":[]},"kR":{"ag":["F2"]},"a0Y":{"di":["~"]},"Ar":{"r9":[]},"Aq":{"r9":[]},"Kv":{"r9":[]},"Kw":{"r9":[]},"a_D":{"f3":["ar<h?,x<R>>?"],"aE":[]},"iB":{"fB":[]},"ej":{"bs":[],"i":[]},"KB":{"bL":[],"K":[]},"un":{"av":[],"i":[]},"o_":{"aE":[]},"oO":{"a5":[],"i":[]},"At":{"ag":["oO"]},"Fg":{"a5":[],"i":[]},"y7":{"ag":["Fg"]},"L3":{"O":[],"az":["O","fG"],"B":[],"W":[],"ax":[],"az.1":"fG","az.0":"O"},"M0":{"fW":[],"aH":[],"i":[]},"a4h":{"bQ":[],"bL":[],"K":[]},"AW":{"fG":[],"ha":[],"eV":["O"],"dt":[]},"a2r":{"bC":[],"bs":[],"i":[]},"Do":{"a5":[],"i":[]},"Hn":{"a5":[],"i":[]},"JI":{"ag":["Do"]},"JH":{"aE":[]},"a_A":{"aE":[]},"LM":{"ag":["Hn"]},"LL":{"aE":[]},"Fh":{"ib":[],"fB":[]},"aTU":{"cs":["1"],"fT":[]},"y9":{"av":[],"i":[]},"ya":{"a5":[],"i":[]},"T8":{"aE":[]},"uo":{"l5":[]},"rb":{"ms":[],"uo":[],"hy":[],"aE":[],"l5":[]},"a1b":{"ag":["ya"]},"ml":{"kP":["1"],"fm":["1"],"di":["1"]},"yn":{"bC":[],"bs":[],"i":[]},"qs":{"a5":[],"i":[]},"Ia":{"bC":[],"bs":[],"i":[]},"Gi":{"a5":[],"i":[]},"f3":{"aE":[]},"a2D":{"ag":["qs"]},"L8":{"ag":["Gi"]},"dR":{"f3":["1"],"aE":[]},"lA":{"f3":["1"],"aE":[]},"L7":{"lA":["1"],"f3":["1"],"aE":[]},"Ge":{"lA":["1"],"f3":["1"],"aE":[],"dR.T":"1","lA.T":"1"},"Gd":{"lA":["I"],"f3":["I"],"aE":[],"dR.T":"I","lA.T":"I"},"Vk":{"a5":[],"i":[]},"bgF":{"bji":["a7<I>"]},"AG":{"ag":["Vk<1>"]},"a2L":{"bC":[],"bs":[],"i":[]},"a2A":{"f3":["yG?"],"aE":[],"dR.T":"yG?"},"Kl":{"bC":[],"bs":[],"i":[]},"Ap":{"a5":[],"i":[]},"r8":{"ag":["Ap<1>"]},"y6":{"di":["1"]},"fm":{"di":["1"]},"ZM":{"bE":["is"],"bE.T":"is"},"kP":{"fm":["1"],"di":["1"]},"FE":{"kP":["1"],"fm":["1"],"di":["1"]},"FQ":{"kP":["1"],"fm":["1"],"di":["1"]},"yK":{"av":[],"i":[]},"Gs":{"hm":["1"],"hm.T":"1"},"Gt":{"bC":[],"bs":[],"i":[]},"uX":{"aE":[]},"AJ":{"a5":[],"i":[]},"AH":{"cs":["fT"],"fT":[],"cs.T":"fT"},"Lp":{"ag":["AJ"]},"Db":{"l5":[]},"iK":{"iB":[],"ib":[],"fB":[]},"jy":{"iK":[],"iB":[],"ib":[],"fB":[]},"Gy":{"iK":[],"iB":[],"ib":[],"fB":[]},"mk":{"iK":[],"iB":[],"ib":[],"fB":[]},"qu":{"iK":[],"iB":[],"ib":[],"fB":[]},"Xs":{"iK":[],"iB":[],"ib":[],"fB":[]},"aPc":{"Se":["aPc"]},"Gv":{"a5":[],"i":[]},"Gw":{"ag":["Gv"]},"a2T":{"bC":[],"bs":[],"i":[]},"YX":{"jy":[],"iK":[],"iB":[],"ib":[],"fB":[]},"ms":{"hy":[],"aE":[],"l5":[]},"uY":{"ib":[],"fB":[]},"v_":{"ms":[],"hy":[],"aE":[],"l5":[]},"Vz":{"av":[],"i":[]},"Oe":{"av":[],"i":[]},"Eq":{"av":[],"i":[]},"Gz":{"a5":[],"i":[]},"Li":{"bC":[],"bs":[],"i":[]},"Lk":{"a5":[],"i":[]},"yO":{"ag":["Gz"]},"a2W":{"ag":["Lk"]},"Lj":{"aE":[]},"a2V":{"bo":[],"aH":[],"i":[]},"a2j":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"a2B":{"f3":["U?"],"aE":[],"dR.T":"U?"},"fZ":{"bl":[]},"Gr":{"bE":["fZ"],"bE.T":"fZ"},"yw":{"a5":[],"i":[]},"mX":{"iF":[],"dz":[],"dI":[]},"mY":{"iN":[],"dz":[],"dI":[]},"yP":{"aE":[]},"mq":{"ag":["1"]},"y2":{"aE":[]},"GF":{"a5":[],"i":[]},"GH":{"bC":[],"bs":[],"i":[]},"a31":{"fj":[],"ag":["GF"],"aE":[]},"VF":{"aE":[]},"GQ":{"a5":[],"i":[]},"a39":{"ag":["GQ"]},"a3a":{"m2":["R"],"bC":[],"bs":[],"i":[],"m2.T":"R"},"b7":{"og":[]},"v8":{"a5":[],"i":[]},"GR":{"a5":[],"i":[]},"Sj":{"tY":["k"],"og":[],"tY.T":"k"},"yY":{"aE":[]},"Lw":{"ag":["v8"]},"GS":{"aE":[]},"Lv":{"ag":["GR"]},"a3d":{"bC":[],"bs":[],"i":[]},"AK":{"bo":[],"aH":[],"i":[]},"GV":{"av":[],"i":[]},"a3i":{"bQ":[],"bL":[],"K":[]},"L1":{"O":[],"bc":["O"],"FY":[],"B":[],"W":[],"ax":[]},"W9":{"aH":[],"i":[]},"va":{"aH":[],"i":[]},"W7":{"va":[],"aH":[],"i":[]},"z5":{"bQ":[],"bL":[],"K":[]},"Ed":{"fD":["m9"],"bs":[],"i":[],"fD.T":"m9"},"W4":{"av":[],"i":[]},"a3l":{"va":[],"aH":[],"i":[]},"a3m":{"bo":[],"aH":[],"i":[]},"a2l":{"dh":[],"bc":["dh"],"B":[],"W":[],"ax":[]},"H5":{"bQ":[],"bL":[],"K":[]},"H6":{"aE":[]},"Wd":{"bo":[],"aH":[],"i":[]},"AE":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Wc":{"aE":[]},"J4":{"aE":[]},"mE":{"dz":[],"dI":[]},"mF":{"dz":[],"dI":[]},"BK":{"dz":[],"dI":[]},"G7":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"yB":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"WJ":{"bo":[],"aH":[],"i":[]},"WI":{"bo":[],"aH":[],"i":[]},"WQ":{"bo":[],"aH":[],"i":[]},"wW":{"eh":[],"bC":[],"bs":[],"i":[]},"b3A":{"eh":[],"bC":[],"bs":[],"i":[]},"a14":{"av":[],"i":[]},"lf":{"av":[],"i":[]},"CK":{"bl":[]},"t8":{"bl":[]},"ta":{"bl":[]},"t9":{"bl":[]},"hf":{"bl":[]},"nz":{"hf":[],"bl":[]},"nB":{"hf":[],"bl":[]},"tr":{"hf":[],"bl":[]},"tl":{"hf":[],"bl":[]},"tm":{"hf":[],"bl":[]},"j7":{"hf":[],"bl":[]},"pE":{"hf":[],"bl":[]},"nC":{"hf":[],"bl":[]},"tp":{"hf":[],"bl":[]},"tq":{"hf":[],"bl":[]},"nA":{"hf":[],"bl":[]},"od":{"bl":[]},"acJ":{"bl":[]},"oe":{"bl":[]},"lR":{"bl":[]},"qc":{"bl":[]},"qm":{"bl":[]},"kZ":{"bl":[]},"qT":{"bl":[]},"kd":{"bl":[]},"qR":{"bl":[]},"Qf":{"bl":[]},"hx":{"ha":[],"eV":["O"],"dt":[]},"oR":{"a5":[],"i":[]},"Ln":{"a5":[],"i":[]},"HQ":{"a5":[],"i":[]},"Lq":{"ag":["oR"]},"Lo":{"ag":["Ln"]},"LV":{"ag":["HQ"]},"Ch":{"fn":["wF"],"aE":[],"fI":[]},"zy":{"a5":[],"i":[]},"Jj":{"bC":[],"bs":[],"i":[]},"a4j":{"ag":["zy"]},"X4":{"av":[],"i":[]},"Br":{"a5":[],"i":[]},"z1":{"a5":[],"i":[]},"eZ":{"bo":[],"aH":[],"i":[]},"wb":{"a5":[],"i":[]},"Ip":{"ag":["Br"]},"Vs":{"a5":[],"i":[]},"Vi":{"a5":[],"i":[]},"VW":{"a5":[],"i":[]},"PZ":{"a5":[],"i":[]},"Es":{"a5":[],"i":[]},"zB":{"a5":[],"i":[]},"zC":{"ag":["zB<1>"]},"I9":{"fn":["zD"],"aE":[]},"zG":{"a5":[],"i":[]},"B_":{"ag":["zG<1>"]},"Mf":{"bC":[],"bs":[],"i":[]},"XA":{"av":[],"i":[]},"vz":{"fW":[],"aH":[],"i":[]},"a50":{"bQ":[],"bL":[],"K":[]},"VT":{"fW":[],"aH":[],"i":[]},"Mg":{"bC":[],"bs":[],"i":[]},"XG":{"av":[],"i":[]},"lm":{"o1":[],"iy":[]},"ol":{"wp":[]},"Hu":{"ol":["c2"],"wp":[],"ol.T":"c2"},"WD":{"av":[],"i":[]},"jR":{"bx":[]},"NT":{"bx":[]},"wk":{"BQ":["1"]},"Rs":{"cA":[]},"wU":{"bF":[],"cd":["bF"]},"Hk":{"Hj":[]},"rL":{"BQ":["1"]},"BR":{"rL":["1"],"wk":["1"],"BQ":["1"]},"ahL":{"rL":["1"],"aTo":["1"],"BQ":["1"]},"DC":{"aT0":["1"],"A":["1"],"Q9":["1"],"x":["1"],"ac":["1"],"o":["1"],"A.E":"1","o.E":"1"},"Rx":{"fn":["nM"],"aE":[]},"rO":{"a5":[],"i":[]},"Aw":{"av":[],"i":[]},"Ax":{"av":[],"i":[]},"lt":{"bl":[]},"zR":{"av":[],"i":[]},"zT":{"av":[],"i":[]},"IF":{"ag":["rO"]},"KG":{"av":[],"i":[]},"YI":{"av":[],"i":[]},"hg":{"a5":[],"i":[]},"Jt":{"ag":["hg"]},"tC":{"a5":[],"i":[]},"a_u":{"ag":["tC"]},"tU":{"a5":[],"i":[]},"K2":{"ag":["tU"]},"RT":{"av":[],"i":[]},"rB":{"a5":[],"i":[]},"vW":{"av":[],"i":[]},"Io":{"ag":["rB"]},"a51":{"av":[],"i":[]},"a0H":{"av":[],"i":[]},"lB":{"av":[],"i":[]},"a2H":{"av":[],"i":[]},"Zv":{"av":[],"i":[]},"Bz":{"a5":[],"i":[]},"Yo":{"ag":["Bz"]},"rQ":{"a5":[],"i":[]},"II":{"ag":["rQ"]},"nk":{"a5":[],"i":[]},"IL":{"ag":["nk"]},"ww":{"av":[],"i":[]},"nw":{"a5":[],"i":[]},"Jm":{"ag":["nw"]},"tg":{"a5":[],"i":[]},"Jn":{"ag":["tg"]},"tH":{"a5":[],"i":[]},"a_E":{"ag":["tH"]},"ue":{"a5":[],"i":[]},"oC":{"bl":[]},"Km":{"ag":["ue"]},"nY":{"a5":[],"i":[]},"Kz":{"ag":["nY"]},"q6":{"a5":[],"i":[]},"KA":{"ag":["q6"]},"uw":{"a5":[],"i":[]},"a1g":{"ag":["uw"]},"ob":{"a5":[],"i":[]},"L6":{"ag":["ob"]},"v5":{"a5":[],"i":[]},"Ls":{"ag":["v5"]},"v6":{"a5":[],"i":[]},"Lt":{"ag":["v6"]},"v7":{"a5":[],"i":[]},"Lu":{"ag":["v7"]},"zH":{"av":[],"i":[]},"x1":{"av":[],"i":[]},"x3":{"av":[],"i":[]},"ug":{"a5":[],"i":[]},"a0P":{"ag":["ug"]},"Ol":{"av":[],"i":[]},"Px":{"av":[],"i":[]},"IO":{"av":[],"i":[]},"Gq":{"a5":[],"i":[]},"a2S":{"ag":["Gq"]},"uh":{"a5":[],"i":[]},"a0Q":{"ag":["uh"]},"Dt":{"a5":[],"i":[]},"JN":{"ag":["Dt"]},"Rp":{"av":[],"i":[]},"a2y":{"av":[],"i":[]},"nK":{"a5":[],"i":[]},"oD":{"bl":[]},"xt":{"av":[],"i":[]},"JO":{"ag":["nK"]},"DD":{"a5":[],"i":[]},"xv":{"ag":["DD"]},"nL":{"av":[],"i":[]},"xw":{"a5":[],"i":[]},"a_G":{"ag":["xw"]},"a2x":{"av":[],"i":[]},"tB":{"av":[],"i":[]},"BG":{"av":[],"i":[]},"Oy":{"av":[],"i":[]},"CF":{"a5":[],"i":[]},"J5":{"ag":["CF"]},"a2E":{"av":[],"i":[]},"qM":{"lU":[]},"fO":{"av":[],"i":[]},"fQ":{"av":[],"i":[]},"fP":{"av":[],"i":[]},"tI":{"a5":[],"i":[]},"a_F":{"ag":["tI"]},"DF":{"av":[],"i":[]},"nU":{"a5":[],"i":[]},"a0j":{"ag":["nU"]},"xV":{"a5":[],"i":[]},"a0m":{"ag":["xV"],"fI":[]},"Vc":{"av":[],"i":[]},"Vb":{"av":[],"i":[]},"a_t":{"av":[],"i":[]},"VD":{"av":[],"i":[]},"a2w":{"av":[],"i":[]},"WM":{"av":[],"i":[]},"Ij":{"a5":[],"i":[]},"Mp":{"ag":["Ij"]},"ES":{"a5":[],"i":[]},"a0O":{"ag":["ES"]},"Yt":{"av":[],"i":[]},"BJ":{"Ce":[]},"po":{"Ce":[]},"ng":{"bX":["x<n>"],"bX.T":"x<n>"},"rY":{"bx":[]},"C1":{"c8":["h","h","1"],"ar":["h","1"],"c8.K":"h","c8.V":"1","c8.C":"h"},"TC":{"bx":[]},"TV":{"tT":[]},"Xq":{"tT":[]},"XL":{"tT":[]},"TA":{"hh":[],"bx":[]},"aQ":{"anc":["1"],"aD":["1"]},"EE":{"o":["1"],"o.E":"1"},"kF":{"ew":["1","h"],"aD":["h"],"ew.R":"1"},"EB":{"ew":["1","2"],"aD":["2"],"ew.R":"1"},"I1":{"ew":["1","mI<1>"],"aD":["mI<1>"],"ew.R":"1"},"GT":{"eT":[]},"t0":{"eT":[]},"Sl":{"eT":[]},"SY":{"eT":[]},"fE":{"eT":[]},"XJ":{"eT":[]},"C4":{"u2":["1","1"],"aD":["1"],"u2.R":"1"},"ew":{"aD":["2"]},"GL":{"aD":["cC<1,2>"]},"GM":{"aD":["l9<1,2,3>"]},"GN":{"aD":["k8<1,2,3,4>"]},"GO":{"aD":["jz<1,2,3,4,5>"]},"GP":{"aD":["hv<1,2,3,4,5,6,7,8>"]},"u2":{"aD":["2"]},"jo":{"ew":["1","1"],"aD":["1"],"ew.R":"1"},"H1":{"ew":["1","1"],"aD":["1"],"ew.R":"1"},"D3":{"aD":["1"]},"SV":{"aD":["h"]},"jP":{"aD":["h"]},"v9":{"aD":["h"]},"TX":{"aD":["h"]},"V2":{"aD":["h"]},"iC":{"ew":["1","x<1>"],"aD":["x<1>"],"ew.R":"1"},"En":{"ew":["1","x<1>"],"aD":["x<1>"]},"FF":{"ew":["1","x<1>"],"aD":["x<1>"],"ew.R":"1"},"Ga":{"ew":["1","2"],"aD":["2"]},"cQ":{"a7":["1"],"cQ.T":"1","cQ.S":"2"},"FG":{"uJ":["1"],"cQ":["1","1"],"a7":["1"],"cQ.T":"1","cQ.S":"1"},"js":{"cQ":["1","1"],"a7":["1"],"js.T":"1","cQ.T":"1","cQ.S":"1"},"TW":{"cQ":["@","@"],"a7":["@"],"cQ.T":"@","cQ.S":"@"},"uJ":{"cQ":["1","1"],"a7":["1"],"cQ.T":"1","cQ.S":"1"},"k3":{"bx":[]},"CB":{"bX":["1"],"bX.T":"1"},"BL":{"zd":["1"],"dH":["1"],"bX":["1"],"bX.T":"1"},"hB":{"bX":["1"],"bX.T":"1"},"zd":{"dH":["1"],"bX":["1"]},"AT":{"bX":["1"],"bX.T":"1"},"Hg":{"eM":["1","1"],"eM.S":"1","eM.T":"1"},"Hf":{"eM":["1","1"],"eM.S":"1","eM.T":"1"},"Kn":{"dH":["1"]},"VZ":{"av":[],"i":[]},"QN":{"lb":[],"cd":["lb"]},"Ju":{"aSF":[],"ok":[],"mz":[],"cd":["mz"]},"lb":{"cd":["lb"]},"Wj":{"lb":[],"cd":["lb"]},"mz":{"cd":["mz"]},"Wk":{"mz":[],"cd":["mz"]},"Wl":{"bx":[]},"z7":{"hh":[],"bx":[]},"H7":{"mz":[],"cd":["mz"]},"ok":{"mz":[],"cd":["mz"]},"Hl":{"bx":[]},"JJ":{"dH":["1"]},"Wv":{"hh":[],"bx":[]},"NS":{"Ce":[]},"Wy":{"js":["@"],"cQ":["@","@"],"a7":["@"],"js.T":"@","cQ.T":"@","cQ.S":"@"},"Hs":{"fI":[]},"ot":{"A":["1"],"x":["1"],"ac":["1"],"o":["1"]},"a_Z":{"ot":["n"],"A":["n"],"x":["n"],"ac":["n"],"o":["n"]},"Xi":{"ot":["n"],"A":["n"],"x":["n"],"ac":["n"],"o":["n"],"A.E":"n","o.E":"n","ot.E":"n"},"V_":{"O":[],"B":[],"W":[],"ax":[]},"Xv":{"bx":[]},"UY":{"O":[],"B":[],"W":[],"ax":[]},"UN":{"O":[],"B":[],"W":[],"ax":[]},"Ic":{"a5":[],"i":[]},"a4Z":{"ag":["Ic"]},"a2_":{"bo":[],"aH":[],"i":[]},"a20":{"bo":[],"aH":[],"i":[]},"a1Z":{"bo":[],"aH":[],"i":[]},"fA":{"qd":[]},"jk":{"qd":[]},"ff":{"qd":[]},"Ci":{"qd":[]},"q_":{"kK":[]},"qk":{"kK":[]},"fL":{"d2":[]},"a_7":{"d2":[]},"Xc":{"d2":[]},"XF":{"fL":[],"d2":[]},"yb":{"fL":[],"d2":[]},"WV":{"fL":[],"d2":[]},"Vp":{"fL":[],"d2":[]},"Cf":{"d2":[]},"ED":{"d2":[]},"yd":{"fL":[],"d2":[]},"wX":{"fL":[],"d2":[]},"WT":{"fL":[],"d2":[]},"RK":{"fL":[],"d2":[]},"Fs":{"d2":[]},"yE":{"d2":[]},"V9":{"d2":[]},"V8":{"d2":[]},"V5":{"d2":[]},"V6":{"d2":[]},"Gc":{"d2":[]},"V7":{"d2":[]},"a_J":{"dH":["@"]},"If":{"bx":[]},"XQ":{"qX":[]},"XV":{"bx":[]},"XX":{"hh":[],"bx":[]},"zK":{"aD":["h"]},"XR":{"bZ":["x<dk>","h"],"bZ.S":"x<dk>","bZ.T":"h"},"kf":{"dk":[]},"ln":{"dk":[]},"lo":{"dk":[]},"lp":{"dk":[]},"hA":{"dk":[]},"lq":{"dk":[]},"h3":{"dk":[]},"Il":{"dk":[]},"zL":{"Il":[],"dk":[]},"XS":{"o":["dk"],"o.E":"dk"},"b3l":{"bC":[],"bs":[],"i":[]},"b60":{"a5":[],"i":[]},"b4g":{"a5":[],"i":[]},"b4h":{"ag":["b4g"]},"baz":{"bC":[],"bs":[],"i":[]},"b9j":{"bC":[],"bs":[],"i":[]},"b3y":{"eh":[],"bC":[],"bs":[],"i":[]},"anc":{"aD":["1"]}}'))
+A.baJ(v.typeUniverse,JSON.parse('{"TO":"iD","mL":"iD","m8":"iD","ahj":"iD","apy":"iD","apx":"iD","a83":"iD","asM":"iD","aiX":"iD","bhN":"f","bhO":"f","bgu":"f","bgo":"aG","bhk":"aG","bgx":"pl","bgp":"ap","bhZ":"ap","bim":"ap","bgn":"aZ","bhx":"aZ","bjD":"jt","bgy":"b5","bhW":"b5","bin":"bm","bhe":"bm","bhE":"nt","bj6":"h2","bgY":"mN","bgC":"lN","biG":"lN","bhU":"cz","bhH":"tK","bhF":"tJ","bgN":"cY","bgP":"kB","bgS":"h_","bgT":"hS","bgO":"hS","bgQ":"hS","ps":{"DR":[]},"C6":{"hd":[]},"eI":{"ez":["1"]},"f1":{"ek":[]},"wu":{"jx":[]},"xA":{"jx":[]},"xD":{"jx":[]},"xL":{"jx":[]},"xR":{"jx":[]},"yN":{"jx":[]},"zk":{"jx":[]},"zq":{"jx":[]},"pC":{"ahN":[]},"Uf":{"hc":[]},"OC":{"cX":[]},"Pa":{"cX":[]},"P7":{"cX":[]},"P8":{"cX":[]},"Pi":{"cX":[]},"Pe":{"cX":[]},"P9":{"cX":[]},"Ph":{"cX":[]},"OF":{"cX":[]},"OH":{"cX":[]},"OE":{"cX":[]},"OD":{"cX":[]},"OM":{"cX":[]},"OO":{"cX":[]},"OV":{"cX":[]},"OT":{"cX":[]},"OS":{"cX":[]},"OJ":{"cX":[]},"ON":{"cX":[]},"OI":{"cX":[]},"OQ":{"cX":[]},"OU":{"cX":[]},"OK":{"cX":[]},"OL":{"cX":[]},"OP":{"cX":[]},"OR":{"cX":[]},"Pb":{"cX":[]},"Pd":{"cX":[]},"Pc":{"cX":[]},"W0":{"cA":[]},"Ez":{"eI":["f"],"ez":["f"]},"OG":{"lO":[]},"C5":{"lO":[]},"wy":{"lO":[]},"P2":{"lO":[]},"Pf":{"lO":[]},"wx":{"lO":[]},"y3":{"o":["kQ"],"o.E":"kQ"},"RH":{"bx":[]},"Bk":{"Dm":[]},"P_":{"eI":["f"],"lO":[],"ez":["f"]},"IM":{"eI":["f"],"lO":[],"ez":["f"]},"IN":{"eI":["f"],"lO":[],"ez":["f"]},"OA":{"eI":["f"],"ez":["f"],"hd":[]},"wL":{"ho":[]},"Vg":{"ho":[]},"NY":{"ho":[],"a84":[]},"Pk":{"ho":[],"a9G":[]},"Pn":{"ho":[],"a9J":[]},"Pm":{"ho":[],"a9I":[]},"T6":{"ho":[],"ajp":[]},"I5":{"ho":[],"Xa":[]},"T4":{"ho":[],"Xa":[],"ajn":[]},"TL":{"ho":[]},"Pu":{"ho":[],"a9S":[]},"P3":{"eI":["f"],"ez":["f"]},"wz":{"eI":["f"],"ez":["f"],"up":[]},"OW":{"kA":[],"eI":["f"],"ez":["f"],"jA":[]},"wA":{"eI":["f"],"ez":["f"],"uu":[]},"C8":{"eI":["f"],"ez":["f"]},"kA":{"eI":["f"],"ez":["f"],"jA":[]},"OY":{"kA":[],"eI":["f"],"ez":["f"],"jA":[]},"OZ":{"kA":[],"eI":["f"],"ez":["f"],"jA":[]},"OX":{"kA":[],"eI":["f"],"ez":["f"],"jA":[]},"P0":{"kA":[],"eI":["f"],"ez":["f"],"jA":[]},"P1":{"ahN":[]},"On":{"cA":[]},"Cb":{"eI":["f"],"ez":["f"]},"RC":{"aT6":[]},"RB":{"bx":[]},"DN":{"bx":[]},"fq":{"o":["1"],"o.E":"1"},"oJ":{"o":["1"],"o.E":"1"},"Ft":{"f1":[],"ek":[],"a84":[]},"Fv":{"f1":[],"ek":[],"a9J":[]},"TF":{"f1":[],"ek":[],"a9I":[]},"Fu":{"f1":[],"ek":[],"a9G":[]},"Fw":{"f1":[],"ek":[],"a9S":[]},"Fx":{"f1":[],"ek":[],"ajn":[]},"Fy":{"f1":[],"ek":[],"ajp":[]},"ze":{"up":[]},"qI":{"uu":[]},"TI":{"ek":[]},"CT":{"dL":[]},"Fj":{"dL":[]},"Ts":{"dL":[]},"Tw":{"dL":[]},"Tu":{"dL":[]},"Tt":{"dL":[]},"Tv":{"dL":[]},"Td":{"dL":[]},"Tc":{"dL":[]},"Tb":{"dL":[]},"Tj":{"dL":[]},"Tl":{"dL":[]},"Tr":{"dL":[]},"Tp":{"dL":[]},"To":{"dL":[]},"Tg":{"dL":[]},"Tk":{"dL":[]},"Tf":{"dL":[]},"Tn":{"dL":[]},"Tq":{"dL":[]},"Th":{"dL":[]},"Ti":{"dL":[]},"Tm":{"dL":[]},"Fz":{"f1":[],"ek":[]},"ti":{"jA":[]},"x9":{"jA":[]},"Rg":{"jA":[]},"xp":{"jA":[]},"Rf":{"jA":[]},"Iz":{"lY":[]},"Kg":{"lY":[]},"Qx":{"lY":[]},"y1":{"lY":[]},"xZ":{"lY":[]},"TH":{"ek":[]},"FA":{"f1":[],"ek":[],"Xa":[]},"DL":{"hd":[]},"Rz":{"hd":[]},"GX":{"Dm":[]},"DM":{"DR":[]},"VN":{"aOt":[]},"mZ":{"A":["1"],"x":["1"],"ac":["1"],"o":["1"]},"a_Y":{"mZ":["n"],"A":["n"],"x":["n"],"ac":["n"],"o":["n"]},"Xh":{"mZ":["n"],"A":["n"],"x":["n"],"ac":["n"],"o":["n"],"A.E":"n","o.E":"n","mZ.E":"n"},"yh":{"uq":[]},"Ow":{"zc":[]},"Vh":{"zc":[]},"Qs":{"kO":[]},"Qw":{"tx":[]},"QB":{"tx":[]},"f":{"ak":[]},"E7":{"I":[],"d9":[]},"E9":{"aJ":[],"d9":[]},"iD":{"f":[],"ak":[]},"w":{"x":["1"],"f":[],"ac":["1"],"ak":[],"o":["1"],"bP":["1"],"o.E":"1"},"ahe":{"w":["1"],"x":["1"],"f":[],"ac":["1"],"ak":[],"o":["1"],"bP":["1"],"o.E":"1"},"pU":{"U":[],"ct":[],"cd":["ct"]},"xI":{"U":[],"n":[],"ct":[],"cd":["ct"],"d9":[]},"Ea":{"U":[],"ct":[],"cd":["ct"],"d9":[]},"m7":{"h":[],"cd":["h"],"bP":["@"],"d9":[]},"rU":{"eM":["3","4"],"eM.S":"3","eM.T":"4"},"rR":{"bZ":["3","4"],"bZ.S":"3","bZ.T":"4"},"lw":{"o":["2"]},"rS":{"lw":["1","2"],"o":["2"],"o.E":"2"},"Jk":{"rS":["1","2"],"lw":["1","2"],"ac":["2"],"o":["2"],"o.E":"2"},"IJ":{"A":["2"],"x":["2"],"lw":["1","2"],"ac":["2"],"o":["2"]},"dm":{"IJ":["1","2"],"A":["2"],"x":["2"],"lw":["1","2"],"ac":["2"],"o":["2"],"A.E":"2","o.E":"2"},"nj":{"cR":["2"],"lw":["1","2"],"ac":["2"],"o":["2"],"o.E":"2"},"rT":{"bb":["3","4"],"ar":["3","4"],"bb.V":"4","bb.K":"3"},"ni":{"lw":["1","2"],"ac":["2"],"o":["2"],"o.E":"2"},"jZ":{"cA":[]},"fu":{"A":["n"],"x":["n"],"ac":["n"],"o":["n"],"A.E":"n","o.E":"n"},"ac":{"o":["1"]},"aN":{"ac":["1"],"o":["1"]},"al":{"aN":["1"],"ac":["1"],"o":["1"],"o.E":"1","aN.E":"1"},"eJ":{"o":["2"],"o.E":"2"},"kE":{"eJ":["1","2"],"ac":["2"],"o":["2"],"o.E":"2"},"Z":{"aN":["2"],"ac":["2"],"o":["2"],"o.E":"2","aN.E":"2"},"aT":{"o":["1"],"o.E":"1"},"j6":{"o":["2"],"o.E":"2"},"vg":{"o":["1"],"o.E":"1"},"CY":{"vg":["1"],"ac":["1"],"o":["1"],"o.E":"1"},"oh":{"o":["1"],"o.E":"1"},"x7":{"oh":["1"],"ac":["1"],"o":["1"],"o.E":"1"},"H2":{"o":["1"],"o.E":"1"},"j5":{"ac":["1"],"o":["1"],"o.E":"1"},"nH":{"o":["1"],"o.E":"1"},"CX":{"nH":["1"],"ac":["1"],"o":["1"],"o.E":"1"},"ef":{"o":["1"],"o.E":"1"},"zF":{"A":["1"],"x":["1"],"ac":["1"],"o":["1"]},"d8":{"aN":["1"],"ac":["1"],"o":["1"],"o.E":"1","aN.E":"1"},"qJ":{"vf":[]},"vP":{"uN":[]},"KL":{"uN":[]},"KM":{"uN":[]},"KN":{"uN":[]},"t1":{"lj":["1","2"],"ar":["1","2"]},"wK":{"ar":["1","2"]},"aU":{"wK":["1","2"],"ar":["1","2"]},"IT":{"o":["1"],"o.E":"1"},"cq":{"wK":["1","2"],"ar":["1","2"]},"E2":{"kJ":[]},"jf":{"kJ":[]},"F6":{"or":[],"cA":[]},"RX":{"cA":[]},"Xm":{"cA":[]},"T_":{"bx":[]},"LG":{"dT":[]},"pu":{"kJ":[]},"Pr":{"kJ":[]},"Ps":{"kJ":[]},"WK":{"kJ":[]},"Wq":{"kJ":[]},"wj":{"kJ":[]},"Zt":{"cA":[]},"Vo":{"cA":[]},"fS":{"bb":["1","2"],"ar":["1","2"],"bb.V":"2","bb.K":"1"},"b0":{"ac":["1"],"o":["1"],"o.E":"1"},"KI":{"uN":[]},"KJ":{"uN":[]},"KK":{"uN":[]},"nR":{"aUm":[]},"Am":{"Uh":[],"u5":[]},"Y3":{"o":["Uh"],"o.E":"Uh"},"z9":{"u5":[]},"a3C":{"o":["u5"],"o.E":"u5"},"ui":{"f":[],"ak":[],"Oj":[],"d9":[]},"f0":{"f":[],"ak":[],"ee":[]},"ET":{"f0":[],"f":[],"c2":[],"ak":[],"ee":[],"d9":[]},"y4":{"f0":[],"c_":["1"],"f":[],"ak":[],"ee":[],"bP":["1"]},"q5":{"A":["U"],"f0":[],"c_":["U"],"x":["U"],"f":[],"ac":["U"],"ak":[],"ee":[],"bP":["U"],"o":["U"]},"jm":{"A":["n"],"f0":[],"c_":["n"],"x":["n"],"f":[],"ac":["n"],"ak":[],"ee":[],"bP":["n"],"o":["n"]},"EU":{"q5":[],"A":["U"],"ad4":[],"f0":[],"c_":["U"],"x":["U"],"f":[],"ac":["U"],"ak":[],"ee":[],"bP":["U"],"o":["U"],"d9":[],"A.E":"U","o.E":"U"},"EV":{"q5":[],"A":["U"],"ad5":[],"f0":[],"c_":["U"],"x":["U"],"f":[],"ac":["U"],"ak":[],"ee":[],"bP":["U"],"o":["U"],"d9":[],"A.E":"U","o.E":"U"},"SR":{"jm":[],"A":["n"],"agZ":[],"f0":[],"c_":["n"],"x":["n"],"f":[],"ac":["n"],"ak":[],"ee":[],"bP":["n"],"o":["n"],"d9":[],"A.E":"n","o.E":"n"},"EW":{"jm":[],"A":["n"],"ah_":[],"f0":[],"c_":["n"],"x":["n"],"f":[],"ac":["n"],"ak":[],"ee":[],"bP":["n"],"o":["n"],"d9":[],"A.E":"n","o.E":"n"},"SS":{"jm":[],"A":["n"],"ah0":[],"f0":[],"c_":["n"],"x":["n"],"f":[],"ac":["n"],"ak":[],"ee":[],"bP":["n"],"o":["n"],"d9":[],"A.E":"n","o.E":"n"},"EX":{"jm":[],"A":["n"],"asx":[],"f0":[],"c_":["n"],"x":["n"],"f":[],"ac":["n"],"ak":[],"ee":[],"bP":["n"],"o":["n"],"d9":[],"A.E":"n","o.E":"n"},"EY":{"jm":[],"A":["n"],"zA":[],"f0":[],"c_":["n"],"x":["n"],"f":[],"ac":["n"],"ak":[],"ee":[],"bP":["n"],"o":["n"],"d9":[],"A.E":"n","o.E":"n"},"EZ":{"jm":[],"A":["n"],"asy":[],"f0":[],"c_":["n"],"x":["n"],"f":[],"ac":["n"],"ak":[],"ee":[],"bP":["n"],"o":["n"],"d9":[],"A.E":"n","o.E":"n"},"uj":{"jm":[],"A":["n"],"cI":[],"f0":[],"c_":["n"],"x":["n"],"f":[],"ac":["n"],"ak":[],"ee":[],"bP":["n"],"o":["n"],"d9":[],"A.E":"n","o.E":"n"},"a4M":{"i9":[]},"a_8":{"cA":[]},"M3":{"or":[],"cA":[]},"af":{"a7":["1"]},"aiU":{"dH":["1"]},"eB":{"eB.T":"1"},"Aa":{"dH":["1"]},"M1":{"X3":[]},"Is":{"Cl":["1"]},"LP":{"o":["1"],"o.E":"1"},"NN":{"cA":[]},"ic":{"cT":["1"],"AQ":["1"],"bX":["1"],"bX.T":"1"},"vD":{"r_":["1"],"eB":["1"],"eB.T":"1"},"oF":{"dH":["1"]},"oU":{"oF":["1"],"dH":["1"]},"lu":{"oF":["1"],"dH":["1"]},"I_":{"bx":[]},"vG":{"Cl":["1"]},"aR":{"vG":["1"],"Cl":["1"]},"oV":{"vG":["1"],"Cl":["1"]},"Hm":{"bX":["1"]},"rf":{"dH":["1"]},"kg":{"It":["1"],"rf":["1"],"dH":["1"]},"rg":{"rf":["1"],"dH":["1"]},"cT":{"AQ":["1"],"bX":["1"],"bX.T":"1"},"r_":{"eB":["1"],"eB.T":"1"},"vU":{"dH":["1"]},"LJ":{"Y2":["1"]},"AQ":{"bX":["1"]},"Jp":{"bX":["1"],"bX.T":"1"},"Ko":{"bX":["1"],"bX.T":"1"},"Kp":{"kg":["1"],"It":["1"],"rf":["1"],"aiU":["1"],"dH":["1"]},"JE":{"bX":["2"]},"A5":{"eB":["2"],"eB.T":"2"},"oM":{"JE":["1","2"],"bX":["2"],"bX.T":"2"},"Jr":{"dH":["1"]},"AL":{"eB":["2"],"eB.T":"2"},"AR":{"eM":["1","2"]},"IC":{"bX":["2"],"bX.T":"2"},"LK":{"AR":["1","2"],"eM":["1","2"],"eM.S":"1","eM.T":"2"},"a5f":{"vA":[]},"a2J":{"vA":[]},"oK":{"bb":["1","2"],"ar":["1","2"],"bb.V":"2","bb.K":"1"},"r4":{"oK":["1","2"],"bb":["1","2"],"ar":["1","2"],"bb.V":"2","bb.K":"1"},"J3":{"oK":["1","2"],"bb":["1","2"],"ar":["1","2"],"bb.V":"2","bb.K":"1"},"vK":{"ac":["1"],"o":["1"],"o.E":"1"},"K8":{"fS":["1","2"],"bb":["1","2"],"ar":["1","2"],"bb.V":"2","bb.K":"1"},"K7":{"fS":["1","2"],"bb":["1","2"],"ar":["1","2"],"bb.V":"2","bb.K":"1"},"mS":{"vR":["1"],"mu":["1"],"cR":["1"],"ac":["1"],"o":["1"],"o.E":"1"},"iV":{"vR":["1"],"mu":["1"],"b5P":["1"],"cR":["1"],"ac":["1"],"o":["1"],"o.E":"1"},"Eo":{"o":["1"],"o.E":"1"},"A":{"x":["1"],"ac":["1"],"o":["1"]},"bb":{"ar":["1","2"]},"Kb":{"ac":["2"],"o":["2"],"o.E":"2"},"EC":{"ar":["1","2"]},"lj":{"ar":["1","2"]},"Ja":{"Jb":["1"],"aNk":["1"]},"vI":{"Jb":["1"]},"tf":{"ac":["1"],"o":["1"],"o.E":"1"},"Ep":{"aN":["1"],"ac":["1"],"o":["1"],"o.E":"1","aN.E":"1"},"mu":{"cR":["1"],"ac":["1"],"o":["1"]},"vR":{"mu":["1"],"cR":["1"],"ac":["1"],"o":["1"]},"dN":{"vR":["1"],"mu":["1"],"cR":["1"],"ac":["1"],"o":["1"],"o.E":"1"},"Ha":{"bb":["1","2"],"ar":["1","2"],"bb.V":"2","bb.K":"1"},"oS":{"ac":["1"],"o":["1"],"o.E":"1"},"vT":{"ac":["2"],"o":["2"],"o.E":"2"},"LB":{"ac":["b6<1,2>"],"o":["b6<1,2>"],"o.E":"b6<1,2>"},"oT":{"mW":["1","2","1"],"mW.T":"1"},"LF":{"mW":["1","hG<1,2>","2"],"mW.T":"2"},"vS":{"mW":["1","hG<1,2>","b6<1,2>"],"mW.T":"b6<1,2>"},"z8":{"mu":["1"],"cR":["1"],"ac":["1"],"o":["1"],"o.E":"1"},"a02":{"bb":["h","@"],"ar":["h","@"],"bb.V":"@","bb.K":"h"},"a03":{"aN":["h"],"ac":["h"],"o":["h"],"o.E":"h","aN.E":"h"},"NI":{"nx":[]},"a4S":{"bZ":["h","x<n>"]},"NK":{"bZ":["h","x<n>"],"bZ.S":"h","bZ.T":"x<n>"},"a4R":{"bZ":["x<n>","h"]},"NJ":{"bZ":["x<n>","h"],"bZ.S":"x<n>","bZ.T":"h"},"BI":{"bZ":["x<n>","h"],"bZ.S":"x<n>","bZ.T":"h"},"O0":{"bZ":["h","x<n>"],"bZ.S":"h","bZ.T":"x<n>"},"Ec":{"cA":[]},"RY":{"cA":[]},"S_":{"bZ":["R?","h"],"bZ.S":"R?","bZ.T":"h"},"RZ":{"bZ":["h","R?"],"bZ.S":"h","bZ.T":"R?"},"S4":{"nx":[]},"S6":{"bZ":["h","x<n>"],"bZ.S":"h","bZ.T":"x<n>"},"S5":{"bZ":["x<n>","h"],"bZ.S":"x<n>","bZ.T":"h"},"Xt":{"nx":[]},"Xu":{"bZ":["h","x<n>"],"bZ.S":"h","bZ.T":"x<n>"},"Ib":{"bZ":["x<n>","h"],"bZ.S":"x<n>","bZ.T":"h"},"O5":{"cd":["O5"]},"bF":{"cd":["bF"]},"U":{"ct":[],"cd":["ct"]},"aS":{"cd":["aS"]},"n":{"ct":[],"cd":["ct"]},"x":{"ac":["1"],"o":["1"]},"ct":{"cd":["ct"]},"Uh":{"u5":[]},"cR":{"ac":["1"],"o":["1"]},"h":{"cd":["h"]},"h4":{"O5":[],"cd":["O5"]},"rG":{"cA":[]},"or":{"cA":[]},"kv":{"cA":[]},"ys":{"cA":[]},"DU":{"cA":[]},"SX":{"cA":[]},"ox":{"cA":[]},"zE":{"ox":[],"cA":[]},"ka":{"cA":[]},"Pz":{"cA":[]},"T7":{"cA":[]},"He":{"cA":[]},"Js":{"bx":[]},"hh":{"bx":[]},"RR":{"ox":[],"bx":[],"cA":[]},"a3G":{"dT":[]},"Gj":{"o":["n"],"o.E":"n"},"Mc":{"oy":[]},"km":{"oy":[]},"Zx":{"oy":[]},"hO":{"f":[],"ak":[]},"pt":{"aG":[],"f":[],"ak":[]},"cY":{"f":[],"ak":[]},"cz":{"bm":[],"f":[],"ak":[]},"aG":{"f":[],"ak":[]},"fz":{"hO":[],"f":[],"ak":[]},"hT":{"f":[],"ak":[]},"m_":{"f":[],"ak":[]},"pO":{"cz":[],"bm":[],"f":[],"ak":[]},"q3":{"aG":[],"f":[],"ak":[]},"hX":{"f":[],"ak":[]},"bm":{"f":[],"ak":[]},"hY":{"f":[],"ak":[]},"jt":{"aG":[],"f":[],"ak":[]},"i2":{"f":[],"ak":[]},"i3":{"f":[],"ak":[]},"i4":{"f":[],"ak":[]},"h_":{"f":[],"ak":[]},"i7":{"f":[],"ak":[]},"h2":{"f":[],"ak":[]},"i8":{"f":[],"ak":[]},"b5":{"cz":[],"bm":[],"f":[],"ak":[]},"Nw":{"f":[],"ak":[]},"NC":{"cz":[],"bm":[],"f":[],"ak":[]},"NH":{"cz":[],"bm":[],"f":[],"ak":[]},"BW":{"cz":[],"bm":[],"f":[],"ak":[]},"lN":{"bm":[],"f":[],"ak":[]},"PF":{"f":[],"ak":[]},"wP":{"f":[],"ak":[]},"hS":{"f":[],"ak":[]},"kB":{"f":[],"ak":[]},"PG":{"f":[],"ak":[]},"PH":{"f":[],"ak":[]},"PV":{"f":[],"ak":[]},"nt":{"bm":[],"f":[],"ak":[]},"Qj":{"f":[],"ak":[]},"CN":{"A":["ju<ct>"],"bh":["ju<ct>"],"x":["ju<ct>"],"c_":["ju<ct>"],"f":[],"ac":["ju<ct>"],"ak":[],"o":["ju<ct>"],"bP":["ju<ct>"],"bh.E":"ju<ct>","A.E":"ju<ct>","o.E":"ju<ct>"},"CO":{"f":[],"ju":["ct"],"ak":[]},"CP":{"A":["h"],"bh":["h"],"x":["h"],"c_":["h"],"f":[],"ac":["h"],"ak":[],"o":["h"],"bP":["h"],"bh.E":"h","A.E":"h","o.E":"h"},"Qm":{"f":[],"ak":[]},"YL":{"A":["cz"],"x":["cz"],"ac":["cz"],"o":["cz"],"A.E":"cz","o.E":"cz"},"ap":{"f":[],"ak":[]},"xd":{"A":["fz"],"bh":["fz"],"x":["fz"],"c_":["fz"],"f":[],"ac":["fz"],"ak":[],"o":["fz"],"bP":["fz"],"bh.E":"fz","A.E":"fz","o.E":"fz"},"D8":{"f":[],"ak":[]},"QO":{"f":[],"ak":[]},"R4":{"cz":[],"bm":[],"f":[],"ak":[]},"Rq":{"f":[],"ak":[]},"tJ":{"A":["bm"],"bh":["bm"],"x":["bm"],"c_":["bm"],"f":[],"ac":["bm"],"ak":[],"o":["bm"],"bP":["bm"],"bh.E":"bm","A.E":"bm","o.E":"bm"},"tK":{"f":[],"ak":[]},"xy":{"f":[],"ak":[]},"tS":{"aSH":[],"cz":[],"bm":[],"f":[],"ak":[]},"Si":{"f":[],"ak":[]},"SC":{"f":[],"ak":[]},"y0":{"f":[],"ak":[]},"SH":{"f":[],"bb":["h","@"],"ak":[],"ar":["h","@"],"bb.V":"@","bb.K":"h"},"SI":{"f":[],"bb":["h","@"],"ak":[],"ar":["h","@"],"bb.V":"@","bb.K":"h"},"SJ":{"A":["hX"],"bh":["hX"],"x":["hX"],"c_":["hX"],"f":[],"ac":["hX"],"ak":[],"o":["hX"],"bP":["hX"],"bh.E":"hX","A.E":"hX","o.E":"hX"},"zU":{"A":["bm"],"x":["bm"],"ac":["bm"],"o":["bm"],"A.E":"bm","o.E":"bm"},"F4":{"A":["bm"],"bh":["bm"],"x":["bm"],"c_":["bm"],"f":[],"ac":["bm"],"ak":[],"o":["bm"],"bP":["bm"],"bh.E":"bm","A.E":"bm","o.E":"bm"},"TQ":{"A":["hY"],"bh":["hY"],"x":["hY"],"c_":["hY"],"f":[],"ac":["hY"],"ak":[],"o":["hY"],"bP":["hY"],"bh.E":"hY","A.E":"hY","o.E":"hY"},"Vl":{"f":[],"bb":["h","@"],"ak":[],"ar":["h","@"],"bb.V":"@","bb.K":"h"},"VE":{"cz":[],"bm":[],"f":[],"ak":[]},"yW":{"f":[],"ak":[]},"Wh":{"A":["i2"],"bh":["i2"],"x":["i2"],"c_":["i2"],"f":[],"ac":["i2"],"ak":[],"o":["i2"],"bP":["i2"],"bh.E":"i2","A.E":"i2","o.E":"i2"},"Wn":{"A":["i3"],"bh":["i3"],"x":["i3"],"c_":["i3"],"f":[],"ac":["i3"],"ak":[],"o":["i3"],"bP":["i3"],"bh.E":"i3","A.E":"i3","o.E":"i3"},"Hi":{"f":[],"bb":["h","h"],"ak":[],"ar":["h","h"],"bb.V":"h","bb.K":"h"},"X_":{"A":["h2"],"bh":["h2"],"x":["h2"],"c_":["h2"],"f":[],"ac":["h2"],"ak":[],"o":["h2"],"bP":["h2"],"bh.E":"h2","A.E":"h2","o.E":"h2"},"X0":{"A":["i7"],"bh":["i7"],"x":["i7"],"c_":["i7"],"f":[],"ac":["i7"],"ak":[],"o":["i7"],"bP":["i7"],"bh.E":"i7","A.E":"i7","o.E":"i7"},"X2":{"f":[],"ak":[]},"X8":{"A":["i8"],"bh":["i8"],"x":["i8"],"c_":["i8"],"f":[],"ac":["i8"],"ak":[],"o":["i8"],"bP":["i8"],"bh.E":"i8","A.E":"i8","o.E":"i8"},"X9":{"f":[],"ak":[]},"Xp":{"f":[],"ak":[]},"Xz":{"f":[],"ak":[]},"zI":{"f":[],"ak":[]},"qW":{"f":[],"ak":[]},"mN":{"f":[],"ak":[]},"Ze":{"A":["cY"],"bh":["cY"],"x":["cY"],"c_":["cY"],"f":[],"ac":["cY"],"ak":[],"o":["cY"],"bP":["cY"],"bh.E":"cY","A.E":"cY","o.E":"cY"},"J8":{"f":[],"ju":["ct"],"ak":[]},"a_x":{"A":["hT?"],"bh":["hT?"],"x":["hT?"],"c_":["hT?"],"f":[],"ac":["hT?"],"ak":[],"o":["hT?"],"bP":["hT?"],"bh.E":"hT?","A.E":"hT?","o.E":"hT?"},"Kq":{"A":["bm"],"bh":["bm"],"x":["bm"],"c_":["bm"],"f":[],"ac":["bm"],"ak":[],"o":["bm"],"bP":["bm"],"bh.E":"bm","A.E":"bm","o.E":"bm"},"a3v":{"A":["i4"],"bh":["i4"],"x":["i4"],"c_":["i4"],"f":[],"ac":["i4"],"ak":[],"o":["i4"],"bP":["i4"],"bh.E":"i4","A.E":"i4","o.E":"i4"},"a3I":{"A":["h_"],"bh":["h_"],"x":["h_"],"c_":["h_"],"f":[],"ac":["h_"],"ak":[],"o":["h_"],"bP":["h_"],"bh.E":"h_","A.E":"h_","o.E":"h_"},"iR":{"bX":["1"],"bX.T":"1"},"A1":{"iR":["1"],"bX":["1"],"bX.T":"1"},"Zu":{"f":[],"ak":[]},"QP":{"A":["cz"],"x":["cz"],"ac":["cz"],"o":["cz"],"A.E":"cz","o.E":"cz"},"lS":{"f":[],"ak":[]},"t5":{"f":[],"ak":[]},"qU":{"aG":[],"f":[],"ak":[]},"Cs":{"f":[],"ak":[]},"DQ":{"f":[],"ak":[]},"xJ":{"f":[],"ak":[]},"F7":{"f":[],"ak":[]},"vO":{"FO":[]},"T1":{"bx":[]},"nE":{"bx":[]},"Fn":{"bx":[]},"Fo":{"bx":[]},"Fq":{"bx":[]},"tV":{"A":["1"],"x":["1"],"ac":["1"],"o":["1"],"A.E":"1","o.E":"1"},"SZ":{"bx":[]},"ju":{"bjC":["1"]},"jg":{"f":[],"ak":[]},"jn":{"f":[],"ak":[]},"jF":{"f":[],"ak":[]},"Sc":{"A":["jg"],"bh":["jg"],"x":["jg"],"f":[],"ac":["jg"],"ak":[],"o":["jg"],"bh.E":"jg","A.E":"jg","o.E":"jg"},"T0":{"A":["jn"],"bh":["jn"],"x":["jn"],"f":[],"ac":["jn"],"ak":[],"o":["jn"],"bh.E":"jn","A.E":"jn","o.E":"jn"},"TR":{"f":[],"ak":[]},"Wu":{"A":["h"],"bh":["h"],"x":["h"],"f":[],"ac":["h"],"ak":[],"o":["h"],"bh.E":"h","A.E":"h","o.E":"h"},"aZ":{"cz":[],"bm":[],"f":[],"ak":[]},"Xb":{"A":["jF"],"bh":["jF"],"x":["jF"],"f":[],"ac":["jF"],"ak":[],"o":["jF"],"bh.E":"jF","A.E":"jF","o.E":"jF"},"c2":{"ee":[]},"ah0":{"x":["n"],"ac":["n"],"o":["n"],"ee":[]},"cI":{"x":["n"],"ac":["n"],"o":["n"],"ee":[]},"asy":{"x":["n"],"ac":["n"],"o":["n"],"ee":[]},"agZ":{"x":["n"],"ac":["n"],"o":["n"],"ee":[]},"asx":{"x":["n"],"ac":["n"],"o":["n"],"ee":[]},"ah_":{"x":["n"],"ac":["n"],"o":["n"],"ee":[]},"zA":{"x":["n"],"ac":["n"],"o":["n"],"ee":[]},"ad4":{"x":["U"],"ac":["U"],"o":["U"],"ee":[]},"ad5":{"x":["U"],"ac":["U"],"o":["U"],"ee":[]},"VV":{"tx":[]},"NO":{"f":[],"ak":[]},"NP":{"f":[],"bb":["h","@"],"ak":[],"ar":["h","@"],"bb.V":"@","bb.K":"h"},"NQ":{"f":[],"ak":[]},"pl":{"f":[],"ak":[]},"T2":{"f":[],"ak":[]},"wY":{"dH":["1"]},"GY":{"eM":["1","2"],"eM.S":"1","eM.T":"2"},"ws":{"a5":[],"i":[]},"mT":{"jp":[],"dz":[],"dI":[]},"C_":{"ag":["ws"]},"fH":{"aRY":[],"o":["h"],"o.E":"h"},"c8":{"ar":["2","3"]},"yV":{"AY":["1","cR<1>"],"AY.E":"1"},"Rj":{"bZ":["x<n>","tc"]},"a37":{"bZ":["x<n>","tc"],"bZ.S":"x<n>","bZ.T":"tc"},"ch":{"aE":[]},"wd":{"ch":["U"],"aE":[]},"Y4":{"ch":["U"],"aE":[]},"Y5":{"ch":["U"],"aE":[]},"FI":{"ch":["U"],"aE":[]},"l1":{"ch":["U"],"aE":[]},"Ct":{"ch":["U"],"aE":[]},"vu":{"ch":["U"],"aE":[]},"wJ":{"ch":["1"],"aE":[]},"Bu":{"ch":["1"],"aE":[]},"K6":{"j0":[]},"Gk":{"j0":[]},"hV":{"j0":[]},"HW":{"j0":[]},"eW":{"j0":[]},"HV":{"j0":[]},"pF":{"j0":[]},"Zz":{"j0":[]},"aK":{"aM":["1"],"aM.T":"1","aK.T":"1"},"fe":{"aK":["S?"],"aM":["S?"],"aM.T":"S?","aK.T":"S?"},"aW":{"ch":["1"],"aE":[]},"h5":{"aM":["1"],"aM.T":"1"},"Gg":{"aK":["1"],"aM":["1"],"aM.T":"1","aK.T":"1"},"VX":{"aK":["T?"],"aM":["T?"],"aM.T":"T?","aK.T":"T?"},"FW":{"aK":["C?"],"aM":["C?"],"aM.T":"C?","aK.T":"C?"},"pS":{"aK":["n"],"aM":["n"],"aM.T":"n","aK.T":"n"},"iq":{"aM":["U"],"aM.T":"U"},"I7":{"aM":["1"],"aM.T":"1"},"Cp":{"a5":[],"i":[]},"IX":{"ag":["Cp"]},"e7":{"S":[]},"Zg":{"lh":[]},"PI":{"av":[],"i":[]},"t3":{"a5":[],"i":[]},"IY":{"ag":["t3"]},"PK":{"dZ":[]},"Zj":{"iE":["Cq"],"iE.T":"Cq"},"Q2":{"Cq":[]},"Cr":{"a5":[],"i":[]},"J_":{"ag":["Cr"]},"PL":{"av":[],"i":[]},"zY":{"a5":[],"i":[]},"PM":{"av":[],"i":[]},"zZ":{"ag":["zY<1>"]},"lx":{"j1":[]},"wQ":{"a5":[],"i":[]},"IZ":{"mq":["wQ"],"ag":["wQ"]},"a44":{"aE":[]},"PO":{"lh":[]},"J0":{"a5":[],"i":[]},"Zr":{"av":[],"i":[]},"PP":{"av":[],"i":[]},"Zm":{"bo":[],"aH":[],"i":[]},"a25":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"J1":{"ag":["J0"]},"J2":{"aH":[],"i":[]},"Zl":{"bQ":[],"bL":[],"K":[]},"KP":{"dA":["O","hx"],"O":[],"az":["O","hx"],"B":[],"W":[],"ax":[],"az.1":"hx","dA.1":"hx","az.0":"O"},"a1_":{"bL":[],"K":[]},"a10":{"i":[]},"t4":{"av":[],"i":[]},"JU":{"bC":[],"bs":[],"i":[]},"PQ":{"av":[],"i":[]},"r1":{"jU":["x<R>"],"he":[]},"xa":{"r1":[],"jU":["x<R>"],"he":[]},"QF":{"r1":[],"jU":["x<R>"],"he":[]},"QD":{"r1":[],"jU":["x<R>"],"he":[]},"nF":{"rG":[],"cA":[]},"a_j":{"tb":["c9"],"he":[]},"hQ":{"aE":[]},"fn":{"aE":[]},"r6":{"aE":[]},"jU":{"he":[]},"tb":{"he":[]},"Qe":{"tb":["Qd"],"he":[]},"cs":{"fT":[],"cs.T":"1"},"Sh":{"fT":[]},"ov":{"fT":[]},"Em":{"k_":[]},"bn":{"o":["1"],"o.E":"1"},"xq":{"o":["1"],"o.E":"1"},"cv":{"a7":["1"]},"xo":{"ax":[]},"Dg":{"c9":[]},"eN":{"bA":[]},"o5":{"bA":[]},"qg":{"bA":[]},"qh":{"bA":[]},"o4":{"bA":[]},"ht":{"bA":[]},"o6":{"bA":[]},"XZ":{"bA":[]},"a4A":{"bA":[]},"uy":{"bA":[]},"a4w":{"uy":[],"bA":[]},"uE":{"bA":[]},"a4H":{"uE":[],"bA":[]},"a4C":{"o5":[],"bA":[]},"a4z":{"qg":[],"bA":[]},"a4B":{"qh":[],"bA":[]},"a4y":{"o4":[],"bA":[]},"uB":{"bA":[]},"a4D":{"uB":[],"bA":[]},"uI":{"bA":[]},"a4L":{"uI":[],"bA":[]},"uG":{"ht":[],"bA":[]},"a4J":{"uG":[],"ht":[],"bA":[]},"uH":{"ht":[],"bA":[]},"a4K":{"uH":[],"ht":[],"bA":[]},"uF":{"ht":[],"bA":[]},"a4I":{"uF":[],"ht":[],"bA":[]},"a4F":{"o6":[],"bA":[]},"uD":{"bA":[]},"a4G":{"uD":[],"bA":[]},"uC":{"bA":[]},"a4E":{"uC":[],"bA":[]},"uz":{"bA":[]},"a4x":{"uz":[],"bA":[]},"kI":{"dz":[],"dI":[]},"Kh":{"AX":[]},"As":{"AX":[]},"iF":{"dz":[],"dI":[]},"ll":{"dz":[],"dI":[]},"kM":{"dz":[],"dI":[]},"jp":{"dz":[],"dI":[]},"CS":{"dz":[],"dI":[]},"kC":{"dz":[],"dI":[]},"dz":{"dI":[]},"Fc":{"dz":[],"dI":[]},"ym":{"dz":[],"dI":[]},"l4":{"dz":[],"dI":[]},"iN":{"dz":[],"dI":[]},"O4":{"dz":[],"dI":[]},"vF":{"dI":[]},"YR":{"xn":[]},"tL":{"ia":[]},"xW":{"ia":[]},"NA":{"av":[],"i":[]},"EG":{"a5":[],"i":[]},"Kc":{"ag":["EG"]},"xY":{"aK":["C?"],"aM":["C?"],"aM.T":"C?","aK.T":"C?"},"EJ":{"aK":["l"],"aM":["l"],"aM.T":"l","aK.T":"l"},"BB":{"av":[],"i":[]},"b61":{"eh":[],"bC":[],"bs":[],"i":[]},"FT":{"a5":[],"i":[]},"a1Y":{"ag":["FT"]},"a_X":{"bo":[],"aH":[],"i":[]},"a2c":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"a0c":{"bK":["d5?"]},"BU":{"a5":[],"i":[]},"ID":{"ag":["BU"]},"a0I":{"ei":[],"bK":["ei"]},"a_W":{"bo":[],"aH":[],"i":[]},"a2b":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Ot":{"av":[],"i":[]},"Ss":{"lQ":["n"],"S":[],"lQ.T":"n"},"Sq":{"lQ":["n"],"S":[],"lQ.T":"n"},"ZH":{"lh":[]},"Qa":{"av":[],"i":[]},"wZ":{"av":[],"i":[]},"x_":{"av":[],"i":[]},"CE":{"kP":["1"],"fm":["1"],"di":["1"]},"Qr":{"a5":[],"i":[]},"Jl":{"bK":["S?"]},"a_4":{"bK":["S?"]},"a_2":{"bK":["U"]},"a_3":{"bK":["ei?"]},"b4q":{"eh":[],"bC":[],"bs":[],"i":[]},"QV":{"av":[],"i":[]},"a_1":{"ei":[],"bK":["ei"]},"YK":{"bo":[],"aH":[],"i":[]},"a23":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Ir":{"ch":["1"],"aE":[]},"RD":{"av":[],"i":[]},"a_K":{"bK":["S?"]},"a_L":{"bK":["S?"]},"RE":{"eh":[],"bC":[],"bs":[],"i":[]},"DX":{"a5":[],"i":[]},"JY":{"ag":["DX"]},"DY":{"m3":[]},"pR":{"pT":[],"m3":[]},"DZ":{"pT":[],"m3":[]},"E_":{"pT":[],"m3":[]},"pT":{"m3":[]},"KF":{"bC":[],"bs":[],"i":[]},"JX":{"a5":[],"i":[]},"xE":{"av":[],"i":[]},"JW":{"ag":["JX"],"aPe":[]},"RQ":{"av":[],"i":[]},"je":{"cH":[]},"a0V":{"je":[],"cH":[]},"li":{"je":[],"cH":[]},"e1":{"je":[],"cH":[]},"IB":{"a5":[],"i":[]},"JL":{"a5":[],"i":[]},"tR":{"a5":[],"i":[]},"JZ":{"aE":[]},"K_":{"aK":["je"],"aM":["je"],"aM.T":"je","aK.T":"je"},"a_U":{"aE":[]},"Yu":{"ag":["IB"]},"JM":{"ag":["JL"]},"KR":{"mx":["fJ"],"O":[],"B":[],"W":[],"ax":[]},"ZD":{"la":["fJ"],"aH":[],"i":[],"la.S":"fJ"},"K0":{"ag":["tR"]},"xP":{"av":[],"i":[]},"a_S":{"bK":["S?"]},"a0h":{"la":["lz"],"aH":[],"i":[],"la.S":"lz"},"a2e":{"mx":["lz"],"O":[],"B":[],"W":[],"ax":[]},"b5S":{"eh":[],"bC":[],"bs":[],"i":[]},"HN":{"a5":[],"i":[]},"LU":{"ag":["HN"]},"Sn":{"av":[],"i":[]},"EF":{"a5":[],"i":[]},"KV":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"v4":{"aK":["cH?"],"aM":["cH?"],"aM.T":"cH?","aK.T":"cH?"},"Kd":{"a5":[],"i":[]},"a0u":{"ag":["EF"]},"a_T":{"bo":[],"aH":[],"i":[]},"a0r":{"ag":["Kd"]},"Lr":{"av":[],"i":[]},"a38":{"aE":[]},"a0s":{"iE":["EI"],"iE.T":"EI"},"Q4":{"EI":[]},"St":{"S":[],"bK":["S"]},"a0v":{"S":[],"bK":["S"]},"Sv":{"ei":[],"bK":["ei"]},"Jq":{"ei":[],"bK":["ei"]},"Sw":{"G":[],"bK":["G"]},"a0w":{"G":[],"bK":["G"]},"K5":{"bK":["1?"]},"jH":{"bK":["1"]},"dg":{"bK":["1"]},"Sx":{"fn":["cR<dJ>"],"aE":[]},"a0e":{"bK":["d5?"]},"u6":{"EK":["1"],"kP":["1"],"fm":["1"],"di":["1"]},"ri":{"a5":[],"i":[]},"rj":{"a5":[],"i":[]},"a5j":{"av":[],"i":[]},"a5h":{"ag":["ri"]},"a5i":{"ag":["rj"]},"XY":{"o0":[]},"PN":{"o0":[]},"Mr":{"aE":[]},"Ms":{"aE":[]},"rX":{"a5":[],"i":[]},"U5":{"a5":[],"i":[]},"YN":{"aE":[]},"YO":{"ag":["rX"]},"b76":{"eh":[],"bC":[],"bs":[],"i":[]},"Gm":{"a5":[],"i":[]},"Lb":{"bC":[],"bs":[],"i":[]},"Jw":{"a5":[],"i":[]},"uV":{"a5":[],"i":[]},"yL":{"ag":["uV"]},"bau":{"a5":[],"i":[]},"Gn":{"ag":["Gm"]},"a2P":{"aE":[]},"IA":{"aj":[]},"Ys":{"av":[],"i":[]},"Jx":{"ag":["Jw"]},"ZL":{"bE":["is"],"bE.T":"is"},"a2Q":{"bC":[],"bs":[],"i":[]},"An":{"a5":[],"i":[]},"VC":{"av":[],"i":[]},"a0t":{"mq":["An"],"ag":["An"]},"b7D":{"eh":[],"bC":[],"bs":[],"i":[]},"a0d":{"bK":["d5?"]},"H3":{"a5":[],"i":[]},"ls":{"bl":[]},"Lx":{"ag":["H3"]},"a3j":{"aH":[],"i":[]},"AD":{"O":[],"B":[],"W":[],"ax":[]},"a4Y":{"aH":[],"i":[]},"a2s":{"O":[],"B":[],"W":[],"ax":[]},"H4":{"eh":[],"bC":[],"bs":[],"i":[]},"vb":{"a5":[],"i":[]},"Ly":{"ag":["vb"]},"zl":{"a5":[],"i":[]},"LR":{"bK":["S?"]},"a3W":{"bK":["S?"]},"a3V":{"bK":["ei"]},"a3Y":{"a5":[],"i":[]},"a3Z":{"av":[],"i":[]},"b8n":{"eh":[],"bC":[],"bs":[],"i":[]},"oo":{"a5":[],"i":[]},"LS":{"ag":["oo"]},"Sy":{"lh":[]},"a43":{"aE":[]},"b8x":{"eh":[],"bC":[],"bs":[],"i":[]},"LX":{"a5":[],"i":[]},"WX":{"av":[],"i":[]},"a4a":{"ag":["LX"]},"a4b":{"bo":[],"aH":[],"i":[]},"a4c":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"a47":{"fW":[],"aH":[],"i":[]},"a48":{"bQ":[],"bL":[],"K":[]},"a2q":{"O":[],"az":["O","hx"],"B":[],"W":[],"ax":[],"az.1":"hx","az.0":"O"},"a46":{"av":[],"i":[]},"a49":{"av":[],"i":[]},"WZ":{"av":[],"i":[]},"JV":{"eh":[],"bC":[],"bs":[],"i":[]},"vp":{"aK":["kc"],"aM":["kc"],"aM.T":"kc","aK.T":"kc"},"Bq":{"a5":[],"i":[]},"zw":{"av":[],"i":[]},"Ye":{"ag":["Bq"]},"I3":{"a5":[],"i":[]},"vt":{"ag":["I3"]},"a4m":{"av":[],"i":[]},"b8S":{"eh":[],"bC":[],"bs":[],"i":[]},"nX":{"hm":["aO8"],"hm.T":"aO8"},"eS":{"il":[]},"hN":{"il":[]},"Kj":{"il":[]},"Fk":{"fF":[]},"a3M":{"aE":[]},"eK":{"cH":[]},"ki":{"cH":[]},"Ob":{"cH":[]},"fd":{"cH":[]},"h9":{"cH":[]},"c4":{"j1":[]},"eu":{"qz":[]},"eU":{"eK":[],"cH":[]},"lQ":{"S":[]},"an":{"dG":[]},"it":{"dG":[]},"r7":{"dG":[]},"aO8":{"hm":["aO8"]},"me":{"hm":["me"],"hm.T":"me"},"NM":{"hm":["lJ"]},"SU":{"bx":[]},"lK":{"hm":["lJ"],"hm.T":"lJ"},"o1":{"iy":[]},"c7":{"eK":[],"cH":[]},"hE":{"eK":[],"cH":[]},"iL":{"j1":[]},"i5":{"eK":[],"cH":[]},"hH":{"eK":[],"cH":[]},"hI":{"eK":[],"cH":[]},"zJ":{"jC":[]},"a4W":{"jC":[]},"mG":{"iy":[],"nW":[],"ax":[]},"Ul":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"yD":{"fF":[],"ax":[]},"Iy":{"aE":[]},"ky":{"kL":[]},"O":{"B":[],"W":[],"ax":[]},"wn":{"jc":["O"]},"ha":{"dt":[]},"Co":{"ha":[],"eV":["1"],"dt":[]},"k2":{"ha":[],"eV":["O"],"dt":[]},"Ut":{"dA":["O","k2"],"O":[],"az":["O","k2"],"B":[],"W":[],"ax":[],"az.1":"k2","dA.1":"k2","az.0":"O"},"PU":{"aE":[]},"Uu":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"qo":{"aE":[]},"uO":{"dA":["O","hw"],"O":[],"az":["O","hw"],"B":[],"W":[],"ax":[],"az.1":"hw","dA.1":"hw","az.0":"O"},"a27":{"O":[],"B":[],"W":[],"ax":[]},"LT":{"qo":[],"aE":[]},"Jz":{"qo":[],"aE":[]},"zV":{"qo":[],"aE":[]},"Ux":{"O":[],"B":[],"W":[],"ax":[]},"iu":{"ha":[],"eV":["O"],"dt":[]},"Uz":{"dA":["O","iu"],"O":[],"az":["O","iu"],"B":[],"W":[],"ax":[],"az.1":"iu","dA.1":"iu","az.0":"O"},"UC":{"O":[],"B":[],"W":[],"ax":[]},"f_":{"W":[]},"fv":{"f_":[],"W":[]},"rZ":{"fv":[],"f_":[],"W":[]},"wD":{"fv":[],"f_":[],"W":[]},"Cj":{"fv":[],"f_":[],"W":[]},"mJ":{"mg":[],"fv":[],"f_":[],"W":[]},"Fd":{"mg":[],"fv":[],"f_":[],"W":[]},"TM":{"f_":[],"W":[]},"mg":{"fv":[],"f_":[],"W":[]},"Cg":{"fv":[],"f_":[],"W":[]},"BF":{"fv":[],"f_":[],"W":[]},"El":{"fv":[],"f_":[],"W":[]},"Dk":{"fv":[],"f_":[],"W":[]},"SM":{"aE":[]},"B":{"W":[],"ax":[]},"eV":{"dt":[]},"a2I":{"ie":[]},"JT":{"ie":[]},"vV":{"ie":[]},"hw":{"ha":[],"eV":["O"],"dt":[]},"o2":{"l8":[]},"oQ":{"fj":[],"aE":[]},"G1":{"dA":["O","hw"],"O":[],"az":["O","hw"],"B":[],"W":[],"ax":[],"az.1":"hw","dA.1":"hw","az.0":"O"},"qA":{"aE":[]},"FX":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"oa":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UQ":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"G2":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Us":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UF":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Um":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UJ":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Uk":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Un":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Cu":{"aE":[]},"AC":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Ur":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Uq":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Up":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"KY":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UL":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UM":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Uw":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UX":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"G_":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UB":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UO":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UH":{"O":[],"bc":["O"],"B":[],"nW":[],"W":[],"ax":[]},"G3":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"G0":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UI":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"G4":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Uo":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UG":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Uy":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UD":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UE":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UA":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"fj":{"aE":[]},"uQ":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UK":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Uj":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"UP":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Uv":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"z4":{"kL":[]},"oi":{"qD":[],"eV":["dh"],"dt":[]},"oj":{"qE":[],"eV":["dh"],"dt":[]},"dh":{"B":[],"W":[],"ax":[]},"W6":{"jc":["dh"]},"qD":{"dt":[]},"qE":{"dt":[]},"US":{"qq":[],"dh":[],"az":["O","jB"],"B":[],"W":[],"ax":[],"az.1":"jB","az.0":"O"},"UT":{"qq":[],"dh":[],"az":["O","jB"],"B":[],"W":[],"ax":[]},"UU":{"qq":[],"dh":[],"az":["O","jB"],"B":[],"W":[],"ax":[],"az.1":"jB","az.0":"O"},"m9":{"dt":[]},"jB":{"qD":[],"eV":["O"],"m9":[],"dt":[]},"qq":{"dh":[],"az":["O","jB"],"B":[],"W":[],"ax":[]},"G5":{"dh":[],"bc":["dh"],"B":[],"W":[],"ax":[]},"UV":{"dh":[],"bc":["dh"],"B":[],"W":[],"ax":[]},"fG":{"ha":[],"eV":["O"],"dt":[]},"G6":{"dA":["O","fG"],"O":[],"az":["O","fG"],"B":[],"W":[],"ax":[],"az.1":"fG","dA.1":"fG","az.0":"O"},"pf":{"aK":["il?"],"aM":["il?"],"aM.T":"il?","aK.T":"il?"},"G8":{"bc":["O"],"B":[],"W":[],"ax":[]},"yC":{"kl":["1"],"O":[],"az":["dh","1"],"FY":[],"B":[],"W":[],"ax":[]},"G9":{"kl":["oj"],"O":[],"az":["dh","oj"],"FY":[],"B":[],"W":[],"ax":[],"az.1":"oj","kl.0":"oj","az.0":"dh"},"UR":{"kl":["oi"],"O":[],"az":["dh","oi"],"FY":[],"B":[],"W":[],"ax":[],"az.1":"oi","kl.0":"oi","az.0":"dh"},"hy":{"aE":[]},"mO":{"ha":[],"eV":["O"],"dt":[]},"V0":{"dA":["O","mO"],"O":[],"az":["O","mO"],"B":[],"W":[],"ax":[],"az.1":"mO","dA.1":"mO","az.0":"O"},"vq":{"a7":["~"]},"HX":{"bx":[]},"dv":{"W":[]},"oE":{"cd":["oE"]},"lC":{"cd":["lC"]},"oW":{"cd":["oW"]},"yT":{"cd":["yT"]},"a33":{"tb":["dv"],"he":[]},"yS":{"aE":[]},"um":{"cd":["yT"]},"zQ":{"a7Y":[]},"yU":{"fF":[]},"tX":{"pV":[]},"pX":{"pV":[]},"Eh":{"pV":[]},"yi":{"bx":[]},"EP":{"bx":[]},"ZF":{"ei":[]},"a3N":{"EQ":[]},"qK":{"ei":[]},"kW":{"kX":[]},"yv":{"kX":[]},"Gf":{"aE":[]},"wt":{"jC":[]},"xM":{"jC":[]},"Fl":{"jC":[]},"CL":{"jC":[]},"WO":{"qO":[]},"WN":{"qO":[]},"WP":{"qO":[]},"zo":{"qO":[]},"a3f":{"qP":[]},"QQ":{"qP":[]},"a1h":{"HM":[]},"n7":{"a5":[],"i":[]},"Im":{"bC":[],"bs":[],"i":[]},"nG":{"a5":[],"i":[]},"aOX":{"bl":[]},"b3S":{"bl":[]},"b3R":{"bl":[]},"wa":{"bl":[]},"wo":{"bl":[]},"is":{"bl":[]},"uM":{"bl":[]},"ev":{"bE":["1"]},"cy":{"bE":["1"],"bE.T":"1"},"In":{"ag":["n7"]},"JC":{"ag":["nG"]},"XI":{"bE":["aOX"],"bE.T":"aOX"},"CJ":{"bE":["bl"],"bE.T":"bl"},"Qg":{"bE":["is"]},"U4":{"bE":["uM"],"bE.T":"uM"},"KC":{"MN":["1"],"ev":["1"],"Au":["1"],"bE":["1"],"bE.T":"1","ev.T":"1"},"KD":{"MO":["1"],"ev":["1"],"Au":["1"],"bE":["1"],"bE.T":"1","ev.T":"1"},"IV":{"bE":["1"],"bE.T":"1"},"Bp":{"a5":[],"i":[]},"Yd":{"ag":["Bp"]},"Yc":{"bo":[],"aH":[],"i":[]},"rD":{"a5":[],"i":[]},"Iq":{"ag":["rD"]},"Ig":{"a5":[],"i":[]},"Mh":{"ag":["Ig"],"fI":[]},"xm":{"a5":[],"i":[]},"JF":{"ag":["xm<1>"]},"yt":{"a5":[],"i":[]},"pj":{"bl":[]},"pi":{"bl":[]},"AA":{"ag":["yt<1>"]},"Iu":{"cy":["1"],"bE":["1"],"bE.T":"1"},"NU":{"jY":["fn<n>"],"bC":[],"bs":[],"i":[],"jY.T":"fn<n>"},"wg":{"a5":[],"i":[]},"tW":{"fB":[]},"Iv":{"ag":["wg"]},"Ee":{"aE":[]},"a11":{"av":[],"i":[]},"jV":{"bC":[],"bs":[],"i":[]},"lP":{"bo":[],"aH":[],"i":[]},"wC":{"bo":[],"aH":[],"i":[]},"oq":{"bo":[],"aH":[],"i":[]},"pv":{"bo":[],"aH":[],"i":[]},"wI":{"bo":[],"aH":[],"i":[]},"b3":{"bo":[],"aH":[],"i":[]},"dl":{"bo":[],"aH":[],"i":[]},"jT":{"bo":[],"aH":[],"i":[]},"Ek":{"fD":["k2"],"bs":[],"i":[],"fD.T":"k2"},"V":{"bo":[],"aH":[],"i":[]},"mA":{"fW":[],"aH":[],"i":[]},"kT":{"fD":["fG"],"bs":[],"i":[],"fD.T":"fG"},"yI":{"fW":[],"aH":[],"i":[]},"wH":{"fW":[],"aH":[],"i":[]},"b3w":{"bC":[],"bs":[],"i":[]},"e_":{"bo":[],"aH":[],"i":[]},"yR":{"bo":[],"aH":[],"i":[]},"a4O":{"hU":[],"bL":[],"K":[]},"a4P":{"bC":[],"bs":[],"i":[]},"T5":{"bo":[],"aH":[],"i":[]},"NX":{"bo":[],"aH":[],"i":[]},"Cv":{"bo":[],"aH":[],"i":[]},"Pl":{"bo":[],"aH":[],"i":[]},"TJ":{"bo":[],"aH":[],"i":[]},"TK":{"bo":[],"aH":[],"i":[]},"QR":{"bo":[],"aH":[],"i":[]},"R5":{"bo":[],"aH":[],"i":[]},"px":{"bo":[],"aH":[],"i":[]},"PT":{"fW":[],"aH":[],"i":[]},"d6":{"bo":[],"aH":[],"i":[]},"Sd":{"bo":[],"aH":[],"i":[]},"Fa":{"bo":[],"aH":[],"i":[]},"a17":{"bQ":[],"bL":[],"K":[]},"wf":{"bo":[],"aH":[],"i":[]},"W8":{"bo":[],"aH":[],"i":[]},"TU":{"av":[],"i":[]},"QT":{"fW":[],"aH":[],"i":[]},"Dc":{"fD":["iu"],"bs":[],"i":[],"fD.T":"iu"},"D6":{"fD":["iu"],"bs":[],"i":[],"fD.T":"iu"},"XM":{"fW":[],"aH":[],"i":[]},"Vf":{"fW":[],"aH":[],"i":[]},"Ub":{"aH":[],"i":[]},"Sf":{"bo":[],"aH":[],"i":[]},"SL":{"bo":[],"aH":[],"i":[]},"fY":{"bo":[],"aH":[],"i":[]},"Nv":{"bo":[],"aH":[],"i":[]},"SF":{"bo":[],"aH":[],"i":[]},"O8":{"bo":[],"aH":[],"i":[]},"pD":{"bo":[],"aH":[],"i":[]},"DV":{"bo":[],"aH":[],"i":[]},"iA":{"av":[],"i":[]},"hP":{"av":[],"i":[]},"t_":{"bo":[],"aH":[],"i":[]},"KO":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Ih":{"fF":[],"ax":[]},"uP":{"aH":[],"i":[]},"qp":{"bQ":[],"bL":[],"K":[]},"XK":{"fF":[],"ax":[]},"PY":{"bo":[],"aH":[],"i":[]},"PA":{"av":[],"i":[]},"ZB":{"aE":[]},"wV":{"eh":[],"bC":[],"bs":[],"i":[]},"a12":{"av":[],"i":[]},"Q6":{"av":[],"i":[]},"CH":{"a5":[],"i":[]},"J6":{"ag":["CH"]},"Qh":{"av":[],"i":[]},"x4":{"a5":[],"i":[]},"Jf":{"ag":["x4"]},"vj":{"fn":["cM"],"aE":[]},"x5":{"a5":[],"i":[]},"pB":{"ag":["x5"],"fI":[]},"Lf":{"a5":[],"i":[]},"vQ":{"lm":[],"o1":[],"iy":[]},"YT":{"bo":[],"aH":[],"i":[]},"a24":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Jg":{"fW":[],"aH":[],"i":[]},"a2R":{"ag":["Lf"],"aUz":[]},"oH":{"ev":["1"],"bE":["1"],"bE.T":"1","ev.T":"1"},"Ma":{"ev":["1"],"bE":["1"],"bE.T":"1","ev.T":"1"},"Mb":{"ev":["1"],"bE":["1"],"bE.T":"1","ev.T":"1"},"a30":{"ev":["oe"],"bE":["oe"],"bE.T":"oe","ev.T":"oe"},"Zc":{"ev":["lR"],"bE":["lR"],"bE.T":"lR","ev.T":"lR"},"dY":{"aE":[]},"tz":{"dY":[],"aE":[]},"Di":{"aE":[]},"ty":{"a5":[],"i":[]},"JA":{"jY":["dY"],"bC":[],"bs":[],"i":[],"jY.T":"dY"},"A3":{"ag":["ty"]},"QZ":{"a5":[],"i":[]},"a_q":{"ag":["ty"]},"Dj":{"a5":[],"i":[]},"aOp":{"bl":[]},"ul":{"bl":[]},"uL":{"bl":[]},"aN9":{"bl":[]},"JB":{"dY":[],"aE":[]},"a_r":{"ag":["Dj"]},"V3":{"bE":["aOp"],"bE.T":"aOp"},"SW":{"bE":["ul"],"bE.T":"ul"},"TZ":{"bE":["uL"],"bE.T":"uL"},"CG":{"bE":["aN9"],"bE.T":"aN9"},"jX":{"fT":[]},"bU":{"jX":["1"],"fT":[]},"a5":{"i":[]},"bo":{"aH":[],"i":[]},"bL":{"K":[]},"iM":{"bL":[],"K":[]},"hU":{"bL":[],"K":[]},"nJ":{"jX":["1"],"fT":[]},"av":{"i":[]},"bs":{"i":[]},"fD":{"bs":[],"i":[]},"bC":{"bs":[],"i":[]},"aH":{"i":[]},"Sa":{"aH":[],"i":[]},"fW":{"aH":[],"i":[]},"QG":{"aH":[],"i":[]},"Cm":{"bL":[],"K":[]},"Wp":{"bL":[],"K":[]},"FK":{"bL":[],"K":[]},"ur":{"bL":[],"K":[]},"bQ":{"bL":[],"K":[]},"S9":{"bQ":[],"bL":[],"K":[]},"GU":{"bQ":[],"bL":[],"K":[]},"jl":{"bQ":[],"bL":[],"K":[]},"a0Z":{"bL":[],"K":[]},"a13":{"i":[]},"kV":{"a5":[],"i":[]},"yu":{"ag":["kV"]},"cK":{"tE":["1"]},"R8":{"av":[],"i":[]},"a_z":{"bo":[],"aH":[],"i":[]},"tF":{"a5":[],"i":[]},"Ab":{"ag":["tF"]},"Ds":{"uk":[]},"jd":{"av":[],"i":[]},"tN":{"eh":[],"bC":[],"bs":[],"i":[]},"nO":{"a5":[],"i":[]},"JS":{"ag":["nO"],"fI":[]},"rM":{"aK":["aj"],"aM":["aj"],"aM.T":"aj","aK.T":"aj"},"nr":{"aK":["j1"],"aM":["j1"],"aM.T":"j1","aK.T":"j1"},"nv":{"aK":["dG"],"aM":["dG"],"aM.T":"dG","aK.T":"dG"},"rK":{"aK":["dx?"],"aM":["dx?"],"aM.T":"dx?","aK.T":"dx?"},"ua":{"aK":["aC"],"aM":["aC"],"aM.T":"aC","aK.T":"aC"},"vo":{"aK":["G"],"aM":["G"],"aM.T":"G","aK.T":"G"},"Bi":{"a5":[],"i":[]},"Bm":{"a5":[],"i":[]},"Bo":{"a5":[],"i":[]},"Bl":{"a5":[],"i":[]},"Bj":{"a5":[],"i":[]},"Bn":{"a5":[],"i":[]},"CW":{"aK":["an"],"aM":["an"],"aM.T":"an","aK.T":"an"},"RN":{"a5":[],"i":[]},"xC":{"ag":["1"]},"wc":{"ag":["1"]},"Y6":{"ag":["Bi"]},"Y9":{"ag":["Bm"]},"Yb":{"ag":["Bo"]},"Y8":{"ag":["Bl"]},"Y7":{"ag":["Bj"]},"Ya":{"ag":["Bn"]},"m2":{"bC":[],"bs":[],"i":[]},"DW":{"hU":[],"bL":[],"K":[]},"jY":{"bC":[],"bs":[],"i":[]},"Af":{"hU":[],"bL":[],"K":[]},"eh":{"bC":[],"bs":[],"i":[]},"zS":{"av":[],"i":[]},"E3":{"a5":[],"i":[]},"K1":{"ag":["E3"]},"a00":{"av":[],"i":[]},"Xd":{"fn":["aC"],"aE":[]},"cE":{"pw":["aj"],"aH":[],"i":[],"pw.0":"aj"},"pw":{"aH":[],"i":[]},"Ai":{"bQ":[],"bL":[],"K":[]},"a2d":{"jv":["aj","O"],"O":[],"bc":["O"],"B":[],"W":[],"ax":[],"jv.0":"aj"},"Ka":{"bC":[],"bs":[],"i":[]},"Eu":{"a5":[],"i":[]},"a55":{"iE":["Ii"],"iE.T":"Ii"},"Q8":{"Ii":[]},"a0k":{"ag":["Eu"]},"aTv":{"bC":[],"bs":[],"i":[]},"Ex":{"iL":[],"j1":[]},"FS":{"av":[],"i":[]},"a0o":{"av":[],"i":[]},"ZV":{"aE":[]},"a0n":{"bo":[],"aH":[],"i":[]},"a2f":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"ud":{"m2":["fr"],"bC":[],"bs":[],"i":[],"m2.T":"fr"},"Ki":{"a5":[],"i":[]},"a0y":{"ag":["Ki"],"fI":[]},"zP":{"dz":[],"dI":[]},"SK":{"av":[],"i":[]},"NE":{"a5":[],"i":[]},"Yi":{"tE":["zP"]},"a0G":{"av":[],"i":[]},"aOb":{"l3":[]},"tG":{"bC":[],"bs":[],"i":[]},"F2":{"a5":[],"i":[]},"kR":{"ag":["F2"]},"a0Y":{"di":["~"]},"Ar":{"r9":[]},"Aq":{"r9":[]},"Kv":{"r9":[]},"Kw":{"r9":[]},"a_D":{"f3":["ar<h?,x<R>>?"],"aE":[]},"iB":{"fB":[]},"ej":{"bs":[],"i":[]},"KB":{"bL":[],"K":[]},"un":{"av":[],"i":[]},"o_":{"aE":[]},"oO":{"a5":[],"i":[]},"At":{"ag":["oO"]},"Fg":{"a5":[],"i":[]},"y7":{"ag":["Fg"]},"L3":{"O":[],"az":["O","fG"],"B":[],"W":[],"ax":[],"az.1":"fG","az.0":"O"},"M0":{"fW":[],"aH":[],"i":[]},"a4h":{"bQ":[],"bL":[],"K":[]},"AW":{"fG":[],"ha":[],"eV":["O"],"dt":[]},"a2r":{"bC":[],"bs":[],"i":[]},"Do":{"a5":[],"i":[]},"Hn":{"a5":[],"i":[]},"JI":{"ag":["Do"]},"JH":{"aE":[]},"a_A":{"aE":[]},"LM":{"ag":["Hn"]},"LL":{"aE":[]},"Fh":{"ib":[],"fB":[]},"aTU":{"cs":["1"],"fT":[]},"y9":{"av":[],"i":[]},"ya":{"a5":[],"i":[]},"T8":{"aE":[]},"uo":{"l5":[]},"rb":{"ms":[],"uo":[],"hy":[],"aE":[],"l5":[]},"a1b":{"ag":["ya"]},"ml":{"kP":["1"],"fm":["1"],"di":["1"]},"yn":{"bC":[],"bs":[],"i":[]},"qs":{"a5":[],"i":[]},"Ia":{"bC":[],"bs":[],"i":[]},"Gi":{"a5":[],"i":[]},"f3":{"aE":[]},"a2D":{"ag":["qs"]},"L8":{"ag":["Gi"]},"dR":{"f3":["1"],"aE":[]},"lA":{"f3":["1"],"aE":[]},"L7":{"lA":["1"],"f3":["1"],"aE":[]},"Ge":{"lA":["1"],"f3":["1"],"aE":[],"dR.T":"1","lA.T":"1"},"Gd":{"lA":["I"],"f3":["I"],"aE":[],"dR.T":"I","lA.T":"I"},"Vk":{"a5":[],"i":[]},"bgF":{"bji":["a7<I>"]},"AG":{"ag":["Vk<1>"]},"a2L":{"bC":[],"bs":[],"i":[]},"a2A":{"f3":["yG?"],"aE":[],"dR.T":"yG?"},"Kl":{"bC":[],"bs":[],"i":[]},"Ap":{"a5":[],"i":[]},"r8":{"ag":["Ap<1>"]},"y6":{"di":["1"]},"fm":{"di":["1"]},"ZM":{"bE":["is"],"bE.T":"is"},"kP":{"fm":["1"],"di":["1"]},"FE":{"kP":["1"],"fm":["1"],"di":["1"]},"FQ":{"kP":["1"],"fm":["1"],"di":["1"]},"yK":{"av":[],"i":[]},"Gs":{"hm":["1"],"hm.T":"1"},"Gt":{"bC":[],"bs":[],"i":[]},"uX":{"aE":[]},"AJ":{"a5":[],"i":[]},"AH":{"cs":["fT"],"fT":[],"cs.T":"fT"},"Lp":{"ag":["AJ"]},"Db":{"l5":[]},"iK":{"iB":[],"ib":[],"fB":[]},"jy":{"iK":[],"iB":[],"ib":[],"fB":[]},"Gy":{"iK":[],"iB":[],"ib":[],"fB":[]},"mk":{"iK":[],"iB":[],"ib":[],"fB":[]},"qu":{"iK":[],"iB":[],"ib":[],"fB":[]},"Xs":{"iK":[],"iB":[],"ib":[],"fB":[]},"aPc":{"Se":["aPc"]},"Gv":{"a5":[],"i":[]},"Gw":{"ag":["Gv"]},"a2T":{"bC":[],"bs":[],"i":[]},"YX":{"jy":[],"iK":[],"iB":[],"ib":[],"fB":[]},"ms":{"hy":[],"aE":[],"l5":[]},"uY":{"ib":[],"fB":[]},"v_":{"ms":[],"hy":[],"aE":[],"l5":[]},"Vz":{"av":[],"i":[]},"Oe":{"av":[],"i":[]},"Eq":{"av":[],"i":[]},"Gz":{"a5":[],"i":[]},"Li":{"bC":[],"bs":[],"i":[]},"Lk":{"a5":[],"i":[]},"yO":{"ag":["Gz"]},"a2W":{"ag":["Lk"]},"Lj":{"aE":[]},"a2V":{"bo":[],"aH":[],"i":[]},"a2j":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"a2B":{"f3":["U?"],"aE":[],"dR.T":"U?"},"fZ":{"bl":[]},"Gr":{"bE":["fZ"],"bE.T":"fZ"},"yw":{"a5":[],"i":[]},"mX":{"iF":[],"dz":[],"dI":[]},"mY":{"iN":[],"dz":[],"dI":[]},"yP":{"aE":[]},"mq":{"ag":["1"]},"y2":{"aE":[]},"GF":{"a5":[],"i":[]},"GH":{"bC":[],"bs":[],"i":[]},"a31":{"fj":[],"ag":["GF"],"aE":[]},"VF":{"aE":[]},"GQ":{"a5":[],"i":[]},"a39":{"ag":["GQ"]},"a3a":{"m2":["R"],"bC":[],"bs":[],"i":[],"m2.T":"R"},"b7":{"og":[]},"v8":{"a5":[],"i":[]},"GR":{"a5":[],"i":[]},"Sj":{"tY":["k"],"og":[],"tY.T":"k"},"yY":{"aE":[]},"Lw":{"ag":["v8"]},"GS":{"aE":[]},"Lv":{"ag":["GR"]},"a3d":{"bC":[],"bs":[],"i":[]},"AK":{"bo":[],"aH":[],"i":[]},"GV":{"av":[],"i":[]},"a3i":{"bQ":[],"bL":[],"K":[]},"L1":{"O":[],"bc":["O"],"FY":[],"B":[],"W":[],"ax":[]},"W9":{"aH":[],"i":[]},"va":{"aH":[],"i":[]},"W7":{"va":[],"aH":[],"i":[]},"z5":{"bQ":[],"bL":[],"K":[]},"Ed":{"fD":["m9"],"bs":[],"i":[],"fD.T":"m9"},"W4":{"av":[],"i":[]},"a3l":{"va":[],"aH":[],"i":[]},"a3m":{"bo":[],"aH":[],"i":[]},"a2l":{"dh":[],"bc":["dh"],"B":[],"W":[],"ax":[]},"H5":{"bQ":[],"bL":[],"K":[]},"H6":{"aE":[]},"Wd":{"bo":[],"aH":[],"i":[]},"AE":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"Wc":{"aE":[]},"J4":{"aE":[]},"mE":{"dz":[],"dI":[]},"mF":{"dz":[],"dI":[]},"BK":{"dz":[],"dI":[]},"G7":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"yB":{"O":[],"bc":["O"],"B":[],"W":[],"ax":[]},"WJ":{"bo":[],"aH":[],"i":[]},"WI":{"bo":[],"aH":[],"i":[]},"WQ":{"bo":[],"aH":[],"i":[]},"wW":{"eh":[],"bC":[],"bs":[],"i":[]},"b3A":{"eh":[],"bC":[],"bs":[],"i":[]},"a14":{"av":[],"i":[]},"lf":{"av":[],"i":[]},"CK":{"bl":[]},"t8":{"bl":[]},"ta":{"bl":[]},"t9":{"bl":[]},"hf":{"bl":[]},"nz":{"hf":[],"bl":[]},"nB":{"hf":[],"bl":[]},"tr":{"hf":[],"bl":[]},"tl":{"hf":[],"bl":[]},"tm":{"hf":[],"bl":[]},"j7":{"hf":[],"bl":[]},"pE":{"hf":[],"bl":[]},"nC":{"hf":[],"bl":[]},"tp":{"hf":[],"bl":[]},"tq":{"hf":[],"bl":[]},"nA":{"hf":[],"bl":[]},"od":{"bl":[]},"acJ":{"bl":[]},"oe":{"bl":[]},"lR":{"bl":[]},"qc":{"bl":[]},"qm":{"bl":[]},"kZ":{"bl":[]},"qT":{"bl":[]},"kd":{"bl":[]},"qR":{"bl":[]},"Qf":{"bl":[]},"hx":{"ha":[],"eV":["O"],"dt":[]},"oR":{"a5":[],"i":[]},"Ln":{"a5":[],"i":[]},"HQ":{"a5":[],"i":[]},"Lq":{"ag":["oR"]},"Lo":{"ag":["Ln"]},"LV":{"ag":["HQ"]},"Ch":{"fn":["wF"],"aE":[],"fI":[]},"zy":{"a5":[],"i":[]},"Jj":{"bC":[],"bs":[],"i":[]},"a4j":{"ag":["zy"]},"X4":{"av":[],"i":[]},"Br":{"a5":[],"i":[]},"z1":{"a5":[],"i":[]},"eZ":{"bo":[],"aH":[],"i":[]},"wb":{"a5":[],"i":[]},"Ip":{"ag":["Br"]},"Vs":{"a5":[],"i":[]},"Vi":{"a5":[],"i":[]},"VW":{"a5":[],"i":[]},"PZ":{"a5":[],"i":[]},"Es":{"a5":[],"i":[]},"zB":{"a5":[],"i":[]},"zC":{"ag":["zB<1>"]},"I9":{"fn":["zD"],"aE":[]},"zG":{"a5":[],"i":[]},"B_":{"ag":["zG<1>"]},"Mf":{"bC":[],"bs":[],"i":[]},"XA":{"av":[],"i":[]},"vz":{"fW":[],"aH":[],"i":[]},"a50":{"bQ":[],"bL":[],"K":[]},"VT":{"fW":[],"aH":[],"i":[]},"Mg":{"bC":[],"bs":[],"i":[]},"XG":{"av":[],"i":[]},"lm":{"o1":[],"iy":[]},"ol":{"wp":[]},"Hu":{"ol":["c2"],"wp":[],"ol.T":"c2"},"WD":{"av":[],"i":[]},"jR":{"bx":[]},"NT":{"bx":[]},"wk":{"BQ":["1"]},"Rs":{"cA":[]},"wU":{"bF":[],"cd":["bF"]},"Hk":{"Hj":[]},"rL":{"BQ":["1"]},"BR":{"rL":["1"],"wk":["1"],"BQ":["1"]},"ahL":{"rL":["1"],"aTo":["1"],"BQ":["1"]},"DC":{"aT0":["1"],"A":["1"],"Q9":["1"],"x":["1"],"ac":["1"],"o":["1"],"A.E":"1","o.E":"1"},"Rx":{"fn":["nM"],"aE":[]},"rO":{"a5":[],"i":[]},"Aw":{"av":[],"i":[]},"Ax":{"av":[],"i":[]},"lt":{"bl":[]},"zR":{"av":[],"i":[]},"zT":{"av":[],"i":[]},"IF":{"ag":["rO"]},"KG":{"av":[],"i":[]},"YI":{"av":[],"i":[]},"hg":{"a5":[],"i":[]},"Jt":{"ag":["hg"]},"tC":{"a5":[],"i":[]},"a_u":{"ag":["tC"]},"tU":{"a5":[],"i":[]},"K2":{"ag":["tU"]},"RT":{"av":[],"i":[]},"rB":{"a5":[],"i":[]},"vW":{"av":[],"i":[]},"Io":{"ag":["rB"]},"a51":{"av":[],"i":[]},"a0H":{"av":[],"i":[]},"lB":{"av":[],"i":[]},"a2H":{"av":[],"i":[]},"Zv":{"av":[],"i":[]},"Bz":{"a5":[],"i":[]},"Yo":{"ag":["Bz"]},"rQ":{"a5":[],"i":[]},"II":{"ag":["rQ"]},"nk":{"a5":[],"i":[]},"IL":{"ag":["nk"]},"ww":{"av":[],"i":[]},"nw":{"a5":[],"i":[]},"Jm":{"ag":["nw"]},"tg":{"a5":[],"i":[]},"Jn":{"ag":["tg"]},"tH":{"a5":[],"i":[]},"a_E":{"ag":["tH"]},"ue":{"a5":[],"i":[]},"oC":{"bl":[]},"Km":{"ag":["ue"]},"nY":{"a5":[],"i":[]},"Kz":{"ag":["nY"]},"q6":{"a5":[],"i":[]},"KA":{"ag":["q6"]},"uw":{"a5":[],"i":[]},"a1g":{"ag":["uw"]},"ob":{"a5":[],"i":[]},"L6":{"ag":["ob"]},"v5":{"a5":[],"i":[]},"Ls":{"ag":["v5"]},"v6":{"a5":[],"i":[]},"Lt":{"ag":["v6"]},"v7":{"a5":[],"i":[]},"Lu":{"ag":["v7"]},"zH":{"av":[],"i":[]},"x1":{"av":[],"i":[]},"x3":{"av":[],"i":[]},"ug":{"a5":[],"i":[]},"a0P":{"ag":["ug"]},"Ol":{"av":[],"i":[]},"Px":{"av":[],"i":[]},"IO":{"av":[],"i":[]},"Gq":{"a5":[],"i":[]},"a2S":{"ag":["Gq"]},"uh":{"a5":[],"i":[]},"a0Q":{"ag":["uh"]},"Dt":{"a5":[],"i":[]},"JN":{"ag":["Dt"]},"Rp":{"av":[],"i":[]},"a2y":{"av":[],"i":[]},"nK":{"a5":[],"i":[]},"oD":{"bl":[]},"xt":{"av":[],"i":[]},"JO":{"ag":["nK"]},"DD":{"a5":[],"i":[]},"xv":{"ag":["DD"]},"nL":{"av":[],"i":[]},"xw":{"a5":[],"i":[]},"a_G":{"ag":["xw"]},"a2x":{"av":[],"i":[]},"tB":{"av":[],"i":[]},"BG":{"av":[],"i":[]},"Oy":{"av":[],"i":[]},"CF":{"a5":[],"i":[]},"J5":{"ag":["CF"]},"a2E":{"av":[],"i":[]},"qM":{"lU":[]},"fO":{"av":[],"i":[]},"fQ":{"av":[],"i":[]},"fP":{"av":[],"i":[]},"tI":{"a5":[],"i":[]},"a_F":{"ag":["tI"]},"DF":{"av":[],"i":[]},"nU":{"a5":[],"i":[]},"a0j":{"ag":["nU"]},"xV":{"a5":[],"i":[]},"a0m":{"ag":["xV"],"fI":[]},"Vc":{"av":[],"i":[]},"Vb":{"av":[],"i":[]},"a_t":{"av":[],"i":[]},"VD":{"av":[],"i":[]},"a2w":{"av":[],"i":[]},"WM":{"av":[],"i":[]},"Ij":{"a5":[],"i":[]},"Mp":{"ag":["Ij"]},"ES":{"a5":[],"i":[]},"a0O":{"ag":["ES"]},"Yt":{"av":[],"i":[]},"BJ":{"Ce":[]},"po":{"Ce":[]},"ng":{"bX":["x<n>"],"bX.T":"x<n>"},"rY":{"bx":[]},"C1":{"c8":["h","h","1"],"ar":["h","1"],"c8.K":"h","c8.V":"1","c8.C":"h"},"TC":{"bx":[]},"TV":{"tT":[]},"Xq":{"tT":[]},"XL":{"tT":[]},"TA":{"hh":[],"bx":[]},"aQ":{"anc":["1"],"aD":["1"]},"EE":{"o":["1"],"o.E":"1"},"kF":{"ew":["1","h"],"aD":["h"],"ew.R":"1"},"EB":{"ew":["1","2"],"aD":["2"],"ew.R":"1"},"I1":{"ew":["1","mI<1>"],"aD":["mI<1>"],"ew.R":"1"},"GT":{"eT":[]},"t0":{"eT":[]},"Sl":{"eT":[]},"SY":{"eT":[]},"fE":{"eT":[]},"XJ":{"eT":[]},"C4":{"u2":["1","1"],"aD":["1"],"u2.R":"1"},"ew":{"aD":["2"]},"GL":{"aD":["cC<1,2>"]},"GM":{"aD":["l9<1,2,3>"]},"GN":{"aD":["k8<1,2,3,4>"]},"GO":{"aD":["jz<1,2,3,4,5>"]},"GP":{"aD":["hv<1,2,3,4,5,6,7,8>"]},"u2":{"aD":["2"]},"jo":{"ew":["1","1"],"aD":["1"],"ew.R":"1"},"H1":{"ew":["1","1"],"aD":["1"],"ew.R":"1"},"D3":{"aD":["1"]},"SV":{"aD":["h"]},"jP":{"aD":["h"]},"v9":{"aD":["h"]},"TX":{"aD":["h"]},"V2":{"aD":["h"]},"iC":{"ew":["1","x<1>"],"aD":["x<1>"],"ew.R":"1"},"En":{"ew":["1","x<1>"],"aD":["x<1>"]},"FF":{"ew":["1","x<1>"],"aD":["x<1>"],"ew.R":"1"},"Ga":{"ew":["1","2"],"aD":["2"]},"cQ":{"a7":["1"],"cQ.T":"1","cQ.S":"2"},"FG":{"uJ":["1"],"cQ":["1","1"],"a7":["1"],"cQ.T":"1","cQ.S":"1"},"js":{"cQ":["1","1"],"a7":["1"],"js.T":"1","cQ.T":"1","cQ.S":"1"},"TW":{"cQ":["@","@"],"a7":["@"],"cQ.T":"@","cQ.S":"@"},"uJ":{"cQ":["1","1"],"a7":["1"],"cQ.T":"1","cQ.S":"1"},"k3":{"bx":[]},"CB":{"bX":["1"],"bX.T":"1"},"BL":{"zd":["1"],"dH":["1"],"bX":["1"],"bX.T":"1"},"hB":{"bX":["1"],"bX.T":"1"},"zd":{"dH":["1"],"bX":["1"]},"AT":{"bX":["1"],"bX.T":"1"},"Hg":{"eM":["1","1"],"eM.S":"1","eM.T":"1"},"Hf":{"eM":["1","1"],"eM.S":"1","eM.T":"1"},"Kn":{"dH":["1"]},"VZ":{"av":[],"i":[]},"QN":{"lb":[],"cd":["lb"]},"Ju":{"aSF":[],"ok":[],"mz":[],"cd":["mz"]},"lb":{"cd":["lb"]},"Wj":{"lb":[],"cd":["lb"]},"mz":{"cd":["mz"]},"Wk":{"mz":[],"cd":["mz"]},"Wl":{"bx":[]},"z7":{"hh":[],"bx":[]},"H7":{"mz":[],"cd":["mz"]},"ok":{"mz":[],"cd":["mz"]},"Hl":{"bx":[]},"JJ":{"dH":["1"]},"Wv":{"hh":[],"bx":[]},"NS":{"Ce":[]},"Wy":{"js":["@"],"cQ":["@","@"],"a7":["@"],"js.T":"@","cQ.T":"@","cQ.S":"@"},"Hs":{"fI":[]},"ot":{"A":["1"],"x":["1"],"ac":["1"],"o":["1"]},"a_Z":{"ot":["n"],"A":["n"],"x":["n"],"ac":["n"],"o":["n"]},"Xi":{"ot":["n"],"A":["n"],"x":["n"],"ac":["n"],"o":["n"],"A.E":"n","o.E":"n","ot.E":"n"},"V_":{"O":[],"B":[],"W":[],"ax":[]},"Xv":{"bx":[]},"UY":{"O":[],"B":[],"W":[],"ax":[]},"UN":{"O":[],"B":[],"W":[],"ax":[]},"Ic":{"a5":[],"i":[]},"a4Z":{"ag":["Ic"]},"a2_":{"bo":[],"aH":[],"i":[]},"a20":{"bo":[],"aH":[],"i":[]},"a1Z":{"bo":[],"aH":[],"i":[]},"fA":{"qd":[]},"jk":{"qd":[]},"ff":{"qd":[]},"Ci":{"qd":[]},"q_":{"kK":[]},"qk":{"kK":[]},"fL":{"d2":[]},"a_7":{"d2":[]},"Xc":{"d2":[]},"XF":{"fL":[],"d2":[]},"yb":{"fL":[],"d2":[]},"WV":{"fL":[],"d2":[]},"Vp":{"fL":[],"d2":[]},"Cf":{"d2":[]},"ED":{"d2":[]},"yd":{"fL":[],"d2":[]},"wX":{"fL":[],"d2":[]},"WT":{"fL":[],"d2":[]},"RK":{"fL":[],"d2":[]},"Fs":{"d2":[]},"yE":{"d2":[]},"V9":{"d2":[]},"V8":{"d2":[]},"V5":{"d2":[]},"V6":{"d2":[]},"Gc":{"d2":[]},"V7":{"d2":[]},"a_J":{"dH":["@"]},"If":{"bx":[]},"XQ":{"qX":[]},"XV":{"bx":[]},"XX":{"hh":[],"bx":[]},"zK":{"aD":["h"]},"XR":{"bZ":["x<dk>","h"],"bZ.S":"x<dk>","bZ.T":"h"},"kf":{"dk":[]},"ln":{"dk":[]},"lo":{"dk":[]},"lp":{"dk":[]},"hA":{"dk":[]},"lq":{"dk":[]},"h3":{"dk":[]},"Il":{"dk":[]},"zL":{"Il":[],"dk":[]},"XS":{"o":["dk"],"o.E":"dk"},"b3l":{"bC":[],"bs":[],"i":[]},"b60":{"a5":[],"i":[]},"b4g":{"a5":[],"i":[]},"b4h":{"ag":["b4g"]},"baz":{"bC":[],"bs":[],"i":[]},"b9j":{"bC":[],"bs":[],"i":[]},"b3y":{"eh":[],"bC":[],"bs":[],"i":[]},"anc":{"aD":["1"]}}'))
 A.baI(v.typeUniverse,JSON.parse('{"Da":1,"Xo":1,"zF":1,"My":2,"y4":1,"dH":1,"aiU":1,"Hm":1,"a3L":1,"ZG":1,"a4U":2,"EC":2,"a4V":1,"a3x":2,"a3w":2,"LC":2,"LD":1,"LE":1,"M9":2,"N_":1,"Oz":1,"Pt":2,"cd":1,"RU":1,"Ag":1,"wY":1,"Bv":1,"wJ":1,"IQ":1,"IR":1,"IS":1,"Fm":1,"Mu":1,"Su":1,"Ke":1,"Co":1,"IU":1,"eV":1,"hu":1,"FZ":1,"Cu":1,"AC":1,"KY":1,"yC":1,"pk":1,"xC":1,"wc":1,"Ae":1,"aOb":1,"Xe":1,"aTU":1,"ml":1,"f3":1,"l0":1,"dR":1,"L7":1,"B0":1,"y6":1,"Sg":1,"FE":1,"FQ":1,"Ao":1,"AB":1,"i1":1,"e3":1,"M4":1,"Xg":1,"Rr":1,"JP":1,"JQ":1,"JR":1,"Vd":1,"En":1,"Ga":2,"Dl":2,"Ws":1,"XH":2,"QE":2}'))
-var u={b:"\nscelgo io\nuna missione per te.\n\n\n1\n<b>Abbracciare<b>\n\n2\n<b>Accarezzare un animale<b>\n\n3\n<b>Accettare una proposta<b>\n\n4\n<b>Accusare<b>\n\n5\n<b>Addormentarsi<b>\n\n6\n<b>Affittare una casa<b>\n\n7\n<b>Amare<b>\n\n8\n<b>Andare per la prima volta in un posto<b>\n\n9\n<b>Ascoltare il figlio<b>\n\n10\n<b>Ascoltare il padre<b>\n\n11\n<b>Ascoltare la figlia<b>\n\n12\n<b>Ascoltare la madre<b>\n\n13\n<b>Ascoltare una canzone<b>\n\n14\n<b>Assolvere<b>\n\n15\n<b>Assumere sostanze<b>\n\n16\n<b>Baciare<b>\n\n17\n<b>Baciarsi<b>\n\n18\n<b>Cadere<b>\n\n19\n<b>Cadere di nuovo<b>\n\n20\n<b>Cambiare idea<b>\n\n21\n<b>Camminare mano<b>\n<b>nella mano<b>\n\n22\n<b>Chiedere aiuto<b>\n\n23\n<b>Chiedere perdono<b>\n\n24\n<b>Chiedere un consiglio<b>\n\n25\n<b>Combattere<b>\n<b>una dipendenza<b>\n\n26\n<b>Commettere un errore<b>\n\n27\n<b>Commettere un reato<b>\n\n28\n<b>Commiserare<b>\n\n29\n<b>Comprare cibo<b>\n\n30\n<b>Comprare qualcosa<b>\n\n31\n<b>Comprare un regalo<b>\n\n32\n<b>Comprare un\u2019auto<b>\n\n33\n<b>Comprare una lavatrice<b>\n\n34\n<b>Comprare vestiti<b>\n\n35\n<b>Condannare<b>\n\n36\n<b>Confidarsi<b>\n\n37\n<b>Controllare di nascosto<b>\n<b>il suo cellulare<b>\n\n38\n<b>Costruire qualcosa<b>\n\n39\n<b>Curarsi<b>\n\n40\n<b>Danzare<b>\n\n41\n<b>Dare un consiglio<b>\n\n42\n<b>Dare un ordine<b>\n\n43\n<b>Decidere di fare un figlio<b>\n\n44\n<b>Decidere di non tenere<b>\n<b>un figlio<b>\n\n45\n<b>Deludere<b>\n\n46\n<b>Deridere<b>\n\n47\n<b>Desiderare<b>\n\n48\n<b>Dimenticare<b>\n\n49\n<b>Dire la verit\xe0<b>\n\n50\n<b>Dire una bugia<b>\n\n51\n<b>Distruggere qualcosa<b>\n\n52\n<b>Dormire<b>\n\n53\n<b>Dormire poco<b>\n\n54\n<b>Essere abbracciati<b>\n\n55\n<b>Essere accusati<b>\n\n56\n<b>Essere amati<b>\n\n57\n<b>Essere assolti<b>\n\n58\n<b>Essere assunti<b>\n\n59\n<b>Essere baciati<b>\n\n60\n<b>Essere commiserati<b>\n\n61\n<b>Essere condannati<b>\n\n62\n<b>Essere curati<b>\n\n63\n<b>Essere delusi da qualcuno<b>\n\n64\n<b>Essere derisi<b>\n\n65\n<b>Essere desiderati<b>\n\n66\n<b>Essere dimenticati<b>\n\n67\n<b>Essere dipendenti<b>\n\n68\n<b>Essere gelosi<b>\n\n69\n<b>Essere giudicati<b>\n\n70\n<b>Essere insultati<b>\n\n71\n<b>Essere perdonati<b>\n\n72\n<b>Essere ricordati<b>\n\n73\n<b>Essere scoperti<b>\n\n74\n<b>Essere sedotti<b>\n\n75\n<b>Essere seducenti<b>\n\n76\n<b>Essere traditi<b>\n\n77\n<b>Fantasticare<b>\n\n78\n<b>Fare la pace<b>\n\n79\n<b>Fare una proposta<b>\n\n80\n<b>Fidarsi<b>\n\n81\n<b>Giudicare<b>\n\n82\n<b>Guadagnare soldi<b>\n\n83\n<b>Imparare qualcosa<b>\n\n84\n<b>Insultare<b>\n\n85\n<b>Invitare qualcuno<b>\n<b>a ballare<b>\n\n86\n<b>Lasciarsi<b>\n\n87\n<b>Litigare<b>\n\n88\n<b>Mettersi insieme<b>\n\n89\n<b>Morire<b>\n\n90\n<b>Nascere<b>\n\n91\n<b>Nascondere qualcosa<b>\n\n92\n<b>Non abbracciare<b>\n\n93\n<b>Non dormire abbastanza<b>\n\n94\n<b>Non fidarsi<b>\n\n95\n<b>Non riuscire a dormire<b>\n\n96\n<b>Non salutare<b>\n\n97\n<b>Parlare al figlio<b>\n\n98\n<b>Parlare al padre<b>\n\n99\n<b>Parlare alla figlia<b>\n\n100\n<b>Parlare alla madre<b>\n\n101\n<b>Parlare troppo<b>\n\n102\n<b>Perdere soldi<b>\n\n103\n<b>Perdonare<b>\n\n104\n<b>Perdonarsi<b>\n\n105\n<b>Piangere<b>\n\n106\n<b>Piantare un albero<b>\n\n107\n<b>Prendere la mano<b>\n<b>di qualcuno<b>\n\n108\n<b>Prendere una decisione<b>\n\n109\n<b>Prendersi cura<b>\n\n110\n<b>Preparare da mangiare<b>\n<b>per qualcuno<b>\n\n111\n<b>Provare piet\xe0<b>\n\n112\n<b>Rialzarsi<b>\n\n113\n<b>Ricevere un consiglio<b>\n\n114\n<b>Ricevere un ordine<b>\n\n115\n<b>Ricevere un regalo<b>\n\n116\n<b>Ricevere una lettera<b>\n\n117\n<b>Ricevere una telefonata<b>\n\n118\n<b>Ricordare<b>\n\n119\n<b>Ricordare un sogno<b>\n\n120\n<b>Ridere<b>\n\n121\n<b>Rifiutare una proposta<b>\n\n122\n<b>Rimpiangere<b>\n\n123\n<b>Rinunciare<b>\n\n124\n<b>Riparare<b>\n\n125\n<b>Salutare affettuosamente<b>\n\n126\n<b>Scegliere un corso di studi<b>\n\n127\n<b>Scegliere un regalo<b>\n\n128\n<b>Scoprire<b>\n\n129\n<b>Scrivere<b>\n\n130\n<b>Scrivere una lettera<b>\n\n131\n<b>Sognare<b>\n\n132\n<b>Studiare<b>\n\n133\n<b>Subire un'ingiustizia<b>\n\n134\n<b>Tacere<b>\n\n135\n<b>Telefonare<b>\n\n136\n<b>Tornare insieme<b>\n\n137\n<b>Tradire<b>\n\n138\n<b>Trasferirsi<b>\n<b>in un'altra citt\xe0<b>\n\n139\n<b>Traslocare<b>\n\n140\n<b>Trovare il telefono occupato<b>\n\n141\n<b>Utilizzare un falso profilo<b>\n\n142\n<b>Vendere qualcosa<b>\n\n143\n<b>Vendicarsi<b>\n\n144\n<b>Vivere un lutto<b>\n\n\nUtilizza come tema\nla <b>missione<b> \"<b>in generale<b>\",\ne continua\ncon questo esercizio\ntutti i giorni,\ncambiando missioni, \nfino a quando\nvedrai\nil tuo <b>primo personaggio<b>\n<b>apparire<b>\nin quello\nche stai scrivendo.\n\nCosa intendo\nper\n\"veder apparire\u201d\nil <b>primo personaggio<b>\nall\u2019interno degli esercizi?\n\nPer me\nsignifica\nche avrai guadagnato\nqualche frammento:\nimmagini,\nun'azione,\nun dettaglio,\nmagari solo un avverbio.\n\nQuando questo\nsar\xe0 accaduto,\nesci\ndal <b>Pozzo dell\u2019Oracolo<b>\ne vai verso\nla <b>Porta nell\u2019Alabastro<b>.\n\nSe non ti convince\nla proposta \ndi dedicarti ad altro\ne di aspettare\nche il tuo personaggio\nappaia,\nti consiglio di prendere\nla <b>Scorciatoia<b>,\ncliccare su <b>6<b>,e di arrivare direttamente\nal <b>Secondo Anello<b>.\n",q:"\x10@\x100@@\xa0\x80 0P`pPP\xb1\x10@\x100@@\xa0\x80 0P`pPP\xb0\x11@\x100@@\xa0\x80 0P`pPP\xb0\x10@\x100@@\xa0\x80 1P`pPP\xb0\x10A\x101AA\xa1\x81 1QaqQQ\xb0\x10@\x100@@\xa0\x80 1Q`pPP\xb0\x10@\x100@@\xa0\x80 1QapQP\xb0\x10@\x100@@\xa0\x80 1PaqQQ\xb0\x10\xe0\x100@@\xa0\x80 1P`pPP\xb0\xb1\xb1\xb1\xb1\x91\xb1\xc1\x81\xb1\xb1\xb1\xb1\xb1\xb1\xb1\xb1\x10@\x100@@\xd0\x80 1P`pPP\xb0\x11A\x111AA\xa1\x81!1QaqQQ\xb1\x10@\x100@@\x90\x80 1P`pPP\xb0",S:" 0\x10000\xa0\x80\x10@P`p`p\xb1 0\x10000\xa0\x80\x10@P`p`p\xb0 0\x10000\xa0\x80\x11@P`p`p\xb0 1\x10011\xa0\x80\x10@P`p`p\xb0 1\x10111\xa1\x81\x10AQaqaq\xb0 1\x10011\xa0\x80\x10@Qapaq\xb0 1\x10011\xa0\x80\x10@Paq`p\xb0 1\x10011\xa0\x80\x10@P`q`p\xb0 \x91\x100\x811\xa0\x80\x10@P`p`p\xb0 1\x10011\xa0\x81\x10@P`p`p\xb0 1\x100111\x80\x10@P`p`p\xb0!1\x11111\xa1\x81\x11AQaqaq\xb1",D:" must not be greater than the number of characters in the file, ",r:'"recorder" must not already be associated with another Canvas.',T:"% of the way to being a CircleBorder that is ",N:"' has been assigned during initialization.",K:"00000008A0009!B000a!C000b000cD000d!E000e000vA000w!F000x!G000y!H000z!I0010!J0011!K0012!I0013!H0014!L0015!M0016!I0017!J0018!N0019!O001a!N001b!P001c001lQ001m001nN001o001qI001r!G001s002iI002j!L002k!J002l!M002m003eI003f!L003g!B003h!R003i!I003j003oA003p!D003q004fA004g!S004h!L004i!K004j004lJ004m004qI004r!H004s!I004t!B004u004vI004w!K004x!J004y004zI0050!T00510056I0057!H0058005aI005b!L005c00jrI00js!T00jt00jvI00jw!T00jx00keI00kf!T00kg00lbI00lc00niA00nj!S00nk00nvA00nw00o2S00o300ofA00og00otI00ou!N00ov00w2I00w300w9A00wa013cI013d!N013e!B013h013iI013j!J013l014tA014u!B014v!A014w!I014x014yA014z!I01500151A0152!G0153!A015c0162U0167016aU016b016wI016x016zK01700171N01720173I0174017eA017f!G017g!A017i017jG017k018qI018r019bA019c019lQ019m!K019n019oQ019p019rI019s!A019t01cjI01ck!G01cl!I01cm01csA01ct01cuI01cv01d0A01d101d2I01d301d4A01d5!I01d601d9A01da01dbI01dc01dlQ01dm01e8I01e9!A01ea01f3I01f401fuA01fx01idI01ie01ioA01ip!I01j401jdQ01je01kaI01kb01kjA01kk01knI01ko!N01kp!G01kq!I01kt!A01ku01kvJ01kw01lhI01li01llA01lm!I01ln01lvA01lw!I01lx01lzA01m0!I01m101m5A01m801ncI01nd01nfA01ni01qfI01qr01r5A01r6!I01r701s3A01s401tlI01tm01toA01tp!I01tq01u7A01u8!I01u901ufA01ug01upI01uq01urA01us01utB01uu01v3Q01v401vkI01vl01vnA01vp01x5I01x8!A01x9!I01xa01xgA01xj01xkA01xn01xpA01xq!I01xz!A01y401y9I01ya01ybA01ye01ynQ01yo01ypI01yq01yrK01ys01ywI01yx!K01yy!I01yz!J01z001z1I01z2!A01z501z7A01z9020pI020s!A020u020yA02130214A02170219A021d!A021l021qI021y0227Q02280229A022a022cI022d!A022e!I022p022rA022t0249I024c!A024d!I024e024lA024n024pA024r024tA024w025dI025e025fA025i025rQ025s!I025t!J0261!I02620267A0269026bA026d027tI027w!A027x!I027y0284A02870288A028b028dA028l028nA028s028xI028y028zA0292029bQ029c029jI029u!A029v02bdI02bi02bmA02bq02bsA02bu02bxA02c0!I02c7!A02cm02cvQ02cw02d4I02d5!J02d6!I02dc02dgA02dh02f1I02f202f8A02fa02fcA02fe02fhA02fp02fqA02fs02g1I02g202g3A02g602gfQ02gn!T02go02gwI02gx02gzA02h0!T02h102ihI02ik!A02il!I02im02isA02iu02iwA02iy02j1A02j902jaA02ji02jlI02jm02jnA02jq02jzQ02k102k2I02kg02kjA02kk02m2I02m302m4A02m5!I02m602mcA02me02mgA02mi02mlA02mm02muI02mv!A02mw02n5I02n602n7A02na02njQ02nk02nsI02nt!K02nu02nzI02o102o3A02o502pyI02q2!A02q702qcA02qe!A02qg02qnA02qu02r3Q02r602r7A02r802t6I02tb!J02tc02trI02ts02u1Q02u202u3B02v502x9I02xc02xlQ02xo02yoI02yp02ysT02yt!I02yu02yvT02yw!S02yx02yyT02yz!B02z0!S02z102z5G02z6!S02z7!I02z8!G02z902zbI02zc02zdA02ze02zjI02zk02ztQ02zu0303I0304!B0305!A0306!I0307!A0308!I0309!A030a!L030b!R030c!L030d!R030e030fA030g031oI031t0326A0327!B0328032cA032d!B032e032fA032g032kI032l032vA032x033wA033y033zB03400345I0346!A0347034fI034g034hT034i!B034j!T034k034oI034p034qS035s037jI037k037tQ037u037vB037w039rI039s03a1Q03a203cvI03cw03fjV03fk03hjW03hk03jzX03k003tmI03tp03trA03ts!I03tt!B03tu03y5I03y8!B03y904fzI04g0!B04g104gqI04gr!L04gs!R04gw04iyI04iz04j1B04j204k1I04k204k4A04kg04kxI04ky04l0A04l104l2B04lc04ltI04lu04lvA04m804moI04mq04mrA04n404pfI04pg04phB04pi!Y04pj!I04pk!B04pl!I04pm!B04pn!J04po04ppI04ps04q1Q04q804qpI04qq04qrG04qs04qtB04qu!T04qv!I04qw04qxG04qy!I04qz04r1A04r2!S04r404rdQ04rk04ucI04ud04ueA04uf04vcI04vd!A04ve04ymI04yo04yzA04z404zfA04zk!I04zo04zpG04zq04zzQ0500053dI053k053tQ053u055iI055j055nA055q058cI058f!A058g058pQ058w0595Q059c059pI059s05a8A05c005c4A05c505dfI05dg05dwA05dx05e3I05e805ehQ05ei05ejB05ek!I05el05eoB05ep05eyI05ez05f7A05f805fgI05fk05fmA05fn05ggI05gh05gtA05gu05gvI05gw05h5Q05h605idI05ie05irA05j005k3I05k405knA05kr05kvB05kw05l5Q05l905lbI05lc05llQ05lm05mlI05mm05mnB05mo05onI05ow05oyA05oz!I05p005pkA05pl05poI05pp!A05pq05pvI05pw!A05px05pyI05pz05q1A05q205vjI05vk05x5A05x705xbA05xc06bgI06bh!T06bi!I06bk06bqB06br!S06bs06buB06bv!Z06bw!A06bx!a06by06bzA06c0!B06c1!S06c206c3B06c4!b06c506c7I06c806c9H06ca!L06cb06cdH06ce!L06cf!H06cg06cjI06ck06cmc06cn!B06co06cpD06cq06cuA06cv!S06cw06d3K06d4!I06d506d6H06d7!I06d806d9Y06da06dfI06dg!N06dh!L06di!R06dj06dlY06dm06dxI06dy!B06dz!I06e006e3B06e4!I06e506e7B06e8!d06e906ecI06ee06enA06eo06f0I06f1!L06f2!R06f306fgI06fh!L06fi!R06fk06fwI06g006g6J06g7!K06g806glJ06gm!K06gn06gqJ06gr!K06gs06gtJ06gu!K06gv06hbJ06hc06i8A06io06iqI06ir!K06is06iwI06ix!K06iy06j9I06ja!J06jb06q9I06qa06qbJ06qc06weI06wf!c06wg06x3I06x4!L06x5!R06x6!L06x7!R06x806xlI06xm06xne06xo06y0I06y1!L06y2!R06y3073jI073k073ne073o07i7I07i807ibe07ic07irI07is07ite07iu07ivI07iw!e07ix!I07iy07j0e07j1!f07j207j3e07j407jsI07jt07jve07jw07l3I07l4!e07l507lqI07lr!e07ls07ngI07nh07nse07nt07nwI07nx!e07ny!I07nz07o1e07o2!I07o307o4e07o507o7I07o807o9e07oa07obI07oc!e07od07oeI07of07ohe07oi07opI07oq!e07or07owI07ox07p1e07p2!I07p307p4e07p5!f07p6!e07p707p8I07p907pge07ph07pjI07pk07ple07pm07ppf07pq07ruI07rv07s0H07s1!I07s207s3G07s4!e07s507s7I07s8!L07s9!R07sa!L07sb!R07sc!L07sd!R07se!L07sf!R07sg!L07sh!R07si!L07sj!R07sk!L07sl!R07sm07usI07ut!L07uu!R07uv07vpI07vq!L07vr!R07vs!L07vt!R07vu!L07vv!R07vw!L07vx!R07vy!L07vz!R07w00876I0877!L0878!R0879!L087a!R087b!L087c!R087d!L087e!R087f!L087g!R087h!L087i!R087j!L087k!R087l!L087m!R087n!L087o!R087p!L087q!R087r!L087s!R087t089jI089k!L089l!R089m!L089n!R089o08ajI08ak!L08al!R08am08viI08vj08vlA08vm08vnI08vt!G08vu08vwB08vx!I08vy!G08vz!B08w008z3I08z4!B08zj!A08zk0926I09280933A0934093hH093i093pB093q!I093r!B093s!L093t!B093u093vI093w093xH093y093zI09400941H0942!L0943!R0944!L0945!R0946!L0947!R0948!L0949!R094a094dB094e!G094f!I094g094hB094i!I094j094kB094l094pI094q094rb094s094uB094v!I094w094xB094y!L094z0956B0957!I0958!B0959!I095a095bB095c095eI096o097de097f099ve09a809g5e09gw09h7e09hc!B09hd09heR09hf09hge09hh!Y09hi09hje09hk!L09hl!R09hm!L09hn!R09ho!L09hp!R09hq!L09hr!R09hs!L09ht!R09hu09hve09hw!L09hx!R09hy!L09hz!R09i0!L09i1!R09i2!L09i3!R09i4!Y09i5!L09i609i7R09i809ihe09ii09inA09io09ise09it!A09iu09iye09iz09j0Y09j109j3e09j5!Y09j6!e09j7!Y09j8!e09j9!Y09ja!e09jb!Y09jc!e09jd!Y09je09k2e09k3!Y09k409kye09kz!Y09l0!e09l1!Y09l2!e09l3!Y09l409l9e09la!Y09lb09lge09lh09liY09ll09lmA09ln09lqY09lr!e09ls09ltY09lu!e09lv!Y09lw!e09lx!Y09ly!e09lz!Y09m0!e09m1!Y09m209mqe09mr!Y09ms09nme09nn!Y09no!e09np!Y09nq!e09nr!Y09ns09nxe09ny!Y09nz09o4e09o509o6Y09o709oae09ob09oeY09of!e09ol09pre09pt09see09sg09ure09v409vjY09vk09wee09wg09xje09xk09xrI09xs0fcve0fcw0fenI0feo0vmce0vmd!Y0vme0wi4e0wi80wjqe0wk00wl9I0wla0wlbB0wlc0wssI0wst!B0wsu!G0wsv!B0wsw0wtbI0wtc0wtlQ0wtm0wviI0wvj0wvmA0wvn!I0wvo0wvxA0wvy0wwtI0wwu0wwvA0www0wz3I0wz40wz5A0wz6!I0wz70wzbB0wzk0x6pI0x6q!A0x6r0x6tI0x6u!A0x6v0x6yI0x6z!A0x700x7mI0x7n0x7rA0x7s0x7vI0x7w!A0x800x87I0x88!K0x890x9vI0x9w0x9xT0x9y0x9zG0xa80xa9A0xaa0xbnI0xbo0xc5A0xce0xcfB0xcg0xcpQ0xcw0xddA0xde0xdnI0xdo!T0xdp0xdqI0xdr!A0xds0xe1Q0xe20xetI0xeu0xf1A0xf20xf3B0xf40xfqI0xfr0xg3A0xgf!I0xgg0xh8V0xhc0xhfA0xhg0xiqI0xir0xj4A0xj50xjaI0xjb0xjdB0xje0xjjI0xjk0xjtQ0xjy0xkfI0xkg0xkpQ0xkq0xm0I0xm10xmeA0xmo0xmqI0xmr!A0xms0xmzI0xn00xn1A0xn40xndQ0xng!I0xnh0xnjB0xnk0xreI0xrf0xrjA0xrk0xrlB0xrm0xroI0xrp0xrqA0xs10xyaI0xyb0xyiA0xyj!B0xyk0xylA0xyo0xyxQ0xz4!g0xz50xzvh0xzw!g0xzx0y0nh0y0o!g0y0p0y1fh0y1g!g0y1h0y27h0y28!g0y290y2zh0y30!g0y310y3rh0y3s!g0y3t0y4jh0y4k!g0y4l0y5bh0y5c!g0y5d0y63h0y64!g0y650y6vh0y6w!g0y6x0y7nh0y7o!g0y7p0y8fh0y8g!g0y8h0y97h0y98!g0y990y9zh0ya0!g0ya10yarh0yas!g0yat0ybjh0ybk!g0ybl0ycbh0ycc!g0ycd0yd3h0yd4!g0yd50ydvh0ydw!g0ydx0yenh0yeo!g0yep0yffh0yfg!g0yfh0yg7h0yg8!g0yg90ygzh0yh0!g0yh10yhrh0yhs!g0yht0yijh0yik!g0yil0yjbh0yjc!g0yjd0yk3h0yk4!g0yk50ykvh0ykw!g0ykx0ylnh0ylo!g0ylp0ymfh0ymg!g0ymh0yn7h0yn8!g0yn90ynzh0yo0!g0yo10yorh0yos!g0yot0ypjh0ypk!g0ypl0yqbh0yqc!g0yqd0yr3h0yr4!g0yr50yrvh0yrw!g0yrx0ysnh0yso!g0ysp0ytfh0ytg!g0yth0yu7h0yu8!g0yu90yuzh0yv0!g0yv10yvrh0yvs!g0yvt0ywjh0ywk!g0ywl0yxbh0yxc!g0yxd0yy3h0yy4!g0yy50yyvh0yyw!g0yyx0yznh0yzo!g0yzp0z0fh0z0g!g0z0h0z17h0z18!g0z190z1zh0z20!g0z210z2rh0z2s!g0z2t0z3jh0z3k!g0z3l0z4bh0z4c!g0z4d0z53h0z54!g0z550z5vh0z5w!g0z5x0z6nh0z6o!g0z6p0z7fh0z7g!g0z7h0z87h0z88!g0z890z8zh0z90!g0z910z9rh0z9s!g0z9t0zajh0zak!g0zal0zbbh0zbc!g0zbd0zc3h0zc4!g0zc50zcvh0zcw!g0zcx0zdnh0zdo!g0zdp0zefh0zeg!g0zeh0zf7h0zf8!g0zf90zfzh0zg0!g0zg10zgrh0zgs!g0zgt0zhjh0zhk!g0zhl0zibh0zic!g0zid0zj3h0zj4!g0zj50zjvh0zjw!g0zjx0zknh0zko!g0zkp0zlfh0zlg!g0zlh0zm7h0zm8!g0zm90zmzh0zn0!g0zn10znrh0zns!g0znt0zojh0zok!g0zol0zpbh0zpc!g0zpd0zq3h0zq4!g0zq50zqvh0zqw!g0zqx0zrnh0zro!g0zrp0zsfh0zsg!g0zsh0zt7h0zt8!g0zt90ztzh0zu0!g0zu10zurh0zus!g0zut0zvjh0zvk!g0zvl0zwbh0zwc!g0zwd0zx3h0zx4!g0zx50zxvh0zxw!g0zxx0zynh0zyo!g0zyp0zzfh0zzg!g0zzh1007h1008!g1009100zh1010!g1011101rh101s!g101t102jh102k!g102l103bh103c!g103d1043h1044!g1045104vh104w!g104x105nh105o!g105p106fh106g!g106h1077h1078!g1079107zh1080!g1081108rh108s!g108t109jh109k!g109l10abh10ac!g10ad10b3h10b4!g10b510bvh10bw!g10bx10cnh10co!g10cp10dfh10dg!g10dh10e7h10e8!g10e910ezh10f0!g10f110frh10fs!g10ft10gjh10gk!g10gl10hbh10hc!g10hd10i3h10i4!g10i510ivh10iw!g10ix10jnh10jo!g10jp10kfh10kg!g10kh10l7h10l8!g10l910lzh10m0!g10m110mrh10ms!g10mt10njh10nk!g10nl10obh10oc!g10od10p3h10p4!g10p510pvh10pw!g10px10qnh10qo!g10qp10rfh10rg!g10rh10s7h10s8!g10s910szh10t0!g10t110trh10ts!g10tt10ujh10uk!g10ul10vbh10vc!g10vd10w3h10w4!g10w510wvh10ww!g10wx10xnh10xo!g10xp10yfh10yg!g10yh10z7h10z8!g10z910zzh1100!g1101110rh110s!g110t111jh111k!g111l112bh112c!g112d1133h1134!g1135113vh113w!g113x114nh114o!g114p115fh115g!g115h1167h1168!g1169116zh1170!g1171117rh117s!g117t118jh118k!g118l119bh119c!g119d11a3h11a4!g11a511avh11aw!g11ax11bnh11bo!g11bp11cfh11cg!g11ch11d7h11d8!g11d911dzh11e0!g11e111erh11es!g11et11fjh11fk!g11fl11gbh11gc!g11gd11h3h11h4!g11h511hvh11hw!g11hx11inh11io!g11ip11jfh11jg!g11jh11k7h11k8!g11k911kzh11l0!g11l111lrh11ls!g11lt11mjh11mk!g11ml11nbh11nc!g11nd11o3h11o4!g11o511ovh11ow!g11ox11pnh11po!g11pp11qfh11qg!g11qh11r7h11r8!g11r911rzh11s0!g11s111srh11ss!g11st11tjh11tk!g11tl11ubh11uc!g11ud11v3h11v4!g11v511vvh11vw!g11vx11wnh11wo!g11wp11xfh11xg!g11xh11y7h11y8!g11y911yzh11z0!g11z111zrh11zs!g11zt120jh120k!g120l121bh121c!g121d1223h1224!g1225122vh122w!g122x123nh123o!g123p124fh124g!g124h1257h1258!g1259125zh1260!g1261126rh126s!g126t127jh127k!g127l128bh128c!g128d1293h1294!g1295129vh129w!g129x12anh12ao!g12ap12bfh12bg!g12bh12c7h12c8!g12c912czh12d0!g12d112drh12ds!g12dt12ejh12ek!g12el12fbh12fc!g12fd12g3h12g4!g12g512gvh12gw!g12gx12hnh12ho!g12hp12ifh12ig!g12ih12j7h12j8!g12j912jzh12k0!g12k112krh12ks!g12kt12ljh12lk!g12ll12mbh12mc!g12md12n3h12n4!g12n512nvh12nw!g12nx12onh12oo!g12op12pfh12pg!g12ph12q7h12q8!g12q912qzh12r0!g12r112rrh12rs!g12rt12sjh12sk!g12sl12tbh12tc!g12td12u3h12u4!g12u512uvh12uw!g12ux12vnh12vo!g12vp12wfh12wg!g12wh12x7h12x8!g12x912xzh12y0!g12y112yrh12ys!g12yt12zjh12zk!g12zl130bh130c!g130d1313h1314!g1315131vh131w!g131x132nh132o!g132p133fh133g!g133h1347h1348!g1349134zh1350!g1351135rh135s!g135t136jh136k!g136l137bh137c!g137d1383h1384!g1385138vh138w!g138x139nh139o!g139p13afh13ag!g13ah13b7h13b8!g13b913bzh13c0!g13c113crh13cs!g13ct13djh13dk!g13dl13ebh13ec!g13ed13f3h13f4!g13f513fvh13fw!g13fx13gnh13go!g13gp13hfh13hg!g13hh13i7h13i8!g13i913izh13j0!g13j113jrh13js!g13jt13kjh13kk!g13kl13lbh13lc!g13ld13m3h13m4!g13m513mvh13mw!g13mx13nnh13no!g13np13ofh13og!g13oh13p7h13p8!g13p913pzh13q0!g13q113qrh13qs!g13qt13rjh13rk!g13rl13sbh13sc!g13sd13t3h13t4!g13t513tvh13tw!g13tx13unh13uo!g13up13vfh13vg!g13vh13w7h13w8!g13w913wzh13x0!g13x113xrh13xs!g13xt13yjh13yk!g13yl13zbh13zc!g13zd1403h1404!g1405140vh140w!g140x141nh141o!g141p142fh142g!g142h1437h1438!g1439143zh1440!g1441144rh144s!g144t145jh145k!g145l146bh146c!g146d1473h1474!g1475147vh147w!g147x148nh148o!g148p149fh149g!g149h14a7h14a8!g14a914azh14b0!g14b114brh14bs!g14bt14cjh14ck!g14cl14dbh14dc!g14dd14e3h14e4!g14e514evh14ew!g14ex14fnh14fo!g14fp14gfh14gg!g14gh14h7h14h8!g14h914hzh14i0!g14i114irh14is!g14it14jjh14jk!g14jl14kbh14kc!g14kd14l3h14l4!g14l514lvh14lw!g14lx14mnh14mo!g14mp14nfh14ng!g14nh14o7h14o8!g14o914ozh14p0!g14p114prh14ps!g14pt14qjh14qk!g14ql14rbh14rc!g14rd14s3h14s4!g14s514svh14sw!g14sx14tnh14to!g14tp14ufh14ug!g14uh14v7h14v8!g14v914vzh14w0!g14w114wrh14ws!g14wt14xjh14xk!g14xl14ybh14yc!g14yd14z3h14z4!g14z514zvh14zw!g14zx150nh150o!g150p151fh151g!g151h1527h1528!g1529152zh1530!g1531153rh153s!g153t154jh154k!g154l155bh155c!g155d1563h1564!g1565156vh156w!g156x157nh157o!g157p158fh158g!g158h1597h1598!g1599159zh15a0!g15a115arh15as!g15at15bjh15bk!g15bl15cbh15cc!g15cd15d3h15d4!g15d515dvh15dw!g15dx15enh15eo!g15ep15ffh15fg!g15fh15g7h15g8!g15g915gzh15h0!g15h115hrh15hs!g15ht15ijh15ik!g15il15jbh15jc!g15jd15k3h15k4!g15k515kvh15kw!g15kx15lnh15lo!g15lp15mfh15mg!g15mh15n7h15n8!g15n915nzh15o0!g15o115orh15os!g15ot15pjh15pk!g15pl15qbh15qc!g15qd15r3h15r4!g15r515rvh15rw!g15rx15snh15so!g15sp15tfh15tg!g15th15u7h15u8!g15u915uzh15v0!g15v115vrh15vs!g15vt15wjh15wk!g15wl15xbh15xc!g15xd15y3h15y4!g15y515yvh15yw!g15yx15znh15zo!g15zp160fh160g!g160h1617h1618!g1619161zh1620!g1621162rh162s!g162t163jh163k!g163l164bh164c!g164d1653h1654!g1655165vh165w!g165x166nh166o!g166p167fh167g!g167h1687h1688!g1689168zh1690!g1691169rh169s!g169t16ajh16ak!g16al16bbh16bc!g16bd16c3h16c4!g16c516cvh16cw!g16cx16dnh16do!g16dp16efh16eg!g16eh16f7h16f8!g16f916fzh16g0!g16g116grh16gs!g16gt16hjh16hk!g16hl16ibh16ic!g16id16j3h16j4!g16j516jvh16jw!g16jx16knh16ko!g16kp16lfh16ls16meW16mj16nvX16o01d6nI1d6o1dkve1dkw1dljI1dlp!U1dlq!A1dlr1dm0U1dm1!I1dm21dmeU1dmg1dmkU1dmm!U1dmo1dmpU1dmr1dmsU1dmu1dn3U1dn41e0tI1e0u!R1e0v!L1e1c1e63I1e64!K1e65!I1e681e6nA1e6o!N1e6p1e6qR1e6r1e6sN1e6t1e6uG1e6v!L1e6w!R1e6x!c1e741e7jA1e7k1e7oe1e7p!L1e7q!R1e7r!L1e7s!R1e7t!L1e7u!R1e7v!L1e7w!R1e7x!L1e7y!R1e7z!L1e80!R1e81!L1e82!R1e83!L1e84!R1e851e86e1e87!L1e88!R1e891e8fe1e8g!R1e8h!e1e8i!R1e8k1e8lY1e8m1e8nG1e8o!e1e8p!L1e8q!R1e8r!L1e8s!R1e8t!L1e8u!R1e8v1e92e1e94!e1e95!J1e96!K1e97!e1e9c1ed8I1edb!d1edd!G1ede1edfe1edg!J1edh!K1edi1edje1edk!L1edl!R1edm1edne1edo!R1edp!e1edq!R1edr1ee1e1ee21ee3Y1ee41ee6e1ee7!G1ee81eeye1eez!L1ef0!e1ef1!R1ef21efue1efv!L1efw!e1efx!R1efy!e1efz!L1eg01eg1R1eg2!L1eg31eg4R1eg5!Y1eg6!e1eg71eggY1egh1ehpe1ehq1ehrY1ehs1eime1eiq1eive1eiy1ej3e1ej61ejbe1eje1ejge1ejk!K1ejl!J1ejm1ejoe1ejp1ejqJ1ejs1ejyI1ek91ekbA1ekc!i1ekd1ereI1erk1ermB1err1eykI1eyl!A1f281f4gI1f4w!A1f4x1f91I1f921f96A1f9c1fa5I1fa7!B1fa81fbjI1fbk!B1fbl1fh9I1fhc1fhlQ1fhs1g7pI1g7r!B1g7s1gd7I1gdb!B1gdc1gjkI1gjl1gjnA1gjp1gjqA1gjw1gjzA1gk01gl1I1gl41gl6A1glb!A1glc1glkI1gls1glzB1gm01gpwI1gpx1gpyA1gq31gq7I1gq81gqdB1gqe!c1gqo1gs5I1gs91gsfB1gsg1h5vI1h5w1h5zA1h681h6hQ1heo1hgpI1hgr1hgsA1hgt!B1hgw1hl1I1hl21hlcA1hld1hpyI1hq81hqaA1hqb1hrrI1hrs1hs6A1hs71hs8B1hs91ht1I1ht21htbQ1htr1htuA1htv1hv3I1hv41hveA1hvf1hvhI1hvi1hvlB1hvx1hwoI1hww1hx5Q1hxc1hxeA1hxf1hyeI1hyf1hysA1hyu1hz3Q1hz41hz7B1hz8!I1hz91hzaA1hzb1i0iI1i0j!A1i0k!I1i0l!T1i0m!I1i0w1i0yA1i0z1i2aI1i2b1i2oA1i2p1i2sI1i2t1i2uB1i2v!I1i2w!B1i2x1i30A1i31!I1i321i33A1i341i3dQ1i3e!I1i3f!T1i3g!I1i3h1i3jB1i3l1i5nI1i5o1i5zA1i601i61B1i62!I1i631i64B1i65!I1i66!A1i801i94I1i95!B1i9c1iamI1ian1iayA1ib41ibdQ1ibk1ibnA1ibp1id5I1id71id8A1id9!I1ida1idgA1idj1idkA1idn1idpA1ids!I1idz!A1ie51ie9I1iea1iebA1iee1iekA1ieo1iesA1iio1ik4I1ik51ikmA1ikn1ikqI1ikr1ikuB1ikv!I1ikw1il5Q1il61il7B1il9!I1ila!A1ilb1injI1ink1io3A1io41io7I1iog1iopQ1itc1iumI1iun1iutA1iuw1iv4A1iv5!T1iv61iv7B1iv81iv9G1iva1ivcI1ivd1ivrB1ivs1ivvI1ivw1ivxA1iww1iy7I1iy81iyoA1iyp1iyqB1iyr1iysI1iz41izdQ1izk1izwT1j0g1j1mI1j1n1j1zA1j20!I1j281j2hQ1j401j57I1j5c1j5lQ1j5m1j5nI1j5o1j5qB1j5r1jcbI1jcc1jcqA1jcr1jhbI1jhc1jhlQ1jhm1jjjI1jjk1jjpA1jjr1jjsA1jjv1jjyA1jjz!I1jk0!A1jk1!I1jk21jk3A1jk41jk6B1jkg1jkpQ1jmo1jo0I1jo11jo7A1joa1jogA1joh!I1joi!T1joj!I1jok!A1jpc!I1jpd1jpmA1jpn1jqqI1jqr1jqxA1jqy!I1jqz1jr2A1jr3!T1jr4!I1jr51jr8B1jr9!T1jra!I1jrb!A1jrk!I1jrl1jrvA1jrw1jt5I1jt61jtlA1jtm1jtoB1jtp!I1jtq1jtsT1jtt1jtuB1juo1k4uI1k4v1k52A1k541k5bA1k5c!I1k5d1k5hB1k5s1k61Q1k621k6kI1k6o!T1k6p!G1k6q1k7jI1k7m1k87A1k891k8mA1kao1kc0I1kc11kc6A1kca!A1kcc1kcdA1kcf1kclA1kcm!I1kcn!A1kcw1kd5Q1kdc1kehI1kei1kemA1keo1kepA1ker1kevA1kew!I1kf41kfdQ1ko01koiI1koj1komA1kon1kv0I1kv11kv4K1kv51kvlI1kvz!B1kw01lriI1lrk1lroB1ls01oifI1oig1oiiL1oij1oilR1oim1ojlI1ojm!R1ojn1ojpI1ojq!L1ojr!R1ojs!L1ojt!R1oju1oqgI1oqh!L1oqi1oqjR1oqk1oviI1ovk1ovqS1ovr!L1ovs!R1s001sctI1scu!L1scv!R1scw1zkuI1zkw1zl5Q1zla1zlbB1zo01zotI1zow1zp0A1zp1!B1zpc1zqnI1zqo1zquA1zqv1zqxB1zqy1zr7I1zr8!B1zr9!I1zrk1zrtQ1zrv20euI20ev20ewB20ex20juI20jz!A20k0!I20k120ljA20lr20luA20lv20m7I20o020o3Y20o4!S20og20ohA20ow25fbe25fk260ve260w26dxI26f426fce2dc02djye2dlc2dleY2dlw2dlzY2dm82dx7e2fpc2ftoI2ftp2ftqA2ftr!B2fts2ftvA2jnk2jxgI2jxh2jxlA2jxm2jxoI2jxp2jyaA2jyb2jycI2jyd2jyjA2jyk2jzdI2jze2jzhA2jzi2k3lI2k3m2k3oA2k3p2l6zI2l722l8fQ2l8g2lmnI2lmo2lo6A2lo72loaI2lob2lpoA2lpp2lpwI2lpx!A2lpy2lqbI2lqc!A2lqd2lqeI2lqf2lqiB2lqj!I2lqz2lr3A2lr52lrjA2mtc2mtiA2mtk2mu0A2mu32mu9A2mub2mucA2mue2muiA2n0g2n1oI2n1s2n1yA2n1z2n25I2n282n2hQ2n2m2ne3I2ne42ne7A2ne82nehQ2nen!J2oe82ojzI2ok02ok6A2olc2on7I2on82oneA2onf!I2onk2ontQ2ony2onzL2p9t2pbfI2pbg!K2pbh2pbjI2pbk!K2pbl2prlI2pz42q67e2q682q6kI2q6l2q6ne2q6o2q98I2q992q9be2q9c2qb0I2qb12qcle2qcm2qdbj2qdc2qo4e2qo5!f2qo62qore2qos2qotI2qou2qpge2qph2qpiI2qpj2qpne2qpo!I2qpp2qpte2qpu2qpwf2qpx2qpye2qpz!f2qq02qq1e2qq22qq4f2qq52qree2qrf2qrjk2qrk2qtde2qte2qtff2qtg2qthe2qti2qtsf2qtt2qude2que2quwf2qux2quze2qv0!f2qv12qv4e2qv52qv7f2qv8!e2qv92qvbf2qvc2qvie2qvj!f2qvk!e2qvl!f2qvm2qvze2qw0!I2qw1!e2qw2!I2qw3!e2qw4!I2qw52qw9e2qwa!f2qwb2qwee2qwf!I2qwg!e2qwh2qwiI2qwj2qyne2qyo2qyuI2qyv2qzae2qzb2qzoI2qzp2r01e2r022r0pI2r0q2r1ve2r1w2r1xf2r1y2r21e2r22!f2r232r2ne2r2o!f2r2p2r2se2r2t2r2uf2r2v2r4je2r4k2r4rI2r4s2r5fe2r5g2r5lI2r5m2r7oe2r7p2r7rf2r7s2r7ue2r7v2r7zf2r802r91I2r922r94H2r952r97Y2r982r9bI2r9c2raae2rab!f2rac2rare2ras2rauf2rav2rb3e2rb4!f2rb52rbfe2rbg!f2rbh2rcve2rcw2rg3I2rg42rgfe2rgg2risI2rit2rjze2rk02rkbI2rkc2rkfe2rkg2rlzI2rm02rm7e2rm82rmhI2rmi2rmne2rmo2rnrI2rns2rnze2ro02rotI2rou2rr3e2rr42rrfI2rrg!f2rrh2rrie2rrj!f2rrk2rrre2rrs2rrzf2rs02rs5e2rs6!f2rs72rsfe2rsg2rspf2rsq2rsre2rss2rsuf2rsv2ruee2ruf!f2rug2rw4e2rw52rw6f2rw7!e2rw82rw9f2rwa!e2rwb!f2rwc2rwse2rwt2rwvf2rww!e2rwx2rx9f2rxa2ry7e2ry82s0jI2s0k2s5be2s5c2sayI2sc02sc9Q2scg2t4te2t4w47p9e47pc5m9pejny9!Ajnz4jo1rAjo5cjobzAl2ionvnhI",M:'<b>2.Radura delle Bacche:<b>\n<b>questo \xe8 il quinto<b>\n<b>di sette esercizi<b>\n<b>e si chiama<b>\n<b>2.5.Categorie<b>\n\nLo scopo\n di questi esercizi\n \xe8\n trovare il <b>nome<b>\n di quello\n che diventer\xe0\n il <b>primo elemento<b>\n della tua storia.\n\nRipeti gli esercizi\n della <b>Radura delle Bacche<b>\n <b>ogni giorno<b>,\n alternandoli,\n o facendo solo quelli che preferisci,\n fino a quando dal tuo lavoro\n vedrai emergere\n un elemento.\n\nQuando questo sar\xe0 avvenuto,\n trova un <b>nome<b>\n per questo elemento\n e vai all\u2019esercizio\n <b>2.7.Ho sentito il mio nome<b>.\n\nPer l\u2019esercizio\n <b>2.5.Categorie<b>\n hai bisogno di\n due <b>dadi<b> da gioco,\nnumerati da uno a sei,\ne di questa <b>lista<b>\n di undici <b>categorie<b>:\n\n2\n<b>Nomi<b>\n\n3\n<b>Baci<b>\n\n4\n<b>Bugie<b>\n\n5\n<b>Addii<b>\n\n6\n<b>Paure<b>\n\n7\n<b>Epifanie<b>\n\n8\n<b>Miracoli<b>\n\n9\n<b>Amori<b>\n\n10\n<b>Riti<b>\n\n11\n<b>Parti del corpo<b>\n\n12\n<b>Colori<b>\n\n Per la prima fase dell\u2019esercizio,\n la <b>scrittura libera<b>,\n lancia i due dadi:\n la somma\nti indicher\xe0\n la <b>categoria<b> da cui partire.\n\nAd esempio:\n se escono\n due e tre,\n la somma,\n cinque,\n ti condurr\xe0 a\n <b>Addii<b>.\n\nA questo punto,\ncon il sistema casuale\nche preferisci,\nscegli una lettera dell\'alfabeto.\n\nAd esempio,\nla lettera "C",\ncome \u201cCarla\u201d.\n\nCosa potrebbe venir fuori\nin un esercizio come questo,\npartendo dal nome \u201cCarla\u201d\n e dalla categoria \u201cAddii\u201d?\n\nImpegnati,\n sperimenta,\n osa.\n\nDecidi\nse continuare in ordine alfabetico\n nella categoria "Addii",\n passando alla lettera \u201cD\u201d,\n oppure\n se lanciare\n di nuovo\n i dadi.\n\nNella stessa giornata,\na partire dalla lettura\n di quello hai scritto\n nella <b>scrittura libera<b>,\n realizza almeno un <b>honoo<b>,\n e dopo\n dedicati\n all\u2019ultima fase dell\u2019esercizio:\n l\u2019<b>hinoo<b>.\n\nIl giorno successivo\n riparti\n dalla lettera\n e dalla categoria\n a cui eri arrivato\n il giorno prima\n oppure\n lancia di nuovo i dadi.\n\nSe clicchi sul\n',F:"<b>5.Primo Anello:<b>\n<b>questo \xe8 il primo<b>\n<b>di quattro esercizi<b>\n<b>e si chiama<b>\n<b>5.1.Comandamenti<b>\n\nEstrai a sorte\nun numero\nda uno a dieci\ned individua\nil corrispondente\n<b>comandamento<b>\ndel catechismo\ndella Chiesa cattolica.\n\nPer comodit\xe0,\nti trascrivo qui\ni comandamenti:\n\n1\n<b>Non avrai altro Dio<b>\n<b>fuori di me<b>\n\n2\n<b>Non nominare<b>\n<b>il nome di Dio invano<b>\n\n3\n<b>Ricordati di santificare<b>\n<b>le feste<b>\n\n4\n<b>Onora il padre e la madre<b>\n\n5\n<b>Non uccidere<b>\n\n6\n<b>Non commettere<b>\n<b>atti impuri<b>\n\n7\n<b>Non rubare<b>\n\n8\n<b>Non dire<b>\n<b>falsa testimonianza<b>\n\n9\n<b>Non desiderare<b>\n<b>la donna d'altri<b>\n\n10\n<b>Non desiderare<b>\n<b>la roba d'altri<b>\n\nSe clicchi sul \n",y:"<b>Affiorano<b>\n<b>frammenti pi\xf9 grandi:<b>\n<b>\xe8 pi\xf9 facile riconoscerli,<b>\n<b>\xe8 pi\xf9 difficile spostarli<b>\n\nScendi nel buio.\n\nUn buio\nassoluto,\nlevigato,\nsenza tempo.\n\nE tu continui a scendere,\ncon la presunzione\ndi chi crede\nche arriver\xe0\nda qualche parte.\n\nNessuno ti ha spiegato\nche ci sono strade\nche si perdono\nnel nulla?\n\nPerch\xe9\ncontinui a fidarti\ndi questo sentiero di corda?\n\nTi rassicura\nperch\xe9 \xe8 difficile\nda percorrere?\n\nNon mi sembra\nun buon motivo.\n\nPer\xf2,\nsotto di te,\nsuggerito\ndal fioco tremolio,\nche fra poco\ndiventer\xe0\nfiaccole,\naffiora\nil cerchio\ndel <b>Quarto Anello<b>.\n\nE fra poco\npotrai anche\ndistinguere\nil tuo trampolino,\nla tua asse di legno.\n\nS\xec,\nc'\xe8 pure quella.\n\nHai avuto\nfortuna,\nquesta volta.\n\nSe vuoi un consiglio,\nnon ti ci abituare.\n\nSei\nal <b>Quarto Anello<b>\nadesso.\n\nNel <b>Quarto Anello<b>\nci sono tre esercizi.\n\nIl primo esercizio\nsi chiama\n<b>8.1.Xia getta il cellulare<b>\n<b>a mare<b>.\n\nIl secondo esercizio\nsi chiama\n<b>8.2.Gettare il cellulare<b>\n<b>a mare<b>.\n\nIl terzo esercizio\nsi chiama\n<b>8.3.Io getto il cellulare<b>\n<b>a mare<b>.\n\nSe dai nuovi esercizi\ndel <b>Quarto Anello<b>\nemergono\n<b>nuovi personaggi<b>,\n<b>nuovi oggetti<b>,\no\n<b>nuovi verbi<b>,\nche ti suggeriscono\ndi tornare\nindietro\nnel tuo percorso,\nconsiderala una benedizione,\nuna ricompensa\nper il tuo impegno,\ne non esitare.\n\nRimani\nnel <b>Quarto Anello<b>\nfinch\xe9\nhai voglia di rifare\ni tre esercizi\ne finch\xe9\nhai voglia di andare avanti\ne indietro\nfra il Quarto Anello\ne gli esercizi\ndei livelli precedenti.\n\nQuando decidi\ndi proseguire\nil viaggio,\nfarai una scoperta.\n\n\xc8 stata una buona idea\nlegare\nil fazzoletto\nad una fiaccola,\naltrimenti\nqueste fiaccole\navrebbero continuato\nad essere tutte uguali,\ne tu avresti continuato\na girare in tondo,\nalla ricerca\ndi una scaletta di corda\nche qui,\nnel <b>Quarto Anello<b>,\nnon c'\xe8,\nadesso lo sai.\n\nE ora?\n\nTi sporgi\nverso\nl'abisso.\n\nNiente.\n\nNon si vede\nnulla,\nper\xf2,\nse sintonizzi\nil tuo udito\noltre\nl'oscurit\xe0,\navverti\nla sensazione\ndi acqua che scorre.\n\nVedi un sasso\naccanto al tuo piede destro.\n\nLo raccogli.\n\nLo lasci cadere\nnell'abisso.\n\nInizi a contare.\n\nE uno.\n\nE due.\n\nL'impatto del sasso\ncon l'acqua\narriva\nprima del \"tre\".\n\nSorridi.\n\nCapisci\nall\u2019improvviso\nperch\xe9\nqualcuno ha lasciato\nun vecchio giubbino salvagente\narancione,\nappeso ad un chiodo\nconficcato nella roccia.\n\nTorni indietro.\n\nRiconosci\nla sagoma del giubbino\nda lontano,\nin una porzione di roccia\nilluminata\nda una fiaccola.\n\nSganci il salvagente\ndal chiodo arrugginito.\n\nIn qualche modo,\nriesci\nad indossare\nil salvagente.\n\nProvi ad allacciarlo:\nuna cinghia \xe8 marcia\ne si squarcia.\n\nIl salvagente puzza,\nma credo che\nin questo momento\ntu abbia altro\na cui pensare.\n\nGuardi di nuovo\nil buco\nnero.\n\nCerchi\nun altro sasso.\n\nNon lo trovi.\n\nRicordi\ndi avere\nuna moneta\nin tasca.\n\nInfili\nla mano\nin tasca\ne\nsenti al tatto\nla forma familiare\ndella moneta.\n\nEstrai\nla moneta\ndalla tasca.\n\nGuardi di nuovo\nil buco.\n\nLanci\nla moneta\nnell'abisso\ne\ninizi a contare.\n\nE uno.\nE due.\n\nAspetta,\nnon dimenticare\ndi esprimere\nil desiderio.\n\nIl \"pluff\"\ndella moneta\narriva prima\ndel \"tre\".\n\nHai fatto in tempo\nad esprimere\nil desiderio?\n",n:"<b>Come sei arrivato qui?<b>\n<b>Da una Scorciatoia,<b>\n<b>attraverso<b>\n<b>un albero squarciato?<b>\n<b>Oppure<b>\n<b>dal Primo Anello?<b>\n\n<b>Dal Primo Anello<b>\nUn passo alla volta\nscendi nell'abisso,\ncon le mani aggrappate\na una scaletta di corda.\n\nOgni tre o quattro passi\napri gli occhi.\n\nNiente.\n\nSolo buio.\n\nChiudi gli occhi di nuovo.\n\nContinui a scendere.\n\nTi fermi.\n\nCerchi di calmare il respiro.\n\nTi fanno male le mani.\n\nApri gli occhi.\n\nNiente.\n\nLi richiudi.\n\nScendi.\nScendi.\nScendi.\n\nIl tuo piede destro\nsi allunga verso il basso\nper l'ultima volta\ne non trova\nil gradino di legno.\n\nLa scaletta di corda \xe8 finita.\n\nApri gli occhi.\n\nGuardi prima in basso,\ne fai male:\nsotto di te\nc'\xe8 il nero assoluto,\nlevigato,\nsenza scampo.\n\nSollevi lo sguardo\ne vedi,\na due metri da te,\nl'estremit\xe0\ndi una lunghissima\nasse di legno,\nche ti ricorda\nun trampolino per i tuffi,\nvisto dal lato sbagliato.\n\nCerchi di calmare il respiro.\n\nUn po' ci riesci.\n\nInspiri.\nEspiri.\n\nAffiora davanti a te\nun arco regolare\ndisegnato nel nulla\nda fiochi bagliori\ntremolanti.\n\nStrizzi gli occhi,\nper vedere meglio,\ncome fanno i miopi,\ne\nti accorgi che l\u2019asse di legno,\nsospesa nel nulla,\n\xe8 una passerella che porta\nal <b>Secondo Anello<b>.\n\nCerchi di calcolare\nla distanza\nfra il tuo piede destro\ne\nl'inizio dell\u2019asse di legno.\n\nC'\xe8 poco da calcolare:\nnon hai scelta.\n\nInizi a ondeggiare\nnel vuoto,\ncome in altalena,\nper ridurre la distanza.\n\nOndeggi.\n\nLe oscillazioni diventano\npi\xf9 ampie\ne regolari.\n\nVai avanti,\ne torni indietro.\n\nVai avanti,\ne torni indietro.\n\nPi\xf9 di questo\nnon \xe8 possibile\navvicinarsi.\n\nDevi saltare.\n\nOscilli in avanti.\n\nDevi\nstaccare le mani\ndalla scaletta di corda,\nlasciarla andare via,\ne saltare.\n\nOscilli indietro.\nOscilli avanti.\n\nSalta,\nadesso,\nche hai ancora\nla forza\ndi farlo.\n\nE poi,\nin qualche modo,\nstrisciando,\nle mani aggrappate\nall\u2019asse\ndi legno ruvido,\narriverai\nal <b>Secondo Anello<b>.\n\nSar\xe0\nanche\npeggio\ndi come immagini,\nma lo farai.\n\nLo fai.\n\nSalti.\n\nTutto esplode\ne vibra,\nma tu resisti,\nle mani avvinghiate\nall\u2019asse di legno,\ne strisci,\nmillimetro\ndopo\nmillimetro,\noscillando sul nulla.\n\nE poi\nl\u2019ultimo sforzo:\nsei sul <b>Secondo Anello<b>\nadesso.\n\n<b>Dalla Scorciatoia<b>\nPotresti\nessere arrivato qui,\nal <b>Secondo Anello<b>,\nanche dalla <b>Scorciatoia<b>,\ndalla <b>Radura delle Bacche<b>,\nseguendo la fenditura\naperta nel terreno\ndal terremoto,\nattraverso lo squarcio\ndella collina.\n\nIn ogni caso,\nadesso sei qui,\ne con la mano\naderente alla roccia,\ninizi a percorrere\nl\u2019Anello.\n\nNel <b>Secondo Anello<b>\nc\u2019\xe8\nun unico esercizio,\nche si chiama\n<b>6.1.Questa non \xe8 una pipa<b>.\n\nE lo puoi fare\ntutte le volte che vuoi,\npartendo\nogni volta\nda un <b>oggetto<b>\nche si \xe8 manifestato\nnegli esercizi precedenti.\n\nSe da quello che scrivi\naffiorano\n<b>nuovi personaggi<b>,\ntorna,\nin compagnia di ognuno di loro,\nall\u2019esercizio\n<b>2.7.Ho sentito il mio nome<b>,\ne con ognuno di loro\nrifai il percorso fin qui,\nsvolgendo tutti gli esercizi\nche hai voglia di svolgere.\n\nChiaramente\nse dagli esercizi emergono\n<b>nuovi oggetti<b>,\npuoi esaminarli,\nuno alla volta,\ncome tema per\n<b>6.1.Questa non \xe8 una pipa<b>.\n\nSo\nche non \xe8 facile\ntornare indietro\ndal <b>Secondo Anello<b>\nal <b>Primo Anello<b>:\nripercorrere\nil trampolino,\nstrisciando\ndi nuovo\ncon le mani aggrappate,\ne saltare di nuovo\nnel vuoto,\nper afferrare al volo\nla scaletta di corda.\n\nE poi\nancora\ntutto al contrario:\n<b>Primo Anello<b>,\n<b>Porta nell\u2019Alabastro<b>,\n<b>Pozzo dell\u2019Oracolo<b>,\n<b>Radura delle Bacche<b>.\n\nNon \xe8 comodo\nneppure tornare indietro\nattraverso la <b>Scorciatoia<b>,\nma\ncredimi:\nsull\u2019<b>Isola delle Storie<b>\nnon \xe8 conveniente\nessere pigri,\naver paura\no fingere\ndi non aver visto.\n\nFai quello\nche ritieni sia giusto fare\ne,\nprima o poi,\ntornerai qui,\nal <b>Secondo Anello<b>.\n\nE per proseguire\nnel viaggio?\n\nPer raggiungere\nil <b>Terzo Anello<b>?\n\nAnche\nnel <b>Secondo Anello<b>\ndue borchie di ferro,\nancorate alla roccia,\ntrattengono\nuna scaletta di corda,\nche si tuffa nell'abisso.\n\nQuando pensi\nche sia arrivato\nil momento giusto,\ntrova la scaletta di corda,\nclicca su <b>7<b>,\ne riprendi il tuo viaggio\nverso il <b>Terzo Anello<b>.\n",W:"<b>Cosa ti ha portato<b>\n<b>il tuo personaggio<b>\n<b>quando \xe8 tornato da te?<b>\n<b>Racconta tutto,<b>\n<b>raccontalo bene,<b>\n<b>in tutti i modi che puoi:<b>\n<b>troverai<b>\n<b>un secondo personaggio,<b>\n<b>e anche di pi\xf9<b>\n\nCammini a fatica in salita,\n infilandoti fra rami\n e\n folti cespugli.\n\nI tuoi piedi\n sprofondano spesso\n in cumuli di aghi di pino,\n ma non ti fermi,\n perch\xe9 sai che \xe8 importante\n arrivare\n in cima alla collina.\n\nIl sentiero fa un'ultima curva\n strana:\n gira stretto a destra\n e si schianta\n contro una parete di alabastro,\n che punta ripida al cielo,\n abbaglia,\n toglie il fiato.\n\nLa strada \xe8 finita:\n non si va pi\xf9 da nessuna parte.\n\nDa oltre cinque minuti\n stai guardando,\n da molto vicino,\n la superficie levigata\n di alabastro,\n il muro scintillante\n che respinge il tuo sguardo.\n\nCerchi di mettere a fuoco qualcosa,\n ma i tuoi occhi scivolano goffi\n da tutte le parti,\n appannati.\n\nNon molli.\n\nNon distogli lo sguardo.\n\nSenti che i tuoi occhi\n diventano rossi.\n\nFra poco inizierai a lacrimare\n per lo sforzo,\n ma non molli.\n\nE fai bene:\n lentamente\n affiora dalla roccia\n il contorno di una porta,\n senza maniglia,\n senza serratura,\n perfettamente incastrata\n nella parete.\n\nS\xec,\n hai visto la porta.\n\nIo dico che puoi anche\n provare a spingerla:\n secondo me,\n si apre.\n\nPoggi la mano sulla roccia,\n spingi,\n e non succede niente.\n\nE adesso?\n\nChe fai?\n\nTorni indietro?\n\nPer andare avanti\n hai bisogno\n di una parola magica.\n\nSi tratta di un <b>nome<b>.\n\nQui,\n alla <b>Porta nell\u2019Alabastro<b>,\n ci sono tre esercizi,\n che ti aiuteranno\n a trovare\n il nome\n di cui hai bisogno:\n il nome\n del tuo <b>secondo personaggio<b>.\n\nIl primo esercizio\n si chiama\n <b>4.1.L\u2019occhio di Dio<b>.\n\nIl secondo esercizio\n si chiama\n <b>4.2.S\xec, dico proprio a te<b>.\n\nIl terzo esercizio\n si chiama\n <b>4.3.Adesso lo racconto io<b>.\n\nQuando dagli esercizi\n sar\xe0 affiorato\n il tuo secondo personaggio,\n e avrai scelto il suo nome,\n potresti gi\xe0\n provare ad aprire\n la <b>Porta nell\u2019Alabastro<b>,\n semplicemente\n pronunciando il nome.\n\nIo per\xf2 ti consiglio\n di non avere fretta\n e di tornare indietro\n alla <b>Radura delle Bacche<b>\n con il tuo nuovo personaggio,\n per rifare\n in sua compagnia\n tutto il percorso:\n da\n <b>2.7.Ho sentito il mio nome<b>,\n fin qui,\n alla <b>Porta nell\u2019Alabastro<b>.\n\nPerch\xe9 prima o poi\n il tempo arriva,\n e il tempo\n \xe8 adesso.\n\nIl nome.\n\nAll'improvviso\n il nome affiora\n in qualche parte\n del tuo corpo.\n\nIn qualche modo,\n il nome\n si fa largo\n fra cellule e sinapsi,\n percorre\n tutto quello\n che c'\xe8 da percorrere,\n punta deciso alle tue labbra\n e\n lo senti risuonare nell'aria.\n\nSorridi.\n\nLa <b>Porta nell'Alabastro<b>\n si apre\n dolcemente,\n come se ruotasse\n su cardini immersi\n in litri di olio minerale.\n\nVarchi la soglia.\n\nClicca su <b>5<b>.\n",s:"<b>Il tuo primo personaggio<b>\n<b>ti aspetta<b>\n<b>addormentato<b>\n<b>nel seme di una bacca<b>\n\nLa stradina sale,\n e tu la segui.\n\nLa sabbia lascia il posto\n a sassi\n e ad erbacce secche.\n\nFa molto caldo.\n Non si sentono pi\xf9\n le rondini.\n\nPolvere,\n grilli\n e cicale.\n\nIl mare scompare\n e ricompare\n fra le curve,\n poi\n la stradina punta decisa\n verso il cuore dell'Isola,\n e il mare scompare sul serio.\n\nStai camminando da molto,\n difficile dire da quanto.\n\nAll'improvviso,\n dietro una curva,\n pi\xf9 a gomito delle altre,\n lo spazio si allarga\n ed esplode una pianura:\n file e file ordinate\n di cespugli.\n\nLe foglie dei cespugli\n hanno forme e tonalit\xe0 di verde\n che non hai mai visto\n prima.\n\nFra le foglie\n noti\n bacche di tutti i colori:\n viola,\n blu,\n arancioni,\n gialle,\n nere.\n\nAnche se non lo vedi,\n da qualche parte\n ci deve essere\n un ruscello,\n un fiume,\n comunque acqua.\n\nC\u2019\xe8 bisogno\n di molta acqua\n per far scintillare\n tanta vita\n su una collina\n desolata\n come questa.\n\nQuesta \xe8\n la <b>Radura delle Bacche<b>,\n il luogo dedicato\n ai primi esercizi di scrittura\n che ti propongo.\n\nL\u2019obiettivo\n dei primi esercizi\n \xe8\n arrivare\n al <b>nome<b>\n del <b>primo elemento<b>\n della tua storia.\n\nSto parlando\n di qualcosa\n che \xe8 affiorato\n dall'indistinto.\n\nMagari\n non sai nemmeno\n se \xe8 un bambino\n o una strega.\n\nForse\n ricordi\n solo\n di averlo visto in sogno.\n\nS\xec,\n sto parlando\n di qualcosa\n di impalpabile.\n\nSto parlando\n di qualcosa\n che \xe8 importante\n per te.\n\nNon sai perch\xe9,\n ma sai\n che \xe8 importante per te.\n\nConsidero\n questi esercizi di scrittura\n come\n pretesti\n per produrre testi\n o meglio\n per consentire\n ai nuclei caldi,\n a quello che \xe8 necessario,\n di manifestarsi,\n in un percorso\n di consapevolezza,\n dal conscio\n all\u2019inconscio,\n che a me ricorda\n le ricerche di Stanislavkij.\n\nIl primo esercizio\n si chiama\n <b>2.1.Scegli un'immagine<b>.\n\nIl secondo esercizio\n si chiama\n <b>2.2.Cosa ho mangiato ieri<b>.\n\nIl terzo esercizio\n si chiama\n <b>2.3.Come ho dormito ieri<b>.\n\nIl quarto esercizio\n si chiama\n <b>2.4.Citt\xe0<b>.\n\nIl quinto esercizio\n si chiama\n <b>2.5.Categorie<b>.\n\nIl sesto esercizio\n si chiama\n <b>2.6.Finalmente<b>\n<b>ho cominciato<b>.\n\nLavora\n ogni giorno\n alle tre fasi,\n <b>scrittura libera<b>,\n <b>honoo<b>\n e\n <b>hinoo<b>,\n di uno dei sei esercizi.\n\nEsplora\n ogni giorno\n un esercizio diverso.\n\nOppure\n confrontati solo\n con alcuni esercizi\n e ignora gli altri:\n l'importante \xe8\n lavorare ogni giorno.\n\nContinua\n fino a quando\n vedrai affiorare dal tuo lavoro\n un elemento,\n magari un personaggio,\n a cui dovrai attribuire\n un <b>nome<b>,\n come \u201cLaura\u201d\n o\n \u201cAndrea\u201d.\n\nQuando avrai trovato\n il nome,\n puoi passare\n all\u2019esercizio\n <b>2.7.Ho sentito il mio nome<b>.\n\nSe,\n non importa in che modo,\n hai gi\xe0\n il nome\n del tuo primo elemento,\n parti direttamente\n dall\u2019esercizio\n <b>2.7.Ho sentito il mio nome.<b>\n",m:"<b>Il viaggio sta per finire:<b>\n<b>tra poco arriverai<b>\n<b>nel luogo da cui eri partito,<b>\n<b>e forse ti sembrer\xe0<b>\n<b>diverso.<b>\n<b>Forse anche tu<b>\n<b>ti sentirai<b>\n<b>diverso<b>\n\nInspiri,\nespiri.\n\nInspiri.\n\nTrattieni il fiato.\n\nCoraggio.\n\nSalti,\nin apnea.\n\nE nel vuoto\nconti.\n\nE uno.\n\nE due.\n\nL'impatto con l'acqua\narriva prima del \"tre\".\n\nUn tonfo ovattato,\nmeno drammatico del previsto.\n\nSei gi\xe0 di nuovo a galla.\n\nEspiri,\ninspiri.\n\nIl giubbotto salvagente\nha fatto il suo lavoro.\n\nNon hai bevuto\nnemmeno un goccio d'acqua.\n\nLa corrente\nti trascina\nplacidamente.\n\nSollevi gli occhi verso l'alto:\nsei in un cunicolo nella roccia,\nin un fiume sotterraneo\nche sta puntando\nal mare,\nl\xec,\nsubito dopo\nil poligono irregolare\ndi luce,\nche filtra dall'esterno.\n\nQuella forma geometrica\nti ricorda qualcosa,\nche non riesci\na mettere a fuoco.\n\nE poi gli stridii,\ndall'alto,\ndal soffitto del cunicolo,\ne all'improvviso\ncapisci\ndove sei.\n\nL'avevo detto:\n\n\"Un'Isola,\nun viaggio,\nnove tappe.\nDalla <b>Grotta delle Rondini<b>\nsi parte,\nalla <b>Grotta delle Rondini<b>\nsi ritorna,\nalla fine del viaggio,\nquando\nil cerchio si chiude,\ncome in tutti i viaggi veri\".\n\nS\xec,\nla <b>Grotta delle Rondini<b>:\nla prima volta\nl'hai vista da fuori,\ndalla spiaggia,\ne adesso stai per raggiungerla\ndall'interno.\n\nS\xec,\nla corrente\nti porta\nverso il mare,\ne in fondo al Cunicolo\nc\u2019\xe8 l\u2019ingresso\ndella <b>Grotta delle Rondini<b>.\n\nNel <b>Cunicolo verso la Luce<b>\nci sono\ntre esercizi.\n\nIl primo esercizio\nsi chiama\n<b>9.1.Voci<b>.\n\nIl secondo esercizio\nsi chiama\n<b>9.2.Confini<b>.\n\nIl terzo esercizio\nsi chiama\n<b>9.3.Tempi<b>.\n\nRipeti\ngli esercizi\ntutte le volte che vuoi:\npoi,\nse ti lasci andare,\nla corrente ti condurr\xe0\nalla <b>Grotta delle Rondini<b>,\ncon la tua storia da condividere,\nse avrai voglia di condividerla.\n",A:"<b>Qui affioreranno<b>\n<b>storie,<b>\n<b>e queste storie<b>\n<b>ti racconteranno<b>\n<b>cose che sapevi,<b>\n<b>ma che non capivi bene<b>\n\nSei nella notte,\n adesso.\n\nAspetta.\n\nFra qualche secondo\n i tuoi occhi\n si abitueranno\n al buio.\n\nFiaccole,\n infisse nella roccia,\n ti mostrano\n uno stretto anello,\n che costeggia dall\u2019interno\n tutta la collina.\n\nS\xec,\n un anello,\n largo meno di due metri.\n\nAl posto tuo,\n io camminerei\n aderente alla parete,\n perch\xe9 l\u2019anello lambisce\n una voragine:\n buio assoluto,\n preistorico,\n senza fondo.\n\nInizi a camminare.\n\nHai freddo.\n\nFra una fiaccola e l\u2019altra,\n attraversi pezzi di buio,\n in cui immagini\n la fiaccola successiva,\n prima di vederla,\n con la mano sinistra\n che non si allontana\n un millimetro\n dalla parete.\n\nCerchi di non guardare mai\n l\u2019abisso.\n\nQuesto \xe8 il <b>Primo Anello<b>,\n il luogo dei quattro esercizi\n che dovrebbero aiutarti\n ad esplorare\n <b>il rapporto<b>\n <b>fra coppie di personaggi<b>.\n\nIl termine pomposo\n per questo\n potrebbe essere\n \u201cMappa relazionale\n fra coppie di personaggi\u201d,\n perch\xe9 ti propongo\n di lavorare su due personaggi\n alla volta.\n\nIl primo esercizio\n si chiama\n <b>5.1.Comandamenti<b>.\n\nIl secondo esercizio\n si chiama\n <b>5.2.Colori<b>.\n\nIl terzo esercizio\n si chiama\n <b>5.3.Parti del corpo<b>.\n\nIl quarto esercizio\n si chiama\n <b>5.4.Due o tre cose che so<b>\n <b>di loro due<b>.\n\nNei primi tre esercizi\n ti chiedo di individuare un tema\n e, a partire da questo tema,\n di costruire una storia,\n in cui compaiano\n i due personaggi\n della tua prima coppia.\n\nCome per tutti gli esercizi,\n articola il tuo lavoro\n in tre fasi:\n <b>scrittura libera<b>,\n <b>honoo<b>\n e\n <b>hinoo<b>.\n\nNella costruzione della storia\n procedi\n con la massima libert\xe0.\n\nOltre ai due personaggi\n da cui hai scelto di partire,\n possono esserci\n tutti i personaggi che vuoi.\n\nI due personaggi\n su cui hai deciso di lavorare\n possono anche avere\n un ruolo marginale\n nella storia.\n\nO magari\n il ruolo marginale\n pu\xf2 averlo solo uno dei due.\n\nPer\xf2\n entrambi i personaggi\n devono essere\n presenti\n nella narrazione.\n\nDopo aver costruito\n la prima storia,\n analizza con attenzione\n quello che hai fatto\n nelle tre le fasi\n dell\u2019esercizio\n e poniti la domanda:\n\n\u201dCosa mi suggerisce\n questa storia\n sulla relazione che c\u2019\xe8\n fra i miei due personaggi?\u201d\n\nA partire dalla tua risposta\n a questa domanda,\n dedicati all\u2019esercizio\n <b>5.4.Due o tre cose che so<b>\n <b>di loro due<b>,\n nel solito modo,\n in tre fasi:\n <b>scrittura libera<b>,\n <b>honoo<b>\n e\n <b>hinoo<b>.\n\nOgni volta che da un esercizio\n affiora\n un nuovo personaggio,\n torna con lui\n all\u2019esercizio\n <b>2.7.Ho sentito il mio nome<b>\n e poi\n al <b>Pozzo dell\u2019Oracolo<b>,\n e rifai in sua compagnia\n il percorso fin qui.\n\nRimani qui al <b>Primo Anello<b>\n tutto il tempo che vuoi,\n rifacendo gli esercizi\n con diverse\n coppie di personaggi.\n\nE poi?\n\nCome si va avanti nel viaggio?\n\nCome si raggiunge\n il <b>Secondo Anello<b>?\n\nVedi quelle due borchie,\n ancorate alla roccia?\n\nVedi che sostengono\n una scaletta di corda,\n che si tuffa nell\u2019abisso,\n al centro del <b>Primo Anello<b>?\n\nTi sporgi,\n ma non vedi\n dove finisce la scaletta:\n il nero\n la inghiotte\n molto prima.\n\nFai come credi,\n io ti dico solo una cosa:\n sai  quanto pu\xf2 oscillare\n una scaletta cos\xec,\n mentre scendi verso\n il nulla?\n\nSe te la senti,\n clicca su <b>6<b>.\n",O:"<b>Se \xe8 davvero<b>\n<b>il tuo personaggio,<b>\n<b>torner\xe0 da te<b>\n<b>mentre stai scrivendo<b>\n<b>altro<b>\n\nLa stradina\n taglia in due\n la <b>Radura delle Bacche<b>,\n punta in fondo alla valle,\n all'inizio della ripida collina,\n che s'innalza verso il cielo.\n\nArrivata ai piedi della collina,\n la stradina\n diventa viottolo pietroso\n e si arrampica,\n attorcigliandosi\n in curve strette.\n\nE tu affronti la salita,\n come se stessi percorrendo\n controcorrente\n un ruscello di sassi,\n che rotola in basso,\n a formare il lago verde\n della <b>Radura delle Bacche<b>,\n ormai alle tue spalle.\n\nSali a zig zag,\n verso la cima.\n\nDopo una curva\n appare,\n in fondo al sentiero,\n il <b>Pozzo dell'Oracolo<b>.\n\n<b>Attenzione<b>:\n sabato 4 marzo 2023,\n quando in Italia erano\n le 6.03 di mattina,\n un terremoto\n ha colpito\n l\u2019<b>Isola delle Storie<b>.\n\nLa terra si \xe8 aperta,\n e la fenditura \n ha creato una biforcazione\n a destra\n nel sentiero\n che stai percorrendo.\n\nCosa fai?\n\nProsegui diritto\n verso il <b>Pozzo dell\u2019Oracolo<b>,\n oppure giri a destra,\n e ti immergi\n nella ferita del terreno,\n come in una trincea?\n\nPer aiutarti nella scelta,\n ti do alcune informazioni:\n se ignori la biforcazione,\n il <b>Pozzo dell\u2019Oracolo<b>\n ti porta verso un percorso\n di scrittura che considero\n pi\xf9 impegnativo,\n e che ti consiglio.\n Invece \n la ferita nel terreno,\n creata dal terremoto,\n \xe8 una <b>Scorciatoia<b>.\n\nSe decidi  per la <b>Scorciatoia<b>,\n attraversi un bosco,\n che prima del terremoto\n era impenetrabile,\n a causa della fitta vegetazione,\n e raggiungi\n il fianco della collina.\n\nLa fenditura nel terreno\n ha incontrato nel suo cammino\n un tiglio secolare,\n cresciuto\n a ridosso della collina,\n e l\u2019ha squarciato.\n\nSe entri nello squarcio\n dell\u2019albero,\n scopri\n che il terremoto\n ha aperto non solo il tiglio,\n ma anche la collina.\n\nS\xec,\n l\u2019albero \xe8 diventato un <b>varco<b>,\n un passaggio\n che ti porta\n all\u2019interno della collina.\n\nSe decidi di seguire\n la <b>Scorciatoia<b>,\n clicca su <b>6<b>,\n e arrivi\n direttamente\n al <b>Secondo Anello<b>,\n altrimenti\n continua a camminare,\n verso il <b>Pozzo dell\u2019Oracolo<b>.\n\nSembra\n l'ingresso\n di una miniera abbandonata,\n e so\n che in Sardegna\n ci sono costruzioni cos\xec,\n chiamate\n Pozzi Sacri.\n\nE so che,\n oltre l'ingresso,\n c'\xe8 una ripida scala\n di gradini di pietra,\n che si inabissa\n verso il cuore della terra.\n\nS\xec,\n devi entrare.\n\nFai attenzione:\n i gradini sono scivolosi.\n\nIl rettangolo di luce dell'ingresso,\n ormai\n dietro di te,\n illumina ancora i gradini,\n ma,\n passo dopo passo,\n il chiarore diventa\n sempre pi\xf9 fioco,\n sempre pi\xf9 lontano.\n\nSei nel buio\n assoluto,\n adesso.\n\nOdore di muschio\n e di umidit\xe0\n e senti,\n dal fondo del <b>Pozzo<b>,\n il gocciolio dell'acqua,\n che diventa sussurro.\n\nSintonizzati\n sul suono,\n fino a quando diventa\n voce di oracolo.\n\nIl primo esercizio\n si chiama\n <b>3.1.Missioni<b>.\n\nIl secondo esercizio\n si chiama\n <b>3.2.Le Tue Missioni<b>.\n\nIl terzo esercizio\n si chiama\n <b>3.3.I Ching<b>.\n\nIl quarto esercizio\n si chiama\n <b>3.4.Frammenti<b>.\n\nIl quinto esercizio\n si chiama\n <b>3.5.Oroscopi<b>.\n\nRimani qui,\n a praticare gli esercizi\n del <b>Pozzo dell'Oracolo<b>,\n fino a quando\n in quello che scrivi\n vedrai apparire\n il tuo <b>primo personaggio<b>.\n\nCosa intendo\n per \"<b>veder apparire<b>\u201d\n il primo personaggio\n all\u2019interno degli esercizi?\n\nRicordi?\n\n<b>Se \xe8 davvero<b>\n<b>il tuo personaggio<b>,\n<b>torner\xe0 da te<b>\n<b>mentre stai scrivendo<b>\n<b>altro<b>\n\nNell\u2019esercizio\n <b>2.7.Ho sentito il mio nome<b>\n hai ascoltato per la prima volta\n la <b>voce<b>\n del tuo primo personaggio:\n adesso ti chiedo\n di <b>mettere da parte<b>\n <b>il tuo primo personaggio<b>\n e di dedicarti\n ai <b>cinque esercizi<b>\n <b>del Pozzo dell\u2019Oracolo<b>.\n\nE di vedere se,\n mentre sei impegnato in altro,\n il tuo personaggio\n torna comunque da te.\n\nDedicati con attenzione\n a questi nuovi esercizi:\n lasciati assorbire dal lavoro,\n non pensare al risultato.\n\nSe mentre sei impegnato\n negli esercizi,\n il tuo <b>primo personaggio<b>\n appare all\u2019improvviso,\n non fermarti:\n continua\n l\u2019esercizio che stavi facendo,\n fino alla fine,\n e solo dopo\n rileggi tutto\n e analizza\n quello che \xe8 accaduto.\n\nCredo che un personaggio\n non venga a trovarti\n a mani vuote.\n\nChe regali ti ha portato?\n\nUn\u2019azione?\n\nDettagli?\n\nUn avverbio?\n\nRaccogli tutto con cura:\n ti servir\xe0 per gli esercizi\n del livello successivo,\n la <b>Porta nell\u2019Alabastro<b>.\n\nE se invece,\n nonostante il tuo impegno,\n il tuo <b>primo personaggio<b>\n non arriva?\n\nNon forzare le cose:\n considera\n l\u2019apparizione\n del tuo primo personaggio\n come una <b>conseguenza<b>,\n non come un obiettivo.\n\nRicorda che qui,\n al <b>Pozzo dell\u2019Oracolo<b>,\n hai cinque diversi esercizi\n fra cui scegliere:\n immagina di avere\n un mazzo di chiavi\n con cui stai cercando\n di aprire una serratura.\n\nSe ti stanchi di provare\n o se questa mia proposta\n non ti convince,\n prendi la <b>Scorciatoia<b>,\n e vai direttamente\n al <b>Secondo Anello<b>.\n\nPer\xf2 non arrenderti\n troppo presto:\n ci sono cose che si imparano\n solo con l\u2019esperienza diretta.\n\nPer motivarti\n ti dico che \xe8 emozionante\n vedere\n il tuo personaggio\n che torna da te,\n mentre tu stai scrivendo altro.\n\nIo dico che arriva.\n\nE poi?\n\nQuando il tuo personaggio\n arriva,\n che fai?\n\nSei ancora\n nel buio,\n ricordi?\n\nPuoi girarti,\n adesso,\n e risalire\n i gradini.\n\nFra qualche passo\n ricomparir\xe0,\n accecante,\n il rettangolo di luce\n dell'ingresso.\n\nGradino\n dopo gradino,\n risali\n verso la luce,\n esci\n dal <b>Pozzo dell'Oracolo<b>,\n clicca su <b>4<b>,\n e riprendi\n il tuo cammino\n verso\n la cima della collina.\n",H:"<b>Un'Isola,<b>\n<b>un viaggio,<b>\n<b>nove tappe.<b>\n<b>Dalla Grotta delle Rondini<b>\n<b>si parte,<b>\n<b>alla Grotta delle Rondini<b>\n<b>si ritorna,<b>\n<b>alla fine del viaggio,<b>\n<b>quando il cerchio<b>\n<b>si chiude,<b>\n<b>come in tutti i viaggi veri<b>\n\nS\xec,\n\xe8 rumore di onde,\nalle tue spalle.\nE hai i piedi sulla sabbia.\n\nSai come si chiama\nquella grotta?\n\nSenti questi suoni?\n\nHai capito cosa sono?\n\nUn giorno qui\nci saranno\nstorie,\nmolte storie,\nanche le tue.\n\nMa adesso\n\xe8 adesso.\n\nE adesso\npreferisci\nguardare la Grotta\nda lontano,\ndalla sabbia,\no\nvuoi\nentrare\nnella Grotta\na nuoto?\n\nNella Grotta\nl\u2019acqua\n\xe8 profondissima.\n\nPer capire\nquanto \xe8 profonda,\ndovresti immergerti,\ne per un bel po\u2019\nvedresti solo\nblu.\n\nDopo il blu,\noltre a coralli,\nmeduse,\nippocampi\ne\naltri organismi\nmarini,\npotresti\nincontrare\nanche\nPalombari\ne\nSirene.\n\nS\xec,\ni <b>Palombari<b>,\nquelli con gli scafandri\ndi metallo,\ncome sono raffigurati\nnelle illustrazioni\ndelle vecchie edizioni\nper ragazzi\ndei romanzi\ndi\nJules Verne.\n\nE le <b>Sirene<b>,\nquelle che non esistono.\n\nLe parole\n<b>Palombaro<b>\ne\n<b>Sirena<b>\nstimolano\nla tua immaginazione\noppure no?\n\nTi senti\npi\xf9 <b>Palombaro<b>\no\npi\xf9 <b>Sirena<b>?\n\nCome immagini\ndi esplorare\nle profondit\xe0\ndella Grotta?\n\nCome farebbe\nun <b>Palombaro<b>\no\ncome farebbe\nuna <b>Sirena<b>?\n\nE nel tuo viaggio\ndi esplorazione\npreferiresti\nincontrare\nun <b>Palombaro<b>\no\nuna <b>Sirena<b>?\n\nLa Grotta\n\xe8\nil luogo\ndel tuo primo esercizio\ndi scrittura.\n\n<b>1.1.Io vorrei<b>\n<b>che di me<b>\n<b>tu sapessi che<b>\n\nDopo averlo svolto,\nguarda a sinistra della Grotta.\n\nVedi il viottolo\nche parte dalla sabbia\ne si arrampica sulla collina?\n\nSe lo percorri,\narrivi\nalla <b>Radura delle Bacche<b>.\n",J:"<b>Va\u2019 dove ti portano i verbi:<b>\n<b>cerca di essere docile<b>\n<b>e coraggioso<b>\n<b>al tempo stesso<b>\n\nAd ogni passo\nla scaletta di corda\noscilla nel vuoto.\n\nDa pi\xf9 di cento gradini\nhai una filastrocca in testa\nche ti sta tormentando.\n\n\"Marcia marcia, soldatino... \"\ne\n\"Marcia marcia, soldatino... \",\ne niente pi\xf9:\navanti non vai.\n\nAll'inizio era anche piacevole:\nla filastrocca\nti faceva compagnia\nnella discesa,\nma adesso\nvorresti solo\nricordare la fine,\ne non ci riesci.\n\nIl cerchio regolare\ndel <b>Terzo Anello<b>\naffiora\ndal buio\nprima\ndel previsto,\nsuggerito\ndai puntini tremolanti\ndelle fiaccole.\n\n\xc8 l\xec,\nin basso,\nlontanissimo,\nma intuibile.\n\nGradino dopo gradino,\nil <b>Terzo Anello<b>\nprende forma,\ne inizi a distinguere\nanche\nil trampolino,\nla stretta asse\ndi legno\nche parte \ndal <b>Terzo Anello<b>, \ne che si protende nel nulla,\nverso l'ultimo gradino\ndella scaletta di corda.\n\nCoraggio.\n\nRipercorri mentalmente\nle azioni\nda compiere,\nquando la scaletta di corda\nsar\xe0 finita:\nle oscillazioni,\nle mani\nche dovranno abbandonare\nla presa,\nil salto,\nl'impatto,\nle vibrazioni selvagge del legno\nsull'abisso,\nil respiro che esplode dappertutto\ne che poi si calma,\ndopo il terrore.\n\nSalti, di nuovo.\n\nTutto esplode.\n\nE poi strisci,\ne hai paura,\nma non molli.\n\nLe mani insanguinate,\nil <b>Terzo Anello<b>\nsempre pi\xf9 vicino.\n\nEcco.\n\nCe l\u2019hai fatta un\u2019altra volta.\n\nSei sul <b>Terzo Anello<b>,\nadesso.\n\nNel <b>Terzo Anello<b>\nci sono\ntre esercizi.\n\nIl primo esercizio\nsi chiama\n<b>7.1.Volare<b>.\n\nIl secondo esercizio\nsi chiama\n<b>7.2.Beatrice vola<b>.\n\nIl terzo esercizio\nsi chiama\n<b>7.3.Io volo<b>.\n\nQuesti esercizi\nhanno come tema\ni <b>verbi<b> apparsi\nin tutte\nle esercitazioni precedenti.\n\nLavora\ncon un verbo alla volta.\n\nSe negli esercizi\naffiorano\n<b>nuovi personaggi<b>,\naccompagnali,\nuno alla volta,\na <b>2.7.Ho sentito il mio nome<b>,\ne rifai tutto il percorso\nin loro compagnia,\nfin qui.\n\nRimani qui\nnel <b>Terzo Anello<b>\nfinch\xe9\nhai voglia\ndi rifare gli esercizi\ncon nuovi verbi.\n\nQuando decidi\ndi proseguire il viaggio,\ntrova il punto\ndove c\u2019\xe8\nla scaletta di corda:\nintuirai prima\nle borchie,\nfissate alla roccia,\npoi,\npasso dopo passo,\nvedrai la scaletta.\n\nEccola:\ndal <b>Terzo Anello<b>\nsi inabissa\nnel nero.\n\nClicca su <b>8<b>,\nil tuo viaggio\npu\xf2 continuare.\n",U:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",R:"Attendi il caricamento dello sfondo prima di continuare.",t:"Broadcast stream controllers do not support pause callbacks",B:"Cannot extract a file path from a URI with a fragment component",z:"Cannot extract a file path from a URI with a query component",Q:"Cannot extract a non-Windows file path from a file URI with an authority",c:"Cannot fire new event. Controller is already firing an event",I:'E533333333333333333333333333DDDDDDD4333333333333333333334C43333CD53333333333333333333333UEDTE4\x933343333\x933333333333333333333333333D433333333333333333CDDEDDD43333333S5333333333333333333333C333333D533333333333333333333333SUDDDDT5\x9933CD4E333333333333333333333333UEDDDDE433333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333TUUS5CT\x94\x95E3333333333333333333333333333333333333333333333333333333333333333333333SUDD3DUU43533333333333333333C3333333333333w733337333333s3333333w7333333333w33333333333333333333CDDTETE43333ED4S5SE3333C33333D33333333333334E433C3333333C33333333333333333333333333333CETUTDT533333CDDDDDDDDDD3333333343333333D$433333333333333333333333SUDTEE433C34333333333333333333333333333333333333333333333333333333333333333333333333333333TUDDDD3333333333CT5333333333333333333333333333DCEUU3U3U5333343333S5CDDD3CDD333333333333333333333333333333333333333333333333333333333333333333333s73333s33333333333""""""""333333339433333333333333CDDDDDDDDDDDDDDDD3333333CDDDDDDDDDDD\x94DDDDDDDDDDDDDDDDDDDDDDDD33333333DDDDDDDD3333333373s333333333333333333333333333333CDTDDDCTE43C4CD3C333333333333333D3C33333\xee\xee\xed\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xed\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xed\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee333333\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb33\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc<3sww73333swwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww7333swwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww7333333w7333333333333333733333333333333333333333333333sww733333s7333333s3wwwww333333333wwwwwwwwwwwwwwwwwwwwwwwwwwwwgffffffffffffvww7wwwwwwswwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww733333333333333333333333swwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww7333333333333333333333333333333333333333333333333333333333swwwww7333333333333333333333333333333333333333333wwwwwwwwwwwwwwwwwwwww7swwwwwss33373733s33333w33333CT333333333333333EDTETD433333333#\x14"333333333333"""233333373ED4U5UE9333C33333D33333333333333www3333333s73333333333EEDDDCC3DDDDUUUDDDDD3T5333333333333333333333333333CCU3333333333333333333333333333334EDDD33SDD4D5U4333333333C43333333333CDDD9DDD3DCD433333333C433333333333333C433333333333334443SEUCUSE4333D33333C43333333533333CU33333333333333333333333333334EDDDD3CDDDDDDDDDDDDDDDDDDDDDDDDDDD33DDDDDDDDDDDDDDDDDDDDDDDDD33334333333C33333333333DD4DDDDDDD433333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333CSUUUUUUUUUUUUUUUUUUUUUUUUUUU333CD43333333333333333333333333333333333333333433333U3333333333333333333333333UUUUUUTEDDDDD3333C3333333333333333373333333333s333333333333swwwww33w733wwwwwww73333s33333333337swwwwsw73333wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwDD4D33CDDDDDCDDDDDDDDDDDDDDDDD43EDDDTUEUCDDD33333D33333333333333DDCDDDDCDCDD333333333DT33333333333333D5333333333333333333333333333CSUE4333333333333CDDDDDDDD4333333DT33333333333333333333333CUDDUDU3SUSU43333433333333333333333333ET533E3333SDD3U3U4333D43333C43333333333333s733333s33333333333CTE333333333333333333UUUUDDDDUD3333"""""(\x02"""""""""3333333333333333333DDDD333333333333333333333333CDDDD3333C3333T333333333333333333333334343C33333333333SET334333333333DDDDDDDDDDDDDDDDDDDDDD4DDDDDDDD4CDDDC4DD43333333333333333333333333333333333333333333333333C33333333333333333333333333333333333333333333333333333333333333333333333333333333DDD433333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333334333333333333333333333333333333DD3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333DD433333333333333333333333333333DDD43333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333DDDDDDD533333333333333333333333DDDTTU5D4DD333C433333D333333333333333333333DDD733333s373ss33w7733333ww733333333333ss33333333333333333333333333333ww3333333333333333333333333333wwww33333www33333333333333333333wwww333333333333333wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww333333wwwwwwwwwwwwwwwwwwwwwww7wwwwwswwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww73333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333C4""333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333DD3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333DDD4333333333333333333333333333333333333333333333333333333DDD4333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333UEDDDTEE43333333333333333333333333333333333333333333333333333CEUDDDE33333333333333333333333333333333333333333333333333CD3DDEDD3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333EDDDCDDT43333333333333333333333333333333333333333CDDDDDDDDDD4EDDDETD3333333333333333333333333333333333333333333333333333333333333DDD3CC4DDD\x94433333333333333333333333333333333SUUC4UT4333333333333333333333333333333333333333333333333333#"""""""B333DDDDDDD433333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333CED3SDD$"""BDDD4CDDD333333333333333DD33333333333333333333333333333333333333333DEDDDUE333333333333333333333333333CCD3D33CD533333333333333333333333333CESEU3333333333333333333DDDD433333CU33333333333333333333333333334DC44333333333333333333333333333CD4DDDDD33333333333333333333DDD\x95DD333343333DDDUD43333333333333333333\x93\x99\x99IDDDDDDE43333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333CDDDDDDDDDDDDDDDDDDDDDD4CDDDDDDDDDDD33333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333CD3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333433333333333333333333333333333333333333333333333333333333333333333333333333DD4333333333333333333333333333333333333333333333333333333333333333333""""""33D4D33CD43333333333333333333CD3343333333333333333333333333333333333333333333333333333333333333333333333333333333333D33333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333CT53333DY333333333333333333333333UDD43UT43333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333D3333333333333333333333333333333333333333D43333333333333333333333333333333333CDDDDD333333333333333333333333CD4333333333333333333333333333333333333333333333333333333333333SUDDDDUDT43333333333343333333333333333333333333333333333333333TEDDTTEETD333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333CUDD3UUDE43333333333333D3333333333333333343333333333SE43CD33333333DD33333C33TEDCSUUU433333333S533333CDDDDDU333333\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa:3\x99\x99\x9933333DDDDD4233333333333333333UTEUS433333333CDCDDDDDDEDDD33433C3E433#"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""BDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD$"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""BDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD$"""""""""""""""2333373r33333333\x93933CDDD4333333333333333CDUUDU53SEUUUD43\xa3\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xba\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xcb\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\f',w:"Error handler must accept one Object or one Object and a StackTrace as arguments, and return a value of the returned future's type",Y:"Failed to load network image.\nImage URL: ",o:"Scrivi almeno 1 carattere prima di scaricare",V:"Stream has been disposed.\nAn ImageStream is considered disposed once at least one listener has been added and subsequently all listeners have been removed and no handles are outstanding from the keepAlive method.\nTo resolve this error, maintain at least one listener on the stream, or create an ImageStreamCompleterHandle from the keepAlive method, or create a new stream for the image.",p:"SystemChrome.setApplicationSwitcherDescription",h:"TextInputClient.updateEditingStateWithDeltas",l:"TextInputClient.updateEditingStateWithTag",C:"The error handler of Future.then must return a value of the returned future's type",i:"There was a problem trying to load FontManifest.json",f:"Vuoi rispondere con\n un honoo o un hinoo?",Z:"assets/icons/isoladellestorie/backgrounds/1grottarondini.png",d:"assets/icons/isoladellestorie/backgrounds/2radurabacche.png",j:"assets/icons/isoladellestorie/backgrounds/3pozzooracolo.png",x:"assets/icons/isoladellestorie/backgrounds/4portaalabastro.png",E:"assets/icons/isoladellestorie/backgrounds/5primoanello.png",v:"assets/icons/isoladellestorie/backgrounds/6secondoanello.png",L:"assets/icons/isoladellestorie/backgrounds/7terzoanello.png",P:"assets/icons/isoladellestorie/backgrounds/8quartoanello.png",e:"assets/icons/isoladellestorie/backgrounds/9cunicololuce.png",k:"assets/icons/isoladellestorie/button1.svg",cA:"assets/icons/isoladellestorie/button2.svg",c1:"assets/icons/isoladellestorie/button3.svg",a9:"assets/icons/isoladellestorie/button4.svg",bR:"assets/icons/isoladellestorie/button5.svg",X:"assets/icons/isoladellestorie/button6.svg",u:"assets/icons/isoladellestorie/button7.svg",bT:"assets/icons/isoladellestorie/button8.svg",g:"assets/icons/isoladellestorie/button9.svg",bV:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11bGFyZGNyamVjd21vaGxoZXV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MDgxNDYsImV4cCI6MjA2OTM4NDE0Nn0.wt0CJD8XHkGoX2qLlmQgwG6RHLUfxx6JKO9EMnpTAsc",au:"gl_Position = ((u_ctransform * position) * u_scale) + u_shift;",a:"id,reply_to,pages,type,recipient_tag,created_at,user_id",aD:"id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id",_:"max must be in range 0 < max \u2264 2^32, was ",a8:"vec2 center = 0.5 * (u_resolution + u_tile_offset);",G:"vec4 localCoord = vec4(gl_FragCoord.x - center.x, center.y - gl_FragCoord.y, 0, 1) * m_gradient;",ba:"\u1ac4\u2bb8\u411f\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u3f4f\u0814\u32b6\u32b6\u32b6\u32b6\u1f81\u32b6\u32b6\u32b6\u1bbb\u2f6f\u3cc2\u051e\u32b6\u11d3\u079b\u2c12\u3967\u1b18\u18aa\u392b\u414f\u07f1\u2eb5\u1880\u1123\u047a\u1909\u08c6\u1909\u11af\u2f32\u1a19\u04d1\u19c3\u2e6b\u209a\u1298\u1259\u0667\u108e\u1160\u3c49\u116f\u1b03\u12a3\u1f7c\u121b\u2023\u1840\u34b0\u088a\u3c13\u04b6\u32b6\u41af\u41cf\u41ef\u4217\u32b6\u32b6\u32b6\u32b6\u32b6\u3927\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u18d8\u1201\u2e2e\u15be\u0553\u32b6\u3be9\u32b6\u416f\u32b6\u32b6\u32b6\u1a68\u10e5\u2a59\u2c0e\u205e\u2ef3\u1019\u04e9\u1a84\u32b6\u32b6\u3d0f\u32b6\u32b6\u32b6\u3f4f\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u104e\u076a\u32b6\u07bb\u15dc\u32b6\u10ba\u32b6\u32b6\u32b6\u32b6\u32b6\u1a3f\u32b6\u0cf2\u1606\u32b6\u32b6\u32b6\u0877\u32b6\u32b6\u073d\u2139\u0dcb\u0bcb\u09b3\u0bcb\u0fd9\u20f7\u03e3\u32b6\u32b6\u32b6\u32b6\u32b6\u0733\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u041d\u0864\u32b6\u32b6\u32b6\u32b6\u32b6\u3915\u32b6\u3477\u32b6\u3193\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u20be\u32b6\u36b1\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u2120\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u2f80\u36ac\u369a\u32b6\u32b6\u32b6\u32b6\u1b8c\u32b6\u1584\u1947\u1ae4\u3c82\u1986\u03b8\u043a\u1b52\u2e77\u19d9\u32b6\u32b6\u32b6\u3cdf\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u093a\u0973\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u3498\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u0834\u32b6\u32b6\u2bb8\u32b6\u32b6\u36ac\u35a6\u32b9\u33d6\u32b6\u32b6\u32b6\u35e5\u24ee\u3847\x00\u0567\u3a12\u2826\u01d4\u2fb3\u29f7\u36f2\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u2bc7\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u1e54\u32b6\u1394\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u2412\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u30b3\u2c62\u3271\u32b6\u32b6\u32b6\u12e3\u32b6\u32b6\u1bf2\u1d44\u2526\u32b6\u2656\u32b6\u32b6\u32b6\u0bcb\u1645\u0a85\u0ddf\u2168\u22af\u09c3\u09c5\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u3f2f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6"}
+var u={b:"\nscelgo io\nuna missione per te.\n\n\n1\n<b>Abbracciare<b>\n\n2\n<b>Accarezzare un animale<b>\n\n3\n<b>Accettare una proposta<b>\n\n4\n<b>Accusare<b>\n\n5\n<b>Addormentarsi<b>\n\n6\n<b>Affittare una casa<b>\n\n7\n<b>Amare<b>\n\n8\n<b>Andare per la prima volta in un posto<b>\n\n9\n<b>Ascoltare il figlio<b>\n\n10\n<b>Ascoltare il padre<b>\n\n11\n<b>Ascoltare la figlia<b>\n\n12\n<b>Ascoltare la madre<b>\n\n13\n<b>Ascoltare una canzone<b>\n\n14\n<b>Assolvere<b>\n\n15\n<b>Assumere sostanze<b>\n\n16\n<b>Baciare<b>\n\n17\n<b>Baciarsi<b>\n\n18\n<b>Cadere<b>\n\n19\n<b>Cadere di nuovo<b>\n\n20\n<b>Cambiare idea<b>\n\n21\n<b>Camminare mano<b>\n<b>nella mano<b>\n\n22\n<b>Chiedere aiuto<b>\n\n23\n<b>Chiedere perdono<b>\n\n24\n<b>Chiedere un consiglio<b>\n\n25\n<b>Combattere<b>\n<b>una dipendenza<b>\n\n26\n<b>Commettere un errore<b>\n\n27\n<b>Commettere un reato<b>\n\n28\n<b>Commiserare<b>\n\n29\n<b>Comprare cibo<b>\n\n30\n<b>Comprare qualcosa<b>\n\n31\n<b>Comprare un regalo<b>\n\n32\n<b>Comprare un\u2019auto<b>\n\n33\n<b>Comprare una lavatrice<b>\n\n34\n<b>Comprare vestiti<b>\n\n35\n<b>Condannare<b>\n\n36\n<b>Confidarsi<b>\n\n37\n<b>Controllare di nascosto<b>\n<b>il suo cellulare<b>\n\n38\n<b>Costruire qualcosa<b>\n\n39\n<b>Curarsi<b>\n\n40\n<b>Danzare<b>\n\n41\n<b>Dare un consiglio<b>\n\n42\n<b>Dare un ordine<b>\n\n43\n<b>Decidere di fare un figlio<b>\n\n44\n<b>Decidere di non tenere<b>\n<b>un figlio<b>\n\n45\n<b>Deludere<b>\n\n46\n<b>Deridere<b>\n\n47\n<b>Desiderare<b>\n\n48\n<b>Dimenticare<b>\n\n49\n<b>Dire la verit\xe0<b>\n\n50\n<b>Dire una bugia<b>\n\n51\n<b>Distruggere qualcosa<b>\n\n52\n<b>Dormire<b>\n\n53\n<b>Dormire poco<b>\n\n54\n<b>Essere abbracciati<b>\n\n55\n<b>Essere accusati<b>\n\n56\n<b>Essere amati<b>\n\n57\n<b>Essere assolti<b>\n\n58\n<b>Essere assunti<b>\n\n59\n<b>Essere baciati<b>\n\n60\n<b>Essere commiserati<b>\n\n61\n<b>Essere condannati<b>\n\n62\n<b>Essere curati<b>\n\n63\n<b>Essere delusi da qualcuno<b>\n\n64\n<b>Essere derisi<b>\n\n65\n<b>Essere desiderati<b>\n\n66\n<b>Essere dimenticati<b>\n\n67\n<b>Essere dipendenti<b>\n\n68\n<b>Essere gelosi<b>\n\n69\n<b>Essere giudicati<b>\n\n70\n<b>Essere insultati<b>\n\n71\n<b>Essere perdonati<b>\n\n72\n<b>Essere ricordati<b>\n\n73\n<b>Essere scoperti<b>\n\n74\n<b>Essere sedotti<b>\n\n75\n<b>Essere seducenti<b>\n\n76\n<b>Essere traditi<b>\n\n77\n<b>Fantasticare<b>\n\n78\n<b>Fare la pace<b>\n\n79\n<b>Fare una proposta<b>\n\n80\n<b>Fidarsi<b>\n\n81\n<b>Giudicare<b>\n\n82\n<b>Guadagnare soldi<b>\n\n83\n<b>Imparare qualcosa<b>\n\n84\n<b>Insultare<b>\n\n85\n<b>Invitare qualcuno<b>\n<b>a ballare<b>\n\n86\n<b>Lasciarsi<b>\n\n87\n<b>Litigare<b>\n\n88\n<b>Mettersi insieme<b>\n\n89\n<b>Morire<b>\n\n90\n<b>Nascere<b>\n\n91\n<b>Nascondere qualcosa<b>\n\n92\n<b>Non abbracciare<b>\n\n93\n<b>Non dormire abbastanza<b>\n\n94\n<b>Non fidarsi<b>\n\n95\n<b>Non riuscire a dormire<b>\n\n96\n<b>Non salutare<b>\n\n97\n<b>Parlare al figlio<b>\n\n98\n<b>Parlare al padre<b>\n\n99\n<b>Parlare alla figlia<b>\n\n100\n<b>Parlare alla madre<b>\n\n101\n<b>Parlare troppo<b>\n\n102\n<b>Perdere soldi<b>\n\n103\n<b>Perdonare<b>\n\n104\n<b>Perdonarsi<b>\n\n105\n<b>Piangere<b>\n\n106\n<b>Piantare un albero<b>\n\n107\n<b>Prendere la mano<b>\n<b>di qualcuno<b>\n\n108\n<b>Prendere una decisione<b>\n\n109\n<b>Prendersi cura<b>\n\n110\n<b>Preparare da mangiare<b>\n<b>per qualcuno<b>\n\n111\n<b>Provare piet\xe0<b>\n\n112\n<b>Rialzarsi<b>\n\n113\n<b>Ricevere un consiglio<b>\n\n114\n<b>Ricevere un ordine<b>\n\n115\n<b>Ricevere un regalo<b>\n\n116\n<b>Ricevere una lettera<b>\n\n117\n<b>Ricevere una telefonata<b>\n\n118\n<b>Ricordare<b>\n\n119\n<b>Ricordare un sogno<b>\n\n120\n<b>Ridere<b>\n\n121\n<b>Rifiutare una proposta<b>\n\n122\n<b>Rimpiangere<b>\n\n123\n<b>Rinunciare<b>\n\n124\n<b>Riparare<b>\n\n125\n<b>Salutare affettuosamente<b>\n\n126\n<b>Scegliere un corso di studi<b>\n\n127\n<b>Scegliere un regalo<b>\n\n128\n<b>Scoprire<b>\n\n129\n<b>Scrivere<b>\n\n130\n<b>Scrivere una lettera<b>\n\n131\n<b>Sognare<b>\n\n132\n<b>Studiare<b>\n\n133\n<b>Subire un'ingiustizia<b>\n\n134\n<b>Tacere<b>\n\n135\n<b>Telefonare<b>\n\n136\n<b>Tornare insieme<b>\n\n137\n<b>Tradire<b>\n\n138\n<b>Trasferirsi<b>\n<b>in un'altra citt\xe0<b>\n\n139\n<b>Traslocare<b>\n\n140\n<b>Trovare il telefono occupato<b>\n\n141\n<b>Utilizzare un falso profilo<b>\n\n142\n<b>Vendere qualcosa<b>\n\n143\n<b>Vendicarsi<b>\n\n144\n<b>Vivere un lutto<b>\n\n\nUtilizza come tema\nla <b>missione<b> \"<b>in generale<b>\",\ne continua\ncon questo esercizio\ntutti i giorni,\ncambiando missioni, \nfino a quando\nvedrai\nil tuo <b>primo personaggio<b>\n<b>apparire<b>\nin quello\nche stai scrivendo.\n\nCosa intendo\nper\n\"veder apparire\u201d\nil <b>primo personaggio<b>\nall\u2019interno degli esercizi?\n\nPer me\nsignifica\nche avrai guadagnato\nqualche frammento:\nimmagini,\nun'azione,\nun dettaglio,\nmagari solo un avverbio.\n\nQuando questo\nsar\xe0 accaduto,\nesci\ndal <b>Pozzo dell\u2019Oracolo<b>\ne vai verso\nla <b>Porta nell\u2019Alabastro<b>.\n\nSe non ti convince\nla proposta \ndi dedicarti ad altro\ne di aspettare\nche il tuo personaggio\nappaia,\nti consiglio di prendere\nla <b>Scorciatoia<b>,\ncliccare su <b>6<b>,e di arrivare direttamente\nal <b>Secondo Anello<b>.\n",q:"\x10@\x100@@\xa0\x80 0P`pPP\xb1\x10@\x100@@\xa0\x80 0P`pPP\xb0\x11@\x100@@\xa0\x80 0P`pPP\xb0\x10@\x100@@\xa0\x80 1P`pPP\xb0\x10A\x101AA\xa1\x81 1QaqQQ\xb0\x10@\x100@@\xa0\x80 1Q`pPP\xb0\x10@\x100@@\xa0\x80 1QapQP\xb0\x10@\x100@@\xa0\x80 1PaqQQ\xb0\x10\xe0\x100@@\xa0\x80 1P`pPP\xb0\xb1\xb1\xb1\xb1\x91\xb1\xc1\x81\xb1\xb1\xb1\xb1\xb1\xb1\xb1\xb1\x10@\x100@@\xd0\x80 1P`pPP\xb0\x11A\x111AA\xa1\x81!1QaqQQ\xb1\x10@\x100@@\x90\x80 1P`pPP\xb0",S:" 0\x10000\xa0\x80\x10@P`p`p\xb1 0\x10000\xa0\x80\x10@P`p`p\xb0 0\x10000\xa0\x80\x11@P`p`p\xb0 1\x10011\xa0\x80\x10@P`p`p\xb0 1\x10111\xa1\x81\x10AQaqaq\xb0 1\x10011\xa0\x80\x10@Qapaq\xb0 1\x10011\xa0\x80\x10@Paq`p\xb0 1\x10011\xa0\x80\x10@P`q`p\xb0 \x91\x100\x811\xa0\x80\x10@P`p`p\xb0 1\x10011\xa0\x81\x10@P`p`p\xb0 1\x100111\x80\x10@P`p`p\xb0!1\x11111\xa1\x81\x11AQaqaq\xb1",D:" must not be greater than the number of characters in the file, ",r:'"recorder" must not already be associated with another Canvas.',T:"% of the way to being a CircleBorder that is ",N:"' has been assigned during initialization.",K:"00000008A0009!B000a!C000b000cD000d!E000e000vA000w!F000x!G000y!H000z!I0010!J0011!K0012!I0013!H0014!L0015!M0016!I0017!J0018!N0019!O001a!N001b!P001c001lQ001m001nN001o001qI001r!G001s002iI002j!L002k!J002l!M002m003eI003f!L003g!B003h!R003i!I003j003oA003p!D003q004fA004g!S004h!L004i!K004j004lJ004m004qI004r!H004s!I004t!B004u004vI004w!K004x!J004y004zI0050!T00510056I0057!H0058005aI005b!L005c00jrI00js!T00jt00jvI00jw!T00jx00keI00kf!T00kg00lbI00lc00niA00nj!S00nk00nvA00nw00o2S00o300ofA00og00otI00ou!N00ov00w2I00w300w9A00wa013cI013d!N013e!B013h013iI013j!J013l014tA014u!B014v!A014w!I014x014yA014z!I01500151A0152!G0153!A015c0162U0167016aU016b016wI016x016zK01700171N01720173I0174017eA017f!G017g!A017i017jG017k018qI018r019bA019c019lQ019m!K019n019oQ019p019rI019s!A019t01cjI01ck!G01cl!I01cm01csA01ct01cuI01cv01d0A01d101d2I01d301d4A01d5!I01d601d9A01da01dbI01dc01dlQ01dm01e8I01e9!A01ea01f3I01f401fuA01fx01idI01ie01ioA01ip!I01j401jdQ01je01kaI01kb01kjA01kk01knI01ko!N01kp!G01kq!I01kt!A01ku01kvJ01kw01lhI01li01llA01lm!I01ln01lvA01lw!I01lx01lzA01m0!I01m101m5A01m801ncI01nd01nfA01ni01qfI01qr01r5A01r6!I01r701s3A01s401tlI01tm01toA01tp!I01tq01u7A01u8!I01u901ufA01ug01upI01uq01urA01us01utB01uu01v3Q01v401vkI01vl01vnA01vp01x5I01x8!A01x9!I01xa01xgA01xj01xkA01xn01xpA01xq!I01xz!A01y401y9I01ya01ybA01ye01ynQ01yo01ypI01yq01yrK01ys01ywI01yx!K01yy!I01yz!J01z001z1I01z2!A01z501z7A01z9020pI020s!A020u020yA02130214A02170219A021d!A021l021qI021y0227Q02280229A022a022cI022d!A022e!I022p022rA022t0249I024c!A024d!I024e024lA024n024pA024r024tA024w025dI025e025fA025i025rQ025s!I025t!J0261!I02620267A0269026bA026d027tI027w!A027x!I027y0284A02870288A028b028dA028l028nA028s028xI028y028zA0292029bQ029c029jI029u!A029v02bdI02bi02bmA02bq02bsA02bu02bxA02c0!I02c7!A02cm02cvQ02cw02d4I02d5!J02d6!I02dc02dgA02dh02f1I02f202f8A02fa02fcA02fe02fhA02fp02fqA02fs02g1I02g202g3A02g602gfQ02gn!T02go02gwI02gx02gzA02h0!T02h102ihI02ik!A02il!I02im02isA02iu02iwA02iy02j1A02j902jaA02ji02jlI02jm02jnA02jq02jzQ02k102k2I02kg02kjA02kk02m2I02m302m4A02m5!I02m602mcA02me02mgA02mi02mlA02mm02muI02mv!A02mw02n5I02n602n7A02na02njQ02nk02nsI02nt!K02nu02nzI02o102o3A02o502pyI02q2!A02q702qcA02qe!A02qg02qnA02qu02r3Q02r602r7A02r802t6I02tb!J02tc02trI02ts02u1Q02u202u3B02v502x9I02xc02xlQ02xo02yoI02yp02ysT02yt!I02yu02yvT02yw!S02yx02yyT02yz!B02z0!S02z102z5G02z6!S02z7!I02z8!G02z902zbI02zc02zdA02ze02zjI02zk02ztQ02zu0303I0304!B0305!A0306!I0307!A0308!I0309!A030a!L030b!R030c!L030d!R030e030fA030g031oI031t0326A0327!B0328032cA032d!B032e032fA032g032kI032l032vA032x033wA033y033zB03400345I0346!A0347034fI034g034hT034i!B034j!T034k034oI034p034qS035s037jI037k037tQ037u037vB037w039rI039s03a1Q03a203cvI03cw03fjV03fk03hjW03hk03jzX03k003tmI03tp03trA03ts!I03tt!B03tu03y5I03y8!B03y904fzI04g0!B04g104gqI04gr!L04gs!R04gw04iyI04iz04j1B04j204k1I04k204k4A04kg04kxI04ky04l0A04l104l2B04lc04ltI04lu04lvA04m804moI04mq04mrA04n404pfI04pg04phB04pi!Y04pj!I04pk!B04pl!I04pm!B04pn!J04po04ppI04ps04q1Q04q804qpI04qq04qrG04qs04qtB04qu!T04qv!I04qw04qxG04qy!I04qz04r1A04r2!S04r404rdQ04rk04ucI04ud04ueA04uf04vcI04vd!A04ve04ymI04yo04yzA04z404zfA04zk!I04zo04zpG04zq04zzQ0500053dI053k053tQ053u055iI055j055nA055q058cI058f!A058g058pQ058w0595Q059c059pI059s05a8A05c005c4A05c505dfI05dg05dwA05dx05e3I05e805ehQ05ei05ejB05ek!I05el05eoB05ep05eyI05ez05f7A05f805fgI05fk05fmA05fn05ggI05gh05gtA05gu05gvI05gw05h5Q05h605idI05ie05irA05j005k3I05k405knA05kr05kvB05kw05l5Q05l905lbI05lc05llQ05lm05mlI05mm05mnB05mo05onI05ow05oyA05oz!I05p005pkA05pl05poI05pp!A05pq05pvI05pw!A05px05pyI05pz05q1A05q205vjI05vk05x5A05x705xbA05xc06bgI06bh!T06bi!I06bk06bqB06br!S06bs06buB06bv!Z06bw!A06bx!a06by06bzA06c0!B06c1!S06c206c3B06c4!b06c506c7I06c806c9H06ca!L06cb06cdH06ce!L06cf!H06cg06cjI06ck06cmc06cn!B06co06cpD06cq06cuA06cv!S06cw06d3K06d4!I06d506d6H06d7!I06d806d9Y06da06dfI06dg!N06dh!L06di!R06dj06dlY06dm06dxI06dy!B06dz!I06e006e3B06e4!I06e506e7B06e8!d06e906ecI06ee06enA06eo06f0I06f1!L06f2!R06f306fgI06fh!L06fi!R06fk06fwI06g006g6J06g7!K06g806glJ06gm!K06gn06gqJ06gr!K06gs06gtJ06gu!K06gv06hbJ06hc06i8A06io06iqI06ir!K06is06iwI06ix!K06iy06j9I06ja!J06jb06q9I06qa06qbJ06qc06weI06wf!c06wg06x3I06x4!L06x5!R06x6!L06x7!R06x806xlI06xm06xne06xo06y0I06y1!L06y2!R06y3073jI073k073ne073o07i7I07i807ibe07ic07irI07is07ite07iu07ivI07iw!e07ix!I07iy07j0e07j1!f07j207j3e07j407jsI07jt07jve07jw07l3I07l4!e07l507lqI07lr!e07ls07ngI07nh07nse07nt07nwI07nx!e07ny!I07nz07o1e07o2!I07o307o4e07o507o7I07o807o9e07oa07obI07oc!e07od07oeI07of07ohe07oi07opI07oq!e07or07owI07ox07p1e07p2!I07p307p4e07p5!f07p6!e07p707p8I07p907pge07ph07pjI07pk07ple07pm07ppf07pq07ruI07rv07s0H07s1!I07s207s3G07s4!e07s507s7I07s8!L07s9!R07sa!L07sb!R07sc!L07sd!R07se!L07sf!R07sg!L07sh!R07si!L07sj!R07sk!L07sl!R07sm07usI07ut!L07uu!R07uv07vpI07vq!L07vr!R07vs!L07vt!R07vu!L07vv!R07vw!L07vx!R07vy!L07vz!R07w00876I0877!L0878!R0879!L087a!R087b!L087c!R087d!L087e!R087f!L087g!R087h!L087i!R087j!L087k!R087l!L087m!R087n!L087o!R087p!L087q!R087r!L087s!R087t089jI089k!L089l!R089m!L089n!R089o08ajI08ak!L08al!R08am08viI08vj08vlA08vm08vnI08vt!G08vu08vwB08vx!I08vy!G08vz!B08w008z3I08z4!B08zj!A08zk0926I09280933A0934093hH093i093pB093q!I093r!B093s!L093t!B093u093vI093w093xH093y093zI09400941H0942!L0943!R0944!L0945!R0946!L0947!R0948!L0949!R094a094dB094e!G094f!I094g094hB094i!I094j094kB094l094pI094q094rb094s094uB094v!I094w094xB094y!L094z0956B0957!I0958!B0959!I095a095bB095c095eI096o097de097f099ve09a809g5e09gw09h7e09hc!B09hd09heR09hf09hge09hh!Y09hi09hje09hk!L09hl!R09hm!L09hn!R09ho!L09hp!R09hq!L09hr!R09hs!L09ht!R09hu09hve09hw!L09hx!R09hy!L09hz!R09i0!L09i1!R09i2!L09i3!R09i4!Y09i5!L09i609i7R09i809ihe09ii09inA09io09ise09it!A09iu09iye09iz09j0Y09j109j3e09j5!Y09j6!e09j7!Y09j8!e09j9!Y09ja!e09jb!Y09jc!e09jd!Y09je09k2e09k3!Y09k409kye09kz!Y09l0!e09l1!Y09l2!e09l3!Y09l409l9e09la!Y09lb09lge09lh09liY09ll09lmA09ln09lqY09lr!e09ls09ltY09lu!e09lv!Y09lw!e09lx!Y09ly!e09lz!Y09m0!e09m1!Y09m209mqe09mr!Y09ms09nme09nn!Y09no!e09np!Y09nq!e09nr!Y09ns09nxe09ny!Y09nz09o4e09o509o6Y09o709oae09ob09oeY09of!e09ol09pre09pt09see09sg09ure09v409vjY09vk09wee09wg09xje09xk09xrI09xs0fcve0fcw0fenI0feo0vmce0vmd!Y0vme0wi4e0wi80wjqe0wk00wl9I0wla0wlbB0wlc0wssI0wst!B0wsu!G0wsv!B0wsw0wtbI0wtc0wtlQ0wtm0wviI0wvj0wvmA0wvn!I0wvo0wvxA0wvy0wwtI0wwu0wwvA0www0wz3I0wz40wz5A0wz6!I0wz70wzbB0wzk0x6pI0x6q!A0x6r0x6tI0x6u!A0x6v0x6yI0x6z!A0x700x7mI0x7n0x7rA0x7s0x7vI0x7w!A0x800x87I0x88!K0x890x9vI0x9w0x9xT0x9y0x9zG0xa80xa9A0xaa0xbnI0xbo0xc5A0xce0xcfB0xcg0xcpQ0xcw0xddA0xde0xdnI0xdo!T0xdp0xdqI0xdr!A0xds0xe1Q0xe20xetI0xeu0xf1A0xf20xf3B0xf40xfqI0xfr0xg3A0xgf!I0xgg0xh8V0xhc0xhfA0xhg0xiqI0xir0xj4A0xj50xjaI0xjb0xjdB0xje0xjjI0xjk0xjtQ0xjy0xkfI0xkg0xkpQ0xkq0xm0I0xm10xmeA0xmo0xmqI0xmr!A0xms0xmzI0xn00xn1A0xn40xndQ0xng!I0xnh0xnjB0xnk0xreI0xrf0xrjA0xrk0xrlB0xrm0xroI0xrp0xrqA0xs10xyaI0xyb0xyiA0xyj!B0xyk0xylA0xyo0xyxQ0xz4!g0xz50xzvh0xzw!g0xzx0y0nh0y0o!g0y0p0y1fh0y1g!g0y1h0y27h0y28!g0y290y2zh0y30!g0y310y3rh0y3s!g0y3t0y4jh0y4k!g0y4l0y5bh0y5c!g0y5d0y63h0y64!g0y650y6vh0y6w!g0y6x0y7nh0y7o!g0y7p0y8fh0y8g!g0y8h0y97h0y98!g0y990y9zh0ya0!g0ya10yarh0yas!g0yat0ybjh0ybk!g0ybl0ycbh0ycc!g0ycd0yd3h0yd4!g0yd50ydvh0ydw!g0ydx0yenh0yeo!g0yep0yffh0yfg!g0yfh0yg7h0yg8!g0yg90ygzh0yh0!g0yh10yhrh0yhs!g0yht0yijh0yik!g0yil0yjbh0yjc!g0yjd0yk3h0yk4!g0yk50ykvh0ykw!g0ykx0ylnh0ylo!g0ylp0ymfh0ymg!g0ymh0yn7h0yn8!g0yn90ynzh0yo0!g0yo10yorh0yos!g0yot0ypjh0ypk!g0ypl0yqbh0yqc!g0yqd0yr3h0yr4!g0yr50yrvh0yrw!g0yrx0ysnh0yso!g0ysp0ytfh0ytg!g0yth0yu7h0yu8!g0yu90yuzh0yv0!g0yv10yvrh0yvs!g0yvt0ywjh0ywk!g0ywl0yxbh0yxc!g0yxd0yy3h0yy4!g0yy50yyvh0yyw!g0yyx0yznh0yzo!g0yzp0z0fh0z0g!g0z0h0z17h0z18!g0z190z1zh0z20!g0z210z2rh0z2s!g0z2t0z3jh0z3k!g0z3l0z4bh0z4c!g0z4d0z53h0z54!g0z550z5vh0z5w!g0z5x0z6nh0z6o!g0z6p0z7fh0z7g!g0z7h0z87h0z88!g0z890z8zh0z90!g0z910z9rh0z9s!g0z9t0zajh0zak!g0zal0zbbh0zbc!g0zbd0zc3h0zc4!g0zc50zcvh0zcw!g0zcx0zdnh0zdo!g0zdp0zefh0zeg!g0zeh0zf7h0zf8!g0zf90zfzh0zg0!g0zg10zgrh0zgs!g0zgt0zhjh0zhk!g0zhl0zibh0zic!g0zid0zj3h0zj4!g0zj50zjvh0zjw!g0zjx0zknh0zko!g0zkp0zlfh0zlg!g0zlh0zm7h0zm8!g0zm90zmzh0zn0!g0zn10znrh0zns!g0znt0zojh0zok!g0zol0zpbh0zpc!g0zpd0zq3h0zq4!g0zq50zqvh0zqw!g0zqx0zrnh0zro!g0zrp0zsfh0zsg!g0zsh0zt7h0zt8!g0zt90ztzh0zu0!g0zu10zurh0zus!g0zut0zvjh0zvk!g0zvl0zwbh0zwc!g0zwd0zx3h0zx4!g0zx50zxvh0zxw!g0zxx0zynh0zyo!g0zyp0zzfh0zzg!g0zzh1007h1008!g1009100zh1010!g1011101rh101s!g101t102jh102k!g102l103bh103c!g103d1043h1044!g1045104vh104w!g104x105nh105o!g105p106fh106g!g106h1077h1078!g1079107zh1080!g1081108rh108s!g108t109jh109k!g109l10abh10ac!g10ad10b3h10b4!g10b510bvh10bw!g10bx10cnh10co!g10cp10dfh10dg!g10dh10e7h10e8!g10e910ezh10f0!g10f110frh10fs!g10ft10gjh10gk!g10gl10hbh10hc!g10hd10i3h10i4!g10i510ivh10iw!g10ix10jnh10jo!g10jp10kfh10kg!g10kh10l7h10l8!g10l910lzh10m0!g10m110mrh10ms!g10mt10njh10nk!g10nl10obh10oc!g10od10p3h10p4!g10p510pvh10pw!g10px10qnh10qo!g10qp10rfh10rg!g10rh10s7h10s8!g10s910szh10t0!g10t110trh10ts!g10tt10ujh10uk!g10ul10vbh10vc!g10vd10w3h10w4!g10w510wvh10ww!g10wx10xnh10xo!g10xp10yfh10yg!g10yh10z7h10z8!g10z910zzh1100!g1101110rh110s!g110t111jh111k!g111l112bh112c!g112d1133h1134!g1135113vh113w!g113x114nh114o!g114p115fh115g!g115h1167h1168!g1169116zh1170!g1171117rh117s!g117t118jh118k!g118l119bh119c!g119d11a3h11a4!g11a511avh11aw!g11ax11bnh11bo!g11bp11cfh11cg!g11ch11d7h11d8!g11d911dzh11e0!g11e111erh11es!g11et11fjh11fk!g11fl11gbh11gc!g11gd11h3h11h4!g11h511hvh11hw!g11hx11inh11io!g11ip11jfh11jg!g11jh11k7h11k8!g11k911kzh11l0!g11l111lrh11ls!g11lt11mjh11mk!g11ml11nbh11nc!g11nd11o3h11o4!g11o511ovh11ow!g11ox11pnh11po!g11pp11qfh11qg!g11qh11r7h11r8!g11r911rzh11s0!g11s111srh11ss!g11st11tjh11tk!g11tl11ubh11uc!g11ud11v3h11v4!g11v511vvh11vw!g11vx11wnh11wo!g11wp11xfh11xg!g11xh11y7h11y8!g11y911yzh11z0!g11z111zrh11zs!g11zt120jh120k!g120l121bh121c!g121d1223h1224!g1225122vh122w!g122x123nh123o!g123p124fh124g!g124h1257h1258!g1259125zh1260!g1261126rh126s!g126t127jh127k!g127l128bh128c!g128d1293h1294!g1295129vh129w!g129x12anh12ao!g12ap12bfh12bg!g12bh12c7h12c8!g12c912czh12d0!g12d112drh12ds!g12dt12ejh12ek!g12el12fbh12fc!g12fd12g3h12g4!g12g512gvh12gw!g12gx12hnh12ho!g12hp12ifh12ig!g12ih12j7h12j8!g12j912jzh12k0!g12k112krh12ks!g12kt12ljh12lk!g12ll12mbh12mc!g12md12n3h12n4!g12n512nvh12nw!g12nx12onh12oo!g12op12pfh12pg!g12ph12q7h12q8!g12q912qzh12r0!g12r112rrh12rs!g12rt12sjh12sk!g12sl12tbh12tc!g12td12u3h12u4!g12u512uvh12uw!g12ux12vnh12vo!g12vp12wfh12wg!g12wh12x7h12x8!g12x912xzh12y0!g12y112yrh12ys!g12yt12zjh12zk!g12zl130bh130c!g130d1313h1314!g1315131vh131w!g131x132nh132o!g132p133fh133g!g133h1347h1348!g1349134zh1350!g1351135rh135s!g135t136jh136k!g136l137bh137c!g137d1383h1384!g1385138vh138w!g138x139nh139o!g139p13afh13ag!g13ah13b7h13b8!g13b913bzh13c0!g13c113crh13cs!g13ct13djh13dk!g13dl13ebh13ec!g13ed13f3h13f4!g13f513fvh13fw!g13fx13gnh13go!g13gp13hfh13hg!g13hh13i7h13i8!g13i913izh13j0!g13j113jrh13js!g13jt13kjh13kk!g13kl13lbh13lc!g13ld13m3h13m4!g13m513mvh13mw!g13mx13nnh13no!g13np13ofh13og!g13oh13p7h13p8!g13p913pzh13q0!g13q113qrh13qs!g13qt13rjh13rk!g13rl13sbh13sc!g13sd13t3h13t4!g13t513tvh13tw!g13tx13unh13uo!g13up13vfh13vg!g13vh13w7h13w8!g13w913wzh13x0!g13x113xrh13xs!g13xt13yjh13yk!g13yl13zbh13zc!g13zd1403h1404!g1405140vh140w!g140x141nh141o!g141p142fh142g!g142h1437h1438!g1439143zh1440!g1441144rh144s!g144t145jh145k!g145l146bh146c!g146d1473h1474!g1475147vh147w!g147x148nh148o!g148p149fh149g!g149h14a7h14a8!g14a914azh14b0!g14b114brh14bs!g14bt14cjh14ck!g14cl14dbh14dc!g14dd14e3h14e4!g14e514evh14ew!g14ex14fnh14fo!g14fp14gfh14gg!g14gh14h7h14h8!g14h914hzh14i0!g14i114irh14is!g14it14jjh14jk!g14jl14kbh14kc!g14kd14l3h14l4!g14l514lvh14lw!g14lx14mnh14mo!g14mp14nfh14ng!g14nh14o7h14o8!g14o914ozh14p0!g14p114prh14ps!g14pt14qjh14qk!g14ql14rbh14rc!g14rd14s3h14s4!g14s514svh14sw!g14sx14tnh14to!g14tp14ufh14ug!g14uh14v7h14v8!g14v914vzh14w0!g14w114wrh14ws!g14wt14xjh14xk!g14xl14ybh14yc!g14yd14z3h14z4!g14z514zvh14zw!g14zx150nh150o!g150p151fh151g!g151h1527h1528!g1529152zh1530!g1531153rh153s!g153t154jh154k!g154l155bh155c!g155d1563h1564!g1565156vh156w!g156x157nh157o!g157p158fh158g!g158h1597h1598!g1599159zh15a0!g15a115arh15as!g15at15bjh15bk!g15bl15cbh15cc!g15cd15d3h15d4!g15d515dvh15dw!g15dx15enh15eo!g15ep15ffh15fg!g15fh15g7h15g8!g15g915gzh15h0!g15h115hrh15hs!g15ht15ijh15ik!g15il15jbh15jc!g15jd15k3h15k4!g15k515kvh15kw!g15kx15lnh15lo!g15lp15mfh15mg!g15mh15n7h15n8!g15n915nzh15o0!g15o115orh15os!g15ot15pjh15pk!g15pl15qbh15qc!g15qd15r3h15r4!g15r515rvh15rw!g15rx15snh15so!g15sp15tfh15tg!g15th15u7h15u8!g15u915uzh15v0!g15v115vrh15vs!g15vt15wjh15wk!g15wl15xbh15xc!g15xd15y3h15y4!g15y515yvh15yw!g15yx15znh15zo!g15zp160fh160g!g160h1617h1618!g1619161zh1620!g1621162rh162s!g162t163jh163k!g163l164bh164c!g164d1653h1654!g1655165vh165w!g165x166nh166o!g166p167fh167g!g167h1687h1688!g1689168zh1690!g1691169rh169s!g169t16ajh16ak!g16al16bbh16bc!g16bd16c3h16c4!g16c516cvh16cw!g16cx16dnh16do!g16dp16efh16eg!g16eh16f7h16f8!g16f916fzh16g0!g16g116grh16gs!g16gt16hjh16hk!g16hl16ibh16ic!g16id16j3h16j4!g16j516jvh16jw!g16jx16knh16ko!g16kp16lfh16ls16meW16mj16nvX16o01d6nI1d6o1dkve1dkw1dljI1dlp!U1dlq!A1dlr1dm0U1dm1!I1dm21dmeU1dmg1dmkU1dmm!U1dmo1dmpU1dmr1dmsU1dmu1dn3U1dn41e0tI1e0u!R1e0v!L1e1c1e63I1e64!K1e65!I1e681e6nA1e6o!N1e6p1e6qR1e6r1e6sN1e6t1e6uG1e6v!L1e6w!R1e6x!c1e741e7jA1e7k1e7oe1e7p!L1e7q!R1e7r!L1e7s!R1e7t!L1e7u!R1e7v!L1e7w!R1e7x!L1e7y!R1e7z!L1e80!R1e81!L1e82!R1e83!L1e84!R1e851e86e1e87!L1e88!R1e891e8fe1e8g!R1e8h!e1e8i!R1e8k1e8lY1e8m1e8nG1e8o!e1e8p!L1e8q!R1e8r!L1e8s!R1e8t!L1e8u!R1e8v1e92e1e94!e1e95!J1e96!K1e97!e1e9c1ed8I1edb!d1edd!G1ede1edfe1edg!J1edh!K1edi1edje1edk!L1edl!R1edm1edne1edo!R1edp!e1edq!R1edr1ee1e1ee21ee3Y1ee41ee6e1ee7!G1ee81eeye1eez!L1ef0!e1ef1!R1ef21efue1efv!L1efw!e1efx!R1efy!e1efz!L1eg01eg1R1eg2!L1eg31eg4R1eg5!Y1eg6!e1eg71eggY1egh1ehpe1ehq1ehrY1ehs1eime1eiq1eive1eiy1ej3e1ej61ejbe1eje1ejge1ejk!K1ejl!J1ejm1ejoe1ejp1ejqJ1ejs1ejyI1ek91ekbA1ekc!i1ekd1ereI1erk1ermB1err1eykI1eyl!A1f281f4gI1f4w!A1f4x1f91I1f921f96A1f9c1fa5I1fa7!B1fa81fbjI1fbk!B1fbl1fh9I1fhc1fhlQ1fhs1g7pI1g7r!B1g7s1gd7I1gdb!B1gdc1gjkI1gjl1gjnA1gjp1gjqA1gjw1gjzA1gk01gl1I1gl41gl6A1glb!A1glc1glkI1gls1glzB1gm01gpwI1gpx1gpyA1gq31gq7I1gq81gqdB1gqe!c1gqo1gs5I1gs91gsfB1gsg1h5vI1h5w1h5zA1h681h6hQ1heo1hgpI1hgr1hgsA1hgt!B1hgw1hl1I1hl21hlcA1hld1hpyI1hq81hqaA1hqb1hrrI1hrs1hs6A1hs71hs8B1hs91ht1I1ht21htbQ1htr1htuA1htv1hv3I1hv41hveA1hvf1hvhI1hvi1hvlB1hvx1hwoI1hww1hx5Q1hxc1hxeA1hxf1hyeI1hyf1hysA1hyu1hz3Q1hz41hz7B1hz8!I1hz91hzaA1hzb1i0iI1i0j!A1i0k!I1i0l!T1i0m!I1i0w1i0yA1i0z1i2aI1i2b1i2oA1i2p1i2sI1i2t1i2uB1i2v!I1i2w!B1i2x1i30A1i31!I1i321i33A1i341i3dQ1i3e!I1i3f!T1i3g!I1i3h1i3jB1i3l1i5nI1i5o1i5zA1i601i61B1i62!I1i631i64B1i65!I1i66!A1i801i94I1i95!B1i9c1iamI1ian1iayA1ib41ibdQ1ibk1ibnA1ibp1id5I1id71id8A1id9!I1ida1idgA1idj1idkA1idn1idpA1ids!I1idz!A1ie51ie9I1iea1iebA1iee1iekA1ieo1iesA1iio1ik4I1ik51ikmA1ikn1ikqI1ikr1ikuB1ikv!I1ikw1il5Q1il61il7B1il9!I1ila!A1ilb1injI1ink1io3A1io41io7I1iog1iopQ1itc1iumI1iun1iutA1iuw1iv4A1iv5!T1iv61iv7B1iv81iv9G1iva1ivcI1ivd1ivrB1ivs1ivvI1ivw1ivxA1iww1iy7I1iy81iyoA1iyp1iyqB1iyr1iysI1iz41izdQ1izk1izwT1j0g1j1mI1j1n1j1zA1j20!I1j281j2hQ1j401j57I1j5c1j5lQ1j5m1j5nI1j5o1j5qB1j5r1jcbI1jcc1jcqA1jcr1jhbI1jhc1jhlQ1jhm1jjjI1jjk1jjpA1jjr1jjsA1jjv1jjyA1jjz!I1jk0!A1jk1!I1jk21jk3A1jk41jk6B1jkg1jkpQ1jmo1jo0I1jo11jo7A1joa1jogA1joh!I1joi!T1joj!I1jok!A1jpc!I1jpd1jpmA1jpn1jqqI1jqr1jqxA1jqy!I1jqz1jr2A1jr3!T1jr4!I1jr51jr8B1jr9!T1jra!I1jrb!A1jrk!I1jrl1jrvA1jrw1jt5I1jt61jtlA1jtm1jtoB1jtp!I1jtq1jtsT1jtt1jtuB1juo1k4uI1k4v1k52A1k541k5bA1k5c!I1k5d1k5hB1k5s1k61Q1k621k6kI1k6o!T1k6p!G1k6q1k7jI1k7m1k87A1k891k8mA1kao1kc0I1kc11kc6A1kca!A1kcc1kcdA1kcf1kclA1kcm!I1kcn!A1kcw1kd5Q1kdc1kehI1kei1kemA1keo1kepA1ker1kevA1kew!I1kf41kfdQ1ko01koiI1koj1komA1kon1kv0I1kv11kv4K1kv51kvlI1kvz!B1kw01lriI1lrk1lroB1ls01oifI1oig1oiiL1oij1oilR1oim1ojlI1ojm!R1ojn1ojpI1ojq!L1ojr!R1ojs!L1ojt!R1oju1oqgI1oqh!L1oqi1oqjR1oqk1oviI1ovk1ovqS1ovr!L1ovs!R1s001sctI1scu!L1scv!R1scw1zkuI1zkw1zl5Q1zla1zlbB1zo01zotI1zow1zp0A1zp1!B1zpc1zqnI1zqo1zquA1zqv1zqxB1zqy1zr7I1zr8!B1zr9!I1zrk1zrtQ1zrv20euI20ev20ewB20ex20juI20jz!A20k0!I20k120ljA20lr20luA20lv20m7I20o020o3Y20o4!S20og20ohA20ow25fbe25fk260ve260w26dxI26f426fce2dc02djye2dlc2dleY2dlw2dlzY2dm82dx7e2fpc2ftoI2ftp2ftqA2ftr!B2fts2ftvA2jnk2jxgI2jxh2jxlA2jxm2jxoI2jxp2jyaA2jyb2jycI2jyd2jyjA2jyk2jzdI2jze2jzhA2jzi2k3lI2k3m2k3oA2k3p2l6zI2l722l8fQ2l8g2lmnI2lmo2lo6A2lo72loaI2lob2lpoA2lpp2lpwI2lpx!A2lpy2lqbI2lqc!A2lqd2lqeI2lqf2lqiB2lqj!I2lqz2lr3A2lr52lrjA2mtc2mtiA2mtk2mu0A2mu32mu9A2mub2mucA2mue2muiA2n0g2n1oI2n1s2n1yA2n1z2n25I2n282n2hQ2n2m2ne3I2ne42ne7A2ne82nehQ2nen!J2oe82ojzI2ok02ok6A2olc2on7I2on82oneA2onf!I2onk2ontQ2ony2onzL2p9t2pbfI2pbg!K2pbh2pbjI2pbk!K2pbl2prlI2pz42q67e2q682q6kI2q6l2q6ne2q6o2q98I2q992q9be2q9c2qb0I2qb12qcle2qcm2qdbj2qdc2qo4e2qo5!f2qo62qore2qos2qotI2qou2qpge2qph2qpiI2qpj2qpne2qpo!I2qpp2qpte2qpu2qpwf2qpx2qpye2qpz!f2qq02qq1e2qq22qq4f2qq52qree2qrf2qrjk2qrk2qtde2qte2qtff2qtg2qthe2qti2qtsf2qtt2qude2que2quwf2qux2quze2qv0!f2qv12qv4e2qv52qv7f2qv8!e2qv92qvbf2qvc2qvie2qvj!f2qvk!e2qvl!f2qvm2qvze2qw0!I2qw1!e2qw2!I2qw3!e2qw4!I2qw52qw9e2qwa!f2qwb2qwee2qwf!I2qwg!e2qwh2qwiI2qwj2qyne2qyo2qyuI2qyv2qzae2qzb2qzoI2qzp2r01e2r022r0pI2r0q2r1ve2r1w2r1xf2r1y2r21e2r22!f2r232r2ne2r2o!f2r2p2r2se2r2t2r2uf2r2v2r4je2r4k2r4rI2r4s2r5fe2r5g2r5lI2r5m2r7oe2r7p2r7rf2r7s2r7ue2r7v2r7zf2r802r91I2r922r94H2r952r97Y2r982r9bI2r9c2raae2rab!f2rac2rare2ras2rauf2rav2rb3e2rb4!f2rb52rbfe2rbg!f2rbh2rcve2rcw2rg3I2rg42rgfe2rgg2risI2rit2rjze2rk02rkbI2rkc2rkfe2rkg2rlzI2rm02rm7e2rm82rmhI2rmi2rmne2rmo2rnrI2rns2rnze2ro02rotI2rou2rr3e2rr42rrfI2rrg!f2rrh2rrie2rrj!f2rrk2rrre2rrs2rrzf2rs02rs5e2rs6!f2rs72rsfe2rsg2rspf2rsq2rsre2rss2rsuf2rsv2ruee2ruf!f2rug2rw4e2rw52rw6f2rw7!e2rw82rw9f2rwa!e2rwb!f2rwc2rwse2rwt2rwvf2rww!e2rwx2rx9f2rxa2ry7e2ry82s0jI2s0k2s5be2s5c2sayI2sc02sc9Q2scg2t4te2t4w47p9e47pc5m9pejny9!Ajnz4jo1rAjo5cjobzAl2ionvnhI",M:'<b>2.Radura delle Bacche:<b>\n<b>questo \xe8 il quinto<b>\n<b>di sette esercizi<b>\n<b>e si chiama<b>\n<b>2.5.Categorie<b>\n\nLo scopo\n di questi esercizi\n \xe8\n trovare il <b>nome<b>\n di quello\n che diventer\xe0\n il <b>primo elemento<b>\n della tua storia.\n\nRipeti gli esercizi\n della <b>Radura delle Bacche<b>\n <b>ogni giorno<b>,\n alternandoli,\n o facendo solo quelli che preferisci,\n fino a quando dal tuo lavoro\n vedrai emergere\n un elemento.\n\nQuando questo sar\xe0 avvenuto,\n trova un <b>nome<b>\n per questo elemento\n e vai all\u2019esercizio\n <b>2.7.Ho sentito il mio nome<b>.\n\nPer l\u2019esercizio\n <b>2.5.Categorie<b>\n hai bisogno di\n due <b>dadi<b> da gioco,\nnumerati da uno a sei,\ne di questa <b>lista<b>\n di undici <b>categorie<b>:\n\n2\n<b>Nomi<b>\n\n3\n<b>Baci<b>\n\n4\n<b>Bugie<b>\n\n5\n<b>Addii<b>\n\n6\n<b>Paure<b>\n\n7\n<b>Epifanie<b>\n\n8\n<b>Miracoli<b>\n\n9\n<b>Amori<b>\n\n10\n<b>Riti<b>\n\n11\n<b>Parti del corpo<b>\n\n12\n<b>Colori<b>\n\n Per la prima fase dell\u2019esercizio,\n la <b>scrittura libera<b>,\n lancia i due dadi:\n la somma\nti indicher\xe0\n la <b>categoria<b> da cui partire.\n\nAd esempio:\n se escono\n due e tre,\n la somma,\n cinque,\n ti condurr\xe0 a\n <b>Addii<b>.\n\nA questo punto,\ncon il sistema casuale\nche preferisci,\nscegli una lettera dell\'alfabeto.\n\nAd esempio,\nla lettera "C",\ncome \u201cCarla\u201d.\n\nCosa potrebbe venir fuori\nin un esercizio come questo,\npartendo dal nome \u201cCarla\u201d\n e dalla categoria \u201cAddii\u201d?\n\nImpegnati,\n sperimenta,\n osa.\n\nDecidi\nse continuare in ordine alfabetico\n nella categoria "Addii",\n passando alla lettera \u201cD\u201d,\n oppure\n se lanciare\n di nuovo\n i dadi.\n\nNella stessa giornata,\na partire dalla lettura\n di quello hai scritto\n nella <b>scrittura libera<b>,\n realizza almeno un <b>honoo<b>,\n e dopo\n dedicati\n all\u2019ultima fase dell\u2019esercizio:\n l\u2019<b>hinoo<b>.\n\nIl giorno successivo\n riparti\n dalla lettera\n e dalla categoria\n a cui eri arrivato\n il giorno prima\n oppure\n lancia di nuovo i dadi.\n\nSe clicchi sul\n',F:"<b>5.Primo Anello:<b>\n<b>questo \xe8 il primo<b>\n<b>di quattro esercizi<b>\n<b>e si chiama<b>\n<b>5.1.Comandamenti<b>\n\nEstrai a sorte\nun numero\nda uno a dieci\ned individua\nil corrispondente\n<b>comandamento<b>\ndel catechismo\ndella Chiesa cattolica.\n\nPer comodit\xe0,\nti trascrivo qui\ni comandamenti:\n\n1\n<b>Non avrai altro Dio<b>\n<b>fuori di me<b>\n\n2\n<b>Non nominare<b>\n<b>il nome di Dio invano<b>\n\n3\n<b>Ricordati di santificare<b>\n<b>le feste<b>\n\n4\n<b>Onora il padre e la madre<b>\n\n5\n<b>Non uccidere<b>\n\n6\n<b>Non commettere<b>\n<b>atti impuri<b>\n\n7\n<b>Non rubare<b>\n\n8\n<b>Non dire<b>\n<b>falsa testimonianza<b>\n\n9\n<b>Non desiderare<b>\n<b>la donna d'altri<b>\n\n10\n<b>Non desiderare<b>\n<b>la roba d'altri<b>\n\nSe clicchi sul \n",y:"<b>Affiorano<b>\n<b>frammenti pi\xf9 grandi:<b>\n<b>\xe8 pi\xf9 facile riconoscerli,<b>\n<b>\xe8 pi\xf9 difficile spostarli<b>\n\nScendi nel buio.\n\nUn buio\nassoluto,\nlevigato,\nsenza tempo.\n\nE tu continui a scendere,\ncon la presunzione\ndi chi crede\nche arriver\xe0\nda qualche parte.\n\nNessuno ti ha spiegato\nche ci sono strade\nche si perdono\nnel nulla?\n\nPerch\xe9\ncontinui a fidarti\ndi questo sentiero di corda?\n\nTi rassicura\nperch\xe9 \xe8 difficile\nda percorrere?\n\nNon mi sembra\nun buon motivo.\n\nPer\xf2,\nsotto di te,\nsuggerito\ndal fioco tremolio,\nche fra poco\ndiventer\xe0\nfiaccole,\naffiora\nil cerchio\ndel <b>Quarto Anello<b>.\n\nE fra poco\npotrai anche\ndistinguere\nil tuo trampolino,\nla tua asse di legno.\n\nS\xec,\nc'\xe8 pure quella.\n\nHai avuto\nfortuna,\nquesta volta.\n\nSe vuoi un consiglio,\nnon ti ci abituare.\n\nSei\nal <b>Quarto Anello<b>\nadesso.\n\nNel <b>Quarto Anello<b>\nci sono tre esercizi.\n\nIl primo esercizio\nsi chiama\n<b>8.1.Xia getta il cellulare<b>\n<b>a mare<b>.\n\nIl secondo esercizio\nsi chiama\n<b>8.2.Gettare il cellulare<b>\n<b>a mare<b>.\n\nIl terzo esercizio\nsi chiama\n<b>8.3.Io getto il cellulare<b>\n<b>a mare<b>.\n\nSe dai nuovi esercizi\ndel <b>Quarto Anello<b>\nemergono\n<b>nuovi personaggi<b>,\n<b>nuovi oggetti<b>,\no\n<b>nuovi verbi<b>,\nche ti suggeriscono\ndi tornare\nindietro\nnel tuo percorso,\nconsiderala una benedizione,\nuna ricompensa\nper il tuo impegno,\ne non esitare.\n\nRimani\nnel <b>Quarto Anello<b>\nfinch\xe9\nhai voglia di rifare\ni tre esercizi\ne finch\xe9\nhai voglia di andare avanti\ne indietro\nfra il Quarto Anello\ne gli esercizi\ndei livelli precedenti.\n\nQuando decidi\ndi proseguire\nil viaggio,\nfarai una scoperta.\n\n\xc8 stata una buona idea\nlegare\nil fazzoletto\nad una fiaccola,\naltrimenti\nqueste fiaccole\navrebbero continuato\nad essere tutte uguali,\ne tu avresti continuato\na girare in tondo,\nalla ricerca\ndi una scaletta di corda\nche qui,\nnel <b>Quarto Anello<b>,\nnon c'\xe8,\nadesso lo sai.\n\nE ora?\n\nTi sporgi\nverso\nl'abisso.\n\nNiente.\n\nNon si vede\nnulla,\nper\xf2,\nse sintonizzi\nil tuo udito\noltre\nl'oscurit\xe0,\navverti\nla sensazione\ndi acqua che scorre.\n\nVedi un sasso\naccanto al tuo piede destro.\n\nLo raccogli.\n\nLo lasci cadere\nnell'abisso.\n\nInizi a contare.\n\nE uno.\n\nE due.\n\nL'impatto del sasso\ncon l'acqua\narriva\nprima del \"tre\".\n\nSorridi.\n\nCapisci\nall\u2019improvviso\nperch\xe9\nqualcuno ha lasciato\nun vecchio giubbino salvagente\narancione,\nappeso ad un chiodo\nconficcato nella roccia.\n\nTorni indietro.\n\nRiconosci\nla sagoma del giubbino\nda lontano,\nin una porzione di roccia\nilluminata\nda una fiaccola.\n\nSganci il salvagente\ndal chiodo arrugginito.\n\nIn qualche modo,\nriesci\nad indossare\nil salvagente.\n\nProvi ad allacciarlo:\nuna cinghia \xe8 marcia\ne si squarcia.\n\nIl salvagente puzza,\nma credo che\nin questo momento\ntu abbia altro\na cui pensare.\n\nGuardi di nuovo\nil buco\nnero.\n\nCerchi\nun altro sasso.\n\nNon lo trovi.\n\nRicordi\ndi avere\nuna moneta\nin tasca.\n\nInfili\nla mano\nin tasca\ne\nsenti al tatto\nla forma familiare\ndella moneta.\n\nEstrai\nla moneta\ndalla tasca.\n\nGuardi di nuovo\nil buco.\n\nLanci\nla moneta\nnell'abisso\ne\ninizi a contare.\n\nE uno.\nE due.\n\nAspetta,\nnon dimenticare\ndi esprimere\nil desiderio.\n\nIl \"pluff\"\ndella moneta\narriva prima\ndel \"tre\".\n\nHai fatto in tempo\nad esprimere\nil desiderio?\n",n:"<b>Come sei arrivato qui?<b>\n<b>Da una Scorciatoia,<b>\n<b>attraverso<b>\n<b>un albero squarciato?<b>\n<b>Oppure<b>\n<b>dal Primo Anello?<b>\n\n<b>Dal Primo Anello<b>\nUn passo alla volta\nscendi nell'abisso,\ncon le mani aggrappate\na una scaletta di corda.\n\nOgni tre o quattro passi\napri gli occhi.\n\nNiente.\n\nSolo buio.\n\nChiudi gli occhi di nuovo.\n\nContinui a scendere.\n\nTi fermi.\n\nCerchi di calmare il respiro.\n\nTi fanno male le mani.\n\nApri gli occhi.\n\nNiente.\n\nLi richiudi.\n\nScendi.\nScendi.\nScendi.\n\nIl tuo piede destro\nsi allunga verso il basso\nper l'ultima volta\ne non trova\nil gradino di legno.\n\nLa scaletta di corda \xe8 finita.\n\nApri gli occhi.\n\nGuardi prima in basso,\ne fai male:\nsotto di te\nc'\xe8 il nero assoluto,\nlevigato,\nsenza scampo.\n\nSollevi lo sguardo\ne vedi,\na due metri da te,\nl'estremit\xe0\ndi una lunghissima\nasse di legno,\nche ti ricorda\nun trampolino per i tuffi,\nvisto dal lato sbagliato.\n\nCerchi di calmare il respiro.\n\nUn po' ci riesci.\n\nInspiri.\nEspiri.\n\nAffiora davanti a te\nun arco regolare\ndisegnato nel nulla\nda fiochi bagliori\ntremolanti.\n\nStrizzi gli occhi,\nper vedere meglio,\ncome fanno i miopi,\ne\nti accorgi che l\u2019asse di legno,\nsospesa nel nulla,\n\xe8 una passerella che porta\nal <b>Secondo Anello<b>.\n\nCerchi di calcolare\nla distanza\nfra il tuo piede destro\ne\nl'inizio dell\u2019asse di legno.\n\nC'\xe8 poco da calcolare:\nnon hai scelta.\n\nInizi a ondeggiare\nnel vuoto,\ncome in altalena,\nper ridurre la distanza.\n\nOndeggi.\n\nLe oscillazioni diventano\npi\xf9 ampie\ne regolari.\n\nVai avanti,\ne torni indietro.\n\nVai avanti,\ne torni indietro.\n\nPi\xf9 di questo\nnon \xe8 possibile\navvicinarsi.\n\nDevi saltare.\n\nOscilli in avanti.\n\nDevi\nstaccare le mani\ndalla scaletta di corda,\nlasciarla andare via,\ne saltare.\n\nOscilli indietro.\nOscilli avanti.\n\nSalta,\nadesso,\nche hai ancora\nla forza\ndi farlo.\n\nE poi,\nin qualche modo,\nstrisciando,\nle mani aggrappate\nall\u2019asse\ndi legno ruvido,\narriverai\nal <b>Secondo Anello<b>.\n\nSar\xe0\nanche\npeggio\ndi come immagini,\nma lo farai.\n\nLo fai.\n\nSalti.\n\nTutto esplode\ne vibra,\nma tu resisti,\nle mani avvinghiate\nall\u2019asse di legno,\ne strisci,\nmillimetro\ndopo\nmillimetro,\noscillando sul nulla.\n\nE poi\nl\u2019ultimo sforzo:\nsei sul <b>Secondo Anello<b>\nadesso.\n\n<b>Dalla Scorciatoia<b>\nPotresti\nessere arrivato qui,\nal <b>Secondo Anello<b>,\nanche dalla <b>Scorciatoia<b>,\ndalla <b>Radura delle Bacche<b>,\nseguendo la fenditura\naperta nel terreno\ndal terremoto,\nattraverso lo squarcio\ndella collina.\n\nIn ogni caso,\nadesso sei qui,\ne con la mano\naderente alla roccia,\ninizi a percorrere\nl\u2019Anello.\n\nNel <b>Secondo Anello<b>\nc\u2019\xe8\nun unico esercizio,\nche si chiama\n<b>6.1.Questa non \xe8 una pipa<b>.\n\nE lo puoi fare\ntutte le volte che vuoi,\npartendo\nogni volta\nda un <b>oggetto<b>\nche si \xe8 manifestato\nnegli esercizi precedenti.\n\nSe da quello che scrivi\naffiorano\n<b>nuovi personaggi<b>,\ntorna,\nin compagnia di ognuno di loro,\nall\u2019esercizio\n<b>2.7.Ho sentito il mio nome<b>,\ne con ognuno di loro\nrifai il percorso fin qui,\nsvolgendo tutti gli esercizi\nche hai voglia di svolgere.\n\nChiaramente\nse dagli esercizi emergono\n<b>nuovi oggetti<b>,\npuoi esaminarli,\nuno alla volta,\ncome tema per\n<b>6.1.Questa non \xe8 una pipa<b>.\n\nSo\nche non \xe8 facile\ntornare indietro\ndal <b>Secondo Anello<b>\nal <b>Primo Anello<b>:\nripercorrere\nil trampolino,\nstrisciando\ndi nuovo\ncon le mani aggrappate,\ne saltare di nuovo\nnel vuoto,\nper afferrare al volo\nla scaletta di corda.\n\nE poi\nancora\ntutto al contrario:\n<b>Primo Anello<b>,\n<b>Porta nell\u2019Alabastro<b>,\n<b>Pozzo dell\u2019Oracolo<b>,\n<b>Radura delle Bacche<b>.\n\nNon \xe8 comodo\nneppure tornare indietro\nattraverso la <b>Scorciatoia<b>,\nma\ncredimi:\nsull\u2019<b>Isola delle Storie<b>\nnon \xe8 conveniente\nessere pigri,\naver paura\no fingere\ndi non aver visto.\n\nFai quello\nche ritieni sia giusto fare\ne,\nprima o poi,\ntornerai qui,\nal <b>Secondo Anello<b>.\n\nE per proseguire\nnel viaggio?\n\nPer raggiungere\nil <b>Terzo Anello<b>?\n\nAnche\nnel <b>Secondo Anello<b>\ndue borchie di ferro,\nancorate alla roccia,\ntrattengono\nuna scaletta di corda,\nche si tuffa nell'abisso.\n\nQuando pensi\nche sia arrivato\nil momento giusto,\ntrova la scaletta di corda,\nclicca su <b>7<b>,\ne riprendi il tuo viaggio\nverso il <b>Terzo Anello<b>.\n",W:"<b>Cosa ti ha portato<b>\n<b>il tuo personaggio<b>\n<b>quando \xe8 tornato da te?<b>\n<b>Racconta tutto,<b>\n<b>raccontalo bene,<b>\n<b>in tutti i modi che puoi:<b>\n<b>troverai<b>\n<b>un secondo personaggio,<b>\n<b>e anche di pi\xf9<b>\n\nCammini a fatica in salita,\n infilandoti fra rami\n e\n folti cespugli.\n\nI tuoi piedi\n sprofondano spesso\n in cumuli di aghi di pino,\n ma non ti fermi,\n perch\xe9 sai che \xe8 importante\n arrivare\n in cima alla collina.\n\nIl sentiero fa un'ultima curva\n strana:\n gira stretto a destra\n e si schianta\n contro una parete di alabastro,\n che punta ripida al cielo,\n abbaglia,\n toglie il fiato.\n\nLa strada \xe8 finita:\n non si va pi\xf9 da nessuna parte.\n\nDa oltre cinque minuti\n stai guardando,\n da molto vicino,\n la superficie levigata\n di alabastro,\n il muro scintillante\n che respinge il tuo sguardo.\n\nCerchi di mettere a fuoco qualcosa,\n ma i tuoi occhi scivolano goffi\n da tutte le parti,\n appannati.\n\nNon molli.\n\nNon distogli lo sguardo.\n\nSenti che i tuoi occhi\n diventano rossi.\n\nFra poco inizierai a lacrimare\n per lo sforzo,\n ma non molli.\n\nE fai bene:\n lentamente\n affiora dalla roccia\n il contorno di una porta,\n senza maniglia,\n senza serratura,\n perfettamente incastrata\n nella parete.\n\nS\xec,\n hai visto la porta.\n\nIo dico che puoi anche\n provare a spingerla:\n secondo me,\n si apre.\n\nPoggi la mano sulla roccia,\n spingi,\n e non succede niente.\n\nE adesso?\n\nChe fai?\n\nTorni indietro?\n\nPer andare avanti\n hai bisogno\n di una parola magica.\n\nSi tratta di un <b>nome<b>.\n\nQui,\n alla <b>Porta nell\u2019Alabastro<b>,\n ci sono tre esercizi,\n che ti aiuteranno\n a trovare\n il nome\n di cui hai bisogno:\n il nome\n del tuo <b>secondo personaggio<b>.\n\nIl primo esercizio\n si chiama\n <b>4.1.L\u2019occhio di Dio<b>.\n\nIl secondo esercizio\n si chiama\n <b>4.2.S\xec, dico proprio a te<b>.\n\nIl terzo esercizio\n si chiama\n <b>4.3.Adesso lo racconto io<b>.\n\nQuando dagli esercizi\n sar\xe0 affiorato\n il tuo secondo personaggio,\n e avrai scelto il suo nome,\n potresti gi\xe0\n provare ad aprire\n la <b>Porta nell\u2019Alabastro<b>,\n semplicemente\n pronunciando il nome.\n\nIo per\xf2 ti consiglio\n di non avere fretta\n e di tornare indietro\n alla <b>Radura delle Bacche<b>\n con il tuo nuovo personaggio,\n per rifare\n in sua compagnia\n tutto il percorso:\n da\n <b>2.7.Ho sentito il mio nome<b>,\n fin qui,\n alla <b>Porta nell\u2019Alabastro<b>.\n\nPerch\xe9 prima o poi\n il tempo arriva,\n e il tempo\n \xe8 adesso.\n\nIl nome.\n\nAll'improvviso\n il nome affiora\n in qualche parte\n del tuo corpo.\n\nIn qualche modo,\n il nome\n si fa largo\n fra cellule e sinapsi,\n percorre\n tutto quello\n che c'\xe8 da percorrere,\n punta deciso alle tue labbra\n e\n lo senti risuonare nell'aria.\n\nSorridi.\n\nLa <b>Porta nell'Alabastro<b>\n si apre\n dolcemente,\n come se ruotasse\n su cardini immersi\n in litri di olio minerale.\n\nVarchi la soglia.\n\nClicca su <b>5<b>.\n",s:"<b>Il tuo primo personaggio<b>\n<b>ti aspetta<b>\n<b>addormentato<b>\n<b>nel seme di una bacca<b>\n\nLa stradina sale,\n e tu la segui.\n\nLa sabbia lascia il posto\n a sassi\n e ad erbacce secche.\n\nFa molto caldo.\n Non si sentono pi\xf9\n le rondini.\n\nPolvere,\n grilli\n e cicale.\n\nIl mare scompare\n e ricompare\n fra le curve,\n poi\n la stradina punta decisa\n verso il cuore dell'Isola,\n e il mare scompare sul serio.\n\nStai camminando da molto,\n difficile dire da quanto.\n\nAll'improvviso,\n dietro una curva,\n pi\xf9 a gomito delle altre,\n lo spazio si allarga\n ed esplode una pianura:\n file e file ordinate\n di cespugli.\n\nLe foglie dei cespugli\n hanno forme e tonalit\xe0 di verde\n che non hai mai visto\n prima.\n\nFra le foglie\n noti\n bacche di tutti i colori:\n viola,\n blu,\n arancioni,\n gialle,\n nere.\n\nAnche se non lo vedi,\n da qualche parte\n ci deve essere\n un ruscello,\n un fiume,\n comunque acqua.\n\nC\u2019\xe8 bisogno\n di molta acqua\n per far scintillare\n tanta vita\n su una collina\n desolata\n come questa.\n\nQuesta \xe8\n la <b>Radura delle Bacche<b>,\n il luogo dedicato\n ai primi esercizi di scrittura\n che ti propongo.\n\nL\u2019obiettivo\n dei primi esercizi\n \xe8\n arrivare\n al <b>nome<b>\n del <b>primo elemento<b>\n della tua storia.\n\nSto parlando\n di qualcosa\n che \xe8 affiorato\n dall'indistinto.\n\nMagari\n non sai nemmeno\n se \xe8 un bambino\n o una strega.\n\nForse\n ricordi\n solo\n di averlo visto in sogno.\n\nS\xec,\n sto parlando\n di qualcosa\n di impalpabile.\n\nSto parlando\n di qualcosa\n che \xe8 importante\n per te.\n\nNon sai perch\xe9,\n ma sai\n che \xe8 importante per te.\n\nConsidero\n questi esercizi di scrittura\n come\n pretesti\n per produrre testi\n o meglio\n per consentire\n ai nuclei caldi,\n a quello che \xe8 necessario,\n di manifestarsi,\n in un percorso\n di consapevolezza,\n dal conscio\n all\u2019inconscio,\n che a me ricorda\n le ricerche di Stanislavkij.\n\nIl primo esercizio\n si chiama\n <b>2.1.Scegli un'immagine<b>.\n\nIl secondo esercizio\n si chiama\n <b>2.2.Cosa ho mangiato ieri<b>.\n\nIl terzo esercizio\n si chiama\n <b>2.3.Come ho dormito ieri<b>.\n\nIl quarto esercizio\n si chiama\n <b>2.4.Citt\xe0<b>.\n\nIl quinto esercizio\n si chiama\n <b>2.5.Categorie<b>.\n\nIl sesto esercizio\n si chiama\n <b>2.6.Finalmente<b>\n<b>ho cominciato<b>.\n\nLavora\n ogni giorno\n alle tre fasi,\n <b>scrittura libera<b>,\n <b>honoo<b>\n e\n <b>hinoo<b>,\n di uno dei sei esercizi.\n\nEsplora\n ogni giorno\n un esercizio diverso.\n\nOppure\n confrontati solo\n con alcuni esercizi\n e ignora gli altri:\n l'importante \xe8\n lavorare ogni giorno.\n\nContinua\n fino a quando\n vedrai affiorare dal tuo lavoro\n un elemento,\n magari un personaggio,\n a cui dovrai attribuire\n un <b>nome<b>,\n come \u201cLaura\u201d\n o\n \u201cAndrea\u201d.\n\nQuando avrai trovato\n il nome,\n puoi passare\n all\u2019esercizio\n <b>2.7.Ho sentito il mio nome<b>.\n\nSe,\n non importa in che modo,\n hai gi\xe0\n il nome\n del tuo primo elemento,\n parti direttamente\n dall\u2019esercizio\n <b>2.7.Ho sentito il mio nome.<b>\n",m:"<b>Il viaggio sta per finire:<b>\n<b>tra poco arriverai<b>\n<b>nel luogo da cui eri partito,<b>\n<b>e forse ti sembrer\xe0<b>\n<b>diverso.<b>\n<b>Forse anche tu<b>\n<b>ti sentirai<b>\n<b>diverso<b>\n\nInspiri,\nespiri.\n\nInspiri.\n\nTrattieni il fiato.\n\nCoraggio.\n\nSalti,\nin apnea.\n\nE nel vuoto\nconti.\n\nE uno.\n\nE due.\n\nL'impatto con l'acqua\narriva prima del \"tre\".\n\nUn tonfo ovattato,\nmeno drammatico del previsto.\n\nSei gi\xe0 di nuovo a galla.\n\nEspiri,\ninspiri.\n\nIl giubbotto salvagente\nha fatto il suo lavoro.\n\nNon hai bevuto\nnemmeno un goccio d'acqua.\n\nLa corrente\nti trascina\nplacidamente.\n\nSollevi gli occhi verso l'alto:\nsei in un cunicolo nella roccia,\nin un fiume sotterraneo\nche sta puntando\nal mare,\nl\xec,\nsubito dopo\nil poligono irregolare\ndi luce,\nche filtra dall'esterno.\n\nQuella forma geometrica\nti ricorda qualcosa,\nche non riesci\na mettere a fuoco.\n\nE poi gli stridii,\ndall'alto,\ndal soffitto del cunicolo,\ne all'improvviso\ncapisci\ndove sei.\n\nL'avevo detto:\n\n\"Un'Isola,\nun viaggio,\nnove tappe.\nDalla <b>Grotta delle Rondini<b>\nsi parte,\nalla <b>Grotta delle Rondini<b>\nsi ritorna,\nalla fine del viaggio,\nquando\nil cerchio si chiude,\ncome in tutti i viaggi veri\".\n\nS\xec,\nla <b>Grotta delle Rondini<b>:\nla prima volta\nl'hai vista da fuori,\ndalla spiaggia,\ne adesso stai per raggiungerla\ndall'interno.\n\nS\xec,\nla corrente\nti porta\nverso il mare,\ne in fondo al Cunicolo\nc\u2019\xe8 l\u2019ingresso\ndella <b>Grotta delle Rondini<b>.\n\nNel <b>Cunicolo verso la Luce<b>\nci sono\ntre esercizi.\n\nIl primo esercizio\nsi chiama\n<b>9.1.Voci<b>.\n\nIl secondo esercizio\nsi chiama\n<b>9.2.Confini<b>.\n\nIl terzo esercizio\nsi chiama\n<b>9.3.Tempi<b>.\n\nRipeti\ngli esercizi\ntutte le volte che vuoi:\npoi,\nse ti lasci andare,\nla corrente ti condurr\xe0\nalla <b>Grotta delle Rondini<b>,\ncon la tua storia da condividere,\nse avrai voglia di condividerla.\n",A:"<b>Qui affioreranno<b>\n<b>storie,<b>\n<b>e queste storie<b>\n<b>ti racconteranno<b>\n<b>cose che sapevi,<b>\n<b>ma che non capivi bene<b>\n\nSei nella notte,\n adesso.\n\nAspetta.\n\nFra qualche secondo\n i tuoi occhi\n si abitueranno\n al buio.\n\nFiaccole,\n infisse nella roccia,\n ti mostrano\n uno stretto anello,\n che costeggia dall\u2019interno\n tutta la collina.\n\nS\xec,\n un anello,\n largo meno di due metri.\n\nAl posto tuo,\n io camminerei\n aderente alla parete,\n perch\xe9 l\u2019anello lambisce\n una voragine:\n buio assoluto,\n preistorico,\n senza fondo.\n\nInizi a camminare.\n\nHai freddo.\n\nFra una fiaccola e l\u2019altra,\n attraversi pezzi di buio,\n in cui immagini\n la fiaccola successiva,\n prima di vederla,\n con la mano sinistra\n che non si allontana\n un millimetro\n dalla parete.\n\nCerchi di non guardare mai\n l\u2019abisso.\n\nQuesto \xe8 il <b>Primo Anello<b>,\n il luogo dei quattro esercizi\n che dovrebbero aiutarti\n ad esplorare\n <b>il rapporto<b>\n <b>fra coppie di personaggi<b>.\n\nIl termine pomposo\n per questo\n potrebbe essere\n \u201cMappa relazionale\n fra coppie di personaggi\u201d,\n perch\xe9 ti propongo\n di lavorare su due personaggi\n alla volta.\n\nIl primo esercizio\n si chiama\n <b>5.1.Comandamenti<b>.\n\nIl secondo esercizio\n si chiama\n <b>5.2.Colori<b>.\n\nIl terzo esercizio\n si chiama\n <b>5.3.Parti del corpo<b>.\n\nIl quarto esercizio\n si chiama\n <b>5.4.Due o tre cose che so<b>\n <b>di loro due<b>.\n\nNei primi tre esercizi\n ti chiedo di individuare un tema\n e, a partire da questo tema,\n di costruire una storia,\n in cui compaiano\n i due personaggi\n della tua prima coppia.\n\nCome per tutti gli esercizi,\n articola il tuo lavoro\n in tre fasi:\n <b>scrittura libera<b>,\n <b>honoo<b>\n e\n <b>hinoo<b>.\n\nNella costruzione della storia\n procedi\n con la massima libert\xe0.\n\nOltre ai due personaggi\n da cui hai scelto di partire,\n possono esserci\n tutti i personaggi che vuoi.\n\nI due personaggi\n su cui hai deciso di lavorare\n possono anche avere\n un ruolo marginale\n nella storia.\n\nO magari\n il ruolo marginale\n pu\xf2 averlo solo uno dei due.\n\nPer\xf2\n entrambi i personaggi\n devono essere\n presenti\n nella narrazione.\n\nDopo aver costruito\n la prima storia,\n analizza con attenzione\n quello che hai fatto\n nelle tre le fasi\n dell\u2019esercizio\n e poniti la domanda:\n\n\u201dCosa mi suggerisce\n questa storia\n sulla relazione che c\u2019\xe8\n fra i miei due personaggi?\u201d\n\nA partire dalla tua risposta\n a questa domanda,\n dedicati all\u2019esercizio\n <b>5.4.Due o tre cose che so<b>\n <b>di loro due<b>,\n nel solito modo,\n in tre fasi:\n <b>scrittura libera<b>,\n <b>honoo<b>\n e\n <b>hinoo<b>.\n\nOgni volta che da un esercizio\n affiora\n un nuovo personaggio,\n torna con lui\n all\u2019esercizio\n <b>2.7.Ho sentito il mio nome<b>\n e poi\n al <b>Pozzo dell\u2019Oracolo<b>,\n e rifai in sua compagnia\n il percorso fin qui.\n\nRimani qui al <b>Primo Anello<b>\n tutto il tempo che vuoi,\n rifacendo gli esercizi\n con diverse\n coppie di personaggi.\n\nE poi?\n\nCome si va avanti nel viaggio?\n\nCome si raggiunge\n il <b>Secondo Anello<b>?\n\nVedi quelle due borchie,\n ancorate alla roccia?\n\nVedi che sostengono\n una scaletta di corda,\n che si tuffa nell\u2019abisso,\n al centro del <b>Primo Anello<b>?\n\nTi sporgi,\n ma non vedi\n dove finisce la scaletta:\n il nero\n la inghiotte\n molto prima.\n\nFai come credi,\n io ti dico solo una cosa:\n sai  quanto pu\xf2 oscillare\n una scaletta cos\xec,\n mentre scendi verso\n il nulla?\n\nSe te la senti,\n clicca su <b>6<b>.\n",O:"<b>Se \xe8 davvero<b>\n<b>il tuo personaggio,<b>\n<b>torner\xe0 da te<b>\n<b>mentre stai scrivendo<b>\n<b>altro<b>\n\nLa stradina\n taglia in due\n la <b>Radura delle Bacche<b>,\n punta in fondo alla valle,\n all'inizio della ripida collina,\n che s'innalza verso il cielo.\n\nArrivata ai piedi della collina,\n la stradina\n diventa viottolo pietroso\n e si arrampica,\n attorcigliandosi\n in curve strette.\n\nE tu affronti la salita,\n come se stessi percorrendo\n controcorrente\n un ruscello di sassi,\n che rotola in basso,\n a formare il lago verde\n della <b>Radura delle Bacche<b>,\n ormai alle tue spalle.\n\nSali a zig zag,\n verso la cima.\n\nDopo una curva\n appare,\n in fondo al sentiero,\n il <b>Pozzo dell'Oracolo<b>.\n\n<b>Attenzione<b>:\n sabato 4 marzo 2023,\n quando in Italia erano\n le 6.03 di mattina,\n un terremoto\n ha colpito\n l\u2019<b>Isola delle Storie<b>.\n\nLa terra si \xe8 aperta,\n e la fenditura \n ha creato una biforcazione\n a destra\n nel sentiero\n che stai percorrendo.\n\nCosa fai?\n\nProsegui diritto\n verso il <b>Pozzo dell\u2019Oracolo<b>,\n oppure giri a destra,\n e ti immergi\n nella ferita del terreno,\n come in una trincea?\n\nPer aiutarti nella scelta,\n ti do alcune informazioni:\n se ignori la biforcazione,\n il <b>Pozzo dell\u2019Oracolo<b>\n ti porta verso un percorso\n di scrittura che considero\n pi\xf9 impegnativo,\n e che ti consiglio.\n Invece \n la ferita nel terreno,\n creata dal terremoto,\n \xe8 una <b>Scorciatoia<b>.\n\nSe decidi  per la <b>Scorciatoia<b>,\n attraversi un bosco,\n che prima del terremoto\n era impenetrabile,\n a causa della fitta vegetazione,\n e raggiungi\n il fianco della collina.\n\nLa fenditura nel terreno\n ha incontrato nel suo cammino\n un tiglio secolare,\n cresciuto\n a ridosso della collina,\n e l\u2019ha squarciato.\n\nSe entri nello squarcio\n dell\u2019albero,\n scopri\n che il terremoto\n ha aperto non solo il tiglio,\n ma anche la collina.\n\nS\xec,\n l\u2019albero \xe8 diventato un <b>varco<b>,\n un passaggio\n che ti porta\n all\u2019interno della collina.\n\nSe decidi di seguire\n la <b>Scorciatoia<b>,\n clicca su <b>6<b>,\n e arrivi\n direttamente\n al <b>Secondo Anello<b>,\n altrimenti\n continua a camminare,\n verso il <b>Pozzo dell\u2019Oracolo<b>.\n\nSembra\n l'ingresso\n di una miniera abbandonata,\n e so\n che in Sardegna\n ci sono costruzioni cos\xec,\n chiamate\n Pozzi Sacri.\n\nE so che,\n oltre l'ingresso,\n c'\xe8 una ripida scala\n di gradini di pietra,\n che si inabissa\n verso il cuore della terra.\n\nS\xec,\n devi entrare.\n\nFai attenzione:\n i gradini sono scivolosi.\n\nIl rettangolo di luce dell'ingresso,\n ormai\n dietro di te,\n illumina ancora i gradini,\n ma,\n passo dopo passo,\n il chiarore diventa\n sempre pi\xf9 fioco,\n sempre pi\xf9 lontano.\n\nSei nel buio\n assoluto,\n adesso.\n\nOdore di muschio\n e di umidit\xe0\n e senti,\n dal fondo del <b>Pozzo<b>,\n il gocciolio dell'acqua,\n che diventa sussurro.\n\nSintonizzati\n sul suono,\n fino a quando diventa\n voce di oracolo.\n\nIl primo esercizio\n si chiama\n <b>3.1.Missioni<b>.\n\nIl secondo esercizio\n si chiama\n <b>3.2.Le Tue Missioni<b>.\n\nIl terzo esercizio\n si chiama\n <b>3.3.I Ching<b>.\n\nIl quarto esercizio\n si chiama\n <b>3.4.Frammenti<b>.\n\nIl quinto esercizio\n si chiama\n <b>3.5.Oroscopi<b>.\n\nRimani qui,\n a praticare gli esercizi\n del <b>Pozzo dell'Oracolo<b>,\n fino a quando\n in quello che scrivi\n vedrai apparire\n il tuo <b>primo personaggio<b>.\n\nCosa intendo\n per \"<b>veder apparire<b>\u201d\n il primo personaggio\n all\u2019interno degli esercizi?\n\nRicordi?\n\n<b>Se \xe8 davvero<b>\n<b>il tuo personaggio<b>,\n<b>torner\xe0 da te<b>\n<b>mentre stai scrivendo<b>\n<b>altro<b>\n\nNell\u2019esercizio\n <b>2.7.Ho sentito il mio nome<b>\n hai ascoltato per la prima volta\n la <b>voce<b>\n del tuo primo personaggio:\n adesso ti chiedo\n di <b>mettere da parte<b>\n <b>il tuo primo personaggio<b>\n e di dedicarti\n ai <b>cinque esercizi<b>\n <b>del Pozzo dell\u2019Oracolo<b>.\n\nE di vedere se,\n mentre sei impegnato in altro,\n il tuo personaggio\n torna comunque da te.\n\nDedicati con attenzione\n a questi nuovi esercizi:\n lasciati assorbire dal lavoro,\n non pensare al risultato.\n\nSe mentre sei impegnato\n negli esercizi,\n il tuo <b>primo personaggio<b>\n appare all\u2019improvviso,\n non fermarti:\n continua\n l\u2019esercizio che stavi facendo,\n fino alla fine,\n e solo dopo\n rileggi tutto\n e analizza\n quello che \xe8 accaduto.\n\nCredo che un personaggio\n non venga a trovarti\n a mani vuote.\n\nChe regali ti ha portato?\n\nUn\u2019azione?\n\nDettagli?\n\nUn avverbio?\n\nRaccogli tutto con cura:\n ti servir\xe0 per gli esercizi\n del livello successivo,\n la <b>Porta nell\u2019Alabastro<b>.\n\nE se invece,\n nonostante il tuo impegno,\n il tuo <b>primo personaggio<b>\n non arriva?\n\nNon forzare le cose:\n considera\n l\u2019apparizione\n del tuo primo personaggio\n come una <b>conseguenza<b>,\n non come un obiettivo.\n\nRicorda che qui,\n al <b>Pozzo dell\u2019Oracolo<b>,\n hai cinque diversi esercizi\n fra cui scegliere:\n immagina di avere\n un mazzo di chiavi\n con cui stai cercando\n di aprire una serratura.\n\nSe ti stanchi di provare\n o se questa mia proposta\n non ti convince,\n prendi la <b>Scorciatoia<b>,\n e vai direttamente\n al <b>Secondo Anello<b>.\n\nPer\xf2 non arrenderti\n troppo presto:\n ci sono cose che si imparano\n solo con l\u2019esperienza diretta.\n\nPer motivarti\n ti dico che \xe8 emozionante\n vedere\n il tuo personaggio\n che torna da te,\n mentre tu stai scrivendo altro.\n\nIo dico che arriva.\n\nE poi?\n\nQuando il tuo personaggio\n arriva,\n che fai?\n\nSei ancora\n nel buio,\n ricordi?\n\nPuoi girarti,\n adesso,\n e risalire\n i gradini.\n\nFra qualche passo\n ricomparir\xe0,\n accecante,\n il rettangolo di luce\n dell'ingresso.\n\nGradino\n dopo gradino,\n risali\n verso la luce,\n esci\n dal <b>Pozzo dell'Oracolo<b>,\n clicca su <b>4<b>,\n e riprendi\n il tuo cammino\n verso\n la cima della collina.\n",H:"<b>Un'Isola,<b>\n<b>un viaggio,<b>\n<b>nove tappe.<b>\n<b>Dalla Grotta delle Rondini<b>\n<b>si parte,<b>\n<b>alla Grotta delle Rondini<b>\n<b>si ritorna,<b>\n<b>alla fine del viaggio,<b>\n<b>quando il cerchio<b>\n<b>si chiude,<b>\n<b>come in tutti i viaggi veri<b>\n\nS\xec,\n\xe8 rumore di onde,\nalle tue spalle.\nE hai i piedi sulla sabbia.\n\nSai come si chiama\nquella grotta?\n\nSenti questi suoni?\n\nHai capito cosa sono?\n\nUn giorno qui\nci saranno\nstorie,\nmolte storie,\nanche le tue.\n\nMa adesso\n\xe8 adesso.\n\nE adesso\npreferisci\nguardare la Grotta\nda lontano,\ndalla sabbia,\no\nvuoi\nentrare\nnella Grotta\na nuoto?\n\nNella Grotta\nl\u2019acqua\n\xe8 profondissima.\n\nPer capire\nquanto \xe8 profonda,\ndovresti immergerti,\ne per un bel po\u2019\nvedresti solo\nblu.\n\nDopo il blu,\noltre a coralli,\nmeduse,\nippocampi\ne\naltri organismi\nmarini,\npotresti\nincontrare\nanche\nPalombari\ne\nSirene.\n\nS\xec,\ni <b>Palombari<b>,\nquelli con gli scafandri\ndi metallo,\ncome sono raffigurati\nnelle illustrazioni\ndelle vecchie edizioni\nper ragazzi\ndei romanzi\ndi\nJules Verne.\n\nE le <b>Sirene<b>,\nquelle che non esistono.\n\nLe parole\n<b>Palombaro<b>\ne\n<b>Sirena<b>\nstimolano\nla tua immaginazione\noppure no?\n\nTi senti\npi\xf9 <b>Palombaro<b>\no\npi\xf9 <b>Sirena<b>?\n\nCome immagini\ndi esplorare\nle profondit\xe0\ndella Grotta?\n\nCome farebbe\nun <b>Palombaro<b>\no\ncome farebbe\nuna <b>Sirena<b>?\n\nE nel tuo viaggio\ndi esplorazione\npreferiresti\nincontrare\nun <b>Palombaro<b>\no\nuna <b>Sirena<b>?\n\nLa Grotta\n\xe8\nil luogo\ndel tuo primo esercizio\ndi scrittura.\n\n<b>1.1.Io vorrei<b>\n<b>che di me<b>\n<b>tu sapessi che<b>\n\nDopo averlo svolto,\nguarda a sinistra della Grotta.\n\nVedi il viottolo\nche parte dalla sabbia\ne si arrampica sulla collina?\n\nSe lo percorri,\narrivi\nalla <b>Radura delle Bacche<b>.\n",J:"<b>Va\u2019 dove ti portano i verbi:<b>\n<b>cerca di essere docile<b>\n<b>e coraggioso<b>\n<b>al tempo stesso<b>\n\nAd ogni passo\nla scaletta di corda\noscilla nel vuoto.\n\nDa pi\xf9 di cento gradini\nhai una filastrocca in testa\nche ti sta tormentando.\n\n\"Marcia marcia, soldatino... \"\ne\n\"Marcia marcia, soldatino... \",\ne niente pi\xf9:\navanti non vai.\n\nAll'inizio era anche piacevole:\nla filastrocca\nti faceva compagnia\nnella discesa,\nma adesso\nvorresti solo\nricordare la fine,\ne non ci riesci.\n\nIl cerchio regolare\ndel <b>Terzo Anello<b>\naffiora\ndal buio\nprima\ndel previsto,\nsuggerito\ndai puntini tremolanti\ndelle fiaccole.\n\n\xc8 l\xec,\nin basso,\nlontanissimo,\nma intuibile.\n\nGradino dopo gradino,\nil <b>Terzo Anello<b>\nprende forma,\ne inizi a distinguere\nanche\nil trampolino,\nla stretta asse\ndi legno\nche parte \ndal <b>Terzo Anello<b>, \ne che si protende nel nulla,\nverso l'ultimo gradino\ndella scaletta di corda.\n\nCoraggio.\n\nRipercorri mentalmente\nle azioni\nda compiere,\nquando la scaletta di corda\nsar\xe0 finita:\nle oscillazioni,\nle mani\nche dovranno abbandonare\nla presa,\nil salto,\nl'impatto,\nle vibrazioni selvagge del legno\nsull'abisso,\nil respiro che esplode dappertutto\ne che poi si calma,\ndopo il terrore.\n\nSalti, di nuovo.\n\nTutto esplode.\n\nE poi strisci,\ne hai paura,\nma non molli.\n\nLe mani insanguinate,\nil <b>Terzo Anello<b>\nsempre pi\xf9 vicino.\n\nEcco.\n\nCe l\u2019hai fatta un\u2019altra volta.\n\nSei sul <b>Terzo Anello<b>,\nadesso.\n\nNel <b>Terzo Anello<b>\nci sono\ntre esercizi.\n\nIl primo esercizio\nsi chiama\n<b>7.1.Volare<b>.\n\nIl secondo esercizio\nsi chiama\n<b>7.2.Beatrice vola<b>.\n\nIl terzo esercizio\nsi chiama\n<b>7.3.Io volo<b>.\n\nQuesti esercizi\nhanno come tema\ni <b>verbi<b> apparsi\nin tutte\nle esercitazioni precedenti.\n\nLavora\ncon un verbo alla volta.\n\nSe negli esercizi\naffiorano\n<b>nuovi personaggi<b>,\naccompagnali,\nuno alla volta,\na <b>2.7.Ho sentito il mio nome<b>,\ne rifai tutto il percorso\nin loro compagnia,\nfin qui.\n\nRimani qui\nnel <b>Terzo Anello<b>\nfinch\xe9\nhai voglia\ndi rifare gli esercizi\ncon nuovi verbi.\n\nQuando decidi\ndi proseguire il viaggio,\ntrova il punto\ndove c\u2019\xe8\nla scaletta di corda:\nintuirai prima\nle borchie,\nfissate alla roccia,\npoi,\npasso dopo passo,\nvedrai la scaletta.\n\nEccola:\ndal <b>Terzo Anello<b>\nsi inabissa\nnel nero.\n\nClicca su <b>8<b>,\nil tuo viaggio\npu\xf2 continuare.\n",U:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",R:"Attendi il caricamento dello sfondo prima di continuare.",t:"Broadcast stream controllers do not support pause callbacks",B:"Cannot extract a file path from a URI with a fragment component",z:"Cannot extract a file path from a URI with a query component",Q:"Cannot extract a non-Windows file path from a file URI with an authority",c:"Cannot fire new event. Controller is already firing an event",I:'E533333333333333333333333333DDDDDDD4333333333333333333334C43333CD53333333333333333333333UEDTE4\x933343333\x933333333333333333333333333D433333333333333333CDDEDDD43333333S5333333333333333333333C333333D533333333333333333333333SUDDDDT5\x9933CD4E333333333333333333333333UEDDDDE433333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333TUUS5CT\x94\x95E3333333333333333333333333333333333333333333333333333333333333333333333SUDD3DUU43533333333333333333C3333333333333w733337333333s3333333w7333333333w33333333333333333333CDDTETE43333ED4S5SE3333C33333D33333333333334E433C3333333C33333333333333333333333333333CETUTDT533333CDDDDDDDDDD3333333343333333D$433333333333333333333333SUDTEE433C34333333333333333333333333333333333333333333333333333333333333333333333333333333TUDDDD3333333333CT5333333333333333333333333333DCEUU3U3U5333343333S5CDDD3CDD333333333333333333333333333333333333333333333333333333333333333333333s73333s33333333333""""""""333333339433333333333333CDDDDDDDDDDDDDDDD3333333CDDDDDDDDDDD\x94DDDDDDDDDDDDDDDDDDDDDDDD33333333DDDDDDDD3333333373s333333333333333333333333333333CDTDDDCTE43C4CD3C333333333333333D3C33333\xee\xee\xed\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xed\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xed\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee333333\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb33\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc<3sww73333swwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww7333swwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww7333333w7333333333333333733333333333333333333333333333sww733333s7333333s3wwwww333333333wwwwwwwwwwwwwwwwwwwwwwwwwwwwgffffffffffffvww7wwwwwwswwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww733333333333333333333333swwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww7333333333333333333333333333333333333333333333333333333333swwwww7333333333333333333333333333333333333333333wwwwwwwwwwwwwwwwwwwww7swwwwwss33373733s33333w33333CT333333333333333EDTETD433333333#\x14"333333333333"""233333373ED4U5UE9333C33333D33333333333333www3333333s73333333333EEDDDCC3DDDDUUUDDDDD3T5333333333333333333333333333CCU3333333333333333333333333333334EDDD33SDD4D5U4333333333C43333333333CDDD9DDD3DCD433333333C433333333333333C433333333333334443SEUCUSE4333D33333C43333333533333CU33333333333333333333333333334EDDDD3CDDDDDDDDDDDDDDDDDDDDDDDDDDD33DDDDDDDDDDDDDDDDDDDDDDDDD33334333333C33333333333DD4DDDDDDD433333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333CSUUUUUUUUUUUUUUUUUUUUUUUUUUU333CD43333333333333333333333333333333333333333433333U3333333333333333333333333UUUUUUTEDDDDD3333C3333333333333333373333333333s333333333333swwwww33w733wwwwwww73333s33333333337swwwwsw73333wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwDD4D33CDDDDDCDDDDDDDDDDDDDDDDD43EDDDTUEUCDDD33333D33333333333333DDCDDDDCDCDD333333333DT33333333333333D5333333333333333333333333333CSUE4333333333333CDDDDDDDD4333333DT33333333333333333333333CUDDUDU3SUSU43333433333333333333333333ET533E3333SDD3U3U4333D43333C43333333333333s733333s33333333333CTE333333333333333333UUUUDDDDUD3333"""""(\x02"""""""""3333333333333333333DDDD333333333333333333333333CDDDD3333C3333T333333333333333333333334343C33333333333SET334333333333DDDDDDDDDDDDDDDDDDDDDD4DDDDDDDD4CDDDC4DD43333333333333333333333333333333333333333333333333C33333333333333333333333333333333333333333333333333333333333333333333333333333333DDD433333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333334333333333333333333333333333333DD3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333DD433333333333333333333333333333DDD43333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333DDDDDDD533333333333333333333333DDDTTU5D4DD333C433333D333333333333333333333DDD733333s373ss33w7733333ww733333333333ss33333333333333333333333333333ww3333333333333333333333333333wwww33333www33333333333333333333wwww333333333333333wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww333333wwwwwwwwwwwwwwwwwwwwwww7wwwwwswwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww73333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333C4""333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333DD3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333DDD4333333333333333333333333333333333333333333333333333333DDD4333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333UEDDDTEE43333333333333333333333333333333333333333333333333333CEUDDDE33333333333333333333333333333333333333333333333333CD3DDEDD3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333EDDDCDDT43333333333333333333333333333333333333333CDDDDDDDDDD4EDDDETD3333333333333333333333333333333333333333333333333333333333333DDD3CC4DDD\x94433333333333333333333333333333333SUUC4UT4333333333333333333333333333333333333333333333333333#"""""""B333DDDDDDD433333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333CED3SDD$"""BDDD4CDDD333333333333333DD33333333333333333333333333333333333333333DEDDDUE333333333333333333333333333CCD3D33CD533333333333333333333333333CESEU3333333333333333333DDDD433333CU33333333333333333333333333334DC44333333333333333333333333333CD4DDDDD33333333333333333333DDD\x95DD333343333DDDUD43333333333333333333\x93\x99\x99IDDDDDDE43333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333CDDDDDDDDDDDDDDDDDDDDDD4CDDDDDDDDDDD33333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333CD3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333433333333333333333333333333333333333333333333333333333333333333333333333333DD4333333333333333333333333333333333333333333333333333333333333333333""""""33D4D33CD43333333333333333333CD3343333333333333333333333333333333333333333333333333333333333333333333333333333333333D33333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333CT53333DY333333333333333333333333UDD43UT43333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333D3333333333333333333333333333333333333333D43333333333333333333333333333333333CDDDDD333333333333333333333333CD4333333333333333333333333333333333333333333333333333333333333SUDDDDUDT43333333333343333333333333333333333333333333333333333TEDDTTEETD333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333CUDD3UUDE43333333333333D3333333333333333343333333333SE43CD33333333DD33333C33TEDCSUUU433333333S533333CDDDDDU333333\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa:3\x99\x99\x9933333DDDDD4233333333333333333UTEUS433333333CDCDDDDDDEDDD33433C3E433#"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""BDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD$"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""BDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD$"""""""""""""""2333373r33333333\x93933CDDD4333333333333333CDUUDU53SEUUUD43\xa3\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xba\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xcb\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\xcc\f',w:"Error handler must accept one Object or one Object and a StackTrace as arguments, and return a value of the returned future's type",Y:"Failed to load network image.\nImage URL: ",o:"Scrivi almeno 1 carattere prima di scaricare",V:"Stream has been disposed.\nAn ImageStream is considered disposed once at least one listener has been added and subsequently all listeners have been removed and no handles are outstanding from the keepAlive method.\nTo resolve this error, maintain at least one listener on the stream, or create an ImageStreamCompleterHandle from the keepAlive method, or create a new stream for the image.",p:"SystemChrome.setApplicationSwitcherDescription",h:"TextInputClient.updateEditingStateWithDeltas",l:"TextInputClient.updateEditingStateWithTag",C:"The error handler of Future.then must return a value of the returned future's type",i:"There was a problem trying to load FontManifest.json",f:"Vuoi rispondere con\n un honoo o un hinoo?",k:"Vuoi spedirlo anche sulla Luna, per mostrarlo a tutti?",Z:"assets/icons/isoladellestorie/backgrounds/1grottarondini.png",d:"assets/icons/isoladellestorie/backgrounds/2radurabacche.png",j:"assets/icons/isoladellestorie/backgrounds/3pozzooracolo.png",x:"assets/icons/isoladellestorie/backgrounds/4portaalabastro.png",E:"assets/icons/isoladellestorie/backgrounds/5primoanello.png",v:"assets/icons/isoladellestorie/backgrounds/6secondoanello.png",L:"assets/icons/isoladellestorie/backgrounds/7terzoanello.png",P:"assets/icons/isoladellestorie/backgrounds/8quartoanello.png",e:"assets/icons/isoladellestorie/backgrounds/9cunicololuce.png",cy:"assets/icons/isoladellestorie/button1.svg",cA:"assets/icons/isoladellestorie/button2.svg",c1:"assets/icons/isoladellestorie/button3.svg",a9:"assets/icons/isoladellestorie/button4.svg",bR:"assets/icons/isoladellestorie/button5.svg",X:"assets/icons/isoladellestorie/button6.svg",u:"assets/icons/isoladellestorie/button7.svg",bT:"assets/icons/isoladellestorie/button8.svg",g:"assets/icons/isoladellestorie/button9.svg",bV:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11bGFyZGNyamVjd21vaGxoZXV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MDgxNDYsImV4cCI6MjA2OTM4NDE0Nn0.wt0CJD8XHkGoX2qLlmQgwG6RHLUfxx6JKO9EMnpTAsc",au:"gl_Position = ((u_ctransform * position) * u_scale) + u_shift;",a:"id,reply_to,pages,type,recipient_tag,created_at,user_id",aD:"id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id",_:"max must be in range 0 < max \u2264 2^32, was ",a8:"vec2 center = 0.5 * (u_resolution + u_tile_offset);",G:"vec4 localCoord = vec4(gl_FragCoord.x - center.x, center.y - gl_FragCoord.y, 0, 1) * m_gradient;",ba:"\u1ac4\u2bb8\u411f\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u3f4f\u0814\u32b6\u32b6\u32b6\u32b6\u1f81\u32b6\u32b6\u32b6\u1bbb\u2f6f\u3cc2\u051e\u32b6\u11d3\u079b\u2c12\u3967\u1b18\u18aa\u392b\u414f\u07f1\u2eb5\u1880\u1123\u047a\u1909\u08c6\u1909\u11af\u2f32\u1a19\u04d1\u19c3\u2e6b\u209a\u1298\u1259\u0667\u108e\u1160\u3c49\u116f\u1b03\u12a3\u1f7c\u121b\u2023\u1840\u34b0\u088a\u3c13\u04b6\u32b6\u41af\u41cf\u41ef\u4217\u32b6\u32b6\u32b6\u32b6\u32b6\u3927\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u18d8\u1201\u2e2e\u15be\u0553\u32b6\u3be9\u32b6\u416f\u32b6\u32b6\u32b6\u1a68\u10e5\u2a59\u2c0e\u205e\u2ef3\u1019\u04e9\u1a84\u32b6\u32b6\u3d0f\u32b6\u32b6\u32b6\u3f4f\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u104e\u076a\u32b6\u07bb\u15dc\u32b6\u10ba\u32b6\u32b6\u32b6\u32b6\u32b6\u1a3f\u32b6\u0cf2\u1606\u32b6\u32b6\u32b6\u0877\u32b6\u32b6\u073d\u2139\u0dcb\u0bcb\u09b3\u0bcb\u0fd9\u20f7\u03e3\u32b6\u32b6\u32b6\u32b6\u32b6\u0733\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u041d\u0864\u32b6\u32b6\u32b6\u32b6\u32b6\u3915\u32b6\u3477\u32b6\u3193\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u20be\u32b6\u36b1\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u2120\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u2f80\u36ac\u369a\u32b6\u32b6\u32b6\u32b6\u1b8c\u32b6\u1584\u1947\u1ae4\u3c82\u1986\u03b8\u043a\u1b52\u2e77\u19d9\u32b6\u32b6\u32b6\u3cdf\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u091e\u090a\u0912\u091a\u0906\u090e\u0916\u093a\u0973\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u3498\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u0834\u32b6\u32b6\u2bb8\u32b6\u32b6\u36ac\u35a6\u32b9\u33d6\u32b6\u32b6\u32b6\u35e5\u24ee\u3847\x00\u0567\u3a12\u2826\u01d4\u2fb3\u29f7\u36f2\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u2bc7\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u1e54\u32b6\u1394\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u2412\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u30b3\u2c62\u3271\u32b6\u32b6\u32b6\u12e3\u32b6\u32b6\u1bf2\u1d44\u2526\u32b6\u2656\u32b6\u32b6\u32b6\u0bcb\u1645\u0a85\u0ddf\u2168\u22af\u09c3\u09c5\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u3f2f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u3d4f\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6\u32b6"}
 var t=(function rtii(){var s=A.a3
 return{od:s("bE<bl>"),pC:s("il"),so:s("ch<l>"),m:s("ch<U>"),Bs:s("ch<S?>"),s1:s("Bx"),vp:s("rG"),jo:s("a7Y"),pR:s("jQ"),Pg:s("fL"),W8:s("rI"),en:s("BA"),FB:s("ph"),Sc:s("pi"),Sr:s("pj"),dq:s("BB<h>"),M1:s("NV"),Al:s("pm<R?>"),jj:s("hO"),m_:s("dx"),k:s("aj"),q:s("ha"),PG:s("wk<@>"),pI:s("Oj"),V4:s("c2"),wY:s("cy<wa>"),nz:s("cy<wo>"),P0:s("cy<is>"),vr:s("cy<acJ>"),gv:s("cy<qc>"),fN:s("cy<qm>"),Tx:s("cy<kZ>"),fn:s("cy<fZ>"),sl:s("cy<od>"),j5:s("cy<qR>"),_n:s("cy<qT>"),ZQ:s("cy<kd>"),f6:s("cy<ls>"),zN:s("cy<lt>"),Or:s("cy<oC>"),Eu:s("cy<oD>"),zJ:s("Or"),p7:s("dm<di<@>?,di<@>>"),vg:s("hQ"),mV:s("aRY"),Lh:s("C6"),XY:s("ps"),p1:s("lO"),qo:s("wz"),z7:s("P5"),m6:s("P6"),E_:s("wA"),Bn:s("C8"),wW:s("nl"),S3:s("C9"),BQ:s("Ca"),V1:s("Cb"),nR:s("Cd"),Kb:s("Ce()"),xG:s("wD"),O5:s("rZ"),Hz:s("fu"),hP:s("hd"),n8:s("S"),Zn:s("Cj"),IC:s("fe"),b8:s("cd<@>"),qO:s("t1<vf,@>"),uf:s("aU<h,aJ>"),l:s("aU<h,h>"),eL:s("aU<h,n>"),vn:s("wL"),T:s("fv"),pU:s("az<B,eV<B>>"),VQ:s("PC<h>"),lp:s("PD<ps,f>"),d1:s("PE<f>"),ZC:s("ff"),ho:s("Cq"),H5:s("b3l"),WS:s("lS"),HY:s("iq"),ip:s("Cv"),I7:s("bgV"),Bk:s("t5"),W7:s("bF"),Hw:s("j1"),l4:s("b3w"),Uf:s("wV"),AG:s("b3y"),uy:s("b3A"),yS:s("wW"),Je:s("bh6"),I:s("jV"),ra:s("bhd"),xm:s("is"),uZ:s("Qi<ag<nO>>"),VF:s("nt"),yN:s("Qk<f>"),uL:s("lW"),zk:s("lX"),iG:s("Qo"),aD:s("eX"),Tu:s("aS"),A0:s("dG"),Ee:s("ac<@>"),lU:s("cz"),C:s("bL"),dr:s("b4q"),hc:s("lY"),EM:s("ti"),IH:s("D0"),S9:s("Qy"),X8:s("Qz"),Q4:s("D2"),oy:s("D3<h>"),Lt:s("cA"),I3:s("aG"),VI:s("bx"),xl:s("bz()"),IX:s("j6<lC,dv>"),bh:s("tl"),oB:s("tm"),ii:s("xb<ky>"),_w:s("nz"),HH:s("nA"),OO:s("j7"),cP:s("tp"),b6:s("tq"),P9:s("nB"),eI:s("tr"),wB:s("nD"),nN:s("aV<h>"),GE:s("aV<dk>"),rq:s("fz"),yX:s("xd"),AK:s("tu"),GH:s("aSF"),Ii:s("kF<x<h>>"),vo:s("kF<x<@>>"),c1:s("kF<cC<h,x<h>>>"),US:s("iu"),s4:s("ad4"),OE:s("ad5"),mx:s("dY"),l5:s("tz"),bE:s("hh"),OP:s("j9"),Uy:s("Dm"),Nh:s("iv<ek>"),_8:s("kJ"),Z9:s("a7<qy>"),xd:s("a7<qy>(h,ar<h,h>)"),Ev:s("a7<I>()"),L0:s("a7<@>"),uz:s("a7<~>"),sB:s("cq<dJ,aJ>"),Fp:s("cq<og,bl>"),pl:s("cq<n,S>"),Si:s("cq<n,aJ>"),o:s("xn"),nd:s("dz"),uA:s("cK<kC>"),C1:s("cK<kI>"),Uv:s("cK<kM>"),jn:s("cK<iF>"),YC:s("cK<jp>"),lG:s("cK<l4>"),hg:s("cK<mE>"),Qm:s("cK<mF>"),jl:s("cK<iN>"),ok:s("cK<ll>"),FW:s("cK<mT>"),ff:s("cK<mX>"),EI:s("cK<mY>"),xR:s("tE<dz>"),yi:s("jX<ag<a5>>"),TX:s("nJ<kR>"),bT:s("nJ<ag<a5>>"),Ks:s("d_"),gm:s("ex"),R1:s("kK"),rQ:s("bhw"),op:s("xq<~(pG)>"),G7:s("Rk<a3U<@>>"),rA:s("tF"),mS:s("tG"),vj:s("Du"),Lm:s("hj"),UQ:s("jb"),AL:s("jc<ax>"),Fn:s("kL"),zE:s("ax"),bG:s("Rt"),zz:s("DC<b58>"),FF:s("aT0<b58>"),eH:s("dp"),gc:s("DM"),Lk:s("aT6"),Gf:s("m_"),Oh:s("tN"),lu:s("DR"),oA:s("m0"),J2:s("xy"),aN:s("RI"),fE:s("RJ"),OX:s("fR"),dW:s("hn"),SG:s("m1"),nT:s("RP<@,j9>"),Bc:s("pQ<bL?>"),WR:s("bhJ"),IS:s("hU"),og:s("eh"),WB:s("bC"),U1:s("je"),Zb:s("tS"),JZ:s("agZ"),XO:s("ah_"),pT:s("ah0"),gD:s("pS"),vz:s("bl"),nQ:s("pT"),Ya:s("xF"),K9:s("E5<@>"),JY:s("o<@>"),VG:s("o<R?>"),wZ:s("w<kt>"),MN:s("w<jQ>"),NS:s("w<dc>"),Pv:s("w<rJ>"),ml:s("w<kw>"),sq:s("w<eu>"),EO:s("w<hb>"),iW:s("w<hc>"),Ns:s("w<cX>"),qN:s("w<nl>"),Cu:s("w<Ca>"),Cz:s("w<nn>"),t_:s("w<S>"),Ai:s("w<a4>"),td:s("w<ip>"),KV:s("w<fv>"),ZD:s("w<fw>"),F:s("w<he>"),AR:s("w<lU>"),vl:s("w<jV>"),Up:s("w<Ql>"),hu:s("w<x2>"),SV:s("w<j4>"),lX:s("w<bL>"),bp:s("w<dY>"),Wj:s("w<pH>"),EN:s("w<j9>"),kZ:s("w<iv<@>>"),no:s("w<nI>"),r8:s("w<kJ>"),ty:s("w<a7<cI>>"),_W:s("w<a7<f?>>"),u2:s("w<a7<ow?>>"),mo:s("w<a7<~>>"),iQ:s("w<dI>"),AB:s("w<kK>"),wj:s("w<ix>"),X3:s("w<hj>"),Ue:s("w<jb>"),om:s("w<jc<ax>>"),_x:s("w<dp>"),gx:s("w<pK>"),XZ:s("w<hn>"),Fa:s("w<hU>"),fJ:s("w<eh>"),VB:s("w<m3>"),VO:s("w<iy>"),O_:s("w<nQ>"),J:s("w<f>"),K0:s("w<pV>"),CE:s("w<pW>"),k5:s("w<ho>"),cN:s("w<kO>"),s9:s("w<Ek>"),Y4:s("w<k_>"),_f:s("w<pY>"),ER:s("w<ahN>"),X_:s("w<x<l7>>"),i1:s("w<x<ie>>"),Eo:s("w<aE>"),ss:s("w<q0>"),a9:s("w<iE<@>>"),w3:s("w<k>"),H7:s("w<ar<h,@>>"),n4:s("w<ar<@,@>>"),Xr:s("w<cG>"),rE:s("w<aC>"),yt:s("w<SP>"),YE:s("w<kQ>"),tc:s("w<uk>"),f2:s("w<d2>"),Qg:s("w<nZ>"),Q:s("w<R>"),yv:s("w<l>"),wi:s("w<o_>"),jT:s("w<q8>"),g8:s("w<aTU<@>>"),n9:s("w<up>"),W5:s("w<dL>"),nx:s("w<q9>"),OB:s("w<mn>"),zY:s("w<uq>"),Gv:s("w<aD<eX>>"),AT:s("w<aD<R>>"),gW:s("w<aD<cC<h,dU>>>"),sb:s("w<aD<h>>"),B3:s("w<aD<dk>>"),Vz:s("w<aD<@>>"),m1:s("w<fX>"),Sd:s("w<jq>"),H9:s("w<qd>"),Cg:s("w<uu>"),wc:s("w<f1>"),cD:s("w<ek>"),tZ:s("w<qf>"),TP:s("w<o1>"),Ic:s("w<ci>"),R:s("w<mo>"),qQ:s("w<yl>"),Zl:s("w<eL>"),qp:s("w<yr>"),kG:s("w<bi>"),Am:s("w<fE>"),Io:s("w<ql>"),AO:s("w<C>"),Pc:s("w<yy>"),Ik:s("w<O>"),xT:s("w<qo>"),TT:s("w<B>"),Ry:s("w<dh>"),c:s("w<ca>"),QT:s("w<el>"),CK:s("w<uU>"),aF:s("w<Vq>"),ZP:s("w<ms>"),D1:s("w<fj>"),u1:s("w<v2>"),q1:s("w<l7>"),QF:s("w<dv>"),o4:s("w<VL>"),Qo:s("w<em>"),Qe:s("w<jA>"),vU:s("w<v3>"),fe:s("w<mv>"),kO:s("w<qz>"),N_:s("w<cH>"),X4:s("w<T>"),s:s("w<h>"),oU:s("w<b8c>"),PL:s("w<zc>"),bt:s("w<qH>"),oc:s("w<mC>"),r6:s("w<f5>"),Lx:s("w<h0>"),J9:s("w<on>"),sD:s("w<qO>"),VS:s("w<qP>"),fm:s("w<vn>"),Ne:s("w<mG>"),FO:s("w<mH<mH<@>>>"),x0:s("w<mK<U>>"),XE:s("w<cI>"),LX:s("w<ow>"),p:s("w<i>"),GA:s("w<fI>"),FQ:s("w<ke>"),Ec:s("w<dk>"),po:s("w<h3>"),Na:s("w<vB>"),OM:s("w<Yp>"),TV:s("w<oE>"),mk:s("w<lv>"),M2:s("w<IG>"),Ra:s("w<hC>"),Kj:s("w<A0>"),_Y:s("w<hD>"),B5:s("w<iT>"),CZ:s("w<ie>"),mz:s("w<a01>"),Kx:s("w<ly>"),he:s("w<K9>"),sn:s("w<oN>"),zj:s("w<oO>"),ML:s("w<aPe>"),m3:s("w<Av>"),di:s("w<jI>"),Ei:s("w<re>"),jE:s("w<mU>"),qi:s("w<eO>"),uD:s("w<fs>"),M6:s("w<La>"),au:s("w<a2N>"),s6:s("w<vQ>"),lb:s("w<oQ>"),YK:s("w<lC>"),Z4:s("w<bau>"),D8:s("w<a4_>"),mh:s("w<a42>"),cR:s("w<AX>"),NM:s("w<oW>"),mj:s("w<vW>"),HZ:s("w<I>"),v:s("w<U>"),ee:s("w<@>"),t:s("w<n>"),u0:s("w<kO?>"),bA:s("w<aE?>"),L:s("w<k?>"),JK:s("w<ek?>"),cA:s("w<C?>"),ny:s("w<di<@>?>"),eE:s("w<em?>"),Fi:s("w<cH?>"),_m:s("w<h?>"),YM:s("w<bj9?>"),Z:s("w<n?>"),a0:s("w<ct>"),Zt:s("w<a7<I>()>"),iM:s("w<bX<k_>()>"),sA:s("w<I(pV)>"),U9:s("w<~(tD)?>"),b:s("w<~()>"),g:s("w<~(bE<bl>)>"),x8:s("w<~(jO)>"),j1:s("w<~(aS)>"),Jh:s("w<~(x<nI>)>"),RP:s("bP<@>"),bz:s("E9"),lZ:s("ak"),lT:s("m8"),dC:s("c_<@>"),e:s("f"),Ek:s("f(n)"),_X:s("f(n{params:R?})"),sW:s("tV<@>"),dl:s("fS<h,@>"),Hf:s("fS<vf,@>"),Cl:s("m9"),D2:s("fT"),M3:s("xJ"),SQ:s("xK"),LE:s("tZ"),bR:s("bU<b4h>"),NE:s("bU<pB>"),dx:s("bU<xv>"),ku:s("bU<y7>"),hA:s("bU<yu>"),A:s("bU<ag<a5>>"),af:s("bU<At>"),L7:s("ho"),h_:s("S8"),kd:s("f_"),LO:s("aTo<@>"),xj:s("iC<R>"),Po:s("iC<h>"),mT:s("iC<@>"),rf:s("El"),hz:s("k_"),jQ:s("cf"),JO:s("fA"),z_:s("Eo<aPc>"),wO:s("u1<@>"),NJ:s("b5S"),uh:s("x<kt>"),Rk:s("x<jQ>"),Br:s("x<kw>"),Gs:s("x<nn>"),Sl:s("x<tu>"),Px:s("x<nI>"),Ch:s("x<kJ>"),lf:s("x<kK>"),j4:s("x<jb>"),bU:s("x<dp>"),gS:s("x<f>"),qC:s("x<k_>"),YN:s("x<d2>"),UX:s("x<R>"),LF:s("x<o_>"),PO:s("x<eL>"),I1:s("x<el>"),xc:s("x<dv>"),yp:s("x<h>"),d0:s("x<fp>"),JF:s("x<vB>"),rb:s("x<I>"),Ly:s("x<U>"),j:s("x<@>"),Cm:s("x<n>"),Dn:s("x<R?>"),ga:s("x<ct>"),I_:s("aE"),da:s("q0"),G:s("k"),bS:s("aTv"),wf:s("mc"),tO:s("b6<l,bt>"),UH:s("b6<bt,qx>"),DC:s("b6<n,l>"),q9:s("b6<n,h>"),sw:s("b6<R,mH<@>>"),qK:s("b6<h,x<eL>>"),qE:s("b6<h?,x<R>>"),Dx:s("EA<@,@>"),eX:s("ar<bF,n>"),kY:s("ar<og,bl>"),nf:s("ar<h,R>"),GU:s("ar<h,h>"),P:s("ar<h,@>"),_P:s("ar<h,n>"),e3:s("ar<i9,@>"),f:s("ar<@,@>"),pE:s("ar<R?,R?>"),rr:s("ar<~(bA),aC?>"),C9:s("eJ<h,lc?>"),G2:s("Z<hb,h>"),OW:s("Z<jq,fX>"),a4:s("Z<h,h>"),cj:s("Z<h,@>"),OL:s("Z<h,n>"),o2:s("Z<mP,i>"),rB:s("Z<oW,dv>"),bK:s("Z<U,U>"),qn:s("Z<n,dv>"),Tr:s("Z<f5,o0?>"),E0:s("EE<mI<h>>"),iB:s("b61"),c4:s("EI"),Le:s("EK<@>"),ui:s("dJ"),h9:s("dg<S>"),Ak:s("dg<dG>"),kU:s("dg<eK>"),iL:s("dg<T>"),XL:s("dg<G>"),QL:s("dg<U>"),Il:s("dg<S?>"),hs:s("dg<G?>"),Oc:s("u7"),xV:s("aC"),w:s("ud"),SA:s("q3"),tB:s("y0"),Pw:s("mf"),xS:s("jj"),Pb:s("ei"),ZA:s("EQ"),_h:s("nW"),wd:s("jk"),Wz:s("k2"),Lb:s("fW"),RZ:s("ui"),jW:s("q5"),A3:s("jm"),F4:s("f0"),u9:s("uj"),uK:s("kR"),I6:s("0&"),_A:s("bm"),Jc:s("ej<tW>"),Tm:s("ej<iB>"),xU:s("ej<fB>"),ji:s("ej<uY>"),WA:s("ej<iK>"),ZE:s("ej<jy>"),Te:s("nZ"),a:s("aJ"),K:s("R"),yw:s("bn<aPe>"),fy:s("bn<~()>"),_:s("bn<~(bE<bl>)>"),jc:s("bn<~(jO)>"),EP:s("l"),gY:s("mg"),o0:s("Fd"),VX:s("jo<cC<h,dU>>"),mA:s("jo<h>"),Jd:s("jo<eX?>"),Aw:s("jo<h?>"),Ms:s("o_"),N1:s("y7"),B9:s("uo"),Mf:s("y9"),sd:s("aOb<R?>"),Q2:s("up"),qA:s("mm"),Fw:s("fD<m9>"),IL:s("fD<dt>"),_O:s("aD<@>"),ke:s("uu"),NX:s("TE"),Nt:s("fX"),D3:s("Fr"),zM:s("f1"),IF:s("Fz"),ix:s("ek"),v3:s("y"),OZ:s("jr"),sv:s("yg"),jP:s("qf"),mX:s("yh"),qa:s("bi0"),ge:s("uy"),Ko:s("uz"),kf:s("yj"),B:s("kS"),pY:s("o4"),qL:s("bA"),GG:s("bi3"),XA:s("o5"),n2:s("uB"),WQ:s("uC"),w5:s("o6"),DB:s("uD"),PB:s("uE"),RH:s("uF"),Mj:s("uG"),xb:s("uH"),ks:s("ht"),oN:s("uI"),L6:s("hZ<x<ar<h,@>>>"),rs:s("hZ<ar<h,@>>"),JE:s("hZ<@>"),Wf:s("hZ<ar<h,@>?>"),QS:s("eL"),bb:s("yn"),_p:s("jt"),C0:s("b76"),yH:s("bs"),PN:s("FO"),MM:s("U7<lU>"),eg:s("fE"),jU:s("yw"),pK:s("uN"),Rp:s("+()"),YT:s("C"),Bb:s("ju<ct>"),r0:s("aQ<eX>"),u4:s("aQ<x<fp>>"),kD:s("aQ<cC<h,dU>>"),h:s("aQ<h>"),nt:s("aQ<kf>"),ZV:s("aQ<ln>"),MC:s("aQ<lo>"),CP:s("aQ<lp>"),OY:s("aQ<hA>"),hq:s("aQ<dk>"),vq:s("aQ<fp>"),hC:s("aQ<lq>"),MB:s("aQ<h3>"),sE:s("aQ<Il>"),lk:s("aQ<@>"),n3:s("aQ<~>"),bN:s("aUm"),Qz:s("Uh"),MY:s("FX"),NW:s("FY"),x:s("O"),DW:s("uO"),f1:s("G0"),I9:s("B"),Jo:s("uP<O>"),F5:s("aH"),GM:s("bc<B>"),Wx:s("oa"),nl:s("dh"),Ss:s("qq"),Cn:s("yB"),dw:s("G7"),E1:s("G9"),UM:s("kZ"),yk:s("anc<@>"),Wd:s("mr"),dZ:s("Ge<n>"),yb:s("f3<R?>"),z4:s("el"),k2:s("Gg<C?>"),Rr:s("d8<h>"),MV:s("d8<oO>"),o_:s("d8<lC>"),Zg:s("l2"),oj:s("yH"),pO:s("di<@>(K,R?)"),Dc:s("Gj"),Sv:s("uU"),nY:s("Gl<b60,bhT>"),BL:s("Gl<vb,my>"),Np:s("yL"),ti:s("Gs<R>"),Cy:s("Gt"),FS:s("Gw"),gt:s("ms"),sm:s("yP"),NF:s("b7D"),qd:s("big"),hI:s("bih"),x9:s("fj"),mb:s("v0"),Wu:s("GH"),_S:s("dS"),ZX:s("l7"),bu:s("dv"),UF:s("em"),g3:s("l8"),y1:s("cC<h,dU>"),mM:s("GP<h,h,h,eX?,h,h?,h,h>"),HS:s("qy"),n5:s("yV<@>"),hh:s("cR<yB>"),c8:s("cR<h>"),Ro:s("cR<@>"),RY:s("cH"),jH:s("qA"),WE:s("yW"),cZ:s("yX"),zU:s("og"),yE:s("biq"),Mp:s("bo"),aJ:s("T"),YA:s("V"),Q3:s("H1<eX>"),Ws:s("H2<h>"),Dj:s("H4"),r:s("qC"),Xp:s("qD"),Gt:s("z5"),D:s("jB"),M0:s("va"),jB:s("qE"),y3:s("lb"),wq:s("mz"),D_:s("ok"),Qv:s("fG"),Km:s("dT"),MF:s("iM"),d2:s("a5"),Iz:s("av"),fc:s("Hj"),Z5:s("Wr<@>"),kj:s("qG"),N:s("h"),Vc:s("b8c"),Xb:s("cu<h>"),_k:s("Wx"),Tv:s("Hs"),d:s("ze"),Ci:s("qI"),ky:s("zf"),Yu:s("WB"),if:s("vf"),WT:s("cv<lJ>"),NP:s("cv<c2>"),Vr:s("cv<Cq>"),re:s("cv<ar<i9,@>>"),az:s("cv<EI>"),Q6:s("cv<me>"),Ow:s("cv<nX>"),AH:s("cv<jr>"),E8:s("cv<Ii>"),d9:s("cv<I>"),SN:s("cv<ar<h,x<h>>?>"),hr:s("cv<el?>"),b7:s("cv<~>"),U8:s("qK"),ev:s("biF"),_0:s("HG"),Pj:s("b8n"),Qr:s("HJ"),mi:s("WU"),ot:s("hw"),cu:s("HP"),qY:s("lh"),bZ:s("b8x"),AS:s("mG"),em:s("G"),we:s("kc"),ZM:s("vp"),ZF:s("mH<mH<@>>"),Ag:s("mH<@>"),qe:s("X3"),ZL:s("I1<h>"),U:s("hx"),U2:s("b8S"),bq:s("mJ"),zW:s("d9"),Ml:s("mK<U>"),Ni:s("aK<l>"),Y:s("aK<U>"),n:s("i9"),ns:s("or"),e2:s("ee"),w7:s("asx"),rd:s("zA"),W1:s("asy"),E:s("cI"),pm:s("zB<cM>"),MX:s("ou<cf>"),O:s("dC<qN>"),gA:s("vv<f>"),kk:s("mL"),lQ:s("Ia"),G5:s("lj<h,h>"),h3:s("ow"),fS:s("ox"),gU:s("kd"),Xu:s("oy"),cr:s("oz"),gz:s("cs<fT>"),xe:s("cs<R>"),kK:s("cs<h>"),f3:s("cs<n>"),Ll:s("cs<fT?>"),fr:s("zG<nM>"),GY:s("ia"),Ih:s("qU"),Dg:s("vz"),rS:s("ib"),X9:s("oA"),Hd:s("aT<h>"),uB:s("hz<h>"),FI:s("ef<bA>"),ZK:s("ef<lc>"),Ri:s("ef<h>"),ow:s("ef<r1>"),kE:s("ef<~(R,dT?)>"),r7:s("ef<~(m0)>"),Pi:s("qV<tz>"),l7:s("i"),a7:s("lm"),Ab:s("i(K)"),X5:s("fI"),Uh:s("Ii"),VW:s("qW"),oL:s("mN"),Qy:s("mO"),rx:s("ke"),cL:s("kf"),mL:s("ln"),UR:s("lo"),RN:s("lp"),Gn:s("hA"),xo:s("dk"),wG:s("fp"),Mw:s("lq"),a1:s("h3"),JC:s("Il"),L1:s("Im"),Mx:s("lu<rN>"),Qh:s("lu<T>"),pB:s("lu<T?>"),h8:s("aR<lJ>"),qs:s("aR<rI>"),J1:s("aR<hO>"),xs:s("aR<Dm>"),rj:s("aR<m_>"),Ca:s("aR<pO>"),b5:s("aR<o<@>>"),XX:s("aR<f>"),Xv:s("aR<x<ke>>"),rK:s("aR<x<@>>"),Fe:s("aR<aJ>"),Iy:s("aR<yX>"),fO:s("aR<my>"),Bx:s("aR<qG>"),pN:s("aR<h>"),gI:s("aR<cI>"),VY:s("aR<I>"),zh:s("aR<@>"),yB:s("aR<c2?>"),F0:s("aR<el?>"),tj:s("aR<mt?>"),gR:s("aR<~>"),BY:s("b9j"),ZW:s("vE"),B6:s("IE"),ao:s("lv"),ad:s("mP"),Vf:s("hC"),Ie:s("qY"),EG:s("vF"),bY:s("J2"),TC:s("r0"),uC:s("fJ"),dA:s("oH<t8>"),Fb:s("oH<t9>"),Uz:s("oH<ta>"),UJ:s("ZK"),qr:s("fq<f>"),VA:s("oJ<f>"),l3:s("Jj"),rF:s("A1<aG>"),rR:s("iR<pt>"),_F:s("iR<aG>"),fg:s("iR<jt>"),Eh:s("JA"),fk:s("A4"),h1:s("A6"),Lv:s("af<lJ>"),lc:s("af<rI>"),Kc:s("af<hO>"),qc:s("af<Dm>"),_T:s("af<m_>"),NT:s("af<DR>"),Eg:s("af<pO>"),mg:s("af<o<@>>"),gO:s("af<f>"),G4:s("af<x<ke>>"),Jk:s("af<x<@>>"),wC:s("af<aJ>"),Gl:s("af<yX>"),dH:s("af<my>"),EW:s("af<qG>"),fB:s("af<h>"),aP:s("af<cI>"),tq:s("af<I>"),LR:s("af<@>"),wJ:s("af<n>"),gg:s("af<c2?>"),X6:s("af<el?>"),cF:s("af<mt?>"),V:s("af<~>"),cK:s("A8"),Qu:s("oL"),U3:s("Ab"),wk:s("hD"),R9:s("r3"),Fy:s("r4<R?,R?>"),WD:s("JU"),Nr:s("JV"),pp:s("ie"),EU:s("Ah"),YL:s("Aj"),cB:s("lz"),Sx:s("aPc"),pt:s("Ak"),Gk:s("Ka"),PJ:s("Al"),h2:s("jH<S>"),Lf:s("jH<I>"),pj:s("jH<U>"),_s:s("jH<S?>"),Ye:s("Kl"),xg:s("a0K"),Tp:s("r9"),Lo:s("ra<@,j9>"),yI:s("oO"),gQ:s("rb"),sZ:s("KF"),VE:s("a1c"),j6:s("a1d"),iZ:s("jI"),Wa:s("oP"),y2:s("vN"),mm:s("Az"),JH:s("mU"),zP:s("eO"),ri:s("KO"),l0:s("KP"),zd:s("KV"),Sq:s("AD"),xL:s("AE"),im:s("L3"),tg:s("L4"),_H:s("L5"),Ez:s("fs"),Pu:s("Lb"),jF:s("Li"),S8:s("LI"),mf:s("LO"),c6:s("vV"),C8:s("oV<DR>"),HE:s("AU"),f4:s("M0"),i9:s("AW"),tH:s("baz"),si:s("dN<dJ>"),XI:s("dN<h>"),JP:s("dN<f5>"),h7:s("dN<n>"),Wp:s("Mb<hf>"),_l:s("Mf"),ps:s("Mg"),DH:s("a54"),y:s("I"),i:s("U"),z:s("@"),Do:s("@()"),C_:s("@(R)"),Hg:s("@(R,dT)"),S:s("n"),s5:s("0&*"),ub:s("R*"),FL:s("kt?"),ZU:s("pf?"),tX:s("a84?"),m2:s("BF?"),VC:s("nb?"),BU:s("hO?"),Vx:s("fd?"),sa:s("h9?"),eJ:s("rK?"),oI:s("d5?"),YY:s("rM?"),CD:s("c2?"),eQ:s("wz?"),I4:s("kA?"),L5:s("a9G?"),JG:s("wD?"),cW:s("a9I?"),eG:s("Cg?"),GB:s("a9J?"),VZ:s("rZ?"),VD:s("wE?"),MH:s("S?"),C5:s("a9S?"),YJ:s("fe?"),Hb:s("fv?"),ms:s("nr?"),V2:s("jV?"),dd:s("eX?"),pc:s("dG?"),Om:s("nv?"),Dv:s("bL?"),fd:s("D1?"),FZ:s("aSH?"),pk:s("dY?"),RC:s("Dk?"),ZY:s("a7<aJ>?"),eS:s("Rc?"),Mm:s("kK?"),_I:s("tG?"),c9:s("ix?"),bQ:s("dp?"),GK:s("kM?"),lF:s("dZ?"),Pr:s("pR?"),Ef:s("je?"),kC:s("f?"),E5:s("fT?"),EZ:s("x<qH>?"),kc:s("x<@>?"),y6:s("k?"),DZ:s("iF?"),nA:s("ar<h,@>?"),Xw:s("ar<@,@>?"),f9:s("ar<h,x<h>>?"),qg:s("ar<R?,R?>?"),iD:s("aC?"),ka:s("ua?"),WV:s("ei?"),X:s("R?"),Ff:s("ajn?"),dJ:s("mg?"),Zr:s("ajp?"),KX:s("eK?"),uR:s("jp?"),xO:s("ur<m9>?"),CY:s("Ft?"),fF:s("Fu?"),p9:s("Fv?"),pA:s("Fw?"),Gr:s("Fx?"),BN:s("Fy?"),mc:s("ek?"),wb:s("FA?"),W:s("yg?"),aA:s("O?"),CA:s("uO?"),Rn:s("B?"),c_:s("bQ?"),Ou:s("qp<O>?"),zI:s("G3?"),ym:s("oa?"),IT:s("dh?"),kR:s("jx?"),_N:s("yO?"),LQ:s("dv?"),m5:s("yS?"),uY:s("mt?"),Zi:s("cH?"),TZ:s("v4?"),pg:s("iL?"),tW:s("T?"),MR:s("jB?"),lE:s("iM?"),u:s("h?"),aE:s("ze?"),zm:s("iN?"),p8:s("G?"),Dh:s("vo?"),qf:s("Xa?"),zV:s("mJ?"),ir:s("aK<U>?"),nc:s("cI?"),AC:s("ow?"),KJ:s("oy?"),Wn:s("ll?"),ju:s("ke?"),Xk:s("hD?"),gJ:s("ra<@,j9>?"),An:s("At?"),av:s("KH?"),JI:s("a3U<@>?"),X7:s("I?"),PM:s("U?"),bo:s("n?"),Nw:s("~()?"),Jy:s("ct"),H:s("~"),M:s("~()"),Vu:s("~(aS)"),Su:s("~(pG)"),ph:s("~(x<nI>)"),lO:s("~(R)"),hK:s("~(R,dT)"),Ld:s("~(bA)"),iS:s("~(kX)"),HT:s("~(R?)")}})();(function constants(){var s=hunkHelpers.makeConstList
 B.Fk=A.BW.prototype
@@ -111954,14 +111947,14 @@ B.b9=new A.DB(0,"deferToChild")
 B.aB=new A.DB(1,"opaque")
 B.cS=new A.DB(2,"translucent")
 B.aU=new A.tH(null)
-B.Ky=new A.fP("Il tuo honoo \xe8 stato salvato nello Scrigno, vuoi inviarlo anche sulla Luna?",null,"S\xec","Non ora",null)
-B.Kz=new A.fP("Sei sicuro di voler eliminare?","","S\xec","No",null)
+B.Ky=new A.fP("Sei sicuro di voler eliminare?","","S\xec","No",null)
+B.Kz=new A.fP("L'hinoo \xe8 stato salvato nel tuo Scrigno.",u.k,"S\xec","No",null)
 B.KA=new A.fP("Qualcuno ha bussato alla tua casa",null,"Apri","Non ora",null)
 B.KB=new A.fP("Devi accedere prima","Per scaricare questo hinoo,\ndevi fare prima il login.\nVuoi andare alla pagina di login?","Vai al login","Annulla",null)
 B.KC=new A.fP("Devi accedere prima","Per scaricare questo honoo,\ndevi fare prima il login.\nVuoi andare alla pagina di login?","Vai al login","Annulla",null)
 B.KD=new A.fP("Devi accedere","Per scaricare questo contenuto, devi fare prima il log in. Vuoi andare alla pagina di login?","Vai al login","Annulla",null)
 B.KE=new A.fP("Devi accedere","Per salvare il tuo honoo nello Scrigno devi prima effettuare l'accesso. Vuoi andare alla pagina di login?","Vai al login","Annulla",null)
-B.KF=new A.fP("Il tuo hinoo \xe8 stato salvato nello Scrigno, vuoi inviarlo anche sulla Luna?",null,"S\xec","Non ora",null)
+B.KF=new A.fP("L'honoo \xe8 stato salvato nel tuo Scrigno.",u.k,"S\xec","No",null)
 B.KG=new A.fP("Devi accedere prima","Per caricare un\u2019immagine,\ndevi fare prima il login.\nVuoi andare alla pagina di login?","Vai al login","Annulla",null)
 B.KH=new A.fP("Devi accedere prima","Per salvare questo hinoo,\ndevi fare prima il login.\nVuoi andare alla pagina di login?","Vai al login","Annulla",null)
 B.KI=new A.fP("Entra pure a casa mia",null,"Entra","Non ora",null)
@@ -112190,7 +112183,7 @@ B.a1Y=new A.iU(0.925,0.5)
 B.a1Z=new A.iU(0.9625,0.75)
 B.a1X=new A.iU(1,1)
 B.Mq=A.b(s([B.a1W,B.a21,B.a22,B.a20,B.a24,B.a25,B.a23,B.a2_,B.a1Y,B.a1Z,B.a1X]),A.a3("w<iU>"))
-B.PY=new A.iG(1,0.12,0.95,0,0.01,u.k,"Grotta delle Rondini")
+B.PY=new A.iG(1,0.12,0.95,0,0.01,u.cy,"Grotta delle Rondini")
 B.PX=new A.iG(2,0.16,0.6,-0.03,-0.02,u.cA,"Radura delle Bacche")
 B.PW=new A.iG(3,0.11,0.3,0.02,-0.01,u.c1,"Pozzo dell'Oracolo")
 B.Q1=new A.iG(4,0.53,0.17,-0.02,-0.02,u.a9,"Porta nell'Alabastro")
@@ -112246,7 +112239,7 @@ B.Ed=new A.wa()
 B.fy=new A.Vy(1,"page")
 B.ix=new A.fZ(B.H,B.fy)
 B.Na=A.b(s([B.Ed,B.ix]),A.a3("w<bl>"))
-B.a_a=new A.iP(1,0.22,0.1,-0.02,u.k,"Grotta delle Rondini")
+B.a_a=new A.iP(1,0.22,0.1,-0.02,u.cy,"Grotta delle Rondini")
 B.a_b=new A.iP(2,0.4,0.1,-0.02,u.cA,"Radura delle Bacche")
 B.a_c=new A.iP(3,0.58,0.1,-0.02,u.c1,"Pozzo dell'Oracolo")
 B.a_5=new A.iP(4,0.77,0.1,-0.02,u.a9,"Porta nell'Alabastro")
@@ -114621,10 +114614,10 @@ B.je=new A.Mq(0,"changeBg")
 B.CI=new A.Mq(1,"pickColor")
 B.CJ=new A.Mq(2,"writeText")
 B.a2S=new A.a5g(B.ab,A.bdo(),A.a3("a5g<~(vA,aVK,vA,~())>"))})();(function staticFields(){$.dO=null
-$.bj=A.aY("canvasKit")
+$.bj=A.aX("canvasKit")
 $.aS1=null
 $.aXd=B.oN
-$.c5=A.aY("_instance")
+$.c5=A.aX("_instance")
 $.b2M=A.v(t.N,A.a3("a7<bht>"))
 $.z0=A.b([],A.a3("w<eI<R>>"))
 $.H0=A.b([],A.a3("w<W_>"))
@@ -114641,7 +114634,7 @@ $.aJj=0
 $.p3=A.b([],A.a3("w<nb>"))
 $.aLE=A.b([],t.nx)
 $.jM=null
-$.b5g=A.aY("_instance")
+$.b5g=A.aX("_instance")
 $.ar_=null
 $.aVA=null
 $.aVB=null
@@ -114663,7 +114656,7 @@ $.aPs=-1
 $.aPM=-1
 $.aXs=-1
 $.aOk=null
-$.aeo=A.aY("_programCache")
+$.aeo=A.aX("_programCache")
 $.aNu=0
 $.aNt=0
 $.aen=null
@@ -114708,10 +114701,10 @@ $.aVP=null
 $.aVQ=null
 $.aVR=null
 $.aVS=null
-$.aP2=A.aY("_lastQuoRemDigits")
-$.aP3=A.aY("_lastQuoRemUsed")
-$.Ix=A.aY("_lastRemUsed")
-$.aP4=A.aY("_lastRem_nsh")
+$.aP2=A.aX("_lastQuoRemDigits")
+$.aP3=A.aX("_lastQuoRemUsed")
+$.Ix=A.aX("_lastRemUsed")
+$.aP4=A.aX("_lastRem_nsh")
 $.aX2=A.v(t.N,t.xd)
 $.aOL=A.b([],A.a3("w<bjJ?>"))
 $.b9Q=A.v(t.S,A.a3("bjs"))
@@ -114747,11 +114740,11 @@ $.aPL=A.aO(t.N)
 $.aWW=null
 $.aJv=null
 $.aps=null
-$.aOx=A.aY("boxConstraints")
-$.aUJ=A.aY("orientation")
-$.aUI=A.aY("deviceType")
-$.GZ=A.aY("height")
-$.qB=A.aY("width")
+$.aOx=A.aX("boxConstraints")
+$.aUJ=A.aX("orientation")
+$.aUI=A.aX("deviceType")
+$.GZ=A.aX("height")
+$.qB=A.aX("width")
 $.b5N=A.v(t.S,A.a3("bhP"))
 $.bcK=A.v(A.a3("wp"),A.a3("Cl<~>"))
 $.aJe=null
@@ -115444,7 +115437,7 @@ for(var o=0;;o++){var n=s(p+"_"+o+"_")
 if(!(n in q)){q[n]=1
 v.isolateTag=n
 break}}v.dispatchPropertyName=v.getIsolateTag("dispatch_record")}()
-hunkHelpers.setOrUpdateInterceptorsByTag({WebGL:J.xG,AnimationEffectReadOnly:J.f,AnimationEffectTiming:J.f,AnimationEffectTimingReadOnly:J.f,AnimationTimeline:J.f,AnimationWorkletGlobalScope:J.f,AuthenticatorAssertionResponse:J.f,AuthenticatorAttestationResponse:J.f,AuthenticatorResponse:J.f,BackgroundFetchFetch:J.f,BackgroundFetchManager:J.f,BackgroundFetchSettledFetch:J.f,BarProp:J.f,BarcodeDetector:J.f,BluetoothRemoteGATTDescriptor:J.f,Body:J.f,BudgetState:J.f,CacheStorage:J.f,CanvasGradient:J.f,CanvasPattern:J.f,CanvasRenderingContext2D:J.f,Client:J.f,Clients:J.f,CookieStore:J.f,Coordinates:J.f,Credential:J.f,CredentialUserData:J.f,CredentialsContainer:J.f,Crypto:J.f,CryptoKey:J.f,CSS:J.f,CSSVariableReferenceValue:J.f,CustomElementRegistry:J.f,DataTransfer:J.f,DataTransferItem:J.f,DeprecatedStorageInfo:J.f,DeprecatedStorageQuota:J.f,DeprecationReport:J.f,DetectedBarcode:J.f,DetectedFace:J.f,DetectedText:J.f,DeviceAcceleration:J.f,DeviceRotationRate:J.f,DirectoryEntry:J.f,webkitFileSystemDirectoryEntry:J.f,FileSystemDirectoryEntry:J.f,DirectoryReader:J.f,WebKitDirectoryReader:J.f,webkitFileSystemDirectoryReader:J.f,FileSystemDirectoryReader:J.f,DocumentOrShadowRoot:J.f,DocumentTimeline:J.f,DOMError:J.f,DOMImplementation:J.f,Iterator:J.f,DOMMatrix:J.f,DOMMatrixReadOnly:J.f,DOMParser:J.f,DOMPoint:J.f,DOMPointReadOnly:J.f,DOMQuad:J.f,DOMStringMap:J.f,Entry:J.f,webkitFileSystemEntry:J.f,FileSystemEntry:J.f,External:J.f,FaceDetector:J.f,FederatedCredential:J.f,FileEntry:J.f,webkitFileSystemFileEntry:J.f,FileSystemFileEntry:J.f,DOMFileSystem:J.f,WebKitFileSystem:J.f,webkitFileSystem:J.f,FileSystem:J.f,FontFace:J.f,FontFaceSource:J.f,FormData:J.f,GamepadButton:J.f,GamepadPose:J.f,Geolocation:J.f,Position:J.f,GeolocationPosition:J.f,Headers:J.f,HTMLHyperlinkElementUtils:J.f,IdleDeadline:J.f,ImageBitmap:J.f,ImageBitmapRenderingContext:J.f,ImageCapture:J.f,InputDeviceCapabilities:J.f,IntersectionObserver:J.f,IntersectionObserverEntry:J.f,InterventionReport:J.f,KeyframeEffect:J.f,KeyframeEffectReadOnly:J.f,MediaCapabilities:J.f,MediaCapabilitiesInfo:J.f,MediaDeviceInfo:J.f,MediaError:J.f,MediaKeyStatusMap:J.f,MediaKeySystemAccess:J.f,MediaKeys:J.f,MediaKeysPolicy:J.f,MediaMetadata:J.f,MediaSession:J.f,MediaSettingsRange:J.f,MemoryInfo:J.f,MessageChannel:J.f,Metadata:J.f,MutationObserver:J.f,WebKitMutationObserver:J.f,MutationRecord:J.f,NavigationPreloadManager:J.f,Navigator:J.f,NavigatorAutomationInformation:J.f,NavigatorConcurrentHardware:J.f,NavigatorCookies:J.f,NavigatorUserMediaError:J.f,NodeFilter:J.f,NodeIterator:J.f,NonDocumentTypeChildNode:J.f,NonElementParentNode:J.f,NoncedElement:J.f,OffscreenCanvasRenderingContext2D:J.f,OverconstrainedError:J.f,PaintRenderingContext2D:J.f,PaintSize:J.f,PaintWorkletGlobalScope:J.f,PasswordCredential:J.f,Path2D:J.f,PaymentAddress:J.f,PaymentInstruments:J.f,PaymentManager:J.f,PaymentResponse:J.f,PerformanceEntry:J.f,PerformanceLongTaskTiming:J.f,PerformanceMark:J.f,PerformanceMeasure:J.f,PerformanceNavigation:J.f,PerformanceNavigationTiming:J.f,PerformanceObserver:J.f,PerformanceObserverEntryList:J.f,PerformancePaintTiming:J.f,PerformanceResourceTiming:J.f,PerformanceServerTiming:J.f,PerformanceTiming:J.f,Permissions:J.f,PhotoCapabilities:J.f,PositionError:J.f,GeolocationPositionError:J.f,Presentation:J.f,PresentationReceiver:J.f,PublicKeyCredential:J.f,PushManager:J.f,PushMessageData:J.f,PushSubscription:J.f,PushSubscriptionOptions:J.f,Range:J.f,RelatedApplication:J.f,ReportBody:J.f,ReportingObserver:J.f,ResizeObserver:J.f,ResizeObserverEntry:J.f,RTCCertificate:J.f,RTCIceCandidate:J.f,mozRTCIceCandidate:J.f,RTCLegacyStatsReport:J.f,RTCRtpContributingSource:J.f,RTCRtpReceiver:J.f,RTCRtpSender:J.f,RTCSessionDescription:J.f,mozRTCSessionDescription:J.f,RTCStatsResponse:J.f,Screen:J.f,ScrollState:J.f,ScrollTimeline:J.f,Selection:J.f,SpeechRecognitionAlternative:J.f,SpeechSynthesisVoice:J.f,StaticRange:J.f,StorageManager:J.f,StyleMedia:J.f,StylePropertyMap:J.f,StylePropertyMapReadonly:J.f,SyncManager:J.f,TaskAttributionTiming:J.f,TextDetector:J.f,TextMetrics:J.f,TrackDefault:J.f,TreeWalker:J.f,TrustedHTML:J.f,TrustedScriptURL:J.f,TrustedURL:J.f,UnderlyingSourceBase:J.f,URLSearchParams:J.f,VRCoordinateSystem:J.f,VRDisplayCapabilities:J.f,VREyeParameters:J.f,VRFrameData:J.f,VRFrameOfReference:J.f,VRPose:J.f,VRStageBounds:J.f,VRStageBoundsPoint:J.f,VRStageParameters:J.f,ValidityState:J.f,VideoPlaybackQuality:J.f,VideoTrack:J.f,VTTRegion:J.f,WindowClient:J.f,WorkletAnimation:J.f,WorkletGlobalScope:J.f,XPathEvaluator:J.f,XPathExpression:J.f,XPathNSResolver:J.f,XPathResult:J.f,XMLSerializer:J.f,XSLTProcessor:J.f,Bluetooth:J.f,BluetoothCharacteristicProperties:J.f,BluetoothRemoteGATTServer:J.f,BluetoothRemoteGATTService:J.f,BluetoothUUID:J.f,BudgetService:J.f,Cache:J.f,DOMFileSystemSync:J.f,DirectoryEntrySync:J.f,DirectoryReaderSync:J.f,EntrySync:J.f,FileEntrySync:J.f,FileReaderSync:J.f,FileWriterSync:J.f,HTMLAllCollection:J.f,Mojo:J.f,MojoHandle:J.f,MojoWatcher:J.f,NFC:J.f,PagePopupController:J.f,Report:J.f,Request:J.f,Response:J.f,SubtleCrypto:J.f,USBAlternateInterface:J.f,USBConfiguration:J.f,USBDevice:J.f,USBEndpoint:J.f,USBInTransferResult:J.f,USBInterface:J.f,USBIsochronousInTransferPacket:J.f,USBIsochronousInTransferResult:J.f,USBIsochronousOutTransferPacket:J.f,USBIsochronousOutTransferResult:J.f,USBOutTransferResult:J.f,WorkerLocation:J.f,WorkerNavigator:J.f,Worklet:J.f,IDBIndex:J.f,IDBObservation:J.f,IDBObserver:J.f,IDBObserverChanges:J.f,SVGAngle:J.f,SVGAnimatedAngle:J.f,SVGAnimatedBoolean:J.f,SVGAnimatedEnumeration:J.f,SVGAnimatedInteger:J.f,SVGAnimatedLength:J.f,SVGAnimatedLengthList:J.f,SVGAnimatedNumber:J.f,SVGAnimatedNumberList:J.f,SVGAnimatedPreserveAspectRatio:J.f,SVGAnimatedRect:J.f,SVGAnimatedString:J.f,SVGAnimatedTransformList:J.f,SVGMatrix:J.f,SVGPoint:J.f,SVGPreserveAspectRatio:J.f,SVGRect:J.f,SVGUnitTypes:J.f,AudioListener:J.f,AudioParam:J.f,AudioTrack:J.f,AudioWorkletGlobalScope:J.f,AudioWorkletProcessor:J.f,PeriodicWave:J.f,WebGLActiveInfo:J.f,ANGLEInstancedArrays:J.f,ANGLE_instanced_arrays:J.f,WebGLBuffer:J.f,WebGLCanvas:J.f,WebGLColorBufferFloat:J.f,WebGLCompressedTextureASTC:J.f,WebGLCompressedTextureATC:J.f,WEBGL_compressed_texture_atc:J.f,WebGLCompressedTextureETC1:J.f,WEBGL_compressed_texture_etc1:J.f,WebGLCompressedTextureETC:J.f,WebGLCompressedTexturePVRTC:J.f,WEBGL_compressed_texture_pvrtc:J.f,WebGLCompressedTextureS3TC:J.f,WEBGL_compressed_texture_s3tc:J.f,WebGLCompressedTextureS3TCsRGB:J.f,WebGLDebugRendererInfo:J.f,WEBGL_debug_renderer_info:J.f,WebGLDebugShaders:J.f,WEBGL_debug_shaders:J.f,WebGLDepthTexture:J.f,WEBGL_depth_texture:J.f,WebGLDrawBuffers:J.f,WEBGL_draw_buffers:J.f,EXTsRGB:J.f,EXT_sRGB:J.f,EXTBlendMinMax:J.f,EXT_blend_minmax:J.f,EXTColorBufferFloat:J.f,EXTColorBufferHalfFloat:J.f,EXTDisjointTimerQuery:J.f,EXTDisjointTimerQueryWebGL2:J.f,EXTFragDepth:J.f,EXT_frag_depth:J.f,EXTShaderTextureLOD:J.f,EXT_shader_texture_lod:J.f,EXTTextureFilterAnisotropic:J.f,EXT_texture_filter_anisotropic:J.f,WebGLFramebuffer:J.f,WebGLGetBufferSubDataAsync:J.f,WebGLLoseContext:J.f,WebGLExtensionLoseContext:J.f,WEBGL_lose_context:J.f,OESElementIndexUint:J.f,OES_element_index_uint:J.f,OESStandardDerivatives:J.f,OES_standard_derivatives:J.f,OESTextureFloat:J.f,OES_texture_float:J.f,OESTextureFloatLinear:J.f,OES_texture_float_linear:J.f,OESTextureHalfFloat:J.f,OES_texture_half_float:J.f,OESTextureHalfFloatLinear:J.f,OES_texture_half_float_linear:J.f,OESVertexArrayObject:J.f,OES_vertex_array_object:J.f,WebGLProgram:J.f,WebGLQuery:J.f,WebGLRenderbuffer:J.f,WebGLRenderingContext:J.f,WebGL2RenderingContext:J.f,WebGLSampler:J.f,WebGLShader:J.f,WebGLShaderPrecisionFormat:J.f,WebGLSync:J.f,WebGLTexture:J.f,WebGLTimerQueryEXT:J.f,WebGLTransformFeedback:J.f,WebGLUniformLocation:J.f,WebGLVertexArrayObject:J.f,WebGLVertexArrayObjectOES:J.f,WebGL2RenderingContextBase:J.f,ArrayBuffer:A.ui,ArrayBufferView:A.f0,DataView:A.ET,Float32Array:A.EU,Float64Array:A.EV,Int16Array:A.SR,Int32Array:A.EW,Int8Array:A.SS,Uint16Array:A.EX,Uint32Array:A.EY,Uint8ClampedArray:A.EZ,CanvasPixelArray:A.EZ,Uint8Array:A.uj,HTMLAudioElement:A.b5,HTMLBRElement:A.b5,HTMLBaseElement:A.b5,HTMLBodyElement:A.b5,HTMLButtonElement:A.b5,HTMLContentElement:A.b5,HTMLDListElement:A.b5,HTMLDataElement:A.b5,HTMLDataListElement:A.b5,HTMLDetailsElement:A.b5,HTMLDialogElement:A.b5,HTMLDivElement:A.b5,HTMLEmbedElement:A.b5,HTMLFieldSetElement:A.b5,HTMLHRElement:A.b5,HTMLHeadElement:A.b5,HTMLHeadingElement:A.b5,HTMLHtmlElement:A.b5,HTMLIFrameElement:A.b5,HTMLLIElement:A.b5,HTMLLabelElement:A.b5,HTMLLegendElement:A.b5,HTMLLinkElement:A.b5,HTMLMapElement:A.b5,HTMLMediaElement:A.b5,HTMLMenuElement:A.b5,HTMLMetaElement:A.b5,HTMLMeterElement:A.b5,HTMLModElement:A.b5,HTMLOListElement:A.b5,HTMLObjectElement:A.b5,HTMLOptGroupElement:A.b5,HTMLOptionElement:A.b5,HTMLOutputElement:A.b5,HTMLParagraphElement:A.b5,HTMLParamElement:A.b5,HTMLPictureElement:A.b5,HTMLPreElement:A.b5,HTMLProgressElement:A.b5,HTMLQuoteElement:A.b5,HTMLScriptElement:A.b5,HTMLShadowElement:A.b5,HTMLSlotElement:A.b5,HTMLSourceElement:A.b5,HTMLSpanElement:A.b5,HTMLStyleElement:A.b5,HTMLTableCaptionElement:A.b5,HTMLTableCellElement:A.b5,HTMLTableDataCellElement:A.b5,HTMLTableHeaderCellElement:A.b5,HTMLTableColElement:A.b5,HTMLTableElement:A.b5,HTMLTableRowElement:A.b5,HTMLTableSectionElement:A.b5,HTMLTemplateElement:A.b5,HTMLTextAreaElement:A.b5,HTMLTimeElement:A.b5,HTMLTitleElement:A.b5,HTMLTrackElement:A.b5,HTMLUListElement:A.b5,HTMLUnknownElement:A.b5,HTMLVideoElement:A.b5,HTMLDirectoryElement:A.b5,HTMLFontElement:A.b5,HTMLFrameElement:A.b5,HTMLFrameSetElement:A.b5,HTMLMarqueeElement:A.b5,HTMLElement:A.b5,AccessibleNodeList:A.Nw,HTMLAnchorElement:A.NC,HTMLAreaElement:A.NH,Blob:A.hO,HTMLCanvasElement:A.BW,CDATASection:A.lN,CharacterData:A.lN,Comment:A.lN,ProcessingInstruction:A.lN,Text:A.lN,CloseEvent:A.pt,CSSPerspective:A.PF,CSSCharsetRule:A.cY,CSSConditionRule:A.cY,CSSFontFaceRule:A.cY,CSSGroupingRule:A.cY,CSSImportRule:A.cY,CSSKeyframeRule:A.cY,MozCSSKeyframeRule:A.cY,WebKitCSSKeyframeRule:A.cY,CSSKeyframesRule:A.cY,MozCSSKeyframesRule:A.cY,WebKitCSSKeyframesRule:A.cY,CSSMediaRule:A.cY,CSSNamespaceRule:A.cY,CSSPageRule:A.cY,CSSRule:A.cY,CSSStyleRule:A.cY,CSSSupportsRule:A.cY,CSSViewportRule:A.cY,CSSStyleDeclaration:A.wP,MSStyleCSSProperties:A.wP,CSS2Properties:A.wP,CSSImageValue:A.hS,CSSKeywordValue:A.hS,CSSNumericValue:A.hS,CSSPositionValue:A.hS,CSSResourceValue:A.hS,CSSUnitValue:A.hS,CSSURLImageValue:A.hS,CSSStyleValue:A.hS,CSSMatrixComponent:A.kB,CSSRotation:A.kB,CSSScale:A.kB,CSSSkew:A.kB,CSSTranslation:A.kB,CSSTransformComponent:A.kB,CSSTransformValue:A.PG,CSSUnparsedValue:A.PH,DataTransferItemList:A.PV,Document:A.nt,HTMLDocument:A.nt,XMLDocument:A.nt,DOMException:A.Qj,ClientRectList:A.CN,DOMRectList:A.CN,DOMRectReadOnly:A.CO,DOMStringList:A.CP,DOMTokenList:A.Qm,MathMLElement:A.cz,Element:A.cz,AbortPaymentEvent:A.aG,AnimationEvent:A.aG,AnimationPlaybackEvent:A.aG,ApplicationCacheErrorEvent:A.aG,BackgroundFetchClickEvent:A.aG,BackgroundFetchEvent:A.aG,BackgroundFetchFailEvent:A.aG,BackgroundFetchedEvent:A.aG,BeforeInstallPromptEvent:A.aG,BeforeUnloadEvent:A.aG,BlobEvent:A.aG,CanMakePaymentEvent:A.aG,ClipboardEvent:A.aG,CompositionEvent:A.aG,CustomEvent:A.aG,DeviceMotionEvent:A.aG,DeviceOrientationEvent:A.aG,ErrorEvent:A.aG,ExtendableEvent:A.aG,ExtendableMessageEvent:A.aG,FetchEvent:A.aG,FocusEvent:A.aG,FontFaceSetLoadEvent:A.aG,ForeignFetchEvent:A.aG,GamepadEvent:A.aG,HashChangeEvent:A.aG,InstallEvent:A.aG,KeyboardEvent:A.aG,MediaEncryptedEvent:A.aG,MediaKeyMessageEvent:A.aG,MediaQueryListEvent:A.aG,MediaStreamEvent:A.aG,MediaStreamTrackEvent:A.aG,MIDIConnectionEvent:A.aG,MIDIMessageEvent:A.aG,MouseEvent:A.aG,DragEvent:A.aG,MutationEvent:A.aG,NotificationEvent:A.aG,PageTransitionEvent:A.aG,PaymentRequestEvent:A.aG,PaymentRequestUpdateEvent:A.aG,PointerEvent:A.aG,PopStateEvent:A.aG,PresentationConnectionAvailableEvent:A.aG,PresentationConnectionCloseEvent:A.aG,PromiseRejectionEvent:A.aG,PushEvent:A.aG,RTCDataChannelEvent:A.aG,RTCDTMFToneChangeEvent:A.aG,RTCPeerConnectionIceEvent:A.aG,RTCTrackEvent:A.aG,SecurityPolicyViolationEvent:A.aG,SensorErrorEvent:A.aG,SpeechRecognitionError:A.aG,SpeechRecognitionEvent:A.aG,SpeechSynthesisEvent:A.aG,StorageEvent:A.aG,SyncEvent:A.aG,TextEvent:A.aG,TouchEvent:A.aG,TrackEvent:A.aG,TransitionEvent:A.aG,WebKitTransitionEvent:A.aG,UIEvent:A.aG,VRDeviceEvent:A.aG,VRDisplayEvent:A.aG,VRSessionEvent:A.aG,WheelEvent:A.aG,MojoInterfaceRequestEvent:A.aG,USBConnectionEvent:A.aG,AudioProcessingEvent:A.aG,OfflineAudioCompletionEvent:A.aG,WebGLContextEvent:A.aG,Event:A.aG,InputEvent:A.aG,SubmitEvent:A.aG,AbsoluteOrientationSensor:A.ap,Accelerometer:A.ap,AccessibleNode:A.ap,AmbientLightSensor:A.ap,Animation:A.ap,ApplicationCache:A.ap,DOMApplicationCache:A.ap,OfflineResourceList:A.ap,BackgroundFetchRegistration:A.ap,BatteryManager:A.ap,BroadcastChannel:A.ap,CanvasCaptureMediaStreamTrack:A.ap,EventSource:A.ap,FontFaceSet:A.ap,Gyroscope:A.ap,LinearAccelerationSensor:A.ap,Magnetometer:A.ap,MediaDevices:A.ap,MediaKeySession:A.ap,MediaQueryList:A.ap,MediaRecorder:A.ap,MediaSource:A.ap,MediaStream:A.ap,MediaStreamTrack:A.ap,MIDIAccess:A.ap,MIDIInput:A.ap,MIDIOutput:A.ap,MIDIPort:A.ap,NetworkInformation:A.ap,Notification:A.ap,OffscreenCanvas:A.ap,OrientationSensor:A.ap,PaymentRequest:A.ap,Performance:A.ap,PermissionStatus:A.ap,PresentationAvailability:A.ap,PresentationConnection:A.ap,PresentationConnectionList:A.ap,PresentationRequest:A.ap,RelativeOrientationSensor:A.ap,RemotePlayback:A.ap,RTCDataChannel:A.ap,DataChannel:A.ap,RTCDTMFSender:A.ap,RTCPeerConnection:A.ap,webkitRTCPeerConnection:A.ap,mozRTCPeerConnection:A.ap,ScreenOrientation:A.ap,Sensor:A.ap,ServiceWorker:A.ap,ServiceWorkerContainer:A.ap,ServiceWorkerRegistration:A.ap,SharedWorker:A.ap,SpeechRecognition:A.ap,webkitSpeechRecognition:A.ap,SpeechSynthesis:A.ap,SpeechSynthesisUtterance:A.ap,VR:A.ap,VRDevice:A.ap,VRDisplay:A.ap,VRSession:A.ap,VisualViewport:A.ap,Worker:A.ap,WorkerPerformance:A.ap,BluetoothDevice:A.ap,BluetoothRemoteGATTCharacteristic:A.ap,Clipboard:A.ap,MojoInterfaceInterceptor:A.ap,USB:A.ap,IDBOpenDBRequest:A.ap,IDBVersionChangeRequest:A.ap,IDBRequest:A.ap,IDBTransaction:A.ap,AnalyserNode:A.ap,RealtimeAnalyserNode:A.ap,AudioBufferSourceNode:A.ap,AudioDestinationNode:A.ap,AudioNode:A.ap,AudioScheduledSourceNode:A.ap,AudioWorkletNode:A.ap,BiquadFilterNode:A.ap,ChannelMergerNode:A.ap,AudioChannelMerger:A.ap,ChannelSplitterNode:A.ap,AudioChannelSplitter:A.ap,ConstantSourceNode:A.ap,ConvolverNode:A.ap,DelayNode:A.ap,DynamicsCompressorNode:A.ap,GainNode:A.ap,AudioGainNode:A.ap,IIRFilterNode:A.ap,MediaElementAudioSourceNode:A.ap,MediaStreamAudioDestinationNode:A.ap,MediaStreamAudioSourceNode:A.ap,OscillatorNode:A.ap,Oscillator:A.ap,PannerNode:A.ap,AudioPannerNode:A.ap,webkitAudioPannerNode:A.ap,ScriptProcessorNode:A.ap,JavaScriptAudioNode:A.ap,StereoPannerNode:A.ap,WaveShaperNode:A.ap,EventTarget:A.ap,File:A.fz,FileList:A.xd,FileReader:A.D8,FileWriter:A.QO,HTMLFormElement:A.R4,Gamepad:A.hT,History:A.Rq,HTMLCollection:A.tJ,HTMLFormControlsCollection:A.tJ,HTMLOptionsCollection:A.tJ,XMLHttpRequest:A.m_,XMLHttpRequestUpload:A.tK,XMLHttpRequestEventTarget:A.tK,ImageData:A.xy,HTMLImageElement:A.pO,HTMLInputElement:A.tS,Location:A.Si,MediaList:A.SC,MessageEvent:A.q3,MessagePort:A.y0,MIDIInputMap:A.SH,MIDIOutputMap:A.SI,MimeType:A.hX,MimeTypeArray:A.SJ,DocumentFragment:A.bm,ShadowRoot:A.bm,Attr:A.bm,DocumentType:A.bm,Node:A.bm,NodeList:A.F4,RadioNodeList:A.F4,Plugin:A.hY,PluginArray:A.TQ,ProgressEvent:A.jt,ResourceProgressEvent:A.jt,RTCStatsReport:A.Vl,HTMLSelectElement:A.VE,SharedArrayBuffer:A.yW,SourceBuffer:A.i2,SourceBufferList:A.Wh,SpeechGrammar:A.i3,SpeechGrammarList:A.Wn,SpeechRecognitionResult:A.i4,Storage:A.Hi,CSSStyleSheet:A.h_,StyleSheet:A.h_,TextTrack:A.i7,TextTrackCue:A.h2,VTTCue:A.h2,TextTrackCueList:A.X_,TextTrackList:A.X0,TimeRanges:A.X2,Touch:A.i8,TouchList:A.X8,TrackDefaultList:A.X9,URL:A.Xp,VideoTrackList:A.Xz,WebSocket:A.zI,Window:A.qW,DOMWindow:A.qW,DedicatedWorkerGlobalScope:A.mN,ServiceWorkerGlobalScope:A.mN,SharedWorkerGlobalScope:A.mN,WorkerGlobalScope:A.mN,CSSRuleList:A.Ze,ClientRect:A.J8,DOMRect:A.J8,GamepadList:A.a_x,NamedNodeMap:A.Kq,MozNamedAttrMap:A.Kq,SpeechRecognitionResultList:A.a3v,StyleSheetList:A.a3I,IDBCursor:A.Cs,IDBCursorWithValue:A.lS,IDBDatabase:A.t5,IDBFactory:A.DQ,IDBKeyRange:A.xJ,IDBObjectStore:A.F7,IDBVersionChangeEvent:A.qU,SVGLength:A.jg,SVGLengthList:A.Sc,SVGNumber:A.jn,SVGNumberList:A.T0,SVGPointList:A.TR,SVGStringList:A.Wu,SVGAElement:A.b_,SVGAnimateElement:A.b_,SVGAnimateMotionElement:A.b_,SVGAnimateTransformElement:A.b_,SVGAnimationElement:A.b_,SVGCircleElement:A.b_,SVGClipPathElement:A.b_,SVGDefsElement:A.b_,SVGDescElement:A.b_,SVGDiscardElement:A.b_,SVGEllipseElement:A.b_,SVGFEBlendElement:A.b_,SVGFEColorMatrixElement:A.b_,SVGFEComponentTransferElement:A.b_,SVGFECompositeElement:A.b_,SVGFEConvolveMatrixElement:A.b_,SVGFEDiffuseLightingElement:A.b_,SVGFEDisplacementMapElement:A.b_,SVGFEDistantLightElement:A.b_,SVGFEFloodElement:A.b_,SVGFEFuncAElement:A.b_,SVGFEFuncBElement:A.b_,SVGFEFuncGElement:A.b_,SVGFEFuncRElement:A.b_,SVGFEGaussianBlurElement:A.b_,SVGFEImageElement:A.b_,SVGFEMergeElement:A.b_,SVGFEMergeNodeElement:A.b_,SVGFEMorphologyElement:A.b_,SVGFEOffsetElement:A.b_,SVGFEPointLightElement:A.b_,SVGFESpecularLightingElement:A.b_,SVGFESpotLightElement:A.b_,SVGFETileElement:A.b_,SVGFETurbulenceElement:A.b_,SVGFilterElement:A.b_,SVGForeignObjectElement:A.b_,SVGGElement:A.b_,SVGGeometryElement:A.b_,SVGGraphicsElement:A.b_,SVGImageElement:A.b_,SVGLineElement:A.b_,SVGLinearGradientElement:A.b_,SVGMarkerElement:A.b_,SVGMaskElement:A.b_,SVGMetadataElement:A.b_,SVGPathElement:A.b_,SVGPatternElement:A.b_,SVGPolygonElement:A.b_,SVGPolylineElement:A.b_,SVGRadialGradientElement:A.b_,SVGRectElement:A.b_,SVGScriptElement:A.b_,SVGSetElement:A.b_,SVGStopElement:A.b_,SVGStyleElement:A.b_,SVGElement:A.b_,SVGSVGElement:A.b_,SVGSwitchElement:A.b_,SVGSymbolElement:A.b_,SVGTSpanElement:A.b_,SVGTextContentElement:A.b_,SVGTextElement:A.b_,SVGTextPathElement:A.b_,SVGTextPositioningElement:A.b_,SVGTitleElement:A.b_,SVGUseElement:A.b_,SVGViewElement:A.b_,SVGGradientElement:A.b_,SVGComponentTransferFunctionElement:A.b_,SVGFEDropShadowElement:A.b_,SVGMPathElement:A.b_,SVGTransform:A.jF,SVGTransformList:A.Xb,AudioBuffer:A.NO,AudioParamMap:A.NP,AudioTrackList:A.NQ,AudioContext:A.pl,webkitAudioContext:A.pl,BaseAudioContext:A.pl,OfflineAudioContext:A.T2})
+hunkHelpers.setOrUpdateInterceptorsByTag({WebGL:J.xG,AnimationEffectReadOnly:J.f,AnimationEffectTiming:J.f,AnimationEffectTimingReadOnly:J.f,AnimationTimeline:J.f,AnimationWorkletGlobalScope:J.f,AuthenticatorAssertionResponse:J.f,AuthenticatorAttestationResponse:J.f,AuthenticatorResponse:J.f,BackgroundFetchFetch:J.f,BackgroundFetchManager:J.f,BackgroundFetchSettledFetch:J.f,BarProp:J.f,BarcodeDetector:J.f,BluetoothRemoteGATTDescriptor:J.f,Body:J.f,BudgetState:J.f,CacheStorage:J.f,CanvasGradient:J.f,CanvasPattern:J.f,CanvasRenderingContext2D:J.f,Client:J.f,Clients:J.f,CookieStore:J.f,Coordinates:J.f,Credential:J.f,CredentialUserData:J.f,CredentialsContainer:J.f,Crypto:J.f,CryptoKey:J.f,CSS:J.f,CSSVariableReferenceValue:J.f,CustomElementRegistry:J.f,DataTransfer:J.f,DataTransferItem:J.f,DeprecatedStorageInfo:J.f,DeprecatedStorageQuota:J.f,DeprecationReport:J.f,DetectedBarcode:J.f,DetectedFace:J.f,DetectedText:J.f,DeviceAcceleration:J.f,DeviceRotationRate:J.f,DirectoryEntry:J.f,webkitFileSystemDirectoryEntry:J.f,FileSystemDirectoryEntry:J.f,DirectoryReader:J.f,WebKitDirectoryReader:J.f,webkitFileSystemDirectoryReader:J.f,FileSystemDirectoryReader:J.f,DocumentOrShadowRoot:J.f,DocumentTimeline:J.f,DOMError:J.f,DOMImplementation:J.f,Iterator:J.f,DOMMatrix:J.f,DOMMatrixReadOnly:J.f,DOMParser:J.f,DOMPoint:J.f,DOMPointReadOnly:J.f,DOMQuad:J.f,DOMStringMap:J.f,Entry:J.f,webkitFileSystemEntry:J.f,FileSystemEntry:J.f,External:J.f,FaceDetector:J.f,FederatedCredential:J.f,FileEntry:J.f,webkitFileSystemFileEntry:J.f,FileSystemFileEntry:J.f,DOMFileSystem:J.f,WebKitFileSystem:J.f,webkitFileSystem:J.f,FileSystem:J.f,FontFace:J.f,FontFaceSource:J.f,FormData:J.f,GamepadButton:J.f,GamepadPose:J.f,Geolocation:J.f,Position:J.f,GeolocationPosition:J.f,Headers:J.f,HTMLHyperlinkElementUtils:J.f,IdleDeadline:J.f,ImageBitmap:J.f,ImageBitmapRenderingContext:J.f,ImageCapture:J.f,InputDeviceCapabilities:J.f,IntersectionObserver:J.f,IntersectionObserverEntry:J.f,InterventionReport:J.f,KeyframeEffect:J.f,KeyframeEffectReadOnly:J.f,MediaCapabilities:J.f,MediaCapabilitiesInfo:J.f,MediaDeviceInfo:J.f,MediaError:J.f,MediaKeyStatusMap:J.f,MediaKeySystemAccess:J.f,MediaKeys:J.f,MediaKeysPolicy:J.f,MediaMetadata:J.f,MediaSession:J.f,MediaSettingsRange:J.f,MemoryInfo:J.f,MessageChannel:J.f,Metadata:J.f,MutationObserver:J.f,WebKitMutationObserver:J.f,MutationRecord:J.f,NavigationPreloadManager:J.f,Navigator:J.f,NavigatorAutomationInformation:J.f,NavigatorConcurrentHardware:J.f,NavigatorCookies:J.f,NavigatorUserMediaError:J.f,NodeFilter:J.f,NodeIterator:J.f,NonDocumentTypeChildNode:J.f,NonElementParentNode:J.f,NoncedElement:J.f,OffscreenCanvasRenderingContext2D:J.f,OverconstrainedError:J.f,PaintRenderingContext2D:J.f,PaintSize:J.f,PaintWorkletGlobalScope:J.f,PasswordCredential:J.f,Path2D:J.f,PaymentAddress:J.f,PaymentInstruments:J.f,PaymentManager:J.f,PaymentResponse:J.f,PerformanceEntry:J.f,PerformanceLongTaskTiming:J.f,PerformanceMark:J.f,PerformanceMeasure:J.f,PerformanceNavigation:J.f,PerformanceNavigationTiming:J.f,PerformanceObserver:J.f,PerformanceObserverEntryList:J.f,PerformancePaintTiming:J.f,PerformanceResourceTiming:J.f,PerformanceServerTiming:J.f,PerformanceTiming:J.f,Permissions:J.f,PhotoCapabilities:J.f,PositionError:J.f,GeolocationPositionError:J.f,Presentation:J.f,PresentationReceiver:J.f,PublicKeyCredential:J.f,PushManager:J.f,PushMessageData:J.f,PushSubscription:J.f,PushSubscriptionOptions:J.f,Range:J.f,RelatedApplication:J.f,ReportBody:J.f,ReportingObserver:J.f,ResizeObserver:J.f,ResizeObserverEntry:J.f,RTCCertificate:J.f,RTCIceCandidate:J.f,mozRTCIceCandidate:J.f,RTCLegacyStatsReport:J.f,RTCRtpContributingSource:J.f,RTCRtpReceiver:J.f,RTCRtpSender:J.f,RTCSessionDescription:J.f,mozRTCSessionDescription:J.f,RTCStatsResponse:J.f,Screen:J.f,ScrollState:J.f,ScrollTimeline:J.f,Selection:J.f,SpeechRecognitionAlternative:J.f,SpeechSynthesisVoice:J.f,StaticRange:J.f,StorageManager:J.f,StyleMedia:J.f,StylePropertyMap:J.f,StylePropertyMapReadonly:J.f,SyncManager:J.f,TaskAttributionTiming:J.f,TextDetector:J.f,TextMetrics:J.f,TrackDefault:J.f,TreeWalker:J.f,TrustedHTML:J.f,TrustedScriptURL:J.f,TrustedURL:J.f,UnderlyingSourceBase:J.f,URLSearchParams:J.f,VRCoordinateSystem:J.f,VRDisplayCapabilities:J.f,VREyeParameters:J.f,VRFrameData:J.f,VRFrameOfReference:J.f,VRPose:J.f,VRStageBounds:J.f,VRStageBoundsPoint:J.f,VRStageParameters:J.f,ValidityState:J.f,VideoPlaybackQuality:J.f,VideoTrack:J.f,VTTRegion:J.f,WindowClient:J.f,WorkletAnimation:J.f,WorkletGlobalScope:J.f,XPathEvaluator:J.f,XPathExpression:J.f,XPathNSResolver:J.f,XPathResult:J.f,XMLSerializer:J.f,XSLTProcessor:J.f,Bluetooth:J.f,BluetoothCharacteristicProperties:J.f,BluetoothRemoteGATTServer:J.f,BluetoothRemoteGATTService:J.f,BluetoothUUID:J.f,BudgetService:J.f,Cache:J.f,DOMFileSystemSync:J.f,DirectoryEntrySync:J.f,DirectoryReaderSync:J.f,EntrySync:J.f,FileEntrySync:J.f,FileReaderSync:J.f,FileWriterSync:J.f,HTMLAllCollection:J.f,Mojo:J.f,MojoHandle:J.f,MojoWatcher:J.f,NFC:J.f,PagePopupController:J.f,Report:J.f,Request:J.f,Response:J.f,SubtleCrypto:J.f,USBAlternateInterface:J.f,USBConfiguration:J.f,USBDevice:J.f,USBEndpoint:J.f,USBInTransferResult:J.f,USBInterface:J.f,USBIsochronousInTransferPacket:J.f,USBIsochronousInTransferResult:J.f,USBIsochronousOutTransferPacket:J.f,USBIsochronousOutTransferResult:J.f,USBOutTransferResult:J.f,WorkerLocation:J.f,WorkerNavigator:J.f,Worklet:J.f,IDBIndex:J.f,IDBObservation:J.f,IDBObserver:J.f,IDBObserverChanges:J.f,SVGAngle:J.f,SVGAnimatedAngle:J.f,SVGAnimatedBoolean:J.f,SVGAnimatedEnumeration:J.f,SVGAnimatedInteger:J.f,SVGAnimatedLength:J.f,SVGAnimatedLengthList:J.f,SVGAnimatedNumber:J.f,SVGAnimatedNumberList:J.f,SVGAnimatedPreserveAspectRatio:J.f,SVGAnimatedRect:J.f,SVGAnimatedString:J.f,SVGAnimatedTransformList:J.f,SVGMatrix:J.f,SVGPoint:J.f,SVGPreserveAspectRatio:J.f,SVGRect:J.f,SVGUnitTypes:J.f,AudioListener:J.f,AudioParam:J.f,AudioTrack:J.f,AudioWorkletGlobalScope:J.f,AudioWorkletProcessor:J.f,PeriodicWave:J.f,WebGLActiveInfo:J.f,ANGLEInstancedArrays:J.f,ANGLE_instanced_arrays:J.f,WebGLBuffer:J.f,WebGLCanvas:J.f,WebGLColorBufferFloat:J.f,WebGLCompressedTextureASTC:J.f,WebGLCompressedTextureATC:J.f,WEBGL_compressed_texture_atc:J.f,WebGLCompressedTextureETC1:J.f,WEBGL_compressed_texture_etc1:J.f,WebGLCompressedTextureETC:J.f,WebGLCompressedTexturePVRTC:J.f,WEBGL_compressed_texture_pvrtc:J.f,WebGLCompressedTextureS3TC:J.f,WEBGL_compressed_texture_s3tc:J.f,WebGLCompressedTextureS3TCsRGB:J.f,WebGLDebugRendererInfo:J.f,WEBGL_debug_renderer_info:J.f,WebGLDebugShaders:J.f,WEBGL_debug_shaders:J.f,WebGLDepthTexture:J.f,WEBGL_depth_texture:J.f,WebGLDrawBuffers:J.f,WEBGL_draw_buffers:J.f,EXTsRGB:J.f,EXT_sRGB:J.f,EXTBlendMinMax:J.f,EXT_blend_minmax:J.f,EXTColorBufferFloat:J.f,EXTColorBufferHalfFloat:J.f,EXTDisjointTimerQuery:J.f,EXTDisjointTimerQueryWebGL2:J.f,EXTFragDepth:J.f,EXT_frag_depth:J.f,EXTShaderTextureLOD:J.f,EXT_shader_texture_lod:J.f,EXTTextureFilterAnisotropic:J.f,EXT_texture_filter_anisotropic:J.f,WebGLFramebuffer:J.f,WebGLGetBufferSubDataAsync:J.f,WebGLLoseContext:J.f,WebGLExtensionLoseContext:J.f,WEBGL_lose_context:J.f,OESElementIndexUint:J.f,OES_element_index_uint:J.f,OESStandardDerivatives:J.f,OES_standard_derivatives:J.f,OESTextureFloat:J.f,OES_texture_float:J.f,OESTextureFloatLinear:J.f,OES_texture_float_linear:J.f,OESTextureHalfFloat:J.f,OES_texture_half_float:J.f,OESTextureHalfFloatLinear:J.f,OES_texture_half_float_linear:J.f,OESVertexArrayObject:J.f,OES_vertex_array_object:J.f,WebGLProgram:J.f,WebGLQuery:J.f,WebGLRenderbuffer:J.f,WebGLRenderingContext:J.f,WebGL2RenderingContext:J.f,WebGLSampler:J.f,WebGLShader:J.f,WebGLShaderPrecisionFormat:J.f,WebGLSync:J.f,WebGLTexture:J.f,WebGLTimerQueryEXT:J.f,WebGLTransformFeedback:J.f,WebGLUniformLocation:J.f,WebGLVertexArrayObject:J.f,WebGLVertexArrayObjectOES:J.f,WebGL2RenderingContextBase:J.f,ArrayBuffer:A.ui,ArrayBufferView:A.f0,DataView:A.ET,Float32Array:A.EU,Float64Array:A.EV,Int16Array:A.SR,Int32Array:A.EW,Int8Array:A.SS,Uint16Array:A.EX,Uint32Array:A.EY,Uint8ClampedArray:A.EZ,CanvasPixelArray:A.EZ,Uint8Array:A.uj,HTMLAudioElement:A.b5,HTMLBRElement:A.b5,HTMLBaseElement:A.b5,HTMLBodyElement:A.b5,HTMLButtonElement:A.b5,HTMLContentElement:A.b5,HTMLDListElement:A.b5,HTMLDataElement:A.b5,HTMLDataListElement:A.b5,HTMLDetailsElement:A.b5,HTMLDialogElement:A.b5,HTMLDivElement:A.b5,HTMLEmbedElement:A.b5,HTMLFieldSetElement:A.b5,HTMLHRElement:A.b5,HTMLHeadElement:A.b5,HTMLHeadingElement:A.b5,HTMLHtmlElement:A.b5,HTMLIFrameElement:A.b5,HTMLLIElement:A.b5,HTMLLabelElement:A.b5,HTMLLegendElement:A.b5,HTMLLinkElement:A.b5,HTMLMapElement:A.b5,HTMLMediaElement:A.b5,HTMLMenuElement:A.b5,HTMLMetaElement:A.b5,HTMLMeterElement:A.b5,HTMLModElement:A.b5,HTMLOListElement:A.b5,HTMLObjectElement:A.b5,HTMLOptGroupElement:A.b5,HTMLOptionElement:A.b5,HTMLOutputElement:A.b5,HTMLParagraphElement:A.b5,HTMLParamElement:A.b5,HTMLPictureElement:A.b5,HTMLPreElement:A.b5,HTMLProgressElement:A.b5,HTMLQuoteElement:A.b5,HTMLScriptElement:A.b5,HTMLShadowElement:A.b5,HTMLSlotElement:A.b5,HTMLSourceElement:A.b5,HTMLSpanElement:A.b5,HTMLStyleElement:A.b5,HTMLTableCaptionElement:A.b5,HTMLTableCellElement:A.b5,HTMLTableDataCellElement:A.b5,HTMLTableHeaderCellElement:A.b5,HTMLTableColElement:A.b5,HTMLTableElement:A.b5,HTMLTableRowElement:A.b5,HTMLTableSectionElement:A.b5,HTMLTemplateElement:A.b5,HTMLTextAreaElement:A.b5,HTMLTimeElement:A.b5,HTMLTitleElement:A.b5,HTMLTrackElement:A.b5,HTMLUListElement:A.b5,HTMLUnknownElement:A.b5,HTMLVideoElement:A.b5,HTMLDirectoryElement:A.b5,HTMLFontElement:A.b5,HTMLFrameElement:A.b5,HTMLFrameSetElement:A.b5,HTMLMarqueeElement:A.b5,HTMLElement:A.b5,AccessibleNodeList:A.Nw,HTMLAnchorElement:A.NC,HTMLAreaElement:A.NH,Blob:A.hO,HTMLCanvasElement:A.BW,CDATASection:A.lN,CharacterData:A.lN,Comment:A.lN,ProcessingInstruction:A.lN,Text:A.lN,CloseEvent:A.pt,CSSPerspective:A.PF,CSSCharsetRule:A.cY,CSSConditionRule:A.cY,CSSFontFaceRule:A.cY,CSSGroupingRule:A.cY,CSSImportRule:A.cY,CSSKeyframeRule:A.cY,MozCSSKeyframeRule:A.cY,WebKitCSSKeyframeRule:A.cY,CSSKeyframesRule:A.cY,MozCSSKeyframesRule:A.cY,WebKitCSSKeyframesRule:A.cY,CSSMediaRule:A.cY,CSSNamespaceRule:A.cY,CSSPageRule:A.cY,CSSRule:A.cY,CSSStyleRule:A.cY,CSSSupportsRule:A.cY,CSSViewportRule:A.cY,CSSStyleDeclaration:A.wP,MSStyleCSSProperties:A.wP,CSS2Properties:A.wP,CSSImageValue:A.hS,CSSKeywordValue:A.hS,CSSNumericValue:A.hS,CSSPositionValue:A.hS,CSSResourceValue:A.hS,CSSUnitValue:A.hS,CSSURLImageValue:A.hS,CSSStyleValue:A.hS,CSSMatrixComponent:A.kB,CSSRotation:A.kB,CSSScale:A.kB,CSSSkew:A.kB,CSSTranslation:A.kB,CSSTransformComponent:A.kB,CSSTransformValue:A.PG,CSSUnparsedValue:A.PH,DataTransferItemList:A.PV,Document:A.nt,HTMLDocument:A.nt,XMLDocument:A.nt,DOMException:A.Qj,ClientRectList:A.CN,DOMRectList:A.CN,DOMRectReadOnly:A.CO,DOMStringList:A.CP,DOMTokenList:A.Qm,MathMLElement:A.cz,Element:A.cz,AbortPaymentEvent:A.aG,AnimationEvent:A.aG,AnimationPlaybackEvent:A.aG,ApplicationCacheErrorEvent:A.aG,BackgroundFetchClickEvent:A.aG,BackgroundFetchEvent:A.aG,BackgroundFetchFailEvent:A.aG,BackgroundFetchedEvent:A.aG,BeforeInstallPromptEvent:A.aG,BeforeUnloadEvent:A.aG,BlobEvent:A.aG,CanMakePaymentEvent:A.aG,ClipboardEvent:A.aG,CompositionEvent:A.aG,CustomEvent:A.aG,DeviceMotionEvent:A.aG,DeviceOrientationEvent:A.aG,ErrorEvent:A.aG,ExtendableEvent:A.aG,ExtendableMessageEvent:A.aG,FetchEvent:A.aG,FocusEvent:A.aG,FontFaceSetLoadEvent:A.aG,ForeignFetchEvent:A.aG,GamepadEvent:A.aG,HashChangeEvent:A.aG,InstallEvent:A.aG,KeyboardEvent:A.aG,MediaEncryptedEvent:A.aG,MediaKeyMessageEvent:A.aG,MediaQueryListEvent:A.aG,MediaStreamEvent:A.aG,MediaStreamTrackEvent:A.aG,MIDIConnectionEvent:A.aG,MIDIMessageEvent:A.aG,MouseEvent:A.aG,DragEvent:A.aG,MutationEvent:A.aG,NotificationEvent:A.aG,PageTransitionEvent:A.aG,PaymentRequestEvent:A.aG,PaymentRequestUpdateEvent:A.aG,PointerEvent:A.aG,PopStateEvent:A.aG,PresentationConnectionAvailableEvent:A.aG,PresentationConnectionCloseEvent:A.aG,PromiseRejectionEvent:A.aG,PushEvent:A.aG,RTCDataChannelEvent:A.aG,RTCDTMFToneChangeEvent:A.aG,RTCPeerConnectionIceEvent:A.aG,RTCTrackEvent:A.aG,SecurityPolicyViolationEvent:A.aG,SensorErrorEvent:A.aG,SpeechRecognitionError:A.aG,SpeechRecognitionEvent:A.aG,SpeechSynthesisEvent:A.aG,StorageEvent:A.aG,SyncEvent:A.aG,TextEvent:A.aG,TouchEvent:A.aG,TrackEvent:A.aG,TransitionEvent:A.aG,WebKitTransitionEvent:A.aG,UIEvent:A.aG,VRDeviceEvent:A.aG,VRDisplayEvent:A.aG,VRSessionEvent:A.aG,WheelEvent:A.aG,MojoInterfaceRequestEvent:A.aG,USBConnectionEvent:A.aG,AudioProcessingEvent:A.aG,OfflineAudioCompletionEvent:A.aG,WebGLContextEvent:A.aG,Event:A.aG,InputEvent:A.aG,SubmitEvent:A.aG,AbsoluteOrientationSensor:A.ap,Accelerometer:A.ap,AccessibleNode:A.ap,AmbientLightSensor:A.ap,Animation:A.ap,ApplicationCache:A.ap,DOMApplicationCache:A.ap,OfflineResourceList:A.ap,BackgroundFetchRegistration:A.ap,BatteryManager:A.ap,BroadcastChannel:A.ap,CanvasCaptureMediaStreamTrack:A.ap,EventSource:A.ap,FontFaceSet:A.ap,Gyroscope:A.ap,LinearAccelerationSensor:A.ap,Magnetometer:A.ap,MediaDevices:A.ap,MediaKeySession:A.ap,MediaQueryList:A.ap,MediaRecorder:A.ap,MediaSource:A.ap,MediaStream:A.ap,MediaStreamTrack:A.ap,MIDIAccess:A.ap,MIDIInput:A.ap,MIDIOutput:A.ap,MIDIPort:A.ap,NetworkInformation:A.ap,Notification:A.ap,OffscreenCanvas:A.ap,OrientationSensor:A.ap,PaymentRequest:A.ap,Performance:A.ap,PermissionStatus:A.ap,PresentationAvailability:A.ap,PresentationConnection:A.ap,PresentationConnectionList:A.ap,PresentationRequest:A.ap,RelativeOrientationSensor:A.ap,RemotePlayback:A.ap,RTCDataChannel:A.ap,DataChannel:A.ap,RTCDTMFSender:A.ap,RTCPeerConnection:A.ap,webkitRTCPeerConnection:A.ap,mozRTCPeerConnection:A.ap,ScreenOrientation:A.ap,Sensor:A.ap,ServiceWorker:A.ap,ServiceWorkerContainer:A.ap,ServiceWorkerRegistration:A.ap,SharedWorker:A.ap,SpeechRecognition:A.ap,webkitSpeechRecognition:A.ap,SpeechSynthesis:A.ap,SpeechSynthesisUtterance:A.ap,VR:A.ap,VRDevice:A.ap,VRDisplay:A.ap,VRSession:A.ap,VisualViewport:A.ap,Worker:A.ap,WorkerPerformance:A.ap,BluetoothDevice:A.ap,BluetoothRemoteGATTCharacteristic:A.ap,Clipboard:A.ap,MojoInterfaceInterceptor:A.ap,USB:A.ap,IDBOpenDBRequest:A.ap,IDBVersionChangeRequest:A.ap,IDBRequest:A.ap,IDBTransaction:A.ap,AnalyserNode:A.ap,RealtimeAnalyserNode:A.ap,AudioBufferSourceNode:A.ap,AudioDestinationNode:A.ap,AudioNode:A.ap,AudioScheduledSourceNode:A.ap,AudioWorkletNode:A.ap,BiquadFilterNode:A.ap,ChannelMergerNode:A.ap,AudioChannelMerger:A.ap,ChannelSplitterNode:A.ap,AudioChannelSplitter:A.ap,ConstantSourceNode:A.ap,ConvolverNode:A.ap,DelayNode:A.ap,DynamicsCompressorNode:A.ap,GainNode:A.ap,AudioGainNode:A.ap,IIRFilterNode:A.ap,MediaElementAudioSourceNode:A.ap,MediaStreamAudioDestinationNode:A.ap,MediaStreamAudioSourceNode:A.ap,OscillatorNode:A.ap,Oscillator:A.ap,PannerNode:A.ap,AudioPannerNode:A.ap,webkitAudioPannerNode:A.ap,ScriptProcessorNode:A.ap,JavaScriptAudioNode:A.ap,StereoPannerNode:A.ap,WaveShaperNode:A.ap,EventTarget:A.ap,File:A.fz,FileList:A.xd,FileReader:A.D8,FileWriter:A.QO,HTMLFormElement:A.R4,Gamepad:A.hT,History:A.Rq,HTMLCollection:A.tJ,HTMLFormControlsCollection:A.tJ,HTMLOptionsCollection:A.tJ,XMLHttpRequest:A.m_,XMLHttpRequestUpload:A.tK,XMLHttpRequestEventTarget:A.tK,ImageData:A.xy,HTMLImageElement:A.pO,HTMLInputElement:A.tS,Location:A.Si,MediaList:A.SC,MessageEvent:A.q3,MessagePort:A.y0,MIDIInputMap:A.SH,MIDIOutputMap:A.SI,MimeType:A.hX,MimeTypeArray:A.SJ,DocumentFragment:A.bm,ShadowRoot:A.bm,Attr:A.bm,DocumentType:A.bm,Node:A.bm,NodeList:A.F4,RadioNodeList:A.F4,Plugin:A.hY,PluginArray:A.TQ,ProgressEvent:A.jt,ResourceProgressEvent:A.jt,RTCStatsReport:A.Vl,HTMLSelectElement:A.VE,SharedArrayBuffer:A.yW,SourceBuffer:A.i2,SourceBufferList:A.Wh,SpeechGrammar:A.i3,SpeechGrammarList:A.Wn,SpeechRecognitionResult:A.i4,Storage:A.Hi,CSSStyleSheet:A.h_,StyleSheet:A.h_,TextTrack:A.i7,TextTrackCue:A.h2,VTTCue:A.h2,TextTrackCueList:A.X_,TextTrackList:A.X0,TimeRanges:A.X2,Touch:A.i8,TouchList:A.X8,TrackDefaultList:A.X9,URL:A.Xp,VideoTrackList:A.Xz,WebSocket:A.zI,Window:A.qW,DOMWindow:A.qW,DedicatedWorkerGlobalScope:A.mN,ServiceWorkerGlobalScope:A.mN,SharedWorkerGlobalScope:A.mN,WorkerGlobalScope:A.mN,CSSRuleList:A.Ze,ClientRect:A.J8,DOMRect:A.J8,GamepadList:A.a_x,NamedNodeMap:A.Kq,MozNamedAttrMap:A.Kq,SpeechRecognitionResultList:A.a3v,StyleSheetList:A.a3I,IDBCursor:A.Cs,IDBCursorWithValue:A.lS,IDBDatabase:A.t5,IDBFactory:A.DQ,IDBKeyRange:A.xJ,IDBObjectStore:A.F7,IDBVersionChangeEvent:A.qU,SVGLength:A.jg,SVGLengthList:A.Sc,SVGNumber:A.jn,SVGNumberList:A.T0,SVGPointList:A.TR,SVGStringList:A.Wu,SVGAElement:A.aZ,SVGAnimateElement:A.aZ,SVGAnimateMotionElement:A.aZ,SVGAnimateTransformElement:A.aZ,SVGAnimationElement:A.aZ,SVGCircleElement:A.aZ,SVGClipPathElement:A.aZ,SVGDefsElement:A.aZ,SVGDescElement:A.aZ,SVGDiscardElement:A.aZ,SVGEllipseElement:A.aZ,SVGFEBlendElement:A.aZ,SVGFEColorMatrixElement:A.aZ,SVGFEComponentTransferElement:A.aZ,SVGFECompositeElement:A.aZ,SVGFEConvolveMatrixElement:A.aZ,SVGFEDiffuseLightingElement:A.aZ,SVGFEDisplacementMapElement:A.aZ,SVGFEDistantLightElement:A.aZ,SVGFEFloodElement:A.aZ,SVGFEFuncAElement:A.aZ,SVGFEFuncBElement:A.aZ,SVGFEFuncGElement:A.aZ,SVGFEFuncRElement:A.aZ,SVGFEGaussianBlurElement:A.aZ,SVGFEImageElement:A.aZ,SVGFEMergeElement:A.aZ,SVGFEMergeNodeElement:A.aZ,SVGFEMorphologyElement:A.aZ,SVGFEOffsetElement:A.aZ,SVGFEPointLightElement:A.aZ,SVGFESpecularLightingElement:A.aZ,SVGFESpotLightElement:A.aZ,SVGFETileElement:A.aZ,SVGFETurbulenceElement:A.aZ,SVGFilterElement:A.aZ,SVGForeignObjectElement:A.aZ,SVGGElement:A.aZ,SVGGeometryElement:A.aZ,SVGGraphicsElement:A.aZ,SVGImageElement:A.aZ,SVGLineElement:A.aZ,SVGLinearGradientElement:A.aZ,SVGMarkerElement:A.aZ,SVGMaskElement:A.aZ,SVGMetadataElement:A.aZ,SVGPathElement:A.aZ,SVGPatternElement:A.aZ,SVGPolygonElement:A.aZ,SVGPolylineElement:A.aZ,SVGRadialGradientElement:A.aZ,SVGRectElement:A.aZ,SVGScriptElement:A.aZ,SVGSetElement:A.aZ,SVGStopElement:A.aZ,SVGStyleElement:A.aZ,SVGElement:A.aZ,SVGSVGElement:A.aZ,SVGSwitchElement:A.aZ,SVGSymbolElement:A.aZ,SVGTSpanElement:A.aZ,SVGTextContentElement:A.aZ,SVGTextElement:A.aZ,SVGTextPathElement:A.aZ,SVGTextPositioningElement:A.aZ,SVGTitleElement:A.aZ,SVGUseElement:A.aZ,SVGViewElement:A.aZ,SVGGradientElement:A.aZ,SVGComponentTransferFunctionElement:A.aZ,SVGFEDropShadowElement:A.aZ,SVGMPathElement:A.aZ,SVGTransform:A.jF,SVGTransformList:A.Xb,AudioBuffer:A.NO,AudioParamMap:A.NP,AudioTrackList:A.NQ,AudioContext:A.pl,webkitAudioContext:A.pl,BaseAudioContext:A.pl,OfflineAudioContext:A.T2})
 hunkHelpers.setOrUpdateLeafTags({WebGL:true,AnimationEffectReadOnly:true,AnimationEffectTiming:true,AnimationEffectTimingReadOnly:true,AnimationTimeline:true,AnimationWorkletGlobalScope:true,AuthenticatorAssertionResponse:true,AuthenticatorAttestationResponse:true,AuthenticatorResponse:true,BackgroundFetchFetch:true,BackgroundFetchManager:true,BackgroundFetchSettledFetch:true,BarProp:true,BarcodeDetector:true,BluetoothRemoteGATTDescriptor:true,Body:true,BudgetState:true,CacheStorage:true,CanvasGradient:true,CanvasPattern:true,CanvasRenderingContext2D:true,Client:true,Clients:true,CookieStore:true,Coordinates:true,Credential:true,CredentialUserData:true,CredentialsContainer:true,Crypto:true,CryptoKey:true,CSS:true,CSSVariableReferenceValue:true,CustomElementRegistry:true,DataTransfer:true,DataTransferItem:true,DeprecatedStorageInfo:true,DeprecatedStorageQuota:true,DeprecationReport:true,DetectedBarcode:true,DetectedFace:true,DetectedText:true,DeviceAcceleration:true,DeviceRotationRate:true,DirectoryEntry:true,webkitFileSystemDirectoryEntry:true,FileSystemDirectoryEntry:true,DirectoryReader:true,WebKitDirectoryReader:true,webkitFileSystemDirectoryReader:true,FileSystemDirectoryReader:true,DocumentOrShadowRoot:true,DocumentTimeline:true,DOMError:true,DOMImplementation:true,Iterator:true,DOMMatrix:true,DOMMatrixReadOnly:true,DOMParser:true,DOMPoint:true,DOMPointReadOnly:true,DOMQuad:true,DOMStringMap:true,Entry:true,webkitFileSystemEntry:true,FileSystemEntry:true,External:true,FaceDetector:true,FederatedCredential:true,FileEntry:true,webkitFileSystemFileEntry:true,FileSystemFileEntry:true,DOMFileSystem:true,WebKitFileSystem:true,webkitFileSystem:true,FileSystem:true,FontFace:true,FontFaceSource:true,FormData:true,GamepadButton:true,GamepadPose:true,Geolocation:true,Position:true,GeolocationPosition:true,Headers:true,HTMLHyperlinkElementUtils:true,IdleDeadline:true,ImageBitmap:true,ImageBitmapRenderingContext:true,ImageCapture:true,InputDeviceCapabilities:true,IntersectionObserver:true,IntersectionObserverEntry:true,InterventionReport:true,KeyframeEffect:true,KeyframeEffectReadOnly:true,MediaCapabilities:true,MediaCapabilitiesInfo:true,MediaDeviceInfo:true,MediaError:true,MediaKeyStatusMap:true,MediaKeySystemAccess:true,MediaKeys:true,MediaKeysPolicy:true,MediaMetadata:true,MediaSession:true,MediaSettingsRange:true,MemoryInfo:true,MessageChannel:true,Metadata:true,MutationObserver:true,WebKitMutationObserver:true,MutationRecord:true,NavigationPreloadManager:true,Navigator:true,NavigatorAutomationInformation:true,NavigatorConcurrentHardware:true,NavigatorCookies:true,NavigatorUserMediaError:true,NodeFilter:true,NodeIterator:true,NonDocumentTypeChildNode:true,NonElementParentNode:true,NoncedElement:true,OffscreenCanvasRenderingContext2D:true,OverconstrainedError:true,PaintRenderingContext2D:true,PaintSize:true,PaintWorkletGlobalScope:true,PasswordCredential:true,Path2D:true,PaymentAddress:true,PaymentInstruments:true,PaymentManager:true,PaymentResponse:true,PerformanceEntry:true,PerformanceLongTaskTiming:true,PerformanceMark:true,PerformanceMeasure:true,PerformanceNavigation:true,PerformanceNavigationTiming:true,PerformanceObserver:true,PerformanceObserverEntryList:true,PerformancePaintTiming:true,PerformanceResourceTiming:true,PerformanceServerTiming:true,PerformanceTiming:true,Permissions:true,PhotoCapabilities:true,PositionError:true,GeolocationPositionError:true,Presentation:true,PresentationReceiver:true,PublicKeyCredential:true,PushManager:true,PushMessageData:true,PushSubscription:true,PushSubscriptionOptions:true,Range:true,RelatedApplication:true,ReportBody:true,ReportingObserver:true,ResizeObserver:true,ResizeObserverEntry:true,RTCCertificate:true,RTCIceCandidate:true,mozRTCIceCandidate:true,RTCLegacyStatsReport:true,RTCRtpContributingSource:true,RTCRtpReceiver:true,RTCRtpSender:true,RTCSessionDescription:true,mozRTCSessionDescription:true,RTCStatsResponse:true,Screen:true,ScrollState:true,ScrollTimeline:true,Selection:true,SpeechRecognitionAlternative:true,SpeechSynthesisVoice:true,StaticRange:true,StorageManager:true,StyleMedia:true,StylePropertyMap:true,StylePropertyMapReadonly:true,SyncManager:true,TaskAttributionTiming:true,TextDetector:true,TextMetrics:true,TrackDefault:true,TreeWalker:true,TrustedHTML:true,TrustedScriptURL:true,TrustedURL:true,UnderlyingSourceBase:true,URLSearchParams:true,VRCoordinateSystem:true,VRDisplayCapabilities:true,VREyeParameters:true,VRFrameData:true,VRFrameOfReference:true,VRPose:true,VRStageBounds:true,VRStageBoundsPoint:true,VRStageParameters:true,ValidityState:true,VideoPlaybackQuality:true,VideoTrack:true,VTTRegion:true,WindowClient:true,WorkletAnimation:true,WorkletGlobalScope:true,XPathEvaluator:true,XPathExpression:true,XPathNSResolver:true,XPathResult:true,XMLSerializer:true,XSLTProcessor:true,Bluetooth:true,BluetoothCharacteristicProperties:true,BluetoothRemoteGATTServer:true,BluetoothRemoteGATTService:true,BluetoothUUID:true,BudgetService:true,Cache:true,DOMFileSystemSync:true,DirectoryEntrySync:true,DirectoryReaderSync:true,EntrySync:true,FileEntrySync:true,FileReaderSync:true,FileWriterSync:true,HTMLAllCollection:true,Mojo:true,MojoHandle:true,MojoWatcher:true,NFC:true,PagePopupController:true,Report:true,Request:true,Response:true,SubtleCrypto:true,USBAlternateInterface:true,USBConfiguration:true,USBDevice:true,USBEndpoint:true,USBInTransferResult:true,USBInterface:true,USBIsochronousInTransferPacket:true,USBIsochronousInTransferResult:true,USBIsochronousOutTransferPacket:true,USBIsochronousOutTransferResult:true,USBOutTransferResult:true,WorkerLocation:true,WorkerNavigator:true,Worklet:true,IDBIndex:true,IDBObservation:true,IDBObserver:true,IDBObserverChanges:true,SVGAngle:true,SVGAnimatedAngle:true,SVGAnimatedBoolean:true,SVGAnimatedEnumeration:true,SVGAnimatedInteger:true,SVGAnimatedLength:true,SVGAnimatedLengthList:true,SVGAnimatedNumber:true,SVGAnimatedNumberList:true,SVGAnimatedPreserveAspectRatio:true,SVGAnimatedRect:true,SVGAnimatedString:true,SVGAnimatedTransformList:true,SVGMatrix:true,SVGPoint:true,SVGPreserveAspectRatio:true,SVGRect:true,SVGUnitTypes:true,AudioListener:true,AudioParam:true,AudioTrack:true,AudioWorkletGlobalScope:true,AudioWorkletProcessor:true,PeriodicWave:true,WebGLActiveInfo:true,ANGLEInstancedArrays:true,ANGLE_instanced_arrays:true,WebGLBuffer:true,WebGLCanvas:true,WebGLColorBufferFloat:true,WebGLCompressedTextureASTC:true,WebGLCompressedTextureATC:true,WEBGL_compressed_texture_atc:true,WebGLCompressedTextureETC1:true,WEBGL_compressed_texture_etc1:true,WebGLCompressedTextureETC:true,WebGLCompressedTexturePVRTC:true,WEBGL_compressed_texture_pvrtc:true,WebGLCompressedTextureS3TC:true,WEBGL_compressed_texture_s3tc:true,WebGLCompressedTextureS3TCsRGB:true,WebGLDebugRendererInfo:true,WEBGL_debug_renderer_info:true,WebGLDebugShaders:true,WEBGL_debug_shaders:true,WebGLDepthTexture:true,WEBGL_depth_texture:true,WebGLDrawBuffers:true,WEBGL_draw_buffers:true,EXTsRGB:true,EXT_sRGB:true,EXTBlendMinMax:true,EXT_blend_minmax:true,EXTColorBufferFloat:true,EXTColorBufferHalfFloat:true,EXTDisjointTimerQuery:true,EXTDisjointTimerQueryWebGL2:true,EXTFragDepth:true,EXT_frag_depth:true,EXTShaderTextureLOD:true,EXT_shader_texture_lod:true,EXTTextureFilterAnisotropic:true,EXT_texture_filter_anisotropic:true,WebGLFramebuffer:true,WebGLGetBufferSubDataAsync:true,WebGLLoseContext:true,WebGLExtensionLoseContext:true,WEBGL_lose_context:true,OESElementIndexUint:true,OES_element_index_uint:true,OESStandardDerivatives:true,OES_standard_derivatives:true,OESTextureFloat:true,OES_texture_float:true,OESTextureFloatLinear:true,OES_texture_float_linear:true,OESTextureHalfFloat:true,OES_texture_half_float:true,OESTextureHalfFloatLinear:true,OES_texture_half_float_linear:true,OESVertexArrayObject:true,OES_vertex_array_object:true,WebGLProgram:true,WebGLQuery:true,WebGLRenderbuffer:true,WebGLRenderingContext:true,WebGL2RenderingContext:true,WebGLSampler:true,WebGLShader:true,WebGLShaderPrecisionFormat:true,WebGLSync:true,WebGLTexture:true,WebGLTimerQueryEXT:true,WebGLTransformFeedback:true,WebGLUniformLocation:true,WebGLVertexArrayObject:true,WebGLVertexArrayObjectOES:true,WebGL2RenderingContextBase:true,ArrayBuffer:true,ArrayBufferView:false,DataView:true,Float32Array:true,Float64Array:true,Int16Array:true,Int32Array:true,Int8Array:true,Uint16Array:true,Uint32Array:true,Uint8ClampedArray:true,CanvasPixelArray:true,Uint8Array:false,HTMLAudioElement:true,HTMLBRElement:true,HTMLBaseElement:true,HTMLBodyElement:true,HTMLButtonElement:true,HTMLContentElement:true,HTMLDListElement:true,HTMLDataElement:true,HTMLDataListElement:true,HTMLDetailsElement:true,HTMLDialogElement:true,HTMLDivElement:true,HTMLEmbedElement:true,HTMLFieldSetElement:true,HTMLHRElement:true,HTMLHeadElement:true,HTMLHeadingElement:true,HTMLHtmlElement:true,HTMLIFrameElement:true,HTMLLIElement:true,HTMLLabelElement:true,HTMLLegendElement:true,HTMLLinkElement:true,HTMLMapElement:true,HTMLMediaElement:true,HTMLMenuElement:true,HTMLMetaElement:true,HTMLMeterElement:true,HTMLModElement:true,HTMLOListElement:true,HTMLObjectElement:true,HTMLOptGroupElement:true,HTMLOptionElement:true,HTMLOutputElement:true,HTMLParagraphElement:true,HTMLParamElement:true,HTMLPictureElement:true,HTMLPreElement:true,HTMLProgressElement:true,HTMLQuoteElement:true,HTMLScriptElement:true,HTMLShadowElement:true,HTMLSlotElement:true,HTMLSourceElement:true,HTMLSpanElement:true,HTMLStyleElement:true,HTMLTableCaptionElement:true,HTMLTableCellElement:true,HTMLTableDataCellElement:true,HTMLTableHeaderCellElement:true,HTMLTableColElement:true,HTMLTableElement:true,HTMLTableRowElement:true,HTMLTableSectionElement:true,HTMLTemplateElement:true,HTMLTextAreaElement:true,HTMLTimeElement:true,HTMLTitleElement:true,HTMLTrackElement:true,HTMLUListElement:true,HTMLUnknownElement:true,HTMLVideoElement:true,HTMLDirectoryElement:true,HTMLFontElement:true,HTMLFrameElement:true,HTMLFrameSetElement:true,HTMLMarqueeElement:true,HTMLElement:false,AccessibleNodeList:true,HTMLAnchorElement:true,HTMLAreaElement:true,Blob:false,HTMLCanvasElement:true,CDATASection:true,CharacterData:true,Comment:true,ProcessingInstruction:true,Text:true,CloseEvent:true,CSSPerspective:true,CSSCharsetRule:true,CSSConditionRule:true,CSSFontFaceRule:true,CSSGroupingRule:true,CSSImportRule:true,CSSKeyframeRule:true,MozCSSKeyframeRule:true,WebKitCSSKeyframeRule:true,CSSKeyframesRule:true,MozCSSKeyframesRule:true,WebKitCSSKeyframesRule:true,CSSMediaRule:true,CSSNamespaceRule:true,CSSPageRule:true,CSSRule:true,CSSStyleRule:true,CSSSupportsRule:true,CSSViewportRule:true,CSSStyleDeclaration:true,MSStyleCSSProperties:true,CSS2Properties:true,CSSImageValue:true,CSSKeywordValue:true,CSSNumericValue:true,CSSPositionValue:true,CSSResourceValue:true,CSSUnitValue:true,CSSURLImageValue:true,CSSStyleValue:false,CSSMatrixComponent:true,CSSRotation:true,CSSScale:true,CSSSkew:true,CSSTranslation:true,CSSTransformComponent:false,CSSTransformValue:true,CSSUnparsedValue:true,DataTransferItemList:true,Document:true,HTMLDocument:true,XMLDocument:true,DOMException:true,ClientRectList:true,DOMRectList:true,DOMRectReadOnly:false,DOMStringList:true,DOMTokenList:true,MathMLElement:true,Element:false,AbortPaymentEvent:true,AnimationEvent:true,AnimationPlaybackEvent:true,ApplicationCacheErrorEvent:true,BackgroundFetchClickEvent:true,BackgroundFetchEvent:true,BackgroundFetchFailEvent:true,BackgroundFetchedEvent:true,BeforeInstallPromptEvent:true,BeforeUnloadEvent:true,BlobEvent:true,CanMakePaymentEvent:true,ClipboardEvent:true,CompositionEvent:true,CustomEvent:true,DeviceMotionEvent:true,DeviceOrientationEvent:true,ErrorEvent:true,ExtendableEvent:true,ExtendableMessageEvent:true,FetchEvent:true,FocusEvent:true,FontFaceSetLoadEvent:true,ForeignFetchEvent:true,GamepadEvent:true,HashChangeEvent:true,InstallEvent:true,KeyboardEvent:true,MediaEncryptedEvent:true,MediaKeyMessageEvent:true,MediaQueryListEvent:true,MediaStreamEvent:true,MediaStreamTrackEvent:true,MIDIConnectionEvent:true,MIDIMessageEvent:true,MouseEvent:true,DragEvent:true,MutationEvent:true,NotificationEvent:true,PageTransitionEvent:true,PaymentRequestEvent:true,PaymentRequestUpdateEvent:true,PointerEvent:true,PopStateEvent:true,PresentationConnectionAvailableEvent:true,PresentationConnectionCloseEvent:true,PromiseRejectionEvent:true,PushEvent:true,RTCDataChannelEvent:true,RTCDTMFToneChangeEvent:true,RTCPeerConnectionIceEvent:true,RTCTrackEvent:true,SecurityPolicyViolationEvent:true,SensorErrorEvent:true,SpeechRecognitionError:true,SpeechRecognitionEvent:true,SpeechSynthesisEvent:true,StorageEvent:true,SyncEvent:true,TextEvent:true,TouchEvent:true,TrackEvent:true,TransitionEvent:true,WebKitTransitionEvent:true,UIEvent:true,VRDeviceEvent:true,VRDisplayEvent:true,VRSessionEvent:true,WheelEvent:true,MojoInterfaceRequestEvent:true,USBConnectionEvent:true,AudioProcessingEvent:true,OfflineAudioCompletionEvent:true,WebGLContextEvent:true,Event:false,InputEvent:false,SubmitEvent:false,AbsoluteOrientationSensor:true,Accelerometer:true,AccessibleNode:true,AmbientLightSensor:true,Animation:true,ApplicationCache:true,DOMApplicationCache:true,OfflineResourceList:true,BackgroundFetchRegistration:true,BatteryManager:true,BroadcastChannel:true,CanvasCaptureMediaStreamTrack:true,EventSource:true,FontFaceSet:true,Gyroscope:true,LinearAccelerationSensor:true,Magnetometer:true,MediaDevices:true,MediaKeySession:true,MediaQueryList:true,MediaRecorder:true,MediaSource:true,MediaStream:true,MediaStreamTrack:true,MIDIAccess:true,MIDIInput:true,MIDIOutput:true,MIDIPort:true,NetworkInformation:true,Notification:true,OffscreenCanvas:true,OrientationSensor:true,PaymentRequest:true,Performance:true,PermissionStatus:true,PresentationAvailability:true,PresentationConnection:true,PresentationConnectionList:true,PresentationRequest:true,RelativeOrientationSensor:true,RemotePlayback:true,RTCDataChannel:true,DataChannel:true,RTCDTMFSender:true,RTCPeerConnection:true,webkitRTCPeerConnection:true,mozRTCPeerConnection:true,ScreenOrientation:true,Sensor:true,ServiceWorker:true,ServiceWorkerContainer:true,ServiceWorkerRegistration:true,SharedWorker:true,SpeechRecognition:true,webkitSpeechRecognition:true,SpeechSynthesis:true,SpeechSynthesisUtterance:true,VR:true,VRDevice:true,VRDisplay:true,VRSession:true,VisualViewport:true,Worker:true,WorkerPerformance:true,BluetoothDevice:true,BluetoothRemoteGATTCharacteristic:true,Clipboard:true,MojoInterfaceInterceptor:true,USB:true,IDBOpenDBRequest:true,IDBVersionChangeRequest:true,IDBRequest:true,IDBTransaction:true,AnalyserNode:true,RealtimeAnalyserNode:true,AudioBufferSourceNode:true,AudioDestinationNode:true,AudioNode:true,AudioScheduledSourceNode:true,AudioWorkletNode:true,BiquadFilterNode:true,ChannelMergerNode:true,AudioChannelMerger:true,ChannelSplitterNode:true,AudioChannelSplitter:true,ConstantSourceNode:true,ConvolverNode:true,DelayNode:true,DynamicsCompressorNode:true,GainNode:true,AudioGainNode:true,IIRFilterNode:true,MediaElementAudioSourceNode:true,MediaStreamAudioDestinationNode:true,MediaStreamAudioSourceNode:true,OscillatorNode:true,Oscillator:true,PannerNode:true,AudioPannerNode:true,webkitAudioPannerNode:true,ScriptProcessorNode:true,JavaScriptAudioNode:true,StereoPannerNode:true,WaveShaperNode:true,EventTarget:false,File:true,FileList:true,FileReader:true,FileWriter:true,HTMLFormElement:true,Gamepad:true,History:true,HTMLCollection:true,HTMLFormControlsCollection:true,HTMLOptionsCollection:true,XMLHttpRequest:true,XMLHttpRequestUpload:true,XMLHttpRequestEventTarget:false,ImageData:true,HTMLImageElement:true,HTMLInputElement:true,Location:true,MediaList:true,MessageEvent:true,MessagePort:true,MIDIInputMap:true,MIDIOutputMap:true,MimeType:true,MimeTypeArray:true,DocumentFragment:true,ShadowRoot:true,Attr:true,DocumentType:true,Node:false,NodeList:true,RadioNodeList:true,Plugin:true,PluginArray:true,ProgressEvent:true,ResourceProgressEvent:true,RTCStatsReport:true,HTMLSelectElement:true,SharedArrayBuffer:true,SourceBuffer:true,SourceBufferList:true,SpeechGrammar:true,SpeechGrammarList:true,SpeechRecognitionResult:true,Storage:true,CSSStyleSheet:true,StyleSheet:true,TextTrack:true,TextTrackCue:true,VTTCue:true,TextTrackCueList:true,TextTrackList:true,TimeRanges:true,Touch:true,TouchList:true,TrackDefaultList:true,URL:true,VideoTrackList:true,WebSocket:true,Window:true,DOMWindow:true,DedicatedWorkerGlobalScope:true,ServiceWorkerGlobalScope:true,SharedWorkerGlobalScope:true,WorkerGlobalScope:true,CSSRuleList:true,ClientRect:true,DOMRect:true,GamepadList:true,NamedNodeMap:true,MozNamedAttrMap:true,SpeechRecognitionResultList:true,StyleSheetList:true,IDBCursor:false,IDBCursorWithValue:true,IDBDatabase:true,IDBFactory:true,IDBKeyRange:true,IDBObjectStore:true,IDBVersionChangeEvent:true,SVGLength:true,SVGLengthList:true,SVGNumber:true,SVGNumberList:true,SVGPointList:true,SVGStringList:true,SVGAElement:true,SVGAnimateElement:true,SVGAnimateMotionElement:true,SVGAnimateTransformElement:true,SVGAnimationElement:true,SVGCircleElement:true,SVGClipPathElement:true,SVGDefsElement:true,SVGDescElement:true,SVGDiscardElement:true,SVGEllipseElement:true,SVGFEBlendElement:true,SVGFEColorMatrixElement:true,SVGFEComponentTransferElement:true,SVGFECompositeElement:true,SVGFEConvolveMatrixElement:true,SVGFEDiffuseLightingElement:true,SVGFEDisplacementMapElement:true,SVGFEDistantLightElement:true,SVGFEFloodElement:true,SVGFEFuncAElement:true,SVGFEFuncBElement:true,SVGFEFuncGElement:true,SVGFEFuncRElement:true,SVGFEGaussianBlurElement:true,SVGFEImageElement:true,SVGFEMergeElement:true,SVGFEMergeNodeElement:true,SVGFEMorphologyElement:true,SVGFEOffsetElement:true,SVGFEPointLightElement:true,SVGFESpecularLightingElement:true,SVGFESpotLightElement:true,SVGFETileElement:true,SVGFETurbulenceElement:true,SVGFilterElement:true,SVGForeignObjectElement:true,SVGGElement:true,SVGGeometryElement:true,SVGGraphicsElement:true,SVGImageElement:true,SVGLineElement:true,SVGLinearGradientElement:true,SVGMarkerElement:true,SVGMaskElement:true,SVGMetadataElement:true,SVGPathElement:true,SVGPatternElement:true,SVGPolygonElement:true,SVGPolylineElement:true,SVGRadialGradientElement:true,SVGRectElement:true,SVGScriptElement:true,SVGSetElement:true,SVGStopElement:true,SVGStyleElement:true,SVGElement:true,SVGSVGElement:true,SVGSwitchElement:true,SVGSymbolElement:true,SVGTSpanElement:true,SVGTextContentElement:true,SVGTextElement:true,SVGTextPathElement:true,SVGTextPositioningElement:true,SVGTitleElement:true,SVGUseElement:true,SVGViewElement:true,SVGGradientElement:true,SVGComponentTransferFunctionElement:true,SVGFEDropShadowElement:true,SVGMPathElement:true,SVGTransform:true,SVGTransformList:true,AudioBuffer:true,AudioParamMap:true,AudioTrackList:true,AudioContext:true,webkitAudioContext:true,BaseAudioContext:false,OfflineAudioContext:true})
 A.y4.$nativeSuperclassTag="ArrayBufferView"
 A.Kr.$nativeSuperclassTag="ArrayBufferView"
