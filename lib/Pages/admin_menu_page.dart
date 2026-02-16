@@ -207,6 +207,12 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
         );
         return;
       }
+      final hasCasa = await _adminService.hasCasaForUser(target.authUserId);
+      if (hasCasa) {
+        if (!mounted) return;
+        showHonooToast(context, message: 'Utente già con casa.');
+        return;
+      }
       final inserted = await _adminService.inviteUsers(
         adminUid: user.id,
         userIds: [target.authUserId],

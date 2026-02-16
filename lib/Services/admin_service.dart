@@ -211,6 +211,16 @@ class AdminService {
     return true;
   }
 
+  Future<bool> hasCasaForUser(String userId) async {
+    if (userId.trim().isEmpty) return false;
+    final rows = await _client
+        .from('case')
+        .select('id')
+        .eq('owner_id', userId)
+        .limit(1);
+    return rows is List && rows.isNotEmpty;
+  }
+
   Future<Set<String>> fetchExistingCaseOwners(List<String> userIds) async {
     if (userIds.isEmpty) return {};
     final rows = await _client
