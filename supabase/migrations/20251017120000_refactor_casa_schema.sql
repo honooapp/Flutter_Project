@@ -42,10 +42,19 @@ alter table if exists public.users
   add column if not exists auth_user_id uuid,
   add column if not exists is_admin boolean not null default false;
 
-update public.users
-set auth_user_id = auth_id
-where auth_user_id is null
-  and auth_id is not null;
+do $$
+begin
+  if exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'users'
+      and column_name = 'auth_id'
+  ) then
+    execute 'update public.users set auth_user_id = auth_id where auth_user_id is null and auth_id is not null';
+  end if;
+end
+$$;
 
 create unique index if not exists users_auth_user_id_key
   on public.users (auth_user_id);
@@ -126,7 +135,7 @@ create policy "Invites update owner status"
   using (auth.uid() = user_id)
   with check (
     auth.uid() = user_id
-    and status in ('pending', 'accepted')
+    and status in ('pending', 'accepted', 'declined')
   );
 
 create policy "Invites delete admin"
