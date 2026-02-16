@@ -145,51 +145,51 @@ class _ChestPageState extends State<ChestPage> {
           builder: (context, constraints) {
             final double maxWidth =
                 (constraints.maxWidth * 0.8).clamp(0.0, constraints.maxWidth);
+            final double maxHeight =
+                (constraints.maxHeight * 0.8).clamp(0.0, constraints.maxHeight);
             return Center(
               child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: maxWidth),
+                constraints: BoxConstraints(
+                  maxWidth: maxWidth,
+                  maxHeight: maxHeight,
+                ),
                 child: Stack(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
+                    ClipRect(
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                         child: Container(
                           width: maxWidth,
+                          height: maxHeight,
+                          padding: const EdgeInsets.fromLTRB(16, 40, 16, 16),
                           decoration: BoxDecoration(
                             color: HonooColor.wave1.withOpacity(0.6),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Stack(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(16, 40, 16, 16),
-                                child: SingleChildScrollView(
-                                  child: Text(
-                                    scrignoText,
-                                    style: HonooDialogStyles.body(
-                                      color: HonooColor.onBackground,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
+                          child: SingleChildScrollView(
+                            physics: const BouncingScrollPhysics(),
+                            child: Text(
+                              scrignoText,
+                              style: HonooDialogStyles.body(
+                                color: HonooColor.onBackground,
                               ),
-                              Positioned(
-                                top: 0,
-                                right: 0,
-                                child: IconButton(
-                                  icon: const Icon(
-                                    Icons.close,
-                                    color: HonooColor.onBackground,
-                                  ),
-                                  iconSize: 40,
-                                  tooltip: 'Chiudi',
-                                  onPressed: () => Navigator.of(context).pop(),
-                                ),
-                              ),
-                            ],
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.close,
+                          color: HonooColor.onBackground,
+                        ),
+                        iconSize: 40,
+                        tooltip: 'Chiudi',
+                        onPressed: () => Navigator.of(context).pop(),
                       ),
                     ),
                   ],
