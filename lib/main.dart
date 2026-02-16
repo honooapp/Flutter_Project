@@ -58,34 +58,36 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return Sizer(
       builder: (context, orientation, deviceType) {
-        return SafeArea(
-          child: GlobalInviteListener(
-            navigatorKey: _navigatorKey,
-            enabled: _initialized,
-            child: MaterialApp(
-              navigatorKey: _navigatorKey,
-              title: 'honoo',
-              theme: ThemeData(
-                tooltipTheme: TooltipThemeData(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [HonooColor.wave1, HonooColor.primary],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  textStyle: const TextStyle(color: Colors.white),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        final Widget app = MaterialApp(
+          navigatorKey: _navigatorKey,
+          title: 'honoo',
+          theme: ThemeData(
+            tooltipTheme: TooltipThemeData(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [HonooColor.wave1, HonooColor.primary],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
+                borderRadius: BorderRadius.circular(12),
               ),
-              home: _initialized ? const AuthGate() : const _BootPlaceholder(),
-              routes: {
-                '/chest': (context) => const ChestPage(),
-              },
+              textStyle: const TextStyle(color: Colors.white),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             ),
           ),
+          home: _initialized ? const AuthGate() : const _BootPlaceholder(),
+          routes: {
+            '/chest': (context) => const ChestPage(),
+          },
+        );
+        return SafeArea(
+          child: _initialized
+              ? GlobalInviteListener(
+                  navigatorKey: _navigatorKey,
+                  enabled: true,
+                  child: app,
+                )
+              : app,
         );
       },
     );
