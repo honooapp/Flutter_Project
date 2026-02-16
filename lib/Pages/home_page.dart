@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Services/house_invite_service.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Utility/utility.dart';
 import '../Widgets/honoo_app_title.dart';
 import 'placeholder_page.dart';
@@ -29,6 +30,8 @@ class _HomePageState extends State<HomePage> {
   Timer? _replyRefreshTimer;
   Timer? _inviteRefreshTimer;
   bool _visitRecorded = false;
+  RealtimeChannel? _inviteChannel;
+  String? _inviteChannelUserId;
 
   @override
   void initState() {
@@ -52,7 +55,27 @@ class _HomePageState extends State<HomePage> {
   void dispose() {
     _replyRefreshTimer?.cancel();
     _inviteRefreshTimer?.cancel();
+    _inviteChannel?.unsubscribe();
     super.dispose();
+  }
+
+  void _subscribeInviteChannel(String userId) {
+    if (_inviteChannel != null && _inviteChannelUserId == userId) return;
+    _inviteChannel?.unsubscribe();
+    _inviteChannelUserId = userId;
+    _inviteChannel = SupabaseProvider.client.channel('house-invites-$userId');
+    _inviteChannel!
+        .on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(
+            event: '*',
+            schema: 'public',
+            table: 'house_invites',
+            filter: 'user_id=eq.$userId',
+          ),
+          (_, [__]) => _checkInviteFlow(),
+        )
+        .subscribe();
   }
 
   Future<void> _loadReplyCount() async {
@@ -87,6 +110,8 @@ class _HomePageState extends State<HomePage> {
       _checkingInviteFlow = false;
       return;
     }
+
+    _subscribeInviteChannel(user.id);
 
     final email = user.email;
     if (email != null && email.isNotEmpty) {
