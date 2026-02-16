@@ -120,7 +120,8 @@ class _HomePageState extends State<HomePage> {
     if (!mounted) return;
     showHonooToast(
       context,
-      message: 'Hai ricevuto un invito per creare la casa.',
+      message: 'Invito ricevuto',
+      duration: const Duration(milliseconds: 2000),
     );
   }
 
