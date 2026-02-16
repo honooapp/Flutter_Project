@@ -25,28 +25,33 @@ class _MyAppState extends State<MyApp> {
       GlobalKey<NavigatorState>();
   bool _initialized = false;
   bool _initStarted = false;
+  String? _initError;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _bootstrapAsync());
+    _bootstrapAsync();
   }
 
   Future<void> _bootstrapAsync() async {
     if (_initStarted) return;
     _initStarted = true;
 
-    await Supabase.initialize(
-      url: 'https://mulardcrjecwmohlheuz.supabase.co',
-      anonKey:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11bGFyZGNyamVjd21vaGxoZXV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MDgxNDYsImV4cCI6MjA2OTM4NDE0Nn0.wt0CJD8XHkGoX2qLlmQgwG6RHLUfxx6JKO9EMnpTAsc',
-    );
-
     try {
-      await Supabase.instance.client.auth.refreshSession();
-    } catch (_) {}
+      await Supabase.initialize(
+        url: 'https://mulardcrjecwmohlheuz.supabase.co',
+        anonKey:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11bGFyZGNyamVjd21vaGxoZXV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MDgxNDYsImV4cCI6MjA2OTM4NDE0Nn0.wt0CJD8XHkGoX2qLlmQgwG6RHLUfxx6JKO9EMnpTAsc',
+      ).timeout(const Duration(seconds: 5));
 
-    ExerciseController().init();
+      try {
+        await Supabase.instance.client.auth.refreshSession();
+      } catch (_) {}
+
+      ExerciseController().init();
+    } catch (e) {
+      _initError = 'Errore inizializzazione: $e';
+    }
 
     if (!mounted) return;
     setState(() {
@@ -75,7 +80,11 @@ class _MyAppState extends State<MyApp> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             ),
           ),
-          home: _initialized ? const AuthGate() : const _BootPlaceholder(),
+          home: _initialized
+              ? (_initError == null
+                  ? const AuthGate()
+                  : _BootError(message: _initError!))
+              : const _BootPlaceholder(),
           routes: {
             '/chest': (context) => const ChestPage(),
           },
@@ -102,6 +111,27 @@ class _BootPlaceholder extends StatelessWidget {
     return const Scaffold(
       body: Center(
         child: CircularProgressIndicator(),
+      ),
+    );
+  }
+}
+
+class _BootError extends StatelessWidget {
+  const _BootError({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            message,
+            textAlign: TextAlign.center,
+          ),
+        ),
       ),
     );
   }
