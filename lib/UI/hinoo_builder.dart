@@ -81,6 +81,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
   static const double _bgMaxScale = 5.0;
   final TransformationController _bgController = TransformationController();
   Matrix4? _bgLockedMatrix;
+  Matrix4? _bgInitialMatrix;
   double _bgScale = _bgMinScale;
 
   // Export/anteprima
@@ -168,9 +169,10 @@ class _HinooBuilderState extends State<HinooBuilder> {
   }
 
   void _resetBgTransform() {
-    _bgController.value = Matrix4.identity();
+    final Matrix4 reset = _bgInitialMatrix?.clone() ?? Matrix4.identity();
+    _bgController.value = reset;
     setState(() {
-      _bgScale = _bgMinScale;
+      _bgScale = _extractScaleFromMatrix(reset);
       _bgLockedMatrix = null;
     });
   }
@@ -213,6 +215,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
     _bgPublicUrl = null;
     _bgLockedMatrix = null;
     _bgController.value = Matrix4.identity();
+    _bgInitialMatrix = null;
     _bgScale = _bgMinScale;
     _bgChosen = false;
     _step = _WizardStep.changeBg;
@@ -777,14 +780,16 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
       // Preview locale immediata
       final Uint8List bytes = await selected.readAsBytes();
+      final Matrix4 initialMatrix = await _fitBackgroundToCanvas(bytes);
       setState(() {
         _localBgPreviewBytes = bytes;
         _bgChosen = true; // abilita OK per procedere
         _bgLockedMatrix = null;
-        _bgScale = _bgMinScale;
+        _bgInitialMatrix = initialMatrix.clone();
+        _bgScale = _extractScaleFromMatrix(initialMatrix);
         _isUploadingBg = true;
       });
-      _bgController.value = Matrix4.identity();
+      _bgController.value = initialMatrix;
 
       await _persistBgUrl(bytes, selected.name);
       if (!mounted) return;
@@ -847,6 +852,24 @@ class _HinooBuilderState extends State<HinooBuilder> {
           message: 'Caricamento sfondo fallito. Riprova.',
         );
       }
+    }
+  }
+
+  Future<Matrix4> _fitBackgroundToCanvas(Uint8List bytes) async {
+    try {
+      final ui.Image image = await decodeImageFromList(bytes);
+      final double canvasW = HinooTypography.baselineCanvasWidth;
+      final double canvasH = HinooTypography.baselineCanvasHeight;
+      final double scaleX = canvasW / image.width;
+      final double scaleY = canvasH / image.height;
+      final double scale = math.max(scaleX, scaleY);
+      final double tx = (canvasW - (image.width * scale)) / 2;
+      final double ty = (canvasH - (image.height * scale)) / 2;
+      return Matrix4.identity()
+        ..translate(tx, ty)
+        ..scale(scale);
+    } catch (_) {
+      return Matrix4.identity();
     }
   }
 

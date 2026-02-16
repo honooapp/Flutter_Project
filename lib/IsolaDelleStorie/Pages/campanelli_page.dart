@@ -409,6 +409,13 @@ class _CampanelliPageState extends State<CampanelliPage> {
     return const AssetImage(defaultCasaBg);
   }
 
+  ImageProvider _campanelloBackgroundProvider(String? bgUrl) {
+    if (bgUrl != null && bgUrl.isNotEmpty) {
+      return NetworkImage(bgUrl);
+    }
+    return const AssetImage(userCampanelloBg);
+  }
+
   List<double>? _parseTransform(dynamic raw) {
     if (raw is! List) return null;
     try {
@@ -504,7 +511,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
               id: 'campanello_$id',
               campanelloHinooId: id,
               ownerId: ownerId,
-              backgroundImage: const AssetImage(userCampanelloBg),
+              backgroundImage: _campanelloBackgroundProvider(
+                slide.backgroundImage,
+              ),
               text: text,
               linkedHouseId: casaId,
             ),
@@ -1074,14 +1083,17 @@ class _CampanelliPageState extends State<CampanelliPage> {
                             _lastHouseCampanelloIndex =
                                 _campanelloIndex == 0 ? 1 : _campanelloIndex;
                           }
-                          if (index == 0 && _campanelloIndex == 0) {
-                            final target = _lastHouseCampanelloIndex;
-                            if (_campanelloPageController.hasClients) {
+                          if (index == 0) {
+                            final int target = _campanelloIndex == 0
+                                ? _lastHouseCampanelloIndex
+                                : _campanelloIndex;
+                            if (target > 0 &&
+                                _campanelloPageController.hasClients) {
                               _campanelloPageController.jumpToPage(target);
                             }
                             setState(() {
                               _verticalPageIndex = index;
-                              _campanelloIndex = target;
+                              if (target > 0) _campanelloIndex = target;
                             });
                             return;
                           }
