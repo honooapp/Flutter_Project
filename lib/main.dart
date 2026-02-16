@@ -8,9 +8,24 @@ import 'Pages/chest_page.dart';
 import 'Utility/honoo_colors.dart';
 import 'Widgets/global_invite_listener.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  try {
+    await Supabase.initialize(
+      url: 'https://mulardcrjecwmohlheuz.supabase.co',
+      anonKey:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11bGFyZGNyamVjd21vaGxoZXV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MDgxNDYsImV4cCI6MjA2OTM4NDE0Nn0.wt0CJD8XHkGoX2qLlmQgwG6RHLUfxx6JKO9EMnpTAsc',
+    ).timeout(const Duration(seconds: 5));
+    try {
+      await Supabase.instance.client.auth
+          .refreshSession()
+          .timeout(const Duration(seconds: 5));
+    } catch (_) {}
+    ExerciseController().init();
+    runApp(const MyApp());
+  } catch (e) {
+    runApp(_BootErrorApp(message: 'Errore inizializzazione: $e'));
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -23,43 +38,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final GlobalKey<NavigatorState> _navigatorKey =
       GlobalKey<NavigatorState>();
-  bool _initialized = false;
-  bool _initStarted = false;
-  String? _initError;
-
-  @override
-  void initState() {
-    super.initState();
-    _bootstrapAsync();
-  }
-
-  Future<void> _bootstrapAsync() async {
-    if (_initStarted) return;
-    _initStarted = true;
-
-    try {
-      await Supabase.initialize(
-        url: 'https://mulardcrjecwmohlheuz.supabase.co',
-        anonKey:
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11bGFyZGNyamVjd21vaGxoZXV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MDgxNDYsImV4cCI6MjA2OTM4NDE0Nn0.wt0CJD8XHkGoX2qLlmQgwG6RHLUfxx6JKO9EMnpTAsc',
-      ).timeout(const Duration(seconds: 5));
-
-      try {
-        await Supabase.instance.client.auth
-            .refreshSession()
-            .timeout(const Duration(seconds: 5));
-      } catch (_) {}
-
-      ExerciseController().init();
-    } catch (e) {
-      _initError = 'Errore inizializzazione: $e';
-    } finally {
-      if (!mounted) return;
-      setState(() {
-        _initialized = true;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,56 +60,39 @@ class _MyAppState extends State<MyApp> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             ),
           ),
-          home: _initialized
-              ? (_initError == null
-                  ? const AuthGate()
-                  : _BootError(message: _initError!))
-              : const _BootPlaceholder(),
+          home: const AuthGate(),
           routes: {
             '/chest': (context) => const ChestPage(),
           },
         );
         return SafeArea(
-          child: _initialized
-              ? GlobalInviteListener(
-                  navigatorKey: _navigatorKey,
-                  enabled: true,
-                  child: app,
-                )
-              : app,
+          child: GlobalInviteListener(
+            navigatorKey: _navigatorKey,
+            enabled: true,
+            child: app,
+          ),
         );
       },
     );
   }
 }
 
-class _BootPlaceholder extends StatelessWidget {
-  const _BootPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
-  }
-}
-
-class _BootError extends StatelessWidget {
-  const _BootError({required this.message});
+class _BootErrorApp extends StatelessWidget {
+  const _BootErrorApp({required this.message});
 
   final String message;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(
-            message,
-            textAlign: TextAlign.center,
+    return MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              message,
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
       ),
