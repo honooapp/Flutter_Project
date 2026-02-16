@@ -3,14 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:honoo/Services/house_invite_service.dart';
 import 'package:honoo/Services/supabase_provider.dart';
-import 'package:honoo/Widgets/honoo_dialogs.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Utility/utility.dart';
 import '../Widgets/honoo_app_title.dart';
 import 'placeholder_page.dart';
-import 'new_hinoo_page.dart';
 
 // Widgets riutilizzabili
 import '../Widgets/sea_footer_bar.dart';
@@ -24,23 +20,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final HouseInviteService _inviteService = HouseInviteService();
-  bool _checkingInviteFlow = false;
   int _replyCount = 0;
   Timer? _replyRefreshTimer;
-  Timer? _inviteRefreshTimer;
   bool _visitRecorded = false;
-  RealtimeChannel? _inviteChannel;
-  String? _inviteChannelUserId;
-  RealtimeChannel? _inviteEmailChannel;
-  String? _inviteChannelEmail;
-  DateTime? _lastInviteToastAt;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkInviteFlow();
       _loadReplyCount();
       _recordVisit();
     });
@@ -48,81 +35,12 @@ class _HomePageState extends State<HomePage> {
       const Duration(seconds: 60),
       (_) => _loadReplyCount(),
     );
-    _inviteRefreshTimer = Timer.periodic(
-      const Duration(seconds: 60),
-      (_) => _checkInviteFlow(),
-    );
   }
 
   @override
   void dispose() {
     _replyRefreshTimer?.cancel();
-    _inviteRefreshTimer?.cancel();
-    _inviteChannel?.unsubscribe();
-    _inviteEmailChannel?.unsubscribe();
     super.dispose();
-  }
-
-  void _subscribeInviteChannel(String userId) {
-    if (_inviteChannel != null && _inviteChannelUserId == userId) return;
-    _inviteChannel?.unsubscribe();
-    _inviteChannelUserId = userId;
-    _inviteChannel = SupabaseProvider.client.channel('house-invites-$userId');
-    _inviteChannel!
-        .on(
-          RealtimeListenTypes.postgresChanges,
-          ChannelFilter(
-            event: '*',
-            schema: 'public',
-            table: 'house_invites',
-            filter: 'user_id=eq.$userId',
-          ),
-          _handleInviteChange,
-        )
-        .subscribe();
-  }
-
-  void _subscribeInviteEmailChannel(String email) {
-    if (_inviteEmailChannel != null && _inviteChannelEmail == email) return;
-    _inviteEmailChannel?.unsubscribe();
-    _inviteChannelEmail = email;
-    _inviteEmailChannel =
-        SupabaseProvider.client.channel('house-invites-email-$email');
-    _inviteEmailChannel!
-        .on(
-          RealtimeListenTypes.postgresChanges,
-          ChannelFilter(
-            event: '*',
-            schema: 'public',
-            table: 'house_invites',
-            filter: 'email=eq.$email',
-          ),
-          _handleInviteChange,
-        )
-        .subscribe();
-  }
-
-  void _handleInviteChange(dynamic payload, [dynamic _]) {
-    _checkInviteFlow();
-    final eventType = payload is Map
-        ? (payload['eventType'] ?? payload['event_type'])
-        : null;
-    final event = eventType?.toString().toLowerCase();
-    if (event != null && event != 'insert' && event != 'update') {
-      return;
-    }
-    final now = DateTime.now();
-    if (_lastInviteToastAt != null &&
-        now.difference(_lastInviteToastAt!) < const Duration(seconds: 3)) {
-      return;
-    }
-    _lastInviteToastAt = now;
-    if (!mounted) return;
-    showHonooToast(
-      context,
-      message: 'Invito ricevuto',
-      duration: const Duration(milliseconds: 2000),
-    );
   }
 
   Future<void> _loadReplyCount() async {
@@ -148,68 +66,6 @@ class _HomePageState extends State<HomePage> {
     } catch (_) {}
   }
 
-  Future<void> _checkInviteFlow() async {
-    if (_checkingInviteFlow) return;
-    _checkingInviteFlow = true;
-
-    final user = SupabaseProvider.client.auth.currentUser;
-    if (user == null) {
-      _checkingInviteFlow = false;
-      return;
-    }
-
-    _subscribeInviteChannel(user.id);
-    final email = user.email;
-    if (email != null && email.isNotEmpty) {
-      _subscribeInviteEmailChannel(email);
-    }
-    if (email != null && email.isNotEmpty) {
-      try {
-        await _inviteService.syncInvitesForEmail(email);
-      } catch (_) {}
-    }
-
-    try {
-      final hasCasa = await _inviteService.hasCasa(user.id);
-      if (hasCasa) {
-        return;
-      }
-
-      var hasInvite =
-          await _inviteService.hasPendingOrAcceptedInvite(user.id);
-      if (!hasInvite && email != null && email.isNotEmpty) {
-        try {
-          await _inviteService.syncInvitesForEmail(email);
-        } catch (_) {}
-        hasInvite = await _inviteService.hasPendingOrAcceptedInvite(user.id);
-      }
-      if (!hasInvite || !mounted) {
-        return;
-      }
-
-      final bool? accepted = await _showCasaInviteDialog();
-      if (!mounted) {
-        return;
-      }
-      if (accepted != true) {
-        await _inviteService.markInvitesDeclined(user.id);
-        return;
-      }
-
-      await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => const NewHinooPage(isCampanello: true),
-        ),
-      );
-      if (mounted) {
-        WidgetsBinding.instance.addPostFrameCallback((_) => _checkInviteFlow());
-      }
-    } catch (_) {
-    } finally {
-      _checkingInviteFlow = false;
-    }
-  }
-
   Future<void> _recordVisit() async {
     if (_visitRecorded) return;
     _visitRecorded = true;
@@ -218,72 +74,6 @@ class _HomePageState extends State<HomePage> {
     } catch (_) {
       _visitRecorded = false;
     }
-  }
-
-  Future<bool?> _showCasaInviteDialog() {
-    return showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => HonooDialogShell(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Complimenti!',
-                style: HonooDialogStyles.title(),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Ecco la tua casa sull\'Isola, crea il tuo campanello!',
-                style: HonooDialogStyles.body(),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        'Crea il campanello',
-                        style: HonooDialogStyles.primaryAction(),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.white70,
-                      ),
-                      child: Text(
-                        'Non ora',
-                        style: HonooDialogStyles.tertiaryAction(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   @override

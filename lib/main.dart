@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'Pages/auth_gate.dart';
 import 'Pages/chest_page.dart';
 import 'Utility/honoo_colors.dart';
+import 'Widgets/global_invite_listener.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +21,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final GlobalKey<NavigatorState> _navigatorKey =
+      GlobalKey<NavigatorState>();
   bool _initialized = false;
   bool _initStarted = false;
 
@@ -56,27 +59,31 @@ class _MyAppState extends State<MyApp> {
     return Sizer(
       builder: (context, orientation, deviceType) {
         return SafeArea(
-          child: MaterialApp(
-            title: 'honoo',
-            theme: ThemeData(
-              tooltipTheme: TooltipThemeData(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [HonooColor.wave1, HonooColor.primary],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+          child: GlobalInviteListener(
+            navigatorKey: _navigatorKey,
+            child: MaterialApp(
+              navigatorKey: _navigatorKey,
+              title: 'honoo',
+              theme: ThemeData(
+                tooltipTheme: TooltipThemeData(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [HonooColor.wave1, HonooColor.primary],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  borderRadius: BorderRadius.circular(12),
+                  textStyle: const TextStyle(color: Colors.white),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
-                textStyle: const TextStyle(color: Colors.white),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
+              home: _initialized ? const AuthGate() : const _BootPlaceholder(),
+              routes: {
+                '/chest': (context) => const ChestPage(),
+              },
             ),
-            home: _initialized ? const AuthGate() : const _BootPlaceholder(),
-            routes: {
-              '/chest': (context) => const ChestPage(),
-            },
           ),
         );
       },
