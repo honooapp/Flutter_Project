@@ -262,10 +262,10 @@ Future<bool?> showHonooDeleteDialog(
       title = 'Vuoi davvero eliminare questa pagina?';
       break;
     case HonooDeletionTarget.honoo:
-      title = 'Vuoi davvero eliminare questo honoo?';
+      title = 'Vuoi davvero eliminarlo?';
       break;
     case HonooDeletionTarget.hinoo:
-      title = 'Vuoi davvero eliminare questo hinoo?';
+      title = 'Vuoi davvero eliminarlo?';
       break;
   }
 
