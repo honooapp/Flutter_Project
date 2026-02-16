@@ -15,16 +15,20 @@ class AdminService {
   final SupabaseClient _client;
 
   Future<bool> isCurrentUserAdmin() async {
-    final res = await _client.rpc('admin_is_admin');
-    if (res is bool) return res;
-    if (res is Map && res['admin_is_admin'] is bool) {
-      return res['admin_is_admin'] as bool;
+    try {
+      final res = await _client.rpc('admin_is_admin');
+      if (res is bool) return res;
+      if (res is Map && res['admin_is_admin'] is bool) {
+        return res['admin_is_admin'] as bool;
+      }
+      return res == true;
+    } catch (_) {
+      return false;
     }
-    return res == true;
   }
 
   Future<List<AdminUserRecord>> fetchAllUsers() async {
-    final rows = await _client.rpc('admin_list_users');
+    final rows = await _safeRpc('admin_list_users');
 
     final users = <AdminUserRecord>[];
     if (rows is List) {
@@ -44,7 +48,7 @@ class AdminService {
   }
 
   Future<List<AdminUserRecord>> fetchAllUsersWithEmails() async {
-    final rows = await _client.rpc('admin_list_user_emails');
+    final rows = await _safeRpc('admin_list_user_emails');
     final users = <AdminUserRecord>[];
     if (rows is List) {
       for (final row in rows) {
@@ -73,7 +77,7 @@ class AdminService {
   }
 
   Future<Map<DateTime, int>> fetchRecentVisits({int days = 3}) async {
-    final res = await _client.rpc(
+    final res = await _safeRpc(
       'admin_list_site_visits',
       params: {'p_days': days},
     );
@@ -94,7 +98,7 @@ class AdminService {
   }
 
   Future<Map<String, int>> fetchTodayMoonCounts() async {
-    final res = await _client.rpc('admin_moon_counts_today');
+    final res = await _safeRpc('admin_moon_counts_today');
     int honooCount = 0;
     int hinooCount = 0;
     if (res is List && res.isNotEmpty) {
@@ -114,7 +118,7 @@ class AdminService {
   }
 
   Future<Map<String, int>> fetchDailyContentCounts() async {
-    final res = await _client.rpc('admin_daily_content_counts');
+    final res = await _safeRpc('admin_daily_content_counts');
     final Map<String, int> counts = {
       'chest_honoo': 0,
       'chest_hinoo': 0,
@@ -141,7 +145,7 @@ class AdminService {
   }
 
   Future<List<String>> fetchUserEmails() async {
-    final rows = await _client.rpc('admin_list_user_emails');
+    final rows = await _safeRpc('admin_list_user_emails');
     final emails = <String>[];
     if (rows is List) {
       for (final row in rows) {
@@ -157,8 +161,10 @@ class AdminService {
   }
 
   Future<AdminUserRecord?> findUserByEmail(String email) async {
-    final res = await _client
-        .rpc('admin_find_user_by_email', params: {'p_email': email});
+    final res = await _safeRpc(
+      'admin_find_user_by_email',
+      params: {'p_email': email},
+    );
     if (res == null) return null;
     if (res is List && res.isNotEmpty) {
       final row = res.first;
@@ -275,6 +281,17 @@ class AdminService {
       'created_at': DateTime.now().toIso8601String(),
     });
     return true;
+  }
+
+  Future<dynamic> _safeRpc(String fn, {Map<String, dynamic>? params}) async {
+    try {
+      if (params == null) {
+        return await _client.rpc(fn);
+      }
+      return await _client.rpc(fn, params: params);
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> _sendInviteEmail(String email) async {
