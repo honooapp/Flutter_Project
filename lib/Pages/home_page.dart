@@ -34,6 +34,7 @@ class _HomePageState extends State<HomePage> {
   String? _inviteChannelUserId;
   RealtimeChannel? _inviteEmailChannel;
   String? _inviteChannelEmail;
+  DateTime? _lastInviteToastAt;
 
   @override
   void initState() {
@@ -76,7 +77,7 @@ class _HomePageState extends State<HomePage> {
             table: 'house_invites',
             filter: 'user_id=eq.$userId',
           ),
-          (_, [__]) => _checkInviteFlow(),
+          _handleInviteChange,
         )
         .subscribe();
   }
@@ -96,9 +97,31 @@ class _HomePageState extends State<HomePage> {
             table: 'house_invites',
             filter: 'email=eq.$email',
           ),
-          (_, [__]) => _checkInviteFlow(),
+          _handleInviteChange,
         )
         .subscribe();
+  }
+
+  void _handleInviteChange(dynamic payload, [dynamic _]) {
+    _checkInviteFlow();
+    final eventType = payload is Map
+        ? (payload['eventType'] ?? payload['event_type'])
+        : null;
+    final event = eventType?.toString().toLowerCase();
+    if (event != null && event != 'insert' && event != 'update') {
+      return;
+    }
+    final now = DateTime.now();
+    if (_lastInviteToastAt != null &&
+        now.difference(_lastInviteToastAt!) < const Duration(seconds: 3)) {
+      return;
+    }
+    _lastInviteToastAt = now;
+    if (!mounted) return;
+    showHonooToast(
+      context,
+      message: 'Hai ricevuto un invito per creare la casa.',
+    );
   }
 
   Future<void> _loadReplyCount() async {
