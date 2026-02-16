@@ -32,6 +32,8 @@ class _HomePageState extends State<HomePage> {
   bool _visitRecorded = false;
   RealtimeChannel? _inviteChannel;
   String? _inviteChannelUserId;
+  RealtimeChannel? _inviteEmailChannel;
+  String? _inviteChannelEmail;
 
   @override
   void initState() {
@@ -56,6 +58,7 @@ class _HomePageState extends State<HomePage> {
     _replyRefreshTimer?.cancel();
     _inviteRefreshTimer?.cancel();
     _inviteChannel?.unsubscribe();
+    _inviteEmailChannel?.unsubscribe();
     super.dispose();
   }
 
@@ -72,6 +75,26 @@ class _HomePageState extends State<HomePage> {
             schema: 'public',
             table: 'house_invites',
             filter: 'user_id=eq.$userId',
+          ),
+          (_, [__]) => _checkInviteFlow(),
+        )
+        .subscribe();
+  }
+
+  void _subscribeInviteEmailChannel(String email) {
+    if (_inviteEmailChannel != null && _inviteChannelEmail == email) return;
+    _inviteEmailChannel?.unsubscribe();
+    _inviteChannelEmail = email;
+    _inviteEmailChannel =
+        SupabaseProvider.client.channel('house-invites-email-$email');
+    _inviteEmailChannel!
+        .on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(
+            event: '*',
+            schema: 'public',
+            table: 'house_invites',
+            filter: 'email=eq.$email',
           ),
           (_, [__]) => _checkInviteFlow(),
         )
@@ -112,8 +135,10 @@ class _HomePageState extends State<HomePage> {
     }
 
     _subscribeInviteChannel(user.id);
-
     final email = user.email;
+    if (email != null && email.isNotEmpty) {
+      _subscribeInviteEmailChannel(email);
+    }
     if (email != null && email.isNotEmpty) {
       try {
         await _inviteService.syncInvitesForEmail(email);
