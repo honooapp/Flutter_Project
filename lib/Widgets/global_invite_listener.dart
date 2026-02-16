@@ -194,6 +194,8 @@ class _GlobalInviteListenerState extends State<GlobalInviteListener> {
         return;
       }
 
+      await inviteService.markInvitesAccepted(user.id);
+
       final bool? accepted = await _showCasaInviteDialog();
       if (accepted != true) {
         await inviteService.markInvitesDeclined(user.id);
