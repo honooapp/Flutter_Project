@@ -221,10 +221,36 @@ class AdminService {
     return rows is List && rows.isNotEmpty;
   }
 
+  Future<bool> hasCampanelloForUser(String userId) async {
+    if (userId.trim().isEmpty) return false;
+    final rows = await _client
+        .from('campanelli')
+        .select('id')
+        .eq('owner_id', userId)
+        .limit(1);
+    return rows is List && rows.isNotEmpty;
+  }
+
   Future<Set<String>> fetchExistingCaseOwners(List<String> userIds) async {
     if (userIds.isEmpty) return {};
     final rows = await _client
         .from('case')
+        .select('owner_id')
+        .in_('owner_id', userIds);
+
+    final existing = <String>{};
+    for (final row in (rows as List)) {
+      if (row is! Map) continue;
+      final String id = row['owner_id']?.toString() ?? '';
+      if (id.isNotEmpty) existing.add(id);
+    }
+    return existing;
+  }
+
+  Future<Set<String>> fetchExistingCampanelliOwners(List<String> userIds) async {
+    if (userIds.isEmpty) return {};
+    final rows = await _client
+        .from('campanelli')
         .select('owner_id')
         .in_('owner_id', userIds);
 
@@ -247,8 +273,12 @@ class AdminService {
 
     final existing = await fetchExistingInvites(filtered);
     final existingCases = await fetchExistingCaseOwners(filtered);
+    final existingCampanelli = await fetchExistingCampanelliOwners(filtered);
     final toInsert = filtered
-        .where((id) => !existing.contains(id) && !existingCases.contains(id))
+        .where((id) =>
+            !existing.contains(id) &&
+            !existingCases.contains(id) &&
+            !existingCampanelli.contains(id))
         .toList();
     if (toInsert.isEmpty) return 0;
 
