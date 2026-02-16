@@ -1,6 +1,8 @@
 -- Admin-only email listing for autocomplete
 
-create or replace function public.admin_list_user_emails()
+drop function if exists public.admin_list_user_emails();
+
+create function public.admin_list_user_emails()
 returns table (auth_user_id uuid, email text)
 language plpgsql
 security definer

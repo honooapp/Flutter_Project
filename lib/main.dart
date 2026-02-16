@@ -61,6 +61,7 @@ class _MyAppState extends State<MyApp> {
         return SafeArea(
           child: GlobalInviteListener(
             navigatorKey: _navigatorKey,
+            enabled: _initialized,
             child: MaterialApp(
               navigatorKey: _navigatorKey,
               title: 'honoo',
