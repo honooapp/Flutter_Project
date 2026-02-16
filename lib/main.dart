@@ -45,18 +45,20 @@ class _MyAppState extends State<MyApp> {
       ).timeout(const Duration(seconds: 5));
 
       try {
-        await Supabase.instance.client.auth.refreshSession();
+        await Supabase.instance.client.auth
+            .refreshSession()
+            .timeout(const Duration(seconds: 5));
       } catch (_) {}
 
       ExerciseController().init();
     } catch (e) {
       _initError = 'Errore inizializzazione: $e';
+    } finally {
+      if (!mounted) return;
+      setState(() {
+        _initialized = true;
+      });
     }
-
-    if (!mounted) return;
-    setState(() {
-      _initialized = true;
-    });
   }
 
   @override
