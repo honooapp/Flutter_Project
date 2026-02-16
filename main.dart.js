@@ -27568,14 +27568,14 @@ fP:function fP(a,b){this.c=a
 this.a=b},
 aQx(a,b,c,d,e,f){return A.es(!0,new A.aMe(e,f,d,c),a,!0,t.H)},
 aW(a,b,c){A.aQx(a,!0,b,null,c,null)},
-aMc(a,b){var s={}
-s.a=null
-switch(b.a){case 0:s.a="Vuoi davvero eliminare questa pagina?"
+aMc(a,b){var s="Vuoi davvero eliminarlo?",r={}
+r.a=null
+switch(b.a){case 0:r.a="Vuoi davvero eliminare questa pagina?"
 break
-case 1:s.a="Vuoi davvero eliminare questo honoo?"
+case 1:r.a=s
 break
-case 2:s.a="Vuoi davvero eliminare questo hinoo?"
-break}return A.es(!0,new A.aMd(s,"L\u2019operazione non \xe8 reversibile."),a,!0,t.y)},
+case 2:r.a=s
+break}return A.es(!0,new A.aMd(r,"L\u2019operazione non \xe8 reversibile."),a,!0,t.y)},
 fR:function fR(a,b,c,d){var _=this
 _.c=a
 _.d=b
