@@ -12,21 +12,24 @@ class GlobalInviteListener extends StatefulWidget {
     super.key,
     required this.child,
     required this.navigatorKey,
+    required this.enabled,
   });
 
   final Widget child;
   final GlobalKey<NavigatorState> navigatorKey;
+  final bool enabled;
 
   @override
   State<GlobalInviteListener> createState() => _GlobalInviteListenerState();
 }
 
 class _GlobalInviteListenerState extends State<GlobalInviteListener> {
-  final HouseInviteService _inviteService = HouseInviteService();
+  HouseInviteService? _inviteService;
   StreamSubscription<AuthState>? _authSub;
   Timer? _inviteRefreshTimer;
   bool _checkingInviteFlow = false;
   bool _dialogOpen = false;
+  bool _started = false;
   RealtimeChannel? _inviteChannel;
   String? _inviteChannelUserId;
   RealtimeChannel? _inviteEmailChannel;
@@ -36,10 +39,17 @@ class _GlobalInviteListenerState extends State<GlobalInviteListener> {
   @override
   void initState() {
     super.initState();
-    _authSub = SupabaseProvider.client.auth.onAuthStateChange.listen((state) {
-      _handleAuthChange(state.session);
-    });
-    _handleAuthChange(SupabaseProvider.client.auth.currentSession);
+    if (widget.enabled) {
+      _start();
+    }
+  }
+
+  @override
+  void didUpdateWidget(GlobalInviteListener oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!oldWidget.enabled && widget.enabled) {
+      _start();
+    }
   }
 
   @override
@@ -62,6 +72,8 @@ class _GlobalInviteListenerState extends State<GlobalInviteListener> {
     _dialogOpen = false;
     if (session == null) return;
 
+    _inviteService ??= HouseInviteService();
+
     _subscribeInviteChannel(session.user.id);
     final email = session.user.email;
     if (email != null && email.isNotEmpty) {
@@ -72,6 +84,15 @@ class _GlobalInviteListenerState extends State<GlobalInviteListener> {
       (_) => _checkInviteFlow(),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkInviteFlow());
+  }
+
+  void _start() {
+    if (_started) return;
+    _started = true;
+    _authSub = SupabaseProvider.client.auth.onAuthStateChange.listen((state) {
+      _handleAuthChange(state.session);
+    });
+    _handleAuthChange(SupabaseProvider.client.auth.currentSession);
   }
 
   void _subscribeInviteChannel(String userId) {
@@ -147,25 +168,27 @@ class _GlobalInviteListenerState extends State<GlobalInviteListener> {
       return;
     }
 
+    final inviteService = _inviteService ??= HouseInviteService();
+
     final email = user.email;
     if (email != null && email.isNotEmpty) {
       try {
-        await _inviteService.syncInvitesForEmail(email);
+        await inviteService.syncInvitesForEmail(email);
       } catch (_) {}
     }
 
     try {
-      final hasCasa = await _inviteService.hasCasa(user.id);
+      final hasCasa = await inviteService.hasCasa(user.id);
       if (hasCasa) {
         return;
       }
 
-      var hasInvite = await _inviteService.hasPendingOrAcceptedInvite(user.id);
+      var hasInvite = await inviteService.hasPendingOrAcceptedInvite(user.id);
       if (!hasInvite && email != null && email.isNotEmpty) {
         try {
-          await _inviteService.syncInvitesForEmail(email);
+          await inviteService.syncInvitesForEmail(email);
         } catch (_) {}
-        hasInvite = await _inviteService.hasPendingOrAcceptedInvite(user.id);
+        hasInvite = await inviteService.hasPendingOrAcceptedInvite(user.id);
       }
       if (!hasInvite) {
         return;
@@ -173,7 +196,7 @@ class _GlobalInviteListenerState extends State<GlobalInviteListener> {
 
       final bool? accepted = await _showCasaInviteDialog();
       if (accepted != true) {
-        await _inviteService.markInvitesDeclined(user.id);
+        await inviteService.markInvitesDeclined(user.id);
         return;
       }
 
