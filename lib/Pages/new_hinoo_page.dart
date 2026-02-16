@@ -379,7 +379,7 @@ class _NewHinooPageState extends State<NewHinooPage>
 
     final HinooType type = widget.forcedType ??
         (widget.isCampanello
-            ? HinooType.personal
+            ? HinooType.answer
             : (widget.isReply ? HinooType.answer : HinooType.personal));
 
     return HinooDraft(
