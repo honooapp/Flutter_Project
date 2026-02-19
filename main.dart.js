@@ -96013,7 +96013,7 @@ return A.j($.Be().kz(p.b),$async$$0)
 case 3:o=b
 n=p.a.c
 if(n==null){s=1
-break}A.b3(n,B.n,o?"Spedito sulla Luna":"Gi\xe0 presente sulla Luna")
+break}A.b3(n,B.n,o?"L'honoo \xe8 anche sulla Luna.":"L'honoo era gi\xe0 presente sulla Luna.")
 case 1:return A.r(q,r)}})
 return A.t($async$$0,r)},
 $S:2}
@@ -96058,7 +96058,7 @@ return A.j(j.e.kz(n.b),$async$$0)
 case 7:m=b
 j=j.c
 if(j==null){s=1
-break}l=m===B.kz?"hinoo spedito sulla Luna.":"hinoo gi\xe0 presente sulla Luna."
+break}l=m===B.kz?"L'hinoo \xe8 anche sulla Luna.":"L'hinoo era gi\xe0 presente sulla Luna."
 A.b3(j,B.n,l)
 p=2
 s=6
@@ -97112,7 +97112,7 @@ return A.j(a.kz(m),$async$kQ)
 case 29:i=a5
 a=n.c
 if(a==null){s=1
-break}h=i===B.kz?"hinoo spedito sulla Luna.":"hinoo gi\xe0 presente sulla Luna."
+break}h=i===B.kz?"L'hinoo \xe8 anche sulla Luna.":"hinoo gi\xe0 presente sulla Luna."
 A.b3(a,B.n,h)
 p=10
 s=28
@@ -97477,7 +97477,7 @@ return A.j(A.DK(l),$async$wy)
 case 11:k=a1
 g=n.c
 if(g==null){s=1
-break}A.b3(g,B.n,k?"Pubblicato sulla Luna.":"Gi\xe0 presente sulla Luna.")
+break}A.b3(g,B.n,k?"L'honoo \xe8 anche sulla Luna.":"Gi\xe0 presente sulla Luna.")
 p=2
 s=6
 break
