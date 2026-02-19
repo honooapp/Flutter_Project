@@ -292,7 +292,9 @@ class _NewHonooPageState extends State<NewHonooPage> {
       if (!mounted) return;
       showHonooToast(
         context,
-        message: ok ? 'Pubblicato sulla Luna.' : 'Già presente sulla Luna.',
+        message: ok
+            ? "L'honoo è anche sulla Luna."
+            : 'Già presente sulla Luna.',
       );
     } catch (e, st) {
       debugPrint('duplicateToMoon failed: $e\n$st');

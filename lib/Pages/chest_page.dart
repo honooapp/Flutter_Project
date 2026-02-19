@@ -555,7 +555,9 @@ class _ChestPageState extends State<ChestPage> {
             if (!mounted) return;
             showHonooToast(
               context,
-              message: ok ? 'Spedito sulla Luna' : 'Già presente sulla Luna',
+              message: ok
+                  ? "L'honoo è anche sulla Luna."
+                  : "L'honoo era già presente sulla Luna.",
             );
           },
         ),
@@ -693,8 +695,8 @@ class _ChestPageState extends State<ChestPage> {
               final result = await _hinooController.sendToMoon(draft);
               if (!mounted) return;
               final text = result == HinooMoonResult.published
-                  ? 'hinoo spedito sulla Luna.'
-                  : 'hinoo già presente sulla Luna.';
+                  ? "L'hinoo è anche sulla Luna."
+                  : "L'hinoo era già presente sulla Luna.";
               showHonooToast(context, message: text);
             } catch (e) {
               if (!mounted) return;

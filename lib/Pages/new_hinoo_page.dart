@@ -312,7 +312,7 @@ class _NewHinooPageState extends State<NewHinooPage>
             final result = await _controller.sendToMoon(hinooDraft);
             if (!mounted) return;
             final text = result == HinooMoonResult.published
-                ? 'hinoo spedito sulla Luna.'
+                ? "L'hinoo è anche sulla Luna."
                 : 'hinoo già presente sulla Luna.';
             showHonooToast(context, message: text);
           } catch (e) {
@@ -406,7 +406,7 @@ class _NewHinooPageState extends State<NewHinooPage>
       final result = await _controller.sendToMoon(hinooDraft);
       if (!mounted) return;
       final text = result == HinooMoonResult.published
-          ? 'Pubblicato sulla Luna.'
+          ? "L'hinoo è anche sulla Luna."
           : 'hinoo già presente sulla Luna.';
       showHonooToast(context, message: text);
     } catch (e) {
