@@ -519,7 +519,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                                 if (_shouldShowCanvasControls)
                                   Positioned(
                                     top: 8,
-                                    left: 8,
+                                    right: 8,
                                     child: _buildCanvasControls(),
                                   ),
                               ],
@@ -575,24 +575,14 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           );
                         },
                       ),
-                      if (_savedToChest)
-                        ResponsiveFooterAction(
-                          asset: "assets/icons/moon.svg",
-                          semanticsLabel: 'Luna',
-                          size: footerIconSize,
-                          splashRadius: 25,
-                          tooltip: 'Spedisci sulla Luna',
-                          onPressed: _submitToMoon,
-                        )
-                      else
-                        ResponsiveFooterAction(
-                          asset: "assets/icons/ok.svg",
-                          semanticsLabel: 'OK',
-                          size: footerIconSize,
-                          splashRadius: 25,
-                          tooltip: 'Salva honoo',
-                          onPressed: _submitHonoo,
-                        ),
+                      ResponsiveFooterAction(
+                        asset: "assets/icons/ok.svg",
+                        semanticsLabel: 'OK',
+                        size: footerIconSize,
+                        splashRadius: 25,
+                        tooltip: 'Salva honoo',
+                        onPressed: _submitHonoo,
+                      ),
                       ResponsiveFooterAction(
                         asset: "assets/icons/piuma.svg",
                         semanticsLabel: 'Piuma',

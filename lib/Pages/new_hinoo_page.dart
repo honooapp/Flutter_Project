@@ -639,7 +639,7 @@ class _NewHinooPageState extends State<NewHinooPage>
                             ),
                             Positioned(
                               top: 8,
-                              left: 8,
+                              right: 8,
                               child: _buildCanvasControls(),
                             ),
                           ],
@@ -725,26 +725,16 @@ class _NewHinooPageState extends State<NewHinooPage>
                             );
                           },
                         ),
-                        if (_savedToChest)
-                          ResponsiveFooterAction(
-                            asset: "assets/icons/moon.svg",
-                            semanticsLabel: 'Luna',
-                            size: footerIconSize,
-                            splashRadius: 25,
-                            tooltip: 'Spedisci sulla Luna',
-                            onPressed: _submitToMoon,
-                          ),
-                        if (!_savedToChest)
-                          ResponsiveFooterAction(
-                            asset: "assets/icons/ok.svg",
-                            semanticsLabel: 'OK',
-                            size: footerIconSize,
-                            splashRadius: 25,
-                            tooltip: widget.isCampanello
-                                ? 'Salva il campanello'
-                                : 'Salva hinoo',
-                            onPressed: _submitHinoo,
-                          ),
+                        ResponsiveFooterAction(
+                          asset: "assets/icons/ok.svg",
+                          semanticsLabel: 'OK',
+                          size: footerIconSize,
+                          splashRadius: 25,
+                          tooltip: widget.isCampanello
+                              ? 'Salva il campanello'
+                              : 'Salva hinoo',
+                          onPressed: _submitHinoo,
+                        ),
                       ],
                     ),
                   ),
