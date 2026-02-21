@@ -45,14 +45,11 @@ class _NewHonooPageState extends State<NewHonooPage> {
   String _text = '';
   String _imageUrl = '';
 
-  /// stato: dopo salvataggio nello scrigno il bottone diventa “luna”
-  bool _savedToChest = false;
 
   /// cache dell’URL immagine definitiva (dopo upload/risoluzione)
   String? _finalImageUrlCache;
 
   /// contenuto effettivamente SALVATO (per evitare reset dello stato da update identici)
-  String _lastSavedText = '';
   String _lastSavedRawImage = '';
   bool _hasMinTextForDownload = false;
 
@@ -107,7 +104,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
               ),
               const SizedBox(width: 6),
               iconBtn(
-                tooltip: 'Elimina honoo',
+                tooltip: 'Cancella honoo',
                 icon: Icons.delete_outline,
                 onPressed: _handleDeleteTap,
               ),
@@ -123,19 +120,13 @@ class _NewHonooPageState extends State<NewHonooPage> {
     // se identico allo stato attuale → nessun rebuild inutile
     if (text == _text && imageUrl == _imageUrl) return;
 
-    final bool isSameAsLastSaved =
-        (text == _lastSavedText && imageUrl == _lastSavedRawImage);
-
     setState(() {
       _text = text;
       _imageUrl = imageUrl;
 
       _hasMinTextForDownload = text.trim().isNotEmpty;
 
-      // resetta l’icona solo se il contenuto è DIVERSO da quello salvato
-      if (!isSameAsLastSaved) {
-        _savedToChest = false;
-      }
+      // resetta eventuali indicatori se il contenuto è DIVERSO da quello salvato
 
       // se cambia l’immagine rispetto a QUELLA SALVATA, invalida cache
       if (imageUrl != _lastSavedRawImage) {
@@ -241,9 +232,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
       if (!mounted) return;
       setState(() {
-        _savedToChest = true;
         _finalImageUrlCache = finalImageUrl;
-        _lastSavedText = _text;
         _lastSavedRawImage = _imageUrl;
       });
 
@@ -381,9 +370,8 @@ class _NewHonooPageState extends State<NewHonooPage> {
     setState(() {
       _text = '';
       _imageUrl = '';
-      _savedToChest = false;
+      // no-op
       _finalImageUrlCache = null;
-      _lastSavedText = '';
       _lastSavedRawImage = '';
       _hasMinTextForDownload = false;
     });

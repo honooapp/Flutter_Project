@@ -9,6 +9,7 @@ import '../Controller/honoo_thread_loader.dart';
 import '../Entities/honoo.dart';
 import '../UI/honoo_card.dart';
 import '../Utility/honoo_colors.dart';
+ 
 
 /// Una pagina del carosello orizzontale della ChestPage.
 /// Se il root honoo ha risposte, mostra un CarouselSlider verticale senza peek,
@@ -119,21 +120,21 @@ class _HonooThreadViewState extends State<HonooThreadView> {
               key: ValueKey(
                   'thread_list_${thread.length}_${_honooIdentity(thread.first)}'),
               padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: cs.CarouselSlider.builder(
-              carouselController: _vController,
-              itemCount: ordered.length,
-              options: cs.CarouselOptions(
-                scrollDirection: Axis.vertical,
-                viewportFraction: 1.0,
-                enableInfiniteScroll: false,
-                padEnds: true,
-                enlargeCenterPage: false,
-                scrollPhysics: const BouncingScrollPhysics(),
-              ),
-              itemBuilder: (context, index, realIdx) {
+              child: cs.CarouselSlider.builder(
+                carouselController: _vController,
+                itemCount: ordered.length,
+                options: cs.CarouselOptions(
+                  scrollDirection: Axis.vertical,
+                  viewportFraction: 1.0,
+                  enableInfiniteScroll: false,
+                  padEnds: true,
+                  enlargeCenterPage: false,
+                  scrollPhysics: const BouncingScrollPhysics(),
+                ),
+                itemBuilder: (context, index, realIdx) {
                   final honoo = ordered[index];
-                  final bool isReply = honoo.replyTo != null &&
-                      honoo.replyTo!.isNotEmpty;
+                  final bool isReply =
+                      honoo.replyTo != null && honoo.replyTo!.isNotEmpty;
                   final String timestamp = _formatTimestamp(honoo.createdAt);
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),

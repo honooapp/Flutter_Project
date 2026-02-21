@@ -9,6 +9,7 @@ import 'package:honoo/Utility/responsive_layout.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
+import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
 
 import 'package:honoo/Controller/honoo_controller.dart';
 
@@ -236,7 +237,30 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
                             SizedBox(
                               width: topMetrics.width,
                               height: topMetrics.height,
-                              child: rootCarousel,
+                              child: () {
+                                final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
+                                    layoutMode == ResponsiveLayoutMode.wideDesktop ||
+                                    layoutMode == ResponsiveLayoutMode.largeDesktop;
+                                if (!isDesktop || _roots.length <= 1 || _isLoadingRoots) {
+                                  return rootCarousel;
+                                }
+                                return DesktopCarouselArrows(
+                                  canPrev: _currentRootIndex > 0,
+                                  canNext: _currentRootIndex < _roots.length - 1,
+                                  onPrev: () => _rootCarousel.animateToPage(
+                                    (_currentRootIndex - 1).clamp(0, _roots.length - 1),
+                                    duration: const Duration(milliseconds: 220),
+                                    curve: Curves.easeOutCubic,
+                                  ),
+                                  onNext: () => _rootCarousel.animateToPage(
+                                    (_currentRootIndex + 1).clamp(0, _roots.length - 1),
+                                    duration: const Duration(milliseconds: 220),
+                                    curve: Curves.easeOutCubic,
+                                  ),
+                                  arrowColor: Colors.white,
+                                  child: rootCarousel,
+                                );
+                              }(),
                             ),
                             const SizedBox(height: gap),
                             Expanded(

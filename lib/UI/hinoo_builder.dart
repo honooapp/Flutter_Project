@@ -858,8 +858,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
   Future<Matrix4> _fitBackgroundToCanvas(Uint8List bytes) async {
     try {
       final ui.Image image = await decodeImageFromList(bytes);
-      final double canvasW = HinooTypography.baselineCanvasWidth;
-      final double canvasH = HinooTypography.baselineCanvasHeight;
+      const double canvasW = HinooTypography.baselineCanvasWidth;
+      const double canvasH = HinooTypography.baselineCanvasHeight;
       final double scaleX = canvasW / image.width;
       final double scaleY = canvasH / image.height;
       final double scale = math.max(scaleX, scaleY);

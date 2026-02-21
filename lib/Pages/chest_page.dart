@@ -31,6 +31,7 @@ import '../Widgets/loading_spinner.dart';
 import '../Widgets/honoo_app_title.dart';
 import '../Widgets/luna_fissa.dart';
 import '../Widgets/responsive_footer_bar.dart';
+import '../Widgets/desktop_carousel_arrows.dart';
 
 import 'reply_honoo_page.dart';
 import 'new_hinoo_page.dart';
@@ -87,6 +88,7 @@ class _ChestPageState extends State<ChestPage> {
   bool _isHinooLoading = true;
   bool _isRefreshingReplies = false;
   Timer? _replyRefreshTimer;
+  final cs.CarouselController _carouselController = cs.CarouselController();
 
   // Key stabili per cattura PNG
   final Map<String, GlobalKey> _captureKeys = <String, GlobalKey>{};
@@ -1302,34 +1304,78 @@ class _ChestPageState extends State<ChestPage> {
                                     return Padding(
                                       padding: EdgeInsets.symmetric(
                                           horizontal: horizontalPadding),
-                                      child: cs.CarouselSlider.builder(
-                                        itemCount: _items.length,
-                                        options: cs.CarouselOptions(
-                                          height: displayHeight,
-                                        viewportFraction: 1.0,
-                                        enableInfiniteScroll: false,
-                                        padEnds: true,
-                                        enlargeCenterPage: false,
-                                        scrollPhysics:
-                                            const BouncingScrollPhysics(),
-                                        onPageChanged: (i, _) =>
-                                            setState(() => _currentIndex = i),
-                                      ),
-                                        itemBuilder: (context, index, realIdx) {
-                                          return Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: horizontalPadding),
-                                            child: _buildChestItem(
-                                              _items[index],
-                                              availableCenterH,
-                                              targetMaxW,
-                                              honooMetrics,
-                                              layoutMode,
-                                            ),
+                                      child: () {
+                                        final slider = cs.CarouselSlider.builder(
+                                          carouselController:
+                                              _carouselController,
+                                          itemCount: _items.length,
+                                          options: cs.CarouselOptions(
+                                            height: displayHeight,
+                                            viewportFraction: 1.0,
+                                            enableInfiniteScroll: false,
+                                            padEnds: true,
+                                            enlargeCenterPage: false,
+                                            scrollPhysics:
+                                                const BouncingScrollPhysics(),
+                                            onPageChanged: (i, _) => setState(
+                                                () => _currentIndex = i),
+                                          ),
+                                          itemBuilder:
+                                              (context, index, realIdx) {
+                                            return Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal:
+                                                      horizontalPadding),
+                                              child: _buildChestItem(
+                                                _items[index],
+                                                availableCenterH,
+                                                targetMaxW,
+                                                honooMetrics,
+                                                layoutMode,
+                                              ),
+                                            );
+                                          },
                                         );
-                                      },
-                                    ),
-                                  );
+
+                                        final bool isDesktop =
+                                            layoutMode ==
+                                                    ResponsiveLayoutMode
+                                                        .desktop ||
+                                                layoutMode ==
+                                                    ResponsiveLayoutMode
+                                                        .wideDesktop ||
+                                                layoutMode ==
+                                                    ResponsiveLayoutMode
+                                                        .largeDesktop;
+                                        if (!isDesktop ||
+                                            _items.length <= 1) return slider;
+                                        return DesktopCarouselArrows(
+                                          canPrev: _currentIndex > 0,
+                                          canNext: _currentIndex <
+                                              _items.length - 1,
+                                          onPrev: () => _carouselController
+                                              .animateToPage(
+                                            (_currentIndex - 1)
+                                                .clamp(0,
+                                                    _items.length - 1),
+                                            duration: const Duration(
+                                                milliseconds: 220),
+                                            curve: Curves.easeOutCubic,
+                                          ),
+                                          onNext: () => _carouselController
+                                              .animateToPage(
+                                            (_currentIndex + 1)
+                                                .clamp(0,
+                                                    _items.length - 1),
+                                            duration: const Duration(
+                                                milliseconds: 220),
+                                            curve: Curves.easeOutCubic,
+                                          ),
+                                          arrowColor: Colors.white,
+                                          child: slider,
+                                        );
+                                      }(),
+                                    );
                                 }(),
                               ),
                             ),

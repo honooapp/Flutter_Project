@@ -391,29 +391,7 @@ class _NewHinooPageState extends State<NewHinooPage>
     );
   }
 
-  Future<void> _submitToMoon() async {
-    final dynamic draft = (_builderKey.currentState as dynamic)?.exportDraft();
-    final pages = (draft is Map) ? (draft['pages'] as List?) : null;
-    if (draft == null || pages == null || pages.isEmpty) {
-      if (!mounted) return;
-      showHonooToast(context,
-          message: 'Nessun contenuto da pubblicare sulla Luna.');
-      return;
-    }
-
-    try {
-      final HinooDraft hinooDraft = _convertRawBuilderDraft(draft);
-      final result = await _controller.sendToMoon(hinooDraft);
-      if (!mounted) return;
-      final text = result == HinooMoonResult.published
-          ? "L'hinoo è anche sulla Luna."
-          : 'hinoo già presente sulla Luna.';
-      showHonooToast(context, message: text);
-    } catch (e) {
-      if (!mounted) return;
-      showHonooToast(context, message: 'Errore: $e');
-    }
-  }
+  // rimosso: submit to moon non più utilizzato in questa pagina
 
   double _contentMaxWidth(double w) {
     return w;
@@ -518,7 +496,7 @@ class _NewHinooPageState extends State<NewHinooPage>
             const SizedBox(width: 6),
           ],
           iconBtn(
-            tooltip: 'Svuota hinoo',
+            tooltip: 'Cancella hinoo',
             icon: Icons.delete_outline,
             onPressed: _deleteCurrentFromBuilder,
           ),

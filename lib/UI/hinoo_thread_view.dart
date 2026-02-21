@@ -4,8 +4,9 @@ import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+ 
 
-class HinooThreadView extends StatelessWidget {
+class HinooThreadView extends StatefulWidget {
   const HinooThreadView({
     super.key,
     required this.root,
@@ -24,8 +25,15 @@ class HinooThreadView extends StatelessWidget {
   final VoidCallback? onDownloadTap;
 
   @override
+  State<HinooThreadView> createState() => _HinooThreadViewState();
+}
+
+class _HinooThreadViewState extends State<HinooThreadView> {
+  final cs.CarouselController _vController = cs.CarouselController();
+
+  @override
   Widget build(BuildContext context) {
-    final List<HinooThreadEntry> sortedReplies = [...replies];
+    final List<HinooThreadEntry> sortedReplies = [...widget.replies];
     sortedReplies.sort((a, b) {
       if (a.createdAt == null && b.createdAt == null) return 0;
       if (a.createdAt == null) return 1;
@@ -34,8 +42,59 @@ class HinooThreadView extends StatelessWidget {
     });
     final List<HinooThreadEntry> items = [
       ...sortedReplies,
-      HinooThreadEntry(draft: root, authorId: rootAuthorId, isReply: false),
+      HinooThreadEntry(
+          draft: widget.root, authorId: widget.rootAuthorId, isReply: false),
     ];
+    final slider = cs.CarouselSlider.builder(
+      key: ValueKey(items.length),
+      carouselController: _vController,
+      itemCount: items.length,
+      options: cs.CarouselOptions(
+        scrollDirection: Axis.vertical,
+        height: widget.maxHeight,
+        viewportFraction: 1.0,
+        enableInfiniteScroll: false,
+        padEnds: true,
+        enlargeCenterPage: false,
+        scrollPhysics: const BouncingScrollPhysics(),
+      ),
+      itemBuilder: (context, index, realIdx) {
+        final entry = items[index];
+        final Widget viewer = HinooViewer(
+          draft: entry.draft,
+          maxHeight: widget.maxHeight,
+          maxWidth: widget.maxWidth,
+          onDownloadTap: widget.onDownloadTap,
+        );
+        if (!entry.isReply) return viewer;
+        final String? uid = SupabaseProvider.client.auth.currentUser?.id;
+        final bool isOwnReply = uid != null && entry.authorId == uid;
+        final Color borderColor =
+            isOwnReply ? HonooColor.wave2 : HonooColor.secondary;
+        return Stack(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: borderColor, width: 2),
+              ),
+              child: viewer,
+            ),
+            if (entry.createdAt != null)
+              Positioned(
+                left: 12,
+                right: 12,
+                bottom: 8,
+                child: _ReplyTimestamp(
+                  label: _formatTimestamp(entry.createdAt!),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       switchInCurve: Curves.easeOutCubic,
@@ -47,55 +106,7 @@ class HinooThreadView extends StatelessWidget {
         ).animate(animation);
         return SlideTransition(position: offset, child: child);
       },
-      child: cs.CarouselSlider.builder(
-        key: ValueKey(items.length),
-        carouselController: cs.CarouselController(),
-        itemCount: items.length,
-        options: cs.CarouselOptions(
-          scrollDirection: Axis.vertical,
-          height: maxHeight,
-          viewportFraction: 1.0,
-          enableInfiniteScroll: false,
-          padEnds: true,
-          enlargeCenterPage: false,
-          scrollPhysics: const BouncingScrollPhysics(),
-        ),
-        itemBuilder: (context, index, realIdx) {
-          final entry = items[index];
-          final Widget viewer = HinooViewer(
-            draft: entry.draft,
-            maxHeight: maxHeight,
-            maxWidth: maxWidth,
-            onDownloadTap: onDownloadTap,
-          );
-          if (!entry.isReply) return viewer;
-          final String? uid = SupabaseProvider.client.auth.currentUser?.id;
-          final bool isOwnReply = uid != null && entry.authorId == uid;
-          final Color borderColor =
-              isOwnReply ? HonooColor.wave2 : HonooColor.secondary;
-          return Stack(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: borderColor, width: 2),
-                ),
-                child: viewer,
-              ),
-              if (entry.createdAt != null)
-                Positioned(
-                  left: 12,
-                  right: 12,
-                  bottom: 8,
-                  child: _ReplyTimestamp(
-                    label: _formatTimestamp(entry.createdAt!),
-                  ),
-                ),
-            ],
-          );
-        },
-      ),
+      child: slider,
     );
   }
 

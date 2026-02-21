@@ -20,6 +20,7 @@ import 'package:honoo/Widgets/honoo_app_title.dart';
 import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
+import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
 
 import '../../Pages/home_page.dart';
 import '../../Pages/shared_conversations_page.dart';
@@ -1134,7 +1135,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                           PointerDeviceKind.trackpad,
                                         },
                                       ),
-                                      child: PageView.builder(
+                                      child: () {
+                                        final pv = PageView.builder(
                                         controller: _campanelloPageController,
                                         scrollDirection: Axis.horizontal,
                                         physics: pagePhysics,
@@ -1150,12 +1152,44 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                             height: canvasSize.height,
                                           );
                                         },
+                                        );
+                                        final bool isDesktop =
+                                            layoutMode ==
+                                                    ResponsiveLayoutMode
+                                                        .desktop ||
+                                                layoutMode ==
+                                                    ResponsiveLayoutMode
+                                                        .wideDesktop ||
+                                                layoutMode ==
+                                                    ResponsiveLayoutMode
+                                                        .largeDesktop;
+                                        if (!isDesktop ||
+                                            campanelloPages.length <= 1) {
+                                          return pv;
+                                        }
+                                        return DesktopCarouselArrows(
+                                          canPrev: _campanelloIndex > 0,
+                                          canNext: _campanelloIndex <
+                                              campanelloPages.length - 1,
+                                          onPrev: () => _animatePage(
+                                            _campanelloPageController,
+                                            delta: -1,
+                                            maxIndex: maxCampanelloIndex,
+                                          ),
+                                          onNext: () => _animatePage(
+                                            _campanelloPageController,
+                                            delta: 1,
+                                            maxIndex: maxCampanelloIndex,
+                                          ),
+                                          arrowColor: Colors.white,
+                                          child: pv,
+                                        );
+                                      }(),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
                           ),
                           casaUnlocked
                               ? AnimatedSwitcher(

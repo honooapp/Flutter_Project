@@ -20,6 +20,7 @@ import '../Widgets/loading_spinner.dart';
 import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/honoo_app_title.dart';
 import '../Widgets/responsive_footer_bar.dart';
+import '../Widgets/desktop_carousel_arrows.dart';
 import 'placeholder_page.dart';
 import 'chest_page.dart';
 import 'reply_honoo_page.dart';
@@ -332,34 +333,56 @@ class _MoonPageState extends State<MoonPage> {
                     PointerDeviceKind.trackpad,
                   },
                 ),
-                child: cs.CarouselSlider.builder(
-                  carouselController: _carouselController,
-                  itemCount: _items.length,
-                  options: cs.CarouselOptions(
-                    height: bodyHeight,
-                    viewportFraction: 1.0,
-                    enableInfiniteScroll: false,
-                    padEnds: true,
-                    enlargeCenterPage: false,
-                    scrollPhysics: const BouncingScrollPhysics(),
-                    onPageChanged: (index, _) {
-                      setState(() => _currentIndex = index);
+                child: () {
+                  final Widget slider = cs.CarouselSlider.builder(
+                    carouselController: _carouselController,
+                    itemCount: _items.length,
+                    options: cs.CarouselOptions(
+                      height: bodyHeight,
+                      viewportFraction: 1.0,
+                      enableInfiniteScroll: false,
+                      padEnds: true,
+                      enlargeCenterPage: false,
+                      scrollPhysics: const BouncingScrollPhysics(),
+                      onPageChanged: (index, _) {
+                        setState(() => _currentIndex = index);
+                      },
+                    ),
+                    itemBuilder: (context, index, realIndex) {
+                      final item = _items[index];
+                      return Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: horizontalPadding),
+                        child: _buildMoonItem(
+                          item,
+                          availableHeight,
+                          maxWidth,
+                          honooMetrics,
+                        ),
+                      );
                     },
-                  ),
-                  itemBuilder: (context, index, realIndex) {
-                    final item = _items[index];
-                    return Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: horizontalPadding),
-                      child: _buildMoonItem(
-                        item,
-                        availableHeight,
-                        maxWidth,
-                        honooMetrics,
-                      ),
-                    );
-                  },
-                ),
+                  );
+
+                  // Desktop-only arrows: derive from isCompact flag
+                  final bool isDesktop = !isCompact;
+                  if (!isDesktop || _items.length <= 1) return slider;
+                  return DesktopCarouselArrows(
+                    canPrev: _currentIndex > 0,
+                    canNext: _currentIndex < _items.length - 1,
+                    onPrev: () => _carouselController.animateToPage(
+                      (_currentIndex - 1).clamp(0, _items.length - 1),
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeOutCubic,
+                    ),
+                    onNext: () => _carouselController.animateToPage(
+                      (_currentIndex + 1).clamp(0, _items.length - 1),
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeOutCubic,
+                    ),
+                    arrowColor: Colors.black,
+                    child: slider,
+                  );
+                }(),
               ),
             ),
           ),
@@ -508,7 +531,7 @@ class _MoonPageState extends State<MoonPage> {
       context: context,
       barrierDismissible: true,
       builder: (_) => const HonooConfirmDialog(
-        title: 'Sei sicuro di voler eliminare?',
+        title: 'Vuoi davvero eliminarlo?',
         message: '',
         confirmLabel: 'Sì',
         cancelLabel: 'No',

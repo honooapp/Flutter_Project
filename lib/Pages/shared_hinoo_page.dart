@@ -9,6 +9,7 @@ import 'package:honoo/Utility/responsive_layout.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
+import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
 
 import 'home_page.dart';
 import 'placeholder_page.dart';
@@ -26,6 +27,7 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
   List<HinooDraft> _items = const [];
   bool _isLoading = true;
   int _currentIndex = 0;
+  final cs.CarouselController _carouselController = cs.CarouselController();
 
   @override
   void initState() {
@@ -116,7 +118,8 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                         ),
                       ),
                     )
-                          : cs.CarouselSlider(
+                  : cs.CarouselSlider(
+                      carouselController: _carouselController,
                       options: cs.CarouselOptions(
                         scrollDirection: Axis.horizontal,
                         height: availableH,
@@ -163,7 +166,30 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                   child: SizedBox(
                     width: targetMaxW,
                     height: availableH,
-                    child: content,
+                    child: () {
+                      final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
+                          layoutMode == ResponsiveLayoutMode.wideDesktop ||
+                          layoutMode == ResponsiveLayoutMode.largeDesktop;
+                      if (!isDesktop || _items.length <= 1 || _isLoading) {
+                        return content;
+                      }
+                      return DesktopCarouselArrows(
+                        canPrev: _currentIndex > 0,
+                        canNext: _currentIndex < _items.length - 1,
+                        onPrev: () => _carouselController.animateToPage(
+                          (_currentIndex - 1).clamp(0, _items.length - 1),
+                          duration: const Duration(milliseconds: 220),
+                          curve: Curves.easeOutCubic,
+                        ),
+                        onNext: () => _carouselController.animateToPage(
+                          (_currentIndex + 1).clamp(0, _items.length - 1),
+                          duration: const Duration(milliseconds: 220),
+                          curve: Curves.easeOutCubic,
+                        ),
+                        arrowColor: Colors.white,
+                        child: content,
+                      );
+                    }(),
                   ),
                 ),
               ),
