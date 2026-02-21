@@ -10,10 +10,6 @@ import 'package:honoo/Widgets/responsive_footer_bar.dart';
 class PerformancePage extends StatelessWidget {
   const PerformancePage({super.key});
 
-  static const String _performanceHeader =
-      "Venceslao Cembalo\n"
-      "18:13 (3 ore fa)\n"
-      "a me\n\n";
 
   static const String performanceText =
       "Venceslao Cembalo,\n"
@@ -33,7 +29,7 @@ class PerformancePage extends StatelessWidget {
       "alla Triennale di Milano,\n"
       "a Casa Lana,\n"
       "progettata da Ettore Sottsass.\n\n"
-      "Sì.\n"
+      "Sì,\n"
       "honoo è stato invitato\n"
       "alla Triennale.\n";
 
@@ -97,7 +93,7 @@ class PerformancePage extends StatelessWidget {
               child: SizedBox(
                 width: contentWidth,
                 child: Text(
-                  _performanceHeader + performanceText,
+                  performanceText,
                   style: bodyStyle,
                   textAlign: TextAlign.center,
                 ),
