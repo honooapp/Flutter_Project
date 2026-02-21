@@ -30,6 +30,7 @@ class HonooBuilder extends StatefulWidget {
   final void Function(String text, String imageUrl)? onHonooChanged;
   final ValueChanged<bool>? onFocusChanged;
   final String? initialText;
+  final String? textHint;
   final String? imageHint;
   final VoidCallback? onDownloadTap;
   final bool showDownloadButton;
@@ -39,6 +40,7 @@ class HonooBuilder extends StatefulWidget {
     this.onHonooChanged,
     this.onFocusChanged,
     this.initialText,
+    this.textHint,
     this.imageHint,
     this.onDownloadTap,
     this.showDownloadButton = true,
@@ -470,7 +472,9 @@ class HonooBuilderState extends State<HonooBuilder> {
                   maxCharsPerLine: 32,
                   horizontalPadding: const EdgeInsets.symmetric(horizontal: 22),
                   decoration: InputDecoration(
-                    hintText: 'Scrivi qui il tuo testo',
+                    hintText: (!_textFocus.hasFocus && _textCtrl.text.isEmpty)
+                        ? (widget.textHint ?? 'Scrivi qui il tuo testo')
+                        : null,
                     hintStyle: textStyle.copyWith(
                       color: HonooColor.background,
                       height: 1.2,

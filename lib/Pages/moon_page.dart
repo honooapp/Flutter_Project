@@ -43,6 +43,8 @@ class _MoonPageState extends State<MoonPage> {
   final cs.CarouselController _carouselController = cs.CarouselController();
   DateTime? _lastScroll;
   final AdminService _adminService = AdminService();
+  // Elementi per cui l'utente ha appena inviato una risposta in questa sessione
+  final Set<String> _repliedItemIds = <String>{};
 
   @override
   void initState() {
@@ -238,14 +240,47 @@ class _MoonPageState extends State<MoonPage> {
                       tooltip: 'Salva nel tuo Cuore',
                       onPressed: _saveCurrentToChest,
                     ),
-                    ResponsiveFooterAction(
-                      asset: 'assets/icons/reply.svg',
-                      semanticsLabel: 'Reply',
-                      size: footerIconSize,
-                      splashRadius: 25,
-                      tooltip: 'Rispondi',
-                      onPressed: () => _showReplyChoice(),
-                    ),
+                    () {
+                      final _MoonItem? curr =
+                          _items.isEmpty ? null : _items[_currentIndex];
+                      String? keyId;
+                      if (curr != null) {
+                        keyId = curr.honoo?.dbId ?? curr.hinooId;
+                      }
+                      final bool showSeeConversation = keyId != null &&
+                          _repliedItemIds.contains(keyId);
+                      if (showSeeConversation) {
+                        return ResponsiveFooterAction(
+                          asset: 'assets/icons/reply.svg',
+                          semanticsLabel: 'Vedi conversazione',
+                          size: footerIconSize,
+                          splashRadius: 25,
+                          tooltip: 'Vedi conversazione',
+                          colorFilter: const ColorFilter.mode(
+                            HonooColor.secondary,
+                            BlendMode.srcIn,
+                          ),
+                          onPressed: () async {
+                            if (!mounted) return;
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const ChestPage(
+                                        focusReplies: true,
+                                      )),
+                            );
+                          },
+                        );
+                      }
+                      return ResponsiveFooterAction(
+                        asset: 'assets/icons/reply.svg',
+                        semanticsLabel: 'Reply',
+                        size: footerIconSize,
+                        splashRadius: 25,
+                        tooltip: 'Rispondi',
+                        onPressed: () => _showReplyChoice(),
+                      );
+                    }(),
                     if (_isAdmin)
                       ResponsiveFooterAction(
                         asset: 'assets/icons/cancella.svg',
@@ -662,12 +697,10 @@ class _MoonPageState extends State<MoonPage> {
       );
       if (!mounted) return;
       if (sent == true) {
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const ChestPage(focusReplies: true),
-          ),
-        );
+        final id = current.honoo?.dbId;
+        if (id != null && id.isNotEmpty) {
+          setState(() => _repliedItemIds.add(id));
+        }
       }
     } else if (choice == _ReplyChoice.hinoo && current.hinoo != null) {
       final String? replyTo = current.hinooId;

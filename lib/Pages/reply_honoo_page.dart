@@ -6,6 +6,8 @@ import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:sizer/sizer.dart';
+import 'package:honoo/Widgets/responsive_footer_bar.dart';
+import 'package:honoo/Widgets/honoo_app_title.dart';
 import '../Entities/honoo.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 
@@ -31,6 +33,7 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
   String? _imageUrl;
 
   bool _isSending = false;
+  bool _sentOnce = false;
 
   void _onHonooChanged(String text, String? imageUrl) {
     setState(() {
@@ -40,6 +43,15 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
   }
 
   Future<void> _sendReply() async {
+    if (_sentOnce) {
+      if (!mounted) return;
+      await showHonooMessageDialog(
+        context,
+        message: 'Risposta già inviata',
+        duration: const Duration(milliseconds: 1400),
+      );
+      return;
+    }
     if (_text.trim().isEmpty) return;
 
     setState(() => _isSending = true);
@@ -68,6 +80,7 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
         context,
         message: 'La tua risposta è partita.',
       );
+      _sentOnce = true;
       await Future.delayed(const Duration(seconds: 1));
       if (!mounted) return;
       Navigator.pop(context, true);
@@ -92,49 +105,51 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(
-              height: 10.h,
-              child: Center(
-                child: Text(
-                  "Rispondi a un honoo",
-                  style: GoogleFonts.libreFranklin(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                    color: HonooColor.secondary,
-                  ),
-                ),
-              ),
+            const SizedBox(
+              height: 52,
+              child: Center(child: HonooAppTitle()),
             ),
             Expanded(
               child: HonooBuilder(
                 onHonooChanged: _onHonooChanged,
-                initialText: widget.initialHintText,
+                initialText: null,
+                textHint: widget.initialHintText,
                 imageHint: widget.initialImageHint,
               ),
             ),
-            if (!_isSending)
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 2.h),
-                child: ElevatedButton(
-                  onPressed: _sendReply,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: HonooColor.secondary,
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 1.5.h),
-                  ),
-                  child: Text(
-                    "Invia risposta",
-                    style: GoogleFonts.libreFranklin(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: HonooColor.background,
-                    ),
-                  ),
+            SizedBox(height: 2.h),
+            ResponsiveFooterBar(
+              useSafeArea: true,
+              bottomPadding: 8,
+              desiredGap: 28,
+              minGap: 16,
+              height: 44,
+              actions: [
+                ResponsiveFooterAction(
+                  asset: "assets/icons/honoo_logo.svg",
+                  semanticsLabel: 'Indietro',
+                  size: 44,
+                  splashRadius: 28,
+                  tooltip: 'Indietro',
+                  onPressed: () => Navigator.pop(context, false),
                 ),
-              ),
+                ResponsiveFooterAction(
+                  asset: "assets/icons/reply.svg",
+                  semanticsLabel: 'Invia risposta',
+                  size: 44,
+                  splashRadius: 28,
+                  tooltip: 'Invia risposta',
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
+                  ),
+                  onPressed: _isSending ? null : _sendReply,
+                ),
+              ],
+            ),
             if (_isSending)
               const Padding(
-                padding: EdgeInsets.all(16),
+                padding: EdgeInsets.only(bottom: 16),
                 child: LoadingSpinner(),
               ),
           ],
