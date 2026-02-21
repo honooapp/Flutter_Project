@@ -135,8 +135,7 @@ class _HonooThreadViewState extends State<HonooThreadView> {
                 ),
                 itemBuilder: (context, index, realIdx) {
                   final honoo = ordered[index];
-                  final bool isReply =
-                      honoo.replyTo != null && honoo.replyTo!.isNotEmpty;
+                  final bool isReply = false; // i bordi top-level sono gestiti a livello carosello
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         child: Stack(

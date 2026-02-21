@@ -65,23 +65,7 @@ class _HinooThreadViewState extends State<HinooThreadView> {
             maxWidth: widget.maxWidth,
             onDownloadTap: widget.onDownloadTap,
           );
-          if (!entry.isReply) return viewer;
-          return Stack(
-            children: [
-              viewer,
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      border:
-                          Border.all(color: HonooColor.secondary, width: 2),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          );
+          return viewer;
       },
     );
 

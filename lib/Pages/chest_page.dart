@@ -957,6 +957,17 @@ class _ChestPageState extends State<ChestPage> {
     );
   }
 
+  Widget _wrapWithReplyFrame(Widget child) {
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: HonooColor.secondary, width: 2),
+      ),
+      child: child,
+    );
+  }
+
   Widget _wrapHonooWithReplyBorder(Widget child, Honoo honoo) {
     if (honoo.type != HonooType.answer) return child;
     return Stack(
@@ -1108,14 +1119,21 @@ class _ChestPageState extends State<ChestPage> {
     final double cardMaxH = isHonoo ? honooMetrics.height : hinooSize.height;
 
     final Widget content = item.when(
-      honoo: (h) => SizedBox(
-        width: honooMetrics.width,
-        height: honooMetrics.height,
-        child: HonooThreadView(
-          root: h,
-          onDownloadTap: () => _handleDownloadForItem(item, repaintKey),
-        ),
-      ),
+      honoo: (h) {
+        // Se è una risposta, il thread deve essere costruito sul padre
+        final Honoo effectiveRoot = (h.type == HonooType.answer &&
+                (h.replyTo != null && h.replyTo!.isNotEmpty))
+            ? h.copyWith(dbId: h.replyTo)
+            : h;
+        return SizedBox(
+          width: honooMetrics.width,
+          height: honooMetrics.height,
+          child: HonooThreadView(
+            root: effectiveRoot,
+            onDownloadTap: () => _handleDownloadForItem(item, repaintKey),
+          ),
+        );
+      },
       hinoo: (row) {
         final replies = _hinooRepliesByRoot[row.id] ?? const [];
         if (replies.isEmpty) {
@@ -1151,17 +1169,21 @@ class _ChestPageState extends State<ChestPage> {
 
     final Widget styledCard = item.when(
       honoo: (h) {
-        final withReply = _wrapHonooWithReplyBorder(card, h);
-        if (h.type == HonooType.answer) return withReply;
+        // Risposta: bordo rosso stile frame, altrimenti cornice Luna quando salvato
+        if (h.type == HonooType.answer) return _wrapWithReplyFrame(card);
         return _wrapWithMoonFrame(
-          withReply,
+          card,
           isMoonSaved: _isFromMoonSaved(h),
         );
       },
-      hinoo: (row) => _wrapWithMoonFrame(
-        card,
-        isMoonSaved: _isHinooFromMoon(row),
-      ),
+      hinoo: (row) {
+        // Se è risposta, bordo rosso stile frame, altrimenti cornice Luna
+        if (row.draft.type == HinooType.answer) return _wrapWithReplyFrame(card);
+        return _wrapWithMoonFrame(
+          card,
+          isMoonSaved: _isHinooFromMoon(row),
+        );
+      },
     );
 
     return AnimatedSwitcher(
