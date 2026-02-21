@@ -143,30 +143,21 @@ class _HonooThreadViewState extends State<HonooThreadView> {
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         child: Stack(
                           children: [
-                            () {
-                              final String? uid =
-                                  SupabaseProvider.client.auth.currentUser?.id;
-                              final bool isOwn =
-                                  uid != null && uid == honoo.userId;
-                              if (isReply && !isOwn) {
-                                return Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(
-                                        color: HonooColor.secondary, width: 2),
-                                  ),
-                                  child: HonooCard(
-                                    honoo: honoo,
-                                    onDownloadTap: widget.onDownloadTap,
-                                  ),
-                                );
-                              }
-                              return HonooCard(
+                            Container(
+                              padding: EdgeInsets.all(isReply ? 4 : 0),
+                              decoration: isReply
+                                  ? BoxDecoration(
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(
+                                          color: HonooColor.secondary,
+                                          width: 2),
+                                    )
+                                  : null,
+                              child: HonooCard(
                                 honoo: honoo,
                                 onDownloadTap: widget.onDownloadTap,
-                              );
-                            }(),
+                              ),
+                            ),
                         if (isReply)
                           Positioned(
                             left: 12,

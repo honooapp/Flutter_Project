@@ -67,22 +67,16 @@ class _HinooThreadViewState extends State<HinooThreadView> {
             onDownloadTap: widget.onDownloadTap,
           );
           if (!entry.isReply) return viewer;
-          final String? uid = SupabaseProvider.client.auth.currentUser?.id;
-          final bool isOwnReply = uid != null && entry.authorId == uid;
           return Stack(
             children: [
-              if (!isOwnReply)
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    border:
-                        Border.all(color: HonooColor.secondary, width: 2),
-                  ),
-                  child: viewer,
-                )
-              else
-                viewer,
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: HonooColor.secondary, width: 2),
+                ),
+                child: viewer,
+              ),
               if (entry.createdAt != null)
                 Positioned(
                   left: 12,

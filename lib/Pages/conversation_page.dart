@@ -127,11 +127,10 @@ class _ConversationPageState extends State<ConversationPage> {
                         },
                       ),
                       items: _thread.map((h) {
-                        final bool isReply = (h.replyTo != null && h.replyTo!.isNotEmpty);
-                        final String? uid = SupabaseProvider.client.auth.currentUser?.id;
-                        final bool isOwn = uid != null && h.userId == uid;
+                        final bool isReply =
+                            (h.replyTo != null && h.replyTo!.isNotEmpty);
                         final Widget card = HonooCard(honoo: h);
-                        if (isReply && !isOwn) {
+                        if (isReply) {
                           return SizedBox(
                             width: honooMetrics.width,
                             height: honooMetrics.height,
@@ -139,7 +138,8 @@ class _ConversationPageState extends State<ConversationPage> {
                               padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(14),
-                                border: Border.all(color: HonooColor.secondary, width: 2),
+                                border: Border.all(
+                                    color: HonooColor.secondary, width: 2),
                               ),
                               child: card,
                             ),

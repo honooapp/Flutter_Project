@@ -959,9 +959,6 @@ class _ChestPageState extends State<ChestPage> {
 
   Widget _wrapHonooWithReplyBorder(Widget child, Honoo honoo) {
     if (honoo.type != HonooType.answer) return child;
-    final String? uid = SupabaseProvider.client.auth.currentUser?.id;
-    final bool isOwnReply = uid != null && honoo.userId == uid;
-    if (isOwnReply) return child; // Nessun bordo per le risposte dell'utente
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(

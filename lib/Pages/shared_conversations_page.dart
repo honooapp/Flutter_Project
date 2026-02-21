@@ -200,11 +200,10 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
                         },
                       ),
                       items: _thread.map((item) {
-                        final bool isReply = (item.replyTo != null && item.replyTo!.isNotEmpty);
-                        final String? uid = SupabaseProvider.client.auth.currentUser?.id;
-                        final bool isOwn = uid != null && item.userId == uid;
+                        final bool isReply =
+                            (item.replyTo != null && item.replyTo!.isNotEmpty);
                         final Widget card = HonooCard(honoo: item);
-                        if (isReply && !isOwn) {
+                        if (isReply) {
                           return SizedBox(
                             width: bottomMetrics.width,
                             height: bottomMetrics.height,
@@ -212,7 +211,8 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
                               padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(14),
-                                border: Border.all(color: HonooColor.secondary, width: 2),
+                                border: Border.all(
+                                    color: HonooColor.secondary, width: 2),
                               ),
                               child: card,
                             ),

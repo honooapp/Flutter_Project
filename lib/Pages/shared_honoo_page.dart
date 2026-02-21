@@ -128,11 +128,8 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                       items: _items.map((item) {
                         final bool isReply =
                             (item.replyTo != null && item.replyTo!.isNotEmpty);
-                        final String? uid =
-                            SupabaseProvider.client.auth.currentUser?.id;
-                        final bool isOwn = uid != null && item.userId == uid;
                         final Widget card = HonooCard(honoo: item);
-                        if (isReply && !isOwn) {
+                        if (isReply) {
                           return SizedBox(
                             width: metrics.width,
                             height: metrics.height,

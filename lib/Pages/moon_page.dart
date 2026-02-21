@@ -85,7 +85,10 @@ class _MoonPageState extends State<MoonPage> {
           if ((honoo.recipientTag ?? '').isEmpty && ownerId != null) {
             honoo.recipientTag = ownerId;
           }
-          items.add(_MoonItem.honoo(honoo, created));
+          // Non mostrare le risposte (reply) sulla Luna
+          if (honoo.type != HonooType.answer) {
+            items.add(_MoonItem.honoo(honoo, created));
+          }
         } else if (kind == 'hinoo') {
           final pages = row['pages'];
           if (pages is List) {
@@ -99,8 +102,11 @@ class _MoonPageState extends State<MoonPage> {
             );
             final String? hinooId = row['id']?.toString();
             final String? ownerId = row['user_id']?.toString();
-            items.add(_MoonItem.hinoo(draft, created,
-                hinooId: hinooId, ownerId: ownerId));
+            // Non mostrare risposte (type answer) sulla Luna
+            if (HinooType.moon == draft.type) {
+              items.add(
+                  _MoonItem.hinoo(draft, created, hinooId: hinooId, ownerId: ownerId));
+            }
           }
         }
       }
