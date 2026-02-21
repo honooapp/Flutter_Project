@@ -138,7 +138,6 @@ class _HonooThreadViewState extends State<HonooThreadView> {
                   final honoo = ordered[index];
                   final bool isReply =
                       honoo.replyTo != null && honoo.replyTo!.isNotEmpty;
-                  final String timestamp = _formatTimestamp(honoo.createdAt);
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         child: Stack(
@@ -158,13 +157,6 @@ class _HonooThreadViewState extends State<HonooThreadView> {
                                 onDownloadTap: widget.onDownloadTap,
                               ),
                             ),
-                        if (isReply)
-                          Positioned(
-                            left: 12,
-                            right: 12,
-                            bottom: 8,
-                            child: _ReplyTimestamp(label: timestamp),
-                          ),
                       ],
                     ),
                   );
@@ -209,38 +201,4 @@ class _HonooThreadViewState extends State<HonooThreadView> {
     );
   }
 
-  String _formatTimestamp(String raw) {
-    final DateTime? parsed = DateTime.tryParse(raw);
-    if (parsed == null) return '';
-    final DateTime local = parsed.toLocal();
-    String two(int value) => value.toString().padLeft(2, '0');
-    return 'Nuova risposta · ${two(local.day)}/${two(local.month)}/${local.year} '
-        '${two(local.hour)}:${two(local.minute)}';
-  }
-}
-
-class _ReplyTimestamp extends StatelessWidget {
-  const _ReplyTimestamp({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: HonooColor.background.withOpacity(0.65),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        label,
-        textAlign: TextAlign.center,
-        style: GoogleFonts.libreFranklin(
-          color: HonooColor.onBackground,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
 }

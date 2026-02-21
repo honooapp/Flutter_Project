@@ -959,13 +959,20 @@ class _ChestPageState extends State<ChestPage> {
 
   Widget _wrapHonooWithReplyBorder(Widget child, Honoo honoo) {
     if (honoo.type != HonooType.answer) return child;
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: HonooColor.secondary, width: 2),
-      ),
-      child: child,
+    return Stack(
+      children: [
+        child,
+        Positioned.fill(
+          child: IgnorePointer(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: HonooColor.secondary, width: 2),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -1143,10 +1150,14 @@ class _ChestPageState extends State<ChestPage> {
     );
 
     final Widget styledCard = item.when(
-      honoo: (h) => _wrapWithMoonFrame(
-        _wrapHonooWithReplyBorder(card, h),
-        isMoonSaved: _isFromMoonSaved(h),
-      ),
+      honoo: (h) {
+        final withReply = _wrapHonooWithReplyBorder(card, h);
+        if (h.type == HonooType.answer) return withReply;
+        return _wrapWithMoonFrame(
+          withReply,
+          isMoonSaved: _isFromMoonSaved(h),
+        );
+      },
       hinoo: (row) => _wrapWithMoonFrame(
         card,
         isMoonSaved: _isHinooFromMoon(row),
