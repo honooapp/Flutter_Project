@@ -2,7 +2,6 @@ import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
-import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
  
 
@@ -69,13 +68,17 @@ class _HinooThreadViewState extends State<HinooThreadView> {
           if (!entry.isReply) return viewer;
           return Stack(
             children: [
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: HonooColor.secondary, width: 2),
+              viewer,
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      border:
+                          Border.all(color: HonooColor.secondary, width: 2),
+                    ),
+                  ),
                 ),
-                child: viewer,
               ),
             ],
           );

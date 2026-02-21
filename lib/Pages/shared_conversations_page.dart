@@ -12,7 +12,6 @@ import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
 
 import 'package:honoo/Controller/honoo_controller.dart';
-import 'package:honoo/Services/supabase_provider.dart';
 
 import 'home_page.dart';
 import 'placeholder_page.dart';

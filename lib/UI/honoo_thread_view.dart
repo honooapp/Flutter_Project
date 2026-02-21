@@ -9,7 +9,6 @@ import '../Controller/honoo_thread_loader.dart';
 import '../Entities/honoo.dart';
 import '../UI/honoo_card.dart';
 import '../Utility/honoo_colors.dart';
-import '../Services/supabase_provider.dart';
  
 
 /// Una pagina del carosello orizzontale della ChestPage.
@@ -142,21 +141,23 @@ class _HonooThreadViewState extends State<HonooThreadView> {
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         child: Stack(
                           children: [
-                            Container(
-                              padding: EdgeInsets.all(isReply ? 4 : 0),
-                              decoration: isReply
-                                  ? BoxDecoration(
+                            HonooCard(
+                              honoo: honoo,
+                              onDownloadTap: widget.onDownloadTap,
+                            ),
+                            if (isReply)
+                              Positioned.fill(
+                                child: IgnorePointer(
+                                  child: Container(
+                                    decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(14),
                                       border: Border.all(
                                           color: HonooColor.secondary,
                                           width: 2),
-                                    )
-                                  : null,
-                              child: HonooCard(
-                                honoo: honoo,
-                                onDownloadTap: widget.onDownloadTap,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
                       ],
                     ),
                   );

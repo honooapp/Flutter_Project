@@ -10,7 +10,6 @@ import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
-import 'package:honoo/Services/supabase_provider.dart';
 
 import '../Entities/honoo.dart';
 import 'reply_honoo_page.dart';
