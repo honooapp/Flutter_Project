@@ -343,6 +343,7 @@ class _MoonPageState extends State<MoonPage> {
                       enableInfiniteScroll: false,
                       padEnds: true,
                       enlargeCenterPage: false,
+                      disableCenter: true,
                       scrollPhysics: const PageScrollPhysics(),
                       onPageChanged: (index, _) {
                         setState(() => _currentIndex = index);

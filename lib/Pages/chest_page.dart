@@ -1203,13 +1203,13 @@ class _ChestPageState extends State<ChestPage> {
 
                 final ResponsiveLayoutMode layoutMode =
                     ResponsiveLayout.modeForWidth(constraints.maxWidth);
-                final bool currentIsHinoo =
-                    current != null && current.honoo == null;
-                final double targetMaxW = currentIsHinoo
+                // Usa una larghezza contenitore costante per evitare jitter tra honoo/hinoo
+                final double containerMaxW = (layoutMode ==
+                            ResponsiveLayoutMode.mobile ||
+                        layoutMode == ResponsiveLayoutMode.tablet)
                     ? constraints.maxWidth
-                    : layoutMode == ResponsiveLayoutMode.mobile
-                        ? constraints.maxWidth
-                        : ResponsiveLayout.contentMaxWidth(constraints.maxWidth);
+                    : ResponsiveLayout.contentMaxWidth(constraints.maxWidth);
+                final double targetMaxW = containerMaxW;
                 final double footerIconSize =
                     ResponsiveLayout.footerIconSizeForMode(layoutMode);
                 final double footerGap =
@@ -1232,15 +1232,13 @@ class _ChestPageState extends State<ChestPage> {
                   maxWidth: targetMaxW,
                   mode: layoutMode,
                 );
-                final double horizontalPadding = currentIsHinoo
-                    ? 0
-                    : layoutMode == ResponsiveLayoutMode.mobile ||
-                            layoutMode == ResponsiveLayoutMode.tablet
+                // Padding orizzontale costante su desktop per pagine del carosello
+                final double horizontalPadding =
+                    (layoutMode == ResponsiveLayoutMode.mobile ||
+                            layoutMode == ResponsiveLayoutMode.tablet)
                         ? 0
                         : 16;
-                final double displayHeight = current?.honoo != null
-                    ? honooMetrics.height
-                    : availableCenterH;
+                // Altezza del carosello orizzontale: area centrale disponibile
 
                 return Stack(
                   clipBehavior: Clip.none,
@@ -1273,7 +1271,7 @@ class _ChestPageState extends State<ChestPage> {
                             child: Container(
                               constraints: BoxConstraints(maxWidth: targetMaxW),
                               child: SizedBox(
-                                height: displayHeight,
+                                height: availableCenterH,
                                 width: double.infinity,
                                 child: () {
                                   if (ctrl.isLoading.value ||
@@ -1301,18 +1299,27 @@ class _ChestPageState extends State<ChestPage> {
                                       padding: EdgeInsets.symmetric(
                                           horizontal: horizontalPadding),
                                       child: () {
+                                        final ScrollPhysics horizPhysics =
+                                            (layoutMode ==
+                                                        ResponsiveLayoutMode
+                                                            .mobile ||
+                                                    layoutMode ==
+                                                        ResponsiveLayoutMode
+                                                            .tablet)
+                                                ? const BouncingScrollPhysics()
+                                                : const PageScrollPhysics();
                                         final slider = cs.CarouselSlider.builder(
                                           carouselController:
                                               _carouselController,
                                           itemCount: _items.length,
                                           options: cs.CarouselOptions(
-                                            height: displayHeight,
+                                            height: availableCenterH,
                                             viewportFraction: 1.0,
                                             enableInfiniteScroll: false,
                                             padEnds: true,
                                             enlargeCenterPage: false,
-                                            scrollPhysics:
-                                                const PageScrollPhysics(),
+                                            disableCenter: true,
+                                            scrollPhysics: horizPhysics,
                                             onPageChanged: (i, _) => setState(
                                                 () => _currentIndex = i),
                                           ),

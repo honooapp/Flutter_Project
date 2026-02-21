@@ -126,7 +126,11 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                           viewportFraction: 1.0,
                           enlargeCenterPage: false,
                           enableInfiniteScroll: false,
-                          scrollPhysics: const PageScrollPhysics(),
+                          disableCenter: true,
+                          scrollPhysics: (layoutMode == ResponsiveLayoutMode.mobile ||
+                                  layoutMode == ResponsiveLayoutMode.tablet)
+                              ? const BouncingScrollPhysics()
+                              : const PageScrollPhysics(),
                           onPageChanged: (index, reason) {
                             setState(() => _currentIndex = index);
                           },
