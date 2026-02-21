@@ -1270,11 +1270,8 @@ class _ChestPageState extends State<ChestPage> {
                               0,
                             ),
                           child: Center(
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 90),
-                              curve: Curves.easeOutCubic,
-                              constraints:
-                                  BoxConstraints(maxWidth: targetMaxW),
+                            child: Container(
+                              constraints: BoxConstraints(maxWidth: targetMaxW),
                               child: SizedBox(
                                 height: displayHeight,
                                 width: double.infinity,
@@ -1315,7 +1312,7 @@ class _ChestPageState extends State<ChestPage> {
                                             padEnds: true,
                                             enlargeCenterPage: false,
                                             scrollPhysics:
-                                                const BouncingScrollPhysics(),
+                                                const PageScrollPhysics(),
                                             onPageChanged: (i, _) => setState(
                                                 () => _currentIndex = i),
                                           ),

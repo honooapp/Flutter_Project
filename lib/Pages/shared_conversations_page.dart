@@ -156,6 +156,7 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
                         viewportFraction: 1.0,
                         enlargeCenterPage: false,
                         enableInfiniteScroll: false,
+                        scrollPhysics: const PageScrollPhysics(),
                         onPageChanged: (index, reason) async {
                           setState(() => _currentRootIndex = index);
                           await _loadThreadFor(_roots[index]);

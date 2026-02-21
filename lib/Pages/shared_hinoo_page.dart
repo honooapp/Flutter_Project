@@ -120,16 +120,17 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                     )
                   : cs.CarouselSlider(
                       carouselController: _carouselController,
-                      options: cs.CarouselOptions(
-                        scrollDirection: Axis.horizontal,
-                        height: availableH,
-                        viewportFraction: 1.0,
-                        enlargeCenterPage: false,
-                        enableInfiniteScroll: false,
-                        onPageChanged: (index, reason) {
-                          setState(() => _currentIndex = index);
-                        },
-                      ),
+                        options: cs.CarouselOptions(
+                          scrollDirection: Axis.horizontal,
+                          height: availableH,
+                          viewportFraction: 1.0,
+                          enlargeCenterPage: false,
+                          enableInfiniteScroll: false,
+                          scrollPhysics: const PageScrollPhysics(),
+                          onPageChanged: (index, reason) {
+                            setState(() => _currentIndex = index);
+                          },
+                        ),
                       items: _items
                           .map(
                             (item) => SizedBox(

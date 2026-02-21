@@ -26,18 +26,28 @@ class HonooThreadState {
 
 class HonooThreadLoader extends ValueNotifier<HonooThreadState> {
   final HonooController controller;
+  bool _isDisposed = false;
 
   HonooThreadLoader({HonooController? controller})
       : controller = controller ?? HonooController(),
         super(const HonooThreadState.loading());
 
   Future<void> load(Honoo root) async {
+    if (_isDisposed) return;
     value = const HonooThreadState.loading();
     try {
       final thread = await controller.getHonooHistory(root);
+      if (_isDisposed) return;
       value = HonooThreadState.success(thread);
     } catch (e) {
+      if (_isDisposed) return;
       value = HonooThreadState.failure(e);
     }
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
   }
 }

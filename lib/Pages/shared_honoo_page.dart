@@ -116,6 +116,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                         viewportFraction: 1.0,
                         enlargeCenterPage: false,
                         enableInfiniteScroll: false,
+                        scrollPhysics: const PageScrollPhysics(),
                         onPageChanged: (index, reason) {
                           setState(() => _currentIndex = index);
                         },

@@ -1,97 +1,53 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <base href="$FLUTTER_BASE_HREF">
+  <head>
+    <base href="$FLUTTER_BASE_HREF">
 
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Apri gli occhi: c’è l’Isola davanti a te.">
+    <meta charset="UTF-8">
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Apri gli occhi: c’è l’Isola davanti a te.">
 
-  <!-- ✅ Tema colore per Chrome, Android, ecc. -->
-  <meta name="theme-color" content="#0175C2">
+    <!-- Tema colore per Chrome, Android, ecc. -->
+    <meta name="theme-color" content="#0175C2">
 
-  <!-- ✅ PWA manifest -->
-  <link rel="manifest" href="manifest.json">
+    <!-- PWA manifest -->
+    <link rel="manifest" href="manifest.json">
 
-  <!-- Favicon principale -->
-  <link rel="icon" href="favicon.ico">
+    <!-- Favicon principale -->
+    <link rel="icon" href="favicon.ico">
+    <link rel="icon" type="image/png" href="icons/honoo_icon-48.png">
 
-  <!-- Fallback per browser moderni (opzionale) -->
-  <link rel="icon" type="image/png" href="icons/honoo_icon-48.png">
+    <!-- Icone mobile -->
+    <link rel="apple-touch-icon" href="icons/honoo_icon-192.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <!-- (apple-mobile-web-app-capable è deprecato; lasciato non incluso per evitare warning) -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="honoo">
 
-  <!-- ✅ Icona per dispositivi Apple -->
-  <link rel="apple-touch-icon" href="icons/honoo_icon-192.png">
+    <title>honoo</title>
 
-  <!-- iOS meta tags -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="honoo">
+    <script>
+      // The value below is injected by flutter build, do not touch.
+      var serviceWorkerVersion = null;
+    </script>
 
-  <title>honoo</title>
-
-  <script>
-    // The value below is injected by flutter build, do not touch.
-    var serviceWorkerVersion = null;
-  </script>
-  
-  <script>window.flutterWebRenderer = "canvaskit";</script>
-  
-  <script src="flutter.js" defer></script>
-<head>
-  <base href="$FLUTTER_BASE_HREF">
-
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Apri gli occhi: c’è l’Isola davanti a te.">
-
-  <!-- ✅ Tema colore per Chrome, Android, ecc. -->
-  <meta name="theme-color" content="#0175C2">
-
-  <!-- ✅ PWA manifest -->
-  <link rel="manifest" href="manifest.json">
-
-  <!-- Favicon principale -->
-  <link rel="icon" href="favicon.ico">
-
-  <!-- Fallback per browser moderni (opzionale) -->
-  <link rel="icon" type="image/png" href="icons/honoo_icon-48.png">
-
-  <!-- ✅ Icona per dispositivi Apple -->
-  <link rel="apple-touch-icon" href="icons/honoo_icon-192.png">
-
-  <!-- iOS meta tags -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="honoo">
-  
-  <title>honoo</title>
-  
-  <script>
-    // The value below is injected by flutter build, do not touch.
-    var serviceWorkerVersion = null;
-  </script>
-  
-  <!-- lancia da telefono canvaskit per poter effettuare i download  -->
-  <script>window.flutterWebRenderer = "canvaskit";</script>
-
-  <script src="flutter.js" defer></script>
-</head>
-<body>
-<script>
-  window.addEventListener('load', function(ev) {
-    _flutter.loader.loadEntrypoint({
-      serviceWorker: {
-        serviceWorkerVersion: serviceWorkerVersion,
-      },
-      onEntrypointLoaded: function(engineInitializer) {
-        engineInitializer.initializeEngine().then(function(appRunner) {
-          appRunner.runApp();
+    <script src="flutter.js" defer></script>
+  </head>
+  <body>
+    <script>
+      window.addEventListener('load', function (ev) {
+        _flutter.loader.loadEntrypoint({
+          serviceWorker: {
+            serviceWorkerVersion: serviceWorkerVersion,
+          },
+          onEntrypointLoaded: function (engineInitializer) {
+            engineInitializer.initializeEngine().then(function (appRunner) {
+              appRunner.runApp();
+            });
+          },
         });
-      }
-    });
-  });
-</script>
-</body>
+      });
+    </script>
+  </body>
 </html>

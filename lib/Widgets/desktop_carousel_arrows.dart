@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 /// Desktop-only overlay that adds left/right click areas and arrow hints
 /// without affecting layout (stacked on top of the carousel).
@@ -36,13 +37,13 @@ class DesktopCarouselArrows extends StatelessWidget {
             children: [
               Expanded(
                 child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
+                  behavior: HitTestBehavior.translucent,
                   onTap: canPrev ? onPrev : null,
                 ),
               ),
               Expanded(
                 child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
+                  behavior: HitTestBehavior.translucent,
                   onTap: canNext ? onNext : null,
                 ),
               ),
@@ -56,14 +57,12 @@ class DesktopCarouselArrows extends StatelessWidget {
             bottom: 0,
             child: Center(
               child: IgnorePointer(
-                child: Text(
-                  '<',
-                  style: TextStyle(
-                    color: arrowColor,
-                    fontSize: arrowSize,
-                    fontWeight: FontWeight.w700,
-                    height: 1,
-                  ),
+                child: SvgPicture.asset(
+                  'assets/icons/arrow_left.svg',
+                  width: arrowSize,
+                  height: arrowSize,
+                  colorFilter: ColorFilter.mode(arrowColor, BlendMode.srcIn),
+                  semanticsLabel: 'Indietro',
                 ),
               ),
             ),
@@ -75,14 +74,12 @@ class DesktopCarouselArrows extends StatelessWidget {
             bottom: 0,
             child: Center(
               child: IgnorePointer(
-                child: Text(
-                  '>',
-                  style: TextStyle(
-                    color: arrowColor,
-                    fontSize: arrowSize,
-                    fontWeight: FontWeight.w700,
-                    height: 1,
-                  ),
+                child: SvgPicture.asset(
+                  'assets/icons/arrow_right.svg',
+                  width: arrowSize,
+                  height: arrowSize,
+                  colorFilter: ColorFilter.mode(arrowColor, BlendMode.srcIn),
+                  semanticsLabel: 'Avanti',
                 ),
               ),
             ),
