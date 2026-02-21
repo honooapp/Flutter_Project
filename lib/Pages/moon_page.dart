@@ -551,12 +551,21 @@ class _MoonPageState extends State<MoonPage> {
         await HinooService.deleteHinooById(id);
       }
       if (!mounted) return;
+      // Calcola il target come l'ultimo elemento visto prima di quello cancellato
+      final int desired = (_currentIndex > 0) ? _currentIndex - 1 : 0;
       setState(() {
         _items.removeAt(_currentIndex);
-        if (_currentIndex >= _items.length) {
-          _currentIndex = _items.isEmpty ? 0 : _items.length - 1;
+        if (_items.isEmpty) {
+          _currentIndex = 0;
+        } else {
+          _currentIndex = desired.clamp(0, _items.length - 1);
         }
       });
+      // Allinea il carosello alla nuova pagina target
+      if (_items.isNotEmpty) {
+        // usa jumpToPage per evitare oscillazioni
+        _carouselController.jumpToPage(_currentIndex);
+      }
       showHonooToast(context, message: 'Eliminato dalla Luna.');
     } catch (e) {
       if (!mounted) return;
