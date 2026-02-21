@@ -1193,19 +1193,30 @@ class _CampanelliPageState extends State<CampanelliPage> {
                           ),
                           casaUnlocked
                               ? AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 280),
+                                  duration: const Duration(milliseconds: 480),
                                   switchInCurve: Curves.easeOutCubic,
                                   switchOutCurve: Curves.easeOutCubic,
                                   transitionBuilder: (child, animation) {
+                                    final curved = CurvedAnimation(
+                                      parent: animation,
+                                      curve: Curves.elasticOut,
+                                    );
                                     final offsetAnimation = Tween<Offset>(
-                                      begin: const Offset(0, 0.08),
+                                      begin: const Offset(0, 0.28),
                                       end: Offset.zero,
-                                    ).animate(animation);
+                                    ).animate(curved);
+                                    final scale = Tween<double>(
+                                      begin: 0.97,
+                                      end: 1.0,
+                                    ).animate(curved);
                                     return SlideTransition(
                                       position: offsetAnimation,
-                                      child: FadeTransition(
-                                        opacity: animation,
-                                        child: child,
+                                      child: ScaleTransition(
+                                        scale: scale,
+                                        child: FadeTransition(
+                                          opacity: animation,
+                                          child: child,
+                                        ),
                                       ),
                                     );
                                   },

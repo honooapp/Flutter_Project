@@ -9,6 +9,7 @@ import '../Controller/honoo_thread_loader.dart';
 import '../Entities/honoo.dart';
 import '../UI/honoo_card.dart';
 import '../Utility/honoo_colors.dart';
+import '../Services/supabase_provider.dart';
  
 
 /// Una pagina del carosello orizzontale della ChestPage.
@@ -71,6 +72,8 @@ class _HonooThreadViewState extends State<HonooThreadView> {
       valueListenable: _loader,
       builder: (context, state, _) {
         Widget child;
+        final bool hasReplies =
+            !state.isLoading && state.error == null && state.thread.length > 1;
         if (state.isLoading) {
           child = const Center(
             key: ValueKey('thread_loading'),
@@ -136,14 +139,34 @@ class _HonooThreadViewState extends State<HonooThreadView> {
                   final bool isReply =
                       honoo.replyTo != null && honoo.replyTo!.isNotEmpty;
                   final String timestamp = _formatTimestamp(honoo.createdAt);
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Stack(
-                      children: [
-                        HonooCard(
-                          honoo: honoo,
-                          onDownloadTap: widget.onDownloadTap,
-                        ),
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Stack(
+                          children: [
+                            () {
+                              final String? uid =
+                                  SupabaseProvider.client.auth.currentUser?.id;
+                              final bool isOwn =
+                                  uid != null && uid == honoo.userId;
+                              if (isReply && !isOwn) {
+                                return Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                        color: HonooColor.secondary, width: 2),
+                                  ),
+                                  child: HonooCard(
+                                    honoo: honoo,
+                                    onDownloadTap: widget.onDownloadTap,
+                                  ),
+                                );
+                              }
+                              return HonooCard(
+                                honoo: honoo,
+                                onDownloadTap: widget.onDownloadTap,
+                              );
+                            }(),
                         if (isReply)
                           Positioned(
                             left: 12,
@@ -161,15 +184,33 @@ class _HonooThreadViewState extends State<HonooThreadView> {
         }
 
         return AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 420),
           switchInCurve: Curves.easeOutCubic,
           switchOutCurve: Curves.easeInCubic,
           transitionBuilder: (child, animation) {
+            if (!hasReplies) {
+              final offset = Tween<Offset>(
+                begin: const Offset(0, 0.12),
+                end: Offset.zero,
+              ).animate(animation);
+              return SlideTransition(position: offset, child: child);
+            }
+            final curved = CurvedAnimation(
+              parent: animation,
+              curve: Curves.elasticOut,
+            );
             final offset = Tween<Offset>(
-              begin: const Offset(0, 0.12),
+              begin: const Offset(0, 0.28),
               end: Offset.zero,
-            ).animate(animation);
-            return SlideTransition(position: offset, child: child);
+            ).animate(curved);
+            final scale = Tween<double>(begin: 0.97, end: 1.0).animate(curved);
+            return SlideTransition(
+              position: offset,
+              child: ScaleTransition(
+                scale: scale,
+                child: FadeTransition(opacity: animation, child: child),
+              ),
+            );
           },
           child: child,
         );

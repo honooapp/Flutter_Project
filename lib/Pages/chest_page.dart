@@ -961,13 +961,12 @@ class _ChestPageState extends State<ChestPage> {
     if (honoo.type != HonooType.answer) return child;
     final String? uid = SupabaseProvider.client.auth.currentUser?.id;
     final bool isOwnReply = uid != null && honoo.userId == uid;
-    final Color borderColor =
-        isOwnReply ? HonooColor.wave2 : HonooColor.secondary;
+    if (isOwnReply) return child; // Nessun bordo per le risposte dell'utente
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderColor, width: 2),
+        border: Border.all(color: HonooColor.secondary, width: 2),
       ),
       child: child,
     );

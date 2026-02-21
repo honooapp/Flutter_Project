@@ -12,6 +12,7 @@ import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
 
 import 'package:honoo/Controller/honoo_controller.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 
 import 'home_page.dart';
 import 'placeholder_page.dart';
@@ -196,15 +197,31 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
                           setState(() => _currentThreadIndex = index);
                         },
                       ),
-                      items: _thread
-                          .map(
-                            (item) => SizedBox(
-                              width: bottomMetrics.width,
-                              height: bottomMetrics.height,
-                              child: HonooCard(honoo: item),
+                      items: _thread.map((item) {
+                        final bool isReply = (item.replyTo != null && item.replyTo!.isNotEmpty);
+                        final String? uid = SupabaseProvider.client.auth.currentUser?.id;
+                        final bool isOwn = uid != null && item.userId == uid;
+                        final Widget card = HonooCard(honoo: item);
+                        if (isReply && !isOwn) {
+                          return SizedBox(
+                            width: bottomMetrics.width,
+                            height: bottomMetrics.height,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(color: HonooColor.secondary, width: 2),
+                              ),
+                              child: card,
                             ),
-                          )
-                          .toList(),
+                          );
+                        }
+                        return SizedBox(
+                          width: bottomMetrics.width,
+                          height: bottomMetrics.height,
+                          child: card,
+                        );
+                      }).toList(),
                     ));
 
           return Column(

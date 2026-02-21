@@ -259,7 +259,7 @@ Future<bool?> showHonooDeleteDialog(
   final String title;
   switch (target) {
     case HonooDeletionTarget.page:
-      title = 'Vuoi davvero eliminare questa pagina?';
+      title = 'Vuoi davvero eliminarlo?';
       break;
     case HonooDeletionTarget.honoo:
       title = 'Vuoi davvero eliminarlo?';

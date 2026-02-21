@@ -10,6 +10,7 @@ import 'package:honoo/Widgets/honoo_app_title.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 
 import 'home_page.dart';
 import 'placeholder_page.dart';
@@ -119,15 +120,34 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                           setState(() => _currentIndex = index);
                         },
                       ),
-                      items: _items
-                          .map(
-                            (item) => SizedBox(
-                              width: metrics.width,
-                              height: metrics.height,
-                              child: HonooCard(honoo: item),
+                      items: _items.map((item) {
+                        final bool isReply =
+                            (item.replyTo != null && item.replyTo!.isNotEmpty);
+                        final String? uid =
+                            SupabaseProvider.client.auth.currentUser?.id;
+                        final bool isOwn = uid != null && item.userId == uid;
+                        final Widget card = HonooCard(honoo: item);
+                        if (isReply && !isOwn) {
+                          return SizedBox(
+                            width: metrics.width,
+                            height: metrics.height,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                    color: HonooColor.secondary, width: 2),
+                              ),
+                              child: card,
                             ),
-                          )
-                          .toList(),
+                          );
+                        }
+                        return SizedBox(
+                          width: metrics.width,
+                          height: metrics.height,
+                          child: card,
+                        );
+                      }).toList(),
                     ));
 
           return Column(

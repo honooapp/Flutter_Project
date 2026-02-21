@@ -59,52 +59,70 @@ class _HinooThreadViewState extends State<HinooThreadView> {
         scrollPhysics: const BouncingScrollPhysics(),
       ),
       itemBuilder: (context, index, realIdx) {
-        final entry = items[index];
-        final Widget viewer = HinooViewer(
-          draft: entry.draft,
-          maxHeight: widget.maxHeight,
-          maxWidth: widget.maxWidth,
-          onDownloadTap: widget.onDownloadTap,
-        );
-        if (!entry.isReply) return viewer;
-        final String? uid = SupabaseProvider.client.auth.currentUser?.id;
-        final bool isOwnReply = uid != null && entry.authorId == uid;
-        final Color borderColor =
-            isOwnReply ? HonooColor.wave2 : HonooColor.secondary;
-        return Stack(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: borderColor, width: 2),
-              ),
-              child: viewer,
-            ),
-            if (entry.createdAt != null)
-              Positioned(
-                left: 12,
-                right: 12,
-                bottom: 8,
-                child: _ReplyTimestamp(
-                  label: _formatTimestamp(entry.createdAt!),
+          final entry = items[index];
+          final Widget viewer = HinooViewer(
+            draft: entry.draft,
+            maxHeight: widget.maxHeight,
+            maxWidth: widget.maxWidth,
+            onDownloadTap: widget.onDownloadTap,
+          );
+          if (!entry.isReply) return viewer;
+          final String? uid = SupabaseProvider.client.auth.currentUser?.id;
+          final bool isOwnReply = uid != null && entry.authorId == uid;
+          return Stack(
+            children: [
+              if (!isOwnReply)
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    border:
+                        Border.all(color: HonooColor.secondary, width: 2),
+                  ),
+                  child: viewer,
+                )
+              else
+                viewer,
+              if (entry.createdAt != null)
+                Positioned(
+                  left: 12,
+                  right: 12,
+                  bottom: 8,
+                  child: _ReplyTimestamp(
+                    label: _formatTimestamp(entry.createdAt!),
+                  ),
                 ),
-              ),
-          ],
-        );
+            ],
+          );
       },
     );
 
+    final bool hasReplies = items.length > 1;
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 420),
       switchInCurve: Curves.easeOutCubic,
       switchOutCurve: Curves.easeInCubic,
       transitionBuilder: (child, animation) {
+        if (!hasReplies) {
+          final offset = Tween<Offset>(
+            begin: const Offset(0, 0.12),
+            end: Offset.zero,
+          ).animate(animation);
+          return SlideTransition(position: offset, child: child);
+        }
+        final curved = CurvedAnimation(parent: animation, curve: Curves.elasticOut);
         final offset = Tween<Offset>(
-          begin: const Offset(0, 0.12),
+          begin: const Offset(0, 0.28),
           end: Offset.zero,
-        ).animate(animation);
-        return SlideTransition(position: offset, child: child);
+        ).animate(curved);
+        final scale = Tween<double>(begin: 0.97, end: 1.0).animate(curved);
+        return SlideTransition(
+          position: offset,
+          child: ScaleTransition(
+            scale: scale,
+            child: FadeTransition(opacity: animation, child: child),
+          ),
+        );
       },
       child: slider,
     );

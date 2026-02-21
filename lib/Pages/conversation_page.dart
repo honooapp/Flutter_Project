@@ -10,6 +10,7 @@ import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 
 import '../Entities/honoo.dart';
 import 'reply_honoo_page.dart';
@@ -125,15 +126,31 @@ class _ConversationPageState extends State<ConversationPage> {
                           setState(() => _currentIndex = index);
                         },
                       ),
-                      items: _thread
-                          .map(
-                            (h) => SizedBox(
-                              width: honooMetrics.width,
-                              height: honooMetrics.height,
-                              child: HonooCard(honoo: h),
+                      items: _thread.map((h) {
+                        final bool isReply = (h.replyTo != null && h.replyTo!.isNotEmpty);
+                        final String? uid = SupabaseProvider.client.auth.currentUser?.id;
+                        final bool isOwn = uid != null && h.userId == uid;
+                        final Widget card = HonooCard(honoo: h);
+                        if (isReply && !isOwn) {
+                          return SizedBox(
+                            width: honooMetrics.width,
+                            height: honooMetrics.height,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(color: HonooColor.secondary, width: 2),
+                              ),
+                              child: card,
                             ),
-                          )
-                          .toList(),
+                          );
+                        }
+                        return SizedBox(
+                          width: honooMetrics.width,
+                          height: honooMetrics.height,
+                          child: card,
+                        );
+                      }).toList(),
                     ));
 
           return Column(
