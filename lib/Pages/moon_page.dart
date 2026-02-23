@@ -133,7 +133,7 @@ class _MoonPageState extends State<MoonPage> {
   Widget build(BuildContext context) {
     const double headerHeight = 52;
     return Scaffold(
-      backgroundColor: HonooColor.background,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -475,7 +475,7 @@ class _MoonPageState extends State<MoonPage> {
         draft: draft,
         maxHeight: cardH,
         maxWidth: cardW,
-        gapColor: HonooColor.background,
+        gapColor: Colors.white,
       );
       content = Center(
         child: ConstrainedBox(
