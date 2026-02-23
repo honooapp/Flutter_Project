@@ -188,8 +188,8 @@ class HonooCard extends StatelessWidget {
             ? content
             : Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(cornerRadius + 2),
-                  border: Border.all(color: HonooColor.secondary, width: 1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: HonooColor.secondary, width: 6),
                 ),
                 child: content,
               );

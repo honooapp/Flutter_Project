@@ -118,10 +118,9 @@ class _HonooThreadViewState extends State<HonooThreadView> {
               return bTime.compareTo(aTime);
             });
             final List<Honoo> ordered = [...replies, root];
-            child = Padding(
+            child = KeyedSubtree(
               key: ValueKey(
                   'thread_list_${thread.length}_${_honooIdentity(thread.first)}'),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: cs.CarouselSlider.builder(
                 carouselController: _vController,
                 itemCount: ordered.length,
@@ -129,36 +128,15 @@ class _HonooThreadViewState extends State<HonooThreadView> {
                   scrollDirection: Axis.vertical,
                   viewportFraction: 1.0,
                   enableInfiniteScroll: false,
-                  padEnds: true,
+                  padEnds: false,
                   enlargeCenterPage: false,
                   scrollPhysics: const BouncingScrollPhysics(),
                 ),
                 itemBuilder: (context, index, realIdx) {
                   final honoo = ordered[index];
-                  final bool isReply = false; // i bordi top-level sono gestiti a livello carosello
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Stack(
-                          children: [
-                            HonooCard(
-                              honoo: honoo,
-                              onDownloadTap: widget.onDownloadTap,
-                            ),
-                            if (isReply)
-                              Positioned.fill(
-                                child: IgnorePointer(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(14),
-                                      border: Border.all(
-                                          color: HonooColor.secondary,
-                                          width: 2),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                      ],
-                    ),
+                  return HonooCard(
+                    honoo: honoo,
+                    onDownloadTap: widget.onDownloadTap,
                   );
                 },
               ),
