@@ -967,7 +967,8 @@ class _ChestPageState extends State<ChestPage> {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.black, width: 2),
+                border:
+                    Border.all(color: HonooColor.secondary, width: 2),
               ),
             ),
           ),

@@ -141,7 +141,8 @@ class _ConversationPageState extends State<ConversationPage> {
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                          color: Colors.black, width: 2),
+                                          color: HonooColor.secondary,
+                                          width: 2),
                                     ),
                                   ),
                                 ),

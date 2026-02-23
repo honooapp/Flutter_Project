@@ -140,7 +140,8 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                          color: Colors.black, width: 2),
+                                          color: HonooColor.secondary,
+                                          width: 2),
                                     ),
                                   ),
                                 ),
