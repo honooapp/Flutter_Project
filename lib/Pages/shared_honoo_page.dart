@@ -132,15 +132,20 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                           return SizedBox(
                             width: metrics.width,
                             height: metrics.height,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
-                                    color: HonooColor.secondary, width: 2),
+                            child: Stack(children: [
+                              card,
+                              Positioned.fill(
+                                child: IgnorePointer(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                          color: Colors.black, width: 2),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              child: card,
-                            ),
+                            ]),
                           );
                         }
                         return SizedBox(

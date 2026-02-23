@@ -958,13 +958,21 @@ class _ChestPageState extends State<ChestPage> {
   }
 
   Widget _wrapWithReplyFrame(Widget child) {
-    return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: HonooColor.secondary, width: 2),
-      ),
-      child: child,
+    // Overlay del bordo nero senza alterare la dimensione del contenuto
+    return Stack(
+      children: [
+        child,
+        Positioned.fill(
+          child: IgnorePointer(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.black, width: 2),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

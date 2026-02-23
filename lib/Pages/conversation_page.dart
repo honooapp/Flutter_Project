@@ -133,15 +133,20 @@ class _ConversationPageState extends State<ConversationPage> {
                           return SizedBox(
                             width: honooMetrics.width,
                             height: honooMetrics.height,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
-                                    color: HonooColor.secondary, width: 2),
+                            child: Stack(children: [
+                              card,
+                              Positioned.fill(
+                                child: IgnorePointer(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                          color: Colors.black, width: 2),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              child: card,
-                            ),
+                            ]),
                           );
                         }
                         return SizedBox(
