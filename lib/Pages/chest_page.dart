@@ -958,42 +958,13 @@ class _ChestPageState extends State<ChestPage> {
   }
 
   Widget _wrapWithReplyFrame(Widget child) {
-    // Overlay del bordo nero senza alterare la dimensione del contenuto
-    return Stack(
-      children: [
-        child,
-        Positioned.fill(
-          child: IgnorePointer(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                border:
-                    Border.all(color: HonooColor.secondary, width: 2),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+    // Non applicare più overlay: le risposte devono essere full-size senza riquadri
+    return child;
   }
 
   Widget _wrapHonooWithReplyBorder(Widget child, Honoo honoo) {
-    if (honoo.type != HonooType.answer) return child;
-    return Stack(
-      children: [
-        child,
-        Positioned.fill(
-          child: IgnorePointer(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: HonooColor.secondary, width: 2),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+    // Non applicare più overlay di risposta
+    return child;
   }
 
   // =========================

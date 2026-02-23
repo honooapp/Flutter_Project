@@ -125,30 +125,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                         },
                       ),
                       items: _items.map((item) {
-                        final bool isReply =
-                            (item.replyTo != null && item.replyTo!.isNotEmpty);
                         final Widget card = HonooCard(honoo: item);
-                        if (isReply) {
-                          return SizedBox(
-                            width: metrics.width,
-                            height: metrics.height,
-                            child: Stack(children: [
-                              card,
-                              Positioned.fill(
-                                child: IgnorePointer(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                          color: HonooColor.secondary,
-                                          width: 2),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ]),
-                          );
-                        }
                         return SizedBox(
                           width: metrics.width,
                           height: metrics.height,

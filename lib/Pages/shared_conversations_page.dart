@@ -199,30 +199,7 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
                         },
                       ),
                       items: _thread.map((item) {
-                        final bool isReply =
-                            (item.replyTo != null && item.replyTo!.isNotEmpty);
                         final Widget card = HonooCard(honoo: item);
-                        if (isReply) {
-                          return SizedBox(
-                            width: bottomMetrics.width,
-                            height: bottomMetrics.height,
-                            child: Stack(children: [
-                              card,
-                              Positioned.fill(
-                                child: IgnorePointer(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                          color: HonooColor.secondary,
-                                          width: 2),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ]),
-                          );
-                        }
                         return SizedBox(
                           width: bottomMetrics.width,
                           height: bottomMetrics.height,

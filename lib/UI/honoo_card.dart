@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../Entities/honoo.dart';
 import '../Utility/honoo_colors.dart';
-import '../Services/supabase_provider.dart';
 import '../Widgets/text_box_download_button.dart';
 
 class HonooCard extends StatelessWidget {
@@ -35,11 +34,7 @@ class HonooCard extends StatelessWidget {
         break;
     }
 
-    final String? uid = SupabaseProvider.client.auth.currentUser?.id;
-    final bool isOwnReply = uid != null && honoo.userId == uid;
-    final Color? replyBorder = honoo.type == HonooType.answer
-        ? (isOwnReply ? HonooColor.wave2 : HonooColor.secondary)
-        : null;
+    final bool isReply = honoo.type == HonooType.answer;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -189,13 +184,12 @@ class HonooCard extends StatelessWidget {
           ),
         );
 
-        final Widget wrapped = replyBorder == null
+        final Widget wrapped = !isReply
             ? content
             : Container(
-                padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(cornerRadius + 6),
-                  border: Border.all(color: replyBorder, width: 2),
+                  borderRadius: BorderRadius.circular(cornerRadius + 2),
+                  border: Border.all(color: HonooColor.secondary, width: 1),
                 ),
                 child: content,
               );

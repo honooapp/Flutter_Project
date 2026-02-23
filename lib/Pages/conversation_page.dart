@@ -126,30 +126,7 @@ class _ConversationPageState extends State<ConversationPage> {
                         },
                       ),
                       items: _thread.map((h) {
-                        final bool isReply =
-                            (h.replyTo != null && h.replyTo!.isNotEmpty);
                         final Widget card = HonooCard(honoo: h);
-                        if (isReply) {
-                          return SizedBox(
-                            width: honooMetrics.width,
-                            height: honooMetrics.height,
-                            child: Stack(children: [
-                              card,
-                              Positioned.fill(
-                                child: IgnorePointer(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                          color: HonooColor.secondary,
-                                          width: 2),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ]),
-                          );
-                        }
                         return SizedBox(
                           width: honooMetrics.width,
                           height: honooMetrics.height,
