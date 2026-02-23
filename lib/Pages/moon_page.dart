@@ -133,7 +133,7 @@ class _MoonPageState extends State<MoonPage> {
   Widget build(BuildContext context) {
     const double headerHeight = 52;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: HonooColor.background,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -174,8 +174,7 @@ class _MoonPageState extends State<MoonPage> {
             final double displayHeight = current?.honoo != null
                 ? honooMetrics.height
                 : centerHeight;
-            final double horizontalPadding =
-                currentIsHinoo ? 0 : (isCompact ? 0 : 16);
+            final double horizontalPadding = 0;
 
             return Column(
               children: [
@@ -476,7 +475,7 @@ class _MoonPageState extends State<MoonPage> {
         draft: draft,
         maxHeight: cardH,
         maxWidth: cardW,
-        gapColor: Colors.white,
+        gapColor: HonooColor.background,
       );
       content = Center(
         child: ConstrainedBox(
