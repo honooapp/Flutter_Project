@@ -174,7 +174,7 @@ class _MoonPageState extends State<MoonPage> {
             final double displayHeight = current?.honoo != null
                 ? honooMetrics.height
                 : centerHeight;
-            final double horizontalPadding = 0;
+            const double horizontalPadding = 0;
 
             return Column(
               children: [

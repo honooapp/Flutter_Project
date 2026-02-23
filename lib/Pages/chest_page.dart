@@ -962,10 +962,7 @@ class _ChestPageState extends State<ChestPage> {
     return child;
   }
 
-  Widget _wrapHonooWithReplyBorder(Widget child, Honoo honoo) {
-    // Non applicare più overlay di risposta
-    return child;
-  }
+  
 
   // =========================
   // DOWNLOAD (operazione C)

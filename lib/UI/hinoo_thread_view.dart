@@ -2,7 +2,6 @@ import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
-import 'package:honoo/Utility/honoo_colors.dart';
  
 
 class HinooThreadView extends StatefulWidget {
@@ -53,7 +52,7 @@ class _HinooThreadViewState extends State<HinooThreadView> {
         height: widget.maxHeight,
         viewportFraction: 1.0,
         enableInfiniteScroll: false,
-        padEnds: true,
+        padEnds: false,
         enlargeCenterPage: false,
         scrollPhysics: const BouncingScrollPhysics(),
       ),
