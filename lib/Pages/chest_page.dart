@@ -1095,9 +1095,10 @@ class _ChestPageState extends State<ChestPage> {
                 (h.replyTo != null && h.replyTo!.isNotEmpty))
             ? h.copyWith(dbId: h.replyTo)
             : h;
+        // Per i thread honoo usa tutta l'area centrale disponibile
         return SizedBox(
-          width: honooMetrics.width,
-          height: honooMetrics.height,
+          width: targetMaxW,
+          height: availableCenterH,
           child: HonooThreadView(
             root: effectiveRoot,
             onDownloadTap: () => _handleDownloadForItem(item, repaintKey),
