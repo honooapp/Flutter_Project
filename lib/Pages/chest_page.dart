@@ -1125,17 +1125,28 @@ class _ChestPageState extends State<ChestPage> {
       },
     );
 
-    // ✅ La "card reale" (bianca) è questa:
-    final Widget card = ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: SizedBox(
-        width: cardW,
-        child: RepaintBoundary(
-          key: repaintKey,
-          child: content,
-        ),
-      ),
+    // Determina se stiamo mostrando un thread (honoo sempre thread; hinoo solo se ha risposte)
+    final bool isThread = item.when(
+      honoo: (_) => true,
+      hinoo: (row) => (_hinooRepliesByRoot[row.id]?.isNotEmpty ?? false),
     );
+
+    // Card: per i thread non applichiamo ClipRRect esterni né misure aggiuntive
+    final Widget card = isThread
+        ? RepaintBoundary(
+            key: repaintKey,
+            child: content,
+          )
+        : ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: SizedBox(
+              width: cardW,
+              child: RepaintBoundary(
+                key: repaintKey,
+                child: content,
+              ),
+            ),
+          );
 
     final Widget styledCard = item.when(
       honoo: (h) {
@@ -1162,11 +1173,14 @@ class _ChestPageState extends State<ChestPage> {
         key: ValueKey(identity),
         child: Center(
           child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight:
-                  cardMaxH, // ✅ limite massimo, ma altezza reale libera
-              maxWidth: cardW,
-            ),
+            constraints: isThread
+                ? BoxConstraints(
+                    maxHeight: cardMaxH,
+                  )
+                : BoxConstraints(
+                    maxHeight: cardMaxH, // ✅ limite massimo
+                    maxWidth: cardW,
+                  ),
             child: Stack(
               clipBehavior: Clip.hardEdge, // 🔒 sempre dentro
               children: [
@@ -1203,12 +1217,22 @@ class _ChestPageState extends State<ChestPage> {
 
                 final ResponsiveLayoutMode layoutMode =
                     ResponsiveLayout.modeForWidth(constraints.maxWidth);
-                // Usa una larghezza contenitore costante per evitare jitter tra honoo/hinoo
-                final double containerMaxW = (layoutMode ==
-                            ResponsiveLayoutMode.mobile ||
-                        layoutMode == ResponsiveLayoutMode.tablet)
+                // Se l'elemento corrente è un thread, usa tutta la larghezza disponibile
+                final bool currentIsThread = (current == null)
+                    ? false
+                    : current.when(
+                        honoo: (_) => true,
+                        hinoo: (row) =>
+                            (_hinooRepliesByRoot[row.id]?.isNotEmpty ?? false),
+                      );
+                final double containerMaxW = (currentIsThread)
                     ? constraints.maxWidth
-                    : ResponsiveLayout.contentMaxWidth(constraints.maxWidth);
+                    : ((layoutMode == ResponsiveLayoutMode.mobile ||
+                            layoutMode == ResponsiveLayoutMode.tablet)
+                        ? constraints.maxWidth
+                        : ResponsiveLayout.contentMaxWidth(
+                            constraints.maxWidth,
+                          ));
                 final double targetMaxW = containerMaxW;
                 final double footerIconSize =
                     ResponsiveLayout.footerIconSizeForMode(layoutMode);
@@ -1233,11 +1257,12 @@ class _ChestPageState extends State<ChestPage> {
                   mode: layoutMode,
                 );
                 // Padding orizzontale costante su desktop per pagine del carosello
-                final double horizontalPadding =
-                    (layoutMode == ResponsiveLayoutMode.mobile ||
+                final double horizontalPadding = currentIsThread
+                    ? 0
+                    : ((layoutMode == ResponsiveLayoutMode.mobile ||
                             layoutMode == ResponsiveLayoutMode.tablet)
                         ? 0
-                        : 16;
+                        : 16);
                 // Altezza del carosello orizzontale: area centrale disponibile
 
                 return Stack(
@@ -1316,7 +1341,7 @@ class _ChestPageState extends State<ChestPage> {
                                             height: availableCenterH,
                                             viewportFraction: 1.0,
                                             enableInfiniteScroll: false,
-                                            padEnds: true,
+                                            padEnds: false,
                                             enlargeCenterPage: false,
                                             disableCenter: true,
                                             scrollPhysics: horizPhysics,
