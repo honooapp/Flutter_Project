@@ -946,15 +946,8 @@ class _ChestPageState extends State<ChestPage> {
   }
 
   Widget _wrapWithMoonFrame(Widget child, {required bool isMoonSaved}) {
-    if (!isMoonSaved) return child;
-    return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: child,
-    );
+    // Nessun contenitore bianco: mantieni full-size come gli altri
+    return child;
   }
 
   Widget _wrapWithReplyFrame(Widget child) {
