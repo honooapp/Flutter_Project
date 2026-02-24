@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Services/honoo_service.dart';
 import 'package:honoo/UI/honoo_card.dart';
+import 'package:honoo/UI/honoo_thread_view.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
@@ -28,13 +29,9 @@ class SharedConversationsPage extends StatefulWidget {
 
 class _SharedConversationsPageState extends State<SharedConversationsPage> {
   List<Honoo> _roots = const [];
-  List<Honoo> _thread = const [];
   bool _isLoadingRoots = true;
-  bool _isLoadingThread = false;
   int _currentRootIndex = 0;
-  int _currentThreadIndex = 0;
   final cs.CarouselController _rootCarousel = cs.CarouselController();
-  final cs.CarouselController _threadCarousel = cs.CarouselController();
 
   @override
   void initState() {
@@ -54,33 +51,9 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
             _roots.isEmpty ? 0 : _currentRootIndex.clamp(0, _roots.length - 1);
         _isLoadingRoots = false;
       });
-      if (_roots.isNotEmpty) {
-        await _loadThreadFor(_roots[_currentRootIndex]);
-      } else {
-        if (mounted) {
-          setState(() => _thread = const []);
-        }
-      }
     } catch (_) {
       if (!mounted) return;
       setState(() => _isLoadingRoots = false);
-    }
-  }
-
-  Future<void> _loadThreadFor(Honoo root) async {
-    setState(() => _isLoadingThread = true);
-    try {
-      final list = await HonooController().getHonooHistory(root);
-      if (!mounted) return;
-      setState(() {
-        _thread = list;
-        _currentThreadIndex =
-            _thread.isEmpty ? 0 : _currentThreadIndex.clamp(0, _thread.length - 1);
-        _isLoadingThread = false;
-      });
-    } catch (_) {
-      if (!mounted) return;
-      setState(() => _isLoadingThread = false);
     }
   }
 
@@ -115,6 +88,7 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
               footerIconSize + footerTopSpacing + footerBottomSpacing;
           final double availableH =
               (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
+          // Nessun padding orizzontale: stile full-page
           const double horizontalPadding = 0;
 
           final Widget threads = _isLoadingRoots
@@ -155,79 +129,7 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
                           .toList(),
                     ));
 
-          final Widget rootCarousel = _isLoadingRoots
-              ? const Center(child: LoadingSpinner())
-              : (_roots.isEmpty
-                  ? Center(
-                      child: Text(
-                        'Nessuna conversazione condivisa',
-                        style: GoogleFonts.libreFranklin(
-                          color: HonooColor.onBackground,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    )
-                  : cs.CarouselSlider(
-                      carouselController: _rootCarousel,
-                      options: cs.CarouselOptions(
-                        scrollDirection: Axis.horizontal,
-                        height: topHeight,
-                        viewportFraction: 1.0,
-                        enlargeCenterPage: false,
-                        enableInfiniteScroll: false,
-                        disableCenter: true,
-                        scrollPhysics: const PageScrollPhysics(),
-                        onPageChanged: (index, reason) async {
-                          setState(() => _currentRootIndex = index);
-                          await _loadThreadFor(_roots[index]);
-                        },
-                      ),
-                      items: _roots
-                          .map(
-                            (item) => SizedBox(
-                              width: targetMaxW,
-                              height: topHeight,
-                              child: HonooCard(honoo: item),
-                            ),
-                          )
-                          .toList(),
-                    ));
-
-          final Widget threadCarousel = _isLoadingThread
-              ? const Center(child: LoadingSpinner())
-              : (_thread.isEmpty
-                  ? Center(
-                      child: Text(
-                        'Nessuna conversazione',
-                        style: GoogleFonts.libreFranklin(
-                          color: HonooColor.onBackground,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    )
-                  : cs.CarouselSlider(
-                      carouselController: _threadCarousel,
-                      options: cs.CarouselOptions(
-                        scrollDirection: Axis.vertical,
-                        height: bottomHeight,
-                        viewportFraction: 1.0,
-                        enlargeCenterPage: false,
-                        enableInfiniteScroll: false,
-                        onPageChanged: (index, reason) {
-                          setState(() => _currentThreadIndex = index);
-                        },
-                      ),
-                      items: _thread.map((item) {
-                        final Widget card = HonooCard(honoo: item);
-                        return SizedBox(
-                          width: targetMaxW,
-                          height: bottomHeight,
-                          child: card,
-                        );
-                      }).toList(),
-                    ));
+          // Rimosse variabili rootCarousel/threadCarousel del layout precedente a due pannelli
 
           return Column(
             children: [
