@@ -475,7 +475,6 @@ class _MoonPageState extends State<MoonPage> {
         draft: draft,
         maxHeight: cardH,
         maxWidth: cardW,
-        gapColor: Colors.white,
       );
       content = Center(
         child: ConstrainedBox(
