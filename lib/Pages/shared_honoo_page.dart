@@ -205,20 +205,12 @@ class _HonooCoverInline extends StatelessWidget {
   final Honoo honoo;
   @override
   Widget build(BuildContext context) {
-    const double gap = 9.0;
     return LayoutBuilder(
       builder: (context, constraints) {
-        // width is unused; we compute cover by height
-        final double areaH = constraints.maxHeight;
-        final double imageSize = ((areaH - gap) / 1.5).clamp(0.0, double.infinity);
-        final double coverW = imageSize;
         return ClipRect(
-          child: Center(
-            child: SizedBox(
-              width: coverW,
-              height: areaH,
-              child: HonooCard(honoo: honoo),
-            ),
+          child: FittedBox(
+            fit: BoxFit.fitHeight,
+            child: HonooCard(honoo: honoo),
           ),
         );
       },

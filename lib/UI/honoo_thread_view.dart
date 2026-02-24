@@ -190,8 +190,7 @@ class _HonooCover extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Clip all overflow to the available area and center the card. Compute width by height to cover vertically.
-    const double gap = 9.0;
+    // Clip all overflow to the available area and scale the card to fill height.
     return LayoutBuilder(
       builder: (context, constraints) {
         final double areaW = constraints.maxWidth.isFinite
@@ -200,16 +199,13 @@ class _HonooCover extends StatelessWidget {
         final double areaH = constraints.maxHeight.isFinite
             ? constraints.maxHeight
             : MediaQuery.of(context).size.height;
-        final double imageSize = ((areaH - gap) / 1.5).clamp(0.0, double.infinity);
-        final double coverW = imageSize; // HonooCard total width equals imageSize
         return ClipRect(
           child: SizedBox(
             width: areaW,
             height: areaH,
             child: Center(
-              child: SizedBox(
-                width: coverW,
-                height: areaH,
+              child: FittedBox(
+                fit: BoxFit.fitHeight,
                 child: HonooCard(
                   honoo: honoo,
                   onDownloadTap: onDownloadTap,
