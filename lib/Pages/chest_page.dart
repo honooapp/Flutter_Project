@@ -1176,7 +1176,8 @@ class _ChestPageState extends State<ChestPage> {
           child: ConstrainedBox(
             constraints: isThread
                 ? BoxConstraints(
-                    maxHeight: cardMaxH,
+                    maxHeight: availableCenterH,
+                    maxWidth: targetMaxW,
                   )
                 : BoxConstraints(
                     maxHeight: cardMaxH, // ✅ limite massimo

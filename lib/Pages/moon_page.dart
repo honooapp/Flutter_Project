@@ -456,8 +456,8 @@ class _MoonPageState extends State<MoonPage> {
           localId != 0 ? localId.toString() : item.createdAt.toIso8601String();
       identity = 'moon_honoo_${dbId ?? fallback}';
       content = SizedBox(
-        width: honooMetrics.width,
-        height: honooMetrics.height,
+        width: maxWidth,
+        height: maxHeight,
         child: HonooThreadView(root: honoo),
       );
     } else {
