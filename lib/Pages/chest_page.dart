@@ -32,6 +32,7 @@ import '../Widgets/honoo_app_title.dart';
 import '../Widgets/luna_fissa.dart';
 import '../Widgets/responsive_footer_bar.dart';
 import '../Widgets/desktop_carousel_arrows.dart';
+import '../UI/thread_layout_scaffold.dart';
 
 import 'reply_honoo_page.dart';
 import 'new_hinoo_page.dart';
@@ -1191,239 +1192,107 @@ class _ChestPageState extends State<ChestPage> {
 
   @override
   Widget build(BuildContext context) {
-    const headerH = 52.0;
-
-    final double lunaReserve = LunaFissa.reserveTopPadding(context);
-    final double extraTop = (lunaReserve - headerH);
-    final double contentTopPadding = extraTop > 0 ? extraTop : 0;
-
-    return Scaffold(
-      backgroundColor: HonooColor.background,
-      body: SafeArea(
-        child: AnimatedBuilder(
-          animation: Listenable.merge([ctrl.isLoading, ctrl.version]),
-          builder: (context, _) {
-            _rebuildItems();
+    return AnimatedBuilder(
+      animation: Listenable.merge([ctrl.isLoading, ctrl.version]),
+      builder: (context, _) {
+        _rebuildItems();
+        return ThreadLayoutScaffold(
+          backgroundColor: HonooColor.background,
+          header: HonooAppTitle(
+            onTap: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const PlaceholderPage()),
+                (route) => false,
+              );
+            },
+          ),
+          overlayBuilder: (ctx, mode) => const LunaFissa(),
+          bodyBuilder: (ctx, viewW, availableH, layoutMode) {
             final _ChestItem? current =
                 _items.isEmpty ? null : _items[_currentIndex];
-
-            return LayoutBuilder(
-              builder: (context, constraints) {
-                final availH = constraints.maxHeight;
-
-                final ResponsiveLayoutMode layoutMode =
-                    ResponsiveLayout.modeForWidth(constraints.maxWidth);
-                // Se l'elemento corrente è un thread, usa tutta la larghezza disponibile
-                final bool currentIsThread = (current == null)
-                    ? false
-                    : current.when(
-                        honoo: (_) => true,
-                        hinoo: (row) =>
-                            (_hinooRepliesByRoot[row.id]?.isNotEmpty ?? false),
-                      );
-                final double containerMaxW = (currentIsThread)
-                    ? constraints.maxWidth
-                    : ((layoutMode == ResponsiveLayoutMode.mobile ||
-                            layoutMode == ResponsiveLayoutMode.tablet)
-                        ? constraints.maxWidth
-                        : ResponsiveLayout.contentMaxWidth(
-                            constraints.maxWidth,
-                          ));
-                final double targetMaxW = containerMaxW;
-                final double footerIconSize =
-                    ResponsiveLayout.footerIconSizeForMode(layoutMode);
-                final double footerGap =
-                    ResponsiveLayout.footerGapForMode(layoutMode);
-                final double footerBottomPadding =
-                    ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
-                final double footerSpacing = footerBottomPadding;
-                final double footerTopSpacing = footerSpacing / 2;
-                final double footerBottomSpacing =
-                    footerSpacing - footerTopSpacing;
-                final double footerReserved =
-                    footerIconSize + footerTopSpacing + footerBottomSpacing;
-
-                final double topPaddingEffective = currentIsThread ? 0 : contentTopPadding;
-                final double availableCenterH =
-                    (availH - headerH - topPaddingEffective - footerReserved)
-                        .clamp(0.0, double.infinity);
-                final HonooBuilderMetrics honooMetrics =
-                    ResponsiveLayout.honooBuilderMetrics(
-                  availableHeight: availableCenterH,
-                  maxWidth: targetMaxW,
-                  mode: layoutMode,
-                );
-                // Padding orizzontale costante su desktop per pagine del carosello
-                final double horizontalPadding = currentIsThread
-                    ? 0
-                    : ((layoutMode == ResponsiveLayoutMode.mobile ||
-                            layoutMode == ResponsiveLayoutMode.tablet)
-                        ? 0
-                        : 16);
-                // Altezza del carosello orizzontale: area centrale disponibile
-
-                return Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Column(
-                      children: [
-                        SizedBox(
-                          height: headerH,
-                          child: Center(
-                            child: HonooAppTitle(
-                              onTap: () {
-                                Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                      builder: (_) => const PlaceholderPage()),
-                                  (route) => false,
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.fromLTRB(
-                              0,
-                              topPaddingEffective,
-                              0,
-                              0,
-                            ),
-                          child: Center(
-                            child: Container(
-                              constraints: BoxConstraints(maxWidth: targetMaxW),
-                              child: SizedBox(
-                                height: availableCenterH,
-                                width: double.infinity,
-                                child: () {
-                                  if (ctrl.isLoading.value ||
-                                      _isHinooLoading) {
-                                    return const Center(
-                                      child:
-                                          LoadingSpinner(color: Colors.white),
-                                    );
-                                  }
-
-                                  if (_items.isEmpty) {
-                                    return Center(
-                                      child: Text(
-                                        'Nessun contenuto nello scrigno',
-                                        style: GoogleFonts.libreFranklin(
-                                          color: HonooColor.onBackground,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                    );
-                                  }
-
-                                    return Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: horizontalPadding),
-                                      child: () {
-                                        final ScrollPhysics horizPhysics =
-                                            (layoutMode ==
-                                                        ResponsiveLayoutMode
-                                                            .mobile ||
-                                                    layoutMode ==
-                                                        ResponsiveLayoutMode
-                                                            .tablet)
-                                                ? const BouncingScrollPhysics()
-                                                : const PageScrollPhysics();
-                                        final slider = cs.CarouselSlider.builder(
-                                          carouselController:
-                                              _carouselController,
-                                          itemCount: _items.length,
-                                          options: cs.CarouselOptions(
-                                            height: availableCenterH,
-                                            viewportFraction: 1.0,
-                                            enableInfiniteScroll: false,
-                                            padEnds: false,
-                                            enlargeCenterPage: false,
-                                            disableCenter: true,
-                                            scrollPhysics: horizPhysics,
-                                            onPageChanged: (i, _) => setState(
-                                                () => _currentIndex = i),
-                                          ),
-                                          itemBuilder:
-                                              (context, index, realIdx) {
-                                            return Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal:
-                                                      horizontalPadding),
-                                              child: _buildChestItem(
-                                                _items[index],
-                                                availableCenterH,
-                                                targetMaxW,
-                                                honooMetrics,
-                                                layoutMode,
-                                              ),
-                                            );
-                                          },
-                                        );
-
-                                        final bool isDesktop =
-                                            layoutMode ==
-                                                    ResponsiveLayoutMode
-                                                        .desktop ||
-                                                layoutMode ==
-                                                    ResponsiveLayoutMode
-                                                        .wideDesktop ||
-                                                layoutMode ==
-                                                    ResponsiveLayoutMode
-                                                        .largeDesktop;
-                                        if (!isDesktop ||
-                                            _items.length <= 1) return slider;
-                                        return DesktopCarouselArrows(
-                                          canPrev: _currentIndex > 0,
-                                          canNext: _currentIndex <
-                                              _items.length - 1,
-                                          onPrev: () => _carouselController
-                                              .animateToPage(
-                                            (_currentIndex - 1)
-                                                .clamp(0,
-                                                    _items.length - 1),
-                                            duration: const Duration(
-                                                milliseconds: 220),
-                                            curve: Curves.easeOutCubic,
-                                          ),
-                                          onNext: () => _carouselController
-                                              .animateToPage(
-                                            (_currentIndex + 1)
-                                                .clamp(0,
-                                                    _items.length - 1),
-                                            duration: const Duration(
-                                                milliseconds: 220),
-                                            curve: Curves.easeOutCubic,
-                                          ),
-                                          arrowColor: Colors.white,
-                                          child: slider,
-                                        );
-                                      }(),
-                                    );
-                                }(),
-                              ),
-                            ),
-                          ),
-                          ),
-                        ),
-                        SizedBox(height: footerTopSpacing),
-                        _footerForItem(
-                          current,
-                          iconSize: footerIconSize,
-                          gap: footerGap,
-                          bottomPadding: footerBottomSpacing,
-                        ),
-                      ],
-                    ),
-                    const LunaFissa(),
-                  ],
+            final HonooBuilderMetrics honooMetrics =
+                ResponsiveLayout.honooBuilderMetrics(
+              availableHeight: availableH,
+              maxWidth: viewW,
+              mode: layoutMode,
+            );
+            if (ctrl.isLoading.value || _isHinooLoading) {
+              return const Center(child: LoadingSpinner(color: Colors.white));
+            }
+            if (_items.isEmpty) {
+              return Center(
+                child: Text(
+                  'Nessun contenuto nello scrigno',
+                  style: GoogleFonts.libreFranklin(
+                    color: HonooColor.onBackground,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              );
+            }
+            final ScrollPhysics horizPhysics = (layoutMode ==
+                        ResponsiveLayoutMode.mobile ||
+                    layoutMode == ResponsiveLayoutMode.tablet)
+                ? const BouncingScrollPhysics()
+                : const PageScrollPhysics();
+            final slider = cs.CarouselSlider.builder(
+              carouselController: _carouselController,
+              itemCount: _items.length,
+              options: cs.CarouselOptions(
+                height: availableH,
+                viewportFraction: 1.0,
+                enableInfiniteScroll: false,
+                padEnds: false,
+                enlargeCenterPage: false,
+                disableCenter: true,
+                scrollPhysics: horizPhysics,
+                onPageChanged: (i, _) => setState(() => _currentIndex = i),
+              ),
+              itemBuilder: (context, index, realIdx) {
+                return _buildChestItem(
+                  _items[index],
+                  availableH,
+                  viewW,
+                  honooMetrics,
+                  layoutMode,
                 );
               },
             );
+            final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
+                layoutMode == ResponsiveLayoutMode.wideDesktop ||
+                layoutMode == ResponsiveLayoutMode.largeDesktop;
+            if (!isDesktop || _items.length <= 1) return slider;
+            return DesktopCarouselArrows(
+              canPrev: _currentIndex > 0,
+              canNext: _currentIndex < _items.length - 1,
+              onPrev: () => _carouselController.animateToPage(
+                (_currentIndex - 1).clamp(0, _items.length - 1),
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+              ),
+              onNext: () => _carouselController.animateToPage(
+                (_currentIndex + 1).clamp(0, _items.length - 1),
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+              ),
+              arrowColor: Colors.white,
+              child: slider,
+            );
           },
-        ),
-      ),
+          footerBuilder: (ctx, mode, footerIconSize, footerGap,
+              footerTopSpacing, footerBottomSpacing) {
+            final _ChestItem? current =
+                _items.isEmpty ? null : _items[_currentIndex];
+            return _footerForItem(
+              current,
+              iconSize: footerIconSize,
+              gap: footerGap,
+              bottomPadding: footerBottomSpacing,
+            );
+          },
+        );
+      },
     );
   }
 }

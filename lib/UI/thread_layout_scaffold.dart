@@ -16,6 +16,7 @@ class ThreadLayoutScaffold extends StatelessWidget {
     required this.header,
     required this.bodyBuilder,
     required this.footerBuilder,
+    this.overlayBuilder,
   });
 
   final Color backgroundColor;
@@ -41,6 +42,10 @@ class ThreadLayoutScaffold extends StatelessWidget {
     double footerTopSpacing,
     double footerBottomSpacing,
   ) footerBuilder;
+
+  /// Overlay opzionale (es. LunaFissa) posizionato sopra header/body/footer
+  final Widget Function(BuildContext context, ResponsiveLayoutMode mode)?
+      overlayBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +73,7 @@ class ThreadLayoutScaffold extends StatelessWidget {
           final double availableH =
               (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
 
-          return Column(
+          final column = Column(
             children: [
               SizedBox(height: headerH, child: Center(child: header)),
               Expanded(
@@ -83,9 +88,16 @@ class ThreadLayoutScaffold extends StatelessWidget {
                   footerTopSpacing, footerBottomSpacing),
             ],
           );
+          if (overlayBuilder == null) return column;
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              column,
+              overlayBuilder!(context, mode),
+            ],
+          );
         },
       ),
     );
   }
 }
-
