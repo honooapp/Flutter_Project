@@ -21,7 +21,9 @@ class HinooViewer extends StatefulWidget {
     required this.maxWidth,
     this.gapColor = HonooColor.background,
     this.onDownloadTap,
+    this.isReply = false,
   });
+  final bool isReply;
 
   @override
   State<HinooViewer> createState() => _HinooViewerState();
@@ -101,9 +103,15 @@ class _HinooViewerState extends State<HinooViewer> {
           height: displayH,
           child: FittedBox(
             fit: BoxFit.contain,
-            child: SizedBox(
+            child: Container(
               width: baselineW,
               height: baselineH,
+              decoration: widget.isReply
+                  ? BoxDecoration(
+                      border: Border.all(color: HonooColor.secondary, width: 1),
+                      borderRadius: BorderRadius.circular(5),
+                    )
+                  : null,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [

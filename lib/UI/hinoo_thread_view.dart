@@ -62,6 +62,7 @@ class _HinooThreadViewState extends State<HinooThreadView> {
             draft: entry.draft,
             maxHeight: widget.maxHeight,
             maxWidth: widget.maxWidth,
+            isReply: entry.isReply,
             onDownloadTap: widget.onDownloadTap,
           );
           return viewer;

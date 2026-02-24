@@ -1172,25 +1172,19 @@ class _ChestPageState extends State<ChestPage> {
       duration: const Duration(milliseconds: 250),
       child: KeyedSubtree(
         key: ValueKey(identity),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: isThread
-                ? BoxConstraints(
-                    maxHeight: availableCenterH,
-                    maxWidth: targetMaxW,
-                  )
-                : BoxConstraints(
-                    maxHeight: cardMaxH, // ✅ limite massimo
-                    maxWidth: cardW,
-                  ),
-            child: Stack(
-              clipBehavior: Clip.hardEdge, // 🔒 sempre dentro
-              children: [
-                styledCard,
-              ],
-            ),
-          ),
-        ),
+        child: isThread
+            ? SizedBox(
+                width: targetMaxW,
+                height: availableCenterH,
+                child: styledCard,
+              )
+            : Center(
+                child: SizedBox(
+                  width: cardW,
+                  height: cardMaxH,
+                  child: styledCard,
+                ),
+              ),
       ),
     );
   }
