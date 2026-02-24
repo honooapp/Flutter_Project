@@ -83,7 +83,11 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
               footerIconSize + footerTopSpacing + footerBottomSpacing;
           final double availableH =
               (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
-          // metrics no longer needed when using full-page cover
+          final metrics = ResponsiveLayout.honooBuilderMetrics(
+            availableHeight: availableH,
+            maxWidth: targetMaxW,
+            mode: layoutMode,
+          );
 
           final Widget content = _isLoading
               ? const Center(child: LoadingSpinner())
@@ -117,9 +121,9 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                       ),
                       items: _items.map((item) {
                         return SizedBox(
-                          width: targetMaxW,
-                          height: availableH,
-                          child: _HonooCoverInline(honoo: item),
+                          width: metrics.width,
+                          height: metrics.height,
+                          child: HonooCard(honoo: item),
                         );
                       }).toList(),
                     ));
@@ -200,20 +204,4 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
   }
 }
 
-class _HonooCoverInline extends StatelessWidget {
-  const _HonooCoverInline({required this.honoo});
-  final Honoo honoo;
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return ClipRect(
-          child: FittedBox(
-            fit: BoxFit.fitHeight,
-            child: HonooCard(honoo: honoo),
-          ),
-        );
-      },
-    );
-  }
-}
+// no inline cover; show HonooCard with normal metrics

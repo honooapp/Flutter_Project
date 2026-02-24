@@ -135,7 +135,7 @@ class _HonooThreadViewState extends State<HonooThreadView> {
                 ),
                 itemBuilder: (context, index, realIdx) {
                   final honoo = ordered[index];
-                  return _HonooCover(
+                  return HonooCard(
                     honoo: honoo,
                     onDownloadTap: widget.onDownloadTap,
                   );
@@ -182,39 +182,4 @@ class _HonooThreadViewState extends State<HonooThreadView> {
 
 }
 
-class _HonooCover extends StatelessWidget {
-  const _HonooCover({required this.honoo, this.onDownloadTap});
-
-  final Honoo honoo;
-  final VoidCallback? onDownloadTap;
-
-  @override
-  Widget build(BuildContext context) {
-    // Clip all overflow to the available area and scale the card to fill height.
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final double areaW = constraints.maxWidth.isFinite
-            ? constraints.maxWidth
-            : MediaQuery.of(context).size.width;
-        final double areaH = constraints.maxHeight.isFinite
-            ? constraints.maxHeight
-            : MediaQuery.of(context).size.height;
-        return ClipRect(
-          child: SizedBox(
-            width: areaW,
-            height: areaH,
-            child: Center(
-              child: FittedBox(
-                fit: BoxFit.fitHeight,
-                child: HonooCard(
-                  honoo: honoo,
-                  onDownloadTap: onDownloadTap,
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
+// No cover wrapper: we show HonooCard at its natural metrics like normal honoo

@@ -89,7 +89,12 @@ class _ConversationPageState extends State<ConversationPage> {
               footerIconSize + footerTopSpacing + footerBottomSpacing;
           final double availableH =
               (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
-          // no horizontal padding needed
+          final HonooBuilderMetrics honooMetrics =
+              ResponsiveLayout.honooBuilderMetrics(
+            availableHeight: availableH,
+            maxWidth: targetMaxW,
+            mode: layoutMode,
+          );
 
           final Widget carousel = _isLoading
               ? const Center(child: LoadingSpinner())
@@ -108,7 +113,7 @@ class _ConversationPageState extends State<ConversationPage> {
                       carouselController: _carouselController,
                       options: cs.CarouselOptions(
                         scrollDirection: Axis.vertical,
-                        height: availableH,
+                        height: honooMetrics.height,
                         viewportFraction: 1.0,
                         enlargeCenterPage: false,
                         enableInfiniteScroll: false,
@@ -118,9 +123,9 @@ class _ConversationPageState extends State<ConversationPage> {
                       ),
                       items: _thread.map((h) {
                         return SizedBox(
-                          width: targetMaxW,
-                          height: availableH,
-                          child: _HonooCoverInline(honoo: h),
+                          width: honooMetrics.width,
+                          height: honooMetrics.height,
+                          child: HonooCard(honoo: h),
                         );
                       }).toList(),
                     ));
@@ -246,20 +251,4 @@ class _ConversationPageState extends State<ConversationPage> {
   }
 }
 
-class _HonooCoverInline extends StatelessWidget {
-  const _HonooCoverInline({required this.honoo});
-  final Honoo honoo;
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return ClipRect(
-          child: FittedBox(
-            fit: BoxFit.fitHeight,
-            child: HonooCard(honoo: honoo),
-          ),
-        );
-      },
-    );
-  }
-}
+// no inline cover wrapper; show HonooCard with normal metrics
