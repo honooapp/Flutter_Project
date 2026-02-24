@@ -84,21 +84,12 @@ class _ConversationPageState extends State<ConversationPage> {
           final double footerBottomSpacing =
               footerSpacing - footerTopSpacing;
           const double headerH = 52;
-          final double targetMaxW = ResponsiveLayout.contentMaxWidth(viewW);
+          final double targetMaxW = viewW;
           final double footerReserved =
               footerIconSize + footerTopSpacing + footerBottomSpacing;
           final double availableH =
               (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
-          final HonooBuilderMetrics honooMetrics =
-              ResponsiveLayout.honooBuilderMetrics(
-            availableHeight: availableH,
-            maxWidth: targetMaxW,
-            mode: layoutMode,
-          );
-          final double horizontalPadding = layoutMode == ResponsiveLayoutMode.mobile ||
-                  layoutMode == ResponsiveLayoutMode.tablet
-              ? 0
-              : 16;
+          const double horizontalPadding = 0;
 
           final Widget carousel = _isLoading
               ? const Center(child: LoadingSpinner())
@@ -117,7 +108,7 @@ class _ConversationPageState extends State<ConversationPage> {
                       carouselController: _carouselController,
                       options: cs.CarouselOptions(
                         scrollDirection: Axis.vertical,
-                        height: honooMetrics.height,
+                        height: availableH,
                         viewportFraction: 1.0,
                         enlargeCenterPage: false,
                         enableInfiniteScroll: false,
@@ -128,8 +119,8 @@ class _ConversationPageState extends State<ConversationPage> {
                       items: _thread.map((h) {
                         final Widget card = HonooCard(honoo: h);
                         return SizedBox(
-                          width: honooMetrics.width,
-                          height: honooMetrics.height,
+                          width: targetMaxW,
+                          height: availableH,
                           child: card,
                         );
                       }).toList(),
@@ -159,8 +150,8 @@ class _ConversationPageState extends State<ConversationPage> {
                       padding: EdgeInsets.symmetric(
                           horizontal: horizontalPadding),
                       child: SizedBox(
-                        width: honooMetrics.width,
-                        height: honooMetrics.height,
+                        width: targetMaxW,
+                        height: availableH,
                         child: carousel,
                       ),
                     ),

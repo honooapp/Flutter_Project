@@ -78,7 +78,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
           final double footerTopSpacing = footerSpacing / 2;
           final double footerBottomSpacing = footerSpacing - footerTopSpacing;
           const double headerH = 52;
-          final double targetMaxW = ResponsiveLayout.contentMaxWidth(viewW);
+          final double targetMaxW = viewW;
           final double footerReserved =
               footerIconSize + footerTopSpacing + footerBottomSpacing;
           final double availableH =
@@ -88,11 +88,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
             maxWidth: targetMaxW,
             mode: layoutMode,
           );
-          final double horizontalPadding =
-              layoutMode == ResponsiveLayoutMode.mobile ||
-                      layoutMode == ResponsiveLayoutMode.tablet
-                  ? 0
-                  : 16;
+          const double horizontalPadding = 0;
 
           final Widget content = _isLoading
               ? const Center(child: LoadingSpinner())
@@ -111,7 +107,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                       carouselController: _carouselController,
                       options: cs.CarouselOptions(
                         scrollDirection: Axis.horizontal,
-                        height: metrics.height,
+                        height: availableH,
                         viewportFraction: 1.0,
                         enlargeCenterPage: false,
                         enableInfiniteScroll: false,
@@ -127,8 +123,8 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                       items: _items.map((item) {
                         final Widget card = HonooCard(honoo: item);
                         return SizedBox(
-                          width: metrics.width,
-                          height: metrics.height,
+                          width: targetMaxW,
+                          height: availableH,
                           child: card,
                         );
                       }).toList(),

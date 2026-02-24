@@ -110,7 +110,7 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
           final double footerTopSpacing = footerSpacing / 2;
           final double footerBottomSpacing = footerSpacing - footerTopSpacing;
           const double headerH = 52;
-          final double targetMaxW = ResponsiveLayout.contentMaxWidth(viewW);
+          final double targetMaxW = viewW;
           final double footerReserved =
               footerIconSize + footerTopSpacing + footerBottomSpacing;
           final double availableH =
@@ -128,11 +128,7 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
             maxWidth: targetMaxW,
             mode: layoutMode,
           );
-          final double horizontalPadding =
-              layoutMode == ResponsiveLayoutMode.mobile ||
-                      layoutMode == ResponsiveLayoutMode.tablet
-                  ? 0
-                  : 16;
+          const double horizontalPadding = 0;
 
           final Widget rootCarousel = _isLoadingRoots
               ? const Center(child: LoadingSpinner())
@@ -151,7 +147,7 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
                       carouselController: _rootCarousel,
                       options: cs.CarouselOptions(
                         scrollDirection: Axis.horizontal,
-                        height: topMetrics.height,
+                        height: topHeight,
                         viewportFraction: 1.0,
                         enlargeCenterPage: false,
                         enableInfiniteScroll: false,
@@ -165,8 +161,8 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
                       items: _roots
                           .map(
                             (item) => SizedBox(
-                              width: topMetrics.width,
-                              height: topMetrics.height,
+                              width: targetMaxW,
+                              height: topHeight,
                               child: HonooCard(honoo: item),
                             ),
                           )
@@ -190,7 +186,7 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
                       carouselController: _threadCarousel,
                       options: cs.CarouselOptions(
                         scrollDirection: Axis.vertical,
-                        height: bottomMetrics.height,
+                        height: bottomHeight,
                         viewportFraction: 1.0,
                         enlargeCenterPage: false,
                         enableInfiniteScroll: false,
@@ -201,8 +197,8 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
                       items: _thread.map((item) {
                         final Widget card = HonooCard(honoo: item);
                         return SizedBox(
-                          width: bottomMetrics.width,
-                          height: bottomMetrics.height,
+                          width: targetMaxW,
+                          height: bottomHeight,
                           child: card,
                         );
                       }).toList(),
