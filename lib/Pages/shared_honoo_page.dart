@@ -83,12 +83,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
               footerIconSize + footerTopSpacing + footerBottomSpacing;
           final double availableH =
               (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
-          final metrics = ResponsiveLayout.honooBuilderMetrics(
-            availableHeight: availableH,
-            maxWidth: targetMaxW,
-            mode: layoutMode,
-          );
-          const double horizontalPadding = 0;
+          // metrics no longer needed when using full-page cover
 
           final Widget content = _isLoading
               ? const Center(child: LoadingSpinner())
@@ -213,7 +208,7 @@ class _HonooCoverInline extends StatelessWidget {
     const double gap = 9.0;
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double areaW = constraints.maxWidth;
+        // width is unused; we compute cover by height
         final double areaH = constraints.maxHeight;
         final double imageSize = ((areaH - gap) / 1.5).clamp(0.0, double.infinity);
         final double coverW = imageSize;

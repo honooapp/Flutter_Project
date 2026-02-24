@@ -157,7 +157,7 @@ class _MoonPageState extends State<MoonPage> {
                     .clamp(0.0, double.infinity);
             final _MoonItem? current =
                 _items.isEmpty ? null : _items[_currentIndex];
-            final bool currentIsHinoo = current != null && current.honoo == null;
+            final bool currentIsHinoo = current != null && current.honoo == null; // info only
             // Allinea a campanelli: usa sempre tutta la larghezza disponibile
             final double targetMaxWidth = constraints.maxWidth;
             final bool isCompact = layoutMode == ResponsiveLayoutMode.mobile ||
