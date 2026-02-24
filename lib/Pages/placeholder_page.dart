@@ -69,6 +69,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     String text,
     TextStyle style, {
     double? height,
+    VoidCallback? onTap,
   }) {
     final linkStyle = (height == null ? style : style.copyWith(height: height))
         .copyWith(
@@ -77,7 +78,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           decorationThickness: 3.0,
         );
     return InkWell(
-      onTap: () {
+      onTap: onTap ?? () {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Sezione in arrivo')),
         );
@@ -224,7 +225,16 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     // Sequenza dei testi e delle icone in ordine di apparizione.
     final List<Widget> blocks = [
       _textBlock('${_trimInlineText(text1First)}\n', baseTextStyle),
-      _linkTextBlock(context, performanceLine, baseTextStyle),
+      _linkTextBlock(
+        context,
+        performanceLine,
+        baseTextStyle,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const PerformancePage()),
+          );
+        },
+      ),
       ..._iconBlockWithSpacing(
         "assets/icons/performance.png",
         inlineIconHeight,
