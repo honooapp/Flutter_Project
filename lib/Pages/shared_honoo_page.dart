@@ -146,41 +146,33 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                 ),
               ),
               Expanded(
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: targetMaxW),
-                    child: Padding(
-                      padding: EdgeInsets.zero,
-                      child: SizedBox(
-                        width: targetMaxW,
-                        height: availableH,
-                        child: () {
-                          final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
-                              layoutMode == ResponsiveLayoutMode.wideDesktop ||
-                              layoutMode == ResponsiveLayoutMode.largeDesktop;
-                          if (!isDesktop || _items.length <= 1 || _isLoading) {
-                            return content;
-                          }
-                          return DesktopCarouselArrows(
-                            canPrev: _currentIndex > 0,
-                            canNext: _currentIndex < _items.length - 1,
-                            onPrev: () => _carouselController.animateToPage(
-                              (_currentIndex - 1).clamp(0, _items.length - 1),
-                              duration: const Duration(milliseconds: 220),
-                              curve: Curves.easeOutCubic,
-                            ),
-                            onNext: () => _carouselController.animateToPage(
-                              (_currentIndex + 1).clamp(0, _items.length - 1),
-                              duration: const Duration(milliseconds: 220),
-                              curve: Curves.easeOutCubic,
-                            ),
-                            arrowColor: Colors.white,
-                            child: content,
-                          );
-                        }(),
+                child: SizedBox(
+                  width: targetMaxW,
+                  height: availableH,
+                  child: () {
+                    final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
+                        layoutMode == ResponsiveLayoutMode.wideDesktop ||
+                        layoutMode == ResponsiveLayoutMode.largeDesktop;
+                    if (!isDesktop || _items.length <= 1 || _isLoading) {
+                      return content;
+                    }
+                    return DesktopCarouselArrows(
+                      canPrev: _currentIndex > 0,
+                      canNext: _currentIndex < _items.length - 1,
+                      onPrev: () => _carouselController.animateToPage(
+                        (_currentIndex - 1).clamp(0, _items.length - 1),
+                        duration: const Duration(milliseconds: 220),
+                        curve: Curves.easeOutCubic,
                       ),
-                    ),
-                  ),
+                      onNext: () => _carouselController.animateToPage(
+                        (_currentIndex + 1).clamp(0, _items.length - 1),
+                        duration: const Duration(milliseconds: 220),
+                        curve: Curves.easeOutCubic,
+                      ),
+                      arrowColor: Colors.white,
+                      child: content,
+                    );
+                  }(),
                 ),
               ),
               SizedBox(height: footerTopSpacing),

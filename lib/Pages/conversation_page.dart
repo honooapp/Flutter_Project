@@ -142,18 +142,10 @@ class _ConversationPageState extends State<ConversationPage> {
                 ),
               ),
               Expanded(
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: targetMaxW),
-                    child: Padding(
-                      padding: EdgeInsets.zero,
-                      child: SizedBox(
-                        width: targetMaxW,
-                        height: availableH,
-                        child: carousel,
-                      ),
-                    ),
-                  ),
+                child: SizedBox(
+                  width: targetMaxW,
+                  height: availableH,
+                  child: carousel,
                 ),
               ),
               SizedBox(height: footerTopSpacing),
