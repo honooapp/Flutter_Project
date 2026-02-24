@@ -151,7 +151,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                   child: ConstrainedBox(
                     constraints: BoxConstraints(maxWidth: targetMaxW),
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                      padding: EdgeInsets.zero,
                       child: SizedBox(
                         width: metrics.width,
                         height: metrics.height,

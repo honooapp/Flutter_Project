@@ -147,8 +147,7 @@ class _ConversationPageState extends State<ConversationPage> {
                   child: ConstrainedBox(
                     constraints: BoxConstraints(maxWidth: targetMaxW),
                     child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: horizontalPadding),
+                      padding: EdgeInsets.zero,
                       child: SizedBox(
                         width: targetMaxW,
                         height: availableH,

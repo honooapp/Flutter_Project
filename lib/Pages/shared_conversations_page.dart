@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Services/honoo_service.dart';
-import 'package:honoo/UI/honoo_card.dart';
+// import removed: no direct use of HonooCard in this page
 import 'package:honoo/UI/honoo_thread_view.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
@@ -12,7 +12,7 @@ import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
 
-import 'package:honoo/Controller/honoo_controller.dart';
+// import removed: no direct use of HonooController here
 
 import 'home_page.dart';
 import 'placeholder_page.dart';
@@ -89,7 +89,7 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
           final double availableH =
               (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
           // Nessun padding orizzontale: stile full-page
-          const double horizontalPadding = 0;
+          // full-page: no horizontal padding
 
           final Widget threads = _isLoadingRoots
               ? const Center(child: LoadingSpinner())
