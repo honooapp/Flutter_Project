@@ -19,6 +19,7 @@ import '../Utility/responsive_layout.dart';
 import '../Widgets/loading_spinner.dart';
 import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/honoo_app_title.dart';
+import '../UI/thread_layout_scaffold.dart';
 import '../Widgets/responsive_footer_bar.dart';
 import '../Widgets/desktop_carousel_arrows.dart';
 import 'placeholder_page.dart';
@@ -131,178 +132,127 @@ class _MoonPageState extends State<MoonPage> {
 
   @override
   Widget build(BuildContext context) {
-    const double headerHeight = 52;
-    return Scaffold(
+    return ThreadLayoutScaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final double availHeight = constraints.maxHeight;
-            final ResponsiveLayoutMode layoutMode =
-                ResponsiveLayout.modeForWidth(constraints.maxWidth);
-            final double footerIconSize =
-                ResponsiveLayout.footerIconSizeForMode(layoutMode);
-            final double footerGap =
-                ResponsiveLayout.footerGapForMode(layoutMode);
-            final double footerBottomPadding =
-                ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
-            final double footerSpacing = footerBottomPadding;
-            final double footerTopSpacing = footerSpacing / 2;
-            final double footerBottomSpacing =
-                footerSpacing - footerTopSpacing;
-            final double footerReserved =
-                footerIconSize + footerTopSpacing + footerBottomSpacing;
-            final double centerHeight =
-                (availHeight - headerHeight - footerReserved)
-                    .clamp(0.0, double.infinity);
-            final _MoonItem? current =
-                _items.isEmpty ? null : _items[_currentIndex];
-            // currentIsHinoo no longer used in full-page layout
-            // Allinea a campanelli: usa sempre tutta la larghezza disponibile
-            final double targetMaxWidth = constraints.maxWidth;
-            final bool isCompact = layoutMode == ResponsiveLayoutMode.mobile ||
-                layoutMode == ResponsiveLayoutMode.tablet;
-            final HonooBuilderMetrics honooMetrics =
-                ResponsiveLayout.honooBuilderMetrics(
-              availableHeight: centerHeight,
-              maxWidth: targetMaxWidth,
-              mode: layoutMode,
-            );
-            final double displayHeight = current?.honoo != null
-                ? honooMetrics.height
-                : centerHeight;
-            const double horizontalPadding = 0;
-
-            return Column(
-              children: [
-                SizedBox(
-                  height: headerHeight,
-                  child: Center(
-                    child: HonooAppTitle(
-                      onTap: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                              builder: (_) => const PlaceholderPage()),
-                          (route) => false,
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Center(
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 90),
-                      curve: Curves.easeOutCubic,
-                      constraints: BoxConstraints(
-                        maxWidth: targetMaxWidth,
-                      ),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: displayHeight,
-                        child: _buildBody(
-                          displayHeight,
-                          centerHeight,
-                          targetMaxWidth,
-                          honooMetrics,
-                          isCompact,
-                          horizontalPadding,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: footerTopSpacing),
-                ResponsiveFooterBar(
-                  useSafeArea: false,
-                  bottomPadding: footerBottomSpacing,
-                  desiredGap: footerGap,
-                  minGap: 16,
-                  height: footerIconSize,
-                  actions: [
-                    ResponsiveFooterAction(
-                      asset: 'assets/icons/home_onTertiary.svg',
-                      semanticsLabel: 'Home',
-                      size: footerIconSize,
-                      splashRadius: 25,
-                      tooltip: 'Home',
-                      onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                              builder: (_) => const HomePage()),
-                          (route) => false,
-                        );
-                      },
-                    ),
-                    ResponsiveFooterAction(
-                      asset: 'assets/icons/heart.svg',
-                      semanticsLabel: 'Heart',
-                      size: footerIconSize,
-                      splashRadius: 25,
-                      tooltip: 'Salva nel tuo Cuore',
-                      onPressed: _saveCurrentToChest,
-                    ),
-                    () {
-                      final _MoonItem? curr =
-                          _items.isEmpty ? null : _items[_currentIndex];
-                      String? keyId;
-                      if (curr != null) {
-                        keyId = curr.honoo?.dbId ?? curr.hinooId;
-                      }
-                      final bool showSeeConversation = keyId != null &&
-                          _repliedItemIds.contains(keyId);
-                      if (showSeeConversation) {
-                        return ResponsiveFooterAction(
-                          asset: 'assets/icons/reply.svg',
-                          semanticsLabel: 'Vedi conversazione',
-                          size: footerIconSize,
-                          splashRadius: 25,
-                          tooltip: 'Vedi conversazione',
-                          colorFilter: const ColorFilter.mode(
-                            HonooColor.secondary,
-                            BlendMode.srcIn,
-                          ),
-                          onPressed: () async {
-                            if (!mounted) return;
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const ChestPage(
-                                        focusReplies: true,
-                                      )),
-                            );
-                          },
-                        );
-                      }
-                      return ResponsiveFooterAction(
-                        asset: 'assets/icons/reply.svg',
-                        semanticsLabel: 'Reply',
-                        size: footerIconSize,
-                        splashRadius: 25,
-                        tooltip: 'Rispondi',
-                        onPressed: () => _showReplyChoice(),
-                      );
-                    }(),
-                    if (_isAdmin)
-                      ResponsiveFooterAction(
-                        asset: 'assets/icons/cancella.svg',
-                        semanticsLabel: 'Elimina',
-                        size: footerIconSize,
-                        colorFilter: const ColorFilter.mode(
-                          Colors.black,
-                          BlendMode.srcIn,
-                        ),
-                        splashRadius: 25,
-                        tooltip: 'Elimina',
-                        onPressed: _deleteCurrentFromMoon,
-                      ),
-                  ],
-                ),
-              ],
-            );
-          },
-        ),
+      header: HonooAppTitle(
+        onTap: () {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const PlaceholderPage()),
+            (route) => false,
+          );
+        },
       ),
+      bodyBuilder: (context, viewW, availableH, layoutMode) {
+        final _MoonItem? current = _items.isEmpty ? null : _items[_currentIndex];
+        final HonooBuilderMetrics honooMetrics =
+            ResponsiveLayout.honooBuilderMetrics(
+          availableHeight: availableH,
+          maxWidth: viewW,
+          mode: layoutMode,
+        );
+        final bool isCompact = layoutMode == ResponsiveLayoutMode.mobile ||
+            layoutMode == ResponsiveLayoutMode.tablet;
+        final double displayHeight =
+            (current?.honoo != null) ? honooMetrics.height : availableH;
+        return SizedBox(
+          width: viewW,
+          height: displayHeight,
+          child: _buildBody(
+            displayHeight,
+            availableH,
+            viewW,
+            honooMetrics,
+            isCompact,
+            0,
+          ),
+        );
+      },
+      footerBuilder: (context, mode, footerIconSize, footerGap,
+          footerTopSpacing, footerBottomSpacing) {
+        return ResponsiveFooterBar(
+          useSafeArea: false,
+          bottomPadding: footerBottomSpacing,
+          desiredGap: footerGap,
+          minGap: 16,
+          height: footerIconSize,
+          actions: [
+            ResponsiveFooterAction(
+              asset: 'assets/icons/home_onTertiary.svg',
+              semanticsLabel: 'Home',
+              size: footerIconSize,
+              splashRadius: 25,
+              tooltip: 'Home',
+              onPressed: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const HomePage()),
+                  (route) => false,
+                );
+              },
+            ),
+            ResponsiveFooterAction(
+              asset: 'assets/icons/heart.svg',
+              semanticsLabel: 'Heart',
+              size: footerIconSize,
+              splashRadius: 25,
+              tooltip: 'Salva nel tuo Cuore',
+              onPressed: _saveCurrentToChest,
+            ),
+            () {
+              final _MoonItem? curr = _items.isEmpty ? null : _items[_currentIndex];
+              String? keyId;
+              if (curr != null) {
+                keyId = curr.honoo?.dbId ?? curr.hinooId;
+              }
+              final bool showSeeConversation =
+                  keyId != null && _repliedItemIds.contains(keyId);
+              if (showSeeConversation) {
+                return ResponsiveFooterAction(
+                  asset: 'assets/icons/reply.svg',
+                  semanticsLabel: 'Vedi conversazione',
+                  size: footerIconSize,
+                  splashRadius: 25,
+                  tooltip: 'Vedi conversazione',
+                  colorFilter: const ColorFilter.mode(
+                    HonooColor.secondary,
+                    BlendMode.srcIn,
+                  ),
+                  onPressed: () async {
+                    if (!mounted) return;
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const ChestPage(
+                                focusReplies: true,
+                              )),
+                    );
+                  },
+                );
+              }
+              return ResponsiveFooterAction(
+                asset: 'assets/icons/reply.svg',
+                semanticsLabel: 'Reply',
+                size: footerIconSize,
+                splashRadius: 25,
+                tooltip: 'Rispondi',
+                onPressed: () => _showReplyChoice(),
+              );
+            }(),
+            if (_isAdmin)
+              ResponsiveFooterAction(
+                asset: 'assets/icons/cancella.svg',
+                semanticsLabel: 'Elimina',
+                size: footerIconSize,
+                colorFilter: const ColorFilter.mode(
+                  Colors.black,
+                  BlendMode.srcIn,
+                ),
+                splashRadius: 25,
+                tooltip: 'Elimina',
+                onPressed: _deleteCurrentFromMoon,
+              ),
+          ],
+        );
+      },
     );
   }
 
