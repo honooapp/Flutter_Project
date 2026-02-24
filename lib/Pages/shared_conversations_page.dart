@@ -11,6 +11,7 @@ import 'package:honoo/Widgets/honoo_app_title.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
+import 'package:honoo/UI/thread_layout_scaffold.dart';
 
 // import removed: no direct use of HonooController here
 
@@ -66,145 +67,102 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ThreadLayoutScaffold(
       backgroundColor: HonooColor.background,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final double viewW = constraints.maxWidth;
-          final double viewH = constraints.maxHeight;
-          final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
-          final layoutMode = ResponsiveLayout.modeForWidth(viewW);
-          final double footerIconSize =
-              ResponsiveLayout.footerIconSizeForMode(layoutMode);
-          final double footerGap = ResponsiveLayout.footerGapForMode(layoutMode);
-          final double footerBottomPadding =
-              ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
-          final double footerSpacing = footerBottomPadding + safeBottom;
-          final double footerTopSpacing = footerSpacing / 2;
-          final double footerBottomSpacing = footerSpacing - footerTopSpacing;
-          const double headerH = 52;
-          final double targetMaxW = viewW;
-          final double footerReserved =
-              footerIconSize + footerTopSpacing + footerBottomSpacing;
-          final double availableH =
-              (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
-          // Nessun padding orizzontale: stile full-page
-          // full-page: no horizontal padding
-
-          final Widget threads = _isLoadingRoots
-              ? const Center(child: LoadingSpinner())
-              : (_roots.isEmpty
-                  ? Center(
-                      child: Text(
-                        'Nessuna conversazione condivisa',
-                        style: GoogleFonts.libreFranklin(
-                          color: HonooColor.onBackground,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    )
-                  : cs.CarouselSlider(
-                      carouselController: _rootCarousel,
-                      options: cs.CarouselOptions(
-                        scrollDirection: Axis.horizontal,
-                        height: availableH,
-                        viewportFraction: 1.0,
-                        enlargeCenterPage: false,
-                        enableInfiniteScroll: false,
-                        disableCenter: true,
-                        scrollPhysics: const PageScrollPhysics(),
-                        onPageChanged: (index, reason) {
-                          setState(() => _currentRootIndex = index);
-                        },
-                      ),
-                      items: _roots
-                          .map(
-                            (root) => SizedBox(
-                              width: targetMaxW,
-                              height: availableH,
-                              child: HonooThreadView(root: root),
-                            ),
-                          )
-                          .toList(),
-                    ));
-
-          // Rimosse variabili rootCarousel/threadCarousel del layout precedente a due pannelli
-
-          return Column(
-            children: [
-              SizedBox(
-                height: headerH,
-                child: Center(
-                  child: HonooAppTitle(
-                    onTap: () {
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                            builder: (_) => const PlaceholderPage()),
-                        (route) => false,
-                      );
-                    },
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Center(
-                  child: SizedBox(
-                    width: targetMaxW,
-                    height: availableH,
-                    child: () {
-                      final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
-                          layoutMode == ResponsiveLayoutMode.wideDesktop ||
-                          layoutMode == ResponsiveLayoutMode.largeDesktop;
-                      if (!isDesktop || _roots.length <= 1 || _isLoadingRoots) {
-                        return threads;
-                      }
-                      return DesktopCarouselArrows(
-                        canPrev: _currentRootIndex > 0,
-                        canNext: _currentRootIndex < _roots.length - 1,
-                        onPrev: () => _rootCarousel.animateToPage(
-                          (_currentRootIndex - 1).clamp(0, _roots.length - 1),
-                          duration: const Duration(milliseconds: 220),
-                          curve: Curves.easeOutCubic,
-                        ),
-                        onNext: () => _rootCarousel.animateToPage(
-                          (_currentRootIndex + 1).clamp(0, _roots.length - 1),
-                          duration: const Duration(milliseconds: 220),
-                          curve: Curves.easeOutCubic,
-                        ),
-                        arrowColor: Colors.white,
-                        child: threads,
-                      );
-                    }(),
-                  ),
-                ),
-              ),
-              SizedBox(height: footerTopSpacing),
-              ResponsiveFooterBar(
-                useSafeArea: false,
-                bottomPadding: footerBottomSpacing,
-                desiredGap: footerGap,
-                minGap: 16,
-                height: footerIconSize,
-                actions: [
-                  ResponsiveFooterAction(
-                    asset: "assets/icons/home.svg",
-                    semanticsLabel: 'Home',
-                    colorFilter: const ColorFilter.mode(
-                      HonooColor.onBackground,
-                      BlendMode.srcIn,
-                    ),
-                    size: footerIconSize,
-                    splashRadius: 25,
-                    tooltip: 'Home',
-                    onPressed: _goHome,
-                  ),
-                ],
-              ),
-            ],
+      header: HonooAppTitle(
+        onTap: () {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const PlaceholderPage()),
+            (route) => false,
           );
         },
       ),
+      bodyBuilder: (context, viewW, availableH, layoutMode) {
+        final Widget threads = _isLoadingRoots
+            ? const Center(child: LoadingSpinner())
+            : (_roots.isEmpty
+                ? Center(
+                    child: Text(
+                      'Nessuna conversazione condivisa',
+                      style: GoogleFonts.libreFranklin(
+                        color: HonooColor.onBackground,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  )
+                : cs.CarouselSlider(
+                    carouselController: _rootCarousel,
+                    options: cs.CarouselOptions(
+                      scrollDirection: Axis.horizontal,
+                      height: availableH,
+                      viewportFraction: 1.0,
+                      enlargeCenterPage: false,
+                      enableInfiniteScroll: false,
+                      disableCenter: true,
+                      scrollPhysics: const PageScrollPhysics(),
+                      onPageChanged: (index, reason) {
+                        setState(() => _currentRootIndex = index);
+                      },
+                    ),
+                    items: _roots
+                        .map(
+                          (root) => SizedBox(
+                            width: viewW,
+                            height: availableH,
+                            child: HonooThreadView(root: root),
+                          ),
+                        )
+                        .toList(),
+                  ));
+
+        final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
+            layoutMode == ResponsiveLayoutMode.wideDesktop ||
+            layoutMode == ResponsiveLayoutMode.largeDesktop;
+        if (!isDesktop || _roots.length <= 1 || _isLoadingRoots) {
+          return threads;
+        }
+        return DesktopCarouselArrows(
+          canPrev: _currentRootIndex > 0,
+          canNext: _currentRootIndex < _roots.length - 1,
+          onPrev: () => _rootCarousel.animateToPage(
+            (_currentRootIndex - 1).clamp(0, _roots.length - 1),
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutCubic,
+          ),
+          onNext: () => _rootCarousel.animateToPage(
+            (_currentRootIndex + 1).clamp(0, _roots.length - 1),
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutCubic,
+          ),
+          arrowColor: Colors.white,
+          child: threads,
+        );
+      },
+      footerBuilder: (context, mode, footerIconSize, footerGap,
+          footerTopSpacing, footerBottomSpacing) {
+        return ResponsiveFooterBar(
+          useSafeArea: false,
+          bottomPadding: footerBottomSpacing,
+          desiredGap: footerGap,
+          minGap: 16,
+          height: footerIconSize,
+          actions: [
+            ResponsiveFooterAction(
+              asset: "assets/icons/home.svg",
+              semanticsLabel: 'Home',
+              colorFilter: const ColorFilter.mode(
+                HonooColor.onBackground,
+                BlendMode.srcIn,
+              ),
+              size: footerIconSize,
+              splashRadius: 25,
+              tooltip: 'Home',
+              onPressed: _goHome,
+            ),
+          ],
+        );
+      },
     );
   }
 }
