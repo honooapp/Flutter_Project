@@ -115,20 +115,45 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
               footerIconSize + footerTopSpacing + footerBottomSpacing;
           final double availableH =
               (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
-          const double gap = 12;
-          final double topHeight = availableH * 0.4;
-          final double bottomHeight = availableH - topHeight - gap;
-          final topMetrics = ResponsiveLayout.honooBuilderMetrics(
-            availableHeight: topHeight,
-            maxWidth: targetMaxW,
-            mode: layoutMode,
-          );
-          final bottomMetrics = ResponsiveLayout.honooBuilderMetrics(
-            availableHeight: bottomHeight,
-            maxWidth: targetMaxW,
-            mode: layoutMode,
-          );
           const double horizontalPadding = 0;
+
+          final Widget threads = _isLoadingRoots
+              ? const Center(child: LoadingSpinner())
+              : (_roots.isEmpty
+                  ? Center(
+                      child: Text(
+                        'Nessuna conversazione condivisa',
+                        style: GoogleFonts.libreFranklin(
+                          color: HonooColor.onBackground,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    )
+                  : cs.CarouselSlider(
+                      carouselController: _rootCarousel,
+                      options: cs.CarouselOptions(
+                        scrollDirection: Axis.horizontal,
+                        height: availableH,
+                        viewportFraction: 1.0,
+                        enlargeCenterPage: false,
+                        enableInfiniteScroll: false,
+                        disableCenter: true,
+                        scrollPhysics: const PageScrollPhysics(),
+                        onPageChanged: (index, reason) {
+                          setState(() => _currentRootIndex = index);
+                        },
+                      ),
+                      items: _roots
+                          .map(
+                            (root) => SizedBox(
+                              width: targetMaxW,
+                              height: availableH,
+                              child: HonooThreadView(root: root),
+                            ),
+                          )
+                          .toList(),
+                    ));
 
           final Widget rootCarousel = _isLoadingRoots
               ? const Center(child: LoadingSpinner())
@@ -222,55 +247,33 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
               ),
               Expanded(
                 child: Center(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: targetMaxW),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                      child: SizedBox(
-                        width: targetMaxW,
-                        height: availableH,
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              width: topMetrics.width,
-                              height: topMetrics.height,
-                              child: () {
-                                final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
-                                    layoutMode == ResponsiveLayoutMode.wideDesktop ||
-                                    layoutMode == ResponsiveLayoutMode.largeDesktop;
-                                if (!isDesktop || _roots.length <= 1 || _isLoadingRoots) {
-                                  return rootCarousel;
-                                }
-                                return DesktopCarouselArrows(
-                                  canPrev: _currentRootIndex > 0,
-                                  canNext: _currentRootIndex < _roots.length - 1,
-                                  onPrev: () => _rootCarousel.animateToPage(
-                                    (_currentRootIndex - 1).clamp(0, _roots.length - 1),
-                                    duration: const Duration(milliseconds: 220),
-                                    curve: Curves.easeOutCubic,
-                                  ),
-                                  onNext: () => _rootCarousel.animateToPage(
-                                    (_currentRootIndex + 1).clamp(0, _roots.length - 1),
-                                    duration: const Duration(milliseconds: 220),
-                                    curve: Curves.easeOutCubic,
-                                  ),
-                                  arrowColor: Colors.white,
-                                  child: rootCarousel,
-                                );
-                              }(),
-                            ),
-                            const SizedBox(height: gap),
-                            Expanded(
-                              child: SizedBox(
-                                width: bottomMetrics.width,
-                                height: bottomMetrics.height,
-                                child: threadCarousel,
-                              ),
-                            ),
-                          ],
+                  child: SizedBox(
+                    width: targetMaxW,
+                    height: availableH,
+                    child: () {
+                      final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
+                          layoutMode == ResponsiveLayoutMode.wideDesktop ||
+                          layoutMode == ResponsiveLayoutMode.largeDesktop;
+                      if (!isDesktop || _roots.length <= 1 || _isLoadingRoots) {
+                        return threads;
+                      }
+                      return DesktopCarouselArrows(
+                        canPrev: _currentRootIndex > 0,
+                        canNext: _currentRootIndex < _roots.length - 1,
+                        onPrev: () => _rootCarousel.animateToPage(
+                          (_currentRootIndex - 1).clamp(0, _roots.length - 1),
+                          duration: const Duration(milliseconds: 220),
+                          curve: Curves.easeOutCubic,
                         ),
-                      ),
-                    ),
+                        onNext: () => _rootCarousel.animateToPage(
+                          (_currentRootIndex + 1).clamp(0, _roots.length - 1),
+                          duration: const Duration(milliseconds: 220),
+                          curve: Curves.easeOutCubic,
+                        ),
+                        arrowColor: Colors.white,
+                        child: threads,
+                      );
+                    }(),
                   ),
                 ),
               ),

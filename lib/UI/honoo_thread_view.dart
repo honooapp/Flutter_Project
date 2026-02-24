@@ -109,15 +109,16 @@ class _HonooThreadViewState extends State<HonooThreadView> {
             final List<Honoo> replies = thread
                 .where((h) => h.replyTo != null && h.replyTo!.isNotEmpty)
                 .toList();
+            // Ordina le risposte dal più vecchio al più recente e mostra la radice per prima
             replies.sort((a, b) {
               final DateTime? aTime = DateTime.tryParse(a.createdAt);
               final DateTime? bTime = DateTime.tryParse(b.createdAt);
               if (aTime == null && bTime == null) return 0;
               if (aTime == null) return 1;
               if (bTime == null) return -1;
-              return bTime.compareTo(aTime);
+              return aTime.compareTo(bTime);
             });
-            final List<Honoo> ordered = [...replies, root];
+            final List<Honoo> ordered = [root, ...replies];
             child = KeyedSubtree(
               key: ValueKey(
                   'thread_list_${thread.length}_${_honooIdentity(thread.first)}'),
