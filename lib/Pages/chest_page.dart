@@ -1248,8 +1248,9 @@ class _ChestPageState extends State<ChestPage> {
                 final double footerReserved =
                     footerIconSize + footerTopSpacing + footerBottomSpacing;
 
+                final double topPaddingEffective = currentIsThread ? 0 : contentTopPadding;
                 final double availableCenterH =
-                    (availH - headerH - contentTopPadding - footerReserved)
+                    (availH - headerH - topPaddingEffective - footerReserved)
                         .clamp(0.0, double.infinity);
                 final HonooBuilderMetrics honooMetrics =
                     ResponsiveLayout.honooBuilderMetrics(
@@ -1289,7 +1290,7 @@ class _ChestPageState extends State<ChestPage> {
                           child: Padding(
                             padding: EdgeInsets.fromLTRB(
                               0,
-                              contentTopPadding,
+                              topPaddingEffective,
                               0,
                               0,
                             ),
