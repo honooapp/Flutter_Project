@@ -12,6 +12,7 @@ import 'home_page.dart';
 import '../Widgets/honoo_dialogs.dart';
 import 'performance_page.dart';
 import 'venceslao_page.dart';
+import 'coming_soon_page.dart';
 
 class PlaceholderPage extends StatefulWidget {
   const PlaceholderPage({super.key});
@@ -262,6 +263,17 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         inlineIconHeight,
         topSpacing: _laboratoriTopSpacing,
         bottomSpacing: _laboratoriBottomSpacing,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const ComingSoonPage(
+                header: 'laboratori teatrali',
+                quote: 'Pagina in elaborazione',
+                bibliography: '',
+              ),
+            ),
+          );
+        },
       ),
       _linkTextBlock(
         context,
@@ -279,6 +291,17 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         inlineIconHeight,
         topSpacing: _lunaTopSpacing,
         bottomSpacing: _lunaBottomSpacing,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const ComingSoonPage(
+                header: 'esplorazioni lunari',
+                quote: 'Pagina in elaborazione',
+                bibliography: '',
+              ),
+            ),
+          );
+        },
       ),
       _linkTextBlock(
         context,
@@ -295,6 +318,17 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         inlineIconHeight,
         topSpacing: _festeTopSpacing,
         bottomSpacing: _festeBottomSpacing,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const ComingSoonPage(
+                header: 'feste',
+                quote: 'Pagina in elaborazione',
+                bibliography: '',
+              ),
+            ),
+          );
+        },
       ),
       _linkTextBlock(
         context,
@@ -312,6 +346,17 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         inlineIconHeight,
         topSpacing: _isolaTopSpacing,
         bottomSpacing: _isolaBottomSpacing,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const ComingSoonPage(
+                header: "viaggi sull'Isola delle Storie",
+                quote: 'Pagina in elaborazione',
+                bibliography: '',
+              ),
+            ),
+          );
+        },
       ),
       _textBlock(textBeforePerformanceMarkerDisplay, baseTextStyle),
       if (performanceMarkerIndex != -1)
