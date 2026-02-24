@@ -241,6 +241,11 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         inlineIconHeight,
         topSpacing: _performanceTopSpacing,
         bottomSpacing: _performanceBottomSpacing,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const PerformancePage()),
+          );
+        },
       ),
       _linkTextBlock(
         context,
@@ -315,6 +320,11 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           inlineIconHeight,
           topSpacing: _performanceSecondTopSpacing,
           bottomSpacing: _performanceSecondBottomSpacing,
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const PerformancePage()),
+            );
+          },
         ),
       _textBlock(textAfterPerformanceMarkerDisplay, baseTextStyle),
       _textBlock(textBeforeVenceslaoDisplay, baseTextStyle),
@@ -324,6 +334,11 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         inlineIconHeight,
         topSpacing: _venceslaoTopSpacing,
         bottomSpacing: _venceslaoBottomSpacing,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const VenceslaoPage()),
+          );
+        },
       ),
       _textBlock(textAfterVenceslaoDisplay, baseTextStyle),
       const SizedBox(height: _honooTopSpacing),
