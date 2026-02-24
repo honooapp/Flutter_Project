@@ -121,11 +121,10 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                         },
                       ),
                       items: _items.map((item) {
-                        final Widget card = HonooCard(honoo: item);
                         return SizedBox(
                           width: targetMaxW,
                           height: availableH,
-                          child: card,
+                          child: _HonooCoverInline(honoo: item),
                         );
                       }).toList(),
                     ));
@@ -153,8 +152,8 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                     child: Padding(
                       padding: EdgeInsets.zero,
                       child: SizedBox(
-                        width: metrics.width,
-                        height: metrics.height,
+                        width: targetMaxW,
+                        height: availableH,
                         child: () {
                           final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
                               layoutMode == ResponsiveLayoutMode.wideDesktop ||
@@ -210,6 +209,32 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
           );
         },
       ),
+    );
+  }
+}
+
+class _HonooCoverInline extends StatelessWidget {
+  const _HonooCoverInline({required this.honoo});
+  final Honoo honoo;
+  @override
+  Widget build(BuildContext context) {
+    const double gap = 9.0;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double areaW = constraints.maxWidth;
+        final double areaH = constraints.maxHeight;
+        final double imageSize = ((areaH - gap) / 1.5).clamp(0.0, double.infinity);
+        final double coverW = imageSize;
+        return ClipRect(
+          child: Center(
+            child: SizedBox(
+              width: coverW,
+              height: areaH,
+              child: HonooCard(honoo: honoo),
+            ),
+          ),
+        );
+      },
     );
   }
 }

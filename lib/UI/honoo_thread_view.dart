@@ -135,7 +135,7 @@ class _HonooThreadViewState extends State<HonooThreadView> {
                 ),
                 itemBuilder: (context, index, realIdx) {
                   final honoo = ordered[index];
-                  return HonooCard(
+                  return _HonooCover(
                     honoo: honoo,
                     onDownloadTap: widget.onDownloadTap,
                   );
@@ -180,4 +180,45 @@ class _HonooThreadViewState extends State<HonooThreadView> {
     );
   }
 
+}
+
+class _HonooCover extends StatelessWidget {
+  const _HonooCover({required this.honoo, this.onDownloadTap});
+
+  final Honoo honoo;
+  final VoidCallback? onDownloadTap;
+
+  @override
+  Widget build(BuildContext context) {
+    // Clip all overflow to the available area and center the card. Compute width by height to cover vertically.
+    const double gap = 9.0;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double areaW = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : MediaQuery.of(context).size.width;
+        final double areaH = constraints.maxHeight.isFinite
+            ? constraints.maxHeight
+            : MediaQuery.of(context).size.height;
+        final double imageSize = ((areaH - gap) / 1.5).clamp(0.0, double.infinity);
+        final double coverW = imageSize; // HonooCard total width equals imageSize
+        return ClipRect(
+          child: SizedBox(
+            width: areaW,
+            height: areaH,
+            child: Center(
+              child: SizedBox(
+                width: coverW,
+                height: areaH,
+                child: HonooCard(
+                  honoo: honoo,
+                  onDownloadTap: onDownloadTap,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
