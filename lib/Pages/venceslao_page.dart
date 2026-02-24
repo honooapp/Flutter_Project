@@ -13,7 +13,7 @@ class VenceslaoPage extends StatelessWidget {
   static const String venceslaoCembaloText =
       "Sono nato a Napoli\n"
       "nel 1965.\n\n"
-      "Ho vissuto in città diverse\n"
+      "Ho vissuto in varie città\n"
       "e ho lavorato\n"
       "in contesti molto differenti.\n\n"
       "Se dovessi trovare\n"
@@ -33,9 +33,7 @@ class VenceslaoPage extends StatelessWidget {
       "di scuole superiori,\n"
       "di Università,\n"
       "di Accademie di Belle Arti,\n\n"
-      "a docenti\n"
-      "all’interno\n"
-      "di corsi di formazione.\n\n"
+      "a docenti\n\n"
       "Per tredici anni\n"
       "ho scritto i testi\n"
       "di un programma televisivo\n"
@@ -63,10 +61,10 @@ class VenceslaoPage extends StatelessWidget {
       "Papà,\n"
       "ma tu mi vuoi bene?\n\n"
       "è il romanzo\n"
-      "su cui sto lavorando\n"
+      "a cui sto lavorando\n"
       "adesso.\n\n"
       "honoo\n"
-      "nasce da qui.\n";
+      "nasce da tutto questo.\n\n\n";
 
   @override
   Widget build(BuildContext context) {
