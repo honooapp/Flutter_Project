@@ -9,6 +9,7 @@ import '../Utility/utility.dart';
 import '../Widgets/background.dart';
 import '../Widgets/honoo_app_title.dart';
 import 'home_page.dart';
+import '../Widgets/honoo_dialogs.dart';
 import 'performance_page.dart';
 import 'venceslao_page.dart';
 
@@ -246,28 +247,66 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           );
         },
       ),
-      _linkTextBlock(context, laboratoriLine, baseTextStyle),
+      _linkTextBlock(
+        context,
+        laboratoriLine,
+        baseTextStyle,
+        onTap: () => showHonooMessageDialog(
+          context,
+          message: 'pagina in elaborazione',
+          duration: const Duration(milliseconds: 1400),
+        ),
+      ),
       ..._iconBlockWithSpacing(
         "assets/icons/laboratori_teatrali.png",
         inlineIconHeight,
         topSpacing: _laboratoriTopSpacing,
         bottomSpacing: _laboratoriBottomSpacing,
       ),
-      _linkTextBlock(context, esplorazioniLine, baseTextStyle, height: 0.9),
+      _linkTextBlock(
+        context,
+        esplorazioniLine,
+        baseTextStyle,
+        height: 0.9,
+        onTap: () => showHonooMessageDialog(
+          context,
+          message: 'pagina in elaborazione',
+          duration: const Duration(milliseconds: 1400),
+        ),
+      ),
       ..._iconBlockWithSpacing(
         "assets/icons/luna.png",
         inlineIconHeight,
         topSpacing: _lunaTopSpacing,
         bottomSpacing: _lunaBottomSpacing,
       ),
-      _linkTextBlock(context, festeLine, baseTextStyle),
+      _linkTextBlock(
+        context,
+        festeLine,
+        baseTextStyle,
+        onTap: () => showHonooMessageDialog(
+          context,
+          message: 'pagina in elaborazione',
+          duration: const Duration(milliseconds: 1400),
+        ),
+      ),
       ..._iconBlockWithSpacing(
         "assets/icons/feste.png",
         inlineIconHeight,
         topSpacing: _festeTopSpacing,
         bottomSpacing: _festeBottomSpacing,
       ),
-      _linkTextBlock(context, viaggiLine, baseTextStyle, height: 0.9),
+      _linkTextBlock(
+        context,
+        viaggiLine,
+        baseTextStyle,
+        height: 0.9,
+        onTap: () => showHonooMessageDialog(
+          context,
+          message: 'pagina in elaborazione',
+          duration: const Duration(milliseconds: 1400),
+        ),
+      ),
       ..._iconBlockWithSpacing(
         "assets/icons/isola.png",
         inlineIconHeight,
