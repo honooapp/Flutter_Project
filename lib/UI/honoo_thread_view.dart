@@ -119,28 +119,38 @@ class _HonooThreadViewState extends State<HonooThreadView> {
               return aTime.compareTo(bTime);
             });
             final List<Honoo> ordered = [root, ...replies];
-            child = KeyedSubtree(
-              key: ValueKey(
-                  'thread_list_${thread.length}_${_honooIdentity(thread.first)}'),
-              child: cs.CarouselSlider.builder(
-                carouselController: _vController,
-                itemCount: ordered.length,
-                options: cs.CarouselOptions(
-                  scrollDirection: Axis.vertical,
-                  viewportFraction: 1.0,
-                  enableInfiniteScroll: false,
-                  padEnds: false,
-                  enlargeCenterPage: false,
-                  scrollPhysics: const BouncingScrollPhysics(),
-                ),
-                itemBuilder: (context, index, realIdx) {
-                  final honoo = ordered[index];
-                  return HonooCard(
-                    honoo: honoo,
-                    onDownloadTap: widget.onDownloadTap,
-                  );
-                },
-              ),
+            child = LayoutBuilder(
+              builder: (ctx, c) {
+                final double h = c.maxHeight.isFinite ? c.maxHeight : MediaQuery.of(ctx).size.height;
+                final double w = c.maxWidth.isFinite ? c.maxWidth : MediaQuery.of(ctx).size.width;
+                return SizedBox(
+                  width: w,
+                  height: h,
+                  child: KeyedSubtree(
+                    key: ValueKey('thread_list_${thread.length}_${_honooIdentity(thread.first)}'),
+                    child: cs.CarouselSlider.builder(
+                      carouselController: _vController,
+                      itemCount: ordered.length,
+                      options: cs.CarouselOptions(
+                        height: h,
+                        scrollDirection: Axis.vertical,
+                        viewportFraction: 1.0,
+                        enableInfiniteScroll: false,
+                        padEnds: false,
+                        enlargeCenterPage: false,
+                        scrollPhysics: const BouncingScrollPhysics(),
+                      ),
+                      itemBuilder: (context, index, realIdx) {
+                        final honoo = ordered[index];
+                        return HonooCard(
+                          honoo: honoo,
+                          onDownloadTap: widget.onDownloadTap,
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
             );
           }
         }
