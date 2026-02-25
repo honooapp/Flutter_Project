@@ -1208,8 +1208,6 @@ class _ChestPageState extends State<ChestPage> {
           ),
           overlayBuilder: (ctx, mode) => const LunaFissa(),
           bodyBuilder: (ctx, viewW, availableH, layoutMode) {
-            final _ChestItem? current =
-                _items.isEmpty ? null : _items[_currentIndex];
             final HonooBuilderMetrics honooMetrics =
                 ResponsiveLayout.honooBuilderMetrics(
               availableHeight: availableH,
