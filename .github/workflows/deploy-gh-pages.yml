@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      DISABLE_PWA:
+        description: 'Disabilita service worker (build di test)'
+        required: false
+        default: 'false'
 
 permissions:
   contents: write
@@ -29,9 +34,11 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.PROD_SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.PROD_SUPABASE_ANON_KEY }}
+          DISABLE_PWA: ${{ github.event.inputs.DISABLE_PWA }}
         run: |
+          if [ "$DISABLE_PWA" = "true" ]; then PWA_FLAG="--pwa-strategy=none"; else PWA_FLAG=""; fi
           flutter build web \
-            --release \
+            --release $PWA_FLAG \
             --dart-define=SUPABASE_URL=$SUPABASE_URL \
             --dart-define=SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
 
