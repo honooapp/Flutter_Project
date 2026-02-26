@@ -1,5 +1,15 @@
 # Changelog
 
+## v2026-02-26 — Bussate live, multi‑share, sobbalzi
+
+- Campanelli: notifiche live via Supabase Realtime per bussate (owner) e aperture (visitor), badge e dialog aggiornati in tempo reale.
+- Flusso visitatore: niente ingresso immediato dopo bussata; si attende l’approvazione e, al grant, si salta al campanello con sobbalzo.
+- Sobbalzi: hint verticale di metà schermo nell’apertura casa e nei thread conversazioni; sobbalzo orizzontale del campanello al grant.
+- Condivisione multipla: nuovo dialog proprietario consente selezione di più contenuti (Honoo/Hinoo/Conversazioni). Scrigno visitatore mostra scelta quando presenti più opzioni.
+- Schema: `house_share_settings.share_modes text[]` con backfill e retro‑compatibilità su `share_mode` (migrazione in `supabase/migrations/20260226211500_add_share_modes_to_house_share_settings.sql`).
+- Robustezza test: sottoscrizioni Realtime avvolte in try/catch per compatibilità con MockSupabaseClient.
+- Config: `lib/main.dart` ora legge `SUPABASE_URL`/`SUPABASE_ANON_KEY` via `env/env.dart`.
+
 ## v2026-02-23.21 — Layout unificato Campanelli (header + full‑width/availableH + footer)
 
 - Nuovo wrapper UI: `ThreadLayoutScaffold` (lib/UI/thread_layout_scaffold.dart)

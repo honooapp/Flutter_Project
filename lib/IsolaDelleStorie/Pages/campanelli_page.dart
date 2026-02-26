@@ -21,6 +21,7 @@ import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../Pages/home_page.dart';
 import '../../Pages/shared_conversations_page.dart';
@@ -51,9 +52,11 @@ class _CampanelliPageState extends State<CampanelliPage> {
   final List<_PendingKnock> _pendingKnocks = [];
   List<String> _ownedHinooIds = const [];
   Timer? _pendingKnockRefreshTimer;
-  final Map<String, _CasaShareMode> _shareModesByCampanello = {
-    campanelloSirenaId: _CasaShareMode.honoo,
-    campanelloPalombaroId: _CasaShareMode.hinoo,
+  RealtimeChannel? _ownerAccessChannel;
+  RealtimeChannel? _visitorAccessChannel;
+  final Map<String, Set<_CasaShareMode>> _shareModesByCampanello = {
+    campanelloSirenaId: {_CasaShareMode.honoo},
+    campanelloPalombaroId: {_CasaShareMode.hinoo},
   };
 
   static const String campanelloSirenaId = 'campanello_sirena';
@@ -80,6 +83,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
       const Duration(seconds: 60),
       (_) => _refreshPendingKnocks(),
     );
+    _subscribeVisitorAccessChannel();
   }
 
   bool _isCampanelloUnlocked(String id) => _unlockedCampanelli.contains(id);
@@ -167,15 +171,13 @@ class _CampanelliPageState extends State<CampanelliPage> {
       honooId = result;
     }
 
-    showHonooToast(context, message: 'Bussata inviata.');
+    showHonooToast(context, message: 'Bussata inviata. Attendi risposta.');
     await _sendHouseKnock(
       campanello,
       hinooId: hinooId,
       honooId: honooId,
     );
-    await Future.delayed(const Duration(milliseconds: 400));
-    if (!mounted) return;
-    await _showEnterDialog(campanello.id);
+    // waiting realtime approval update
   }
 
   Future<void> _sendHouseKnock(
@@ -218,7 +220,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
   Future<void> _hintSwipeUp() async {
     if (!_pageController.hasClients) return;
     final position = _pageController.position;
-    final double bump = position.viewportDimension * 0.12;
+    final double bump = position.viewportDimension * 0.5;
     final double start = position.pixels;
     final double target = (start + bump)
         .clamp(position.minScrollExtent, position.maxScrollExtent);
@@ -246,20 +248,20 @@ class _CampanelliPageState extends State<CampanelliPage> {
     }
 
     final String shareKey = _shareKeyFor(campanello);
-    _CasaShareMode? mode = _shareModesByCampanello[shareKey];
+    Set<_CasaShareMode>? modes = _shareModesByCampanello[shareKey];
     final user = SupabaseProvider.client.auth.currentUser;
     final bool isOwner = user != null && campanello.ownerId == user.id;
 
-    if (mode == null && isOwner) {
-      final selected = await _showShareModeDialog();
-      if (selected == null || !mounted) return;
-      await _saveShareMode(campanello, selected);
+    if ((modes == null || modes.isEmpty) && isOwner) {
+      final selected = await _showOwnerMultiShareDialog();
+      if (selected == null || selected.isEmpty || !mounted) return;
+      await _saveShareModes(campanello, selected);
       if (!mounted) return;
-      mode = selected;
+      modes = selected;
     }
 
     if (!mounted) return;
-    if (mode == null) {
+    if (modes == null || modes.isEmpty) {
       showHonooToast(
         context,
         message: 'Il padrone di casa non ha ancora scelto cosa condividere.',
@@ -267,38 +269,52 @@ class _CampanelliPageState extends State<CampanelliPage> {
       return;
     }
 
-    _openSharedContent(mode, campanello);
+    if (modes.length == 1) {
+      _openSharedContent(modes.first, campanello);
+      return;
+    }
+
+    final _CasaShareMode? choice =
+        await _showVisitorShareChoiceDialog(context, modes);
+    if (choice != null) {
+      _openSharedContent(choice, campanello);
+    }
   }
 
-  Future<_CasaShareMode?> _showShareModeDialog() {
-    return showDialog<_CasaShareMode>(
+  Future<Set<_CasaShareMode>?> _showOwnerMultiShareDialog() {
+    return showDialog<Set<_CasaShareMode>>(
       context: context,
       barrierDismissible: true,
-      builder: (_) => const _CasaShareDialog(),
+      builder: (_) => const _CasaMultiShareDialog(),
     );
   }
 
-  Future<void> _saveShareMode(
+  
+
+  Future<void> _saveShareModes(
     CampanelloData campanello,
-    _CasaShareMode mode,
+    Set<_CasaShareMode> modes,
   ) async {
     final user = SupabaseProvider.client.auth.currentUser;
     final shareKey = _shareKeyFor(campanello);
 
     if (user == null || campanello.campanelloHinooId == null) {
-      setState(() => _shareModesByCampanello[shareKey] = mode);
+      setState(() => _shareModesByCampanello[shareKey] = modes);
       return;
     }
 
+    final List<String> values = modes.map((m) => m.dbValue).toList();
+    final String? single = values.isNotEmpty ? values.first : null;
     await SupabaseProvider.client.from('house_share_settings').upsert({
       'owner_id': user.id,
       'campanello_hinoo_id': campanello.campanelloHinooId,
-      'share_mode': mode.dbValue,
+      'share_mode': single, // retrocompatibilità
+      'share_modes': values,
       'updated_at': DateTime.now().toIso8601String(),
     }, onConflict: 'campanello_hinoo_id');
 
     if (!mounted) return;
-    setState(() => _shareModesByCampanello[shareKey] = mode);
+    setState(() => _shareModesByCampanello[shareKey] = modes);
   }
 
   void _openSharedContent(_CasaShareMode mode, CampanelloData campanello) {
@@ -467,16 +483,27 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
       final shareRows = await SupabaseProvider.client
           .from('house_share_settings')
-          .select('campanello_hinoo_id,share_mode')
+          .select('campanello_hinoo_id,share_mode,share_modes')
           .in_('campanello_hinoo_id', hinooIds);
 
       for (final row in (shareRows as List)) {
         if (row is! Map) continue;
         final String? hinooId = row['campanello_hinoo_id'] as String?;
-        final String? mode = row['share_mode'] as String?;
-        final parsed = _CasaShareModeMapper.fromDb(mode);
-        if (hinooId != null && parsed != null) {
-          _shareModesByCampanello[hinooId] = parsed;
+        final List<dynamic>? modes = row['share_modes'] as List<dynamic>?;
+        Set<_CasaShareMode> selected = {};
+        if (modes != null) {
+          for (final v in modes) {
+            final parsed = _CasaShareModeMapper.fromDb(v?.toString());
+            if (parsed != null) selected.add(parsed);
+          }
+        }
+        if (selected.isEmpty) {
+          final String? mode = row['share_mode'] as String?;
+          final parsed = _CasaShareModeMapper.fromDb(mode);
+          if (parsed != null) selected = {parsed};
+        }
+        if (hinooId != null && selected.isNotEmpty) {
+          _shareModesByCampanello[hinooId] = selected;
         }
       }
 
@@ -542,6 +569,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
           );
         });
       }
+      _subscribeOwnerAccessChannel();
       if (!_checkedKnocks) {
         _checkedKnocks = true;
         await _checkPendingKnocks(ownedHinooIds);
@@ -558,6 +586,170 @@ class _CampanelliPageState extends State<CampanelliPage> {
         setState(() => _isLoadingUserEntries = false);
       }
     }
+  }
+
+  void _subscribeOwnerAccessChannel() {
+    try {
+      final user = SupabaseProvider.client.auth.currentUser;
+      if (user == null) return;
+      // Re-subscribe if needed
+      _ownerAccessChannel?.unsubscribe();
+      _ownerAccessChannel = SupabaseProvider.client.channel('house-access-owner-${user.id}')
+        ..on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(
+            event: 'INSERT',
+            schema: 'public',
+            table: 'house_access',
+          ),
+          (payload, [ref]) {
+            try {
+              final Map? record = payload is Map ? payload['new'] as Map? : null;
+              if (record == null) return;
+              final String? tag = record['target_house_tag']?.toString();
+              final dynamic granted = record['granted_at'];
+              if (tag == null || tag.isEmpty) return;
+              if (!_ownedHinooIds.contains(tag)) return;
+              if (granted != null) return; // only pending knocks
+              // Append pending knock and show toast
+              final String id = record['id']?.toString() ?? '';
+              final String? raw = record['created_at']?.toString();
+              final DateTime createdAt =
+                  raw == null || raw.isEmpty ? DateTime.now() : DateTime.parse(raw);
+              final String? hinooId = record['hinoo_id']?.toString();
+              final String? honooId = record['honoo_id']?.toString();
+              if (!mounted) return;
+              setState(() {
+                _pendingKnocks.add(
+                  _PendingKnock(
+                    id: id,
+                    targetTag: tag,
+                    createdAt: createdAt,
+                    hinooId: hinooId,
+                    honooId: honooId,
+                  ),
+                );
+                _pendingKnockTags.add(tag);
+              });
+              showHonooToast(context, message: 'Qualcuno ha bussato alla tua casa');
+            } catch (_) {}
+          },
+        )
+        ..on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(
+            event: 'DELETE',
+            schema: 'public',
+            table: 'house_access',
+          ),
+          (payload, [ref]) {
+            // keep local list in sync if deletions happen
+            try {
+              final Map? oldRec = payload is Map ? payload['old'] as Map? : null;
+              if (oldRec == null) return;
+              final String? id = oldRec['id']?.toString();
+              if (id == null) return;
+              if (!mounted) return;
+              setState(() {
+                _pendingKnocks.removeWhere((k) => k.id == id);
+                _pendingKnockTags
+                  ..clear()
+                  ..addAll(_pendingKnocks.map((k) => k.targetTag));
+              });
+            } catch (_) {}
+          },
+        )
+        ..subscribe();
+    } catch (_) {
+      // In test or when Realtime not available, safely ignore
+    }
+  }
+
+  void _subscribeVisitorAccessChannel() {
+    try {
+      final user = SupabaseProvider.client.auth.currentUser;
+      if (user == null) return;
+      _visitorAccessChannel?.unsubscribe();
+      _visitorAccessChannel = SupabaseProvider.client.channel('house-access-visitor-${user.id}')
+        ..on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'house_access',
+            filter: 'visitor_id=eq.${user.id}',
+          ),
+          (payload, [ref]) async {
+            try {
+              final Map? record = payload is Map ? payload['new'] as Map? : null;
+              if (record == null) return;
+              final dynamic granted = record['granted_at'];
+              if (granted == null) return;
+              final String? tag = record['target_house_tag']?.toString();
+              if (tag == null || tag.isEmpty) return;
+              if (!mounted) return;
+              showHonooToast(context, message: 'La casa è stata aperta');
+              await _goToCampanelloByTag(tag);
+              await _hintCampanelloBounce();
+              // unlock the specific campanello for this session
+              final entry = _entryForTag(tag);
+              if (entry != null && mounted) {
+                setState(() => _unlockedCampanelli.add(entry.campanello.id));
+              }
+            } catch (_) {}
+          },
+        )
+        ..subscribe();
+    } catch (_) {
+      // In test or when Realtime not available, safely ignore
+    }
+  }
+
+  Future<void> _goToCampanelloByTag(String tag) async {
+    final List<_CampanelloEntry> campanelli = _buildCampanelli();
+    final int idx = campanelli.indexWhere(
+      (e) => e.campanello.campanelloHinooId == tag,
+    );
+    if (idx < 0) return;
+    // Horizontal PageView uses a pages list with an intro at index 0
+    final int pageIndex = idx + 1;
+    // Ensure we are on the campanelli layer (vertical page 0)
+    if (_pageController.hasClients) {
+      await _pageController.animateToPage(
+        0,
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+      );
+    }
+    if (_campanelloPageController.hasClients) {
+      await _campanelloPageController.animateToPage(
+        pageIndex,
+        duration: const Duration(milliseconds: 240),
+        curve: Curves.easeOutCubic,
+      );
+      if (mounted) setState(() => _campanelloIndex = pageIndex);
+    }
+  }
+
+  Future<void> _hintCampanelloBounce() async {
+    if (!_campanelloPageController.hasClients) return;
+    final position = _campanelloPageController.position;
+    final double bump = (position.viewportDimension * 0.08).clamp(6.0, 60.0);
+    final double start = position.pixels;
+    final double target = (start + bump)
+        .clamp(position.minScrollExtent, position.maxScrollExtent);
+    try {
+      await _campanelloPageController.animateTo(
+        target,
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+      );
+      await _campanelloPageController.animateTo(
+        start,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+      );
+    } catch (_) {}
   }
 
   Future<void> _checkPendingKnocks(List<String> hinooIds) async {
@@ -679,9 +871,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
     HinooDraft? draft,
     Honoo? honoo,
   }) async {
-    final _CasaShareMode? mode = await _showShareModeDialog();
-    if (mode == null || !mounted) return;
-    await _saveShareMode(entry.campanello, mode);
+    final Set<_CasaShareMode>? modes = await _showOwnerMultiShareDialog();
+    if (modes == null || modes.isEmpty || !mounted) return;
+    await _saveShareModes(entry.campanello, modes);
     await SupabaseProvider.client.from('house_access').update({
       'granted_at': DateTime.now().toIso8601String(),
     }).eq('id', knock.id);
@@ -930,6 +1122,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
   @override
   void dispose() {
     _pendingKnockRefreshTimer?.cancel();
+    _ownerAccessChannel?.unsubscribe();
+    _visitorAccessChannel?.unsubscribe();
     _pageController.dispose();
     _campanelloPageController.dispose();
     super.dispose();
@@ -1872,8 +2066,27 @@ extension _CasaShareModeMapper on _CasaShareMode {
   }
 }
 
-class _CasaShareDialog extends StatelessWidget {
-  const _CasaShareDialog();
+// (Rimosso il vecchio dialogo single-choice non più usato)
+
+class _CasaMultiShareDialog extends StatefulWidget {
+  const _CasaMultiShareDialog();
+
+  @override
+  State<_CasaMultiShareDialog> createState() => _CasaMultiShareDialogState();
+}
+
+class _CasaMultiShareDialogState extends State<_CasaMultiShareDialog> {
+  final Set<_CasaShareMode> _selected = {};
+
+  void _toggle(_CasaShareMode mode) {
+    setState(() {
+      if (_selected.contains(mode)) {
+        _selected.remove(mode);
+      } else {
+        _selected.add(mode);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1894,11 +2107,17 @@ class _CasaShareDialog extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 12),
                 child: SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(mode),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
+                  child: OutlinedButton(
+                    onPressed: () => _toggle(mode),
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor:
+                          _selected.contains(mode) ? Colors.white : Colors.transparent,
                       foregroundColor: Colors.black,
+                      side: BorderSide(
+                        color: _selected.contains(mode)
+                            ? Colors.white
+                            : Colors.white24,
+                      ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 14,
@@ -1906,13 +2125,45 @@ class _CasaShareDialog extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      elevation: 0,
                     ),
-                    child: Text(
-                      mode.label,
-                      style: HonooDialogStyles.primaryAction(),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_selected.contains(mode))
+                          const Icon(Icons.check, size: 18),
+                        if (_selected.contains(mode)) const SizedBox(width: 8),
+                        Text(
+                          mode.label,
+                          style: HonooDialogStyles.primaryAction(),
+                        ),
+                      ],
                     ),
                   ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _selected.isEmpty
+                    ? null
+                    : () => Navigator.of(context).pop(_selected),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  'Condividi',
+                  style: HonooDialogStyles.primaryAction(),
                 ),
               ),
             ),
@@ -1930,3 +2181,64 @@ class _CasaShareDialog extends StatelessWidget {
     );
   }
 }
+
+  Future<_CasaShareMode?> _showVisitorShareChoiceDialog(
+    BuildContext context,
+    Set<_CasaShareMode> modes,
+  ) async {
+    return showDialog<_CasaShareMode>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => HonooDialogShell(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Cosa vuoi aprire?',
+                style: HonooDialogStyles.title(),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ...modes.map(
+                (mode) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(mode),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        mode.label,
+                        style: HonooDialogStyles.primaryAction(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: TextButton.styleFrom(foregroundColor: Colors.white54),
+                child: Text(
+                  'Chiudi',
+                  style: HonooDialogStyles.tertiaryAction(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
