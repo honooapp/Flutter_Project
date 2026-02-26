@@ -3,7 +3,7 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 
-const RESOURCES = {"assets/AssetManifest.json": "c412f9afef1f27b3985782879e650038",
+const RESOURCES = {"assets/AssetManifest.json": "c0847aea3e8dad05c5397d4f001a8a6d",
 "assets/assets/sirenaepalombaro.jpg": "035c4a8fed4875fdea42ef29a6d95959",
 "assets/assets/stanza.jpg": "29933221212632dff6ad52334cc9da6a",
 "assets/assets/campanello2.png": "0b9d2091f671d1fe68ad893ca10e2d3d",
@@ -19,6 +19,7 @@ const RESOURCES = {"assets/AssetManifest.json": "c412f9afef1f27b3985782879e65003
 "assets/assets/images/casa_sirena.png": "99e1b5aa543d439adeab1c19c7dbd473",
 "assets/assets/images/casa_palombaro.png": "aec3daa2984255e1d0dd2ec57d2db3d6",
 "assets/assets/images/hinoo_default_1080x1920.png": "7671d72a5b8f654e10c182fe2fbdb427",
+"assets/assets/stanza-02_carta.jpg": "2cf530faa9cecfc2fcc33b3fb86ee3d9",
 "assets/assets/icons/load.svg": "3c33988ef9b2d10c8d46a9e89cbfe338",
 "assets/assets/icons/arrow_left.svg": "d2b022769c93054c77c83a19db611203",
 "assets/assets/icons/dado.png": "bd34185ee999b54456ba78406edcc1e7",
@@ -236,12 +237,12 @@ const RESOURCES = {"assets/AssetManifest.json": "c412f9afef1f27b3985782879e65003
 "assets/packages/golden_toolkit/fonts/Roboto-Regular.ttf": "ac3f799d5bbaf5196fab15ab8de8431c",
 "assets/fonts/MaterialIcons-Regular.otf": "67f4e02883483ee354f698b3e6dac0a9",
 "assets/shaders/ink_sparkle.frag": "f8b80e740d33eb157090be4e995febdf",
-"assets/AssetManifest.bin": "085271f5e8bb1479ba3770a5486760da",
+"assets/AssetManifest.bin": "3d56dbf2049086910b8f26fca647f19c",
 "assets/FontManifest.json": "533db2964f00aa0a56d9c03607f21c52",
-"index.html": "922fce71c9423ee14a9c908728bfa7bb",
-"/": "922fce71c9423ee14a9c908728bfa7bb",
+"index.html": "4c943f816ba155e1bd458576ad845062",
+"/": "4c943f816ba155e1bd458576ad845062",
 "manifest.json": "68268adfd9ea5553746313cc93c5f887",
-"main.dart.js": "ec0237be44ba63a16f0120539d9c8906",
+"main.dart.js": "77299613c01ed120c56b6ee03c3555bc",
 "favicon.ico": "ed54c59b64878d2d06ec2bf2c1a3aa7d",
 "flutter.js": "6fef97aeca90b426343ba6c5c9dc5d4a",
 "canvaskit/canvaskit.wasm": "f48eaf57cada79163ec6dec7929486ea",
@@ -251,7 +252,7 @@ const RESOURCES = {"assets/AssetManifest.json": "c412f9afef1f27b3985782879e65003
 "canvaskit/skwasm.worker.js": "19659053a277272607529ef87acf9d8a",
 "canvaskit/chromium/canvaskit.wasm": "fc18c3010856029414b70cae1afc5cd9",
 "canvaskit/chromium/canvaskit.js": "8c8392ce4a4364cbb240aa09b5652e05",
-"version.json": "36ebf088e792919511c898d53ed38677",
+"version.json": "575fb5da6a11e323046ad3d14f89769a",
 "icons/honoo_icon-512.png": "9ffa8db87af77fe122309e4aeed54971",
 "icons/honoo_icon-192.png": "35b2fb81cb2d422be558c6c7921f597a",
 "icons/honoo_icon-48.png": "ef17724e0caeefe32b66eb71b36265a5"};
