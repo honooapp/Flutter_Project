@@ -299,7 +299,11 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
                               boundaryMargin: const EdgeInsets.all(200),
                               child: SizedBox.expand(
                                 child: _imageProvider == null
-                                    ? Container(color: Colors.white)
+                                    ? Image.asset(
+                                        'assets/stanza-02_carta.jpg',
+                                        fit: BoxFit.cover,
+                                        alignment: Alignment.center,
+                                      )
                                     : Image(
                                         image: _imageProvider!,
                                         fit: BoxFit.cover,
