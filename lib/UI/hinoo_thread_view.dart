@@ -26,11 +26,43 @@ class HinooThreadView extends StatefulWidget {
   State<HinooThreadView> createState() => _HinooThreadViewState();
 }
 
-class _HinooThreadViewState extends State<HinooThreadView> {
+class _HinooThreadViewState extends State<HinooThreadView>
+    with SingleTickerProviderStateMixin {
   final cs.CarouselController _vController = cs.CarouselController();
+  late final AnimationController _introController;
+  late final Animation<double> _introCurve;
+  late final AnimationController _bounceController;
+  late final Animation<double> _bounceCurve;
+  int _lastIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _introController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _introCurve = CurvedAnimation(parent: _introController, curve: Curves.easeOutBack);
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+    );
+    _bounceCurve = CurvedAnimation(parent: _bounceController, curve: Curves.easeOutBack);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _introController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _introController.dispose();
+    _bounceController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    // animazioni già inizializzate in initState
     final List<HinooThreadEntry> sortedReplies = [...widget.replies];
     sortedReplies.sort((a, b) {
       if (a.createdAt == null && b.createdAt == null) return 0;
@@ -43,31 +75,45 @@ class _HinooThreadViewState extends State<HinooThreadView> {
       HinooThreadEntry(
           draft: widget.root, authorId: widget.rootAuthorId, isReply: false),
     ];
-    final slider = cs.CarouselSlider.builder(
-      key: ValueKey(items.length),
-      carouselController: _vController,
-      itemCount: items.length,
-      options: cs.CarouselOptions(
-        scrollDirection: Axis.vertical,
-        height: widget.maxHeight,
-        viewportFraction: 1.0,
-        enableInfiniteScroll: false,
-        padEnds: false,
-        enlargeCenterPage: false,
-        scrollPhysics: const BouncingScrollPhysics(),
-      ),
-      itemBuilder: (context, index, realIdx) {
-          final entry = items[index];
-          final Widget viewer = HinooViewer(
-            draft: entry.draft,
-            maxHeight: widget.maxHeight,
-            maxWidth: widget.maxWidth,
-            isReply: entry.isReply,
-            onDownloadTap: widget.onDownloadTap,
-          );
-          return viewer;
-      },
-    );
+    final slider = LayoutBuilder(builder: (ctx, c) {
+      final double h = c.maxHeight.isFinite ? c.maxHeight : widget.maxHeight;
+      final dy = (1.0 - _introCurve.value) * 12.0 - (_bounceCurve.value * 6.0);
+      final scale = 1.0 - (1.0 - _introCurve.value) * 0.01 - (_bounceCurve.value * 0.005);
+      return Transform.translate(
+        offset: Offset(0, -dy),
+        child: Transform.scale(
+          scale: scale.clamp(0.97, 1.0),
+          child: cs.CarouselSlider.builder(
+            key: ValueKey(items.length),
+            carouselController: _vController,
+            itemCount: items.length,
+            options: cs.CarouselOptions(
+              scrollDirection: Axis.vertical,
+              height: h,
+              viewportFraction: 1.0,
+              enableInfiniteScroll: false,
+              padEnds: false,
+              enlargeCenterPage: false,
+              scrollPhysics: const BouncingScrollPhysics(),
+              onPageChanged: (index, reason) {
+                if (index > _lastIndex) _bounceController.forward(from: 0);
+                _lastIndex = index;
+              },
+            ),
+            itemBuilder: (context, index, realIdx) {
+              final entry = items[index];
+              return HinooViewer(
+                draft: entry.draft,
+                maxHeight: widget.maxHeight,
+                maxWidth: widget.maxWidth,
+                isReply: entry.isReply,
+                onDownloadTap: widget.onDownloadTap,
+              );
+            },
+          ),
+        ),
+      );
+    });
 
     final bool hasReplies = items.length > 1;
     return AnimatedSwitcher(

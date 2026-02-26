@@ -28,9 +28,15 @@ class HonooThreadView extends StatefulWidget {
   State<HonooThreadView> createState() => _HonooThreadViewState();
 }
 
-class _HonooThreadViewState extends State<HonooThreadView> {
+class _HonooThreadViewState extends State<HonooThreadView>
+    with SingleTickerProviderStateMixin {
   late final HonooThreadLoader _loader;
   final _vController = cs.CarouselController();
+  late final AnimationController _introController;
+  late final Animation<double> _introCurve;
+  late final AnimationController _bounceController;
+  late final Animation<double> _bounceCurve;
+  int _lastIndex = 0;
 
   String _honooIdentity(Honoo honoo) {
     final String? dbId = honoo.dbId;
@@ -48,6 +54,19 @@ class _HonooThreadViewState extends State<HonooThreadView> {
   void initState() {
     super.initState();
     _loader = HonooThreadLoader()..load(widget.root);
+    _introController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _introCurve = CurvedAnimation(parent: _introController, curve: Curves.easeOutBack);
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+    );
+    _bounceCurve = CurvedAnimation(parent: _bounceController, curve: Curves.easeOutBack);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _introController.forward();
+    });
   }
 
   @override
@@ -61,6 +80,8 @@ class _HonooThreadViewState extends State<HonooThreadView> {
   @override
   void dispose() {
     _loader.dispose();
+    _introController.dispose();
+    _bounceController.dispose();
     super.dispose();
   }
 
@@ -123,7 +144,13 @@ class _HonooThreadViewState extends State<HonooThreadView> {
               builder: (ctx, c) {
                 final double h = c.maxHeight.isFinite ? c.maxHeight : MediaQuery.of(ctx).size.height;
                 final double w = c.maxWidth.isFinite ? c.maxWidth : MediaQuery.of(ctx).size.width;
-                return SizedBox(
+                final double dy = (1.0 - _introCurve.value) * 12.0 - (_bounceCurve.value * 6.0);
+                final double scale = 1.0 - (1.0 - _introCurve.value) * 0.01 - (_bounceCurve.value * 0.005);
+                return Transform.translate(
+                  offset: Offset(0, -dy),
+                  child: Transform.scale(
+                    scale: scale.clamp(0.97, 1.0),
+                    child: SizedBox(
                   width: w,
                   height: h,
                   child: KeyedSubtree(
@@ -139,6 +166,12 @@ class _HonooThreadViewState extends State<HonooThreadView> {
                         padEnds: false,
                         enlargeCenterPage: false,
                         scrollPhysics: const BouncingScrollPhysics(),
+                        onPageChanged: (index, reason) {
+                          if (index > _lastIndex) {
+                            _bounceController.forward(from: 0);
+                          }
+                          _lastIndex = index;
+                        },
                       ),
                       itemBuilder: (context, index, realIdx) {
                         final honoo = ordered[index];
@@ -149,6 +182,7 @@ class _HonooThreadViewState extends State<HonooThreadView> {
                       },
                     ),
                   ),
+                ),
                 );
               },
             );
