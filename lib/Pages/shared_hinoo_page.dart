@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Entities/hinoo.dart';
+import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
@@ -11,8 +12,12 @@ import 'package:honoo/UI/thread_layout_scaffold.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
+import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'new_hinoo_page.dart';
+import 'new_honoo_page.dart';
 
 import 'home_page.dart';
+import 'chest_page.dart';
 import 'placeholder_page.dart';
 
 class SharedHinooPage extends StatefulWidget {
@@ -25,7 +30,7 @@ class SharedHinooPage extends StatefulWidget {
 }
 
 class _SharedHinooPageState extends State<SharedHinooPage> {
-  List<HinooDraft> _items = const [];
+  List<_SharedHinooItem> _items = const [];
   bool _isLoading = true;
   int _currentIndex = 0;
   final cs.CarouselController _carouselController = cs.CarouselController();
@@ -41,25 +46,26 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
     try {
       final rows = await SupabaseProvider.client
           .from('hinoo')
-          .select('pages,type,recipient_tag,created_at')
+          .select('id,pages,type,recipient_tag,created_at')
           .eq('user_id', widget.ownerId)
           .eq('type', 'personal')
           .order('created_at', ascending: false);
 
-      final list = <HinooDraft>[];
+      final list = <_SharedHinooItem>[];
       for (final row in (rows as List)) {
         final pages = row['pages'];
         if (pages is! List) continue;
-        list.add(
-          HinooDraft(
+        final draft = HinooDraft(
             pages: pages
                 .whereType<Map<String, dynamic>>()
                 .map((entry) => HinooSlide.fromJson(entry))
                 .toList(),
             type: HinooType.personal,
             recipientTag: row['recipient_tag'] as String?,
-          ),
-        );
+          );
+        final String id = row['id']?.toString() ?? '';
+        if (id.isEmpty) continue;
+        list.add(_SharedHinooItem(id: id, draft: draft));
       }
 
       if (!mounted) return;
@@ -130,7 +136,7 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                             width: viewW,
                             height: availableH,
                             child: HinooViewer(
-                              draft: item,
+                              draft: item.draft,
                               maxHeight: availableH,
                               maxWidth: viewW,
                             ),
@@ -183,9 +189,144 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
               tooltip: 'Home',
               onPressed: _goHome,
             ),
+            if (!_isLoading && _items.isNotEmpty)
+              ResponsiveFooterAction(
+                asset: 'assets/icons/reply.svg',
+                semanticsLabel: 'Rispondi',
+                size: footerIconSize,
+                splashRadius: 25,
+                tooltip: 'Rispondi',
+                onPressed: () async {
+                  final ctx = context;
+                  final nav = Navigator.of(ctx);
+                  final _ReplyChoice? choice = await showDialog<_ReplyChoice>(
+                    context: ctx,
+                    barrierDismissible: true,
+                    builder: (_) => HonooDialogShell(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Vuoi rispondere con\n un honoo o un hinoo?',
+                              style: HonooDialogStyles.title(),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'La risposta verrà mostrata nelle conversazioni dello Scrigno.',
+                              style: HonooDialogStyles.tertiaryAction(),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () =>
+                                    Navigator.of(ctx).pop(_ReplyChoice.honoo),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: Text(
+                                  'honoo',
+                                  style: HonooDialogStyles.primaryAction(),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () =>
+                                    Navigator.of(ctx).pop(_ReplyChoice.hinoo),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: Text(
+                                  'hinoo',
+                                  style: HonooDialogStyles.primaryAction(),
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(),
+                              style: TextButton.styleFrom(
+                                  foregroundColor: Colors.white54),
+                              child: Text(
+                                'Annulla',
+                                style: HonooDialogStyles.tertiaryAction(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                  if (choice == null || !mounted) return;
+                  final _SharedHinooItem current = _items[_currentIndex];
+                  if (choice == _ReplyChoice.hinoo) {
+                    await nav.push(
+                      MaterialPageRoute(
+                        builder: (_) => NewHinooPage(
+                          forcedType: HinooType.answer,
+                          recipientTag: widget.ownerId,
+                          replyTo: current.id,
+                        ),
+                      ),
+                    );
+                    if (!mounted) return;
+                    await nav.push(
+                      MaterialPageRoute(
+                        builder: (_) => const ChestPage(focusReplies: true),
+                      ),
+                    );
+                  } else {
+                    // Risposta con honoo indirizzata al proprietario
+                    await nav.push(
+                      MaterialPageRoute(
+                        builder: (_) => NewHonooPage(
+                          forcedType: HonooType.answer,
+                          recipientTag: widget.ownerId,
+                          returnSavedId: false,
+                        ),
+                      ),
+                    );
+                    if (!mounted) return;
+                    await nav.push(
+                      MaterialPageRoute(
+                        builder: (_) => const ChestPage(focusReplies: true),
+                      ),
+                    );
+                  }
+                },
+              ),
           ],
         );
       },
     );
   }
 }
+
+class _SharedHinooItem {
+  final String id;
+  final HinooDraft draft;
+
+  const _SharedHinooItem({required this.id, required this.draft});
+}
+
+enum _ReplyChoice { honoo, hinoo }

@@ -11,9 +11,14 @@ import 'package:honoo/UI/thread_layout_scaffold.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
+import 'package:honoo/Entities/hinoo.dart';
+import 'package:honoo/Widgets/honoo_dialogs.dart';
 
 import 'home_page.dart';
 import 'placeholder_page.dart';
+import 'chest_page.dart';
+import 'reply_honoo_page.dart';
+import 'new_hinoo_page.dart';
 
 class SharedHonooPage extends StatefulWidget {
   const SharedHonooPage({super.key, required this.ownerId});
@@ -161,11 +166,135 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
               tooltip: 'Home',
               onPressed: _goHome,
             ),
+            if (!_isLoading && _items.isNotEmpty)
+              ResponsiveFooterAction(
+                asset: 'assets/icons/reply.svg',
+                semanticsLabel: 'Rispondi',
+                size: footerIconSize,
+                splashRadius: 25,
+                tooltip: 'Rispondi',
+                onPressed: () async {
+                  final ctx = context;
+                  final nav = Navigator.of(ctx);
+                  final messenger = ScaffoldMessenger.of(ctx);
+                  final Honoo current = _items[_currentIndex];
+                  final _ReplyChoice? choice = await showDialog<_ReplyChoice>(
+                    context: ctx,
+                    barrierDismissible: true,
+                    builder: (_) => HonooDialogShell(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Vuoi rispondere con\n un honoo o un hinoo?',
+                              style: HonooDialogStyles.title(),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'La risposta verrà mostrata nelle conversazioni dello Scrigno.',
+                              style: HonooDialogStyles.tertiaryAction(),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () => Navigator.of(ctx).pop(_ReplyChoice.honoo),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: Text(
+                                  'honoo',
+                                  style: HonooDialogStyles.primaryAction(),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () => Navigator.of(ctx).pop(_ReplyChoice.hinoo),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: Text(
+                                  'hinoo',
+                                  style: HonooDialogStyles.primaryAction(),
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(),
+                              style: TextButton.styleFrom(foregroundColor: Colors.white54),
+                              child: Text(
+                                'Annulla',
+                                style: HonooDialogStyles.tertiaryAction(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                  if (choice == null || !mounted) return;
+                  if (choice == _ReplyChoice.honoo) {
+                    final sent = await nav.push<bool>(
+                       MaterialPageRoute(
+                         builder: (_) => ReplyHonooPage(
+                           originalHonoo: current,
+                           initialHintText: 'Scrivi la tua risposta...',
+                           initialImageHint: 'Aggiungi un’immagine (opzionale)',
+                         ),
+                       ),
+                     );
+                    if (sent == true && mounted) {
+                      messenger.hideCurrentSnackBar();
+                      await nav.push(
+                        MaterialPageRoute(
+                          builder: (_) => const ChestPage(focusReplies: true),
+                        ),
+                      );
+                    }
+                  } else if (choice == _ReplyChoice.hinoo) {
+                    await nav.push(
+                      MaterialPageRoute(
+                        builder: (_) => NewHinooPage(
+                          forcedType: HinooType.answer,
+                          recipientTag: current.userId,
+                        ),
+                      ),
+                    );
+                    if (!mounted) return;
+                    await nav.push(
+                      MaterialPageRoute(
+                        builder: (_) => const ChestPage(focusReplies: true),
+                      ),
+                    );
+                  }
+                },
+              ),
           ],
         );
       },
     );
   }
 }
+
+enum _ReplyChoice { honoo, hinoo }
 
 // no inline cover; show HonooCard with normal metrics

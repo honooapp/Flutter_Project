@@ -9,6 +9,7 @@
 - Schema: `house_share_settings.share_modes text[]` con backfill e retro‑compatibilità su `share_mode` (migrazione in `supabase/migrations/20260226211500_add_share_modes_to_house_share_settings.sql`).
 - Robustezza test: sottoscrizioni Realtime avvolte in try/catch per compatibilità con MockSupabaseClient.
 - Config: `lib/main.dart` ora legge `SUPABASE_URL`/`SUPABASE_ANON_KEY` via `env/env.dart`.
+- Rispondi dai contenuti condivisi: dalle pagine condivise è possibile rispondere sia allo stesso tipo (Honoo→Honoo, Hinoo→Hinoo) sia “incrociato” (Honoo→Hinoo e Hinoo→Honoo, indirizzato al proprietario). Dopo l’invio si apre lo Scrigno con focus conversazioni.
 
 ## v2026-02-23.21 — Layout unificato Campanelli (header + full‑width/availableH + footer)
 
