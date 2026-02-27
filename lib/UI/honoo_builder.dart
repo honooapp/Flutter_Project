@@ -8,6 +8,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:honoo/Utility/heic_converter.dart' as heic;
 
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
@@ -175,7 +176,15 @@ class HonooBuilderState extends State<HonooBuilder> {
           await picker.pickImage(source: ImageSource.gallery);
       if (selected == null) return;
 
-      final Uint8List bytes = await selected.readAsBytes();
+      Uint8List bytes = await selected.readAsBytes();
+      // Gestione HEIC su Web: converti a PNG se possibile
+      final name = (selected.name).toLowerCase();
+      if (name.endsWith('.heic') || name.endsWith('.heif')) {
+        final converted = await heic.heicToPng(bytes);
+        if (converted != null && converted.isNotEmpty) {
+          bytes = converted;
+        }
+      }
 
       _imageController.value = Matrix4.identity();
 

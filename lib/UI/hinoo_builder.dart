@@ -20,6 +20,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import '../Services/hinoo_storage_uploader.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'package:honoo/Utility/heic_converter.dart' as heic;
 import 'package:honoo/UI/HinooBuilder/dialogs/anteprima_png.dart';
 import 'package:honoo/UI/HinooBuilder/dialogs/download_hinoo_dialog.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
@@ -779,7 +780,14 @@ class _HinooBuilderState extends State<HinooBuilder> {
       if (selected == null) return;
 
       // Preview locale immediata
-      final Uint8List bytes = await selected.readAsBytes();
+      Uint8List bytes = await selected.readAsBytes();
+      final name = (selected.name).toLowerCase();
+      if (name.endsWith('.heic') || name.endsWith('.heif')) {
+        final converted = await heic.heicToPng(bytes);
+        if (converted != null && converted.isNotEmpty) {
+          bytes = converted;
+        }
+      }
       final Matrix4 initialMatrix = await _fitBackgroundToCanvas(bytes);
       setState(() {
         _localBgPreviewBytes = bytes;
