@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -345,14 +346,14 @@ class _AdminMoonSearchPageState extends State<AdminMoonSearchPage> {
     );
   }
 
-  Size _fitAspect(double maxW, double maxH, double aspect) {
+  ui.Size _fitAspect(double maxW, double maxH, double aspect) {
     double w = maxW;
     double h = w / aspect;
     if (h > maxH) {
       h = maxH;
       w = h * aspect;
     }
-    return Size(w, h);
+    return ui.Size(w, h);
   }
 }
 
@@ -378,4 +379,3 @@ class _MoonSearchItem {
     return hinoo(this.hinoo!);
   }
 }
-
