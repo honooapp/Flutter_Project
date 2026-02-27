@@ -23,6 +23,19 @@ class HinooStorageUploader {
     return allowed.contains(e) ? e : 'jpg';
   }
 
+  static String _contentTypeForExt(String ext) {
+    switch (ext) {
+      case 'png':
+        return 'image/png';
+      case 'webp':
+        return 'image/webp';
+      case 'jpg':
+      case 'jpeg':
+      default:
+        return 'image/jpeg';
+    }
+  }
+
   static String _normalizeFolder(String? folder) {
     switch (folder) {
       case 'backgrounds':
@@ -57,9 +70,10 @@ class HinooStorageUploader {
     await _client.storage.from(bucket).uploadBinary(
           path,
           bytes,
-          fileOptions: const FileOptions(
+          fileOptions: FileOptions(
             upsert: false,
             cacheControl: 'public, max-age=31536000',
+            contentType: _contentTypeForExt(safeExt),
           ),
         );
 

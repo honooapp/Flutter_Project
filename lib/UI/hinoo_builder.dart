@@ -825,9 +825,10 @@ class _HinooBuilderState extends State<HinooBuilder> {
         return; // opzionale: consenti preview locale senza upload
       }
 
-      final ext = _extensionFromName(originalName);
+      // Converte sempre in PNG per compatibilità (HEIC/WEBP su web/mobile)
+      final Uint8List pngBytes = await _toPng(bytes);
       final url = await HinooStorageUploader.uploadBackground(
-          bytes: bytes, ext: ext, userId: user.id);
+          bytes: pngBytes, ext: 'png', userId: user.id);
       setState(() {
         _bgPublicUrl = url;
       });
@@ -853,6 +854,18 @@ class _HinooBuilderState extends State<HinooBuilder> {
         );
       }
     }
+  }
+
+  Future<Uint8List> _toPng(Uint8List src) async {
+    try {
+      final codec = await ui.instantiateImageCodec(src);
+      final frame = await codec.getNextFrame();
+      final ui.Image image = frame.image;
+      final bd = await image.toByteData(format: ui.ImageByteFormat.png);
+      final bytes = bd?.buffer.asUint8List();
+      if (bytes != null && bytes.isNotEmpty) return bytes;
+    } catch (_) {}
+    return src; // fallback: restituisci originale
   }
 
   Future<Matrix4> _fitBackgroundToCanvas(Uint8List bytes) async {
