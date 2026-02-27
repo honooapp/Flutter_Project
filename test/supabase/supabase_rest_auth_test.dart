@@ -7,8 +7,15 @@ import '_env.dart';
 
 void main() {
   group('Supabase REST auth', () {
+    final hasEnv = env('SUPABASE_URL').isNotEmpty &&
+        env('SUPABASE_ANON_KEY').isNotEmpty &&
+        env('TEST_EMAIL').isNotEmpty &&
+        env('TEST_PASSWORD').isNotEmpty;
     test('signInWithPassword (GoTrue)',
-        timeout: const Timeout(Duration(seconds: 25)), () async {
+        timeout: const Timeout(Duration(seconds: 25)),
+        skip: hasEnv
+            ? false
+            : 'Skipping: SUPABASE_URL/ANON_KEY/TEST_EMAIL/TEST_PASSWORD missing', () async {
       final url = env('SUPABASE_URL');
       final key = env('SUPABASE_ANON_KEY');
       final email = env('TEST_EMAIL');

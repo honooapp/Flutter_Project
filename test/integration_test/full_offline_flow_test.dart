@@ -74,6 +74,8 @@ void main() {
     expect(chestButton, findsOneWidget);
     await tester.tap(chestButton);
     await tester.pumpAndSettle();
+    // Extra attesa per permettere a caroselli/transizioni di stabilizzarsi
+    await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.byType(ChestPage), findsOneWidget);
     expect(find.textContaining('Test chest flow'), findsWidgets);

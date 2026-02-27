@@ -5,8 +5,10 @@ import '_env.dart';
 
 void main() {
   group('Supabase REST storage', () {
+    final hasEnv = env('TEST_IMAGE_URL').isNotEmpty;
     test('Public image reachable',
-        timeout: const Timeout(Duration(seconds: 20)), () async {
+        timeout: const Timeout(Duration(seconds: 20)),
+        skip: hasEnv ? false : 'Skipping: TEST_IMAGE_URL mancante', () async {
       final url = env('TEST_IMAGE_URL');
       expect(url, isNotEmpty, reason: 'TEST_IMAGE_URL mancante');
 

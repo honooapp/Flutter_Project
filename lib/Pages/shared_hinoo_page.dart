@@ -14,6 +14,7 @@ import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'package:honoo/Widgets/busy_overlay.dart';
 import 'new_hinoo_page.dart';
 import 'new_honoo_page.dart';
 
@@ -332,32 +333,8 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                       // ignore: use_build_context_synchronously
                       context: ctx,
                       barrierDismissible: false,
-                      builder: (_) => const HonooDialogShell(
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(24, 24, 24, 16),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(height: 8),
-                              SizedBox(
-                                width: 28,
-                                height: 28,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  valueColor: AlwaysStoppedAnimation(Colors.white),
-                                ),
-                              ),
-                              SizedBox(height: 16),
-                              Text(
-                                'Apro la conversazione...',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(color: Colors.white70),
-                              ),
-                            ],
-                        ),
-                      ),
-                    ),
-                  );
+                      builder: (_) => const BusyOverlay(message: 'Apro la conversazione...'),
+                    );
                     // ignore: use_build_context_synchronously
                     await nav.push(
                       MaterialPageRoute(

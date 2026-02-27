@@ -22,6 +22,7 @@ import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:honoo/Widgets/busy_overlay.dart';
 
 import '../../Pages/home_page.dart';
 import '../../Pages/shared_conversations_page.dart';
@@ -88,38 +89,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
     await showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (_) =>
-          // ignore: prefer_const_constructors
-          HonooDialogShell(
-        child:
-            // ignore: prefer_const_constructors
-            Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-          child:
-              // ignore: prefer_const_constructors
-              Column(
-            mainAxisSize: MainAxisSize.min,
-            // ignore: prefer_const_literals_to_create_immutables
-            children: [
-              const SizedBox(height: 8),
-              const SizedBox(
-                width: 28,
-                height: 28,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  valueColor: AlwaysStoppedAnimation(Colors.white),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Attendi...',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white70),
-              ),
-            ],
-          ),
-        ),
-      ),
+      builder: (_) => BusyOverlay(message: message),
     );
   }
 

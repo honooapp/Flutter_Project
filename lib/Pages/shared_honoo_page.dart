@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:honoo/Widgets/busy_overlay.dart';
 import 'package:flutter/services.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Services/honoo_service.dart';
@@ -317,31 +318,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                         // ignore: use_build_context_synchronously
                         context: ctx,
                         barrierDismissible: false,
-                        builder: (_) => const HonooDialogShell(
-                          child: Padding(
-                            padding: EdgeInsets.fromLTRB(24, 24, 24, 16),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(height: 8),
-                                SizedBox(
-                                  width: 28,
-                                  height: 28,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    valueColor: AlwaysStoppedAnimation(Colors.white),
-                                  ),
-                                ),
-                                SizedBox(height: 16),
-                                Text(
-                                  'Apro la conversazione...',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.white70),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        builder: (_) => const BusyOverlay(message: 'Apro la conversazione...'),
                       );
                       messenger.hideCurrentSnackBar();
                       // ignore: use_build_context_synchronously
@@ -363,31 +340,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                       // ignore: use_build_context_synchronously
                       context: ctx,
                       barrierDismissible: false,
-                      builder: (_) => const HonooDialogShell(
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(24, 24, 24, 16),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(height: 8),
-                              SizedBox(
-                                width: 28,
-                                height: 28,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  valueColor: AlwaysStoppedAnimation(Colors.white),
-                                ),
-                              ),
-                              SizedBox(height: 16),
-                              Text(
-                                'Apro la conversazione...',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(color: Colors.white70),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      builder: (_) => const BusyOverlay(message: 'Apro la conversazione...'),
                     );
                     await nav.push(
                       MaterialPageRoute(
