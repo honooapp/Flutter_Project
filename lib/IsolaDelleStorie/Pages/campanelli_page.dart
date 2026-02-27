@@ -38,6 +38,12 @@ class CampanelliPage extends StatefulWidget {
 }
 
 class _CampanelliPageState extends State<CampanelliPage> {
+  // Animations: centralize durations/curves to avoid magic numbers
+  static const Duration _kAnimFast = Duration(milliseconds: 220);
+  static const Duration _kAnimMed = Duration(milliseconds: 240);
+  static const Duration _kBounceIn = Duration(milliseconds: 180);
+  static const Duration _kBounceOut = Duration(milliseconds: 200);
+  static const Curve _kCurve = Curves.easeOutCubic;
   int _campanelloIndex = 0;
   int _verticalPageIndex = 0;
   int _lastHouseCampanelloIndex = 1;
@@ -49,6 +55,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
   bool _checkedKnocks = false;
   bool _checkingPendingKnocks = false;
   bool _isKnocking = false;
+  DateTime? _lastKnockToastAt;
   final Set<String> _pendingKnockTags = {};
   final List<_PendingKnock> _pendingKnocks = [];
   List<String> _ownedHinooIds = const [];
@@ -81,14 +88,21 @@ class _CampanelliPageState extends State<CampanelliPage> {
     await showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => HonooDialogShell(
-        child: Padding(
+      builder: (_) =>
+          // ignore: prefer_const_constructors
+          HonooDialogShell(
+        child:
+            // ignore: prefer_const_constructors
+            Padding(
           padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-          child: Column(
+          child:
+              // ignore: prefer_const_constructors
+              Column(
             mainAxisSize: MainAxisSize.min,
-            children: const [
-              SizedBox(height: 8),
-              SizedBox(
+            // ignore: prefer_const_literals_to_create_immutables
+            children: [
+              const SizedBox(height: 8),
+              const SizedBox(
                 width: 28,
                 height: 28,
                 child: CircularProgressIndicator(
@@ -96,8 +110,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
                   valueColor: AlwaysStoppedAnimation(Colors.white),
                 ),
               ),
-              SizedBox(height: 16),
-              Text(
+              const SizedBox(height: 16),
+              const Text(
                 'Attendi...',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white70),
@@ -164,15 +178,13 @@ class _CampanelliPageState extends State<CampanelliPage> {
     final int current = page?.round() ?? controller.initialPage;
     final int target = (current + delta).clamp(0, maxIndex);
     if (target == current) return;
-    controller.animateToPage(
-      target,
-      duration: const Duration(milliseconds: 220),
-      curve: Curves.easeOutCubic,
-    );
+    controller.animateToPage(target, duration: _kAnimFast, curve: _kCurve);
   }
 
   Future<void> _handleKnock(CampanelloData campanello) async {
     if (_isKnocking) return;
+    // Light haptic feedback on knock intent
+    try { HapticFeedback.lightImpact(); } catch (_) {}
     if (_isCampanelloUnlocked(campanello.id)) {
       await _showEnterDialog(campanello.id);
       return;
@@ -282,16 +294,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
     final double target = (start + bump)
         .clamp(position.minScrollExtent, position.maxScrollExtent);
 
-    await _pageController.animateTo(
-      target,
-      duration: const Duration(milliseconds: 220),
-      curve: Curves.easeOutCubic,
-    );
-    await _pageController.animateTo(
-      start,
-      duration: const Duration(milliseconds: 240),
-      curve: Curves.easeOutCubic,
-    );
+    await _pageController.animateTo(target, duration: _kAnimFast, curve: _kCurve);
+    await _pageController.animateTo(start, duration: _kAnimMed, curve: _kCurve);
   }
 
   String _shareKeyFor(CampanelloData campanello) {
@@ -657,14 +661,27 @@ class _CampanelliPageState extends State<CampanelliPage> {
       if (user == null) return;
       // Re-subscribe if needed
       _ownerAccessChannel?.unsubscribe();
+      // Build filter to limit INSERT events to owned target tags
+      ChannelFilter insertFilter;
+      if (_ownedHinooIds.isNotEmpty) {
+        final list = _ownedHinooIds.join(',');
+        insertFilter = ChannelFilter(
+          event: 'INSERT',
+          schema: 'public',
+          table: 'house_access',
+          filter: 'target_house_tag=in.($list)',
+        );
+      } else {
+        insertFilter = ChannelFilter(
+          event: 'INSERT',
+          schema: 'public',
+          table: 'house_access',
+        );
+      }
       _ownerAccessChannel = SupabaseProvider.client.channel('house-access-owner-${user.id}')
         ..on(
           RealtimeListenTypes.postgresChanges,
-          ChannelFilter(
-            event: 'INSERT',
-            schema: 'public',
-            table: 'house_access',
-          ),
+          insertFilter,
           (payload, [ref]) {
             try {
               final Map? record = payload is Map ? payload['new'] as Map? : null;
@@ -674,7 +691,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
               if (tag == null || tag.isEmpty) return;
               if (!_ownedHinooIds.contains(tag)) return;
               if (granted != null) return; // only pending knocks
-              // Append pending knock and show toast
+              // Append pending knock and show toast (debounced)
               final String id = record['id']?.toString() ?? '';
               final String? raw = record['created_at']?.toString();
               final DateTime createdAt =
@@ -694,7 +711,12 @@ class _CampanelliPageState extends State<CampanelliPage> {
                 );
                 _pendingKnockTags.add(tag);
               });
-              showHonooToast(context, message: 'Qualcuno ha bussato alla tua casa');
+              final now = DateTime.now();
+              if (_lastKnockToastAt == null ||
+                  now.difference(_lastKnockToastAt!) > const Duration(seconds: 3)) {
+                _lastKnockToastAt = now;
+                showHonooToast(context, message: 'Qualcuno ha bussato alla tua casa');
+              }
             } catch (_) {}
           },
         )
@@ -752,6 +774,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
               if (tag == null || tag.isEmpty) return;
               if (!mounted) return;
               showHonooToast(context, message: 'La casa è stata aperta');
+              // Light haptic feedback on house open
+              try { HapticFeedback.lightImpact(); } catch (_) {}
               await _goToCampanelloByTag(tag);
               await _hintCampanelloBounce();
               // unlock the specific campanello for this session
@@ -802,16 +826,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
     final double target = (start + bump)
         .clamp(position.minScrollExtent, position.maxScrollExtent);
     try {
-      await _campanelloPageController.animateTo(
-        target,
-        duration: const Duration(milliseconds: 180),
-        curve: Curves.easeOutCubic,
-      );
-      await _campanelloPageController.animateTo(
-        start,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutCubic,
-      );
+      await _campanelloPageController.animateTo(target, duration: _kBounceIn, curve: _kCurve);
+      await _campanelloPageController.animateTo(start, duration: _kBounceOut, curve: _kCurve);
     } catch (_) {}
   }
 
@@ -945,7 +961,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
         }).eq('id', knock.id);
       } catch (e) {
         debugPrint('house_access grant error: $e');
-        showHonooToast(context, message: 'Operazione non riuscita. Ritenta.');
+        if (mounted) {
+          showHonooToast(context, message: 'Operazione non riuscita. Ritenta.');
+        }
         return _hideBusyOverlay();
       }
     } finally {
@@ -974,6 +992,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
         ..addAll(_pendingKnocks.map((item) => item.targetTag));
     });
     showHonooToast(context, message: 'Casa aperta.');
+    // Light haptic on owner approval as further confirmation
+    try { HapticFeedback.lightImpact(); } catch (_) {}
   }
 
   Future<void> _openPendingKnock(_PendingKnock knock) async {
@@ -2266,13 +2286,12 @@ class _CasaMultiShareDialogState extends State<_CasaMultiShareDialog> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         width: 16,
                         height: 16,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor:
-                              const AlwaysStoppedAnimation(Colors.black),
+                          valueColor: AlwaysStoppedAnimation(Colors.black),
                           backgroundColor: Colors.white,
                         ),
                       ),
@@ -2290,11 +2309,12 @@ class _CasaMultiShareDialogState extends State<_CasaMultiShareDialog> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () async {
+                    final nav = Navigator.of(context);
                     setState(() => _saving = true);
                     try {
                       await widget.onConfirm(_selected);
                       if (!mounted) return;
-                      Navigator.of(context).pop(_selected);
+                      nav.pop(_selected);
                     } finally {
                       if (mounted) setState(() => _saving = false);
                     }

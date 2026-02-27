@@ -55,10 +55,10 @@ void main() {
     await tester.enterText(tf, '“risposta di prova”');
     await tester.pump();
 
-    final sendButton = find.textContaining('Invia', findRichText: true);
-    expect(sendButton, findsWidgets);
+    final sendButton = find.bySemanticsLabel('Invia risposta');
+    expect(sendButton, findsOneWidget);
 
-    await tester.tap(sendButton.first);
+    await tester.tap(sendButton);
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();

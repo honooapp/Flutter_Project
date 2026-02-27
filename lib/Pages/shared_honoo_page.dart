@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Services/honoo_service.dart';
 import 'package:honoo/UI/honoo_card.dart';
@@ -126,10 +127,9 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
         final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
             layoutMode == ResponsiveLayoutMode.wideDesktop ||
             layoutMode == ResponsiveLayoutMode.largeDesktop;
-        if (!isDesktop || _items.length <= 1 || _isLoading) {
-          return content;
-        }
-        return DesktopCarouselArrows(
+        Widget base = content;
+        if (isDesktop && _items.length > 1 && !_isLoading) {
+          base = DesktopCarouselArrows(
           canPrev: _currentIndex > 0,
           canNext: _currentIndex < _items.length - 1,
           onPrev: () => _carouselController.animateToPage(
@@ -144,6 +144,35 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
           ),
           arrowColor: Colors.white,
           child: content,
+          );
+        }
+        return Actions(
+          actions: <Type, Action<Intent>>{
+            _ArrowIntent: CallbackAction<_ArrowIntent>(
+              onInvoke: (intent) {
+                if (!isDesktop) return null;
+                final int target = (_currentIndex + intent.delta)
+                    .clamp(0, (_items.length - 1));
+                if (target == _currentIndex) return null;
+                _carouselController.animateToPage(
+                  target,
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOutCubic,
+                );
+                return null;
+              },
+            ),
+          },
+          child: Shortcuts(
+            shortcuts: <LogicalKeySet, Intent>{
+              LogicalKeySet(LogicalKeyboardKey.arrowLeft): const _ArrowIntent(-1),
+              LogicalKeySet(LogicalKeyboardKey.arrowRight): const _ArrowIntent(1),
+            },
+            child: Focus(
+              autofocus: true,
+              child: base,
+            ),
+          ),
         );
       },
       footerBuilder: (context, mode, footerIconSize, footerGap,
@@ -180,6 +209,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                   final nav = Navigator.of(ctx);
                   final messenger = ScaffoldMessenger.of(ctx);
                   final Honoo current = _items[_currentIndex];
+                  bool locked = false;
                   final _ReplyChoice? choice = await showDialog<_ReplyChoice>(
                     context: ctx,
                     barrierDismissible: true,
@@ -204,7 +234,11 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: () => Navigator.of(ctx).pop(_ReplyChoice.honoo),
+                                onPressed: () {
+                                  if (locked) return;
+                                  locked = true;
+                                  Navigator.of(ctx).pop(_ReplyChoice.honoo);
+                                },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.white,
                                   foregroundColor: Colors.black,
@@ -224,7 +258,11 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: () => Navigator.of(ctx).pop(_ReplyChoice.hinoo),
+                                onPressed: () {
+                                  if (locked) return;
+                                  locked = true;
+                                  Navigator.of(ctx).pop(_ReplyChoice.hinoo);
+                                },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.white,
                                   foregroundColor: Colors.black,
@@ -241,7 +279,13 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                               ),
                             ),
                             TextButton(
-                              onPressed: () => Navigator.of(ctx).pop(),
+                              onPressed: locked
+                                  ? null
+                                  : () {
+                                      if (locked) return;
+                                      locked = true;
+                                      Navigator.of(ctx).pop();
+                                    },
                               style: TextButton.styleFrom(foregroundColor: Colors.white54),
                               child: Text(
                                 'Annulla',
@@ -265,15 +309,20 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                        ),
                      );
                     if (sent == true && mounted) {
+                      // ignore: use_build_context_synchronously
+                      showHonooToast(ctx, message: 'Risposta inviata.');
+                      // ignore: use_build_context_synchronously
+                      // ignore: use_build_context_synchronously
                       await showDialog<void>(
+                        // ignore: use_build_context_synchronously
                         context: ctx,
                         barrierDismissible: false,
-                        builder: (_) => HonooDialogShell(
+                        builder: (_) => const HonooDialogShell(
                           child: Padding(
-                            padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+                            padding: EdgeInsets.fromLTRB(24, 24, 24, 16),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
-                              children: const [
+                              children: [
                                 SizedBox(height: 8),
                                 SizedBox(
                                   width: 28,
@@ -295,23 +344,31 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                         ),
                       );
                       messenger.hideCurrentSnackBar();
+                      // ignore: use_build_context_synchronously
                       await nav.push(
                         MaterialPageRoute(
                           builder: (_) => const ChestPage(focusReplies: true),
                         ),
                       );
-                      if (mounted) Navigator.of(ctx, rootNavigator: true).maybePop();
+                      if (mounted) {
+                        // ignore: use_build_context_synchronously
+                        final rootNav = Navigator.of(ctx, rootNavigator: true);
+                        rootNav.maybePop();
+                      }
                     }
                   } else if (choice == _ReplyChoice.hinoo) {
+                    // ignore: use_build_context_synchronously
+                    showHonooToast(ctx, message: 'Risposta inviata.');
                     await showDialog<void>(
+                      // ignore: use_build_context_synchronously
                       context: ctx,
                       barrierDismissible: false,
-                      builder: (_) => HonooDialogShell(
+                      builder: (_) => const HonooDialogShell(
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+                          padding: EdgeInsets.fromLTRB(24, 24, 24, 16),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
-                            children: const [
+                            children: [
                               SizedBox(height: 8),
                               SizedBox(
                                 width: 28,
@@ -341,12 +398,17 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                       ),
                     );
                     if (!mounted) return;
+                    // ignore: use_build_context_synchronously
                     await nav.push(
                       MaterialPageRoute(
                         builder: (_) => const ChestPage(focusReplies: true),
                       ),
                     );
-                    if (mounted) Navigator.of(ctx, rootNavigator: true).maybePop();
+                    if (mounted) {
+                      // ignore: use_build_context_synchronously
+                      final rootNav = Navigator.of(ctx, rootNavigator: true);
+                      rootNav.maybePop();
+                    }
                   }
                   if (mounted) setState(() => _replying = false);
                 },
@@ -366,6 +428,11 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
       },
     );
   }
+}
+
+class _ArrowIntent extends Intent {
+  const _ArrowIntent(this.delta);
+  final int delta;
 }
 
 enum _ReplyChoice { honoo, hinoo }
