@@ -34,6 +34,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
   bool _isLoading = true;
   int _currentIndex = 0;
   final cs.CarouselController _carouselController = cs.CarouselController();
+  bool _replying = false;
 
   @override
   void initState() {
@@ -166,7 +167,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
               tooltip: 'Home',
               onPressed: _goHome,
             ),
-            if (!_isLoading && _items.isNotEmpty)
+            if (!_isLoading && _items.isNotEmpty && !_replying)
               ResponsiveFooterAction(
                 asset: 'assets/icons/reply.svg',
                 semanticsLabel: 'Rispondi',
@@ -174,6 +175,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                 splashRadius: 25,
                 tooltip: 'Rispondi',
                 onPressed: () async {
+                setState(() => _replying = true);
                   final ctx = context;
                   final nav = Navigator.of(ctx);
                   final messenger = ScaffoldMessenger.of(ctx);
@@ -286,7 +288,18 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                       ),
                     );
                   }
+                  if (mounted) setState(() => _replying = false);
                 },
+              ),
+            if (!_isLoading && _items.isNotEmpty && _replying)
+              ResponsiveFooterAction(
+                asset: 'assets/icons/reply.svg',
+                semanticsLabel: 'Rispondi',
+                size: footerIconSize,
+                splashRadius: 25,
+                tooltip: 'Rispondi',
+                onPressed: null,
+                icon: SizedBox(width: footerIconSize, height: footerIconSize),
               ),
           ],
         );

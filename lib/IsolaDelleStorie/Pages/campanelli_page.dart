@@ -48,6 +48,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
   bool _isHoveringCampanelli = false;
   bool _checkedKnocks = false;
   bool _checkingPendingKnocks = false;
+  bool _isKnocking = false;
   final Set<String> _pendingKnockTags = {};
   final List<_PendingKnock> _pendingKnocks = [];
   List<String> _ownedHinooIds = const [];
@@ -133,6 +134,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
   }
 
   Future<void> _handleKnock(CampanelloData campanello) async {
+    if (_isKnocking) return;
     if (_isCampanelloUnlocked(campanello.id)) {
       await _showEnterDialog(campanello.id);
       return;
@@ -171,12 +173,17 @@ class _CampanelliPageState extends State<CampanelliPage> {
       honooId = result;
     }
 
-    showHonooToast(context, message: 'Bussata inviata. Attendi risposta.');
-    await _sendHouseKnock(
-      campanello,
-      hinooId: hinooId,
-      honooId: honooId,
-    );
+    setState(() => _isKnocking = true);
+    try {
+      showHonooToast(context, message: 'Bussata inviata. Attendi risposta.');
+      await _sendHouseKnock(
+        campanello,
+        hinooId: hinooId,
+        honooId: honooId,
+      );
+    } finally {
+      if (mounted) setState(() => _isKnocking = false);
+    }
     // waiting realtime approval update
   }
 
@@ -253,10 +260,14 @@ class _CampanelliPageState extends State<CampanelliPage> {
     final bool isOwner = user != null && campanello.ownerId == user.id;
 
     if ((modes == null || modes.isEmpty) && isOwner) {
-      final selected = await _showOwnerMultiShareDialog();
+      final selected = await showDialog<Set<_CasaShareMode>>(
+        context: context,
+        barrierDismissible: true,
+        builder: (_) => _CasaMultiShareDialog(
+          onConfirm: (picked) => _saveShareModes(campanello, picked),
+        ),
+      );
       if (selected == null || selected.isEmpty || !mounted) return;
-      await _saveShareModes(campanello, selected);
-      if (!mounted) return;
       modes = selected;
     }
 
@@ -285,7 +296,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
     return showDialog<Set<_CasaShareMode>>(
       context: context,
       barrierDismissible: true,
-      builder: (_) => const _CasaMultiShareDialog(),
+      builder: (_) => _CasaMultiShareDialog(
+        onConfirm: (modes) async {},
+      ),
     );
   }
 
@@ -1482,7 +1495,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
                             );
                           },
                         ),
-                        if (showCampanello && !isOwnCampanello)
+                        if (showCampanello && !isOwnCampanello && !_isKnocking)
                           ResponsiveFooterAction(
                             asset: "assets/icons/campanello_bianco.png",
                             semanticsLabel: 'Campanello',
@@ -1510,6 +1523,19 @@ class _CampanelliPageState extends State<CampanelliPage> {
                               ],
                             ),
                           ),
+                        if (showCampanello && !isOwnCampanello && _isKnocking)
+                          ResponsiveFooterAction(
+                            asset: "assets/icons/campanello_bianco.png",
+                            semanticsLabel: 'Campanello',
+                            size: footerIconSize,
+                            splashRadius: 25,
+                            tooltip: 'Campanello',
+                            onPressed: null,
+                            icon: SizedBox(
+                              width: footerIconSize,
+                              height: footerIconSize,
+                            ),
+                          ),
                         if (!showCampanello && hasAnyPendingKnock)
                           ResponsiveFooterAction(
                             asset: "assets/icons/campanello_bianco.png",
@@ -1535,6 +1561,19 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                   ),
                                 ),
                               ],
+                            ),
+                          ),
+                        if (!showCampanello && !hasAnyPendingKnock)
+                          ResponsiveFooterAction(
+                            asset: "assets/icons/campanello_bianco.png",
+                            semanticsLabel: 'Campanelli',
+                            size: footerIconSize,
+                            splashRadius: 25,
+                            tooltip: 'Bussate in attesa',
+                            onPressed: null,
+                            icon: SizedBox(
+                              width: footerIconSize,
+                              height: footerIconSize,
                             ),
                           ),
                       ],
@@ -2069,7 +2108,9 @@ extension _CasaShareModeMapper on _CasaShareMode {
 // (Rimosso il vecchio dialogo single-choice non più usato)
 
 class _CasaMultiShareDialog extends StatefulWidget {
-  const _CasaMultiShareDialog();
+  const _CasaMultiShareDialog({required this.onConfirm});
+
+  final Future<void> Function(Set<_CasaShareMode> modes) onConfirm;
 
   @override
   State<_CasaMultiShareDialog> createState() => _CasaMultiShareDialogState();
@@ -2077,6 +2118,7 @@ class _CasaMultiShareDialog extends StatefulWidget {
 
 class _CasaMultiShareDialogState extends State<_CasaMultiShareDialog> {
   final Set<_CasaShareMode> _selected = {};
+  bool _saving = false;
 
   void _toggle(_CasaShareMode mode) {
     setState(() {
@@ -2143,30 +2185,77 @@ class _CasaMultiShareDialogState extends State<_CasaMultiShareDialog> {
               ),
             ),
             const SizedBox(height: 4),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _selected.isEmpty
-                    ? null
-                    : () => Navigator.of(context).pop(_selected),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
+            if (_saving)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              const AlwaysStoppedAnimation(Colors.black),
+                          backgroundColor: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Salvo...',
+                        style: HonooDialogStyles.primaryAction(),
+                      ),
+                    ],
                   ),
-                  elevation: 0,
                 ),
-                child: Text(
-                  'Condividi',
-                  style: HonooDialogStyles.primaryAction(),
+              )
+            else if (_selected.isNotEmpty)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    setState(() => _saving = true);
+                    try {
+                      await widget.onConfirm(_selected);
+                      if (!mounted) return;
+                      Navigator.of(context).pop(_selected);
+                    } finally {
+                      if (mounted) setState(() => _saving = false);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Condividi',
+                    style: HonooDialogStyles.primaryAction(),
+                  ),
                 ),
               ),
-            ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               style: TextButton.styleFrom(foregroundColor: Colors.white54),
