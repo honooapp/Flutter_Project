@@ -76,6 +76,44 @@ class _CampanelliPageState extends State<CampanelliPage> {
     campanelloPalombaroId,
   };
 
+  Future<void> _showBusyOverlay(String message) async {
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => HonooDialogShell(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              SizedBox(height: 8),
+              SizedBox(
+                width: 28,
+                height: 28,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  valueColor: AlwaysStoppedAnimation(Colors.white),
+                ),
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Attendi...',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white70),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _hideBusyOverlay() {
+    if (!mounted) return;
+    Navigator.of(context, rootNavigator: true).maybePop();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -175,12 +213,24 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
     setState(() => _isKnocking = true);
     try {
-      showHonooToast(context, message: 'Bussata inviata. Attendi risposta.');
-      await _sendHouseKnock(
-        campanello,
-        hinooId: hinooId,
-        honooId: honooId,
-      );
+      await _showBusyOverlay('Invio la bussata...');
+      try {
+        await _sendHouseKnock(
+          campanello,
+          hinooId: hinooId,
+          honooId: honooId,
+        );
+        _hideBusyOverlay();
+        if (mounted) {
+          showHonooToast(context, message: 'Bussata inviata. Attendi risposta.');
+        }
+      } catch (e) {
+        debugPrint('house_access insert error: $e');
+        _hideBusyOverlay();
+        if (mounted) {
+          showHonooToast(context, message: 'Invio non riuscito. Ritenta tra poco.');
+        }
+      }
     } finally {
       if (mounted) setState(() => _isKnocking = false);
     }
@@ -884,12 +934,23 @@ class _CampanelliPageState extends State<CampanelliPage> {
     HinooDraft? draft,
     Honoo? honoo,
   }) async {
-    final Set<_CasaShareMode>? modes = await _showOwnerMultiShareDialog();
-    if (modes == null || modes.isEmpty || !mounted) return;
-    await _saveShareModes(entry.campanello, modes);
-    await SupabaseProvider.client.from('house_access').update({
-      'granted_at': DateTime.now().toIso8601String(),
-    }).eq('id', knock.id);
+    await _showBusyOverlay('Apro la casa...');
+    try {
+      final Set<_CasaShareMode>? modes = await _showOwnerMultiShareDialog();
+      if (modes == null || modes.isEmpty || !mounted) return _hideBusyOverlay();
+      await _saveShareModes(entry.campanello, modes);
+      try {
+        await SupabaseProvider.client.from('house_access').update({
+          'granted_at': DateTime.now().toIso8601String(),
+        }).eq('id', knock.id);
+      } catch (e) {
+        debugPrint('house_access grant error: $e');
+        showHonooToast(context, message: 'Operazione non riuscita. Ritenta.');
+        return _hideBusyOverlay();
+      }
+    } finally {
+      _hideBusyOverlay();
+    }
 
     if (draft != null) {
       try {

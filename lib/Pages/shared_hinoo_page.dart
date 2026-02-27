@@ -282,6 +282,35 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                   if (choice == null || !mounted) return;
                   final _SharedHinooItem current = _items[_currentIndex];
                   if (choice == _ReplyChoice.hinoo) {
+                    await showDialog<void>(
+                      context: ctx,
+                      barrierDismissible: false,
+                      builder: (_) => HonooDialogShell(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              SizedBox(height: 8),
+                              SizedBox(
+                                width: 28,
+                                height: 28,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  valueColor: AlwaysStoppedAnimation(Colors.white),
+                                ),
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                'Apro la conversazione...',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: Colors.white70),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
                     await nav.push(
                       MaterialPageRoute(
                         builder: (_) => NewHinooPage(
@@ -297,8 +326,38 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                         builder: (_) => const ChestPage(focusReplies: true),
                       ),
                     );
+                    if (mounted) Navigator.of(ctx, rootNavigator: true).maybePop();
                   } else {
                     // Risposta con honoo indirizzata al proprietario
+                    await showDialog<void>(
+                      context: ctx,
+                      barrierDismissible: false,
+                      builder: (_) => HonooDialogShell(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              SizedBox(height: 8),
+                              SizedBox(
+                                width: 28,
+                                height: 28,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  valueColor: AlwaysStoppedAnimation(Colors.white),
+                                ),
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                'Apro la conversazione...',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: Colors.white70),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
                     await nav.push(
                       MaterialPageRoute(
                         builder: (_) => NewHonooPage(
@@ -314,6 +373,7 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                         builder: (_) => const ChestPage(focusReplies: true),
                       ),
                     );
+                    if (mounted) Navigator.of(ctx, rootNavigator: true).maybePop();
                   }
                   if (mounted) setState(() => _replying = false);
                 },
