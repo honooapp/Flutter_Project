@@ -278,7 +278,8 @@ class _AdminMoonSearchPageState extends State<AdminMoonSearchPage> {
     return LayoutBuilder(builder: (context, c) {
       final w = c.maxWidth;
       final isNarrow = w < 700;
-      final maxTileW = isNarrow ? w : (w / 3).clamp(300, 420);
+      final double maxTileW =
+          isNarrow ? w : (w / 3).clamp(300.0, 420.0).toDouble();
       return GridView.builder(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: maxTileW,

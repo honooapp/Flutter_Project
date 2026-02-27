@@ -886,14 +886,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
     }
   }
 
-  String _extensionFromName(String name) {
-    final n = name.toLowerCase();
-    final i = n.lastIndexOf('.');
-    if (i < 0) return 'jpg';
-    final e = n.substring(i + 1);
-    if (e.length > 5) return 'jpg';
-    return e;
-  }
+  // rimosso: estensione non più necessaria (conversione sempre in PNG)
 
   // ========================================================================
   // Utility basiche per slide (se non hai un model)
