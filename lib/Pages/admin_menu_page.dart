@@ -11,6 +11,7 @@ import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'home_page.dart';
+import 'admin_moon_search_page.dart';
 
 class AdminMenuPage extends StatefulWidget {
   const AdminMenuPage({super.key});
@@ -312,6 +313,32 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                       style: GoogleFonts.lora(
                         color: HonooColor.onBackground.withOpacity(0.8),
                         fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    // Ricerca Luna (admin)
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const AdminMoonSearchPage(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'Cerca su Luna (admin)',
+                        style: GoogleFonts.libreFranklin(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 32),

@@ -30,7 +30,9 @@ import '../Controller/honoo_controller.dart';
 import '../Controller/hinoo_controller.dart';
 
 class MoonPage extends StatefulWidget {
-  const MoonPage({super.key});
+  const MoonPage({super.key, this.initialItemId});
+
+  final String? initialItemId;
 
   @override
   State<MoonPage> createState() => _MoonPageState();
@@ -114,8 +116,17 @@ class _MoonPageState extends State<MoonPage> {
 
       items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
+      int initialIndex = 0;
+      if (widget.initialItemId != null && widget.initialItemId!.isNotEmpty) {
+        final idx = items.indexWhere((it) {
+          final String? id = it.honoo?.dbId ?? it.hinooId;
+          return id == widget.initialItemId;
+        });
+        if (idx >= 0) initialIndex = idx;
+      }
       setState(() {
         _items = items;
+        _currentIndex = initialIndex.clamp(0, items.isEmpty ? 0 : items.length - 1);
         _isLoading = false;
       });
     } catch (e) {
