@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:async';
 import 'dart:html' as html;
 import 'dart:js_util' as jsu;
 
@@ -35,4 +36,3 @@ Future<Uint8List?> heicToPng(Uint8List input) async {
     return null;
   }
 }
-
