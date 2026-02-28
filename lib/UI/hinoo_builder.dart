@@ -559,7 +559,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
                 transformationController: _bgController,
                 panEnabled: interactive,
                 scaleEnabled: interactive,
-                minScale: _bgMinScale,
+                minScale: _bgMinInteractiveScale,
                 maxScale: _bgMaxScale,
                 boundaryMargin: const EdgeInsets.all(200),
                 child: fitted,
@@ -576,7 +576,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
             showControls: _bgChosen && _localBgPreviewBytes != null,
             isUploading: _isUploadingBg,
             currentScale: _bgScale,
-            minScale: _bgMinScale,
+            minScale: _bgMinInteractiveScale,
             maxScale: _bgMaxScale,
             onScaleChanged: _bgChosen ? _updateBgScale : null,
             onZoomIn: _bgChosen && _bgScale < _bgMaxScale
@@ -894,8 +894,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
       const double canvasH = HinooTypography.baselineCanvasHeight;
       final double scaleX = canvasW / image.width;
       final double scaleY = canvasH / image.height;
-      // Fit iniziale: "adatta" (contain). Mostra tutta l'immagine senza crop.
-      final double scale = math.min(scaleX, scaleY);
+      // Fit iniziale: "riempi" (cover). Occupa tutto lo spazio disponibile senza deformazioni.
+      final double scale = math.max(scaleX, scaleY);
       final double tx = (canvasW - (image.width * scale)) / 2;
       final double ty = (canvasH - (image.height * scale)) / 2;
       return Matrix4.identity()

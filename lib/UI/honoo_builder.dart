@@ -64,7 +64,7 @@ class HonooBuilderState extends State<HonooBuilder> {
 
   // trasformazioni zoom/pan
   final TransformationController _imageController = TransformationController();
-  static const double _imageMinScale = 0.5;
+  static const double _imageMinScale = 1.0; // non permettere zoom-out sotto il fill
   static const double _imageMaxScale = 5.0;
   double _imageScale = _imageMinScale;
 
@@ -586,7 +586,7 @@ class HonooBuilderState extends State<HonooBuilder> {
                             child: SizedBox.expand(
                               child: Image(
                                 image: MemoryImage(_imageBytes!),
-                                fit: BoxFit.contain,
+                                fit: BoxFit.cover,
                                 alignment: Alignment.center,
                               ),
                             ),
