@@ -299,10 +299,19 @@ class _NewHinooPageState extends State<NewHinooPage>
       _chestBounceController.forward(from: 0);
       final bool isAnswer = (hinooDraft.type == HinooType.answer) || widget.isReply;
       if (isAnswer) {
+        showHonooToast(
+          context,
+          message:
+              "L'hinoo adesso è nel tuo Scrigno, e, soprattutto, nello Scrigno di qualcun altro.",
+        );
         await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => const ChestPage(focusReplies: true),
+            builder: (_) => ChestPage(
+              focusReplies: true,
+              focusConversationId: widget.conversationId,
+              highlightLatest: true,
+            ),
           ),
         );
         return;
@@ -718,12 +727,16 @@ class _NewHinooPageState extends State<NewHinooPage>
                         ),
                         ResponsiveFooterAction(
                           asset: "assets/icons/ok.svg",
-                          semanticsLabel: 'OK',
+                          semanticsLabel: ((widget.isReply || widget.forcedType == HinooType.answer)
+                                  ? 'Invia'
+                                  : (widget.isCampanello ? 'Salva il campanello' : 'OK')),
                           size: footerIconSize,
                           splashRadius: 25,
-                          tooltip: widget.isCampanello
-                              ? 'Salva il campanello'
-                              : 'Salva hinoo',
+                          tooltip: (widget.isReply || widget.forcedType == HinooType.answer)
+                              ? 'Invia'
+                              : (widget.isCampanello
+                                  ? 'Salva il campanello'
+                                  : 'Salva hinoo'),
                           onPressed: _submitHinoo,
                         ),
                       ],

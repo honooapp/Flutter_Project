@@ -42,9 +42,16 @@ import 'home_page.dart';
 import 'placeholder_page.dart';
 
 class ChestPage extends StatefulWidget {
-  const ChestPage({super.key, this.focusReplies = false});
+  const ChestPage({
+    super.key,
+    this.focusReplies = false,
+    this.focusConversationId,
+    this.highlightLatest = false,
+  });
 
   final bool focusReplies;
+  final String? focusConversationId;
+  final bool highlightLatest;
 
   @override
   State<ChestPage> createState() => _ChestPageState();
@@ -88,6 +95,7 @@ class _ChestPageState extends State<ChestPage> {
   final Map<String, DateTime> _honooLatestReplies = {};
   final Map<String, DateTime> _hinooLatestReplies = {};
   final Map<String, List<HinooThreadEntry>> _hinooRepliesByRoot = {};
+  ConversationEntry? _selectedConvEntry;
   bool _isHinooLoading = true;
   bool _isRefreshingReplies = false;
   Timer? _replyRefreshTimer;
@@ -368,7 +376,20 @@ class _ChestPageState extends State<ChestPage> {
 
     _items = [...conversationItems, ...otherItems];
 
-    if (widget.focusReplies && conversationItems.isNotEmpty) {
+    if (widget.focusConversationId != null) {
+      final idx = _items.indexWhere((it) {
+        final String? cid = it.when(
+          honoo: (h) => h.conversationId,
+          hinoo: (row) => row.conversationId ?? row.draft.conversationId,
+        );
+        return cid == widget.focusConversationId;
+      });
+      if (idx >= 0) {
+        _currentIndex = idx;
+      } else if (widget.focusReplies && conversationItems.isNotEmpty) {
+        _currentIndex = 0;
+      }
+    } else if (widget.focusReplies && conversationItems.isNotEmpty) {
       _currentIndex = 0;
     } else if (_currentIndex >= _items.length) {
       _currentIndex = _items.isEmpty ? 0 : _items.length - 1;
@@ -638,6 +659,54 @@ class _ChestPageState extends State<ChestPage> {
         },
       ),
     );
+
+    // Conversazione unificata: azione di invio sulla Luna per entry selezionata
+    final String? convId = current.conversationId;
+    if (convId != null && convId.isNotEmpty && _selectedConvEntry != null) {
+      final entry = _selectedConvEntry!;
+      final String? myId = SupabaseProvider.client.auth.currentUser?.id;
+      final bool isMine = entry.ownerId != null && myId != null && entry.ownerId == myId;
+      final bool isPersonalEntry = entry.kind == ConversationEntryKind.honoo
+          ? (entry.honoo!.type == HonooType.personal)
+          : (entry.hinoo!.type == HinooType.personal);
+      if (isMine && isPersonalEntry) {
+        actions.add(
+          ResponsiveFooterAction(
+            asset: "assets/icons/moon.svg",
+            semanticsLabel: 'Luna',
+            colorFilter: const ColorFilter.mode(
+              HonooColor.onBackground,
+              BlendMode.srcIn,
+            ),
+            size: iconSize,
+            splashRadius: 25,
+            tooltip: 'Spedisci sulla Luna',
+            onPressed: () async {
+              try {
+                if (entry.kind == ConversationEntryKind.honoo) {
+                  final ok = await HonooController().sendToMoon(entry.honoo!);
+                  if (!mounted) return;
+                  showHonooToast(context,
+                      message: ok
+                          ? "L'honoo è anche sulla Luna."
+                          : "L'honoo era già presente sulla Luna.");
+                } else {
+                  final result = await _hinooController.sendToMoon(entry.hinoo!);
+                  if (!mounted) return;
+                  final text = result == HinooMoonResult.published
+                      ? "L'hinoo è anche sulla Luna."
+                      : "L'hinoo era già presente sulla Luna.";
+                  showHonooToast(context, message: text);
+                }
+              } catch (e) {
+                if (!mounted) return;
+                showHonooToast(context, message: 'Errore: $e');
+              }
+            },
+          ),
+        );
+      }
+    }
 
     return ResponsiveFooterBar(
       useSafeArea: false,
@@ -1110,6 +1179,10 @@ class _ChestPageState extends State<ChestPage> {
             conversationId: convId,
             maxWidth: targetMaxW,
             maxHeight: availableCenterH,
+            onSelect: (e) => setState(() => _selectedConvEntry = e),
+            highlightLatest: widget.highlightLatest &&
+                (widget.focusConversationId != null &&
+                    widget.focusConversationId == convId),
           );
         }
         // Se è una risposta, il thread deve essere costruito sul padre
@@ -1134,6 +1207,10 @@ class _ChestPageState extends State<ChestPage> {
             conversationId: convId,
             maxWidth: cardW,
             maxHeight: cardMaxH,
+            onSelect: (e) => setState(() => _selectedConvEntry = e),
+            highlightLatest: widget.highlightLatest &&
+                (widget.focusConversationId != null &&
+                    widget.focusConversationId == convId),
           );
         }
         final replies = _hinooRepliesByRoot[row.id] ?? const [];

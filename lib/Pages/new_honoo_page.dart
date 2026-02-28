@@ -242,11 +242,20 @@ class _NewHonooPageState extends State<NewHonooPage> {
       });
 
       if (type == HonooType.answer) {
-        // Risposta: vai subito allo Scrigno sulle conversazioni
+        // Risposta: messaggio dedicato e vai allo Scrigno con focus conversazione + sobbalzo
+        showHonooToast(
+          context,
+          message:
+              "L'honoo adesso è nel tuo Scrigno, e, soprattutto nello Scrigno di quacun altro.",
+        );
         await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => const ChestPage(focusReplies: true),
+            builder: (_) => ChestPage(
+              focusReplies: true,
+              focusConversationId: conversationId,
+              highlightLatest: true,
+            ),
           ),
         );
         return;
@@ -581,10 +590,14 @@ class _NewHonooPageState extends State<NewHonooPage> {
                       ),
                       ResponsiveFooterAction(
                         asset: "assets/icons/ok.svg",
-                        semanticsLabel: 'OK',
+                        semanticsLabel: (widget.forcedType == HonooType.answer)
+                            ? 'Invia'
+                            : 'OK',
                         size: footerIconSize,
                         splashRadius: 25,
-                        tooltip: 'Salva honoo',
+                        tooltip: (widget.forcedType == HonooType.answer)
+                            ? 'Invia'
+                            : 'Salva honoo',
                         onPressed: _submitHonoo,
                       ),
                       ResponsiveFooterAction(

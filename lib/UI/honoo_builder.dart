@@ -509,6 +509,7 @@ class HonooBuilderState extends State<HonooBuilder> {
                   ),
                   keyboardType: TextInputType.multiline,
                   textInputAction: TextInputAction.newline,
+                  autofocus: true,
                   expands: true,
                   scrollPhysics: const ClampingScrollPhysics(),
                   cursorColor: Colors.black,

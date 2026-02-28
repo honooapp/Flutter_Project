@@ -1,9 +1,8 @@
-import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/honoo.dart';
-import 'package:honoo/Services/hinoo_service.dart';
 import 'package:honoo/Services/supabase_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
 import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
@@ -14,38 +13,60 @@ class UnifiedThreadView extends StatefulWidget {
     required this.conversationId,
     required this.maxWidth,
     required this.maxHeight,
+    this.onSelect,
+    this.highlightLatest = false,
   });
 
   final String conversationId;
   final double maxWidth;
   final double maxHeight;
+  final ValueChanged<ConversationEntry>? onSelect;
+  final bool highlightLatest;
 
   @override
   State<UnifiedThreadView> createState() => _UnifiedThreadViewState();
 }
 
-class _UnifiedThreadViewState extends State<UnifiedThreadView> {
+class _UnifiedThreadViewState extends State<UnifiedThreadView>
+    with SingleTickerProviderStateMixin {
   bool _loading = true;
   List<_Entry> _entries = const [];
+  RealtimeChannel? _chan;
+  int _selected = -1;
+  late final AnimationController _bounce;
+  late final Animation<Offset> _offsetAnim;
+  bool _didHighlight = false;
 
   @override
   void initState() {
     super.initState();
+    _bounce = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _offsetAnim = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
+        .chain(CurveTween(curve: Curves.elasticOut))
+        .animate(_bounce);
     _load();
     _subscribe();
   }
 
   void _subscribe() {
     final client = SupabaseProvider.client;
-    client
+    void refresh(dynamic _, [dynamic __]) => _load();
+    _chan = client
         .channel('conv-${widget.conversationId}')
-        .on(RealtimeListenTypes.postgresChanges,
-            ChannelFilter(event: '*', schema: 'public', table: 'honoo'),
-            (_) => _load())
-        .on(RealtimeListenTypes.postgresChanges,
-            ChannelFilter(event: '*', schema: 'public', table: 'hinoo'),
-            (_) => _load())
-        .subscribe();
+      ..on(
+        RealtimeListenTypes.postgresChanges,
+        ChannelFilter(event: '*', schema: 'public', table: 'honoo'),
+        refresh,
+      )
+      ..on(
+        RealtimeListenTypes.postgresChanges,
+        ChannelFilter(event: '*', schema: 'public', table: 'hinoo'),
+        refresh,
+      )
+      ..subscribe();
   }
 
   Future<void> _load() async {
@@ -59,7 +80,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> {
           .order('created_at', ascending: true);
       final hinooRows = await c
           .from('hinoo')
-          .select('id,pages,type,recipient_tag,reply_to,created_at,user_id,conversation_id')
+          .select('id,pages,type,recipient_tag,reply_to,created_at,user_id,conversation_id,is_from_moon_saved')
           .eq('conversation_id', widget.conversationId)
           .order('created_at', ascending: true);
 
@@ -81,7 +102,9 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> {
           replyTo: r['reply_to'] as String?,
           conversationId: r['conversation_id']?.toString(),
         );
-        entries.add(_Entry.hinoo(draft));
+        final ownerId = r['user_id']?.toString();
+        final bool isFromMoonSaved = (r['is_from_moon_saved'] as bool?) ?? false;
+        entries.add(_Entry.hinoo(draft, ownerId: ownerId, isFromMoonSaved: isFromMoonSaved));
       }
       entries.sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
@@ -90,6 +113,12 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> {
         _entries = entries;
         _loading = false;
       });
+      if (widget.highlightLatest && !_didHighlight && _entries.isNotEmpty) {
+        _didHighlight = true;
+        _bounce.forward(from: 0);
+        setState(() => _selected = _entries.length - 1);
+        widget.onSelect?.call(_toConversationEntry(_entries.last));
+      }
     } catch (_) {
       if (!mounted) return;
       setState(() => _loading = false);
@@ -104,22 +133,75 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> {
       itemCount: _entries.length,
       itemBuilder: (context, index) {
         final e = _entries[index];
-        return Padding(
+        final bool selected = index == _selected;
+        final entry = _toConversationEntry(e);
+        return GestureDetector(
+          onTap: () {
+            setState(() => _selected = index);
+            widget.onSelect?.call(entry);
+          },
+          child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
-          child: e.when(
-            honoo: (h) => SizedBox(
-              width: widget.maxWidth,
-              height: (widget.maxHeight * 0.66).clamp(240, widget.maxHeight),
-              child: HonooCard(honoo: h),
-            ),
-            hinoo: (d) => SizedBox(
-              width: widget.maxWidth,
-              height: widget.maxHeight,
-              child: HinooViewer(draft: d, maxHeight: widget.maxHeight, maxWidth: widget.maxWidth),
-            ),
+          child: (widget.highlightLatest && index == _entries.length - 1)
+              ? SlideTransition(
+                  position: _offsetAnim,
+                  child: e.when(
+                    honoo: (h) => _buildHonooTile(h, selected),
+                    hinoo: (d) => _buildHinooTile(d, selected),
+                  ),
+                )
+              : e.when(
+                  honoo: (h) => _buildHonooTile(h, selected),
+                  hinoo: (d) => _buildHinooTile(d, selected),
+                ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildHonooTile(Honoo h, bool selected) {
+    return SizedBox(
+      width: widget.maxWidth,
+      height: (widget.maxHeight * 0.66).clamp(240, widget.maxHeight),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border.all(
+              color: selected ? Colors.white70 : Colors.transparent, width: 2),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: HonooCard(honoo: h),
+      ),
+    );
+  }
+
+  Widget _buildHinooTile(HinooDraft d, bool selected) {
+    return SizedBox(
+      width: widget.maxWidth,
+      height: widget.maxHeight,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border.all(
+              color: selected ? Colors.white70 : Colors.transparent, width: 2),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: HinooViewer(
+            draft: d, maxHeight: widget.maxHeight, maxWidth: widget.maxWidth),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _chan?.unsubscribe();
+    _bounce.dispose();
+    super.dispose();
+  }
+
+  ConversationEntry _toConversationEntry(_Entry e) {
+    return e.when(
+      honoo: (h) => ConversationEntry.honoo(h),
+      hinoo: (d) => ConversationEntry.hinoo(d, ownerId: e.ownerId, isFromMoonSaved: e.isFromMoonSaved),
     );
   }
 }
@@ -128,10 +210,13 @@ class _Entry {
   final Honoo? honoo;
   final HinooDraft? hinoo;
   final DateTime createdAt;
+  final String? ownerId;
+  final bool isFromMoonSaved;
 
-  _Entry._(this.honoo, this.hinoo, this.createdAt);
-  factory _Entry.honoo(Honoo h) => _Entry._(h, null, DateTime.tryParse(h.createdAt) ?? DateTime.now());
-  factory _Entry.hinoo(HinooDraft d) => _Entry._(null, d, DateTime.now());
+  _Entry._(this.honoo, this.hinoo, this.createdAt, {this.ownerId, this.isFromMoonSaved = false});
+  factory _Entry.honoo(Honoo h) => _Entry._(h, null, DateTime.tryParse(h.createdAt) ?? DateTime.now(), ownerId: h.userId);
+  factory _Entry.hinoo(HinooDraft d, {String? ownerId, bool isFromMoonSaved = false}) =>
+      _Entry._(null, d, DateTime.now(), ownerId: ownerId, isFromMoonSaved: isFromMoonSaved);
 
   T when<T>({required T Function(Honoo) honoo, required T Function(HinooDraft) hinoo}) {
     if (this.honoo != null) return honoo(this.honoo!);
@@ -139,3 +224,17 @@ class _Entry {
   }
 }
 
+enum ConversationEntryKind { honoo, hinoo }
+
+class ConversationEntry {
+  final ConversationEntryKind kind;
+  final Honoo? honoo;
+  final HinooDraft? hinoo;
+  final String? ownerId;
+  final bool isFromMoonSaved;
+
+  ConversationEntry._(this.kind, {this.honoo, this.hinoo, this.ownerId, this.isFromMoonSaved = false});
+  factory ConversationEntry.honoo(Honoo h) => ConversationEntry._(ConversationEntryKind.honoo, honoo: h, ownerId: h.userId, isFromMoonSaved: h.isFromMoonSaved);
+  factory ConversationEntry.hinoo(HinooDraft d, {String? ownerId, bool isFromMoonSaved = false}) =>
+      ConversationEntry._(ConversationEntryKind.hinoo, hinoo: d, ownerId: ownerId, isFromMoonSaved: isFromMoonSaved);
+}

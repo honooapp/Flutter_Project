@@ -10,6 +10,7 @@ import 'package:honoo/Widgets/honoo_app_title.dart';
 import '../Entities/honoo.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
+import 'chest_page.dart';
 
 class ReplyHonooPage extends StatefulWidget {
   final Honoo originalHonoo;
@@ -87,12 +88,27 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
 
       showHonooToast(
         context,
-        message: 'La tua risposta è partita.',
+        message:
+            "L'honoo adesso è nel tuo Scrigno, e, soprattutto nello Scrigno di quacun altro.",
       );
       _sentOnce = true;
-      await Future.delayed(const Duration(seconds: 1));
       if (!mounted) return;
-      Navigator.pop(context, true);
+      // Vai allo Scrigno con focus sulla conversazione e sobbalzo sulla risposta
+      final convId = newHonoo.conversationId ?? widget.originalHonoo.conversationId ?? widget.originalHonoo.dbId;
+      if (convId != null && convId.isNotEmpty) {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ChestPage(
+              focusReplies: true,
+              focusConversationId: convId,
+              highlightLatest: true,
+            ),
+          ),
+        );
+      } else {
+        Navigator.pop(context, true);
+      }
     } catch (e) {
       debugPrint('Errore invio reply: $e');
       if (!mounted) return;
@@ -144,10 +160,10 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
                 ),
                 ResponsiveFooterAction(
                   asset: "assets/icons/reply.svg",
-                  semanticsLabel: 'Invia risposta',
+                  semanticsLabel: 'Invia',
                   size: 44,
                   splashRadius: 28,
-                  tooltip: 'Invia risposta',
+                  tooltip: 'Invia',
                   colorFilter: const ColorFilter.mode(
                     Colors.white,
                     BlendMode.srcIn,
