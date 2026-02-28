@@ -100516,7 +100516,7 @@ return A.i(A.a7g(a),$async$Ax)
 case 7:n=c
 m=360/J.aPc(n)
 l=640/J.aPa(n)
-k=Math.max(A.fa(m),A.fa(l))
+k=Math.min(A.fa(m),A.fa(l))
 j=(360-J.aPc(n)*k)/2
 i=(640-J.aPa(n)*k)/2
 h=new A.aB(new Float64Array(16))
