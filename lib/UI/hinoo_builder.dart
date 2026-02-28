@@ -80,6 +80,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
   bool _isUploadingBg = false;
   static const double _bgMinScale = 0.5;
   static const double _bgMaxScale = 5.0;
+  // min scale effettivo per l'interazione: almeno il fill iniziale
+  double _bgMinInteractiveScale = _bgMinScale;
   final TransformationController _bgController = TransformationController();
   Matrix4? _bgLockedMatrix;
   Matrix4? _bgInitialMatrix;
@@ -800,12 +802,14 @@ class _HinooBuilderState extends State<HinooBuilder> {
         }
       }
       final Matrix4 initialMatrix = await _fitBackgroundToCanvas(bytes);
+      final double initialScale = _extractScaleFromMatrix(initialMatrix);
       setState(() {
         _localBgPreviewBytes = bytes;
         _bgChosen = true; // abilita OK per procedere
         _bgLockedMatrix = null;
         _bgInitialMatrix = initialMatrix.clone();
-        _bgScale = _extractScaleFromMatrix(initialMatrix);
+        _bgScale = initialScale;
+        _bgMinInteractiveScale = initialScale;
         _isUploadingBg = true;
       });
       _bgController.value = initialMatrix;
