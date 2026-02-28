@@ -298,7 +298,15 @@ class HonooBuilderState extends State<HonooBuilder> {
     if (boundary == null) return null;
 
     try {
-      final double pixelRatio = View.of(context).devicePixelRatio;
+      final double deviceRatio = View.of(context).devicePixelRatio;
+      final Size logical = boundary.size;
+      const double maxOut = 2560.0;
+      final double longEdge =
+          logical.width > logical.height ? logical.width : logical.height;
+      double pixelRatio = deviceRatio;
+      if (longEdge * deviceRatio > maxOut && longEdge > 0) {
+        pixelRatio = (maxOut / longEdge).clamp(1.0, deviceRatio);
+      }
       final ui.Image base = await boundary.toImage(pixelRatio: pixelRatio);
 
       final int framePx = (framePadding * pixelRatio).round();

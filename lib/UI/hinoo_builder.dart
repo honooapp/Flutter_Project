@@ -323,7 +323,18 @@ class _HinooBuilderState extends State<HinooBuilder> {
           ?.findRenderObject() as RenderRepaintBoundary?;
       if (boundary == null) return null;
       final HinooExportSpec exportSpec = getHinooExportSpec(exportMode);
-      final double effectivePixelRatio = exportSpec.pixelRatio;
+      // Limita il pixel ratio per evitare OOM nella generazione PNG
+      final Size logical = boundary.size;
+      const double maxOut = 2560.0; // lato lungo massimo del PNG esportato
+      final double longEdge =
+          logical.width > logical.height ? logical.width : logical.height;
+      double effectivePixelRatio = exportSpec.pixelRatio;
+      if (longEdge > 0) {
+        final double maxPr = maxOut / longEdge;
+        if (effectivePixelRatio > maxPr) {
+          effectivePixelRatio = maxPr.clamp(1.0, effectivePixelRatio);
+        }
+      }
       assert(() {
         debugPrint(
           'Hinoo export boundary size: ${boundary.size.width}x${boundary.size.height}',
