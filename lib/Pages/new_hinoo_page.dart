@@ -295,6 +295,16 @@ class _NewHinooPageState extends State<NewHinooPage>
       if (!mounted) return;
       setState(() => _savedToChest = true);
       _chestBounceController.forward(from: 0);
+      final bool isAnswer = (hinooDraft.type == HinooType.answer) || widget.isReply;
+      if (isAnswer) {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ChestPage(focusReplies: true),
+          ),
+        );
+        return;
+      }
       if (!widget.isReply && !widget.isCampanello) {
         final bool? sendToMoon = await showDialog<bool>(
           context: context,

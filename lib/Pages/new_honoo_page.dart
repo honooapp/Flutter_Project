@@ -236,7 +236,16 @@ class _NewHonooPageState extends State<NewHonooPage> {
         _lastSavedRawImage = _imageUrl;
       });
 
-      if (widget.forcedType != HonooType.answer) {
+      if (type == HonooType.answer) {
+        // Risposta: vai subito allo Scrigno sulle conversazioni
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ChestPage(focusReplies: true),
+          ),
+        );
+        return;
+      } else {
         final bool? sendToMoon = await showDialog<bool>(
           context: context,
           barrierDismissible: true,
