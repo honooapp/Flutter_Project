@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Services/supabase_provider.dart';
+import 'package:honoo/Utility/replies_seen_tracker.dart';
 import '../Utility/utility.dart';
 import '../Widgets/honoo_app_title.dart';
 import 'placeholder_page.dart';
@@ -47,18 +48,26 @@ class _HomePageState extends State<HomePage> {
     final user = SupabaseProvider.client.auth.currentUser;
     if (user == null) return;
     try {
+      final lastSeen = await RepliesSeenTracker.lastSeen();
       final honooRows = await SupabaseProvider.client
           .from('honoo')
-          .select('id')
+          .select('created_at')
           .eq('destination', 'reply')
           .eq('recipient_tag', user.id);
       final hinooRows = await SupabaseProvider.client
           .from('hinoo')
-          .select('id')
+          .select('created_at')
           .eq('type', 'answer')
           .eq('recipient_tag', user.id);
-      final int count =
-          (honooRows as List).length + (hinooRows as List).length;
+      int count = 0;
+      for (final r in (honooRows as List)) {
+        final dt = DateTime.tryParse((r['created_at'] ?? '').toString());
+        if (dt != null && (lastSeen == null || dt.isAfter(lastSeen))) count++;
+      }
+      for (final r in (hinooRows as List)) {
+        final dt = DateTime.tryParse((r['created_at'] ?? '').toString());
+        if (dt != null && (lastSeen == null || dt.isAfter(lastSeen))) count++;
+      }
       if (!mounted) return;
       if (count != _replyCount) {
         setState(() => _replyCount = count);

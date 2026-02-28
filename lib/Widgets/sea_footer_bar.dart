@@ -7,6 +7,7 @@ import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/island_page.dart';
 import 'package:honoo/Pages/new_honoo_page.dart';
 import 'package:honoo/Pages/chest_page.dart';
+import 'package:honoo/Utility/replies_seen_tracker.dart';
 
 /// Barra “mare” riutilizzabile con onde + isola (sx) + scrigno (centro) + bottiglia (dx)
 /// Posizioni, dimensioni e z-order identici alla HomePage.
@@ -95,13 +96,13 @@ class SeaFooterBar extends StatelessWidget {
                     iconSize: bottleSize,
                     splashRadius: 40,
                     tooltip: 'Scrivi',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const NewHonooPage()),
-                      );
-                    },
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const NewHonooPage()),
+                    );
+                  },
                   ),
                 ),
               ),
@@ -181,15 +182,20 @@ class SeaFooterBar extends StatelessWidget {
                         iconSize: chestSize,
                         splashRadius: 40,
                         tooltip: 'Apri il tuo Cuore',
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  ChestPage(focusReplies: replyCount > 0),
+                      onPressed: () {
+                        if (replyCount > 0) {
+                          RepliesSeenTracker.markNow();
+                        }
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChestPage(
+                              focusReplies: replyCount > 0,
+                              highlightLatest: replyCount > 0,
                             ),
-                          );
-                        },
+                          ),
+                        );
+                      },
                       ),
                       if (replyCount > 0)
                         Positioned(
