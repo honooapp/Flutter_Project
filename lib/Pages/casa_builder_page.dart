@@ -122,7 +122,15 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
           _captureKey.currentContext?.findRenderObject()
               as RenderRepaintBoundary?;
       if (boundary == null) return null;
-      final double pixelRatio = MediaQuery.of(context).devicePixelRatio;
+      final double deviceRatio = MediaQuery.of(context).devicePixelRatio;
+      final Size logical = boundary.size;
+      const double maxOut = 2560.0;
+      final double longEdge =
+          logical.width > logical.height ? logical.width : logical.height;
+      double pixelRatio = deviceRatio;
+      if (longEdge * deviceRatio > maxOut && longEdge > 0) {
+        pixelRatio = (maxOut / longEdge).clamp(1.0, deviceRatio);
+      }
       final ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
       final ByteData? byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);

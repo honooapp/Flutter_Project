@@ -13,7 +13,7 @@ import '../Entities/honoo.dart';
 import 'home_page.dart';
 import '../UI/hinoo_viewer.dart';
 import '../UI/hinoo_typography.dart';
-import '../UI/honoo_thread_view.dart';
+import '../UI/honoo_card.dart';
 import '../Utility/honoo_colors.dart';
 import '../Utility/responsive_layout.dart';
 import '../Widgets/loading_spinner.dart';
@@ -414,10 +414,12 @@ class _MoonPageState extends State<MoonPage> {
       final String fallback =
           localId != 0 ? localId.toString() : item.createdAt.toIso8601String();
       identity = 'moon_honoo_${dbId ?? fallback}';
-      content = SizedBox(
-        width: maxWidth,
-        height: maxHeight,
-        child: HonooThreadView(root: honoo),
+      content = Center(
+        child: SizedBox(
+          width: honooMetrics.width,
+          height: honooMetrics.height,
+          child: HonooCard(honoo: honoo),
+        ),
       );
     } else {
       final draft = item.hinoo!;
