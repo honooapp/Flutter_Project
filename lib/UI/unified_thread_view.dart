@@ -54,19 +54,19 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   void _subscribe() {
     final client = SupabaseProvider.client;
     void refresh(dynamic _, [dynamic __]) => _load();
-    _chan = client
-        .channel('conv-${widget.conversationId}')
-      ..on(
-        RealtimeListenTypes.postgresChanges,
-        ChannelFilter(event: '*', schema: 'public', table: 'honoo'),
-        refresh,
-      )
-      ..on(
-        RealtimeListenTypes.postgresChanges,
-        ChannelFilter(event: '*', schema: 'public', table: 'hinoo'),
-        refresh,
-      )
-      ..subscribe();
+    _chan = client.channel('conv-${widget.conversationId}');
+    _chan!
+        .on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(event: '*', schema: 'public', table: 'honoo'),
+          refresh,
+        )
+        .on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(event: '*', schema: 'public', table: 'hinoo'),
+          refresh,
+        )
+        .subscribe();
   }
 
   Future<void> _load() async {
