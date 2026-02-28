@@ -664,6 +664,27 @@ class _MoonPageState extends State<MoonPage> {
           setState(() => _repliedItemIds.add(id));
         }
       }
+    } else if (choice == _ReplyChoice.honoo && current.hinoo != null) {
+      // Risposta ad un hinoo con un honoo
+      await _ensureMoonItemInChest(current);
+      if (!mounted) return;
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => NewHonooPage(
+            forcedType: HonooType.answer,
+            recipientTag: current.ownerId,
+            returnSavedId: false,
+          ),
+        ),
+      );
+      if (!mounted) return;
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const ChestPage(focusReplies: true),
+        ),
+      );
     } else if (choice == _ReplyChoice.hinoo && current.hinoo != null) {
       final String? replyTo = current.hinooId;
       if (replyTo == null || replyTo.isEmpty) return;
@@ -676,6 +697,27 @@ class _MoonPageState extends State<MoonPage> {
             forcedType: HinooType.answer,
             recipientTag: current.ownerId,
             replyTo: replyTo,
+          ),
+        ),
+      );
+      if (!mounted) return;
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const ChestPage(focusReplies: true),
+        ),
+      );
+    } else if (choice == _ReplyChoice.hinoo && current.honoo != null) {
+      // Risposta ad un honoo con un hinoo
+      await _ensureMoonItemInChest(current);
+      if (!mounted) return;
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => NewHinooPage(
+            forcedType: HinooType.answer,
+            recipientTag: current.honoo!.userId,
+            // replyTo assente: thread eterogeneo non collegabile per schema attuale
           ),
         ),
       );
