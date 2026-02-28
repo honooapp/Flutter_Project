@@ -543,12 +543,13 @@ class _HinooBuilderState extends State<HinooBuilder> {
               child: _localBgPreviewBytes != null
                   ? Image.memory(
                       _localBgPreviewBytes!,
-                      fit: BoxFit.contain,
+                      fit: BoxFit.cover, // riempi sempre il canvas 9:16
                     )
                   : const Image(
-                    image: AssetImage('assets/images/hinoo_default_1080x1920.png'),
-                    fit: BoxFit.contain,
-                  ),
+                      image:
+                          AssetImage('assets/images/hinoo_default_1080x1920.png'),
+                      fit: BoxFit.cover,
+                    ),
             );
             final bool interactive = (_step == _WizardStep.changeBg &&
                 _bgChosen &&
