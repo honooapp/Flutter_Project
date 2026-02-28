@@ -675,6 +675,7 @@ class _MoonPageState extends State<MoonPage> {
           builder: (_) => NewHonooPage(
             forcedType: HonooType.answer,
             recipientTag: current.ownerId,
+            conversationId: current.hinooId,
             returnSavedId: false,
           ),
         ),
@@ -718,6 +719,7 @@ class _MoonPageState extends State<MoonPage> {
           builder: (_) => NewHinooPage(
             forcedType: HinooType.answer,
             recipientTag: current.honoo!.userId,
+            conversationId: current.honoo!.dbId,
             // replyTo assente: thread eterogeneo non collegabile per schema attuale
           ),
         ),

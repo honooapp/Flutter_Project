@@ -13,6 +13,7 @@ class Honoo {
   HonooType type;
   String? replyTo;
   String? recipientTag;
+  String? conversationId;
 
   // Nuovi flag lato app
   bool isFromMoonSaved;
@@ -30,7 +31,8 @@ class Honoo {
     this.recipientTag,
   ])  : dbId = null,
         isFromMoonSaved = false,
-        hasReplies = false;
+        hasReplies = false,
+        conversationId = null;
 
   // Comodità
   String? get idAsString => dbId;
@@ -55,6 +57,7 @@ class Honoo {
     // Flag opzionali se esistono a DB, altrimenti false
     h.isFromMoonSaved = (map['is_from_moon_saved'] as bool?) ?? false;
     h.hasReplies = (map['has_replies'] as bool?) ?? false;
+    h.conversationId = map['conversation_id']?.toString();
 
     return h;
   }
@@ -69,6 +72,7 @@ class Honoo {
       'destination': _mapHonooTypeToDestination(type),
       'reply_to': replyTo,
       'recipient_tag': recipientTag,
+      'conversation_id': conversationId,
       // opzionali: salva solo se hai colonne a DB
       'is_from_moon_saved': isFromMoonSaved,
       'has_replies': hasReplies,
@@ -84,6 +88,7 @@ class Honoo {
       'destination': dest, // 'chest' | 'moon' | 'reply'
       'reply_to': dest == 'reply' ? replyTo : null,
       'recipient_tag': dest == 'reply' ? recipientTag : null,
+      'conversation_id': conversationId,
     };
   }
 
@@ -112,6 +117,7 @@ class Honoo {
     String? recipientTag,
     bool? isFromMoonSaved,
     bool? hasReplies,
+    String? conversationId,
   }) {
     final h = Honoo(
       id ?? this.id,
@@ -127,6 +133,7 @@ class Honoo {
     h.dbId = dbId ?? this.dbId;
     h.isFromMoonSaved = isFromMoonSaved ?? this.isFromMoonSaved;
     h.hasReplies = hasReplies ?? this.hasReplies;
+    h.conversationId = conversationId ?? this.conversationId;
     return h;
   }
 

@@ -23,6 +23,7 @@ import '../UI/honoo_thread_view.dart';
 import '../UI/hinoo_viewer.dart';
 import '../UI/hinoo_thread_view.dart';
 import '../UI/hinoo_typography.dart';
+import '../UI/unified_thread_view.dart';
 
 import '../Utility/honoo_colors.dart';
 import '../Utility/responsive_layout.dart';
@@ -258,6 +259,7 @@ class _ChestPageState extends State<ChestPage> {
           type: _hinooTypeFrom(r['type'] as String?),
           recipientTag: r['recipient_tag'] as String?,
           replyTo: r['reply_to'] as String?,
+          conversationId: r['conversation_id']?.toString(),
           isFromMoonSaved: (r['is_from_moon_saved'] as bool?) ?? false,
         );
 
@@ -275,6 +277,7 @@ class _ChestPageState extends State<ChestPage> {
               createdAt: created,
               isFromMoonSaved: isFromMoonSaved,
               ownerId: r['user_id']?.toString(),
+              conversationId: r['conversation_id']?.toString(),
             ),
           );
         }
@@ -297,7 +300,7 @@ class _ChestPageState extends State<ChestPage> {
     try {
       final rows = await client
           .from('hinoo')
-          .select('id,pages,type,reply_to,recipient_tag,created_at,is_from_moon_saved,user_id')
+          .select('id,pages,type,reply_to,recipient_tag,created_at,is_from_moon_saved,user_id,conversation_id')
           .eq('user_id', uid)
           .in_('type', ['personal', 'moon'])
           .order('created_at', ascending: false);
@@ -311,7 +314,7 @@ class _ChestPageState extends State<ChestPage> {
       }
       final rows = await client
           .from('hinoo')
-          .select('id,pages,type,reply_to,recipient_tag,created_at,user_id')
+          .select('id,pages,type,reply_to,recipient_tag,created_at,user_id,conversation_id')
           .eq('user_id', uid)
           .in_('type', ['personal', 'moon'])
           .order('created_at', ascending: false);
@@ -1101,6 +1104,14 @@ class _ChestPageState extends State<ChestPage> {
 
     final Widget content = item.when(
       honoo: (h) {
+        final String? convId = h.conversationId;
+        if (convId != null && convId.isNotEmpty) {
+          return UnifiedThreadView(
+            conversationId: convId,
+            maxWidth: targetMaxW,
+            maxHeight: availableCenterH,
+          );
+        }
         // Se è una risposta, il thread deve essere costruito sul padre
         final Honoo effectiveRoot = (h.type == HonooType.answer &&
                 (h.replyTo != null && h.replyTo!.isNotEmpty))
@@ -1117,6 +1128,14 @@ class _ChestPageState extends State<ChestPage> {
         );
       },
       hinoo: (row) {
+        final String? convId = row.conversationId ?? row.draft.conversationId;
+        if (convId != null && convId.isNotEmpty) {
+          return UnifiedThreadView(
+            conversationId: convId,
+            maxWidth: cardW,
+            maxHeight: cardMaxH,
+          );
+        }
         final replies = _hinooRepliesByRoot[row.id] ?? const [];
         if (replies.isEmpty) {
           return HinooViewer(
@@ -1337,6 +1356,7 @@ class _HinooRow {
   final DateTime createdAt;
   final bool isFromMoonSaved;
   final String? ownerId;
+  final String? conversationId;
 
   const _HinooRow({
     required this.id,
@@ -1344,6 +1364,7 @@ class _HinooRow {
     required this.createdAt,
     required this.isFromMoonSaved,
     required this.ownerId,
+    this.conversationId,
   });
 }
 

@@ -19,6 +19,7 @@ import '../UI/HonooBuilder/dialogs/name_honoo_dialog.dart';
 import 'placeholder_page.dart';
 import '../Utility/responsive_layout.dart';
 import '../Widgets/responsive_footer_bar.dart';
+import 'package:uuid/uuid.dart';
 
 class NewHonooPage extends StatefulWidget {
   const NewHonooPage({
@@ -26,11 +27,13 @@ class NewHonooPage extends StatefulWidget {
     this.forcedType,
     this.recipientTag,
     this.returnSavedId = false,
+    this.conversationId,
   });
 
   final HonooType? forcedType;
   final String? recipientTag;
   final bool returnSavedId;
+  final String? conversationId;
 
   @override
   State<NewHonooPage> createState() => _NewHonooPageState();
@@ -207,6 +210,8 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
     // 4) Crea e salva
     final HonooType type = widget.forcedType ?? HonooType.personal;
+    // conversation: se risposta usa quella fornita; altrimenti genera una nuova
+    final String conversationId = widget.conversationId ?? const Uuid().v4();
     final newHonoo = Honoo(
       0,
       _text,
@@ -217,7 +222,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
       type,
       null,
       widget.recipientTag,
-    );
+    )..conversationId = conversationId;
 
     try {
       if (widget.returnSavedId) {

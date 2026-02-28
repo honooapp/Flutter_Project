@@ -33,6 +33,7 @@ class NewHinooPage extends StatefulWidget {
     this.recipientTag,
     this.returnSavedId = false,
     this.replyTo,
+    this.conversationId,
   });
 
   final bool isReply;
@@ -41,6 +42,7 @@ class NewHinooPage extends StatefulWidget {
   final String? recipientTag;
   final bool returnSavedId;
   final String? replyTo;
+  final String? conversationId;
 
   @override
   State<NewHinooPage> createState() => _NewHinooPageState();
@@ -397,6 +399,7 @@ class _NewHinooPageState extends State<NewHinooPage>
       type: type,
       recipientTag: widget.recipientTag,
       replyTo: widget.replyTo,
+      conversationId: widget.conversationId,
       baseCanvasHeight: _lastCanvasHeight > 0 ? _lastCanvasHeight : null,
     );
   }

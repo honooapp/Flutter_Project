@@ -73,6 +73,7 @@ class HinooDraft {
   final HinooType type; // personal | moon | answer
   final String? recipientTag; // opzionale
   final String? replyTo; // opzionale
+  final String? conversationId; // opzionale
   final bool isFromMoonSaved;
   final double?
       baseCanvasHeight; // altezza canvas al momento della creazione (per proporzioni testo)
@@ -82,6 +83,7 @@ class HinooDraft {
     this.type = HinooType.personal,
     this.recipientTag,
     this.replyTo,
+    this.conversationId,
     this.isFromMoonSaved = false,
     this.baseCanvasHeight,
   });
@@ -91,6 +93,7 @@ class HinooDraft {
     HinooType? type,
     String? replyTo,
     String? recipientTag,
+    String? conversationId,
     bool? isFromMoonSaved,
     double? baseCanvasHeight,
   }) {
@@ -99,6 +102,7 @@ class HinooDraft {
       type: type ?? this.type,
       recipientTag: recipientTag ?? this.recipientTag,
       replyTo: replyTo ?? this.replyTo,
+      conversationId: conversationId ?? this.conversationId,
       isFromMoonSaved: isFromMoonSaved ?? this.isFromMoonSaved,
       baseCanvasHeight: baseCanvasHeight ?? this.baseCanvasHeight,
     );
@@ -108,6 +112,7 @@ class HinooDraft {
         'type': type.name,
         'recipientTag': recipientTag,
         'replyTo': replyTo,
+        'conversationId': conversationId,
         'isFromMoonSaved': isFromMoonSaved,
         'pages': pages.map((p) => p.toJson()).toList(),
         if (baseCanvasHeight != null) 'baseCanvasHeight': baseCanvasHeight,
@@ -117,6 +122,7 @@ class HinooDraft {
         type: _typeFrom(json['type'] as String?),
         recipientTag: json['recipientTag'] as String?,
         replyTo: json['replyTo'] as String?,
+        conversationId: json['conversationId'] as String?,
         isFromMoonSaved: json['isFromMoonSaved'] as bool? ?? false,
         pages: (json['pages'] as List<dynamic>? ?? [])
             .map((e) => HinooSlide.fromJson(e as Map<String, dynamic>))

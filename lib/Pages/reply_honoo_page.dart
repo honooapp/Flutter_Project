@@ -69,7 +69,8 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
         SupabaseProvider.client.auth.currentUser!.id,
         HonooType.answer,
         replyTarget,
-        widget.originalHonoo.recipientTag);
+        widget.originalHonoo.recipientTag)
+      ..conversationId = widget.originalHonoo.conversationId ?? widget.originalHonoo.dbId;
 
     try {
       // Assicura che il root sia nello Scrigno se arriviamo dalla Luna
