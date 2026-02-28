@@ -61,6 +61,16 @@ class HinooService {
             .maybeSingle();
         if (res == null) throw 'publishHinoo: insert fallita';
         return;
+      } else if (_isMissingConversationIdColumn(e)) {
+        final fallback = Map<String, dynamic>.from(data)
+          ..remove('conversation_id');
+        final res = await _client
+            .from(_table)
+            .insert(fallback)
+            .select()
+            .maybeSingle();
+        if (res == null) throw 'publishHinoo: insert fallita';
+        return;
       }
       debugPrint(
           '[HinooService] publishHinoo error: ${e.message} details=${e.details} hint=${e.hint} code=${e.code}');
@@ -113,6 +123,18 @@ class HinooService {
       if (_isMissingMoonSavedColumn(e)) {
         final fallback = Map<String, dynamic>.from(data)
           ..remove('is_from_moon_saved');
+        final res = await _client
+            .from(_table)
+            .insert(fallback)
+            .select()
+            .maybeSingle();
+        if (res == null) throw 'publishHinoo: insert fallita';
+        final id = res['id']?.toString() ?? '';
+        if (id.isEmpty) throw 'publishHinoo: id mancante';
+        return id;
+      } else if (_isMissingConversationIdColumn(e)) {
+        final fallback = Map<String, dynamic>.from(data)
+          ..remove('conversation_id');
         final res = await _client
             .from(_table)
             .insert(fallback)
@@ -278,6 +300,14 @@ class HinooService {
     final hint = e.hint ?? '';
     final combined = '$message $details $hint';
     return combined.contains('is_from_moon_saved');
+  }
+
+  static bool _isMissingConversationIdColumn(PostgrestException e) {
+    final message = e.message;
+    final details = e.details ?? '';
+    final hint = e.hint ?? '';
+    final combined = '$message $details $hint'.toLowerCase();
+    return combined.contains('conversation_id');
   }
 
   static Future<void> saveDraft(HinooDraft draft) async {
