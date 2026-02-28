@@ -9,6 +9,7 @@ import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
 import '../Entities/honoo.dart';
 import 'package:honoo/Services/supabase_provider.dart';
+import 'package:honoo/Controller/honoo_controller.dart';
 
 class ReplyHonooPage extends StatefulWidget {
   final Honoo originalHonoo;
@@ -71,6 +72,14 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
         widget.originalHonoo.recipientTag);
 
     try {
+      // Assicura che il root sia nello Scrigno se arriviamo dalla Luna
+      if (widget.originalHonoo.type == HonooType.moon) {
+        try {
+          await HonooController()
+              .saveToChest(widget.originalHonoo.copyWith(isFromMoonSaved: true));
+        } catch (_) {}
+      }
+
       await HonooService.publishHonoo(newHonoo);
 
       if (!mounted) return;
