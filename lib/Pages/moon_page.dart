@@ -26,6 +26,7 @@ import 'placeholder_page.dart';
 import 'chest_page.dart';
 import 'reply_honoo_page.dart';
 import 'new_hinoo_page.dart';
+import 'new_honoo_page.dart';
 import '../Controller/honoo_controller.dart';
 import '../Controller/hinoo_controller.dart';
 
