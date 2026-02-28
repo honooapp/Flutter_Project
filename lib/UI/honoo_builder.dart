@@ -212,16 +212,19 @@ class HonooBuilderState extends State<HonooBuilder> {
     if (boundary == null) return null;
 
     try {
+      // Prendi le info necessarie prima dell'await per evitare lint
+      final double deviceRatio = View.of(context).devicePixelRatio;
+
       // Assicurati che il frame corrente sia completamente layouttato
       await Future<void>.delayed(Duration.zero);
       await WidgetsBinding.instance.endOfFrame;
+      if (!mounted) return null;
 
       // In rari casi (layout immediato) la size può risultare 0
       if (boundary.size.isEmpty) {
         await Future<void>.delayed(const Duration(milliseconds: 16));
+        if (!mounted) return null;
       }
-
-      final double deviceRatio = View.of(context).devicePixelRatio;
       final Size logical = boundary.size;
       // Limita la dimensione finale per evitare OOM (target max lato ~ 2048px)
       const double maxOut = 2048.0;
@@ -307,11 +310,13 @@ class HonooBuilderState extends State<HonooBuilder> {
     if (boundary == null) return null;
 
     try {
+      // Prendi le info necessarie prima dell'await per evitare lint
+      final double deviceRatio = View.of(context).devicePixelRatio;
+
       // Attendi la fine del frame per sicurezza (sopratutto in reply flow)
       await Future<void>.delayed(Duration.zero);
       await WidgetsBinding.instance.endOfFrame;
-
-      final double deviceRatio = View.of(context).devicePixelRatio;
+      if (!mounted) return null;
       final Size logical = boundary.size;
       const double maxOut = 2560.0;
       final double longEdge =
