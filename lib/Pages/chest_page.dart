@@ -561,6 +561,14 @@ class _ChestPageState extends State<ChestPage> {
         _exitConversation();
         return;
       }
+      // If conversation has only one element, avoid locking the carousel into conversation mode.
+      if (merged.length <= 1) {
+        setState(() {
+          _itemsConversation = merged;
+        });
+        _exitConversation();
+        return;
+      }
       setState(() {
         _itemsConversation = merged;
         // Always start from newest item (index 0)
