@@ -64,6 +64,8 @@ class _ChestPageState extends State<ChestPage> {
   ChestMode _mode = ChestMode.normal;
   String? _activeConversationId;
   int? _previousIndexBeforeConversation;
+  bool _isBouncing = false;
+  String? _bouncedConvId;
   // removed unused selected conversation index (not needed for rendering)
 
   static const String _scrignoInfoPrefKey = 'scrigno_info_seen_v1';
@@ -571,6 +573,12 @@ class _ChestPageState extends State<ChestPage> {
           try {
             _carouselController.jumpToPage(0);
           } catch (_) {}
+          // Trigger bounce once when entering a conversation, if there is another entry to reveal
+          if (_itemsConversation.length > 1 &&
+              (_bouncedConvId != conversationId)) {
+            _runConversationBounce();
+            _bouncedConvId = conversationId;
+          }
         }
       });
     } catch (_) {
@@ -578,6 +586,62 @@ class _ChestPageState extends State<ChestPage> {
       setState(() {
         _itemsConversation = const [];
       });
+    }
+  }
+
+  String? _convIdOfItem(_ChestItem it) => it.when(
+        honoo: (h) => h.conversationId,
+        hinoo: (row) => row.conversationId ?? row.draft.conversationId,
+      );
+
+  PageController? _findPageController() {
+    try {
+      final dynamic cc = _carouselController;
+      // Try direct pageController
+      final dynamic pc1 = (cc as dynamic).pageController;
+      if (pc1 is PageController) return pc1;
+      // Try via state
+      final dynamic state = (cc as dynamic).state;
+      final dynamic pc2 = state?.pageController;
+      if (pc2 is PageController) return pc2;
+    } catch (_) {}
+    return null;
+  }
+
+  Future<void> _runConversationBounce() async {
+    if (!mounted || _isBouncing) return;
+    final pc = _findPageController();
+    if (pc == null || !pc.hasClients) return;
+    final position = pc.position;
+    // Ensure there is a next item in the same conversation to reveal
+    final items = _mode == ChestMode.normal ? _itemsNormal : _itemsConversation;
+    final int i = _currentIndex;
+    if (i + 1 >= items.length) return;
+    final String? cid = _convIdOfItem(items[i]);
+    final String? nextCid = _convIdOfItem(items[i + 1]);
+    if (cid == null || cid.isEmpty || nextCid != cid) return;
+    final double extent = position.viewportDimension;
+    if (extent <= 0) return;
+    final double start = position.pixels;
+    setState(() => _isBouncing = true);
+    try {
+      await position.animateTo(
+        start + extent * 0.5,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOut,
+      );
+      if (!mounted) return;
+      await position.animateTo(
+        start,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.elasticOut,
+      );
+    } catch (_) {
+      // ignore runtime animation errors
+    } finally {
+      if (mounted) {
+        setState(() => _isBouncing = false);
+      }
     }
   }
 
@@ -1606,10 +1670,37 @@ class _ChestPageState extends State<ChestPage> {
                 );
               },
             );
+            // Trigger bounce in normal mode when highlighting latest or when selecting first of a conversation group
+            if (_mode == ChestMode.normal && !_isBouncing) {
+              final int i = _currentIndex;
+              if (i >= 0 && i < items.length) {
+                final String? cid = _convIdOfItem(items[i]);
+                final bool hasConv = cid != null && cid.isNotEmpty;
+                final bool isFirstOfGroup = hasConv &&
+                    (i == 0 || _convIdOfItem(items[i - 1]) != cid);
+                final bool hasNextInSameGroup = hasConv &&
+                    (i + 1 < items.length) && _convIdOfItem(items[i + 1]) == cid;
+                if (hasConv && hasNextInSameGroup &&
+                    (widget.highlightLatest || isFirstOfGroup) &&
+                    (_bouncedConvId != cid)) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (!mounted) return;
+                    if (_bouncedConvId == cid) return;
+                    _runConversationBounce();
+                    _bouncedConvId = cid;
+                  });
+                }
+              }
+            }
             final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
                 layoutMode == ResponsiveLayoutMode.wideDesktop ||
                 layoutMode == ResponsiveLayoutMode.largeDesktop;
-            if (!isDesktop || items.length <= 1) return slider;
+            if (!isDesktop || items.length <= 1) {
+              return AbsorbPointer(
+                absorbing: _isBouncing,
+                child: slider,
+              );
+            }
             return DesktopCarouselArrows(
               canPrev: _currentIndex > 0,
               canNext: _currentIndex < items.length - 1,
@@ -1624,7 +1715,10 @@ class _ChestPageState extends State<ChestPage> {
                 curve: Curves.easeOutCubic,
               ),
               arrowColor: Colors.white,
-              child: slider,
+              child: AbsorbPointer(
+                absorbing: _isBouncing,
+                child: slider,
+              ),
             );
           },
           footerBuilder: (ctx, mode, footerIconSize, footerGap,
