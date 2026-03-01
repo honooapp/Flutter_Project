@@ -64,6 +64,7 @@ class _ChestPageState extends State<ChestPage> {
   ChestMode _mode = ChestMode.normal;
   String? _activeConversationId;
   int? _previousIndexBeforeConversation;
+  int _selectedConversationIndex = 0;
 
   static const String _scrignoInfoPrefKey = 'scrigno_info_seen_v1';
   static const String scrignoText =
@@ -385,6 +386,60 @@ class _ChestPageState extends State<ChestPage> {
 
     _itemsNormal = [...conversationItems, ...otherItems];
 
+    // Post-processing: group conversation entries contiguously, newest-first within each group.
+    // Preserve the position of the most recent element of each group according to current ordering.
+    if (_itemsNormal.isNotEmpty) {
+      final List<_ChestItem> items = List.of(_itemsNormal);
+      final int n = items.length;
+      final Set<int> consumed = <int>{};
+      final List<_ChestItem> regrouped = [];
+
+      String? _convIdOf(_ChestItem it) => it.when(
+            honoo: (h) => h.conversationId,
+            hinoo: (row) => row.conversationId ?? row.draft.conversationId,
+          );
+
+      for (int i = 0; i < n; i++) {
+        if (consumed.contains(i)) continue;
+        final _ChestItem it = items[i];
+        final String? cid = _convIdOf(it);
+        if (cid == null || cid.isEmpty) {
+          regrouped.add(it);
+          consumed.add(i);
+          continue;
+        }
+
+        // Collect all members of this conversation that are not yet consumed
+        final List<_ChestItem> group = [];
+        final List<int> groupIdx = [];
+        for (int j = i; j < n; j++) {
+          if (consumed.contains(j)) continue;
+          final _ChestItem cand = items[j];
+          final String? ccid = _convIdOf(cand);
+          if (ccid == cid) {
+            group.add(cand);
+            groupIdx.add(j);
+          }
+        }
+
+        if (group.length <= 1) {
+          // Nothing to group
+          regrouped.add(it);
+          consumed.add(i);
+          continue;
+        }
+
+        // Sort within group by createdAt DESC (newest first)
+        group.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        regrouped.addAll(group);
+        for (final gIdx in groupIdx) {
+          consumed.add(gIdx);
+        }
+      }
+
+      _itemsNormal = regrouped;
+    }
+
     if (_mode == ChestMode.normal && widget.focusConversationId != null) {
       final idx = _itemsNormal.indexWhere((it) {
         final String? cid = it.when(
@@ -493,17 +548,30 @@ class _ChestPageState extends State<ChestPage> {
         }
       }
 
-      // Sort by createdAt ascending (conversation flow)
-      merged.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      // Sort by createdAt DESC so newest is index 0
+      merged.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
       if (!mounted) return;
+      if (merged.isEmpty) {
+        setState(() {
+          _itemsConversation = const [];
+        });
+        _exitConversation();
+        return;
+      }
       setState(() {
         _itemsConversation = merged;
-        // Keep current index unless out of bounds
-        if (_currentIndex >= _itemsConversation.length) {
-          _currentIndex = _itemsConversation.isEmpty
-              ? 0
-              : _itemsConversation.length - 1;
+        // Always start from newest item (index 0)
+        _currentIndex = 0;
+        _selectedConversationIndex = 0;
+      });
+      // Ensure PageView (Carousel) jumps to page 0 in conversation mode
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (_mode == ChestMode.conversation) {
+          try {
+            _carouselController.jumpToPage(0);
+          } catch (_) {}
         }
       });
     } catch (_) {
@@ -1344,7 +1412,13 @@ class _ChestPageState extends State<ChestPage> {
               _previousIndexBeforeConversation = _currentIndex;
               _mode = ChestMode.conversation;
               _activeConversationId = convId;
+              _currentIndex = 0;
+              _selectedConversationIndex = 0;
             });
+            // Reset the controller to the first page (newest entry)
+            try {
+              _carouselController.jumpToPage(0);
+            } catch (_) {}
             _loadConversation(convId);
           });
           return SizedBox(
@@ -1495,7 +1569,12 @@ class _ChestPageState extends State<ChestPage> {
                 enlargeCenterPage: false,
                 disableCenter: true,
                 scrollPhysics: horizPhysics,
-                onPageChanged: (i, _) => setState(() => _currentIndex = i),
+                onPageChanged: (i, _) => setState(() {
+                  _currentIndex = i;
+                  if (_mode == ChestMode.conversation) {
+                    _selectedConversationIndex = i;
+                  }
+                }),
               ),
               itemBuilder: (context, index, realIdx) {
                 return _buildChestItem(
