@@ -621,20 +621,39 @@ class _ChestPageState extends State<ChestPage> {
     final pc = _findPageController();
     if (pc == null || !pc.hasClients) return;
     final position = pc.position;
-    // Ensure there is a next item in the same conversation to reveal
+    // Ensure current item is part of a conversation with at least 2 elements
     final items = _mode == ChestMode.normal ? _itemsNormal : _itemsConversation;
     final int i = _currentIndex;
-    if (i + 1 >= items.length) return;
+    if (i < 0 || i >= items.length) return;
     final String? cid = _convIdOfItem(items[i]);
-    final String? nextCid = _convIdOfItem(items[i + 1]);
-    if (cid == null || cid.isEmpty || nextCid != cid) return;
+    if (cid == null || cid.isEmpty) return;
+    // Robust sibling check: any other item with same conv id and different identity
+    bool hasSibling = false;
+    for (int k = 0; k < items.length; k++) {
+      if (k == i) continue;
+      if (_convIdOfItem(items[k]) == cid) {
+        hasSibling = true;
+        break;
+      }
+    }
+    if (!hasSibling) return;
+    // Pick a visible sibling direction: prefer next, fallback to previous
+    int dir = 0;
+    if (i + 1 < items.length && _convIdOfItem(items[i + 1]) == cid) dir = 1;
+    else if (i - 1 >= 0 && _convIdOfItem(items[i - 1]) == cid) dir = -1;
+    if (dir == 0) return;
+
     final double extent = position.viewportDimension;
     if (extent <= 0) return;
     final double start = position.pixels;
+    final double targetUnclamped = start + extent * 0.5 * dir;
+    final double target = targetUnclamped
+        .clamp(position.minScrollExtent, position.maxScrollExtent)
+        .toDouble();
     setState(() => _isBouncing = true);
     try {
       await position.animateTo(
-        start + extent * 0.5,
+        target,
         duration: const Duration(milliseconds: 350),
         curve: Curves.easeOut,
       );
@@ -1684,11 +1703,20 @@ class _ChestPageState extends State<ChestPage> {
               if (i >= 0 && i < items.length) {
                 final String? cid = _convIdOfItem(items[i]);
                 final bool hasConv = cid != null && cid.isNotEmpty;
+                // Sibling validation (>= 2 elements in conversation)
+                bool hasSibling = false;
+                if (hasConv) {
+                  for (int k = 0; k < items.length; k++) {
+                    if (k == i) continue;
+                    if (_convIdOfItem(items[k]) == cid) {
+                      hasSibling = true;
+                      break;
+                    }
+                  }
+                }
                 final bool isFirstOfGroup = hasConv &&
                     (i == 0 || _convIdOfItem(items[i - 1]) != cid);
-                final bool hasNextInSameGroup = hasConv &&
-                    (i + 1 < items.length) && _convIdOfItem(items[i + 1]) == cid;
-                if (hasConv && hasNextInSameGroup &&
+                if (hasConv && hasSibling &&
                     (widget.highlightLatest || isFirstOfGroup) &&
                     (_bouncedConvId != cid)) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
