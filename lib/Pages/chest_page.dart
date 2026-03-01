@@ -1323,10 +1323,6 @@ class _ChestPageState extends State<ChestPage> {
     return child;
   }
 
-  Widget _wrapWithReplyFrame(Widget child) {
-    // Non applicare più overlay: le risposte devono essere full-size senza riquadri
-    return child;
-  }
 
   
 
