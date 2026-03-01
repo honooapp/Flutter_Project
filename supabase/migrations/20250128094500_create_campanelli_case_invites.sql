@@ -3,7 +3,7 @@
 create table if not exists public.campanelli (
   id uuid primary key default gen_random_uuid(),
   owner_id uuid not null references auth.users(id) on delete cascade,
-  hinoo_id uuid references public.hinoo(id),
+  hinoo_id uuid,
   house_id uuid references public."case"(id),
   created_at timestamptz not null default now()
 );
