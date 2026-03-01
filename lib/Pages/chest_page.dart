@@ -1470,22 +1470,47 @@ class _ChestPageState extends State<ChestPage> {
             ),
           );
 
+    // Apply red border ONLY for received replies and ONLY around content box (non-thread)
+    final String? currentUserId = SupabaseProvider.client.auth.currentUser?.id;
+    bool showRedBorder = item.when(
+      honoo: (h) => h.type == HonooType.answer && h.userId != currentUserId,
+      hinoo: (row) =>
+          row.draft.type == HinooType.answer && (row.ownerId ?? '') != currentUserId,
+    );
+    if (isThread) {
+      showRedBorder = false; // never frame full-area thread views
+    }
+
     final Widget styledCard = item.when(
       honoo: (h) {
-        // Risposta: bordo rosso stile frame, altrimenti cornice Luna quando salvato
-        if (h.type == HonooType.answer) return _wrapWithReplyFrame(card);
-        return _wrapWithMoonFrame(
+        final Widget base = _wrapWithMoonFrame(
           card,
           isMoonSaved: _isFromMoonSaved(h),
         );
+        if (showRedBorder) {
+          return Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.red, width: 6),
+            ),
+            child: base,
+          );
+        }
+        return base;
       },
       hinoo: (row) {
-        // Se è risposta, bordo rosso stile frame, altrimenti cornice Luna
-        if (row.draft.type == HinooType.answer) return _wrapWithReplyFrame(card);
-        return _wrapWithMoonFrame(
+        final Widget base = _wrapWithMoonFrame(
           card,
           isMoonSaved: _isHinooFromMoon(row),
         );
+        if (showRedBorder) {
+          return Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.red, width: 6),
+            ),
+            child: base,
+          );
+        }
+        return base;
       },
     );
 
