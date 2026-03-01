@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
   <head>
     <base href="/">
 
@@ -39,12 +39,15 @@
   </head>
   <body>
     <noscript>Per usare honoo è necessario abilitare JavaScript.</noscript>
+    <!-- Service Worker DISABILITATO temporaneamente per evitare problemi di cache -->
     <script>
       window.addEventListener('load', function (ev) {
         _flutter.loader.loadEntrypoint({
+          <!--
           serviceWorker: {
             serviceWorkerVersion: serviceWorkerVersion,
           },
+          -->
           onEntrypointLoaded: function (engineInitializer) {
             engineInitializer.initializeEngine().then(function (appRunner) {
               appRunner.runApp();

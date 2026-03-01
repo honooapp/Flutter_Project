@@ -302,7 +302,7 @@ class _NewHinooPageState extends State<NewHinooPage>
         showHonooToast(
           context,
           message:
-              "L'hinoo adesso è nel tuo Scrigno, e, soprattutto, nello Scrigno di qualcun altro.",
+              "L'hinoo adesso è nel tuo Scrigno,\n e,\n soprattutto,\n nello Scrigno di qualcun altro.",
         );
         await Navigator.push(
           context,

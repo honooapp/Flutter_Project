@@ -6,6 +6,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
 import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
+import 'package:carousel_slider/carousel_slider.dart' as cs;
+import 'package:honoo/Utility/honoo_colors.dart';
 
 class UnifiedThreadView extends StatefulWidget {
   const UnifiedThreadView({
@@ -32,10 +34,12 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   bool _loading = true;
   List<_Entry> _entries = const [];
   RealtimeChannel? _chan;
-  int _selected = -1;
+  int _selected = 0;
   late final AnimationController _bounce;
   late final Animation<Offset> _offsetAnim;
   bool _didHighlight = false;
+  bool _bouncingSelected = false;
+  final cs.CarouselController _vController = cs.CarouselController();
 
   @override
   void initState() {
@@ -44,9 +48,14 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    _offsetAnim = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
+    _offsetAnim = Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero)
         .chain(CurveTween(curve: Curves.elasticOut))
         .animate(_bounce);
+    _bounce.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        if (mounted) setState(() => _bouncingSelected = false);
+      }
+    });
     _load();
     _subscribe();
   }
@@ -128,46 +137,63 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   @override
   Widget build(BuildContext context) {
     if (_loading) return const Center(child: LoadingSpinner());
-    return ListView.builder(
-      physics: const BouncingScrollPhysics(),
-      itemCount: _entries.length,
-      itemBuilder: (context, index) {
-        final e = _entries[index];
-        final bool selected = index == _selected;
-        final entry = _toConversationEntry(e);
-        return GestureDetector(
-          onTap: () {
+    final double h = widget.maxHeight;
+    final bool useHint = widget.highlightLatest && !_didHighlight && _entries.isNotEmpty;
+    final Widget list = SizedBox(
+      width: widget.maxWidth,
+      height: h,
+      child: cs.CarouselSlider.builder(
+        carouselController: _vController,
+        itemCount: _entries.length,
+        options: cs.CarouselOptions(
+          height: h,
+          scrollDirection: Axis.vertical,
+          viewportFraction: 1.0,
+          enableInfiniteScroll: false,
+          padEnds: false,
+          enlargeCenterPage: false,
+          scrollPhysics: const BouncingScrollPhysics(),
+          onPageChanged: (index, reason) {
             setState(() => _selected = index);
-            widget.onSelect?.call(entry);
+            widget.onSelect?.call(_toConversationEntry(_entries[index]));
+            // Rimbalzo visivo sull'entry corrente dopo lo scorrimento
+            if (reason != cs.CarouselPageChangedReason.controller) {
+              setState(() => _bouncingSelected = true);
+              _bounce.forward(from: 0);
+            }
           },
-          child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: (widget.highlightLatest && index == _entries.length - 1)
-              ? SlideTransition(
-                  position: _offsetAnim,
-                  child: e.when(
-                    honoo: (h) => _buildHonooTile(h, selected),
-                    hinoo: (d) => _buildHinooTile(d, selected),
-                  ),
-                )
-              : e.when(
-                  honoo: (h) => _buildHonooTile(h, selected),
-                  hinoo: (d) => _buildHinooTile(d, selected),
-                ),
-          ),
-        );
-      },
+        ),
+        itemBuilder: (context, index, realIdx) {
+          final e = _entries[index];
+          final bool selected = index == _selected;
+          final String? myId = SupabaseProvider.client.auth.currentUser?.id;
+          final bool isOther = (e.ownerId != null && myId != null)
+              ? (e.ownerId != myId)
+              : false;
+          final child = e.when(
+            honoo: (h) => _buildHonooTile(h, selected, isOther: isOther),
+            hinoo: (d) => _buildHinooTile(d, selected, isOther: isOther),
+          );
+          final bool shouldBounce =
+              (useHint && index == _entries.length - 1) || (selected && _bouncingSelected);
+          return shouldBounce
+              ? SlideTransition(position: _offsetAnim, child: child)
+              : child;
+        },
+      ),
     );
+    return list;
   }
 
-  Widget _buildHonooTile(Honoo h, bool selected) {
+  Widget _buildHonooTile(Honoo h, bool selected, {required bool isOther}) {
     return SizedBox(
       width: widget.maxWidth,
-      height: (widget.maxHeight * 0.66).clamp(240, widget.maxHeight),
+      height: widget.maxHeight,
       child: DecoratedBox(
         decoration: BoxDecoration(
           border: Border.all(
-              color: selected ? Colors.white70 : Colors.transparent, width: 2),
+              color: isOther ? HonooColor.secondary : (selected ? Colors.white70 : Colors.transparent),
+              width: isOther ? 6 : 2),
           borderRadius: BorderRadius.circular(12),
         ),
         child: HonooCard(honoo: h),
@@ -175,14 +201,15 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
     );
   }
 
-  Widget _buildHinooTile(HinooDraft d, bool selected) {
+  Widget _buildHinooTile(HinooDraft d, bool selected, {required bool isOther}) {
     return SizedBox(
       width: widget.maxWidth,
       height: widget.maxHeight,
       child: DecoratedBox(
         decoration: BoxDecoration(
           border: Border.all(
-              color: selected ? Colors.white70 : Colors.transparent, width: 2),
+              color: isOther ? HonooColor.secondary : (selected ? Colors.white70 : Colors.transparent),
+              width: isOther ? 6 : 2),
           borderRadius: BorderRadius.circular(12),
         ),
         child: HinooViewer(

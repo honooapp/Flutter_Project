@@ -89,7 +89,7 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
       showHonooToast(
         context,
         message:
-            "L'honoo adesso è nel tuo Scrigno, e, soprattutto nello Scrigno di quacun altro.",
+            "L'honoo adesso è nel tuo Scrigno,\n e,\n soprattutto,\nnello Scrigno di qualcun altro.",
       );
       _sentOnce = true;
       if (!mounted) return;

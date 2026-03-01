@@ -51,14 +51,16 @@ class _HomePageState extends State<HomePage> {
       final lastSeen = await RepliesSeenTracker.lastSeen();
       final honooRows = await SupabaseProvider.client
           .from('honoo')
-          .select('created_at')
+          .select('created_at,user_id')
           .eq('destination', 'reply')
-          .eq('recipient_tag', user.id);
+          .eq('recipient_tag', user.id)
+          .neq('user_id', user.id);
       final hinooRows = await SupabaseProvider.client
           .from('hinoo')
-          .select('created_at')
+          .select('created_at,user_id')
           .eq('type', 'answer')
-          .eq('recipient_tag', user.id);
+          .eq('recipient_tag', user.id)
+          .neq('user_id', user.id);
       int count = 0;
       for (final r in (honooRows as List)) {
         final dt = DateTime.tryParse((r['created_at'] ?? '').toString());
