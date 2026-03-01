@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
   <head>
     <base href="/">
 
@@ -29,7 +29,7 @@
 
     <script>
       // The value below is injected by flutter build, do not touch.
-      var serviceWorkerVersion = "470078275";
+      var serviceWorkerVersion = "1224168810";
     </script>
 
     <!-- Supporto HEIC su web (conversione client-side in PNG) -->
@@ -39,12 +39,15 @@
   </head>
   <body>
     <noscript>Per usare honoo è necessario abilitare JavaScript.</noscript>
+    <!-- Service Worker DISABILITATO temporaneamente per evitare problemi di cache -->
     <script>
       window.addEventListener('load', function (ev) {
         _flutter.loader.loadEntrypoint({
+          <!--
           serviceWorker: {
             serviceWorkerVersion: serviceWorkerVersion,
           },
+          -->
           onEntrypointLoaded: function (engineInitializer) {
             engineInitializer.initializeEngine().then(function (appRunner) {
               appRunner.runApp();
