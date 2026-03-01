@@ -13,6 +13,7 @@ import '../Widgets/honoo_dialogs.dart';
 import 'performance_page.dart';
 import 'venceslao_page.dart';
 import 'coming_soon_page.dart';
+import 'laboratori_siae_page.dart';
 
 class PlaceholderPage extends StatefulWidget {
   const PlaceholderPage({super.key});
@@ -252,11 +253,11 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         context,
         laboratoriLine,
         baseTextStyle,
-        onTap: () => showHonooMessageDialog(
-          context,
-          message: 'pagina in elaborazione',
-          duration: const Duration(milliseconds: 1400),
-        ),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const LaboratoriSiaePage()),
+          );
+        },
       ),
       ..._iconBlockWithSpacing(
         "assets/icons/laboratori_teatrali.png",
@@ -265,13 +266,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         bottomSpacing: _laboratoriBottomSpacing,
         onTap: () {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const ComingSoonPage(
-                header: 'laboratori teatrali',
-                quote: 'Pagina in elaborazione',
-                bibliography: '',
-              ),
-            ),
+            MaterialPageRoute(builder: (_) => const LaboratoriSiaePage()),
           );
         },
       ),
