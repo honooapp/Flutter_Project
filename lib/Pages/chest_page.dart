@@ -64,7 +64,7 @@ class _ChestPageState extends State<ChestPage> {
   ChestMode _mode = ChestMode.normal;
   String? _activeConversationId;
   int? _previousIndexBeforeConversation;
-  int _selectedConversationIndex = 0;
+  // removed unused selected conversation index (not needed for rendering)
 
   static const String _scrignoInfoPrefKey = 'scrigno_info_seen_v1';
   static const String scrignoText =
@@ -394,7 +394,7 @@ class _ChestPageState extends State<ChestPage> {
       final Set<int> consumed = <int>{};
       final List<_ChestItem> regrouped = [];
 
-      String? _convIdOf(_ChestItem it) => it.when(
+      String? convIdOf(_ChestItem it) => it.when(
             honoo: (h) => h.conversationId,
             hinoo: (row) => row.conversationId ?? row.draft.conversationId,
           );
@@ -402,7 +402,7 @@ class _ChestPageState extends State<ChestPage> {
       for (int i = 0; i < n; i++) {
         if (consumed.contains(i)) continue;
         final _ChestItem it = items[i];
-        final String? cid = _convIdOf(it);
+        final String? cid = convIdOf(it);
         if (cid == null || cid.isEmpty) {
           regrouped.add(it);
           consumed.add(i);
@@ -415,7 +415,7 @@ class _ChestPageState extends State<ChestPage> {
         for (int j = i; j < n; j++) {
           if (consumed.contains(j)) continue;
           final _ChestItem cand = items[j];
-          final String? ccid = _convIdOf(cand);
+          final String? ccid = convIdOf(cand);
           if (ccid == cid) {
             group.add(cand);
             groupIdx.add(j);
@@ -563,7 +563,6 @@ class _ChestPageState extends State<ChestPage> {
         _itemsConversation = merged;
         // Always start from newest item (index 0)
         _currentIndex = 0;
-        _selectedConversationIndex = 0;
       });
       // Ensure PageView (Carousel) jumps to page 0 in conversation mode
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1413,7 +1412,6 @@ class _ChestPageState extends State<ChestPage> {
               _mode = ChestMode.conversation;
               _activeConversationId = convId;
               _currentIndex = 0;
-              _selectedConversationIndex = 0;
             });
             // Reset the controller to the first page (newest entry)
             try {
@@ -1571,9 +1569,6 @@ class _ChestPageState extends State<ChestPage> {
                 scrollPhysics: horizPhysics,
                 onPageChanged: (i, _) => setState(() {
                   _currentIndex = i;
-                  if (_mode == ChestMode.conversation) {
-                    _selectedConversationIndex = i;
-                  }
                 }),
               ),
               itemBuilder: (context, index, realIdx) {
