@@ -1232,6 +1232,7 @@ class _ChestPageState extends State<ChestPage> {
             forcedType: HinooType.answer,
             recipientTag: current.recipientTag,
             replyTo: replyTo,
+            conversationId: replyTo,
           ),
         ),
       );
@@ -1273,6 +1274,7 @@ class _ChestPageState extends State<ChestPage> {
             forcedType: HinooType.answer,
             recipientTag: current.draft.recipientTag,
             replyTo: current.id,
+            conversationId: current.id,
           ),
         ),
       );

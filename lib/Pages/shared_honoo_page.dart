@@ -347,18 +347,12 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                         builder: (_) => NewHinooPage(
                           forcedType: HinooType.answer,
                           recipientTag: current.userId,
+                          // Collega la risposta alla conversazione dell'honoo
+                          conversationId: current.conversationId ?? current.dbId,
                         ),
                       ),
                     );
-                    if (!mounted) return;
-                    // ignore: use_build_context_synchronously
-                    await nav.push(
-                      MaterialPageRoute(
-                        builder: (_) => const ChestPage(focusReplies: true),
-                      ),
-                    );
                     if (mounted) {
-                      // ignore: use_build_context_synchronously
                       final rootNav = Navigator.of(ctx, rootNavigator: true);
                       rootNav.maybePop();
                     }

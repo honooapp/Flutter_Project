@@ -342,18 +342,11 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                           forcedType: HinooType.answer,
                           recipientTag: widget.ownerId,
                           replyTo: current.id,
+                          conversationId: current.id,
                         ),
                       ),
                     );
-                    if (!mounted) return;
-                    // ignore: use_build_context_synchronously
-                    await nav.push(
-                      MaterialPageRoute(
-                        builder: (_) => const ChestPage(focusReplies: true),
-                      ),
-                    );
                     if (mounted) {
-                      // ignore: use_build_context_synchronously
                       final rootNav = Navigator.of(ctx, rootNavigator: true);
                       rootNav.maybePop();
                     }
@@ -399,15 +392,9 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                         builder: (_) => NewHonooPage(
                           forcedType: HonooType.answer,
                           recipientTag: widget.ownerId,
+                          conversationId: current.id,
                           returnSavedId: false,
                         ),
-                      ),
-                    );
-                    if (!mounted) return;
-                    // ignore: use_build_context_synchronously
-                    await nav.push(
-                      MaterialPageRoute(
-                        builder: (_) => const ChestPage(focusReplies: true),
                       ),
                     );
                     if (mounted) {
