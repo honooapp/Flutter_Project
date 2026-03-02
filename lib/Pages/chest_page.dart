@@ -1668,11 +1668,8 @@ class _ChestPageState extends State<ChestPage> {
                 ),
               );
             }
-            final ScrollPhysics horizPhysics = (layoutMode ==
-                        ResponsiveLayoutMode.mobile ||
-                    layoutMode == ResponsiveLayoutMode.tablet)
-                ? const BouncingScrollPhysics()
-                : const PageScrollPhysics();
+            // Use PageScrollPhysics to avoid gesture conflicts with nested vertical carousels
+            final ScrollPhysics horizPhysics = const PageScrollPhysics();
             final slider = cs.CarouselSlider.builder(
               carouselController: _carouselController,
               itemCount: items.length,
