@@ -13,7 +13,7 @@ void main() {
   testWidgets(
     'Login flow end-to-end (magic link o email/password)',
     (tester) async {
-      await tester.pumpWidget(const MyApp());
+      await tester.pumpWidget(MyApp(supabaseClient: harness.client));
       await tester.pumpAndSettle();
 
       // Trova campo email nella schermata di login

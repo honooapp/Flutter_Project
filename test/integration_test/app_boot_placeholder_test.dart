@@ -22,7 +22,7 @@ void main() {
   });
 
   testWidgets('boot senza sessione mostra PlaceholderPage', (tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(MyApp(supabaseClient: harness.client));
     await tester.pumpAndSettle();
 
     expect(find.byType(PlaceholderPage), findsOneWidget);

@@ -35,7 +35,9 @@ Future<void> main() async {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, this.supabaseClient});
+
+  final SupabaseClient? supabaseClient;
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -45,12 +47,14 @@ class _MyAppState extends State<MyApp> {
   final GlobalKey<NavigatorState> _navigatorKey =
       GlobalKey<NavigatorState>();
   StreamSubscription<AuthState>? _authSub;
+  late final SupabaseClient _client;
 
   @override
   void initState() {
     super.initState();
+    _client = widget.supabaseClient ?? Supabase.instance.client;
     // Guard globale: se la sessione diventa nulla (refresh fallito/expired), torna al Placeholder.
-    _authSub = Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+    _authSub = _client.auth.onAuthStateChange.listen((data) {
       final session = data.session;
       if (!mounted) return;
       if (session == null) {

@@ -9,7 +9,7 @@ void main() {
   testWidgets(
     'boot → mostra login o home senza crash',
     (tester) async {
-      await tester.pumpWidget(const MyApp());
+      await tester.pumpWidget(MyApp(supabaseClient: harness.client));
       await tester.pumpAndSettle();
 
       // Prova a riconoscere la schermata tramite Key (più stabile)

@@ -65,7 +65,7 @@ void main() {
 
   testWidgets('utente autenticato → home → scrigno con dati mock',
       (tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(MyApp(supabaseClient: harness.client));
     await tester.pumpAndSettle();
 
     expect(find.byType(HomePage), findsOneWidget);

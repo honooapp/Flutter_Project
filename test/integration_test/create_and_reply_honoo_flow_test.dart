@@ -10,7 +10,7 @@ void main() {
   testWidgets(
     'crea honoo e poi rispondi',
     (tester) async {
-      await tester.pumpWidget(const MyApp());
+      await tester.pumpWidget(MyApp(supabaseClient: harness.client));
       await tester.pumpAndSettle();
 
       // Verifica che la conversazione mostri l'honoo appena creato
