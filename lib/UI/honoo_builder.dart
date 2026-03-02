@@ -515,7 +515,7 @@ class HonooBuilderState extends State<HonooBuilder> {
                   maxCharsPerLine: 32,
                   horizontalPadding: const EdgeInsets.symmetric(horizontal: 22),
                   decoration: InputDecoration(
-                    hintText: (!_textFocus.hasFocus && _textCtrl.text.isEmpty)
+                    hintText: _textCtrl.text.isEmpty
                         ? (widget.textHint ?? 'Scrivi qui il tuo testo')
                         : null,
                     hintStyle: textStyle.copyWith(
