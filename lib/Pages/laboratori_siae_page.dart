@@ -11,7 +11,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'home_page.dart';
 import 'laboratori_noi_e_loro_page.dart';
-import 'placeholder_page.dart';
 
 class LaboratoriSiaePage extends StatelessWidget {
   const LaboratoriSiaePage({super.key});
@@ -24,22 +23,22 @@ class LaboratoriSiaePage extends StatelessWidget {
       "Venceslao Cembalo,\n"
       "Angelo Grimaldi,\n"
       "Alessandro Bottone,\n"
-      "Agnese Fornito\n"
+      "Agnese Fornito,\n"
       "Antonio Sodorino,\n"
-      "Giacomo Carruolo\n"
-      "e Daniele Tammaro\n"
+      "Giacomo Carruolo,\n"
+      "e Daniele Tammaro,\n"
       "di realizzare il progetto\n"
       "con gli studenti\n"
       "dell’Istituto Statale\n"
       "Alessandro Volta\n"
       "di Aversa\n"
       "e con i loro tutor\n"
-      "Gabriella Maria Corvino\n"
-      "Luisa Isabella Coscione\n"
-      "Immacolata Iorio\n"
-      "Filomena Reccia\n"
-      "Vincenzo  Fusco\n"
-      "Agostino  Gravante \n"
+      "Gabriella Maria Corvino,\n"
+      "Luisa Isabella Coscione,\n"
+      "Immacolata Iorio,\n"
+      "Filomena Reccia,\n"
+      "Vincenzo  Fusco,\n"
+      "Agostino  Gravante,\n"
       "Pasqualina D’Agostino.\n\n"
       "Sì,\n"
       "nel 2025\n"
