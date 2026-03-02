@@ -2,9 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:honoo/main.dart';
+import '../test_supabase_helper.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  late SupabaseTestHarness harness;
+
+  setUpAll(registerSupabaseFallbacks);
+
+  setUp(() {
+    harness = SupabaseTestHarness(withAuthenticatedUser: false);
+    harness.enableOverrides();
+  });
+
+  tearDown(() {
+    harness.disableOverrides();
+  });
 
   testWidgets(
     'boot → mostra login o home senza crash',
