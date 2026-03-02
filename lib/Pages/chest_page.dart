@@ -639,8 +639,11 @@ class _ChestPageState extends State<ChestPage> {
     if (!hasSibling) return;
     // Pick a visible sibling direction: prefer next, fallback to previous
     int dir = 0;
-    if (i + 1 < items.length && _convIdOfItem(items[i + 1]) == cid) dir = 1;
-    else if (i - 1 >= 0 && _convIdOfItem(items[i - 1]) == cid) dir = -1;
+    if (i + 1 < items.length && _convIdOfItem(items[i + 1]) == cid) {
+      dir = 1;
+    } else if (i - 1 >= 0 && _convIdOfItem(items[i - 1]) == cid) {
+      dir = -1;
+    }
     if (dir == 0) return;
 
     final double extent = position.viewportDimension;
