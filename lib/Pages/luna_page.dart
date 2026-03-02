@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Controller/device_controller.dart';
@@ -6,45 +5,54 @@ import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'home_page.dart';
-import 'laboratori_noi_e_loro_page.dart';
 import 'placeholder_page.dart';
 
-class LaboratoriSiaePage extends StatelessWidget {
-  const LaboratoriSiaePage({super.key});
+class LunaPage extends StatelessWidget {
+  const LunaPage({super.key});
 
-  static const String _bodyAfterLinks =
-      "\n"
-      "è stato selezionato\n"
-      "per il contributo Siae,\n"
-      "che ha permesso a\n"
-      "Venceslao Cembalo,\n"
-      "Angelo Grimaldi,\n"
-      "Alessandro Bottone,\n"
-      "Agnese Fornito\n"
-      "Antonio Sodorino,\n"
-      "Giacomo Carruolo\n"
-      "e Daniele Tammaro\n"
-      "di realizzare il progetto\n"
-      "con gli studenti\n"
-      "dell’Istituto Statale\n"
-      "Alessandro Volta\n"
-      "di Aversa\n"
-      "e con i loro tutor\n"
-      "Gabriella Maria Corvino\n"
-      "Luisa Isabella Coscione\n"
-      "Immacolata Iorio\n"
-      "Filomena Reccia\n"
-      "Vincenzo  Fusco\n"
-      "Agostino  Gravante \n"
-      "Pasqualina D’Agostino.\n\n"
-      "Sì,\n"
-      "nel 2025\n"
-      "honoo ha partecipato\n"
-      "a un Bando Siae.\n"
-      "E ha vinto.\n";
+  static const String lunaText =
+      "Cosa c’è\n"
+      "oggi\n"
+      "sulla Luna?\n\n"
+      "Qualcosa\n"
+      "che ti incuriosisce?\n\n"
+      "Ti basta guardare\n"
+      "da lontano?\n\n"
+      "O vorresti fare\n"
+      "qualcosa di più?\n\n"
+      "O molto di più?\n\n"
+      "A lezione dico sempre\n"
+      "che considero\n"
+      "honoo e hinoo\n"
+      "non come\n"
+      "prodotti finiti,\n"
+      "ma come momenti\n"
+      "di un processo di scrittura,\n"
+      "articolato\n"
+      "come viaggio\n"
+      "di esplorazione\n"
+      "di un’Isola.\n\n"
+      "Però\n"
+      "qui\n"
+      "non sono\n"
+      "a lezione.\n\n"
+      "E poi ci sono\n"
+      "i momenti\n"
+      "in cui esagero,\n"
+      "come adesso,\n"
+      "e allora dico\n"
+      "che la Luna di honoo\n"
+      "potrebbe essere\n"
+      "l’app ideata,\n"
+      "per gioco,\n"
+      "da Dante\n"
+      "o da Guido Cavalcanti,\n"
+      "se l’incantesimo del Mago\n"
+      "li avesse fatti riapparire\n"
+      "dalle nostre parti,\n"
+      "in questi giorni.\n";
 
   @override
   Widget build(BuildContext context) {
@@ -67,44 +75,6 @@ class LaboratoriSiaePage extends StatelessWidget {
       fontWeight: FontWeight.w200,
       height: 1.3,
     );
-
-    final List<InlineSpan> spans = [
-      TextSpan(text: 'honoo e ', style: baseTextStyle),
-      TextSpan(
-        text: 'Crocopie',
-        style: baseTextStyle.copyWith(
-          fontWeight: FontWeight.w700,
-          decoration: TextDecoration.underline,
-        ),
-        recognizer: TapGestureRecognizer()
-          ..onTap = () async {
-            final uri = Uri.parse('https://crocopie.com');
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
-          },
-      ),
-      TextSpan(
-        text:
-            '\nhanno partecipato\nal Bando\nSiae Per Chi Crea 2025\ncon il progetto\n',
-        style: baseTextStyle,
-      ),
-      TextSpan(
-        text: 'Noi e loro',
-        style: baseTextStyle.copyWith(
-          fontWeight: FontWeight.w700,
-          decoration: TextDecoration.underline,
-        ),
-        recognizer: TapGestureRecognizer()
-          ..onTap = () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => const LaboratoriNoiELoroPage(),
-              ),
-            );
-          },
-      ),
-      TextSpan(text: '.\n\nNoi e loro', style: baseTextStyle),
-      TextSpan(text: _bodyAfterLinks, style: baseTextStyle),
-    ];
 
     return Scaffold(
       backgroundColor: HonooColor.background,
@@ -136,9 +106,10 @@ class LaboratoriSiaePage extends StatelessWidget {
                   const SizedBox(height: 5.0),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: RichText(
+                    child: Text(
+                      lunaText,
+                      style: baseTextStyle,
                       textAlign: TextAlign.center,
-                      text: TextSpan(children: spans),
                     ),
                   ),
                   const Spacer(),
@@ -178,3 +149,4 @@ class LaboratoriSiaePage extends StatelessWidget {
     );
   }
 }
+
