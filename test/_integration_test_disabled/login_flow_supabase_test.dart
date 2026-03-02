@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:flutter/material.dart';
 import 'package:honoo/main.dart';
-import '../test_supabase_helper.dart';
 
 // ATTENZIONE:
 // - Questo test chiama davvero Supabase. Va abilitato SOLO in locale con un progetto di test.
@@ -11,20 +10,11 @@ import '../test_supabase_helper.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  late SupabaseTestHarness harness;
-  setUpAll(registerSupabaseFallbacks);
-  setUp(() {
-    harness = SupabaseTestHarness(withAuthenticatedUser: false);
-    harness.enableOverrides();
-  });
-  tearDown(() {
-    harness.disableOverrides();
-  });
 
   testWidgets(
     'Login flow end-to-end (magic link o email/password)',
     (tester) async {
-      await tester.pumpWidget(MyApp(supabaseClient: harness.client));
+      await tester.pumpWidget(const MyApp());
       await tester.pumpAndSettle();
 
       // Trova campo email nella schermata di login
@@ -62,3 +52,4 @@ void main() {
     skip: true,
   );
 }
+

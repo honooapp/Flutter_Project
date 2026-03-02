@@ -3,25 +3,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
 import 'package:honoo/main.dart';
-import '../test_supabase_helper.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  late SupabaseTestHarness harness;
-  setUpAll(registerSupabaseFallbacks);
-  setUp(() {
-    harness = SupabaseTestHarness(withAuthenticatedUser: true);
-    harness.enableOverrides();
-  });
-  tearDown(() {
-    harness.disableOverrides();
-  });
 
   testWidgets(
     'crea honoo e poi rispondi',
     (tester) async {
-      await tester.pumpWidget(MyApp(supabaseClient: harness.client));
+      await tester.pumpWidget(const MyApp());
       await tester.pumpAndSettle();
 
       // Verifica che la conversazione mostri l'honoo appena creato
@@ -47,3 +37,4 @@ void main() {
     tags: ['integration'],
   );
 }
+
