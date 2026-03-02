@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:carousel_slider/carousel_slider.dart' as cs;
@@ -112,6 +113,9 @@ class _ChestPageState extends State<ChestPage> {
   bool _isRefreshingReplies = false;
   Timer? _replyRefreshTimer;
   final cs.CarouselController _carouselController = cs.CarouselController();
+  // Performance guard: avoid redundant regrouping when inputs haven't changed
+  String? _lastRebuildSignature;
+  int _rebuildCalls = 0; // debug counter
 
   // Key stabili per cattura PNG
   final Map<String, GlobalKey> _captureKeys = <String, GlobalKey>{};
@@ -345,6 +349,28 @@ class _ChestPageState extends State<ChestPage> {
   }
 
   void _rebuildItems() {
+    // Build a lightweight signature of inputs that affect list construction
+    final String sig = [
+      ctrl.version.value.toString(),
+      _hinoo.length.toString(),
+      _honooLatestReplies.length.toString(),
+      _hinooLatestReplies.length.toString(),
+      _hinooRepliesByRoot.length.toString(),
+      widget.focusConversationId ?? '',
+      widget.focusReplies ? '1' : '0',
+      widget.highlightLatest ? '1' : '0',
+      _mode.name,
+      _activeConversationId ?? '',
+    ].join('|');
+    assert(() {
+      _rebuildCalls++;
+      debugPrint('ChestPage._rebuildItems() #$_rebuildCalls sig=$sig');
+      return true;
+    }());
+    if (_lastRebuildSignature == sig) {
+      return; // No input change; skip expensive regrouping
+    }
+    _lastRebuildSignature = sig;
     final honooItems = ctrl.personal.map<_ChestItem>((h) {
       // Use updated_at when available to satisfy ordering by last activity/edit
       final DateTime dt = DateTime.tryParse(h.updatedAt) ??
@@ -716,14 +742,17 @@ class _ChestPageState extends State<ChestPage> {
         ...((honooRepliesToMe as List?) ?? const []),
         ...((honooRepliesFromMe as List?) ?? const []),
       ];
-
+      // Deduplicate processing to avoid redundant map updates (no behavior change)
+      final seenHonooKeys = <String>{};
       for (final row in honooReplies) {
         if (row is! Map) continue;
         final String rootId = row['reply_to']?.toString() ?? '';
         if (rootId.isEmpty) continue;
-        final DateTime created = DateTime.tryParse(
-                (row['created_at'] ?? '').toString()) ??
-            DateTime.now();
+        final String createdRaw = (row['created_at'] ?? '').toString();
+        final DateTime created =
+            DateTime.tryParse(createdRaw) ?? DateTime.now();
+        final String key = '$rootId|$createdRaw';
+        if (!seenHonooKeys.add(key)) continue;
         final DateTime? existing = _honooLatestReplies[rootId];
         if (existing == null || created.isAfter(existing)) {
           _honooLatestReplies[rootId] = created;
