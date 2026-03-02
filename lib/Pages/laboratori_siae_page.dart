@@ -6,6 +6,7 @@ import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
+import 'package:honoo/Widgets/background.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'home_page.dart';
@@ -49,9 +50,9 @@ class LaboratoriSiaePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isPhone = DeviceController().isPhone();
-    final double deviceWidth = MediaQuery.of(context).size.width;
+    final double screenWidth = MediaQuery.of(context).size.width;
     final ResponsiveLayoutMode layoutMode =
-        ResponsiveLayout.modeForWidth(deviceWidth);
+        ResponsiveLayout.modeForWidth(screenWidth);
     final double footerIconSize =
         ResponsiveLayout.footerIconSizeForMode(layoutMode);
     final double footerBottomPadding =
@@ -60,6 +61,26 @@ class LaboratoriSiaePage extends StatelessWidget {
     final double footerSpacing = footerBottomPadding + safeBottom;
     final double footerTopSpacing = footerSpacing / 2;
     final double footerBottomSpacing = footerSpacing - footerTopSpacing;
+    final double footerSidePadding = () {
+      switch (layoutMode) {
+        case ResponsiveLayoutMode.mobile:
+          return 16.0;
+        case ResponsiveLayoutMode.tablet:
+          return 20.0;
+        case ResponsiveLayoutMode.desktop:
+        case ResponsiveLayoutMode.wideDesktop:
+        case ResponsiveLayoutMode.largeDesktop:
+          return 24.0;
+      }
+    }();
+
+    final double contentWidth = isPhone
+        ? screenWidth
+        : () {
+            const double minDesktopWidth = 420.0;
+            final double target = screenWidth * 0.4;
+            return target < minDesktopWidth ? minDesktopWidth : target;
+          }();
 
     final TextStyle baseTextStyle = GoogleFonts.arvo(
       color: HonooColor.onBackground,
@@ -106,75 +127,80 @@ class LaboratoriSiaePage extends StatelessWidget {
       TextSpan(text: _bodyAfterLinks, style: baseTextStyle),
     ];
 
-    return Scaffold(
-      backgroundColor: HonooColor.background,
-      body: Row(
-        children: [
-          const Spacer(),
-          Container(
-            constraints: BoxConstraints(
-              maxWidth: isPhone ? deviceWidth : deviceWidth * 0.5,
-            ),
+    final Widget content = Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          const SizedBox(
+            height: 52,
             child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  SizedBox(
-                    height: 52,
-                    child: Center(
-                      child: HonooAppTitle(
-                        onTap: () {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (_) => const PlaceholderPage()),
-                            (route) => false,
-                          );
-                        },
-                      ),
-                    ),
+              child: HonooAppTitle(),
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: SizedBox(
+                width: contentWidth,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(children: spans),
                   ),
-                  const SizedBox(height: 5.0),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(children: spans),
-                    ),
-                  ),
-                  const Spacer(),
-                  SizedBox(height: footerTopSpacing),
-                  ResponsiveFooterBar(
-                    useSafeArea: false,
-                    bottomPadding: footerBottomSpacing,
-                    desiredGap: ResponsiveLayout.footerGapForMode(layoutMode),
-                    minGap: 16,
-                    height: footerIconSize,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    alignment: Alignment.centerLeft,
-                    actions: [
-                      ResponsiveFooterAction(
-                        asset: "assets/icons/home.svg",
-                        semanticsLabel: 'Home',
-                        size: footerIconSize,
-                        splashRadius: 25,
-                        tooltip: 'Home',
-                        onPressed: () {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (_) => const HomePage()),
-                            (route) => false,
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-          const Spacer(),
+          SizedBox(height: footerTopSpacing),
+          Padding(
+            padding: EdgeInsets.only(left: footerSidePadding),
+            child: ResponsiveFooterBar(
+              useSafeArea: false,
+              bottomPadding: footerBottomSpacing,
+              desiredGap: ResponsiveLayout.footerGapForMode(layoutMode),
+              minGap: 16,
+              height: footerIconSize,
+              mainAxisAlignment: MainAxisAlignment.start,
+              alignment: Alignment.centerLeft,
+              actions: [
+                ResponsiveFooterAction(
+                  asset: "assets/icons/home.svg",
+                  semanticsLabel: 'Home',
+                  size: footerIconSize,
+                  splashRadius: 25,
+                  tooltip: 'Home',
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const HomePage()),
+                      (route) => false,
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
+
+    final Widget pageBody = Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Row(
+        children: [
+          Expanded(child: Container()),
+          Align(
+            alignment: Alignment.center,
+            child: Container(
+              color: HonooColor.background.withOpacity(isPhone ? 1 : 0.7),
+              constraints: BoxConstraints(maxWidth: contentWidth),
+              child: content,
+            ),
+          ),
+          Expanded(child: Container()),
+        ],
+      ),
+    );
+
+    return isPhone ? pageBody : Background(child: pageBody);
   }
 }
