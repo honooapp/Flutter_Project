@@ -346,7 +346,9 @@ class _ChestPageState extends State<ChestPage> {
 
   void _rebuildItems() {
     final honooItems = ctrl.personal.map<_ChestItem>((h) {
-      final dt = DateTime.tryParse(h.createdAt) ??
+      // Use updated_at when available to satisfy ordering by last activity/edit
+      final DateTime dt = DateTime.tryParse(h.updatedAt) ??
+          DateTime.tryParse(h.createdAt) ??
           DateTime.fromMillisecondsSinceEpoch(0);
       return _ChestItem.honoo(h, dt);
     }).toList();
