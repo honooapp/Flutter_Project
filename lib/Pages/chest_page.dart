@@ -1460,7 +1460,9 @@ class _ChestPageState extends State<ChestPage> {
     final Widget content = item.when(
       honoo: (h) {
         final String? convId = h.conversationId;
-        if (convId != null && convId.isNotEmpty) {
+        if (_mode == ChestMode.normal &&
+            convId != null &&
+            convId.isNotEmpty) {
           return UnifiedThreadView(
             conversationId: convId,
             maxWidth: targetMaxW,
