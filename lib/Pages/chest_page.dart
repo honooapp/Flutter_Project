@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:ui' show ImageFilter;
 
@@ -1431,9 +1430,8 @@ class _ChestPageState extends State<ChestPage> {
       }
 
       final ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
-      final ByteData? byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
-      final Uint8List? bytes = byteData?.buffer.asUint8List();
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final bytes = byteData?.buffer.asUint8List();
 
       if (bytes == null || bytes.isEmpty) {
         throw Exception('PNG vuoto o nullo.');
@@ -1593,7 +1591,7 @@ class _ChestPageState extends State<ChestPage> {
             ),
           );
 
-    // Apply red border ONLY for received replies and ONLY around content box (non-thread)
+    // Apply borders ONLY around content box (non-thread)
     final String? currentUserId = SupabaseProvider.client.auth.currentUser?.id;
     bool showRedBorder = item.when(
       honoo: (h) => h.type == HonooType.answer && h.userId != currentUserId,
@@ -1602,6 +1600,13 @@ class _ChestPageState extends State<ChestPage> {
     );
     if (isThread) {
       showRedBorder = false; // never frame full-area thread views
+    }
+    bool showWhiteBorder = item.when(
+      honoo: (h) => _isFromMoonSaved(h),
+      hinoo: (row) => _isHinooFromMoon(row),
+    );
+    if (isThread) {
+      showWhiteBorder = false; // never frame full-area thread views
     }
 
     final Widget styledCard = item.when(
@@ -1617,6 +1622,13 @@ class _ChestPageState extends State<ChestPage> {
             ),
             child: base,
           );
+        } else if (showWhiteBorder) {
+          return Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.white, width: 6),
+            ),
+            child: base,
+          );
         }
         return base;
       },
@@ -1629,6 +1641,13 @@ class _ChestPageState extends State<ChestPage> {
           return Container(
             decoration: BoxDecoration(
               border: Border.all(color: Colors.red, width: 6),
+            ),
+            child: base,
+          );
+        } else if (showWhiteBorder) {
+          return Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.white, width: 6),
             ),
             child: base,
           );
@@ -1700,7 +1719,7 @@ class _ChestPageState extends State<ChestPage> {
               );
             }
             // Use PageScrollPhysics to avoid gesture conflicts with nested vertical carousels
-            final ScrollPhysics horizPhysics = const PageScrollPhysics();
+            const horizPhysics = PageScrollPhysics();
             final slider = cs.CarouselSlider.builder(
               carouselController: _carouselController,
               itemCount: items.length,
