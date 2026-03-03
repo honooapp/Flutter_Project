@@ -285,8 +285,9 @@ class _ChestPageState extends State<ChestPage> {
           isFromMoonSaved: (r['is_from_moon_saved'] as bool?) ?? false,
         );
 
+        // deterministic fallback to epoch to avoid unstable ordering
         final created = DateTime.tryParse((r['created_at'] ?? '').toString()) ??
-            DateTime.now();
+            DateTime.fromMillisecondsSinceEpoch(0);
 
         final String? id = r['id']?.toString();
         if (id != null && id.isNotEmpty) {
@@ -344,6 +345,13 @@ class _ChestPageState extends State<ChestPage> {
       if (rows is Map) return [rows];
       return const [];
     }
+  }
+
+  String _stableIdOf(_ChestItem it) {
+    return it.when(
+      honoo: (h) => (h.dbId ?? ''),
+      hinoo: (row) => row.id,
+    );
   }
 
   void _rebuildItems() {
@@ -404,13 +412,26 @@ class _ChestPageState extends State<ChestPage> {
         honoo: (h) => _honooLatestReplies[h.dbId ?? ''],
         hinoo: (row) => _hinooLatestReplies[row.id],
       );
-      if (aReply == null && bReply == null) return 0;
+      if (aReply == null && bReply == null) {
+        // fallback: createdAt DESC, then stable id
+        final int byCreated = b.createdAt.compareTo(a.createdAt);
+        if (byCreated != 0) return byCreated;
+        return _stableIdOf(a).compareTo(_stableIdOf(b));
+      }
       if (aReply == null) return 1;
       if (bReply == null) return -1;
-      return bReply.compareTo(aReply);
+      final int byLatest = bReply.compareTo(aReply);
+      if (byLatest != 0) return byLatest;
+      final int byCreated = b.createdAt.compareTo(a.createdAt);
+      if (byCreated != 0) return byCreated;
+      return _stableIdOf(a).compareTo(_stableIdOf(b));
     });
 
-    otherItems.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    otherItems.sort((a, b) {
+      final int byCreated = b.createdAt.compareTo(a.createdAt);
+      if (byCreated != 0) return byCreated;
+      return _stableIdOf(a).compareTo(_stableIdOf(b));
+    });
 
     _itemsNormal = [...conversationItems, ...otherItems];
 
@@ -457,8 +478,12 @@ class _ChestPageState extends State<ChestPage> {
           continue;
         }
 
-        // Sort within group by createdAt DESC (newest first)
-        group.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        // Sort within group by createdAt DESC (newest first), stable id as tie-breaker
+        group.sort((a, b) {
+          final int byCreated = b.createdAt.compareTo(a.createdAt);
+          if (byCreated != 0) return byCreated;
+          return _stableIdOf(a).compareTo(_stableIdOf(b));
+        });
         regrouped.addAll(group);
         for (final gIdx in groupIdx) {
           consumed.add(gIdx);
@@ -557,8 +582,9 @@ class _ChestPageState extends State<ChestPage> {
           conversationId: r['conversation_id']?.toString(),
           isFromMoonSaved: (r['is_from_moon_saved'] as bool?) ?? false,
         );
+        // deterministic fallback to epoch to avoid unstable ordering
         final created = DateTime.tryParse((r['created_at'] ?? '').toString()) ??
-            DateTime.now();
+            DateTime.fromMillisecondsSinceEpoch(0);
         final String? id = r['id']?.toString();
         if (id != null && id.isNotEmpty) {
           merged.add(
@@ -576,8 +602,15 @@ class _ChestPageState extends State<ChestPage> {
         }
       }
 
-      // Sort by createdAt DESC so newest is index 0
-      merged.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      // Sort by createdAt DESC so newest is index 0; tie-break with stable id
+      merged.sort((a, b) {
+        final int byCreated = b.createdAt.compareTo(a.createdAt);
+        if (byCreated != 0) return byCreated;
+        // stable id: honoo.dbId or hinoo.id
+        String idA = a.when(honoo: (h) => h.dbId ?? '', hinoo: (row) => row.id);
+        String idB = b.when(honoo: (h) => h.dbId ?? '', hinoo: (row) => row.id);
+        return idA.compareTo(idB);
+      });
 
       if (!mounted) return;
       if (merged.isEmpty) {
@@ -790,9 +823,10 @@ class _ChestPageState extends State<ChestPage> {
         if (rootId.isEmpty) continue;
         final pages = row['pages'];
         if (pages is! List) continue;
+        // deterministic fallback to epoch to avoid unstable ordering
         final DateTime created = DateTime.tryParse(
                 (row['created_at'] ?? '').toString()) ??
-            DateTime.now();
+            DateTime.fromMillisecondsSinceEpoch(0);
         final draft = HinooDraft(
           pages: pages
               .whereType<Map<String, dynamic>>()
