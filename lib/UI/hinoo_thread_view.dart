@@ -101,8 +101,8 @@ class _HinooThreadViewState extends State<HinooThreadView>
           if (mounted) _hintController.forward(from: 0);
         });
       }
-      // Rimbalzo fino a metà schermo per mostrare il contesto della risposta
-      final double hint = _hintCurve.value * (h * 0.5);
+      // Rimbalzo: sali fino a metà schermo (negativo) e ritorna alla posizione iniziale
+      final double hint = -_hintCurve.value * (h * 0.5);
       return Transform.translate(
         offset: Offset(0, -dy + hint),
         child: Transform.scale(
