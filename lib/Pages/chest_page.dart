@@ -1585,10 +1585,11 @@ class _ChestPageState extends State<ChestPage> {
         }
         final replies = _hinooRepliesByRoot[row.id] ?? const [];
         if (replies.isEmpty) {
+          // Visualizzazione a tutta pagina tra header e footer
           return HinooViewer(
             draft: row.draft,
-            maxHeight: cardMaxH,
-            maxWidth: cardW,
+            maxHeight: availableCenterH,
+            maxWidth: targetMaxW,
             authorId: row.ownerId,
             onDownloadTap: () => _handleDownloadForItem(item, repaintKey),
           );
@@ -1696,19 +1697,11 @@ class _ChestPageState extends State<ChestPage> {
       duration: const Duration(milliseconds: 250),
       child: KeyedSubtree(
         key: ValueKey(identity),
-        child: isThread
-            ? SizedBox(
-                width: targetMaxW,
-                height: availableCenterH,
-                child: styledCard,
-              )
-            : Center(
-                child: SizedBox(
-                  width: cardW,
-                  height: cardMaxH,
-                  child: styledCard,
-                ),
-              ),
+        child: SizedBox(
+          width: targetMaxW,
+          height: availableCenterH,
+          child: styledCard,
+        ),
       ),
     );
   }

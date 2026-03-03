@@ -116,13 +116,13 @@ class _HinooViewerState extends State<HinooViewer> {
               height: baselineH,
               decoration: (widget.isReply && !isOwn)
                   ? BoxDecoration(
-                      border: Border.all(color: HonooColor.secondary, width: 1),
-                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: HonooColor.secondary, width: 6),
+                      borderRadius: BorderRadius.circular(12),
                     )
                   : (widget.draft.isFromMoonSaved && !isOwn)
                       ? BoxDecoration(
-                          border: Border.all(color: Colors.white, width: 1),
-                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(color: Colors.white, width: 6),
+                          borderRadius: BorderRadius.circular(12),
                         )
                       : null,
               child: Stack(
