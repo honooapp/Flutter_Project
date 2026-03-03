@@ -75,11 +75,11 @@ class _HonooThreadViewState extends State<HonooThreadView>
     );
     _hintCurve = TweenSequence<double>([
       TweenSequenceItem(
-        tween: CurvedTween(curve: Curves.easeOut),
+        tween: CurveTween(curve: Curves.easeOut),
         weight: 50,
       ),
       TweenSequenceItem(
-        tween: CurvedTween(curve: Curves.easeIn),
+        tween: CurveTween(curve: Curves.easeIn),
         weight: 50,
       ),
     ]).animate(_hintController);
