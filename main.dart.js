@@ -101755,8 +101755,8 @@ r=isFinite(l)&&l>0?l/640:1}if(!isFinite(r)||r<=0)r=1
 l=A.a9([A.l0(B.bT),B.a1Q,A.l0(B.bS),B.a1I],t.zU,t.o)
 k=A.a9([B.a0H,new A.cj(new A.aDz(n),new A.bl(A.b([],t.g),t._),t.Cb)],t.n,t.V)
 j=n.a
-if(j.w)j=new A.bX(m,m,A.hn(B.bC,6),A.aW(12),m,m,B.I)
-else j=j.c.f?new A.bX(m,m,A.hn(B.f,6),A.aW(12),m,m,B.I):m
+if(j.w)j=new A.bX(m,m,A.hn(B.bC,1),A.aW(5),m,m,B.I)
+else j=j.c.f?new A.bX(m,m,A.hn(B.f,1),A.aW(5),m,m,B.I):m
 s=A.aW(5)
 p=A.on(a).xp(A.cu([B.ap,B.b0,B.bx,B.b1],t.B))
 o=n.d
