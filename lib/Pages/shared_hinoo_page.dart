@@ -229,7 +229,6 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                 onPressed: () async {
                 setState(() => _replying = true);
                   final ctx = context;
-                  final nav = Navigator.of(ctx);
                   bool locked = false;
                   final _ReplyChoice? choice = await showDialog<_ReplyChoice>(
                     context: ctx,
@@ -321,7 +320,8 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                       ),
                   ),
                   );
-                  if (choice == null || !mounted) return;
+                  if (!mounted) return;
+                  if (choice == null) return;
                   final _SharedHinooItem current = _items[_currentIndex];
                   if (choice == _ReplyChoice.hinoo) {
                     // Usa State.context dopo l'await precedente

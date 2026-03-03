@@ -298,7 +298,8 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                       ),
                     ),
                   );
-                  if (choice == null || !mounted) return;
+                  if (!mounted) return;
+                  if (choice == null) return;
                   if (choice == _ReplyChoice.honoo) {
                     final sent = await nav.push<bool>(
                        MaterialPageRoute(
