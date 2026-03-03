@@ -8,7 +8,6 @@ import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Widgets/background.dart';
 
 import 'home_page.dart';
-import 'placeholder_page.dart';
 
 class LaboratoriNoiELoroPage extends StatelessWidget {
   const LaboratoriNoiELoroPage({super.key});

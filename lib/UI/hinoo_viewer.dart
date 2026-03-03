@@ -124,7 +124,7 @@ class _HinooViewerState extends State<HinooViewer> {
                           border: Border.all(color: Colors.white, width: 1),
                           borderRadius: BorderRadius.circular(5),
                         )
-                      : null),
+                      : null,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [

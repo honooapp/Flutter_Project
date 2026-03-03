@@ -19,7 +19,6 @@ import 'new_hinoo_page.dart';
 import 'new_honoo_page.dart';
 
 import 'home_page.dart';
-import 'chest_page.dart';
 import 'placeholder_page.dart';
 
 class SharedHinooPage extends StatefulWidget {
