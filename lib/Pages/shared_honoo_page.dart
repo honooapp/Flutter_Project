@@ -334,9 +334,10 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                       }
                     }
                   } else if (choice == _ReplyChoice.hinoo) {
-                    final rootNav = Navigator.of(ctx, rootNavigator: true);
+                    if (!mounted) return;
+                    final rootNav = Navigator.of(context, rootNavigator: true);
                     final dialogContext = rootNav.context;
-                    showHonooToast(ctx, message: 'Risposta inviata.');
+                    showHonooToast(context, message: 'Risposta inviata.');
                     await showDialog<void>(
                       context: dialogContext,
                       barrierDismissible: false,

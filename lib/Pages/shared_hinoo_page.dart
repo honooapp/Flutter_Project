@@ -324,10 +324,11 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                   if (choice == null || !mounted) return;
                   final _SharedHinooItem current = _items[_currentIndex];
                   if (choice == _ReplyChoice.hinoo) {
-                    // Pre-cattura un navigator e un contesto stabile per il dialog
-                    final rootNav = Navigator.of(ctx, rootNavigator: true);
+                    if (!mounted) return;
+                    // Usa il contesto corrente (montato) dopo l'await precedente
+                    final rootNav = Navigator.of(context, rootNavigator: true);
                     final dialogContext = rootNav.context;
-                    showHonooToast(ctx, message: 'Risposta inviata.');
+                    showHonooToast(context, message: 'Risposta inviata.');
                     await showDialog<void>(
                       context: dialogContext,
                       barrierDismissible: false,
@@ -347,9 +348,10 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                     if (mounted) rootNav.maybePop();
                   } else {
                     // Risposta con honoo indirizzata al proprietario
-                    final rootNav = Navigator.of(ctx, rootNavigator: true);
+                    if (!mounted) return;
+                    final rootNav = Navigator.of(context, rootNavigator: true);
                     final dialogContext = rootNav.context;
-                    showHonooToast(ctx, message: 'Risposta inviata.');
+                    showHonooToast(context, message: 'Risposta inviata.');
                     await showDialog<void>(
                       context: dialogContext,
                       barrierDismissible: false,
