@@ -33,10 +33,8 @@ class _HinooThreadViewState extends State<HinooThreadView>
   late final Animation<double> _introCurve;
   late final AnimationController _bounceController;
   late final Animation<double> _bounceCurve;
-  late final AnimationController _hintController;
-  late final Animation<double> _hintCurve;
   int _lastIndex = 0;
-  bool _hinted = false;
+  bool _hinted = false; // mantenuto ma inutilizzato dopo la rimozione dell'hint
 
   @override
   void initState() {
@@ -51,16 +49,6 @@ class _HinooThreadViewState extends State<HinooThreadView>
       duration: const Duration(milliseconds: 220),
     );
     _bounceCurve = CurvedAnimation(parent: _bounceController, curve: Curves.easeOutBack);
-    _hintController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-    _hintCurve = CurvedAnimation(parent: _hintController, curve: Curves.easeOutCubic);
-    _hintController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _hintController.reverse();
-      }
-    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _introController.forward();
     });
@@ -70,7 +58,7 @@ class _HinooThreadViewState extends State<HinooThreadView>
   void dispose() {
     _introController.dispose();
     _bounceController.dispose();
-    _hintController.dispose();
+    // nessun hint controller attivo
     super.dispose();
   }
 
@@ -89,18 +77,12 @@ class _HinooThreadViewState extends State<HinooThreadView>
       HinooThreadEntry(
           draft: widget.root, authorId: widget.rootAuthorId, isReply: false),
     ];
-    if (items.length > 1 && !_hinted) {
-      _hinted = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _hintController.forward(from: 0);
-      });
-    }
     final slider = LayoutBuilder(builder: (ctx, c) {
       final double h = c.maxHeight.isFinite ? c.maxHeight : widget.maxHeight;
       final dy = (1.0 - _introCurve.value) * 12.0 - (_bounceCurve.value * 6.0);
       final scale = 1.0 - (1.0 - _introCurve.value) * 0.01 - (_bounceCurve.value * 0.005);
-      // Piccolo hint dal basso per suggerire contenuto successivo: ~18% dell'altezza
-      final double hint = _hintCurve.value * (h * 0.18);
+      // Disabilita l'hint verticale per mantenere il primo messaggio agganciato in alto.
+      final double hint = 0.0;
       return Transform.translate(
         offset: Offset(0, -dy + hint),
         child: Transform.scale(
