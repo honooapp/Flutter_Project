@@ -34,6 +34,10 @@ class _HinooThreadViewState extends State<HinooThreadView>
   late final AnimationController _bounceController;
   late final Animation<double> _bounceCurve;
   int _lastIndex = 0;
+  // Micro-hint per suggerire contenuto successivo (12px max)
+  late final AnimationController _hintController;
+  late final Animation<double> _hintCurve;
+  bool _hinted = false;
 
   @override
   void initState() {
@@ -48,6 +52,16 @@ class _HinooThreadViewState extends State<HinooThreadView>
       duration: const Duration(milliseconds: 220),
     );
     _bounceCurve = CurvedAnimation(parent: _bounceController, curve: Curves.easeOutBack);
+    _hintController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 180),
+    );
+    _hintCurve = CurvedAnimation(parent: _hintController, curve: Curves.easeOutCubic);
+    _hintController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _hintController.reverse();
+      }
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _introController.forward();
     });
@@ -57,7 +71,7 @@ class _HinooThreadViewState extends State<HinooThreadView>
   void dispose() {
     _introController.dispose();
     _bounceController.dispose();
-    // nessun hint controller attivo
+    _hintController.dispose();
     super.dispose();
   }
 
@@ -80,8 +94,15 @@ class _HinooThreadViewState extends State<HinooThreadView>
       final double h = c.maxHeight.isFinite ? c.maxHeight : widget.maxHeight;
       final dy = (1.0 - _introCurve.value) * 12.0 - (_bounceCurve.value * 6.0);
       final scale = 1.0 - (1.0 - _introCurve.value) * 0.01 - (_bounceCurve.value * 0.005);
-      // Disabilita l'hint verticale per mantenere il primo messaggio agganciato in alto.
-      const double hint = 0.0;
+      // Micro-rimbalzo: max ~12px per non spostare sensibilmente il primo messaggio
+      if (items.length > 1 && !_hinted) {
+        _hinted = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _hintController.forward(from: 0);
+        });
+      }
+      const double kMicro = 12.0;
+      final double hint = _hintCurve.value * kMicro;
       return Transform.translate(
         offset: Offset(0, -dy + hint),
         child: Transform.scale(
