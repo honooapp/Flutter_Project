@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../Entities/honoo.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 import '../Utility/honoo_colors.dart';
 import '../Widgets/text_box_download_button.dart';
 
@@ -184,8 +185,10 @@ class HonooCard extends StatelessWidget {
           ),
         );
 
-        final bool showReplyBorder = isReply;
-        final bool showMoonSavedBorder = !showReplyBorder && honoo.isFromMoonSaved;
+        final String? currentUserId = SupabaseProvider.client.auth.currentUser?.id;
+        final bool isOwn = currentUserId != null && currentUserId == honoo.userId;
+        final bool showReplyBorder = isReply && !isOwn;
+        final bool showMoonSavedBorder = !showReplyBorder && honoo.isFromMoonSaved && !isOwn;
         final Widget wrapped = (showReplyBorder || showMoonSavedBorder)
             ? Container(
                 decoration: BoxDecoration(

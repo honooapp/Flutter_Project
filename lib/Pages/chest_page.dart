@@ -1556,6 +1556,7 @@ class _ChestPageState extends State<ChestPage> {
             draft: row.draft,
             maxHeight: cardMaxH,
             maxWidth: cardW,
+            authorId: row.ownerId,
             onDownloadTap: () => _handleDownloadForItem(item, repaintKey),
           );
         }
@@ -1604,8 +1605,8 @@ class _ChestPageState extends State<ChestPage> {
       showRedBorder = false; // never frame full-area thread views
     }
     bool showWhiteBorder = item.when(
-      honoo: (h) => _isFromMoonSaved(h),
-      hinoo: (row) => _isHinooFromMoon(row),
+      honoo: (h) => _isFromMoonSaved(h) && h.userId != currentUserId,
+      hinoo: (row) => _isHinooFromMoon(row) && (row.ownerId ?? '') != currentUserId,
     );
     if (isThread) {
       showWhiteBorder = false; // never frame full-area thread views

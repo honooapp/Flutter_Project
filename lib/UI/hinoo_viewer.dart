@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 import '../Entities/hinoo.dart';
 import 'hinoo_typography.dart';
 import '../Utility/honoo_colors.dart';
@@ -22,8 +23,10 @@ class HinooViewer extends StatefulWidget {
     this.gapColor = HonooColor.background,
     this.onDownloadTap,
     this.isReply = false,
+    this.authorId,
   });
   final bool isReply;
+  final String? authorId;
 
   @override
   State<HinooViewer> createState() => _HinooViewerState();
@@ -72,6 +75,11 @@ class _HinooViewerState extends State<HinooViewer> {
     final double displayW = baselineW * scale;
     final double displayH = baselineH * scale;
 
+    final String? currentUserId = SupabaseProvider.client.auth.currentUser?.id;
+    final bool isOwn = (widget.authorId != null && widget.authorId!.isNotEmpty)
+        ? (widget.authorId == currentUserId)
+        : false;
+
     return FocusableActionDetector(
       autofocus: true,
       shortcuts: {
@@ -106,12 +114,12 @@ class _HinooViewerState extends State<HinooViewer> {
             child: Container(
               width: baselineW,
               height: baselineH,
-              decoration: widget.isReply
+              decoration: (widget.isReply && !isOwn)
                   ? BoxDecoration(
                       border: Border.all(color: HonooColor.secondary, width: 1),
                       borderRadius: BorderRadius.circular(5),
                     )
-                  : (widget.draft.isFromMoonSaved
+                  : (widget.draft.isFromMoonSaved && !isOwn)
                       ? BoxDecoration(
                           border: Border.all(color: Colors.white, width: 1),
                           borderRadius: BorderRadius.circular(5),

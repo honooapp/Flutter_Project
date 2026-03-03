@@ -107,6 +107,7 @@ class _HinooThreadViewState extends State<HinooThreadView>
                 maxHeight: widget.maxHeight,
                 maxWidth: widget.maxWidth,
                 isReply: entry.isReply,
+                authorId: entry.authorId,
                 onDownloadTap: widget.onDownloadTap,
               );
             },
