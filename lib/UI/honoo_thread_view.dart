@@ -166,7 +166,9 @@ class _HonooThreadViewState extends State<HonooThreadView>
                 final double h = c.maxHeight.isFinite ? c.maxHeight : MediaQuery.of(ctx).size.height;
                 final double w = c.maxWidth.isFinite ? c.maxWidth : MediaQuery.of(ctx).size.width;
                 final double dy = (1.0 - _introCurve.value) * 12.0 - (_bounceCurve.value * 6.0);
-                final double hint = _hintCurve.value * (h * 0.5);
+                // Riduci l'ampiezza dell'hint per evitare che il primo messaggio
+                // appaia a metà schermo: ~18% dell'altezza disponibile.
+                final double hint = _hintCurve.value * (h * 0.18);
                 final double scale = 1.0 - (1.0 - _introCurve.value) * 0.01 - (_bounceCurve.value * 0.005);
                 return Transform.translate(
                   offset: Offset(0, -dy + hint),
