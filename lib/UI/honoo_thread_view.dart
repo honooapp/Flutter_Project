@@ -71,7 +71,7 @@ class _HonooThreadViewState extends State<HonooThreadView>
     _bounceCurve = CurvedAnimation(parent: _bounceController, curve: Curves.easeOutBack);
     _hintController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 180),
+      duration: const Duration(milliseconds: 220),
     );
     _hintCurve = CurvedAnimation(parent: _hintController, curve: Curves.easeOutCubic);
     _hintController.addStatusListener((status) {
@@ -167,9 +167,8 @@ class _HonooThreadViewState extends State<HonooThreadView>
                 final double h = c.maxHeight.isFinite ? c.maxHeight : MediaQuery.of(ctx).size.height;
                 final double w = c.maxWidth.isFinite ? c.maxWidth : MediaQuery.of(ctx).size.width;
                 final double dy = (1.0 - _introCurve.value) * 12.0 - (_bounceCurve.value * 6.0);
-                // Micro-rimbalzo: max ~12px per non spostare sensibilmente il primo messaggio
-                const double kMicro = 12.0;
-                final double hint = _hintCurve.value * kMicro;
+                // Rimbalzo fino a metà schermo per mostrare il contesto della risposta
+                final double hint = _hintCurve.value * (h * 0.5);
                 final double scale = 1.0 - (1.0 - _introCurve.value) * 0.01 - (_bounceCurve.value * 0.005);
                 return Transform.translate(
                   offset: Offset(0, -dy + hint),

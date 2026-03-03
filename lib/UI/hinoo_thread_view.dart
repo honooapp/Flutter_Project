@@ -54,7 +54,7 @@ class _HinooThreadViewState extends State<HinooThreadView>
     _bounceCurve = CurvedAnimation(parent: _bounceController, curve: Curves.easeOutBack);
     _hintController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 180),
+      duration: const Duration(milliseconds: 220),
     );
     _hintCurve = CurvedAnimation(parent: _hintController, curve: Curves.easeOutCubic);
     _hintController.addStatusListener((status) {
@@ -101,8 +101,8 @@ class _HinooThreadViewState extends State<HinooThreadView>
           if (mounted) _hintController.forward(from: 0);
         });
       }
-      const double kMicro = 12.0;
-      final double hint = _hintCurve.value * kMicro;
+      // Rimbalzo fino a metà schermo per mostrare il contesto della risposta
+      final double hint = _hintCurve.value * (h * 0.5);
       return Transform.translate(
         offset: Offset(0, -dy + hint),
         child: Transform.scale(
