@@ -324,13 +324,12 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                   if (choice == null || !mounted) return;
                   final _SharedHinooItem current = _items[_currentIndex];
                   if (choice == _ReplyChoice.hinoo) {
-                    // ignore: use_build_context_synchronously
+                    // Pre-cattura un navigator e un contesto stabile per il dialog
+                    final rootNav = Navigator.of(ctx, rootNavigator: true);
+                    final dialogContext = rootNav.context;
                     showHonooToast(ctx, message: 'Risposta inviata.');
-                    // ignore: use_build_context_synchronously
-                    // ignore: use_build_context_synchronously
                     await showDialog<void>(
-                      // ignore: use_build_context_synchronously
-                      context: ctx,
+                      context: dialogContext,
                       barrierDismissible: false,
                       builder: (_) => const BusyOverlay(message: 'Apro la conversazione...'),
                     );
@@ -345,19 +344,14 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                         ),
                       ),
                     );
-                    if (mounted) {
-                      final rootNav = Navigator.of(ctx, rootNavigator: true);
-                      rootNav.maybePop();
-                    }
+                    if (mounted) rootNav.maybePop();
                   } else {
                     // Risposta con honoo indirizzata al proprietario
-                    // ignore: use_build_context_synchronously
+                    final rootNav = Navigator.of(ctx, rootNavigator: true);
+                    final dialogContext = rootNav.context;
                     showHonooToast(ctx, message: 'Risposta inviata.');
-                    // ignore: use_build_context_synchronously
-                    // ignore: use_build_context_synchronously
                     await showDialog<void>(
-                      // ignore: use_build_context_synchronously
-                      context: ctx,
+                      context: dialogContext,
                       barrierDismissible: false,
                       builder: (_) => const HonooDialogShell(
                         child: Padding(
@@ -385,7 +379,6 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                         ),
                       ),
                     );
-                    // ignore: use_build_context_synchronously
                     await nav.push(
                       MaterialPageRoute(
                         builder: (_) => NewHonooPage(
@@ -396,11 +389,7 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                         ),
                       ),
                     );
-                    if (mounted) {
-                      // ignore: use_build_context_synchronously
-                      final rootNav = Navigator.of(ctx, rootNavigator: true);
-                      rootNav.maybePop();
-                    }
+                    if (mounted) rootNav.maybePop();
                   }
                   if (mounted) setState(() => _replying = false);
                 },

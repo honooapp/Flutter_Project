@@ -334,11 +334,11 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                       }
                     }
                   } else if (choice == _ReplyChoice.hinoo) {
-                    // ignore: use_build_context_synchronously
+                    final rootNav = Navigator.of(ctx, rootNavigator: true);
+                    final dialogContext = rootNav.context;
                     showHonooToast(ctx, message: 'Risposta inviata.');
                     await showDialog<void>(
-                      // ignore: use_build_context_synchronously
-                      context: ctx,
+                      context: dialogContext,
                       barrierDismissible: false,
                       builder: (_) => const BusyOverlay(message: 'Apro la conversazione...'),
                     );
@@ -352,10 +352,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                         ),
                       ),
                     );
-                    if (mounted) {
-                      final rootNav = Navigator.of(ctx, rootNavigator: true);
-                      rootNav.maybePop();
-                    }
+                    if (mounted) rootNav.maybePop();
                   }
                   if (mounted) setState(() => _replying = false);
                 },
