@@ -334,7 +334,6 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                       }
                     }
                   } else if (choice == _ReplyChoice.hinoo) {
-                    if (!mounted) return;
                     final rootNav = Navigator.of(context, rootNavigator: true);
                     final dialogContext = rootNav.context;
                     showHonooToast(context, message: 'Risposta inviata.');
@@ -343,7 +342,8 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                       barrierDismissible: false,
                       builder: (_) => const BusyOverlay(message: 'Apro la conversazione...'),
                     );
-                    await nav.push(
+                    if (!mounted) return;
+                    await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => NewHinooPage(
                           forcedType: HinooType.answer,

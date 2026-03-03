@@ -324,8 +324,7 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                   if (choice == null || !mounted) return;
                   final _SharedHinooItem current = _items[_currentIndex];
                   if (choice == _ReplyChoice.hinoo) {
-                    if (!mounted) return;
-                    // Usa il contesto corrente (montato) dopo l'await precedente
+                    // Usa State.context dopo l'await precedente
                     final rootNav = Navigator.of(context, rootNavigator: true);
                     final dialogContext = rootNav.context;
                     showHonooToast(context, message: 'Risposta inviata.');
@@ -334,8 +333,8 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                       barrierDismissible: false,
                       builder: (_) => const BusyOverlay(message: 'Apro la conversazione...'),
                     );
-                    // ignore: use_build_context_synchronously
-                    await nav.push(
+                    if (!mounted) return;
+                    await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => NewHinooPage(
                           forcedType: HinooType.answer,
@@ -348,7 +347,6 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                     if (mounted) rootNav.maybePop();
                   } else {
                     // Risposta con honoo indirizzata al proprietario
-                    if (!mounted) return;
                     final rootNav = Navigator.of(context, rootNavigator: true);
                     final dialogContext = rootNav.context;
                     showHonooToast(context, message: 'Risposta inviata.');
@@ -381,7 +379,8 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                         ),
                       ),
                     );
-                    await nav.push(
+                    if (!mounted) return;
+                    await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => NewHonooPage(
                           forcedType: HonooType.answer,
