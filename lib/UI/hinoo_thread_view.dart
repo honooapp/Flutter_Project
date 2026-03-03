@@ -34,7 +34,6 @@ class _HinooThreadViewState extends State<HinooThreadView>
   late final AnimationController _bounceController;
   late final Animation<double> _bounceCurve;
   int _lastIndex = 0;
-  bool _hinted = false; // mantenuto ma inutilizzato dopo la rimozione dell'hint
 
   @override
   void initState() {
@@ -82,7 +81,7 @@ class _HinooThreadViewState extends State<HinooThreadView>
       final dy = (1.0 - _introCurve.value) * 12.0 - (_bounceCurve.value * 6.0);
       final scale = 1.0 - (1.0 - _introCurve.value) * 0.01 - (_bounceCurve.value * 0.005);
       // Disabilita l'hint verticale per mantenere il primo messaggio agganciato in alto.
-      final double hint = 0.0;
+      const double hint = 0.0;
       return Transform.translate(
         offset: Offset(0, -dy + hint),
         child: Transform.scale(

@@ -36,10 +36,8 @@ class _HonooThreadViewState extends State<HonooThreadView>
   late final Animation<double> _introCurve;
   late final AnimationController _bounceController;
   late final Animation<double> _bounceCurve;
-  late final AnimationController _hintController;
-  late final Animation<double> _hintCurve;
   int _lastIndex = 0;
-  bool _conversationHinted = false;
+  // niente hint verticale: primo messaggio sempre ancorato in alto
 
   String _honooIdentity(Honoo honoo) {
     final String? dbId = honoo.dbId;
@@ -67,16 +65,6 @@ class _HonooThreadViewState extends State<HonooThreadView>
       duration: const Duration(milliseconds: 220),
     );
     _bounceCurve = CurvedAnimation(parent: _bounceController, curve: Curves.easeOutBack);
-    _hintController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-    _hintCurve = CurvedAnimation(parent: _hintController, curve: Curves.easeOutCubic);
-    _hintController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _hintController.reverse();
-      }
-    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _introController.forward();
     });
@@ -95,7 +83,7 @@ class _HonooThreadViewState extends State<HonooThreadView>
     _loader.dispose();
     _introController.dispose();
     _bounceController.dispose();
-    _hintController.dispose();
+    // nessun hint controller da rilasciare
     super.dispose();
   }
 
@@ -108,13 +96,6 @@ class _HonooThreadViewState extends State<HonooThreadView>
         Widget child;
         final bool hasReplies =
             !state.isLoading && state.error == null && state.thread.length > 1;
-        if (hasReplies && !_conversationHinted) {
-          // Trigger a half-screen vertical hint bounce once when a conversation is present
-          _conversationHinted = true;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) _hintController.forward(from: 0);
-          });
-        }
         if (state.isLoading) {
           child = const Center(
             key: ValueKey('thread_loading'),
@@ -166,9 +147,8 @@ class _HonooThreadViewState extends State<HonooThreadView>
                 final double h = c.maxHeight.isFinite ? c.maxHeight : MediaQuery.of(ctx).size.height;
                 final double w = c.maxWidth.isFinite ? c.maxWidth : MediaQuery.of(ctx).size.width;
                 final double dy = (1.0 - _introCurve.value) * 12.0 - (_bounceCurve.value * 6.0);
-                // Disabilita l'hint verticale per mantenere il primo messaggio
-                // agganciato in alto sotto l'header.
-                final double hint = 0.0;
+                // Disabilita l'hint verticale per mantenere il primo messaggio in alto
+                const double hint = 0.0;
                 final double scale = 1.0 - (1.0 - _introCurve.value) * 0.01 - (_bounceCurve.value * 0.005);
                 return Transform.translate(
                   offset: Offset(0, -dy + hint),
