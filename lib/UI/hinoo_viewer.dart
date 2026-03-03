@@ -111,7 +111,12 @@ class _HinooViewerState extends State<HinooViewer> {
                       border: Border.all(color: HonooColor.secondary, width: 1),
                       borderRadius: BorderRadius.circular(5),
                     )
-                  : null,
+                  : (widget.draft.isFromMoonSaved
+                      ? BoxDecoration(
+                          border: Border.all(color: Colors.white, width: 1),
+                          borderRadius: BorderRadius.circular(5),
+                        )
+                      : null),
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [

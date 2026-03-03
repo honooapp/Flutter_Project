@@ -184,15 +184,22 @@ class HonooCard extends StatelessWidget {
           ),
         );
 
-        final Widget wrapped = !isReply
-            ? content
-            : Container(
+        final bool showReplyBorder = isReply;
+        final bool showMoonSavedBorder = !showReplyBorder && honoo.isFromMoonSaved;
+        final Widget wrapped = (showReplyBorder || showMoonSavedBorder)
+            ? Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: HonooColor.secondary, width: 6),
+                  border: Border.all(
+                    color: showReplyBorder
+                        ? HonooColor.secondary
+                        : Colors.white,
+                    width: 6,
+                  ),
                 ),
                 child: content,
-              );
+              )
+            : content;
 
         return Center(child: wrapped);
       },
