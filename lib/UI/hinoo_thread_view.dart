@@ -54,14 +54,18 @@ class _HinooThreadViewState extends State<HinooThreadView>
     _bounceCurve = CurvedAnimation(parent: _bounceController, curve: Curves.easeOutBack);
     _hintController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 220),
+      duration: const Duration(milliseconds: 360),
     );
-    _hintCurve = CurvedAnimation(parent: _hintController, curve: Curves.easeOutCubic);
-    _hintController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _hintController.reverse();
-      }
-    });
+    _hintCurve = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: CurvedTween(curve: Curves.easeOut),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: CurvedTween(curve: Curves.easeIn),
+        weight: 50,
+      ),
+    ]).animate(_hintController);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _introController.forward();
     });
