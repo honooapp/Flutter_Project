@@ -33,7 +33,6 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> {
   bool _loading = true;
   List<_Entry> _entries = const [];
   RealtimeChannel? _chan;
-  int _selected = 0;
   bool _didHighlight = false;
 
   @override
@@ -107,7 +106,6 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> {
       });
       if (widget.highlightLatest && !_didHighlight && _entries.isNotEmpty) {
         _didHighlight = true;
-        setState(() => _selected = _entries.length - 1);
         widget.onSelect?.call(_toConversationEntry(_entries.last));
       }
     } catch (_) {
@@ -158,38 +156,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> {
     );
   }
 
-  Widget _buildHonooTile(Honoo h, bool selected, {required bool isOther}) {
-    return SizedBox(
-      width: widget.maxWidth,
-      height: widget.maxHeight,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          border: Border.all(
-              color: isOther ? HonooColor.secondary : (selected ? Colors.white70 : Colors.transparent),
-              width: isOther ? 6 : 2),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: HonooCard(honoo: h),
-      ),
-    );
-  }
-
-  Widget _buildHinooTile(HinooDraft d, bool selected, {required bool isOther}) {
-    return SizedBox(
-      width: widget.maxWidth,
-      height: widget.maxHeight,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          border: Border.all(
-              color: isOther ? HonooColor.secondary : (selected ? Colors.white70 : Colors.transparent),
-              width: isOther ? 6 : 2),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: HinooViewer(
-            draft: d, maxHeight: widget.maxHeight, maxWidth: widget.maxWidth),
-      ),
-    );
-  }
+  // Tile helpers non più utilizzati con il rendering a lista separata
 
   @override
   void dispose() {
