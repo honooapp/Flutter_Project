@@ -7,7 +7,6 @@ import 'package:honoo/UI/hinoo_viewer.dart';
 import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 // rendering a lista con separatori; rimosso carousel verticale
-import 'package:honoo/Utility/honoo_colors.dart';
 
 class UnifiedThreadView extends StatefulWidget {
   const UnifiedThreadView({
