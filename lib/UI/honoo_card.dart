@@ -72,7 +72,8 @@ class HonooCard extends StatelessWidget {
           color: cardBg,
           elevation: 0,
           margin: EdgeInsets.zero,
-          clipBehavior: Clip.antiAlias,
+          // Evita clipping dei bordi/ombre esterne applicate dal contenitore padre
+          clipBehavior: Clip.none,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(cornerRadius),
           ),
