@@ -129,19 +129,38 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
     if (widget.isActive && !_hasPlayedReveal && mounted) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        _controller.forward();
-        _hasPlayedReveal = true;
+        // Attiva reveal solo se la prima card (più recente) è una reply di altri (non moon-saved, non mia)
+        if (_entries.isNotEmpty && _shouldReveal(_entries.last)) {
+          _controller.forward();
+          _hasPlayedReveal = true;
+        }
       });
     }
+  }
+
+  bool _shouldReveal(_Entry e) {
+    final String? myId = SupabaseProvider.client.auth.currentUser?.id;
+    // Moon-saved: non rivelare
+    final bool isMoon = e.isFromMoonSaved == true ||
+        (e.honoo != null && (e.honoo!.isFromMoonSaved == true));
+    if (isMoon) return false;
+
+    // Creato da me: non rivelare
+    if (e.ownerId != null && myId != null && e.ownerId == myId) return false;
+
+    // Reply?
+    final bool isReply = e.honoo != null
+        ? (e.honoo!.type == HonooType.answer)
+        : (e.hinoo != null && e.hinoo!.type == HinooType.answer);
+
+    return isReply;
   }
 
   @override
   Widget build(BuildContext context) {
     if (_loading) return const Center(child: LoadingSpinner());
-    final double h = widget.maxHeight;
     return SizedBox(
       width: widget.maxWidth,
-      height: h,
       child: ListView.separated(
         padding: const EdgeInsets.symmetric(vertical: 16),
         physics: const BouncingScrollPhysics(),
@@ -159,7 +178,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
               maxWidth: widget.maxWidth,
             ),
           );
-          if (index == 0) {
+          if (index == 0 && _shouldReveal(e)) {
             final screenH = MediaQuery.of(context).size.height;
             return AnimatedBuilder(
               animation: _liftAnimation,
