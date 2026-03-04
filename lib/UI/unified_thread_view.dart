@@ -161,16 +161,16 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
     if (_loading) return const Center(child: LoadingSpinner());
     return SizedBox(
       width: widget.maxWidth,
-      child: ListView.separated(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+      height: widget.maxHeight,
+      child: PageView.builder(
+        scrollDirection: Axis.vertical,
         physics: const BouncingScrollPhysics(),
         itemCount: _entries.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 14),
         itemBuilder: (context, index) {
-          // Visualizza in ordine inverso: ultimo in cima
+          // Ordine inverso: ultimo (più recente) in cima
           final revIndex = _entries.length - 1 - index;
           final e = _entries[revIndex];
-          final child = e.when(
+          final card = e.when(
             honoo: (h) => HonooCard(honoo: h),
             hinoo: (d) => HinooViewer(
               draft: d,
@@ -178,6 +178,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
               maxWidth: widget.maxWidth,
             ),
           );
+          final Widget page = SizedBox.expand(child: card);
           if (index == 0 && _shouldReveal(e)) {
             final screenH = MediaQuery.of(context).size.height;
             return AnimatedBuilder(
@@ -186,10 +187,10 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
                 final double offsetY = _liftAnimation.value * (screenH * 0.4);
                 return Transform.translate(offset: Offset(0, offsetY), child: childWidget);
               },
-              child: child,
+              child: page,
             );
           }
-          return child;
+          return page;
         },
       ),
     );

@@ -165,7 +165,8 @@ class _HinooViewerState extends State<HinooViewer> {
                         child: PageView.builder(
                           scrollDirection: Axis.vertical,
                           controller: _vController,
-                          physics: const PageScrollPhysics(),
+                          // disabilita scroll interno in contesti di thread verticale a pagina intera
+                          physics: const NeverScrollableScrollPhysics(),
                           allowImplicitScrolling: true,
                           itemCount: widget.draft.pages.length,
                           itemBuilder: (context, index) {
