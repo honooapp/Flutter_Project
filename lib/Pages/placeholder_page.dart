@@ -13,6 +13,7 @@ import '../Widgets/honoo_dialogs.dart';
 import 'performance_page.dart';
 import 'venceslao_page.dart';
 import 'coming_soon_page.dart';
+import 'feste_page.dart';
 import 'luna_page.dart';
 import 'viaggi_isola_page.dart';
 import 'laboratori_siae_page.dart';
@@ -298,11 +299,11 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         context,
         festeLine,
         baseTextStyle,
-        onTap: () => showHonooMessageDialog(
-          context,
-          message: 'pagina in elaborazione',
-          duration: const Duration(milliseconds: 1400),
-        ),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const FestePage()),
+          );
+        },
       ),
       ..._iconBlockWithSpacing(
         "assets/icons/feste.png",
@@ -311,13 +312,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         bottomSpacing: _festeBottomSpacing,
         onTap: () {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const ComingSoonPage(
-                header: 'feste',
-                quote: 'Pagina in elaborazione',
-                bibliography: '',
-              ),
-            ),
+            MaterialPageRoute(builder: (_) => const FestePage()),
           );
         },
       ),
