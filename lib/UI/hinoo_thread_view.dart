@@ -32,7 +32,6 @@ class _HinooThreadViewState extends State<HinooThreadView>
   late final Animation<double> _introCurve;
   late final AnimationController _bounceController;
   late final Animation<double> _bounceCurve;
-  int _lastIndex = 0;
   // Micro-hint per suggerire contenuto successivo (12px max)
   late final AnimationController _hintController;
   late final Animation<double> _hintCurve;
