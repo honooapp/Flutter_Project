@@ -1,4 +1,4 @@
-import 'package:carousel_slider/carousel_slider.dart' as cs;
+// rimosso carousel per rendering a lista separata
 import 'package:flutter/material.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
@@ -28,7 +28,6 @@ class HinooThreadView extends StatefulWidget {
 
 class _HinooThreadViewState extends State<HinooThreadView>
     with SingleTickerProviderStateMixin {
-  final cs.CarouselController _vController = cs.CarouselController();
   late final AnimationController _introController;
   late final Animation<double> _introCurve;
   late final AnimationController _bounceController;
@@ -111,24 +110,12 @@ class _HinooThreadViewState extends State<HinooThreadView>
         offset: Offset(0, -dy + hint),
         child: Transform.scale(
           scale: scale.clamp(0.97, 1.0),
-          child: cs.CarouselSlider.builder(
-            key: ValueKey(items.length),
-            carouselController: _vController,
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            physics: const BouncingScrollPhysics(),
             itemCount: items.length,
-            options: cs.CarouselOptions(
-              scrollDirection: Axis.vertical,
-              height: h,
-              viewportFraction: 1.0,
-              enableInfiniteScroll: false,
-              padEnds: false,
-              enlargeCenterPage: false,
-              scrollPhysics: const BouncingScrollPhysics(),
-              onPageChanged: (index, reason) {
-                if (index > _lastIndex) _bounceController.forward(from: 0);
-                _lastIndex = index;
-              },
-            ),
-            itemBuilder: (context, index, realIdx) {
+            separatorBuilder: (_, __) => const SizedBox(height: 14),
+            itemBuilder: (context, index) {
               final entry = items[index];
               return HinooViewer(
                 draft: entry.draft,

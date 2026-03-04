@@ -1,5 +1,5 @@
 // lib/UI/honoo_thread_view.dart
-import 'package:carousel_slider/carousel_slider.dart' as cs;
+// rimosso carousel per rendering a lista separata
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -31,7 +31,6 @@ class HonooThreadView extends StatefulWidget {
 class _HonooThreadViewState extends State<HonooThreadView>
     with SingleTickerProviderStateMixin {
   late final HonooThreadLoader _loader;
-  final _vController = cs.CarouselController();
   late final AnimationController _introController;
   late final Animation<double> _introCurve;
   late final AnimationController _bounceController;
@@ -40,7 +39,7 @@ class _HonooThreadViewState extends State<HonooThreadView>
   late final AnimationController _hintController;
   late final Animation<double> _hintCurve;
   bool _hinted = false;
-  int _lastIndex = 0;
+  // niente gestione page-change verticale: lista con separatori
   // niente hint verticale: primo messaggio sempre ancorato in alto
 
   String _honooIdentity(Honoo honoo) {
@@ -181,35 +180,18 @@ class _HonooThreadViewState extends State<HonooThreadView>
                     child: SizedBox(
                       width: w,
                       height: h,
-                      child: KeyedSubtree(
-                        key: ValueKey(
-                            'thread_list_${thread.length}_${_honooIdentity(thread.first)}'),
-                        child: cs.CarouselSlider.builder(
-                          carouselController: _vController,
-                          itemCount: ordered.length,
-                          options: cs.CarouselOptions(
-                            height: h,
-                            scrollDirection: Axis.vertical,
-                            viewportFraction: 1.0,
-                            enableInfiniteScroll: false,
-                            padEnds: false,
-                            enlargeCenterPage: false,
-                            scrollPhysics: const BouncingScrollPhysics(),
-                            onPageChanged: (index, reason) {
-                              if (index > _lastIndex) {
-                                _bounceController.forward(from: 0);
-                              }
-                              _lastIndex = index;
-                            },
-                          ),
-                          itemBuilder: (context, index, realIdx) {
-                            final honoo = ordered[index];
-                            return HonooCard(
-                              honoo: honoo,
-                              onDownloadTap: widget.onDownloadTap,
-                            );
-                          },
-                        ),
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: ordered.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 14),
+                        itemBuilder: (context, index) {
+                          final honoo = ordered[index];
+                          return HonooCard(
+                            honoo: honoo,
+                            onDownloadTap: widget.onDownloadTap,
+                          );
+                        },
                       ),
                     ),
                   ),
