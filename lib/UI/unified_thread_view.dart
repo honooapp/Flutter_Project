@@ -16,6 +16,7 @@ class UnifiedThreadView extends StatefulWidget {
     required this.maxHeight,
     this.onSelect,
     this.highlightLatest = false,
+    this.isActive = false,
   });
 
   final String conversationId;
@@ -23,20 +24,29 @@ class UnifiedThreadView extends StatefulWidget {
   final double maxHeight;
   final ValueChanged<ConversationEntry>? onSelect;
   final bool highlightLatest;
+  final bool isActive;
 
   @override
   State<UnifiedThreadView> createState() => _UnifiedThreadViewState();
 }
 
-class _UnifiedThreadViewState extends State<UnifiedThreadView> {
+class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTickerProviderStateMixin {
   bool _loading = true;
   List<_Entry> _entries = const [];
   RealtimeChannel? _chan;
   bool _didHighlight = false;
+  bool _hasPlayedReveal = false;
+  late AnimationController _controller;
+  late Animation<double> _liftAnimation;
 
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 450));
+    _liftAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: -1.0), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: -1.0, end: 0.0), weight: 50),
+    ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     _load();
     _subscribe();
   }
@@ -114,6 +124,18 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> {
   }
 
   @override
+  void didUpdateWidget(covariant UnifiedThreadView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive && !_hasPlayedReveal && mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _controller.forward();
+        _hasPlayedReveal = true;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (_loading) return const Center(child: LoadingSpinner());
     final double h = widget.maxHeight;
@@ -126,7 +148,9 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> {
         itemCount: _entries.length,
         separatorBuilder: (_, __) => const SizedBox(height: 14),
         itemBuilder: (context, index) {
-          final e = _entries[index];
+          // Visualizza in ordine inverso: ultimo in cima
+          final revIndex = _entries.length - 1 - index;
+          final e = _entries[revIndex];
           final child = e.when(
             honoo: (h) => HonooCard(honoo: h),
             hinoo: (d) => HinooViewer(
@@ -135,21 +159,18 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> {
               maxWidth: widget.maxWidth,
             ),
           );
-          return TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.0, end: 1.0),
-            duration: Duration(milliseconds: 250 + (index * 40)),
-            curve: Curves.easeOut,
-            builder: (context, value, childWidget) {
-              return Opacity(
-                opacity: value,
-                child: Transform.translate(
-                  offset: Offset(0, (1 - value) * 8),
-                  child: childWidget,
-                ),
-              );
-            },
-            child: child,
-          );
+          if (index == 0) {
+            final screenH = MediaQuery.of(context).size.height;
+            return AnimatedBuilder(
+              animation: _liftAnimation,
+              builder: (context, childWidget) {
+                final double offsetY = _liftAnimation.value * (screenH * 0.4);
+                return Transform.translate(offset: Offset(0, offsetY), child: childWidget);
+              },
+              child: child,
+            );
+          }
+          return child;
         },
       ),
     );
@@ -160,6 +181,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> {
   @override
   void dispose() {
     _chan?.unsubscribe();
+    _controller.dispose();
     super.dispose();
   }
 

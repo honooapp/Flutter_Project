@@ -1499,8 +1499,9 @@ class _ChestPageState extends State<ChestPage> {
     double availableCenterH,
     double targetMaxW,
     HonooBuilderMetrics honooMetrics,
-    ResponsiveLayoutMode layoutMode,
-  ) {
+    ResponsiveLayoutMode layoutMode, {
+    bool isActive = false,
+  }) {
     final String identity = item.when(
       honoo: (h) {
         final String? dbId = h.dbId;
@@ -1534,6 +1535,7 @@ class _ChestPageState extends State<ChestPage> {
             conversationId: convId,
             maxWidth: targetMaxW,
             maxHeight: availableCenterH,
+            isActive: isActive,
             onSelect: (e) => setState(() => _selectedConvEntry = e),
             highlightLatest: widget.highlightLatest &&
                 (widget.focusConversationId != null &&
@@ -1765,12 +1767,14 @@ class _ChestPageState extends State<ChestPage> {
                 }),
               ),
               itemBuilder: (context, index, realIdx) {
+                final bool isActive = _currentIndex == index;
                 return _buildChestItem(
                   items[index],
                   availableH,
                   viewW,
                   honooMetrics,
                   layoutMode,
+                  isActive: isActive,
                 );
               },
             );
