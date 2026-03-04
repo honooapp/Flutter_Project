@@ -14,6 +14,7 @@ import 'performance_page.dart';
 import 'venceslao_page.dart';
 import 'coming_soon_page.dart';
 import 'luna_page.dart';
+import 'viaggi_isola_page.dart';
 import 'laboratori_siae_page.dart';
 
 class PlaceholderPage extends StatefulWidget {
@@ -325,11 +326,11 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         viaggiLine,
         baseTextStyle,
         height: 0.9,
-        onTap: () => showHonooMessageDialog(
-          context,
-          message: 'pagina in elaborazione',
-          duration: const Duration(milliseconds: 1400),
-        ),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const ViaggiIsolaPage()),
+          );
+        },
       ),
       ..._iconBlockWithSpacing(
         "assets/icons/isola.png",
@@ -338,13 +339,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         bottomSpacing: _isolaBottomSpacing,
         onTap: () {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const ComingSoonPage(
-                header: "viaggi sull'Isola delle Storie",
-                quote: 'Pagina in elaborazione',
-                bibliography: '',
-              ),
-            ),
+            MaterialPageRoute(builder: (_) => const ViaggiIsolaPage()),
           );
         },
       ),
