@@ -108,7 +108,7 @@ class ViaggiIsolaPage extends StatelessWidget {
                       style: bodyStyle,
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 9),
+                    // Rimosso spazio sopra l'immagine della mappa
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Center(
@@ -126,7 +126,7 @@ class ViaggiIsolaPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    // Rimosso spazio tra immagine della mappa e testo sottostante
                     Text(
                       _textBelowMap,
                       style: bodyStyle,
@@ -186,4 +186,3 @@ class ViaggiIsolaPage extends StatelessWidget {
     return isPhone ? pageBody : Background(child: pageBody);
   }
 }
-
