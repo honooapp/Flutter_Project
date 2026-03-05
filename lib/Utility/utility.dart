@@ -20,7 +20,7 @@ class Utility {
   final String text1Fifth =
       """\n\navevi gli occhi chiusi\ne hai fatto la scelta giusta.\n\nMi chiamo\nVenceslao Cembalo\ne se telefoni al\n3274920811,\npuoi sentire\nun’altra volta\nla mia voce\ne continuare il viaggio.\n\n Se le cose\nstanno\ndiversamente,\nclicca sull’icona della\nhome\nin basso a sinistra.\n\nIn alto\nal centro\ndi ogni schermata\nc'è il logo\n\n""";
   final String text1Six =
-      """\n\nse ci clicchi sopra,\ntorni qui\na questa pagina.\n""";
+      """\n\nse ci clicchi sopra,\ntorni qui\na questa pagina.\n\n""";
   final String sostieniText =
       """
 Vuoi collaborare
