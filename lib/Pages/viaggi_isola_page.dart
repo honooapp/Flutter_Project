@@ -22,10 +22,9 @@ class ViaggiIsolaPage extends StatelessWidget {
       "può essere un modo\n"
       "di viaggiare.\n\n"
       "Questa è la Mappa\n"
-      "dell’Isola.\n\n";
+      "dell’Isola.";
 
   static const String _textBelowMap =
-      "\n"
       "Nella parte orientale\n"
       "ci sono i luoghi\n"
       "di un percorso\n"
