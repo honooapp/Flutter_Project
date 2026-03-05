@@ -8,6 +8,7 @@ import '../Utility/honoo_colors.dart';
 import '../Utility/utility.dart';
 import '../Widgets/background.dart';
 import '../Widgets/honoo_app_title.dart';
+import 'package:honoo/Utility/formatted_text.dart';
 import 'home_page.dart';
 import 'performance_page.dart';
 import 'venceslao_page.dart';
@@ -368,7 +369,13 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
       _textBlock(Utility().appName, titleStyle),
       const SizedBox(height: _honooBottomSpacing),
       _textBlock(_trimInlineText(Utility().text1Six), baseTextStyle),
-      _textBlock(_trimInlineText(Utility().sostieniText), baseTextStyle),
+      // Usa FormattedText per supportare hyperlink cliccabili nel testo di sostegno
+      FormattedText(
+        inputText: Utility().sostieniText,
+        color: HonooColor.onBackground,
+        fontSize: 18,
+        fontWeight: FontWeight.w200,
+      ),
     ];
 
     final Widget content = Center(

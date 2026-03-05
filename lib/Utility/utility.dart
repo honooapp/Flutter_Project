@@ -22,61 +22,49 @@ class Utility {
   final String text1Six =
       """\n\nse ci clicchi sopra,\ntorni qui\na questa pagina.\n\n""";
   final String sostieniText =
-      """
-Vuoi collaborare
-a questo progetto?
-
-Scrivimi a
-venceslao.cembalo@gmail.com.
-
-Se fai la dichiarazione
-dei redditi,
-puoi scegliere
-di destinare
-il 5 per mille
-a honoo.
-
-Non è una donazione in più.
-Non costa nulla.
-
-È una parte
-delle tue imposte
-che puoi decidere
-a chi destinare.
-
-Firma
-nel riquadro
-dedicato agli Enti
-del Terzo Settore
-e scrivi
-il codice fiscale
-di honoo.
-
-Codice fiscale di
-honoo - laboratorio multimediale:
-95349850636
-
-Se ti va,
-clicca qui:
-https://ko-fi.com/honoo2026
-per offrire
-un bicchiere di Idromele
-agli Gnometti delle Idee.
-
-Oppure
-un paio di fiaschi.
-
-I risultati
-saranno scintillanti:
-gli Gnometti delle Idee
-sono sconsideratamente generosi
-con chi è generoso.
-
-Prova
-e di me dirai
-che gli amici
-li consiglio bene.
-""";
+      'Vuoi collaborare\n'
+      'a questo progetto?\n\n'
+      'Scrivimi a\n'
+      'venceslao.cembalo@gmail.com.\n\n'
+      'Se fai la dichiarazione\n'
+      'dei redditi,\n'
+      'puoi scegliere\n'
+      'di destinare\n'
+      'il 5 per mille\n'
+      'a honoo.\n\n'
+      'Non è una donazione in più.\n'
+      'Non costa nulla.\n\n'
+      'È una parte\n'
+      'delle tue imposte\n'
+      'che puoi decidere\n'
+      'a chi destinare.\n\n'
+      'Firma\n'
+      'nel riquadro\n'
+      'dedicato agli Enti\n'
+      'del Terzo Settore\n'
+      'e scrivi\n'
+      'il codice fiscale\n'
+      'di honoo.\n\n'
+      'Codice fiscale di\n'
+      'honoo - laboratorio multimediale:\n'
+      '95349850636\n\n'
+      'Se ti va,\n'
+      'clicca qui:\n\n'
+      '<l>https://ko-fi.com/honoo2026||ko-fi.com/honoo2026</l>\n'
+      'per offrire\n\n'
+      'un bicchiere di Idromele\n'
+      'agli Gnometti delle Idee.\n\n'
+      'Oppure\n'
+      'un paio di fiaschi.\n\n'
+      'I risultati\n'
+      'saranno scintillanti:\n'
+      'gli Gnometti delle Idee\n'
+      'sono sconsideratamente generosi\n'
+      'con chi è generoso.\n\n'
+      'Prova\n'
+      'e di me dirai\n'
+      'che gli amici\n'
+      'li consiglio bene.\n';
   final String textHome1 = 'Ti regaliamo la Luna.\nPer sempre.';
   final String textHome2 =
       'Niente è per sempre,\ne nessuno può regalarti la Luna.\n\nÈ vero,\nma non per i poeti.\n\nVuoi essere un poeta di honoo?\n\nClicca sulla Bottiglia,\ne componi i tuoi honoo e hinoo.\n\nOppure sulla Luna,\ne guarda gli honoo\ne gli hinoo degli altri.\n\nO sull’Isola,\ne inizia il viaggio\nverso le tue storie.';
