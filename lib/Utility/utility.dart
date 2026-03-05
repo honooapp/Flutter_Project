@@ -50,7 +50,7 @@ class Utility {
       '95349850636\n\n'
       'Se ti va,\n'
       'clicca qui:\n\n'
-      '<lb>https://ko-fi.com/honoo2026||ko-fi.com/honoo2026</lb>\n\n'
+      '<l>https://ko-fi.com/honoo2026||ko-fi.com/honoo2026</l>\n\n'
       'per offrire\n'
       'un bicchiere di Idromele\n'
       'agli Gnometti delle Idee.\n\n'
