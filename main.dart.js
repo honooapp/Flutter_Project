@@ -27994,12 +27994,13 @@ _.b=b
 _.c=c
 _.d=d},
 Nu:function Nu(){},
-pX:function pX(a,b,c,d,e){var _=this
+pX:function pX(a,b,c,d,e,f){var _=this
 _.c=a
 _.d=b
 _.e=c
 _.f=d
-_.a=e},
+_.r=e
+_.a=f},
 aet:function aet(a,b,c){this.a=a
 this.b=b
 this.c=c},
@@ -31884,7 +31885,7 @@ return A.r($async$aRC,r)},
 aX9(a){var s,r,q=null,p=a.split("<b>"),o=A.b([],t.Ne)
 for(s=0;s<p.length;++s)if(B.e.cb(s,2)===0){r=p[s]
 o.push(A.c5(q,q,A.cz(B.f,q,q,q,18,q,B.w,q),r))}else{r=p[s]
-o.push(A.c5(q,q,A.cz(B.f,q,q,q,18,q,B.Z,q),r))}return A.z5(q,q,B.cr,q,q,!0,q,A.c5(o,q,q,q),B.n,q,q,1,B.aQ)},
+o.push(A.c5(q,q,A.cz(B.f,q,q,q,18,q,B.Y,q),r))}return A.z5(q,q,B.cr,q,q,!0,q,A.c5(o,q,q,q),B.n,q,q,1,B.aQ)},
 bt(a){return"assets/icons/ching/svg/ching_"+a+".svg"},
 ag2(a){switch(a.a){case 1:return"moon"
 default:return a.b}},
@@ -54505,7 +54506,7 @@ if(s!=null&&s.a!=null)return
 r=this.r
 if(r){p.z=B.aG
 q=p.jK(1,B.a_p,B.JK)}else{p.z=B.aG
-q=p.jK(0,B.Y,B.p1)}q.b0(new A.aAz(this,r),t.H)},
+q=p.jK(0,B.Z,B.p1)}q.b0(new A.aAz(this,r),t.H)},
 G(a0){var s,r,q,p,o,n,m,l,k,j,i,h,g=this,f=null,e=g.a.r==null,d=!e,c=A.Qs(a0),b=c.ghB(),a=g.a.e
 if(a==null)s=f
 else s=A.Qk(a,a0)
@@ -93794,7 +93795,7 @@ q=r==null?null:B.d.aI(r)
 if(q==null)q=a.z
 p=B.e.aJ(q+b,0,c)
 if(p===q)return
-a.e3(p,B.Y,B.ay)},
+a.e3(p,B.Z,B.ay)},
 m0(a){return this.aiJ(a)},
 aiJ(a){var s=0,r=A.t(t.H),q,p=2,o,n=[],m=this,l,k,j,i,h,g,f,e
 var $async$m0=A.o(function(b,c){if(b===1){o=c
@@ -93933,9 +93934,9 @@ m.toString
 l=o.Q
 l.toString
 s=3
-return A.i(k.hq(B.d.aJ(n+j*0.5,m,l),B.Y,B.ay),$async$wd)
+return A.i(k.hq(B.d.aJ(n+j*0.5,m,l),B.Z,B.ay),$async$wd)
 case 3:s=4
-return A.i(k.hq(n,B.Y,B.p2),$async$wd)
+return A.i(k.hq(n,B.Z,B.p2),$async$wd)
 case 4:case 1:return A.q(q,r)}})
 return A.r($async$wd,r)},
 w9(a){return this.ajH(a)},
@@ -94204,12 +94205,12 @@ n=p.r
 s=n.d.length!==0?3:4
 break
 case 3:s=5
-return A.i(n.e3(0,B.Y,B.ay),$async$w4)
+return A.i(n.e3(0,B.Z,B.ay),$async$w4)
 case 5:case 4:n=p.w
 s=n.d.length!==0?6:7
 break
 case 6:s=8
-return A.i(n.e3(o,B.Y,B.p2),$async$w4)
+return A.i(n.e3(o,B.Z,B.p2),$async$w4)
 case 8:if(p.c!=null)p.J(new A.axb(p,o))
 case 7:case 1:return A.q(q,r)}})
 return A.r($async$w4,r)},
@@ -94232,9 +94233,9 @@ i.toString
 l=B.d.aJ(m+j,f,i)
 p=4
 s=7
-return A.i(g.hq(l,B.Y,B.p1),$async$wc)
+return A.i(g.hq(l,B.Z,B.p1),$async$wc)
 case 7:s=8
-return A.i(g.hq(m,B.Y,B.a8),$async$wc)
+return A.i(g.hq(m,B.Z,B.a8),$async$wc)
 case 8:p=2
 s=6
 break
@@ -94776,7 +94777,7 @@ A.axr.prototype={
 $1(a){return new A.B1(this.a,null)},
 $S:538}
 A.axK.prototype={
-$1(a){var s,r,q=null,p=A.ak("Vuoi inviare un messaggio\nprima di bussare?",q,q,q,q,q,A.aU(B.f,q,20,B.Z,q),B.n,q),o=this.a,n=A.e9(q,q,B.f,q,q,q,0,q,q,B.l,q,q,B.ai,q,new A.bQ(A.aX(16),B.u),q,q,q,q)
+$1(a){var s,r,q=null,p=A.ak("Vuoi inviare un messaggio\nprima di bussare?",q,q,q,q,q,A.aU(B.f,q,20,B.Y,q),B.n,q),o=this.a,n=A.e9(q,q,B.f,q,q,q,0,q,q,B.l,q,q,B.ai,q,new A.bQ(A.aX(16),B.u),q,q,q,q)
 n=A.em(A.ak("Scrivi un hinoo",q,q,q,q,q,A.aU(B.l,q,14,B.G,q),q,q),new A.axH(o),n)
 s=A.e9(q,q,B.f,q,q,q,0,q,q,B.l,q,q,B.ai,q,new A.bQ(A.aX(16),B.u),q,q,q,q)
 s=A.em(A.ak("Scrivi un honoo",q,q,q,q,q,A.aU(B.l,q,14,B.G,q),q,q),new A.axI(o),s)
@@ -94802,7 +94803,7 @@ A.axv.prototype={
 $2(a,b){return B.e.aU(b.c.a,a.c.a)},
 $S:540}
 A.axw.prototype={
-$1(a){var s,r,q,p,o,n,m=null,l=A.ak("Bussate in attesa",m,m,m,m,m,A.aU(B.f,m,20,B.Z,m),B.n,m),k=t.p,j=A.b([],k)
+$1(a){var s,r,q,p,o,n,m=null,l=A.ak("Bussate in attesa",m,m,m,m,m,A.aU(B.f,m,20,B.Y,m),B.n,m),k=t.p,j=A.b([],k)
 for(s=this.b,r=s.length,q=this.a,p=0;p<s.length;s.length===r||(0,A.L)(s),++p){o=s[p]
 n=new A.bn(16,16)
 n=A.e9(m,m,B.f,m,m,m,0,m,m,B.l,m,m,B.ai,m,new A.bQ(new A.dB(n,n,n,n),B.u),m,m,m,m)
@@ -94871,10 +94872,10 @@ b7=A.a9([A.l2(B.b7),B.a1O,A.l2(B.b8),B.a1N,A.l2(B.bT),B.a1Q,A.l2(B.bS),B.a1P],t.
 a=A.a9([B.a0K,new A.cj(new A.ay4(b2,b),new A.bm(A.b([],t.g),t._),t.zN)],t.n,t.V)
 a0=t.B
 a1=A.op(c6).xq(A.cv([B.aq,B.b0,B.bz,B.b1],a0))
-a0=A.bh(A.aVo(new A.V(c3.a,c3.b,A.kc(A.o7(B.bj,A.Wb(A.op(c6).xq(A.cv([B.aq,B.b0,B.bz,B.b1],a0)),new A.ay5(b2,c,r,c3,b1,b).$0()),a4,a4,a4,a4,new A.ay6(b2),a4),B.bh,a4,new A.ay7(b2),new A.ay8(b2),a4),a4),new A.af(0,b3,0,1/0),B.Y,B.pb),a4,a4,a4)
+a0=A.bh(A.aVo(new A.V(c3.a,c3.b,A.kc(A.o7(B.bj,A.Wb(A.op(c6).xq(A.cv([B.aq,B.b0,B.bz,B.b1],a0)),new A.ay5(b2,c,r,c3,b1,b).$0()),a4,a4,a4,a4,new A.ay6(b2),a4),B.bh,a4,new A.ay7(b2),new A.ay8(b2),a4),a4),new A.af(0,b3,0,1/0),B.Z,B.pb),a4,a4,a4)
 a2=t.kK
 if(f){a3=s[o].b
-a2=A.rS(A.bh(A.aZP(a3,c0,b4,c5,!0,new A.cP(a3.a+"_open",a2),e,a5,c2,c4),a4,a4,a4),B.K_,A.By(),B.Y,B.Y,new A.ay9())}else{a3=s[o].b
+a2=A.rS(A.bh(A.aZP(a3,c0,b4,c5,!0,new A.cP(a3.a+"_open",a2),e,a5,c2,c4),a4,a4,a4),B.K_,A.By(),B.Z,B.Z,new A.ay9())}else{a3=s[o].b
 a2=A.bh(A.aZP(a3,c0,b4,c5,!1,new A.cP(a3.a+"_closed",a2),e,a5,c2,c4),a4,a4,a4)}a3=t.p
 a2=A.b([a0,a2],a3)
 a0=A.b([new A.V(a4,c1,A.o7(B.bj,A.Wb(a1,new A.yB(!1,B.ab,!1,b2.r,c,!0,new A.aya(b2),A.aYW(a2,!0,!0,!0),B.v,a4,!0,a4)),a4,a4,a4,a4,new A.ayb(b2),a4),a4)],a3)
@@ -95018,7 +95019,7 @@ A.L7.prototype={
 G(a){var s,r=null,q=this.c,p=q>99?"99+":B.e.j(q),o=q>9?18:16
 q=A.aX(o/2)
 s=A.iA(B.R,1.5)
-return A.b7(r,A.bh(A.ak(p,r,r,r,r,r,A.f5(B.f,10,B.Z),r,r),r,r,r),B.h,r,new A.af(o,1/0,0,1/0),new A.c2(B.ww,r,s,q,r,r,B.K),r,o,r,r,B.dl,r,r,r)}}
+return A.b7(r,A.bh(A.ak(p,r,r,r,r,r,A.f5(B.f,10,B.Y),r,r),r,r,r),B.h,r,new A.af(o,1/0,0,1/0),new A.c2(B.ww,r,s,q,r,r,B.K),r,o,r,r,B.dl,r,r,r)}}
 A.Cn.prototype={}
 A.Ct.prototype={}
 A.lJ.prototype={}
@@ -95053,7 +95054,7 @@ ab(){return new A.Zm(A.aM(t.ad),B.k)},
 aAI(a){return this.c.$1(a)}}
 A.Zm.prototype={
 arG(a){this.J(new A.ayu(this,a))},
-G(a){var s,r=this,q=null,p=t.p,o=A.b([A.ak("Cosa vuoi condividere?",q,q,q,q,q,A.aU(B.f,q,20,B.Z,q),B.n,q),B.aD],p)
+G(a){var s,r=this,q=null,p=t.p,o=A.b([A.ak("Cosa vuoi condividere?",q,q,q,q,q,A.aU(B.f,q,20,B.Y,q),B.n,q),B.aD],p)
 B.b.B(o,new A.a1(B.OT,new A.ayy(r),t.o2))
 o.push(B.BW)
 if(r.e){s=A.e9(q,q,B.f,q,q,q,0,q,q,B.l,q,q,B.ai,q,new A.bQ(A.aX(16),B.u),q,q,q,q)
@@ -95113,7 +95114,7 @@ A.ayA.prototype={
 $0(){return A.Z(this.a,!1).cj()},
 $S:0}
 A.aOj.prototype={
-$1(a){var s,r=null,q=A.b([A.ak("Cosa vuoi aprire?",r,r,r,r,r,A.aU(B.f,r,20,B.Z,r),B.n,r),B.aD],t.p),p=this.b
+$1(a){var s,r=null,q=A.b([A.ak("Cosa vuoi aprire?",r,r,r,r,r,A.aU(B.f,r,20,B.Y,r),B.n,r),B.aD],t.p),p=this.b
 B.b.B(q,this.a.cn(0,new A.aOh(p),t.l7))
 s=A.hJ(r,r,r,r,r,r,r,r,r,B.a6,r,r,r,r,r,r,r,r,r)
 q.push(A.j0(!1,A.ak("Chiudi",r,r,r,r,r,A.aU(B.a6,r,13,r,r),r,r),B.h,r,r,r,r,r,new A.aOi(p),r,s))
@@ -95170,7 +95171,7 @@ r=$.vk.an()
 q=A.ae(153,2,34,81)
 p=A.aX(8)
 o=g.d
-n=A.b([new A.pX(o.c,B.f,18,f,f)],t.p)
+n=A.b([new A.pX(o.c,B.f,18,f,f,f)],t.p)
 m=g.d
 l=m.r
 if(l!=null&&m.w==="Dado"){k=m.a==="3.3"
@@ -95178,13 +95179,13 @@ j=k?0:8
 i=k?72:140
 h=k?72:140
 if(k){l.toString
-m=A.fM(f,A.dx(l,f,B.L,f,m.w,f,f),B.V,!1,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,new A.aBr(a),f,f,f,f,f,f,!1,B.aB)}else{m=A.cz(B.ce,f,f,f,22,f,B.Z,f)
+m=A.fM(f,A.dx(l,f,B.L,f,m.w,f,f),B.V,!1,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,f,new A.aBr(a),f,f,f,f,f,f,!1,B.aB)}else{m=A.cz(B.ce,f,f,f,22,f,B.Y,f)
 l=g.d
 k=l.r
 k.toString
 k=A.dx(k,B.ad,B.L,f,l.w,f,f)
 m=new A.D6(g.f.aBq(l.a),new A.aBs(g),new A.V(72,72,k,f),B.p0,B.p4,m,f)}n.push(new A.aY(new A.ar(0,j,0,j),new A.V(i,h,m,f),f))}m=g.d.f
-if(m!=null)n.push(new A.pX(m,B.f,18,f,f))
+if(m!=null)n.push(new A.pX(m,B.f,18,f,f,f))
 m=A.aYW(n,!0,!0,!0)
 n=n.length
 return A.b7(B.o,new A.yd(m,new A.ar(0,0,0,s),B.ab,!1,f,f,B.bY,!1,f,n,B.V,B.ae,f,B.v,new A.cP("desc_list_"+o.a,d)),B.h,f,f,new A.c2(q,f,f,p,f,f,B.K),f,f,new A.cP("desc_"+e.a,d),f,B.kn,f,f,80*r/100)},
@@ -95207,7 +95208,7 @@ q=A.b([r,B.bB,A.IE(A.cu(A.bh(A.iB(A.C6(n.ada(a),p),B.v,m),m,m,m)),q),B.bB],o)
 if(s.length!==0&&n.e)q.push(new A.aY(B.dk,A.bdj(B.a1z,s,12,12),m))
 q.push(B.bB)
 q.push(n.adw())
-return A.eF(B.R,A.rS(new A.jt(A.ca(B.H,A.b([l,A.l7(0,A.bk(q,B.cW,B.a1,B.x),0)],o),B.v,B.ba),new A.cP(k.a,t.kK)),B.hD,new A.aBB(),B.Y,B.f2,new A.aBC()),m)}}
+return A.eF(B.R,A.rS(new A.jt(A.ca(B.H,A.b([l,A.l7(0,A.bk(q,B.cW,B.a1,B.x),0)],o),B.v,B.ba),new A.cP(k.a,t.kK)),B.hD,new A.aBB(),B.Z,B.f2,new A.aBC()),m)}}
 A.aBA.prototype={
 $0(){this.b.d=this.a.a},
 $S:0}
@@ -97556,7 +97557,7 @@ $1(a){var s=this.a,r=s.a
 return A.yu(r,B.aN,s.b.c,r,!1)},
 $S:39}
 A.aA3.prototype={
-$1(a){var s,r,q=null,p=A.ak(u.f,q,q,q,q,q,A.aU(B.f,q,20,B.Z,q),B.n,q),o=this.a,n=A.e9(q,q,B.f,q,q,q,0,q,q,B.l,q,q,B.ai,q,new A.bQ(A.aX(16),B.u),q,q,q,q)
+$1(a){var s,r,q=null,p=A.ak(u.f,q,q,q,q,q,A.aU(B.f,q,20,B.Y,q),B.n,q),o=this.a,n=A.e9(q,q,B.f,q,q,q,0,q,q,B.l,q,q,B.ai,q,new A.bQ(A.aX(16),B.u),q,q,q,q)
 n=A.em(A.ak("honoo",q,q,q,q,q,A.aU(B.l,q,14,B.G,q),q,q),new A.aA0(o),n)
 s=A.e9(q,q,B.f,q,q,q,0,q,q,B.l,q,q,B.ai,q,new A.bQ(A.aX(16),B.u),q,q,q,q)
 s=A.em(A.ak("hinoo",q,q,q,q,q,A.aU(B.l,q,14,B.G,q),q,q),new A.aA1(o),s)
@@ -97763,11 +97764,11 @@ r.w=s},
 $S:2}
 A.aAe.prototype={
 $0(){var s=this.a
-return s.dx.e3(B.e.aJ(s.z-1,0,this.b.length-1),B.Y,B.ay)},
+return s.dx.e3(B.e.aJ(s.z-1,0,this.b.length-1),B.Z,B.ay)},
 $S:0}
 A.aAd.prototype={
 $0(){var s=this.a
-return s.dx.e3(B.e.aJ(s.z+1,0,this.b.length-1),B.Y,B.ay)},
+return s.dx.e3(B.e.aJ(s.z+1,0,this.b.length-1),B.Z,B.ay)},
 $S:0}
 A.aAj.prototype={
 $6(a,b,c,d,e,f){var s=this.a,r=s.d===B.dg?s.Q:s.as
@@ -98108,7 +98109,7 @@ A.aDN.prototype={
 $2(a,b){var s,r=null,q=b.b,p=q<600?q:q*0.5,o=A.bh(new A.h2(new A.aDM(a),r),r,r,r),n=A.cu(A.b7(r,r,B.h,r,r,r,r,r,r,r,r,r,r,r))
 $.NW()
 s=t.p
-return A.ca(B.H,A.b([A.bk(A.b([new A.V(r,52,o,r),A.cu(A.fU(new A.V(q,r,A.eE(A.b([n,A.b7(r,A.bk(A.b([new A.V(r,b.d*0.8,A.ca(B.H,A.b([A.l7(0,new A.dd(B.eP,r,r,A.fU(A.bk(A.b([B.dJ,A.ak("Ti regaliamo la Luna.\nPer sempre.",r,r,r,r,r,A.cz(B.f,r,r,r,18,r,B.Z,r),B.n,r),B.bA,A.ak("Niente \xe8 per sempre,\ne nessuno pu\xf2 regalarti la Luna.\n\n\xc8 vero,\nma non per i poeti.\n\nVuoi essere un poeta di honoo?\n\nClicca sulla Bottiglia,\ne componi i tuoi honoo e hinoo.\n\nOppure sulla Luna,\ne guarda gli honoo\ne gli hinoo degli altri.\n\nO sull\u2019Isola,\ne inizia il viaggio\nverso le tue storie.",r,r,r,r,r,A.cz(B.f,r,r,r,18,r,B.w,r),B.n,r)],s),B.q,B.r,B.x),B.ae,r,r),r),0)],s),B.h,B.a_),r)],s),B.q,B.r,B.x),B.h,r,new A.af(0,p,0,1/0),r,r,r,r,r,r,r,r,r),A.cu(A.b7(r,r,B.h,r,r,r,r,r,r,r,r,r,r,r))],s),B.q,B.r,B.x),r),B.ae,r,r)),new A.Wj(this.a.d,r)],s),B.q,B.r,B.x),B.Qv],s),B.h,B.ba)},
+return A.ca(B.H,A.b([A.bk(A.b([new A.V(r,52,o,r),A.cu(A.fU(new A.V(q,r,A.eE(A.b([n,A.b7(r,A.bk(A.b([new A.V(r,b.d*0.8,A.ca(B.H,A.b([A.l7(0,new A.dd(B.eP,r,r,A.fU(A.bk(A.b([B.dJ,A.ak("Ti regaliamo la Luna.\nPer sempre.",r,r,r,r,r,A.cz(B.f,r,r,r,18,r,B.Y,r),B.n,r),B.bA,A.ak("Niente \xe8 per sempre,\ne nessuno pu\xf2 regalarti la Luna.\n\n\xc8 vero,\nma non per i poeti.\n\nVuoi essere un poeta di honoo?\n\nClicca sulla Bottiglia,\ne componi i tuoi honoo e hinoo.\n\nOppure sulla Luna,\ne guarda gli honoo\ne gli hinoo degli altri.\n\nO sull\u2019Isola,\ne inizia il viaggio\nverso le tue storie.",r,r,r,r,r,A.cz(B.f,r,r,r,18,r,B.w,r),B.n,r)],s),B.q,B.r,B.x),B.ae,r,r),r),0)],s),B.h,B.a_),r)],s),B.q,B.r,B.x),B.h,r,new A.af(0,p,0,1/0),r,r,r,r,r,r,r,r,r),A.cu(A.b7(r,r,B.h,r,r,r,r,r,r,r,r,r,r,r))],s),B.q,B.r,B.x),r),B.ae,r,r)),new A.Wj(this.a.d,r)],s),B.q,B.r,B.x),B.Qv],s),B.h,B.ba)},
 $S:34}
 A.aDM.prototype={
 $0(){A.Z(this.a,!1).cO(A.aD(new A.aDK(),null,t.z),new A.aDL())},
@@ -98149,12 +98150,12 @@ $S:4}
 A.y7.prototype={
 G(a){var s,r,q,p,o,n,m=null,l=$.nm().lk(),k=t.w,j=A.aW(a,m,k).w.a.a,i=A.ha(j),h=A.iW(i),g=A.iV(i)+A.aW(a,m,k).w.r.d,f=g/2,e=new A.ait(i).$0(),d=l?j:new A.aiu(j).$0(),c=A.cz(B.f,m,m,m,18,m,B.bt,1.3)
 k=A.c5(m,m,c,"honoo e ")
-s=c.Zu(B.bp,B.Z)
+s=c.Zu(B.bp,B.Y)
 r=A.vr(m,m)
 r.au=new A.aiv()
 s=A.c5(m,r,s,"Crocopie")
 r=A.c5(m,m,c,"\nhanno partecipato\nal Bando\nSiae Per Chi Crea 2025\ncon il progetto\n")
-q=c.Zu(B.bp,B.Z)
+q=c.Zu(B.bp,B.Y)
 p=A.vr(m,m)
 p.au=new A.aiw(a)
 q=A.cu(A.fU(new A.V(d,m,new A.aY(B.kp,A.z5(m,m,B.cr,m,m,!0,m,A.c5(A.b([k,s,r,A.c5(m,p,q,"Noi e loro"),A.c5(m,m,c,".\n\nNoi e loro"),A.c5(m,m,c,"\n\xe8 stato selezionato\nper il contributo Siae,\nche ha permesso a\nVenceslao Cembalo,\nAngelo Grimaldi,\nAlessandro Bottone,\nAgnese Fornito,\nAntonio Sodorino,\nGiacomo Carruolo,\ne Daniele Tammaro,\ndi realizzare il progetto\ncon gli studenti\ndell\u2019Istituto Statale\nAlessandro Volta\ndi Aversa\ne con i loro tutor\nGabriella Maria Corvino,\nLuisa Isabella Coscione,\nImmacolata Iorio,\nFilomena Reccia,\nVincenzo  Fusco,\nAgostino  Gravante,\nPasqualina D\u2019Agostino.\n\nS\xec,\nnel 2025\nhonoo ha partecipato\na un Bando Siae.\nE ha vinto.\n")],t.VO),m,m,m),B.n,m,m,1,B.aQ),m),m),B.ae,m,m))
@@ -98320,7 +98321,7 @@ q=A.a9([B.a0J,new A.cj(new A.aFL(n),new A.bm(A.b([],t.g),t._),t.Or)],t.n,t.V)
 p=n.f.length
 o=n.c
 o.toString
-s=A.aec(q,!0,new A.V(m,a,new A.aY(new A.ar(f,0,f,0),A.o7(B.bj,A.Wb(A.op(o).xq(A.cv([B.aq,B.b0,B.bz,B.b1],t.B)),new A.aFM(n,a,f,b,c,d,e).$0()),m,m,m,m,new A.aFN(n),m),m),new A.cP("moon_content_"+p,t.kK)),!0,m,B.bh,m,m,r)}return A.rS(s,B.p6,A.By(),B.Y,B.f2,A.aTP())},
+s=A.aec(q,!0,new A.V(m,a,new A.aY(new A.ar(f,0,f,0),A.o7(B.bj,A.Wb(A.op(o).xq(A.cv([B.aq,B.b0,B.bz,B.b1],t.B)),new A.aFM(n,a,f,b,c,d,e).$0()),m,m,m,m,new A.aFN(n),m),m),new A.cP("moon_content_"+p,t.kK)),!0,m,B.bh,m,m,r)}return A.rS(s,B.p6,A.By(),B.Z,B.f2,A.aTP())},
 ama(a){var s,r,q,p=this
 if(p.f.length===0)return
 s=Date.now()
@@ -98334,7 +98335,7 @@ Hr(a){var s,r=this.f.length
 if(r===0)return
 s=B.e.aJ(a,0,r-1)
 if(s===this.r)return
-this.w.e3(s,B.Y,B.ay)},
+this.w.e3(s,B.Z,B.ay)},
 wB(){var s=0,r=A.t(t.H),q,p=2,o,n=this,m,l,k,j,i,h,g,f
 var $async$wB=A.o(function(a,b){if(a===1){o=b
 s=p}while(true)switch(s){case 0:g=n.f
@@ -98649,15 +98650,15 @@ n=A.aoj(j.d,j.c,0.5625)
 m=n.a
 l=n.b
 k=A.xM(i,f,!1,l,m,i)
-o=A.bh(new A.dD(new A.af(0,m,0,l),A.nA(A.aX(12),new A.V(m,l,k,i)),i),i,i,i)}return new A.aY(new A.ar(g,0,g,0),A.rS(new A.jt(o,new A.cP(p,t.kK)),B.cg,A.By(),B.Y,B.f2,A.aTP()),i)},
+o=A.bh(new A.dD(new A.af(0,m,0,l),A.nA(A.aX(12),new A.V(m,l,k,i)),i),i,i,i)}return new A.aY(new A.ar(g,0,g,0),A.rS(new A.jt(o,new A.cP(p,t.kK)),B.cg,A.By(),B.Z,B.f2,A.aTP()),i)},
 $S:619}
 A.aFK.prototype={
 $0(){var s=this.a
-return s.w.e3(B.e.aJ(s.r-1,0,s.f.length-1),B.Y,B.ay)},
+return s.w.e3(B.e.aJ(s.r-1,0,s.f.length-1),B.Z,B.ay)},
 $S:0}
 A.aFJ.prototype={
 $0(){var s=this.a
-return s.w.e3(B.e.aJ(s.r+1,0,s.f.length-1),B.Y,B.ay)},
+return s.w.e3(B.e.aJ(s.r+1,0,s.f.length-1),B.Z,B.ay)},
 $S:0}
 A.aFO.prototype={
 $1(a){return B.Ll},
@@ -98670,7 +98671,7 @@ if(s===0)r.r=0
 else r.r=B.e.aJ(this.b,0,s-1)},
 $S:0}
 A.aFZ.prototype={
-$1(a){var s,r,q=null,p=A.ak(u.f,q,q,q,q,q,A.aU(B.f,q,20,B.Z,q),B.n,q),o=this.a,n=A.e9(q,q,B.f,q,q,q,0,q,q,B.l,q,q,B.ai,q,new A.bQ(A.aX(16),B.u),q,q,q,q)
+$1(a){var s,r,q=null,p=A.ak(u.f,q,q,q,q,q,A.aU(B.f,q,20,B.Y,q),B.n,q),o=this.a,n=A.e9(q,q,B.f,q,q,q,0,q,q,B.l,q,q,B.ai,q,new A.bQ(A.aX(16),B.u),q,q,q,q)
 n=A.em(A.ak("honoo",q,q,q,q,q,A.aU(B.l,q,14,B.G,q),q,q),new A.aFW(o),n)
 s=A.e9(q,q,B.f,q,q,q,0,q,q,B.l,q,q,B.ai,q,new A.bQ(A.aX(16),B.u),q,q,q,q)
 s=A.em(A.ak("hinoo",q,q,q,q,q,A.aU(B.l,q,14,B.G,q),q,q),new A.aFX(o),s)
@@ -99451,7 +99452,7 @@ j=A.bh(new A.h2(new A.aHl(a),f),f,f,f)
 i=t.p
 h=A.b([A.iB(A.aX_(f,f,d.d,d.gamw(),d.gamq(),f),B.v,f)],i)
 if(d.y||B.c.b9(d.r).length!==0)h.push(A.bK(f,d.amo(),f,f,f,8,8,f))
-j=A.bk(A.b([new A.V(f,52,j,f),B.BT,new A.V(f,l,A.bh(A.aVo(new A.V(k.b,k.c,A.ca(B.H,h,B.v,B.a_),f),new A.af(0,r,0,1/0),B.Y,B.pb),f,f,f),f)],i),B.q,B.r,B.x)
+j=A.bk(A.b([new A.V(f,52,j,f),B.BT,new A.V(f,l,A.bh(A.aVo(new A.V(k.b,k.c,A.ca(B.H,h,B.v,B.a_),f),new A.af(0,r,0,1/0),B.Z,B.pb),f,f,f),f)],i),B.q,B.r,B.x)
 h=d.a.c===B.bF
 g=h?"Invia":"OK"
 h=h?"Invia":"Salva honoo"
@@ -99585,7 +99586,7 @@ q.push(B.BU)
 q.push(a6.pb("honoo",a3))
 q.push(B.BU)
 q.push(a6.pb(a6.rQ("\n\nse ci clicchi sopra,\ntorni qui\na questa pagina.\n\n"),a2))
-q.push(new A.pX("Vuoi collaborare\na questo progetto?\n\nScrivimi a\nvenceslao.cembalo@gmail.com.\n\nSe fai la dichiarazione\ndei redditi,\npuoi scegliere\ndi destinare\nil 5 per mille\na honoo.\n\nNon \xe8 una donazione in pi\xf9.\nNon costa nulla.\n\n\xc8 una parte\ndelle tue imposte\nche puoi decidere\na chi destinare.\n\nFirma\nnel riquadro\ndedicato agli Enti\ndel Terzo Settore\ne scrivi\nil codice fiscale\ndi honoo.\n\nCodice fiscale di\nhonoo - laboratorio multimediale:\n95349850636\n\nSe ti va,\nclicca qui:\n\n<l>https://ko-fi.com/honoo2026||https://ko-fi.com/honoo2026</l>\n\nper offrire\nun bicchiere di Idromele\nagli Gnometti delle Idee.\n\nOppure\nun paio di fiaschi.\n\nI risultati\nsaranno scintillanti:\ngli Gnometti delle Idee\nsono sconsideratamente generosi\ncon chi \xe8 generoso.\n\nProva\ne di me dirai\nche gli amici\nli consiglio bene.\n\n\n",B.f,18,B.bt,a7))
+q.push(new A.pX("Vuoi collaborare\na questo progetto?\n\nScrivimi a\nvenceslao.cembalo@gmail.com.\n\nSe fai la dichiarazione\ndei redditi,\npuoi scegliere\ndi destinare\nil 5 per mille\na honoo.\n\nNon \xe8 una donazione in pi\xf9.\nNon costa nulla.\n\n\xc8 una parte\ndelle tue imposte\nche puoi decidere\na chi destinare.\n\nFirma\nnel riquadro\ndedicato agli Enti\ndel Terzo Settore\ne scrivi\nil codice fiscale\ndi honoo.\n\nCodice fiscale di\nhonoo - laboratorio multimediale:\n95349850636\n\nSe ti va,\nclicca qui:\n\nhttps://ko-fi.com/honoo2026\n\nper offrire\nun bicchiere di Idromele\nagli Gnometti delle Idee.\n\nOppure\nun paio di fiaschi.\n\nI risultati\nsaranno scintillanti:\ngli Gnometti delle Idee\nsono sconsideratamente generosi\ncon chi \xe8 generoso.\n\nProva\ne di me dirai\nche gli amici\nli consiglio bene.\n\n\n",B.f,18,B.bt,B.Y,a7))
 a4=A.bh(A.bk(A.b([B.cJ,A.cu(A.fU(new A.V(a0,a7,A.bk(q,B.q,B.r,B.x),a7),B.ae,a7,a7)),new A.V(a7,c,a7,a7),new A.aY(new A.ar(a,0,0,0),A.fa(A.b([new A.bz("assets/icons/home.svg",g,"Home",new A.aI2(b6),"Home",a7,a7,a7)],t.O),B.be,d-c,e,g,!1,B.r,16,!1),a7)],b3),B.q,B.a1,B.x),a7,a7,a7)
 r=A.cu(A.b7(a7,a7,B.h,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7))
 a5=A.eF(B.O,A.eE(A.b([r,new A.dd(B.o,a7,a7,A.b7(a7,a4,B.h,A.ae(B.d.aI(255*(b2?1:0.7)),1,14,34),new A.af(0,a0,0,1/0),a7,a7,a7,a7,a7,a7,a7,a7,a7),a7),A.cu(A.b7(a7,a7,B.h,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7,a7))],b3),B.q,B.r,B.x),a7)
@@ -99880,11 +99881,11 @@ $1(a){return new A.V(this.a,this.b,new A.xQ(a,null,null),null)},
 $S:258}
 A.aK9.prototype={
 $0(){var s=this.a
-return s.r.e3(B.e.aJ(s.f-1,0,J.ap(s.d)-1),B.Y,B.ay)},
+return s.r.e3(B.e.aJ(s.f-1,0,J.ap(s.d)-1),B.Z,B.ay)},
 $S:0}
 A.aK8.prototype={
 $0(){var s=this.a
-return s.r.e3(B.e.aJ(s.f+1,0,J.ap(s.d)-1),B.Y,B.ay)},
+return s.r.e3(B.e.aJ(s.f+1,0,J.ap(s.d)-1),B.Z,B.ay)},
 $S:0}
 A.aKe.prototype={
 $6(a,b,c,d,e,f){return A.fa(A.b([new A.bz("assets/icons/home.svg",c,"Home",this.a.gaqp(),"Home",B.ad,25,null)],t.O),B.o,f,d,c,!1,B.a1,16,!1)},
@@ -100000,11 +100001,11 @@ return new A.V(s,r,A.xM(null,a.b,!1,r,s,null),null)},
 $S:633}
 A.aKA.prototype={
 $0(){var s=this.a
-return s.r.e3(B.e.aJ(s.f-1,0,s.d.length-1),B.Y,B.ay)},
+return s.r.e3(B.e.aJ(s.f-1,0,s.d.length-1),B.Z,B.ay)},
 $S:0}
 A.aKz.prototype={
 $0(){var s=this.a
-return s.r.e3(B.e.aJ(s.f+1,0,s.d.length-1),B.Y,B.ay)},
+return s.r.e3(B.e.aJ(s.f+1,0,s.d.length-1),B.Z,B.ay)},
 $S:0}
 A.aKB.prototype={
 $1(a){var s,r
@@ -100012,7 +100013,7 @@ if(!this.b)return null
 s=this.a
 r=B.e.aJ(s.f+a.a,0,s.d.length-1)
 if(r===s.f)return null
-s.r.e3(r,B.Y,B.ay)
+s.r.e3(r,B.Z,B.ay)
 return null},
 $S:634}
 A.aKG.prototype={
@@ -100072,7 +100073,7 @@ A.aKo.prototype={
 $0(){return this.a.w=!0},
 $S:0}
 A.aKp.prototype={
-$1(a){var s,r=null,q=A.ak(u.f,r,r,r,r,r,A.aU(B.f,r,20,B.Z,r),B.n,r),p=A.ak(u.A,r,r,r,r,r,A.aU(B.a6,r,13,r,r),B.n,r),o=this.a,n=this.b,m=A.e9(r,r,B.f,r,r,r,0,r,r,B.l,r,r,B.ai,r,new A.bQ(A.aX(16),B.u),r,r,r,r)
+$1(a){var s,r=null,q=A.ak(u.f,r,r,r,r,r,A.aU(B.f,r,20,B.Y,r),B.n,r),p=A.ak(u.A,r,r,r,r,r,A.aU(B.a6,r,13,r,r),B.n,r),o=this.a,n=this.b,m=A.e9(r,r,B.f,r,r,r,0,r,r,B.l,r,r,B.ai,r,new A.bQ(A.aX(16),B.u),r,r,r,r)
 m=A.em(A.ak("honoo",r,r,r,r,r,A.aU(B.l,r,14,B.G,r),r,r),new A.aKl(o,n),m)
 s=A.e9(r,r,B.f,r,r,r,0,r,r,B.l,r,r,B.ai,r,new A.bQ(A.aX(16),B.u),r,r,r,r)
 s=A.em(A.ak("hinoo",r,r,r,r,r,A.aU(B.l,r,14,B.G,r),r,r),new A.aKm(o,n),s)
@@ -100206,11 +100207,11 @@ return new A.V(s.b,s.c,new A.iK(a,null,null),null)},
 $S:258}
 A.aL1.prototype={
 $0(){var s=this.a
-return s.r.e3(B.e.aJ(s.f-1,0,J.ap(s.d)-1),B.Y,B.ay)},
+return s.r.e3(B.e.aJ(s.f-1,0,J.ap(s.d)-1),B.Z,B.ay)},
 $S:0}
 A.aL0.prototype={
 $0(){var s=this.a
-return s.r.e3(B.e.aJ(s.f+1,0,J.ap(s.d)-1),B.Y,B.ay)},
+return s.r.e3(B.e.aJ(s.f+1,0,J.ap(s.d)-1),B.Z,B.ay)},
 $S:0}
 A.aL2.prototype={
 $1(a){var s,r
@@ -100218,7 +100219,7 @@ if(!this.b)return null
 s=this.a
 r=B.e.aJ(s.f+a.a,0,J.ap(s.d)-1)
 if(r===s.f)return null
-s.r.e3(r,B.Y,B.ay)
+s.r.e3(r,B.Z,B.ay)
 return null},
 $S:636}
 A.aL7.prototype={
@@ -100283,7 +100284,7 @@ A.aKP.prototype={
 $0(){return this.a.w=!0},
 $S:0}
 A.aKQ.prototype={
-$1(a){var s,r=null,q=A.ak(u.f,r,r,r,r,r,A.aU(B.f,r,20,B.Z,r),B.n,r),p=A.ak(u.A,r,r,r,r,r,A.aU(B.a6,r,13,r,r),B.n,r),o=this.a,n=this.b,m=A.e9(r,r,B.f,r,r,r,0,r,r,B.l,r,r,B.ai,r,new A.bQ(A.aX(16),B.u),r,r,r,r)
+$1(a){var s,r=null,q=A.ak(u.f,r,r,r,r,r,A.aU(B.f,r,20,B.Y,r),B.n,r),p=A.ak(u.A,r,r,r,r,r,A.aU(B.a6,r,13,r,r),B.n,r),o=this.a,n=this.b,m=A.e9(r,r,B.f,r,r,r,0,r,r,B.l,r,r,B.ai,r,new A.bQ(A.aX(16),B.u),r,r,r,r)
 m=A.em(A.ak("honoo",r,r,r,r,r,A.aU(B.l,r,14,B.G,r),r,r),new A.aKM(o,n),m)
 s=A.e9(r,r,B.f,r,r,r,0,r,r,B.l,r,r,B.ai,r,new A.bQ(A.aX(16),B.u),r,r,r,r)
 s=A.em(A.ak("hinoo",r,r,r,r,r,A.aU(B.l,r,14,B.G,r),r,r),new A.aKN(o,n),s)
@@ -100919,7 +100920,7 @@ return A.i(q.a.b_("house_invites").bx(0,A.a9(["status","declined"],p,p)).bD("use
 case 2:return A.q(null,r)}})
 return A.r($async$EU,r)}}
 A.xg.prototype={
-G(a){var s,r=null,q=A.ak("Scarica hinoo",r,r,r,r,r,A.aU(B.f,r,20,B.Z,r),B.n,r),p=A.ak("Scarica il tuo hinoo in formato .png.",r,r,r,r,r,A.aU(B.C,r,14,r,r),B.n,r),o=A.e9(r,r,B.f,r,r,r,0,r,r,B.l,r,r,B.ai,r,new A.bQ(A.aX(16),B.u),r,r,r,r)
+G(a){var s,r=null,q=A.ak("Scarica hinoo",r,r,r,r,r,A.aU(B.f,r,20,B.Y,r),B.n,r),p=A.ak("Scarica il tuo hinoo in formato .png.",r,r,r,r,r,A.aU(B.C,r,14,r,r),B.n,r),o=A.e9(r,r,B.f,r,r,r,0,r,r,B.l,r,r,B.ai,r,new A.bQ(A.aX(16),B.u),r,r,r,r)
 o=A.em(A.ak("Scarica",r,r,r,r,r,A.aU(B.l,r,14,B.G,r),r,r),new A.ac2(a),o)
 s=A.hJ(r,r,r,r,r,r,r,r,r,B.a6,r,r,r,r,r,r,r,r,r)
 return new A.eC(new A.aY(B.b6,A.bk(A.b([q,B.an,p,B.bA,new A.V(1/0,r,o,r),B.aD,A.j0(!1,A.ak("Annulla",r,r,r,r,r,A.aU(B.a6,r,13,r,r),r,r),B.h,r,r,r,r,r,new A.ac3(a),r,s)],t.p),B.q,B.r,B.S),r),0.92,420,r)}}
@@ -100949,7 +100950,7 @@ this.aC()},
 G(a){var s,r,q,p,o,n,m=null,l=this.d
 l===$&&A.a()
 s=B.c.b9(l.a.a)
-r=A.ak("Come vuoi chiamare\nil tuo hinoo?",m,m,m,m,m,A.aU(B.f,m,20,B.Z,m),B.n,m)
+r=A.ak("Come vuoi chiamare\nil tuo hinoo?",m,m,m,m,m,A.aU(B.f,m,20,B.Y,m),B.n,m)
 q=A.ak("Se \xe8 per il mio corso,\nsei il numero 37\ned \xe8 il tuo primo lavoro,\nchiamalo 37.1\nse \xe8 il tuo secondo lavoro,\nchiamalo 37.2",m,m,m,m,m,A.aU(B.C,m,14,m,m),B.n,m)
 p=A.aU(B.f,m,16,m,m)
 o=A.aU(B.e2,m,16,m,m)
@@ -101067,7 +101068,7 @@ this.aC()},
 G(a){var s,r,q,p,o,n,m=null,l=this.d
 l===$&&A.a()
 s=B.c.b9(l.a.a)
-r=A.ak("Come vuoi chiamare il tuo honoo?",m,m,m,m,m,A.aU(B.f,m,20,B.Z,m),B.n,m)
+r=A.ak("Come vuoi chiamare il tuo honoo?",m,m,m,m,m,A.aU(B.f,m,20,B.Y,m),B.n,m)
 q=A.ak("Se \xe8 per il mio corso,\nsei il numero 25 ed \xe8 il tuo primo lavoro,\nchiamalo 25.1\nse \xe8 il tuo secondo lavoro,\nchiamalo 25.2",m,m,m,m,m,A.aU(B.C,m,14,m,m),B.n,m)
 p=A.aU(B.f,m,16,m,m)
 o=A.aU(B.e2,m,16,m,m)
@@ -101764,7 +101765,7 @@ B.b.dr(r,new A.aDB())
 s=A.ad(r,!0,s)
 r=this.a
 s.push(new A.jp(r.c,r.r,!1,null))
-return A.rS(new A.cM(new A.aDC(this,s),null),B.kk,A.By(),B.Y,B.f2,new A.aDD(s.length>1))}}
+return A.rS(new A.cM(new A.aDC(this,s),null),B.kk,A.By(),B.Z,B.f2,new A.aDD(s.length>1))}}
 A.aDE.prototype={
 $1(a){var s=this.a
 if(s.c!=null){s=s.d
@@ -101898,7 +101899,7 @@ if(p==null)p=l.z
 m=m.a.c.a.length
 o=B.e.aJ(p+a.a,0,m-1)
 if(o===p)return n
-l.e3(o,B.Y,B.ay)
+l.e3(o,B.Z,B.ay)
 return n},
 $S:649}
 A.aDH.prototype={
@@ -102494,7 +102495,7 @@ o=A.ad(m,!0,m.$ti.h("u.E"))
 B.b.dr(o,new A.aDX())
 m=A.b([p],t._x)
 B.b.B(m,o)
-r=new A.cM(new A.aDY(s,m),n)}}return A.rS(r,B.kk,A.By(),B.Y,B.f2,new A.aDZ(l))},
+r=new A.cM(new A.aDY(s,m),n)}}return A.rS(r,B.kk,A.By(),B.Z,B.f2,new A.aDZ(l))},
 $S:653}
 A.aDT.prototype={
 $1(a){var s=this.a
@@ -102754,11 +102755,14 @@ A.pX.prototype={
 G(a){var s=null,r=A.by("<(\\w+)>(.*?)<\\1>",!0,!1,!1),q=A.b([],t.VO)
 A.NO(this.c,r,new A.aet(this,q,a),new A.aeu(this,q,a))
 return A.z5(s,s,B.cr,s,s,!0,s,A.c5(q,s,s,s),B.n,s,s,1,B.aQ)},
-ade(a,b,c){var s=null,r=B.c.bi(b,"http")?b:"https://"+b,q=A.cz(B.f,B.bp,s,s,18,s,B.Z,s),p=A.vr(s,s)
-p.au=new A.aer(r)
-return A.c5(s,p,q,a)},
-RE(a,b,c){var s,r=null,q=B.c.bi(b,"http")?b:"https://"+b,p=this.f
-p=A.cz(B.f,B.bp,r,r,18,r,p==null?B.w:p,r)
+ade(a,b,c){var s,r=null,q=B.c.bi(b,"http")?b:"https://"+b,p=this.r
+p=A.cz(B.f,B.bp,r,r,18,r,p==null?B.Y:p,r)
+s=A.vr(r,r)
+s.au=new A.aer(q)
+return A.c5(r,s,p,a)},
+RE(a,b,c){var s,r=null,q=B.c.bi(b,"http")?b:"https://"+b,p=this.r
+if(p==null){p=this.f
+if(p==null)p=B.w}p=A.cz(B.f,B.bp,r,r,18,r,p,r)
 s=A.vr(r,r)
 s.au=new A.aes(q)
 return A.c5(r,s,p,a)},
@@ -102766,7 +102770,7 @@ gh8(a){return this.f}}
 A.aet.prototype={
 $1(a){var s,r,q=this,p=null,o=a.mX(2),n=a.mX(1)
 if(o!=null&&n!=null)if(n==="b"){s=q.a
-q.b.push(A.c5(p,p,A.cz(s.d,p,p,p,s.e,p,B.Z,p),o))}else if(n==="i"){s=q.a
+q.b.push(A.c5(p,p,A.cz(s.d,p,p,p,s.e,p,B.Y,p),o))}else if(n==="i"){s=q.a
 q.b.push(A.c5(p,p,A.cz(s.d,p,p,p,s.e,B.c0,B.w,p),o))}else if(n==="l"){r=o.split("||")
 q.b.push(q.a.RE(r[0],r[1],q.c))}else if(n==="lb"){r=o.split("||")
 q.b.push(q.a.ade(r[0],r[1],q.c))}return""},
@@ -103124,7 +103128,7 @@ A.aCR.prototype={
 $1(a){return B.S0},
 $S:39}
 A.aCW.prototype={
-$1(a){var s,r,q=null,p=A.ak("Complimenti!",q,q,q,q,q,A.aU(B.f,q,20,B.Z,q),B.n,q),o=A.ak("Ecco la tua casa sull'Isola, crea il tuo campanello!",q,q,q,q,q,A.aU(B.C,q,14,q,q),B.n,q),n=this.a,m=A.e9(q,q,B.f,q,q,q,0,q,q,B.l,q,q,B.ai,q,new A.bQ(A.aX(16),B.u),q,q,q,q)
+$1(a){var s,r,q=null,p=A.ak("Complimenti!",q,q,q,q,q,A.aU(B.f,q,20,B.Y,q),B.n,q),o=A.ak("Ecco la tua casa sull'Isola, crea il tuo campanello!",q,q,q,q,q,A.aU(B.C,q,14,q,q),B.n,q),n=this.a,m=A.e9(q,q,B.f,q,q,q,0,q,q,B.l,q,q,B.ai,q,new A.bQ(A.aX(16),B.u),q,q,q,q)
 m=A.em(A.ak("Crea il campanello",q,q,q,q,q,A.aU(B.l,q,14,B.G,q),q,q),new A.aCU(n),m)
 s=A.hJ(q,q,q,q,q,q,q,q,q,B.C,q,q,q,q,q,q,q,q,q)
 r=t.p
@@ -103146,7 +103150,7 @@ return A.fM(B.cj,A.cZ(!0,s,!1,q,q,!1,q,q,q,"Home",q,q,q,q,q,q,q,q,q,q,q,q,q,q,q,
 A.eC.prototype={
 G(a){return A.aWe(A.ae(B.d.aI(255*this.d),0,0,0),new A.dD(new A.af(0,this.e,0,1/0),this.c,null),B.f7,new A.bQ(A.aX(24),B.u))}}
 A.h3.prototype={
-G(a){var s=this,r=null,q=t.p,p=A.b([A.ak(s.c,r,r,r,r,r,A.aU(B.f,r,20,B.Z,r),B.n,r)],q),o=s.d
+G(a){var s=this,r=null,q=t.p,p=A.b([A.ak(s.c,r,r,r,r,r,A.aU(B.f,r,20,B.Y,r),B.n,r)],q),o=s.d
 if(o!=null&&B.c.b9(o).length!==0){o.toString
 B.b.B(p,A.b([B.an,A.ak(o,r,r,r,r,r,A.aU(B.C,r,14,r,r),B.n,r)],q))}p.push(B.bA)
 q=A.e9(r,r,B.f,r,r,r,0,r,r,B.l,r,r,B.ai,r,new A.bQ(A.aX(16),B.u),r,r,r,r)
@@ -103176,7 +103180,7 @@ this.aC()},
 G(a){var s=null,r=t.p,q=A.b([],r),p=this.a
 p=p.d
 if(p!=null&&B.c.b9(p).length!==0){p.toString
-B.b.B(q,A.b([A.ak(p,s,s,s,s,s,A.aU(B.f,s,20,B.Z,s),B.n,s),B.bB],r))}q.push(A.ak(this.a.c,s,s,s,s,s,A.aU(B.f,s,14,s,s),B.n,s))
+B.b.B(q,A.b([A.ak(p,s,s,s,s,s,A.aU(B.f,s,20,B.Y,s),B.n,s),B.bB],r))}q.push(A.ak(this.a.c,s,s,s,s,s,A.aU(B.f,s,14,s,s),B.n,s))
 return new A.eC(new A.aY(B.f7,A.bk(q,B.q,B.r,B.S),s),0.88,320,s)}}
 A.aDQ.prototype={
 $0(){var s=this.a.c
@@ -103426,7 +103430,7 @@ A.a3e.prototype={
 G(a){var s,r=null,q=this.c,p=q>99?"99+":B.e.j(q),o=q>9?20:18
 q=A.aX(o/2)
 s=A.iA(B.R,1.5)
-return A.b7(r,A.bh(A.ak(p,r,r,r,r,r,A.f5(B.f,10,B.Z),r,r),r,r,r),B.h,r,new A.af(o,1/0,0,1/0),new A.c2(B.ww,r,s,q,r,r,B.K),r,o,r,r,B.dl,r,r,r)}}
+return A.b7(r,A.bh(A.ak(p,r,r,r,r,r,A.f5(B.f,10,B.Y),r,r),r,r,r),B.h,r,new A.af(o,1/0,0,1/0),new A.c2(B.ww,r,s,q,r,r,B.K),r,o,r,r,B.dl,r,r,r)}}
 A.Xm.prototype={
 G(a){var s=null,r=A.aX(15),q=A.ae(140,0,0,0),p=A.aX(15)
 return A.aSK(A.jw(B.a8,!0,s,A.kZ(!1,r,!0,A.b7(s,A.ah6(B.kO,B.f,18),B.h,s,s,new A.c2(q,s,s,p,s,s,B.K),s,30,s,s,s,s,s,30),s,!0,s,s,s,s,s,s,s,s,s,this.c,s,s,s,s),B.h,B.O,0,s,s,s,s,s,B.cI),this.d)}}
@@ -114529,7 +114533,7 @@ B.q=new A.tj(2,"center")
 B.cW=new A.tj(3,"stretch")
 B.oO=new A.tj(4,"baseline")
 B.oP=new A.fo(0.18,1,0.04,1)
-B.Y=new A.fo(0.215,0.61,0.355,1)
+B.Z=new A.fo(0.215,0.61,0.355,1)
 B.J2=new A.fo(0.05,0,0.133333,0.06)
 B.bi=new A.fo(0.25,0.1,0.25,1)
 B.e4=new A.fo(0.42,0,1,1)
@@ -114824,7 +114828,7 @@ B.kG=new A.kT(3,"w400")
 B.KO=new A.kT(4,"w500")
 B.G=new A.jn(5)
 B.KP=new A.kT(5,"w600")
-B.Z=new A.jn(6)
+B.Y=new A.jn(6)
 B.pB=new A.kT(6,"w700")
 B.KQ=new A.kT(7,"w800")
 B.KR=new A.kT(8,"w900")
@@ -114832,7 +114836,7 @@ B.pC=new A.hx("Invalid method call",null,null)
 B.KS=new A.hx("Expected envelope, got nothing",null,null)
 B.bE=new A.hx("Message corrupted",null,null)
 B.KT=new A.hx("Invalid envelope",null,null)
-B.KV=new A.pX("Nella parte occidentale\ndell'Isola\nnon ci sono veramente\ni leoni,\nma qualcuno che conosci\no che vorrebbe conoscerti.",B.f,18,null,null)
+B.KV=new A.pX("Nella parte occidentale\ndell'Isola\nnon ci sono veramente\ni leoni,\nma qualcuno che conosci\no che vorrebbe conoscerti.",B.f,18,null,null,null)
 B.pD=new A.xA(0,"ltr")
 B.pE=new A.xA(1,"rtl")
 B.kH=new A.xA(3,"sandwich")
@@ -114859,8 +114863,8 @@ B.pG=new A.eA(B.bu,B.bD)
 B.pH=new A.eA(B.bu,B.c0)
 B.pI=new A.eA(B.G,B.bD)
 B.pJ=new A.eA(B.G,B.c0)
-B.kK=new A.eA(B.Z,B.bD)
-B.kL=new A.eA(B.Z,B.c0)
+B.kK=new A.eA(B.Y,B.bD)
+B.kL=new A.eA(B.Y,B.c0)
 B.hQ=new A.jn(7)
 B.L3=new A.eA(B.hQ,B.bD)
 B.L4=new A.eA(B.hQ,B.c0)
@@ -115168,7 +115172,7 @@ B.i7=A.b(s([0,0,24576,1023,65534,34815,65534,18431]),t.t)
 B.bM=A.b(s([2774754246,2222750968,2574743534,2373680118,234025727,3177933782,2976870366,1422247313,1345335392,50397442,2842126286,2099981142,436141799,1658312629,3870010189,2591454956,1170918031,2642575903,1086966153,2273148410,368769775,3948501426,3376891790,200339707,3970805057,1742001331,4255294047,3937382213,3214711843,4154762323,2524082916,1539358875,3266819957,486407649,2928907069,1780885068,1513502316,1094664062,49805301,1338821763,1546925160,4104496465,887481809,150073849,2473685474,1943591083,1395732834,1058346282,201589768,1388824469,1696801606,1589887901,672667696,2711000631,251987210,3046808111,151455502,907153956,2608889883,1038279391,652995533,1764173646,3451040383,2675275242,453576978,2659418909,1949051992,773462580,756751158,2993581788,3998898868,4221608027,4132590244,1295727478,1641469623,3467883389,2066295122,1055122397,1898917726,2542044179,4115878822,1758581177,0,753790401,1612718144,536673507,3367088505,3982187446,3194645204,1187761037,3653156455,1262041458,3729410708,3561770136,3898103984,1255133061,1808847035,720367557,3853167183,385612781,3309519750,3612167578,1429418854,2491778321,3477423498,284817897,100794884,2172616702,4031795360,1144798328,3131023141,3819481163,4082192802,4272137053,3225436288,2324664069,2912064063,3164445985,1211644016,83228145,3753688163,3249976951,1977277103,1663115586,806359072,452984805,250868733,1842533055,1288555905,336333848,890442534,804056259,3781124030,2727843637,3427026056,957814574,1472513171,4071073621,2189328124,1195195770,2892260552,3881655738,723065138,2507371494,2690670784,2558624025,3511635870,2145180835,1713513028,2116692564,2878378043,2206763019,3393603212,703524551,3552098411,1007948840,2044649127,3797835452,487262998,1994120109,1004593371,1446130276,1312438900,503974420,3679013266,168166924,1814307912,3831258296,1573044895,1859376061,4021070915,2791465668,2828112185,2761266481,937747667,2339994098,854058965,1137232011,1496790894,3077402074,2358086913,1691735473,3528347292,3769215305,3027004632,4199962284,133494003,636152527,2942657994,2390391540,3920539207,403179536,3585784431,2289596656,1864705354,1915629148,605822008,4054230615,3350508659,1371981463,602466507,2094914977,2624877800,555687742,3712699286,3703422305,2257292045,2240449039,2423288032,1111375484,3300242801,2858837708,3628615824,84083462,32962295,302911004,2741068226,1597322602,4183250862,3501832553,2441512471,1489093017,656219450,3114180135,954327513,335083755,3013122091,856756514,3144247762,1893325225,2307821063,2811532339,3063651117,572399164,2458355477,552200649,1238290055,4283782570,2015897680,2061492133,2408352771,4171342169,2156497161,386731290,3669999461,837215959,3326231172,3093850320,3275833730,2962856233,1999449434,286199582,3417354363,4233385128,3602627437,974525996]),t.t)
 B.qf=A.b(s([0,0,26624,1023,65534,2047,65534,2047]),t.t)
 B.NA=A.b(s([0,0,32722,12287,65534,34815,65534,18431]),t.t)
-B.qh=A.b(s([B.eb,B.bt,B.hP,B.w,B.bu,B.G,B.Z,B.hQ,B.fa]),A.a4("w<jn>"))
+B.qh=A.b(s([B.eb,B.bt,B.hP,B.w,B.bu,B.G,B.Y,B.hQ,B.fa]),A.a4("w<jn>"))
 B.d6=new A.zE(0,"butt")
 B.VI=new A.zE(1,"round")
 B.C4=new A.zE(2,"square")
@@ -116116,7 +116120,7 @@ B.r5=new A.k(4294968590)
 B.v4=new A.k(4294970702)
 B.R3=new A.b0(301,{AVRInput:B.tY,AVRPower:B.tZ,Accel:B.qE,Accept:B.qT,Again:B.qU,AllCandidates:B.rh,Alphanumeric:B.ri,AltGraph:B.ig,AppSwitch:B.vr,ArrowDown:B.bS,ArrowLeft:B.b7,ArrowRight:B.b8,ArrowUp:B.bT,Attn:B.qV,AudioBalanceLeft:B.tR,AudioBalanceRight:B.tS,AudioBassBoostDown:B.tT,AudioBassBoostToggle:B.vi,AudioBassBoostUp:B.tU,AudioFaderFront:B.tV,AudioFaderRear:B.tW,AudioSurroundModeNext:B.tX,AudioTrebleDown:B.vj,AudioTrebleUp:B.vk,AudioVolumeDown:B.ts,AudioVolumeMute:B.tu,AudioVolumeUp:B.tt,Backspace:B.bR,BrightnessDown:B.r6,BrightnessUp:B.r7,BrowserBack:B.tK,BrowserFavorites:B.tL,BrowserForward:B.tM,BrowserHome:B.tN,BrowserRefresh:B.tO,BrowserSearch:B.tP,BrowserStop:B.tQ,Call:B.vs,Camera:B.r8,CameraFocus:B.vt,Cancel:B.qW,CapsLock:B.fo,ChannelDown:B.u_,ChannelUp:B.u0,Clear:B.ld,Close:B.tf,ClosedCaptionToggle:B.u7,CodeInput:B.rj,ColorF0Red:B.u1,ColorF1Green:B.u2,ColorF2Yellow:B.u3,ColorF3Blue:B.u4,ColorF4Grey:B.u5,ColorF5Brown:B.u6,Compose:B.rk,ContextMenu:B.qX,Convert:B.rl,Copy:B.qL,CrSel:B.qM,Cut:B.qN,DVR:B.v5,Delete:B.bv,Dimmer:B.u8,DisplaySwap:B.u9,Eisu:B.rA,Eject:B.r9,End:B.dx,EndCall:B.vu,Enter:B.ie,EraseEof:B.qO,Esc:B.fn,Escape:B.fn,ExSel:B.qP,Execute:B.qY,Exit:B.ua,F1:B.rK,F10:B.rT,F11:B.rU,F12:B.rV,F13:B.rW,F14:B.rX,F15:B.rY,F16:B.rZ,F17:B.t_,F18:B.t0,F19:B.t1,F2:B.rL,F20:B.t2,F21:B.t3,F22:B.t4,F23:B.t5,F24:B.t6,F3:B.rM,F4:B.rN,F5:B.rO,F6:B.rP,F7:B.rQ,F8:B.rR,F9:B.rS,FavoriteClear0:B.ub,FavoriteClear1:B.uc,FavoriteClear2:B.ud,FavoriteClear3:B.ue,FavoriteRecall0:B.uf,FavoriteRecall1:B.ug,FavoriteRecall2:B.uh,FavoriteRecall3:B.ui,FavoriteStore0:B.uj,FavoriteStore1:B.uk,FavoriteStore2:B.ul,FavoriteStore3:B.um,FinalMode:B.rm,Find:B.qZ,Fn:B.lc,FnLock:B.qF,GoBack:B.vv,GoHome:B.vw,GroupFirst:B.rn,GroupLast:B.ro,GroupNext:B.rp,GroupPrevious:B.rq,Guide:B.un,GuideNextDay:B.uo,GuidePreviousDay:B.up,HangulMode:B.rx,HanjaMode:B.ry,Hankaku:B.rB,HeadsetHook:B.vx,Help:B.r_,Hibernate:B.re,Hiragana:B.rC,HiraganaKatakana:B.rD,Home:B.dy,Hyper:B.qG,Info:B.uq,Insert:B.le,InstantReplay:B.ur,JunjaMode:B.rz,KanaMode:B.rE,KanjiMode:B.rF,Katakana:B.rG,Key11:B.w2,Key12:B.w3,LastNumberRedial:B.vy,LaunchApplication1:B.tA,LaunchApplication2:B.tv,LaunchAssistant:B.tI,LaunchCalendar:B.tw,LaunchContacts:B.tG,LaunchControlPanel:B.tJ,LaunchMail:B.tx,LaunchMediaPlayer:B.ty,LaunchMusicPlayer:B.tz,LaunchPhone:B.tH,LaunchScreenSaver:B.tB,LaunchSpreadsheet:B.tC,LaunchWebBrowser:B.tD,LaunchWebCam:B.tE,LaunchWordProcessor:B.tF,Link:B.us,ListProgram:B.ut,LiveContent:B.uu,Lock:B.uv,LogOff:B.ra,MailForward:B.tg,MailReply:B.th,MailSend:B.ti,MannerMode:B.vA,MediaApps:B.uw,MediaAudioTrack:B.v6,MediaClose:B.vh,MediaFastForward:B.ux,MediaLast:B.uy,MediaPause:B.uz,MediaPlay:B.uA,MediaPlayPause:B.tj,MediaRecord:B.uB,MediaRewind:B.uC,MediaSkip:B.uD,MediaSkipBackward:B.v7,MediaSkipForward:B.v8,MediaStepBackward:B.v9,MediaStepForward:B.va,MediaStop:B.tk,MediaTopMenu:B.vb,MediaTrackNext:B.tl,MediaTrackPrevious:B.tm,MicrophoneToggle:B.vl,MicrophoneVolumeDown:B.vm,MicrophoneVolumeMute:B.vo,MicrophoneVolumeUp:B.vn,ModeChange:B.rr,NavigateIn:B.vc,NavigateNext:B.vd,NavigateOut:B.ve,NavigatePrevious:B.vf,New:B.tn,NextCandidate:B.rs,NextFavoriteChannel:B.uE,NextUserProfile:B.uF,NonConvert:B.rt,Notification:B.vz,NumLock:B.ih,OnDemand:B.uG,Open:B.to,PageDown:B.fp,PageUp:B.fq,Pairing:B.vg,Paste:B.qQ,Pause:B.r0,PinPDown:B.uH,PinPMove:B.uI,PinPToggle:B.uJ,PinPUp:B.uK,Play:B.r1,PlaySpeedDown:B.uL,PlaySpeedReset:B.uM,PlaySpeedUp:B.uN,Power:B.rb,PowerOff:B.rc,PreviousCandidate:B.ru,Print:B.tp,PrintScreen:B.rd,Process:B.rv,Props:B.r2,RandomToggle:B.uO,RcLowBattery:B.uP,RecordSpeedNext:B.uQ,Redo:B.qR,RfBypass:B.uR,Romaji:B.rH,STBInput:B.uW,STBPower:B.uX,Save:B.tq,ScanChannelsToggle:B.uS,ScreenModeNext:B.uT,ScrollLock:B.ii,Select:B.r3,Settings:B.uU,ShiftLevel5:B.qK,SingleCandidate:B.rw,Soft1:B.t7,Soft2:B.t8,Soft3:B.t9,Soft4:B.ta,Soft5:B.tb,Soft6:B.tc,Soft7:B.td,Soft8:B.te,SpeechCorrectionList:B.vp,SpeechInputToggle:B.vq,SpellCheck:B.tr,SplitScreenToggle:B.uV,Standby:B.rf,Subtitle:B.uY,Super:B.qH,Symbol:B.qI,SymbolLock:B.qJ,TV:B.v_,TV3DMode:B.vC,TVAntennaCable:B.vD,TVAudioDescription:B.vE,TVAudioDescriptionMixDown:B.vF,TVAudioDescriptionMixUp:B.vG,TVContentsMenu:B.vH,TVDataService:B.vI,TVInput:B.v0,TVInputComponent1:B.vJ,TVInputComponent2:B.vK,TVInputComposite1:B.vL,TVInputComposite2:B.vM,TVInputHDMI1:B.vN,TVInputHDMI2:B.vO,TVInputHDMI3:B.vP,TVInputHDMI4:B.vQ,TVInputVGA1:B.vR,TVMediaContext:B.vS,TVNetwork:B.vT,TVNumberEntry:B.vU,TVPower:B.v1,TVRadioService:B.vV,TVSatellite:B.vW,TVSatelliteBS:B.vX,TVSatelliteCS:B.vY,TVSatelliteToggle:B.vZ,TVTerrestrialAnalog:B.w_,TVTerrestrialDigital:B.w0,TVTimer:B.w1,Tab:B.id,Teletext:B.uZ,Undo:B.qS,Unidentified:B.qD,VideoModeNext:B.v2,VoiceDial:B.vB,WakeUp:B.rg,Wink:B.v3,Zenkaku:B.rI,ZenkakuHankaku:B.rJ,ZoomIn:B.r4,ZoomOut:B.r5,ZoomToggle:B.v4},B.qg,A.a4("b0<f,k>"))
 B.R4=new A.b0(301,{AVRInput:4294970632,AVRPower:4294970633,Accel:4294967553,Accept:4294968577,Again:4294968578,AllCandidates:4294969089,Alphanumeric:4294969090,AltGraph:4294967555,AppSwitch:4294971393,ArrowDown:4294968065,ArrowLeft:4294968066,ArrowRight:4294968067,ArrowUp:4294968068,Attn:4294968579,AudioBalanceLeft:4294970625,AudioBalanceRight:4294970626,AudioBassBoostDown:4294970627,AudioBassBoostToggle:4294970882,AudioBassBoostUp:4294970628,AudioFaderFront:4294970629,AudioFaderRear:4294970630,AudioSurroundModeNext:4294970631,AudioTrebleDown:4294970884,AudioTrebleUp:4294970885,AudioVolumeDown:4294969871,AudioVolumeMute:4294969873,AudioVolumeUp:4294969872,Backspace:4294967304,BrightnessDown:4294968833,BrightnessUp:4294968834,BrowserBack:4294970369,BrowserFavorites:4294970370,BrowserForward:4294970371,BrowserHome:4294970372,BrowserRefresh:4294970373,BrowserSearch:4294970374,BrowserStop:4294970375,Call:4294971394,Camera:4294968835,CameraFocus:4294971395,Cancel:4294968580,CapsLock:4294967556,ChannelDown:4294970634,ChannelUp:4294970635,Clear:4294968321,Close:4294969857,ClosedCaptionToggle:4294970642,CodeInput:4294969091,ColorF0Red:4294970636,ColorF1Green:4294970637,ColorF2Yellow:4294970638,ColorF3Blue:4294970639,ColorF4Grey:4294970640,ColorF5Brown:4294970641,Compose:4294969092,ContextMenu:4294968581,Convert:4294969093,Copy:4294968322,CrSel:4294968323,Cut:4294968324,DVR:4294970703,Delete:4294967423,Dimmer:4294970643,DisplaySwap:4294970644,Eisu:4294969108,Eject:4294968836,End:4294968069,EndCall:4294971396,Enter:4294967309,EraseEof:4294968325,Esc:4294967323,Escape:4294967323,ExSel:4294968326,Execute:4294968582,Exit:4294970645,F1:4294969345,F10:4294969354,F11:4294969355,F12:4294969356,F13:4294969357,F14:4294969358,F15:4294969359,F16:4294969360,F17:4294969361,F18:4294969362,F19:4294969363,F2:4294969346,F20:4294969364,F21:4294969365,F22:4294969366,F23:4294969367,F24:4294969368,F3:4294969347,F4:4294969348,F5:4294969349,F6:4294969350,F7:4294969351,F8:4294969352,F9:4294969353,FavoriteClear0:4294970646,FavoriteClear1:4294970647,FavoriteClear2:4294970648,FavoriteClear3:4294970649,FavoriteRecall0:4294970650,FavoriteRecall1:4294970651,FavoriteRecall2:4294970652,FavoriteRecall3:4294970653,FavoriteStore0:4294970654,FavoriteStore1:4294970655,FavoriteStore2:4294970656,FavoriteStore3:4294970657,FinalMode:4294969094,Find:4294968583,Fn:4294967558,FnLock:4294967559,GoBack:4294971397,GoHome:4294971398,GroupFirst:4294969095,GroupLast:4294969096,GroupNext:4294969097,GroupPrevious:4294969098,Guide:4294970658,GuideNextDay:4294970659,GuidePreviousDay:4294970660,HangulMode:4294969105,HanjaMode:4294969106,Hankaku:4294969109,HeadsetHook:4294971399,Help:4294968584,Hibernate:4294968841,Hiragana:4294969110,HiraganaKatakana:4294969111,Home:4294968070,Hyper:4294967560,Info:4294970661,Insert:4294968327,InstantReplay:4294970662,JunjaMode:4294969107,KanaMode:4294969112,KanjiMode:4294969113,Katakana:4294969114,Key11:4294971905,Key12:4294971906,LastNumberRedial:4294971400,LaunchApplication1:4294970118,LaunchApplication2:4294970113,LaunchAssistant:4294970126,LaunchCalendar:4294970114,LaunchContacts:4294970124,LaunchControlPanel:4294970127,LaunchMail:4294970115,LaunchMediaPlayer:4294970116,LaunchMusicPlayer:4294970117,LaunchPhone:4294970125,LaunchScreenSaver:4294970119,LaunchSpreadsheet:4294970120,LaunchWebBrowser:4294970121,LaunchWebCam:4294970122,LaunchWordProcessor:4294970123,Link:4294970663,ListProgram:4294970664,LiveContent:4294970665,Lock:4294970666,LogOff:4294968837,MailForward:4294969858,MailReply:4294969859,MailSend:4294969860,MannerMode:4294971402,MediaApps:4294970667,MediaAudioTrack:4294970704,MediaClose:4294970715,MediaFastForward:4294970668,MediaLast:4294970669,MediaPause:4294970670,MediaPlay:4294970671,MediaPlayPause:4294969861,MediaRecord:4294970672,MediaRewind:4294970673,MediaSkip:4294970674,MediaSkipBackward:4294970705,MediaSkipForward:4294970706,MediaStepBackward:4294970707,MediaStepForward:4294970708,MediaStop:4294969863,MediaTopMenu:4294970709,MediaTrackNext:4294969864,MediaTrackPrevious:4294969865,MicrophoneToggle:4294970886,MicrophoneVolumeDown:4294970887,MicrophoneVolumeMute:4294970889,MicrophoneVolumeUp:4294970888,ModeChange:4294969099,NavigateIn:4294970710,NavigateNext:4294970711,NavigateOut:4294970712,NavigatePrevious:4294970713,New:4294969866,NextCandidate:4294969100,NextFavoriteChannel:4294970675,NextUserProfile:4294970676,NonConvert:4294969101,Notification:4294971401,NumLock:4294967562,OnDemand:4294970677,Open:4294969867,PageDown:4294968071,PageUp:4294968072,Pairing:4294970714,Paste:4294968328,Pause:4294968585,PinPDown:4294970678,PinPMove:4294970679,PinPToggle:4294970680,PinPUp:4294970681,Play:4294968586,PlaySpeedDown:4294970682,PlaySpeedReset:4294970683,PlaySpeedUp:4294970684,Power:4294968838,PowerOff:4294968839,PreviousCandidate:4294969102,Print:4294969868,PrintScreen:4294968840,Process:4294969103,Props:4294968587,RandomToggle:4294970685,RcLowBattery:4294970686,RecordSpeedNext:4294970687,Redo:4294968329,RfBypass:4294970688,Romaji:4294969115,STBInput:4294970693,STBPower:4294970694,Save:4294969869,ScanChannelsToggle:4294970689,ScreenModeNext:4294970690,ScrollLock:4294967564,Select:4294968588,Settings:4294970691,ShiftLevel5:4294967569,SingleCandidate:4294969104,Soft1:4294969601,Soft2:4294969602,Soft3:4294969603,Soft4:4294969604,Soft5:4294969605,Soft6:4294969606,Soft7:4294969607,Soft8:4294969608,SpeechCorrectionList:4294971137,SpeechInputToggle:4294971138,SpellCheck:4294969870,SplitScreenToggle:4294970692,Standby:4294968842,Subtitle:4294970695,Super:4294967566,Symbol:4294967567,SymbolLock:4294967568,TV:4294970697,TV3DMode:4294971649,TVAntennaCable:4294971650,TVAudioDescription:4294971651,TVAudioDescriptionMixDown:4294971652,TVAudioDescriptionMixUp:4294971653,TVContentsMenu:4294971654,TVDataService:4294971655,TVInput:4294970698,TVInputComponent1:4294971656,TVInputComponent2:4294971657,TVInputComposite1:4294971658,TVInputComposite2:4294971659,TVInputHDMI1:4294971660,TVInputHDMI2:4294971661,TVInputHDMI3:4294971662,TVInputHDMI4:4294971663,TVInputVGA1:4294971664,TVMediaContext:4294971665,TVNetwork:4294971666,TVNumberEntry:4294971667,TVPower:4294970699,TVRadioService:4294971668,TVSatellite:4294971669,TVSatelliteBS:4294971670,TVSatelliteCS:4294971671,TVSatelliteToggle:4294971672,TVTerrestrialAnalog:4294971673,TVTerrestrialDigital:4294971674,TVTimer:4294971675,Tab:4294967305,Teletext:4294970696,Undo:4294968330,Unidentified:4294967297,VideoModeNext:4294970700,VoiceDial:4294971403,WakeUp:4294968843,Wink:4294970701,Zenkaku:4294969116,ZenkakuHankaku:4294969117,ZoomIn:4294968589,ZoomOut:4294968590,ZoomToggle:4294970702},B.qg,t.eL)
-B.R5=new A.co([B.eb,"Thin",B.bt,"ExtraLight",B.hP,"Light",B.w,"Regular",B.bu,"Medium",B.G,"SemiBold",B.Z,"Bold",B.hQ,"ExtraBold",B.fa,"Black"],A.a4("co<jn,f>"))
+B.R5=new A.co([B.eb,"Thin",B.bt,"ExtraLight",B.hP,"Light",B.w,"Regular",B.bu,"Medium",B.G,"SemiBold",B.Y,"Bold",B.hQ,"ExtraBold",B.fa,"Black"],A.a4("co<jn,f>"))
 B.eG=new A.bc(B.b7,!1,!1,!1,!1)
 B.eH=new A.bc(B.b8,!1,!1,!1,!1)
 B.a3f=new A.Bh(1,"left")
@@ -116825,7 +116829,7 @@ B.BK=new A.bc(B.la,!0,!1,!1,!1)
 B.BI=new A.bc(B.lb,!0,!1,!1,!1)
 B.V7=new A.bc(B.fm,!0,!1,!1,!1)
 B.V8=new A.bc(B.fm,!0,!0,!1,!1)
-B.KU=new A.pX("Questo\n\xe8 un percorso di scrittura,\nche si presenta\ncome l\u2019esplorazione di un\u2019<b>Isola<b>.\n\nUn viaggio,\nnove tappe,\ntrenta esercizi.\n\nOgni esercizio\n\xe8 articolato in tre fasi,\nche io chiamo\n<b>scrittura libera,<b>\n<b>honoo<b> (\"on\xf9\")\ne\n<b>hinoo<b> (\u201cin\xf9\u201d).\n\n\n<b>Scrittura libera<b>\nA partire dal tema proposto,\nscrivi per\n almeno dieci minuti,\nnella forma che preferisci.\n\nDedica cio\xe8\nuno spazio quotidiano\nalla scrittura,\ne difendilo.\n\nIn questa fase\npuoi accompagnare\nla scrittura\nad altri metodi\ndi rappresentazione,\ncome la fotografia\no il disegno.\n\nIn effetti\nsarebbe pi\xf9 esatto dire:\n\u201ca partire dal tema proposto,\ninizia una riflessione,\nannotando quello che affiora\nnel modo\nche ti sembra pi\xf9 comodo\u201d.\n\nSecondo me,\nun ottimo risultato\nsarebbe riuscire a \ndedicare a questa fase\nalmeno\nquaranta, cinquanta minuti\nal giorno.\nMa non considerare questo\nil tuo obiettivo.\n\nIl tuo obiettivo\n\xe8 quello di confrontarti\ncon questa prima fase\ntutti i giorni,\nsenza saltare alcun giorno.\n\nAvrai bisogno\ndi un orologio:\nsegna l\u2019orario in cui inizi\nla tua <b>scrittura libera<b>\ne continua\nfinch\xe9 non saranno trascorsi\n<b>almeno dieci minuti<b>.\n\nQuando smetti,\nscrivi l\u2019orario in cui hai smesso,\ne calcola\nquanto \xe8 durata la tua scrittura.\n\nLavora\ncon il massimo della\nconcentrazione,\ndopo aver cercato di eliminare\ntutte le possibili\nfonti di distrazione.\n\nIo scriverei al mattino,\ncon un pennarello molto fluido,\nsu fogli bianchi,\nsenza righe.\n\nSi tratta di gusti:\nti invito a scoprire i tuoi.\n\nTi consiglio\ndi non mostrare a nessuno\nquello che verr\xe0 fuori\nin questa prima fase di scrittura.\n\n\n<b>honoo<b>\nRileggi con attenzione\ntutto quello\nche\nsei riuscito a far affiorare\ndurante la <b>scrittura libera<b>,\ne poi,\na partire\nda quello che hai scritto,\nrealizza almeno un <b>honoo<b>.\n\nUn <b>honoo<b>\n\xe8 una composizione\narticolata in un <b>breve testo<b>,\ndisposto in un massimo di <b>cinque righe<b>,\ne un\u2019<b>immagine quadrata<b>.\n\nOgni riga contiene al massimo\ncirca trentadue caratteri.\n\nPer darti un'idea,\nquesta\n\xe8 la riga pi\xf9 lunga possibile.\n\n\u2014 Hai il presente. Non ti basta?\n\n\nIl testo\n\xe8 <b>formattato al centro<b>\ne\nscritto in <b>carattere Arvo<b>.\n\nIn questo contesto,\nconsidero l\u2019<b>honoo<b>\nuna tecnica\nper evidenziare\npunti caldi\ndal magma informe\ndella <b>scrittura libera<b>,\ne per iniziare\na strutturare\nquesti punti caldi\nin forme pi\xf9 complesse.\n\n\n<b>hinoo<b>\nDopo aver realizzato\nalmeno un <b>honoo<b>,\nscrivi\nalmeno un <b>hinoo<b>.\n\nUn <b>hinoo<b>\n\xe8 una composizione\nformata\nda un <b>testo<b>,\ndisposto in un massimo\ndi <b>venti righe<b>,\nsopra un'<b>immagine rettangolare<b>.\n\n\nLe dimensioni dell'immagine sono\n<b>1080<b> pixel in larghezza\ne <b>1920<b> in altezza,\ncon un rapporto d'aspetto <b>9:16<b>\ncome una Storia Instagram.\n\nLa lunghezza massima\ndi ogni riga\n\xe8 come quella\ndella riga di un honoo.\n\nIl carattere \xe8 <b>Lora<b>.\n\nIl <b>colore<b> del testo\npu\xf2 essere\n<b>bianco<b> o <b>nero<b>.\n\nNelle mie intenzioni,\nla scelta espressiva\ndel punto\n in cui andare\n \"a capo\",\nnei testi dell\u2019<b>honoo<b>\ne dell\u2019<b>hinoo<b>,\naccende\nun riflettore\nsu alcuni elementi,\ne ci indica\nla strada\nverso\nla nostra storia.\n\nL\u2019ideale\nsarebbe svolgere\nnell\u2019arco della stessa giornata.\nle tre fasi\ndi ogni esercizio:\n<b>scrittura libera<b>,\n<b>honoo<b>\ne\n<b>hinoo<b>.\n\nSe vuoi comporre\ni tuoi <b>honoo<b>\ne i tuoi <b>hinoo<b>,\nclicca sulla <b>Bottiglia<b>.\n\nSe vuoi vedere\ngli <b>honoo<b>\ne gli <b>hinoo<b>\ndegli altri,\nclicca sulla <b>Luna<b>.\n\nSe clicchi sullo <b>Scrigno<b>,\npuoi vedere\ngli <b>honoo<b> e gli <b>hinoo<b>\nche hai scritto,\ngli <b>honoo<b> e gli <b>hinoo<b>\nche hai salvato,\ne gli <b>honoo<b> e gli <b>hinoo<b>\nche hai ricevuto in risposta\nai tuoi <b>honoo<b> e <b>hinoo<b>.\n\nSe vuoi iniziare\nil tuo viaggio sull\u2019<b>Isola<b>,\nclicca su <b>1<b>\ne vai alla\n<b>Grotta delle Rondini<b>.\n\nSe sei iscritto al mio Corso,\nogni settimana ti assegner\xf2\nun esercizio,\nda svolgere nelle tre fasi,\n<b>scrittura libera<b>,\n<b>honoo<b>\ne <b>hinoo<b>,\ne ogni marted\xec,\nentro le 18.00,\ndovrai caricare\nalmeno un honoo\no un hinoo\nnella cartella\n<b>Marted\xec, 18.00<b>\ncondivisa con te su Google Drive,\ncon privilegi da Editor.\n\nDopo le 18.00 di ogni marted\xec,\ngli honoo e gli hinoo\nsaranno spostati\nnella cartella <b>Luna<b>,\nin sottocartelle nominate,\ndi settimana in settimana,\n<b>Prima Luna<b>,\n<b>Seconda Luna<b>,\neccetera\nfino a <b>Nona Luna<b>,\ncondivise con te,\ncon privilegi da Visualizzatore.\n\nAlla fine del Corso,\nti chieder\xf2\ndi realizzare un <b>henoo<b>,\ncio\xe8 una composizione\n di un minimo di due\ne di un massimo di nove elementi,\ndove per \u201celemento\u201d\nintendo sia un honoo,\nche un hinoo.\n",B.f,18,null,null)
+B.KU=new A.pX("Questo\n\xe8 un percorso di scrittura,\nche si presenta\ncome l\u2019esplorazione di un\u2019<b>Isola<b>.\n\nUn viaggio,\nnove tappe,\ntrenta esercizi.\n\nOgni esercizio\n\xe8 articolato in tre fasi,\nche io chiamo\n<b>scrittura libera,<b>\n<b>honoo<b> (\"on\xf9\")\ne\n<b>hinoo<b> (\u201cin\xf9\u201d).\n\n\n<b>Scrittura libera<b>\nA partire dal tema proposto,\nscrivi per\n almeno dieci minuti,\nnella forma che preferisci.\n\nDedica cio\xe8\nuno spazio quotidiano\nalla scrittura,\ne difendilo.\n\nIn questa fase\npuoi accompagnare\nla scrittura\nad altri metodi\ndi rappresentazione,\ncome la fotografia\no il disegno.\n\nIn effetti\nsarebbe pi\xf9 esatto dire:\n\u201ca partire dal tema proposto,\ninizia una riflessione,\nannotando quello che affiora\nnel modo\nche ti sembra pi\xf9 comodo\u201d.\n\nSecondo me,\nun ottimo risultato\nsarebbe riuscire a \ndedicare a questa fase\nalmeno\nquaranta, cinquanta minuti\nal giorno.\nMa non considerare questo\nil tuo obiettivo.\n\nIl tuo obiettivo\n\xe8 quello di confrontarti\ncon questa prima fase\ntutti i giorni,\nsenza saltare alcun giorno.\n\nAvrai bisogno\ndi un orologio:\nsegna l\u2019orario in cui inizi\nla tua <b>scrittura libera<b>\ne continua\nfinch\xe9 non saranno trascorsi\n<b>almeno dieci minuti<b>.\n\nQuando smetti,\nscrivi l\u2019orario in cui hai smesso,\ne calcola\nquanto \xe8 durata la tua scrittura.\n\nLavora\ncon il massimo della\nconcentrazione,\ndopo aver cercato di eliminare\ntutte le possibili\nfonti di distrazione.\n\nIo scriverei al mattino,\ncon un pennarello molto fluido,\nsu fogli bianchi,\nsenza righe.\n\nSi tratta di gusti:\nti invito a scoprire i tuoi.\n\nTi consiglio\ndi non mostrare a nessuno\nquello che verr\xe0 fuori\nin questa prima fase di scrittura.\n\n\n<b>honoo<b>\nRileggi con attenzione\ntutto quello\nche\nsei riuscito a far affiorare\ndurante la <b>scrittura libera<b>,\ne poi,\na partire\nda quello che hai scritto,\nrealizza almeno un <b>honoo<b>.\n\nUn <b>honoo<b>\n\xe8 una composizione\narticolata in un <b>breve testo<b>,\ndisposto in un massimo di <b>cinque righe<b>,\ne un\u2019<b>immagine quadrata<b>.\n\nOgni riga contiene al massimo\ncirca trentadue caratteri.\n\nPer darti un'idea,\nquesta\n\xe8 la riga pi\xf9 lunga possibile.\n\n\u2014 Hai il presente. Non ti basta?\n\n\nIl testo\n\xe8 <b>formattato al centro<b>\ne\nscritto in <b>carattere Arvo<b>.\n\nIn questo contesto,\nconsidero l\u2019<b>honoo<b>\nuna tecnica\nper evidenziare\npunti caldi\ndal magma informe\ndella <b>scrittura libera<b>,\ne per iniziare\na strutturare\nquesti punti caldi\nin forme pi\xf9 complesse.\n\n\n<b>hinoo<b>\nDopo aver realizzato\nalmeno un <b>honoo<b>,\nscrivi\nalmeno un <b>hinoo<b>.\n\nUn <b>hinoo<b>\n\xe8 una composizione\nformata\nda un <b>testo<b>,\ndisposto in un massimo\ndi <b>venti righe<b>,\nsopra un'<b>immagine rettangolare<b>.\n\n\nLe dimensioni dell'immagine sono\n<b>1080<b> pixel in larghezza\ne <b>1920<b> in altezza,\ncon un rapporto d'aspetto <b>9:16<b>\ncome una Storia Instagram.\n\nLa lunghezza massima\ndi ogni riga\n\xe8 come quella\ndella riga di un honoo.\n\nIl carattere \xe8 <b>Lora<b>.\n\nIl <b>colore<b> del testo\npu\xf2 essere\n<b>bianco<b> o <b>nero<b>.\n\nNelle mie intenzioni,\nla scelta espressiva\ndel punto\n in cui andare\n \"a capo\",\nnei testi dell\u2019<b>honoo<b>\ne dell\u2019<b>hinoo<b>,\naccende\nun riflettore\nsu alcuni elementi,\ne ci indica\nla strada\nverso\nla nostra storia.\n\nL\u2019ideale\nsarebbe svolgere\nnell\u2019arco della stessa giornata.\nle tre fasi\ndi ogni esercizio:\n<b>scrittura libera<b>,\n<b>honoo<b>\ne\n<b>hinoo<b>.\n\nSe vuoi comporre\ni tuoi <b>honoo<b>\ne i tuoi <b>hinoo<b>,\nclicca sulla <b>Bottiglia<b>.\n\nSe vuoi vedere\ngli <b>honoo<b>\ne gli <b>hinoo<b>\ndegli altri,\nclicca sulla <b>Luna<b>.\n\nSe clicchi sullo <b>Scrigno<b>,\npuoi vedere\ngli <b>honoo<b> e gli <b>hinoo<b>\nche hai scritto,\ngli <b>honoo<b> e gli <b>hinoo<b>\nche hai salvato,\ne gli <b>honoo<b> e gli <b>hinoo<b>\nche hai ricevuto in risposta\nai tuoi <b>honoo<b> e <b>hinoo<b>.\n\nSe vuoi iniziare\nil tuo viaggio sull\u2019<b>Isola<b>,\nclicca su <b>1<b>\ne vai alla\n<b>Grotta delle Rondini<b>.\n\nSe sei iscritto al mio Corso,\nogni settimana ti assegner\xf2\nun esercizio,\nda svolgere nelle tre fasi,\n<b>scrittura libera<b>,\n<b>honoo<b>\ne <b>hinoo<b>,\ne ogni marted\xec,\nentro le 18.00,\ndovrai caricare\nalmeno un honoo\no un hinoo\nnella cartella\n<b>Marted\xec, 18.00<b>\ncondivisa con te su Google Drive,\ncon privilegi da Editor.\n\nDopo le 18.00 di ogni marted\xec,\ngli honoo e gli hinoo\nsaranno spostati\nnella cartella <b>Luna<b>,\nin sottocartelle nominate,\ndi settimana in settimana,\n<b>Prima Luna<b>,\n<b>Seconda Luna<b>,\neccetera\nfino a <b>Nona Luna<b>,\ncondivise con te,\ncon privilegi da Visualizzatore.\n\nAlla fine del Corso,\nti chieder\xf2\ndi realizzare un <b>henoo<b>,\ncio\xe8 una composizione\n di un minimo di due\ne di un massimo di nove elementi,\ndove per \u201celemento\u201d\nintendo sia un honoo,\nche un hinoo.\n",B.f,18,null,null,null)
 B.BP=new A.Hl(null,B.bY,B.KU,B.ae,null)
 B.Vb=new A.W(1e5,1e5)
 B.Vd=new A.W(22,22)
@@ -117002,7 +117006,7 @@ B.Cn=new A.H(!0,null,null,null,null,null,null,null,null,null,null,null,null,null
 B.mu=new A.H(!1,null,null,null,null,null,14,B.w,null,-0.15,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.Cp=new A.H(!1,B.hA,null,".SF Pro Text",null,null,17,null,null,-0.41,null,null,null,null,null,null,null,B.i,null,null,null,null,null,null,null,null)
 B.Za=new A.H(!0,B.f,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.mv=new A.H(!0,null,null,null,null,null,null,B.Z,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
+B.mv=new A.H(!0,null,null,null,null,null,null,B.Y,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.Xm=new A.H(!0,B.X,null,".AppleSystemUIFont",null,null,null,null,null,null,null,null,null,null,null,null,null,B.i,null,null,null,"blackRedwoodCity displayLarge",null,null,null,null)
 B.XN=new A.H(!0,B.X,null,".AppleSystemUIFont",null,null,null,null,null,null,null,null,null,null,null,null,null,B.i,null,null,null,"blackRedwoodCity displayMedium",null,null,null,null)
 B.Xn=new A.H(!0,B.X,null,".AppleSystemUIFont",null,null,null,null,null,null,null,null,null,null,null,null,null,B.i,null,null,null,"blackRedwoodCity displaySmall",null,null,null,null)
@@ -117123,13 +117127,13 @@ B.a_6=new A.H(!1,null,null,null,null,null,45,B.w,null,null,null,B.T,null,null,nu
 B.Zi=new A.H(!1,null,null,null,null,null,40,B.w,null,null,null,B.T,null,null,null,null,null,null,null,null,null,"tall headlineLarge 2014",null,null,null,null)
 B.XU=new A.H(!1,null,null,null,null,null,34,B.w,null,null,null,B.T,null,null,null,null,null,null,null,null,null,"tall headlineMedium 2014",null,null,null,null)
 B.XP=new A.H(!1,null,null,null,null,null,24,B.w,null,null,null,B.T,null,null,null,null,null,null,null,null,null,"tall headlineSmall 2014",null,null,null,null)
-B.a_3=new A.H(!1,null,null,null,null,null,21,B.Z,null,null,null,B.T,null,null,null,null,null,null,null,null,null,"tall titleLarge 2014",null,null,null,null)
+B.a_3=new A.H(!1,null,null,null,null,null,21,B.Y,null,null,null,B.T,null,null,null,null,null,null,null,null,null,"tall titleLarge 2014",null,null,null,null)
 B.Y_=new A.H(!1,null,null,null,null,null,17,B.w,null,null,null,B.T,null,null,null,null,null,null,null,null,null,"tall titleMedium 2014",null,null,null,null)
 B.a_7=new A.H(!1,null,null,null,null,null,15,B.bu,null,null,null,B.T,null,null,null,null,null,null,null,null,null,"tall titleSmall 2014",null,null,null,null)
-B.ZY=new A.H(!1,null,null,null,null,null,15,B.Z,null,null,null,B.T,null,null,null,null,null,null,null,null,null,"tall bodyLarge 2014",null,null,null,null)
+B.ZY=new A.H(!1,null,null,null,null,null,15,B.Y,null,null,null,B.T,null,null,null,null,null,null,null,null,null,"tall bodyLarge 2014",null,null,null,null)
 B.Yd=new A.H(!1,null,null,null,null,null,15,B.w,null,null,null,B.T,null,null,null,null,null,null,null,null,null,"tall bodyMedium 2014",null,null,null,null)
 B.Zk=new A.H(!1,null,null,null,null,null,13,B.w,null,null,null,B.T,null,null,null,null,null,null,null,null,null,"tall bodySmall 2014",null,null,null,null)
-B.Z0=new A.H(!1,null,null,null,null,null,15,B.Z,null,null,null,B.T,null,null,null,null,null,null,null,null,null,"tall labelLarge 2014",null,null,null,null)
+B.Z0=new A.H(!1,null,null,null,null,null,15,B.Y,null,null,null,B.T,null,null,null,null,null,null,null,null,null,"tall labelLarge 2014",null,null,null,null)
 B.Zo=new A.H(!1,null,null,null,null,null,12,B.w,null,null,null,B.T,null,null,null,null,null,null,null,null,null,"tall labelMedium 2014",null,null,null,null)
 B.YZ=new A.H(!1,null,null,null,null,null,11,B.w,null,null,null,B.T,null,null,null,null,null,null,null,null,null,"tall labelSmall 2014",null,null,null,null)
 B.a_h=new A.he(B.Y5,B.XA,B.a_6,B.Zi,B.XU,B.XP,B.a_3,B.Y_,B.a_7,B.ZY,B.Yd,B.Zk,B.Z0,B.Zo,B.YZ)
