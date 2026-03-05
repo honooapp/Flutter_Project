@@ -375,6 +375,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         color: HonooColor.onBackground,
         fontSize: 18,
         fontWeight: FontWeight.w200,
+        linkFontWeight: FontWeight.w700,
       ),
     ];
 

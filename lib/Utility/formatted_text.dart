@@ -10,13 +10,15 @@ class FormattedText extends StatelessWidget {
   final Color color;
   final double fontSize;
   final FontWeight? fontWeight;
+  final FontWeight? linkFontWeight;
 
   const FormattedText(
       {super.key,
       required this.inputText,
       required this.color,
       required this.fontSize,
-      this.fontWeight});
+      this.fontWeight,
+      this.linkFontWeight});
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +108,7 @@ class FormattedText extends StatelessWidget {
       style: GoogleFonts.arvo(
         color: HonooColor.onBackground,
         fontSize: 18,
-        fontWeight: FontWeight.w700,
+        fontWeight: linkFontWeight ?? FontWeight.w700,
         decoration: TextDecoration.underline,
       ),
       recognizer: TapGestureRecognizer()
@@ -126,7 +128,7 @@ class FormattedText extends StatelessWidget {
       style: GoogleFonts.arvo(
           color: HonooColor.onBackground,
           fontSize: 18,
-          fontWeight: fontWeight ?? FontWeight.w400,
+          fontWeight: linkFontWeight ?? (fontWeight ?? FontWeight.w400),
           decoration: TextDecoration.underline),
       recognizer: TapGestureRecognizer()
         ..onTap = () async {
