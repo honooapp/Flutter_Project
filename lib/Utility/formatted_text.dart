@@ -62,13 +62,32 @@ class FormattedText extends StatelessWidget {
         return '';
       },
       onNonMatch: (String text) {
-        textSpans.add(TextSpan(
-            text: text,
-            style: GoogleFonts.arvo(
-              color: color,
-              fontSize: fontSize,
-              fontWeight: fontWeight ?? FontWeight.w400,
-            )));
+        // Auto-link raw URLs in non-tagged text
+        final urlRegex = RegExp(r'(https?:\/\/[^\s]+)');
+        int lastIndex = 0;
+        for (final m in urlRegex.allMatches(text)) {
+          if (m.start > lastIndex) {
+            textSpans.add(TextSpan(
+                text: text.substring(lastIndex, m.start),
+                style: GoogleFonts.arvo(
+                  color: color,
+                  fontSize: fontSize,
+                  fontWeight: fontWeight ?? FontWeight.w400,
+                )));
+          }
+          final urlText = m.group(0)!;
+          textSpans.add(_buildHyperlinkSpan(urlText, urlText, context));
+          lastIndex = m.end;
+        }
+        if (lastIndex < text.length) {
+          textSpans.add(TextSpan(
+              text: text.substring(lastIndex),
+              style: GoogleFonts.arvo(
+                color: color,
+                fontSize: fontSize,
+                fontWeight: fontWeight ?? FontWeight.w400,
+              )));
+        }
         return '';
       },
     );
@@ -93,7 +112,7 @@ class FormattedText extends StatelessWidget {
       recognizer: TapGestureRecognizer()
         ..onTap = () async {
           final Uri url = Uri.parse(href);
-          if (!await launchUrl(url)) {
+          if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
             throw Exception('Could not launch $url');
           }
         },
@@ -112,7 +131,7 @@ class FormattedText extends StatelessWidget {
       recognizer: TapGestureRecognizer()
         ..onTap = () async {
           final Uri url = Uri.parse(href);
-          if (!await launchUrl(url)) {
+          if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
             throw Exception('Could not launch $url');
           }
         },
