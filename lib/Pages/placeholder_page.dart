@@ -370,66 +370,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
       _textBlock(Utility().appName, titleStyle),
       const SizedBox(height: _honooBottomSpacing),
       _textBlock(_trimInlineText(Utility().text1Six), baseTextStyle),
-      _textBlock(
-        _trimInlineText(
-          """
-Vuoi collaborare
-a questo progetto?
-
-Scrivimi a
-venceslao.cembalo@gmail.com.
-
-Se fai la dichiarazione
-dei redditi,
-puoi scegliere
-di destinare
-il 5 per mille
-a honoo.
-
-Non è una donazione in più.
-Non costa nulla.
-
-È una parte
-delle tue imposte
-che puoi decidere
-a chi destinare.
-
-Firma
-nel riquadro
-dedicato agli Enti
-del Terzo Settore
-e scrivi
-il codice fiscale
-di honoo.
-
-Codice fiscale di
-honoo - laboratorio multimediale:
-95349850636
-
-Se ti va,
-clicca qui:
-https://ko-fi.com/honoo2026
-per offrire
-un bicchiere di Idromele
-agli Gnometti delle Idee.
-
-Oppure
-un paio di fiaschi.
-
-I risultati
-saranno scintillanti:
-gli Gnometti delle Idee
-sono sconsideratamente generosi
-con chi è generoso.
-
-Prova
-e di me dirai
-che gli amici
-li consiglio bene.
-""",
-        ),
-        baseTextStyle,
-      ),
+      _textBlock(_trimInlineText(Utility().sostieniText), baseTextStyle),
     ];
 
     final Widget content = Center(

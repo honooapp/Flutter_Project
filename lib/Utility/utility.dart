@@ -21,6 +21,62 @@ class Utility {
       """\n\navevi gli occhi chiusi\ne hai fatto la scelta giusta.\n\nMi chiamo\nVenceslao Cembalo\ne se telefoni al\n3274920811,\npuoi sentire\nun’altra volta\nla mia voce\ne continuare il viaggio.\n\n Se le cose\nstanno\ndiversamente,\nclicca sull’icona della\nhome\nin basso a sinistra.\n\nIn alto\nal centro\ndi ogni schermata\nc'è il logo\n\n""";
   final String text1Six =
       """\n\nse ci clicchi sopra,\ntorni qui\na questa pagina.\n""";
+  final String sostieniText =
+      """
+Vuoi collaborare
+a questo progetto?
+
+Scrivimi a
+venceslao.cembalo@gmail.com.
+
+Se fai la dichiarazione
+dei redditi,
+puoi scegliere
+di destinare
+il 5 per mille
+a honoo.
+
+Non è una donazione in più.
+Non costa nulla.
+
+È una parte
+delle tue imposte
+che puoi decidere
+a chi destinare.
+
+Firma
+nel riquadro
+dedicato agli Enti
+del Terzo Settore
+e scrivi
+il codice fiscale
+di honoo.
+
+Codice fiscale di
+honoo - laboratorio multimediale:
+95349850636
+
+Se ti va,
+clicca qui:
+https://ko-fi.com/honoo2026
+per offrire
+un bicchiere di Idromele
+agli Gnometti delle Idee.
+
+Oppure
+un paio di fiaschi.
+
+I risultati
+saranno scintillanti:
+gli Gnometti delle Idee
+sono sconsideratamente generosi
+con chi è generoso.
+
+Prova
+e di me dirai
+che gli amici
+li consiglio bene.
+""";
   final String textHome1 = 'Ti regaliamo la Luna.\nPer sempre.';
   final String textHome2 =
       'Niente è per sempre,\ne nessuno può regalarti la Luna.\n\nÈ vero,\nma non per i poeti.\n\nVuoi essere un poeta di honoo?\n\nClicca sulla Bottiglia,\ne componi i tuoi honoo e hinoo.\n\nOppure sulla Luna,\ne guarda gli honoo\ne gli hinoo degli altri.\n\nO sull’Isola,\ne inizia il viaggio\nverso le tue storie.';
