@@ -228,7 +228,7 @@ class _NewHinooPageState extends State<NewHinooPage>
       showHonooToast(
         context,
         message:
-            'Per salvare lo hinoo nello Scrigno, conferma prima il caricamento dello sfondo (pulsante OK nello step sfondo).',
+            'Per salvare l\'hinoo nello Scrigno,\n premi ✓\n e conferma prima\n il caricamento dell\'immagine.',
       );
       return;
     }
