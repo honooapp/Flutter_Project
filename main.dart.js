@@ -98801,7 +98801,7 @@ break}A.aR(a1,B.m,u.Y)
 s=1
 break}if(B.b.eN(m.a,new A.aGM())){a1=n.c
 if(a1==null){s=1
-break}A.aR(a1,B.m,"Per salvare lo hinoo nello Scrigno, conferma prima il caricamento dello sfondo (pulsante OK nello step sfondo).")
+break}A.aR(a1,B.m,"Per salvare l'hinoo nello Scrigno,\n premi \u2713\n e conferma prima\n il caricamento dell'immagine.")
 s=1
 break}if(J.d(a2.i(0,"isUploadingBg"),!0)||n.Q){a1=n.c
 if(a1==null){s=1
