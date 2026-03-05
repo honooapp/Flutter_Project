@@ -81,6 +81,7 @@ class FormattedText extends StatelessWidget {
 
   TextSpan _buildHyperlinkBoldSpan(
       String text, String link, BuildContext context) {
+    final String href = link.startsWith('http') ? link : 'https://$link';
     return TextSpan(
       text: text,
       style: GoogleFonts.arvo(
@@ -91,7 +92,7 @@ class FormattedText extends StatelessWidget {
       ),
       recognizer: TapGestureRecognizer()
         ..onTap = () async {
-          final Uri url = Uri.parse('https://$link');
+          final Uri url = Uri.parse(href);
           if (!await launchUrl(url)) {
             throw Exception('Could not launch $url');
           }
@@ -100,6 +101,7 @@ class FormattedText extends StatelessWidget {
   }
 
   TextSpan _buildHyperlinkSpan(String text, String link, BuildContext context) {
+    final String href = link.startsWith('http') ? link : 'https://$link';
     return TextSpan(
       text: text,
       style: GoogleFonts.arvo(
@@ -109,7 +111,7 @@ class FormattedText extends StatelessWidget {
           decoration: TextDecoration.underline),
       recognizer: TapGestureRecognizer()
         ..onTap = () async {
-          final Uri url = Uri.parse('https://$link');
+          final Uri url = Uri.parse(href);
           if (!await launchUrl(url)) {
             throw Exception('Could not launch $url');
           }
