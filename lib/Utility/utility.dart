@@ -50,8 +50,8 @@ class Utility {
       '95349850636\n\n'
       'Se ti va,\n'
       'clicca qui:\n\n'
-      '<l>https://ko-fi.com/honoo2026||ko-fi.com/honoo2026</l>\n'
-      'per offrire\n\n'
+      '<l>https://ko-fi.com/honoo2026||ko-fi.com/honoo2026</l>\n\n'
+      'per offrire\n'
       'un bicchiere di Idromele\n'
       'agli Gnometti delle Idee.\n\n'
       'Oppure\n'
@@ -64,7 +64,7 @@ class Utility {
       'Prova\n'
       'e di me dirai\n'
       'che gli amici\n'
-      'li consiglio bene.\n';
+      'li consiglio bene.\n\n\n';
   final String textHome1 = 'Ti regaliamo la Luna.\nPer sempre.';
   final String textHome2 =
       'Niente è per sempre,\ne nessuno può regalarti la Luna.\n\nÈ vero,\nma non per i poeti.\n\nVuoi essere un poeta di honoo?\n\nClicca sulla Bottiglia,\ne componi i tuoi honoo e hinoo.\n\nOppure sulla Luna,\ne guarda gli honoo\ne gli hinoo degli altri.\n\nO sull’Isola,\ne inizia il viaggio\nverso le tue storie.';
