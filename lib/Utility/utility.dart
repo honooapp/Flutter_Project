@@ -21,8 +21,7 @@ class Utility {
       """\n\navevi gli occhi chiusi\ne hai fatto la scelta giusta.\n\nMi chiamo\nVenceslao Cembalo\ne se telefoni al\n3274920811,\npuoi sentire\nun’altra volta\nla mia voce\ne continuare il viaggio.\n\n Se le cose\nstanno\ndiversamente,\nclicca sull’icona della\nhome\nin basso a sinistra.\n\nIn alto\nal centro\ndi ogni schermata\nc'è il logo\n\n""";
   final String text1Six =
       """\n\nse ci clicchi sopra,\ntorni qui\na questa pagina.\n\n""";
-  final String sostieniText =
-      'Vuoi collaborare\n'
+  final String sostieniText = 'Vuoi collaborare\n'
       'a questo progetto?\n\n'
       'Scrivimi a\n'
       'venceslao.cembalo@gmail.com.\n\n'
@@ -64,7 +63,7 @@ class Utility {
       'Prova\n'
       'e di me dirai\n'
       'che gli amici\n'
-      'li consiglio bene.\n\n\n';
+      'li consiglio bene.\n';
   final String textHome1 = 'Ti regaliamo la Luna.\nPer sempre.';
   final String textHome2 =
       'Niente è per sempre,\ne nessuno può regalarti la Luna.\n\nÈ vero,\nma non per i poeti.\n\nVuoi essere un poeta di honoo?\n\nClicca sulla Bottiglia,\ne componi i tuoi honoo e hinoo.\n\nOppure sulla Luna,\ne guarda gli honoo\ne gli hinoo degli altri.\n\nO sull’Isola,\ne inizia il viaggio\nverso le tue storie.';
