@@ -21,62 +21,11 @@ class Utility {
       """\n\navevi gli occhi chiusi\ne hai fatto la scelta giusta.\n\nMi chiamo\nVenceslao Cembalo\ne se telefoni al\n3274920811,\npuoi sentire\nun’altra volta\nla mia voce\ne continuare il viaggio.\n\n Se le cose\nstanno\ndiversamente,\nclicca sull’icona della\nhome\nin basso a sinistra.\n\nIn alto\nal centro\ndi ogni schermata\nc'è il logo\n\n""";
   final String text1Six =
       """\n\nse ci clicchi sopra,\ntorni qui\na questa pagina.\n\n""";
-  final String sostieniText = 'Vuoi collaborare\n'
-      'a questo progetto?\n\n'
-      'Scrivimi a\n'
-      'venceslao.cembalo@gmail.com.\n\n'
-      'Se fai la dichiarazione\n'
-      'dei redditi,\n'
-      'puoi scegliere\n'
-      'di destinare\n'
-      'il 5 per mille\n'
-      'a honoo.\n\n'
-      'Non è una donazione in più.\n'
-      'Non costa nulla.\n\n'
-      'È una parte\n'
-      'delle tue imposte\n'
-      'che puoi decidere\n'
-      'a chi destinare.\n\n'
-      'Firma\n'
-      'nel riquadro\n'
-      'dedicato agli Enti\n'
-      'del Terzo Settore\n'
-      'e scrivi\n'
-      'il codice fiscale\n'
-      'di honoo.\n\n'
-      'Codice fiscale di\n'
-      'honoo - laboratorio multimediale:\n'
-      '95349850636\n\n'
-      'Se ti va,\n'
-      'clicca qui:\n\n'
-      'https://ko-fi.com/honoo2026\n\n'
-      'per offrire\n'
-      'un bicchiere di Idromele\n'
-      'agli Gnometti delle Idee.\n\n'
-      'Oppure\n'
-      'un paio di fiaschi.\n\n'
-      'I risultati\n'
-      'saranno scintillanti:\n'
-      'gli Gnometti delle Idee\n'
-      'sono sconsideratamente generosi\n'
-      'con chi è generoso.\n\n'
-      'Prova\n'
-      'e di me dirai\n'
-      'che gli amici\n'
-      'li consiglio bene.\n';
+  final String sostieniText = 'Vuoi collaborare\na questo progetto?\n\nScrivimi a\nvenceslao.cembalo@gmail.com.\n\nSe fai la dichiarazione\ndei redditi,\npuoi scegliere\ndi destinare\nil 5 per mille\na honoo.\n\nNon è una donazione in più.\nNon costa nulla.\n\nÈ una parte\ndelle tue imposte\nche puoi decidere\na chi destinare.\n\nFirma\nnel riquadro\ndedicato agli Enti\ndel Terzo Settore\ne scrivi\nil codice fiscale\ndi honoo.\n\nCodice fiscale di\nhonoo - laboratorio multimediale:\n95349850636\n\nSe ti va,\nclicca qui:\n\nhttps://ko-fi.com/honoo2026\n\nper offrire\nun bicchiere di Idromele\nagli Gnometti delle Idee.\n\nOppure\nun paio di fiaschi.\n\nI risultati\nsaranno scintillanti:\ngli Gnometti delle Idee\nsono sconsideratamente generosi\ncon chi è generoso.\n\nProva\ne di me dirai\nche gli amici\nli consiglio bene.\n';
   final String textHome1 = 'Ti regaliamo la Luna.\nPer sempre.';
   final String textHome2 =
       'Niente è per sempre,\ne nessuno può regalarti la Luna.\n\nÈ vero,\nma non per i poeti.\n\nVuoi essere un poeta di honoo?\n\nClicca sulla Bottiglia,\ne componi i tuoi honoo e hinoo.\n\nOppure sulla Luna,\ne guarda gli honoo\ne gli hinoo degli altri.\n\nO sull’Isola,\ne inizia il viaggio\nverso le tue storie.';
-  final String campanelliText = 'In questa parte dell’Isola\n'
-    'ci sono case.\n\n'
-    'Vuoi scoprire chi ci abita?\n\n'
-    'Scorrendo verso destra\n'
-    'puoi leggere\n'
-    'ciò che ogni abitante\n'
-    'ha scelto di raccontarti.\n\n'
-    'Se vuoi,\n'
-    'prova a bussare:\n'
-    'magari ti fa entrare.';
+  final String campanelliText = 'In questa parte dell’Isola\nci sono case.\n\nVuoi scoprire chi ci abita?\n\nScorrendo verso destra\npuoi leggere\nciò che ogni abitante\nha scelto di raccontarti.\n\nSe vuoi,\nprova a bussare:\nmagari ti fa entrare.';
   final String campanelloExample1Text = 'Ti piace\nascoltare musica\nin compagnia?\n\nE ballare in casa,\ncome si fa alle feste?\n\nQuesto è il campanello\ndi casa mia.\n\nPuoi bussare,\nse vuoi.\n\nMagari sono a casa.\nMagari sto ascoltando musica.\nMagari è musica che ti piace.';
   final String campanelloExample2Text = 'Ti piace\nfare colazione in compagnia,\nin un terrazzo esposto a Sud?\n\nQuesto è il campanello di casa mia.\n\nPuoi bussare,\nse vuoi.\n\nMagari sono sul terrazzo.\nMagari c’è il sole.\nMagari sto facendo colazione.';
   final String chestHeader = 'Il tuo Cuore custodisce';
