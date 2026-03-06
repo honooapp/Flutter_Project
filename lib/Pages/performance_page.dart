@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Widgets/honoo_standard_page.dart';
+import 'package:honoo/Utility/honoo_colors.dart';
 
 class PerformancePage extends StatelessWidget {
   const PerformancePage({super.key});

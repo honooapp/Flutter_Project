@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/honoo_standard_page.dart';
-import 'package:honoo/Utility/responsive_layout.dart';
+// import 'package:honoo/Utility/responsive_layout.dart';
 
 class ViaggiIsolaPage extends StatelessWidget {
   const ViaggiIsolaPage({super.key});
@@ -36,8 +36,7 @@ class ViaggiIsolaPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ResponsiveLayoutMode layoutMode =
-        ResponsiveLayout.modeForWidth(MediaQuery.of(context).size.width);
+    // Layout handled by HonooStandardPage; no local layoutMode needed
 
     final TextStyle bodyStyle = GoogleFonts.arvo(
       color: HonooColor.onBackground,
