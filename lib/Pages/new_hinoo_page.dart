@@ -634,9 +634,8 @@ class _NewHinooPageState extends State<NewHinooPage>
                                   key: _builderKey,
                                   onHinooChanged: _onHinooChanged,
                                   onPngExported: _onPngExported,
-                                  hintText: widget.isCampanello
-                                      ? 'Scrivi qui tutto quello che vuoi per la pagina del tuo campanello'
-                                      : 'Carica prima la tua immagine\n conferma con \u2713\n e poi scrivi il tuo testo',
+                                  hintText:
+                                      'Carica prima la tua immagine\n conferma con \u2713\n e poi scrivi il tuo testo',
                                   backgroundPromptText: widget.isCampanello
                                       ? 'Scrivi qui\n'
                                           'tutto quello che vuoi\n'
