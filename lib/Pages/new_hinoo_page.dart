@@ -154,6 +154,8 @@ class _NewHinooPageState extends State<NewHinooPage>
   }
 
   Future<void> _submitHinoo() async {
+    const String writeHint =
+        'Carica prima la tua immagine\n conferma con \u2713\n e poi scrivi il tuo testo';
     final dynamic rawDraft =
         (_builderKey.currentState as dynamic)?.exportDraft();
     final pages = (rawDraft is Map) ? (rawDraft['pages'] as List?) : null;
@@ -161,7 +163,7 @@ class _NewHinooPageState extends State<NewHinooPage>
       if (!mounted) return;
       showHonooToast(
         context,
-        message: 'Completa il tuo hinoo caricando l’immagine e il testo.',
+        message: writeHint,
       );
       return;
     }
@@ -268,8 +270,15 @@ class _NewHinooPageState extends State<NewHinooPage>
     final validationErrors = _controller.validateDraft(hinooDraft);
     if (validationErrors.isNotEmpty) {
       if (!mounted) return;
-      final errorText = 'Bozza non valida:\n- ${validationErrors.join('\n- ')}';
-      showHonooToast(context, message: errorText);
+      // Se manca il testo, mostra l'hint invece del dialog/testo generico
+      final hasMissingText =
+          validationErrors.any((e) => e.toLowerCase().contains('testo'));
+      if (hasMissingText) {
+        showHonooToast(context, message: writeHint);
+      } else {
+        final errorText = 'Bozza non valida:\n- ${validationErrors.join('\n- ')}';
+        showHonooToast(context, message: errorText);
+      }
       return;
     }
 
@@ -627,7 +636,7 @@ class _NewHinooPageState extends State<NewHinooPage>
                                   onPngExported: _onPngExported,
                                   hintText: widget.isCampanello
                                       ? 'Scrivi qui tutto quello che vuoi per la pagina del tuo campanello'
-                                      : null,
+                                      : 'Carica prima la tua immagine\n conferma con \u2713\n e poi scrivi il tuo testo',
                                   backgroundPromptText: widget.isCampanello
                                       ? 'Scrivi qui\n'
                                           'tutto quello che vuoi\n'
