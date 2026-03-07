@@ -46,8 +46,6 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   static const double _venceslaoBottomSpacing = 15;
   static const double _honooTopSpacing = 15;
   static const double _honooBottomSpacing = 15;
-  static const double _podcastTopSpacing = 5;
-  static const double _podcastBottomSpacing = 30;
   static const double _libriTopSpacing = 5;
   static const double _libriBottomSpacing = 30;
 
