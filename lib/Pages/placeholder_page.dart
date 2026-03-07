@@ -397,18 +397,6 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           );
         },
       ),
-      ..._materialIconBlockWithSpacing(
-        Icons.book,
-        inlineIconHeight,
-        topSpacing: _libriTopSpacing,
-        bottomSpacing: _libriBottomSpacing,
-        color: _linkIconColor,
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const LibriPage()),
-          );
-        },
-      ),
       _linkTextBlock(
         context,
         podcastLine,
