@@ -373,7 +373,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         },
       ),
       ..._materialIconBlockWithSpacing(
-        Icons.podcasts,
+        Icons.mic,
         inlineIconHeight,
         topSpacing: _podcastTopSpacing,
         bottomSpacing: _podcastBottomSpacing,
@@ -395,7 +395,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         },
       ),
       ..._materialIconBlockWithSpacing(
-        Icons.menu_book,
+        Icons.book,
         inlineIconHeight,
         topSpacing: _libriTopSpacing,
         bottomSpacing: _libriBottomSpacing,
