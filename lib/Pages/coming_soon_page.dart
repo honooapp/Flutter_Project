@@ -29,6 +29,17 @@ class ComingSoonPage extends StatefulWidget {
 class _ComingSoonPageState extends State<ComingSoonPage> {
   @override
   Widget build(BuildContext context) {
+    const String kQuote = 'Quanto poveri\n'
+        'sono coloro\n'
+        'che non hanno pazienza!\n\n'
+        'Quale ferita\n'
+        'si è mai guarita\n'
+        'se non per gradi?\n\n';
+    const String kBibliography = 'William Shakespeare\n'
+        'Otello\n'
+        '1604\n'
+        'Atto II, scena III\n'
+        'vv. 360–361\n';
     final bool isPhone = DeviceController().isPhone();
     final double deviceWidth = MediaQuery.of(context).size.width;
     final ResponsiveLayoutMode layoutMode =
@@ -69,16 +80,13 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
                     ),
                   ),
                   const SizedBox(height: 5.0),
-                  FormattedText(
-                    inputText: widget.header,
-                    color: HonooColor.onBackground,
-                    fontSize: 18,
-                  ),
+                  // Header non utilizzato: contenuto fisso per ComingSoon
+                  const SizedBox.shrink(),
                   const SizedBox(height: 30.0),
                   SizedBox(
                     width: 80.w,
                     child: Text(
-                      widget.quote,
+                      kQuote,
                       style: GoogleFonts.libreFranklin(
                         color: HonooColor.wave4,
                         fontSize: 18,
@@ -92,7 +100,7 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
                     height: 20.h,
                     width: 80.w,
                     child: Text(
-                      widget.bibliography,
+                      kBibliography,
                       style: GoogleFonts.libreFranklin(
                         color: HonooColor.wave4,
                         fontSize: 14,
