@@ -66,6 +66,23 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     ];
   }
 
+  List<Widget> _materialIconBlockWithSpacing(
+    IconData icon,
+    double size, {
+    double topSpacing = 0,
+    double bottomSpacing = 0,
+    VoidCallback? onTap,
+  }) {
+    return [
+      if (topSpacing > 0) SizedBox(height: topSpacing),
+      GestureDetector(
+        onTap: onTap,
+        child: Icon(icon, size: size, color: HonooColor.onBackground),
+      ),
+      if (bottomSpacing > 0) SizedBox(height: bottomSpacing),
+    ];
+  }
+
   Widget _textBlock(String text, TextStyle style, {double? height}) {
     if (text.trim().isEmpty) return const SizedBox.shrink();
     return Text(
@@ -355,8 +372,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           );
         },
       ),
-      ..._iconBlockWithSpacing(
-        "assets/icons/performance.png",
+      ..._materialIconBlockWithSpacing(
+        Icons.podcasts,
         inlineIconHeight,
         topSpacing: _podcastTopSpacing,
         bottomSpacing: _podcastBottomSpacing,
@@ -377,8 +394,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           );
         },
       ),
-      ..._iconBlockWithSpacing(
-        "assets/icons/performance.png",
+      ..._materialIconBlockWithSpacing(
+        Icons.menu_book,
         inlineIconHeight,
         topSpacing: _libriTopSpacing,
         bottomSpacing: _libriBottomSpacing,
