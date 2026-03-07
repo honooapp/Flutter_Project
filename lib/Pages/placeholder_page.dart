@@ -397,24 +397,15 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           );
         },
       ),
-      _linkTextBlock(
-        context,
-        podcastLine,
-        baseTextStyle,
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const PodcastDirettePage()),
-          );
-        },
-      ),
-      ..._iconBlockWithSpacing(
-        "assets/icons/performance.png",
+      ..._materialIconBlockWithSpacing(
+        Icons.book,
         inlineIconHeight,
-        topSpacing: _podcastTopSpacing,
-        bottomSpacing: _podcastBottomSpacing,
+        topSpacing: _libriTopSpacing,
+        bottomSpacing: _libriBottomSpacing,
+        color: _linkIconColor,
         onTap: () {
           Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const PodcastDirettePage()),
+            MaterialPageRoute(builder: (_) => const LibriPage()),
           );
         },
       ),
