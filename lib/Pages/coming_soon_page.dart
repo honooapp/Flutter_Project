@@ -6,6 +6,7 @@ import 'package:honoo/Widgets/honoo_app_title.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
 import 'package:sizer/sizer.dart';
+import 'package:honoo/Utility/utility.dart';
 
 import '../Controller/device_controller.dart';
 import 'home_page.dart';
@@ -29,17 +30,8 @@ class ComingSoonPage extends StatefulWidget {
 class _ComingSoonPageState extends State<ComingSoonPage> {
   @override
   Widget build(BuildContext context) {
-    const String kQuote = 'Quanto poveri\n'
-        'sono coloro\n'
-        'che non hanno pazienza!\n\n'
-        'Quale ferita\n'
-        'si è mai guarita\n'
-        'se non per gradi?\n\n';
-    const String kBibliography = 'William Shakespeare\n'
-        'Otello\n'
-        '1604\n'
-        'Atto II, scena III\n'
-        'vv. 360–361\n';
+    final String quote = Utility().shakespeare;
+    final String bibliography = Utility().bibliography;
     final bool isPhone = DeviceController().isPhone();
     final double deviceWidth = MediaQuery.of(context).size.width;
     final ResponsiveLayoutMode layoutMode =
@@ -80,13 +72,13 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
                     ),
                   ),
                   const SizedBox(height: 5.0),
-                  // Header non utilizzato: contenuto fisso per ComingSoon
+                  // Header non utilizzato: contenuto fisso da Utility
                   const SizedBox.shrink(),
                   const SizedBox(height: 30.0),
                   SizedBox(
                     width: 80.w,
                     child: Text(
-                      kQuote,
+                      quote,
                       style: GoogleFonts.libreFranklin(
                         color: HonooColor.wave4,
                         fontSize: 18,
@@ -100,7 +92,7 @@ class _ComingSoonPageState extends State<ComingSoonPage> {
                     height: 20.h,
                     width: 80.w,
                     child: Text(
-                      kBibliography,
+                      bibliography,
                       style: GoogleFonts.libreFranklin(
                         color: HonooColor.wave4,
                         fontSize: 14,
