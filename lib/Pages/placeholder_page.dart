@@ -17,6 +17,7 @@ import 'luna_page.dart';
 import 'viaggi_isola_page.dart';
 import 'laboratori_siae_page.dart';
 import 'podcast_dirette_page.dart';
+import 'libri_page.dart';
 
 class PlaceholderPage extends StatefulWidget {
   const PlaceholderPage({super.key});
@@ -45,6 +46,10 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   static const double _venceslaoBottomSpacing = 15;
   static const double _honooTopSpacing = 15;
   static const double _honooBottomSpacing = 15;
+  static const double _podcastTopSpacing = 5;
+  static const double _podcastBottomSpacing = 30;
+  static const double _libriTopSpacing = 5;
+  static const double _libriBottomSpacing = 30;
 
   List<Widget> _iconBlockWithSpacing(
     String asset,
@@ -142,6 +147,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     const String festeLine = 'feste';
     const String viaggiLine = "viaggi sull'Isola delle Storie";
     const String podcastLine = 'podcast e dirette';
+    const String libriLine = 'libri';
     const String venceslaoLine = 'Venceslao Cembalo';
     final String text1First = Utility().text1First;
     const String performanceMarker = 'che ci siamo visti\n\n';
@@ -338,6 +344,48 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const ViaggiIsolaPage()),
+          );
+        },
+      ),
+      _linkTextBlock(
+        context,
+        podcastLine,
+        baseTextStyle,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const PodcastDirettePage()),
+          );
+        },
+      ),
+      ..._iconBlockWithSpacing(
+        "assets/icons/performance.png",
+        inlineIconHeight,
+        topSpacing: _podcastTopSpacing,
+        bottomSpacing: _podcastBottomSpacing,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const PodcastDirettePage()),
+          );
+        },
+      ),
+      _linkTextBlock(
+        context,
+        libriLine,
+        baseTextStyle,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const LibriPage()),
+          );
+        },
+      ),
+      ..._iconBlockWithSpacing(
+        "assets/icons/performance.png",
+        inlineIconHeight,
+        topSpacing: _libriTopSpacing,
+        bottomSpacing: _libriBottomSpacing,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const LibriPage()),
           );
         },
       ),
