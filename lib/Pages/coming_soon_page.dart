@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:honoo/Utility/formatted_text.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
