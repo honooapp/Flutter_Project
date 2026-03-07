@@ -19,11 +19,11 @@ class LibriPage extends StatelessWidget {
     );
 
     final String full = Utility().libriText;
-    final String firstTitle = 'Isola delle Storie';
+    const String firstTitle = 'Isola delle Storie';
     final int idx = full.indexOf(firstTitle);
     final String intro = idx >= 0 ? full.substring(0, idx) : full;
 
-    String _header(String text) => text.replaceAll('\n', ' ').trim();
+    String headerText(String text) => text.replaceAll('\n', ' ').trim();
 
     final spans = <InlineSpan>[
       TextSpan(text: intro, style: style),
@@ -38,7 +38,7 @@ class LibriPage extends StatelessWidget {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => ComingSoonPage(
-                  header: _header('Isola delle Storie'),
+                  header: headerText('Isola delle Storie'),
                   quote: '',
                   bibliography: '',
                 ),
@@ -57,7 +57,7 @@ class LibriPage extends StatelessWidget {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => ComingSoonPage(
-                  header: _header(
+                  header: headerText(
                       'Isole delle Storie\n(con illustrazioni di Joel Folda)'),
                   quote: '',
                   bibliography: '',
@@ -77,7 +77,7 @@ class LibriPage extends StatelessWidget {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => ComingSoonPage(
-                  header: _header('Immacolato'),
+                  header: headerText('Immacolato'),
                   quote: '',
                   bibliography: '',
                 ),
@@ -96,7 +96,7 @@ class LibriPage extends StatelessWidget {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => ComingSoonPage(
-                  header: _header('I limoni sono finiti'),
+                  header: headerText('I limoni sono finiti'),
                   quote: '',
                   bibliography: '',
                 ),
@@ -115,7 +115,7 @@ class LibriPage extends StatelessWidget {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => ComingSoonPage(
-                  header: _header('Almeno\navresti potuto\ncambiare i nomi'),
+                  header: headerText('Almeno\navresti potuto\ncambiare i nomi'),
                   quote: '',
                   bibliography: '',
                 ),
@@ -134,7 +134,7 @@ class LibriPage extends StatelessWidget {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => ComingSoonPage(
-                  header: _header('Papà,\nma tu mi vuoi bene?'),
+                  header: headerText('Papà,\nma tu mi vuoi bene?'),
                   quote: '',
                   bibliography: '',
                 ),
