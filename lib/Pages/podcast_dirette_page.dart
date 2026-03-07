@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/utility.dart';
 import 'package:honoo/Widgets/honoo_standard_page.dart';
+import 'coming_soon_page.dart';
 
 class PodcastDirettePage extends StatelessWidget {
   const PodcastDirettePage({super.key});
@@ -29,7 +30,7 @@ class PodcastDirettePage extends StatelessWidget {
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const _YouTubeInfoPage()),
+              MaterialPageRoute(builder: (_) => const ComingSoonPage(header: 'Un canale YouTube', quote: '', bibliography: '')),
             );
           },
       ),
@@ -42,7 +43,7 @@ class PodcastDirettePage extends StatelessWidget {
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const _PodcastInfoPage()),
+              MaterialPageRoute(builder: (_) => const ComingSoonPage(header: 'Un podcast', quote: '', bibliography: '')),
             );
           },
       ),
@@ -55,7 +56,7 @@ class PodcastDirettePage extends StatelessWidget {
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const _TwitchInfoPage()),
+              MaterialPageRoute(builder: (_) => const ComingSoonPage(header: 'Un account Twitch', quote: '', bibliography: '')),
             );
           },
       ),
@@ -72,66 +73,4 @@ class PodcastDirettePage extends StatelessWidget {
   }
 }
 
-class _YouTubeInfoPage extends StatelessWidget {
-  const _YouTubeInfoPage();
-  @override
-  Widget build(BuildContext context) {
-    final TextStyle style = GoogleFonts.arvo(
-      color: HonooColor.onBackground,
-      fontSize: 18,
-      fontWeight: FontWeight.w200,
-      height: 1.3,
-    );
-    return HonooStandardPage(
-      contentWidthFactor: 0.45,
-      child: Text(
-        Utility().podcastDiretteText,
-        style: style,
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-}
-
-class _PodcastInfoPage extends StatelessWidget {
-  const _PodcastInfoPage();
-  @override
-  Widget build(BuildContext context) {
-    final TextStyle style = GoogleFonts.arvo(
-      color: HonooColor.onBackground,
-      fontSize: 18,
-      fontWeight: FontWeight.w200,
-      height: 1.3,
-    );
-    return HonooStandardPage(
-      contentWidthFactor: 0.45,
-      child: Text(
-        Utility().podcastDiretteText,
-        style: style,
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-}
-
-class _TwitchInfoPage extends StatelessWidget {
-  const _TwitchInfoPage();
-  @override
-  Widget build(BuildContext context) {
-    final TextStyle style = GoogleFonts.arvo(
-      color: HonooColor.onBackground,
-      fontSize: 18,
-      fontWeight: FontWeight.w200,
-      height: 1.3,
-    );
-    return HonooStandardPage(
-      contentWidthFactor: 0.45,
-      child: Text(
-        Utility().podcastDiretteText,
-        style: style,
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-}
-
+// Sotto-pagine rimosse: ora i link aprono ComingSoonPage.

@@ -366,6 +366,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           );
         },
       ),
+      _textBlock('e', baseTextStyle),
       _linkTextBlock(
         context,
         libriLine,
