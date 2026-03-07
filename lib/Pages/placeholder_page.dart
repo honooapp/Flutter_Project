@@ -48,6 +48,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   static const double _honooBottomSpacing = 15;
   static const double _libriTopSpacing = 5;
   static const double _libriBottomSpacing = 30;
+  static const Color _linkIconColor = Color.fromRGBO(183, 183, 206, 1);
 
   List<Widget> _iconBlockWithSpacing(
     String asset,
@@ -72,12 +73,13 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     double topSpacing = 0,
     double bottomSpacing = 0,
     VoidCallback? onTap,
+    Color? color,
   }) {
     return [
       if (topSpacing > 0) SizedBox(height: topSpacing),
       GestureDetector(
         onTap: onTap,
-        child: Icon(icon, size: size, color: HonooColor.onBackground),
+        child: Icon(icon, size: size, color: color ?? HonooColor.onBackground),
       ),
       if (bottomSpacing > 0) SizedBox(height: bottomSpacing),
     ];
@@ -377,6 +379,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         inlineIconHeight,
         topSpacing: _podcastTopSpacing,
         bottomSpacing: _podcastBottomSpacing,
+        color: _linkIconColor,
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const PodcastDirettePage()),
@@ -399,6 +402,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         inlineIconHeight,
         topSpacing: _libriTopSpacing,
         bottomSpacing: _libriBottomSpacing,
+        color: _linkIconColor,
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const LibriPage()),
