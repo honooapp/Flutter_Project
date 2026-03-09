@@ -76,7 +76,7 @@ class _IslandPageState extends State<IslandPage> {
                                 final double maxW = constraints.maxWidth.isFinite
                                     ? constraints.maxWidth
                                     : MediaQuery.of(ctx).size.width;
-                                final double width = math.min(maxW, 520.0);
+                                final double width = math.min(maxW, 480.0);
                                 return Center(
                                   child: SizedBox(
                                     width: width,
@@ -108,9 +108,9 @@ class _IslandPageState extends State<IslandPage> {
                                   color: HonooColor.onBackground,
                                   fontSize: 18,
                                 ),
-                                const SizedBox(height: 16),
+                            const SizedBox(height: 12),
                                 exampleImage('assets/hinooesempio.png'),
-                                const SizedBox(height: 24),
+                            const SizedBox(height: 20),
                                 FormattedText(
                                   inputText: full.substring(idx2EndWithBreaks),
                                   color: HonooColor.onBackground,
@@ -171,9 +171,9 @@ class _IslandPageState extends State<IslandPage> {
                                 color: HonooColor.onBackground,
                                 fontSize: 18,
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 12),
                               exampleImage('assets/honooesempio.png'),
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 20),
 
                               // Between marker1 and the phrase
                               FormattedText(
@@ -181,9 +181,9 @@ class _IslandPageState extends State<IslandPage> {
                                 color: HonooColor.onBackground,
                                 fontSize: 18,
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 12),
                               exampleImage('assets/hinooesempio.png'),
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 20),
 
                               // Remaining content
                               if (afterSecondImage.trim().isNotEmpty)
@@ -204,7 +204,7 @@ class _IslandPageState extends State<IslandPage> {
                                 color: HonooColor.onBackground,
                                 fontSize: 18,
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 12),
                               exampleImage('assets/honooesempio.png'),
                               const SizedBox(height: 24),
                               FormattedText(
@@ -212,9 +212,9 @@ class _IslandPageState extends State<IslandPage> {
                                 color: HonooColor.onBackground,
                                 fontSize: 18,
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 12),
                               exampleImage('assets/hinooesempio.png'),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 12),
                             ],
                           );
                         }
