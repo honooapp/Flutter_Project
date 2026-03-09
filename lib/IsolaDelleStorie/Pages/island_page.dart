@@ -58,10 +58,17 @@ class _IslandPageState extends State<IslandPage> {
                       builder: (context) {
                         // Marker: trattino lungo (em dash) come da testo e00
                         const String marker1 =
-                            "— Hai il presente. Non ti basta?\n";
+                            "— Hai il presente. Non ti basta?\\n";
+                        const String marker2Base =
+                            "il colore del testo può essere bianco o nero";
 
-                        const String full = IsolaDelleStoreContentManager.e00;
+                        final String full = IsolaDelleStoreContentManager.e00;
                         final int idx1 = full.indexOf(marker1);
+                        final String fullLower = full.toLowerCase();
+                        final int idx2Start = fullLower.indexOf(
+                          marker2Base.toLowerCase(),
+                          idx1 >= 0 ? idx1 + marker1.length : 0,
+                        );
 
                         // Helper for responsive example images
                         Widget exampleImage(String assetPath) => LayoutBuilder(
@@ -82,23 +89,55 @@ class _IslandPageState extends State<IslandPage> {
                               },
                             );
 
-                        // Fallback: if marker is not found, render full text + both images
+                        // Fallback: if first marker is not found
                         if (idx1 < 0) {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const FormattedText(
-                                inputText: IsolaDelleStoreContentManager.e00,
-                                color: HonooColor.onBackground,
-                                fontSize: 18,
-                              ),
-                              const SizedBox(height: 16),
-                              exampleImage('assets/honooesempio.png'),
-                              const SizedBox(height: 16),
-                              exampleImage('assets/hinooesempio.png'),
-                              const SizedBox(height: 8),
-                            ],
-                          );
+                          if (idx2Start >= 0) {
+                            int idx2End = idx2Start + marker2Base.length;
+                            int extraNs = 0;
+                            while (idx2End + extraNs < full.length &&
+                                full[idx2End + extraNs] == '\\n' &&
+                                extraNs < 2) {
+                              extraNs++;
+                            }
+                            final int idx2EndWithBreaks = idx2End + extraNs;
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                FormattedText(
+                                  inputText: full.substring(0, idx2EndWithBreaks),
+                                  color: HonooColor.onBackground,
+                                  fontSize: 18,
+                                ),
+                                const SizedBox(height: 16),
+                                exampleImage('assets/hinooesempio.png'),
+                                const SizedBox(height: 24),
+                                FormattedText(
+                                  inputText: full.substring(idx2EndWithBreaks),
+                                  color: HonooColor.onBackground,
+                                  fontSize: 18,
+                                ),
+                                const SizedBox(height: 16),
+                                exampleImage('assets/honooesempio.png'),
+                                const SizedBox(height: 8),
+                              ],
+                            );
+                          } else {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const FormattedText(
+                                  inputText: IsolaDelleStoreContentManager.e00,
+                                  color: HonooColor.onBackground,
+                                  fontSize: 18,
+                                ),
+                                const SizedBox(height: 16),
+                                exampleImage('assets/honooesempio.png'),
+                                const SizedBox(height: 16),
+                                exampleImage('assets/hinooesempio.png'),
+                                const SizedBox(height: 8),
+                              ],
+                            );
+                          }
                         }
 
                         final String beforeFirstImage =
@@ -106,39 +145,79 @@ class _IslandPageState extends State<IslandPage> {
                         final String afterFirstImage =
                             full.substring(idx1 + marker1.length);
 
-                        // Normal case: split and inject both images
+                        // Normal case: split and inject both images at the requested positions
 
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            // Text before first image
-                            FormattedText(
-                              inputText: beforeFirstImage,
-                              color: HonooColor.onBackground,
-                              fontSize: 18,
-                            ),
-                            const SizedBox(height: 16),
+                        if (idx2Start >= 0) {
+                          int idx2End = idx2Start + marker2Base.length;
+                          int extraNs = 0;
+                          while (idx2End + extraNs < full.length &&
+                              full[idx2End + extraNs] == '\\n' &&
+                              extraNs < 2) {
+                            extraNs++;
+                          }
+                          final int idx2EndWithBreaks = idx2End + extraNs;
 
-                            // First example image (honoo)
-                            exampleImage('assets/honooesempio.png'),
+                          final String betweenImages = full.substring(
+                              idx1 + marker1.length, idx2EndWithBreaks);
+                          final String afterSecondImage =
+                              full.substring(idx2EndWithBreaks);
 
-                            const SizedBox(height: 24),
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              // Up to first marker
+                              FormattedText(
+                                inputText: beforeFirstImage,
+                                color: HonooColor.onBackground,
+                                fontSize: 18,
+                              ),
+                              const SizedBox(height: 16),
+                              exampleImage('assets/honooesempio.png'),
+                              const SizedBox(height: 24),
 
-                            // Remaining text after first image
-                            FormattedText(
-                              inputText: afterFirstImage,
-                              color: HonooColor.onBackground,
-                              fontSize: 18,
-                            ),
+                              // Between marker1 and the phrase
+                              FormattedText(
+                                inputText: betweenImages,
+                                color: HonooColor.onBackground,
+                                fontSize: 18,
+                              ),
+                              const SizedBox(height: 16),
+                              exampleImage('assets/hinooesempio.png'),
+                              const SizedBox(height: 24),
 
-                            const SizedBox(height: 16),
-
-                            // Second example image (hinoo)
-                            exampleImage('assets/hinooesempio.png'),
-
-                            const SizedBox(height: 8),
-                          ],
-                        );
+                              // Remaining content
+                              if (afterSecondImage.trim().isNotEmpty)
+                                FormattedText(
+                                  inputText: afterSecondImage,
+                                  color: HonooColor.onBackground,
+                                  fontSize: 18,
+                                ),
+                            ],
+                          );
+                        } else {
+                          // No phrase found: inject first image at marker1 and append second at end
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              FormattedText(
+                                inputText: beforeFirstImage,
+                                color: HonooColor.onBackground,
+                                fontSize: 18,
+                              ),
+                              const SizedBox(height: 16),
+                              exampleImage('assets/honooesempio.png'),
+                              const SizedBox(height: 24),
+                              FormattedText(
+                                inputText: afterFirstImage,
+                                color: HonooColor.onBackground,
+                                fontSize: 18,
+                              ),
+                              const SizedBox(height: 16),
+                              exampleImage('assets/hinooesempio.png'),
+                              const SizedBox(height: 8),
+                            ],
+                          );
+                        }
                       },
                     ),
                   ),
