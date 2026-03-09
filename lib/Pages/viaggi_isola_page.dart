@@ -55,7 +55,7 @@ class ViaggiIsolaPage extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Center(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
