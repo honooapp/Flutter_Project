@@ -56,18 +56,15 @@ class _IslandPageState extends State<IslandPage> {
                     physics: const BouncingScrollPhysics(),
                     child: Builder(
                       builder: (context) {
+                        // Marker: trattino lungo (em dash) come da testo e00
                         const String marker1 =
-                            "-Hai il presente, non ti basta?\n\nQuesto è un honoo:\n";
-                        const String marker2 =
-                            "il colore del testo può essere bianco o nero\n\n";
+                            "— Hai il presente. Non ti basta?\n";
 
                         const String full = IsolaDelleStoreContentManager.e00;
                         final int idx1 = full.indexOf(marker1);
-                        final int idx2 =
-                            idx1 >= 0 ? full.indexOf(marker2, idx1 + marker1.length) : -1;
 
-                        // Fallback: if markers are not found, render original text only.
-                        if (idx1 < 0 || idx2 < 0) {
+                        // Fallback: if marker is not found, render original text only.
+                        if (idx1 < 0) {
                           return const FormattedText(
                             inputText: IsolaDelleStoreContentManager.e00,
                             color: HonooColor.onBackground,
@@ -77,10 +74,8 @@ class _IslandPageState extends State<IslandPage> {
 
                         final String beforeFirstImage =
                             full.substring(0, idx1 + marker1.length);
-                        final String betweenImages = full.substring(
-                            idx1 + marker1.length, idx2 + marker2.length);
-                        final String afterSecondImage =
-                            full.substring(idx2 + marker2.length);
+                        final String afterFirstImage =
+                            full.substring(idx1 + marker1.length);
 
                         Widget exampleImage(String assetPath) => LayoutBuilder(
                               builder: (ctx, constraints) {
@@ -116,23 +111,9 @@ class _IslandPageState extends State<IslandPage> {
 
                             const SizedBox(height: 24),
 
-                            // Text between images
+                            // Remaining text after first image
                             FormattedText(
-                              inputText: betweenImages,
-                              color: HonooColor.onBackground,
-                              fontSize: 18,
-                            ),
-
-                            const SizedBox(height: 16),
-
-                            // Second example image (hinoo)
-                            exampleImage('assets/hinooesempio.png'),
-
-                            const SizedBox(height: 24),
-
-                            // Remaining text after second image
-                            FormattedText(
-                              inputText: afterSecondImage,
+                              inputText: afterFirstImage,
                               color: HonooColor.onBackground,
                               fontSize: 18,
                             ),
