@@ -1540,6 +1540,7 @@ class _ChestPageState extends State<ChestPage> {
             highlightLatest: widget.highlightLatest &&
                 (widget.focusConversationId != null &&
                     widget.focusConversationId == convId),
+            onDownloadTap: () => _handleDownloadForItem(item, repaintKey),
           );
         }
         // Se è una risposta, il thread deve essere costruito sul padre

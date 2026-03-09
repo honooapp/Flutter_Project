@@ -17,6 +17,7 @@ class UnifiedThreadView extends StatefulWidget {
     this.onSelect,
     this.highlightLatest = false,
     this.isActive = false,
+    this.onDownloadTap,
   });
 
   final String conversationId;
@@ -25,6 +26,7 @@ class UnifiedThreadView extends StatefulWidget {
   final ValueChanged<ConversationEntry>? onSelect;
   final bool highlightLatest;
   final bool isActive;
+  final VoidCallback? onDownloadTap;
 
   @override
   State<UnifiedThreadView> createState() => _UnifiedThreadViewState();
@@ -171,11 +173,12 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
           final revIndex = _entries.length - 1 - index;
           final e = _entries[revIndex];
           final card = e.when(
-            honoo: (h) => HonooCard(honoo: h),
+            honoo: (h) => HonooCard(honoo: h, onDownloadTap: widget.onDownloadTap),
             hinoo: (d) => HinooViewer(
               draft: d,
               maxHeight: widget.maxHeight,
               maxWidth: widget.maxWidth,
+              onDownloadTap: widget.onDownloadTap,
             ),
           );
           final Widget page = SizedBox.expand(child: card);
