@@ -1,4 +1,6 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Services/supabase_provider.dart';
@@ -6,6 +8,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
 import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
+import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
+import 'package:honoo/Widgets/honoo_dialogs.dart';
 // rendering a lista con separatori; rimosso carousel verticale
 
 class UnifiedThreadView extends StatefulWidget {
@@ -172,13 +176,24 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
           // Ordine inverso: ultimo (più recente) in cima
           final revIndex = _entries.length - 1 - index;
           final e = _entries[revIndex];
+          final GlobalKey repaintKey = GlobalKey();
+          Future<void> _download() => _downloadFromBoundary(
+                repaintKey: repaintKey,
+                baseName: e.honoo != null ? 'honoo' : 'hinoo',
+              );
           final card = e.when(
-            honoo: (h) => HonooCard(honoo: h, onDownloadTap: widget.onDownloadTap),
-            hinoo: (d) => HinooViewer(
-              draft: d,
-              maxHeight: widget.maxHeight,
-              maxWidth: widget.maxWidth,
-              onDownloadTap: widget.onDownloadTap,
+            honoo: (h) => RepaintBoundary(
+              key: repaintKey,
+              child: HonooCard(honoo: h, onDownloadTap: _download),
+            ),
+            hinoo: (d) => RepaintBoundary(
+              key: repaintKey,
+              child: HinooViewer(
+                draft: d,
+                maxHeight: widget.maxHeight,
+                maxWidth: widget.maxWidth,
+                onDownloadTap: _download,
+              ),
             ),
           );
           final Widget page = SizedBox.expand(child: card);
@@ -213,6 +228,46 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
       honoo: (h) => ConversationEntry.honoo(h),
       hinoo: (d) => ConversationEntry.hinoo(d, ownerId: e.ownerId, isFromMoonSaved: e.isFromMoonSaved),
     );
+  }
+}
+
+extension on _UnifiedThreadViewState {
+  Future<void> _downloadFromBoundary({
+    required GlobalKey repaintKey,
+    required String baseName,
+  }) async {
+    try {
+      final RenderRepaintBoundary? boundary = repaintKey.currentContext
+          ?.findRenderObject() as RenderRepaintBoundary?;
+      if (boundary == null) {
+        throw Exception('Impossibile scaricare: boundary non trovata.');
+      }
+
+      double pixelRatio = 3.0;
+      final ui.Size logicalSize = boundary.size;
+      if (logicalSize.height > 0) {
+        const double targetHeight = 1920.0;
+        final double ratioH = targetHeight / logicalSize.height;
+        if (ratioH.isFinite && ratioH > 0) pixelRatio = ratioH;
+      }
+
+      final ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final bytes = byteData?.buffer.asUint8List();
+      if (bytes == null || bytes.isEmpty) {
+        throw Exception('PNG vuoto o nullo.');
+      }
+
+      final saver = getDownloadSaver();
+      final String filename = '${baseName}_${DateTime.now().millisecondsSinceEpoch}.png';
+      await saver.save([DownloadImage(filename: filename, bytes: bytes)]);
+
+      if (!mounted) return;
+      showHonooToast(context, message: 'Download avviato.');
+    } catch (e) {
+      if (!mounted) return;
+      showHonooToast(context, message: 'Errore download: $e');
+    }
   }
 }
 
