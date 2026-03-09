@@ -61,7 +61,7 @@ class _IslandPageState extends State<IslandPage> {
                         const String marker2 =
                             "il colore del testo può essere bianco o nero\n\n";
 
-                        final String full = IsolaDelleStoreContentManager.e00;
+                        const String full = IsolaDelleStoreContentManager.e00;
                         final int idx1 = full.indexOf(marker1);
                         final int idx2 =
                             idx1 >= 0 ? full.indexOf(marker2, idx1 + marker1.length) : -1;
@@ -82,14 +82,22 @@ class _IslandPageState extends State<IslandPage> {
                         final String afterSecondImage =
                             full.substring(idx2 + marker2.length);
 
-                        Widget exampleImage(String assetPath) => Center(
-                              child: ConstrainedBox(
-                                constraints: const BoxConstraints(maxWidth: 480),
-                                child: Image.asset(
-                                  assetPath,
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
+                        Widget exampleImage(String assetPath) => LayoutBuilder(
+                              builder: (ctx, constraints) {
+                                final double maxW = constraints.maxWidth.isFinite
+                                    ? constraints.maxWidth
+                                    : MediaQuery.of(ctx).size.width;
+                                final double width = math.min(maxW, 520.0);
+                                return Center(
+                                  child: SizedBox(
+                                    width: width,
+                                    child: Image.asset(
+                                      assetPath,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                );
+                              },
                             );
 
                         return Column(
