@@ -149,9 +149,9 @@ class _NewHonooPageState extends State<NewHonooPage> {
         context: context,
         barrierDismissible: true,
         builder: (_) => const HonooConfirmDialog(
-          title: 'Devi accedere',
+          title: 'Devi prima accedere',
           message:
-              'Per salvare il tuo honoo nello Scrigno devi prima effettuare l\'accesso. Vuoi andare alla pagina di login?',
+          '\nVuoi andare alla pagina di login?',
           confirmLabel: 'Vai al login',
         ),
       );
@@ -353,9 +353,9 @@ class _NewHonooPageState extends State<NewHonooPage> {
         context: context,
         barrierDismissible: true,
         builder: (_) => const HonooConfirmDialog(
-          title: 'Devi accedere prima',
+          title: 'Devi prima accedere',
           message:
-              'Per scaricare questo honoo,\ndevi fare prima il login.\nVuoi andare alla pagina di login?',
+              '\nVuoi andare alla pagina di login?',
           confirmLabel: 'Vai al login',
         ),
       );

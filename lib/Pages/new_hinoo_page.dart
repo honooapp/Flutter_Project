@@ -461,9 +461,9 @@ class _NewHinooPageState extends State<NewHinooPage>
         context: context,
         barrierDismissible: true,
         builder: (_) => const HonooConfirmDialog(
-          title: 'Devi accedere prima',
+          title: 'Devi prima accedere',
           message:
-              'Per scaricare questo hinoo,\ndevi fare prima il login.\nVuoi andare alla pagina di login?',
+              'Vuoi andare alla pagina di login?',
           confirmLabel: 'Vai al login',
         ),
       );
@@ -635,7 +635,7 @@ class _NewHinooPageState extends State<NewHinooPage>
                                   onHinooChanged: _onHinooChanged,
                                   onPngExported: _onPngExported,
                                   hintText:
-                                      'Carica prima la tua immagine\n conferma con \u2713\n e poi scrivi il tuo testo',
+                                      'Carica prima la tua immagine,\n conferma con \u2713\n e poi scrivi il tuo testo',
                                   backgroundPromptText: widget.isCampanello
                                       ? 'Scrivi qui\n'
                                           'tutto quello che vuoi\n'

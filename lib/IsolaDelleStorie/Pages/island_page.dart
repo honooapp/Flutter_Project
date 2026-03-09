@@ -62,7 +62,7 @@ class _IslandPageState extends State<IslandPage> {
                         const String marker2Base =
                             "il colore del testo può essere bianco o nero";
 
-                        final String full = IsolaDelleStoreContentManager.e00;
+                        const String full = IsolaDelleStoreContentManager.e00;
                         final int idx1 = full.indexOf(marker1);
                         final String fullLower = full.toLowerCase();
                         final int idx2Start = fullLower.indexOf(
