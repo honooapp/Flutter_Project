@@ -52,12 +52,85 @@ class _IslandPageState extends State<IslandPage> {
                     color: HonooColor.wave1.withOpacity(0.6),
                     borderRadius: BorderRadius.circular(8.0),
                   ),
-                  child: const SingleChildScrollView(
-                    physics: BouncingScrollPhysics(),
-                    child: FormattedText(
-                      inputText: IsolaDelleStoreContentManager.e00,
-                      color: HonooColor.onBackground,
-                      fontSize: 18,
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Builder(
+                      builder: (context) {
+                        const String marker1 =
+                            "-Hai il presente, non ti basta?\n\nQuesto è un honoo:\n";
+                        const String marker2 =
+                            "il colore del testo può essere bianco o nero\n\n";
+
+                        final String full = IsolaDelleStoreContentManager.e00;
+                        final int idx1 = full.indexOf(marker1);
+                        final int idx2 =
+                            idx1 >= 0 ? full.indexOf(marker2, idx1 + marker1.length) : -1;
+
+                        // Fallback: if markers are not found, render original text only.
+                        if (idx1 < 0 || idx2 < 0) {
+                          return const FormattedText(
+                            inputText: IsolaDelleStoreContentManager.e00,
+                            color: HonooColor.onBackground,
+                            fontSize: 18,
+                          );
+                        }
+
+                        final String beforeFirstImage =
+                            full.substring(0, idx1 + marker1.length);
+                        final String betweenImages = full.substring(
+                            idx1 + marker1.length, idx2 + marker2.length);
+                        final String afterSecondImage =
+                            full.substring(idx2 + marker2.length);
+
+                        Widget exampleImage(String assetPath) => Center(
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(maxWidth: 480),
+                                child: Image.asset(
+                                  assetPath,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            );
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Text before first image
+                            FormattedText(
+                              inputText: beforeFirstImage,
+                              color: HonooColor.onBackground,
+                              fontSize: 18,
+                            ),
+                            const SizedBox(height: 16),
+
+                            // First example image (honoo)
+                            exampleImage('assets/honooesempio.png'),
+
+                            const SizedBox(height: 24),
+
+                            // Text between images
+                            FormattedText(
+                              inputText: betweenImages,
+                              color: HonooColor.onBackground,
+                              fontSize: 18,
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // Second example image (hinoo)
+                            exampleImage('assets/hinooesempio.png'),
+
+                            const SizedBox(height: 24),
+
+                            // Remaining text after second image
+                            FormattedText(
+                              inputText: afterSecondImage,
+                              color: HonooColor.onBackground,
+                              fontSize: 18,
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ),
