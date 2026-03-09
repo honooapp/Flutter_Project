@@ -63,20 +63,7 @@ class _IslandPageState extends State<IslandPage> {
                         const String full = IsolaDelleStoreContentManager.e00;
                         final int idx1 = full.indexOf(marker1);
 
-                        // Fallback: if marker is not found, render original text only.
-                        if (idx1 < 0) {
-                          return const FormattedText(
-                            inputText: IsolaDelleStoreContentManager.e00,
-                            color: HonooColor.onBackground,
-                            fontSize: 18,
-                          );
-                        }
-
-                        final String beforeFirstImage =
-                            full.substring(0, idx1 + marker1.length);
-                        final String afterFirstImage =
-                            full.substring(idx1 + marker1.length);
-
+                        // Helper for responsive example images
                         Widget exampleImage(String assetPath) => LayoutBuilder(
                               builder: (ctx, constraints) {
                                 final double maxW = constraints.maxWidth.isFinite
@@ -94,6 +81,32 @@ class _IslandPageState extends State<IslandPage> {
                                 );
                               },
                             );
+
+                        // Fallback: if marker is not found, render full text + both images
+                        if (idx1 < 0) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const FormattedText(
+                                inputText: IsolaDelleStoreContentManager.e00,
+                                color: HonooColor.onBackground,
+                                fontSize: 18,
+                              ),
+                              const SizedBox(height: 16),
+                              exampleImage('assets/honooesempio.png'),
+                              const SizedBox(height: 16),
+                              exampleImage('assets/hinooesempio.png'),
+                              const SizedBox(height: 8),
+                            ],
+                          );
+                        }
+
+                        final String beforeFirstImage =
+                            full.substring(0, idx1 + marker1.length);
+                        final String afterFirstImage =
+                            full.substring(idx1 + marker1.length);
+
+                        // Normal case: split and inject both images
 
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -117,6 +130,13 @@ class _IslandPageState extends State<IslandPage> {
                               color: HonooColor.onBackground,
                               fontSize: 18,
                             ),
+
+                            const SizedBox(height: 16),
+
+                            // Second example image (hinoo)
+                            exampleImage('assets/hinooesempio.png'),
+
+                            const SizedBox(height: 8),
                           ],
                         );
                       },
