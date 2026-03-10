@@ -69,6 +69,8 @@ class _NewHinooPageState extends State<NewHinooPage>
   bool get _hasMinTextForDownload => _currentTextLength >= 1;
 
   static const double _titleH = 65;
+  static const String _kWriteHint =
+      'Carica prima la tua immagine,\n conferma con \u2713\n e poi scrivi il tuo testo';
 
   @override
   void initState() {
@@ -154,8 +156,7 @@ class _NewHinooPageState extends State<NewHinooPage>
   }
 
   Future<void> _submitHinoo() async {
-    const String writeHint =
-        'Carica prima la tua immagine\n conferma con \u2713\n e poi scrivi il tuo testo';
+    const String writeHint = _kWriteHint;
     final dynamic rawDraft =
         (_builderKey.currentState as dynamic)?.exportDraft();
     final pages = (rawDraft is Map) ? (rawDraft['pages'] as List?) : null;
@@ -629,22 +630,21 @@ class _NewHinooPageState extends State<NewHinooPage>
                         child: Stack(
                           children: [
                             Positioned.fill(
-                              child: ClipRect(
-                                child: HinooBuilder(
-                                  key: _builderKey,
-                                  onHinooChanged: _onHinooChanged,
-                                  onPngExported: _onPngExported,
-                                  hintText:
-                                      'Carica prima la tua immagine,\n conferma con \u2713\n e poi scrivi il tuo testo',
-                                  backgroundPromptText: widget.isCampanello
-                                      ? 'Scrivi qui\n'
-                                          'tutto quello che vuoi\n'
-                                          'per la pagina\n'
-                                          'del tuo campanello'
-                                      : null,
-                                ),
-                              ),
-                            ),
+            child: ClipRect(
+                child: HinooBuilder(
+                  key: _builderKey,
+                  onHinooChanged: _onHinooChanged,
+                  onPngExported: _onPngExported,
+                  hintText: _kWriteHint,
+                  backgroundPromptText: widget.isCampanello
+                      ? 'Scrivi qui\n'
+                          'tutto quello che vuoi\n'
+                          'per la pagina\n'
+                          'del tuo campanello'
+                      : null,
+                ),
+              ),
+            ),
                             Positioned(
                               top: 8,
                               right: 8,
