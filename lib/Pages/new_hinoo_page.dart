@@ -69,8 +69,7 @@ class _NewHinooPageState extends State<NewHinooPage>
   bool get _hasMinTextForDownload => _currentTextLength >= 1;
 
   static const double _titleH = 65;
-  static const String _kWriteHint =
-      'Carica prima la tua immagine,\n conferma con \u2713\n e poi scrivi il tuo testo';
+  static const String _kWriteHint = 'Scrivi qui il tuo testo';
 
   @override
   void initState() {
@@ -413,12 +412,16 @@ class _NewHinooPageState extends State<NewHinooPage>
             ? HinooType.answer
             : (widget.isReply ? HinooType.answer : HinooType.personal));
 
+    // Se è una risposta e non è stato passato esplicitamente un conversationId,
+    // usa replyTo come conversationId per garantire il raggruppamento.
+    final String? convId = widget.conversationId ?? widget.replyTo;
+
     return HinooDraft(
       pages: slides,
       type: type,
       recipientTag: widget.recipientTag,
       replyTo: widget.replyTo,
-      conversationId: widget.conversationId,
+      conversationId: convId,
       baseCanvasHeight: _lastCanvasHeight > 0 ? _lastCanvasHeight : null,
     );
   }
@@ -733,20 +736,21 @@ class _NewHinooPageState extends State<NewHinooPage>
                             );
                           },
                         ),
-                        ResponsiveFooterAction(
-                          asset: "assets/icons/ok.svg",
-                          semanticsLabel: ((widget.isReply || widget.forcedType == HinooType.answer)
-                                  ? 'Invia'
-                                  : (widget.isCampanello ? 'Salva il campanello' : 'OK')),
-                          size: footerIconSize,
-                          splashRadius: 25,
-                          tooltip: (widget.isReply || widget.forcedType == HinooType.answer)
-                              ? 'Invia'
-                              : (widget.isCampanello
-                                  ? 'Salva il campanello'
-                                  : 'Salva hinoo'),
-                          onPressed: _submitHinoo,
-                        ),
+                        if (_isWriteStep && _currentTextLength > 0)
+                          ResponsiveFooterAction(
+                            asset: "assets/icons/ok.svg",
+                            semanticsLabel: ((widget.isReply || widget.forcedType == HinooType.answer)
+                                    ? 'Invia'
+                                    : (widget.isCampanello ? 'Salva il campanello' : 'OK')),
+                            size: footerIconSize,
+                            splashRadius: 25,
+                            tooltip: (widget.isReply || widget.forcedType == HinooType.answer)
+                                ? 'Invia'
+                                : (widget.isCampanello
+                                    ? 'Salva il campanello'
+                                    : 'Salva hinoo'),
+                            onPressed: _submitHinoo,
+                          ),
                       ],
                     ),
                   ),

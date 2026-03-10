@@ -59,14 +59,15 @@ class _IslandPageState extends State<IslandPage> {
                         // Marker: trattino lungo (em dash) come da testo e00
                         const String marker1 =
                             "— Hai il presente. Non ti basta?\\n";
-                        const String marker2Base =
-                            "il colore del testo può essere bianco o nero";
+                        const String marker2 =
+                            "Il <b>colore<b> del testo\n"
+                            "può essere\n"
+                            "<b>bianco<b> o <b>nero<b>.\n";
 
                         const String full = IsolaDelleStoreContentManager.e00;
                         final int idx1 = full.indexOf(marker1);
-                        final String fullLower = full.toLowerCase();
-                        final int idx2Start = fullLower.indexOf(
-                          marker2Base.toLowerCase(),
+                        final int idx2Start = full.indexOf(
+                          marker2,
                           idx1 >= 0 ? idx1 + marker1.length : 0,
                         );
 
@@ -92,14 +93,7 @@ class _IslandPageState extends State<IslandPage> {
                         // Fallback: if first marker is not found
                         if (idx1 < 0) {
                           if (idx2Start >= 0) {
-                            int idx2End = idx2Start + marker2Base.length;
-                            int extraNs = 0;
-                            while (idx2End + extraNs < full.length &&
-                                full[idx2End + extraNs] == '\\n' &&
-                                extraNs < 2) {
-                              extraNs++;
-                            }
-                            final int idx2EndWithBreaks = idx2End + extraNs;
+                            final int idx2EndWithBreaks = idx2Start + marker2.length;
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
@@ -148,14 +142,7 @@ class _IslandPageState extends State<IslandPage> {
                         // Normal case: split and inject both images at the requested positions
 
                         if (idx2Start >= 0) {
-                          int idx2End = idx2Start + marker2Base.length;
-                          int extraNs = 0;
-                          while (idx2End + extraNs < full.length &&
-                              full[idx2End + extraNs] == '\\n' &&
-                              extraNs < 2) {
-                            extraNs++;
-                          }
-                          final int idx2EndWithBreaks = idx2End + extraNs;
+                          final int idx2EndWithBreaks = idx2Start + marker2.length;
 
                           final String betweenImages = full.substring(
                               idx1 + marker1.length, idx2EndWithBreaks);
