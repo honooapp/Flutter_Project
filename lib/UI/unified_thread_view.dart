@@ -177,14 +177,16 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
           final revIndex = _entries.length - 1 - index;
           final e = _entries[revIndex];
           final GlobalKey repaintKey = GlobalKey();
-          Future<void> download() => _downloadFromBoundary(
-                repaintKey: repaintKey,
-                baseName: e.honoo != null ? 'honoo' : 'hinoo',
-              );
           final card = e.when(
             honoo: (h) => RepaintBoundary(
               key: repaintKey,
-              child: HonooCard(honoo: h, onDownloadTap: download),
+              child: HonooCard(
+                honoo: h,
+                onDownloadTap: () => _downloadFromBoundary(
+                  repaintKey: repaintKey,
+                  baseName: e.honoo != null ? 'honoo' : 'hinoo',
+                ),
+              ),
             ),
             hinoo: (d) => RepaintBoundary(
               key: repaintKey,
@@ -192,7 +194,10 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
                 draft: d,
                 maxHeight: widget.maxHeight,
                 maxWidth: widget.maxWidth,
-                onDownloadTap: download,
+                onDownloadTap: () => _downloadFromBoundary(
+                  repaintKey: repaintKey,
+                  baseName: e.honoo != null ? 'honoo' : 'hinoo',
+                ),
               ),
             ),
           );
