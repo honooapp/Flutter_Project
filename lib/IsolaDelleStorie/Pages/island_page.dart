@@ -103,7 +103,7 @@ class _IslandPageState extends State<IslandPage> {
                                   fontSize: 18,
                                 ),
                             const SizedBox(height: 12),
-                                exampleImage('assets/hinooesempio.png'),
+                                exampleImage('assets/honooesempio.png'),
                             const SizedBox(height: 20),
                                 FormattedText(
                                   inputText: full.substring(idx2EndWithBreaks),
@@ -127,7 +127,7 @@ class _IslandPageState extends State<IslandPage> {
                                 const SizedBox(height: 16),
                                 exampleImage('assets/honooesempio.png'),
                                 const SizedBox(height: 16),
-                                exampleImage('assets/hinooesempio.png'),
+                              exampleImage('assets/honooesempio.png'),
                                 const SizedBox(height: 8),
                               ],
                             );
@@ -159,7 +159,7 @@ class _IslandPageState extends State<IslandPage> {
                                 fontSize: 18,
                               ),
                               const SizedBox(height: 12),
-                              exampleImage('assets/hinooesempio.png'),
+                              exampleImage('assets/honooesempio.png'),
                               const SizedBox(height: 20),
 
                               // Between marker1 and the phrase
@@ -192,7 +192,7 @@ class _IslandPageState extends State<IslandPage> {
                                 fontSize: 18,
                               ),
                               const SizedBox(height: 12),
-                              exampleImage('assets/hinooesempio.png'),
+                              exampleImage('assets/honooesempio.png'),
                               const SizedBox(height: 24),
                               FormattedText(
                                 inputText: afterFirstImage,
