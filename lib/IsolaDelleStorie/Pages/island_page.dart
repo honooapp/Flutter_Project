@@ -159,7 +159,7 @@ class _IslandPageState extends State<IslandPage> {
                                 fontSize: 18,
                               ),
                               const SizedBox(height: 12),
-                              exampleImage('assets/honooesempio.png'),
+                              exampleImage('assets/hinooesempio.png'),
                               const SizedBox(height: 20),
 
                               // Between marker1 and the phrase
@@ -169,7 +169,7 @@ class _IslandPageState extends State<IslandPage> {
                                 fontSize: 18,
                               ),
                               const SizedBox(height: 12),
-                              exampleImage('assets/hinooesempio.png'),
+                              exampleImage('assets/honooesempio.png'),
                               const SizedBox(height: 20),
 
                               // Remaining content
@@ -192,7 +192,7 @@ class _IslandPageState extends State<IslandPage> {
                                 fontSize: 18,
                               ),
                               const SizedBox(height: 12),
-                              exampleImage('assets/honooesempio.png'),
+                              exampleImage('assets/hinooesempio.png'),
                               const SizedBox(height: 24),
                               FormattedText(
                                 inputText: afterFirstImage,
@@ -200,7 +200,7 @@ class _IslandPageState extends State<IslandPage> {
                                 fontSize: 18,
                               ),
                               const SizedBox(height: 12),
-                              exampleImage('assets/hinooesempio.png'),
+                              exampleImage('assets/honooesempio.png'),
                               const SizedBox(height: 12),
                             ],
                           );
