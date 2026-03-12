@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -513,6 +514,10 @@ class HonooBuilderState extends State<HonooBuilder> {
                   style: textStyle,
                   maxLines: 5,
                   maxCharsPerLine: 32,
+                  onChanged: () => setState(() {}),
+                  additionalInputFormatters: [
+                    LengthLimitingTextInputFormatter(144),
+                  ],
                   horizontalPadding: const EdgeInsets.symmetric(horizontal: 22),
                   decoration: InputDecoration(
                     hintText: _textCtrl.text.isEmpty
@@ -533,6 +538,31 @@ class HonooBuilderState extends State<HonooBuilder> {
                   cursorColor: Colors.black,
                   cursorWidth: 3,
                   cursorRadius: const Radius.circular(0),
+                ),
+              ),
+              // Contacaratteri in alto a sinistra (Arvo) – 0/144
+              Positioned(
+                top: 8,
+                left: 8,
+                child: IgnorePointer(
+                  child: Builder(
+                    builder: (_) {
+                      final int used = _textCtrl.text.characters.length;
+                      final Color color = used >= 144
+                          ? HonooColor.secondary
+                          : (used >= 120
+                              ? Colors.orangeAccent
+                              : HonooColor.onTertiary.withOpacity(0.75));
+                      return Text(
+                        '$used/144',
+                        style: GoogleFonts.arvo(
+                          color: color,
+                          fontSize: 12,
+                          height: 1.0,
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
               if (widget.onDownloadTap != null && widget.showDownloadButton)
