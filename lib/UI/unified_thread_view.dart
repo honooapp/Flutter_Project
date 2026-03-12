@@ -1,15 +1,14 @@
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/honoo.dart';
+import 'package:honoo/Entities/conversation_entry.dart';
 import 'package:honoo/Services/supabase_provider.dart';
+import 'package:honoo/Services/conversation_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
 import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
-import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
-import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'package:honoo/Utility/download_capture.dart';
 // rendering a lista con separatori; rimosso carousel verticale
 
 class UnifiedThreadView extends StatefulWidget {
@@ -38,7 +37,7 @@ class UnifiedThreadView extends StatefulWidget {
 
 class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTickerProviderStateMixin {
   bool _loading = true;
-  List<_Entry> _entries = const [];
+  List<ConversationEntry> _entries = const [];
   RealtimeChannel? _chan;
   bool _didHighlight = false;
   bool _hasPlayedReveal = false;
@@ -58,61 +57,13 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
   }
 
   void _subscribe() {
-    final client = SupabaseProvider.client;
-    void refresh(dynamic _, [dynamic __]) => _load();
-    _chan = client.channel('conv-${widget.conversationId}');
-    _chan!
-        .on(
-          RealtimeListenTypes.postgresChanges,
-          ChannelFilter(event: '*', schema: 'public', table: 'honoo'),
-          refresh,
-        )
-        .on(
-          RealtimeListenTypes.postgresChanges,
-          ChannelFilter(event: '*', schema: 'public', table: 'hinoo'),
-          refresh,
-        )
-        .subscribe();
+    _chan = ConversationService.subscribeConversation(widget.conversationId, _load);
   }
 
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final c = SupabaseProvider.client;
-      final honooRows = await c
-          .from('honoo')
-          .select('id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id,conversation_id')
-          .eq('conversation_id', widget.conversationId)
-          .order('created_at', ascending: true);
-      final hinooRows = await c
-          .from('hinoo')
-          .select('id,pages,type,recipient_tag,reply_to,created_at,user_id,conversation_id,is_from_moon_saved')
-          .eq('conversation_id', widget.conversationId)
-          .order('created_at', ascending: true);
-
-      final entries = <_Entry>[];
-      for (final r in (honooRows as List)) {
-        final h = Honoo.fromMap(Map<String, dynamic>.from(r));
-        entries.add(_Entry.honoo(h));
-      }
-      for (final r in (hinooRows as List)) {
-        final pages = r['pages'];
-        if (pages is! List) continue;
-        final draft = HinooDraft(
-          pages: pages
-              .whereType<Map<String, dynamic>>()
-              .map(HinooSlide.fromJson)
-              .toList(),
-          type: HinooType.answer,
-          recipientTag: r['recipient_tag'] as String?,
-          replyTo: r['reply_to'] as String?,
-          conversationId: r['conversation_id']?.toString(),
-        );
-        final ownerId = r['user_id']?.toString();
-        final bool isFromMoonSaved = (r['is_from_moon_saved'] as bool?) ?? false;
-        entries.add(_Entry.hinoo(draft, ownerId: ownerId, isFromMoonSaved: isFromMoonSaved));
-      }
-      entries.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      final entries = await ConversationService.fetchConversation(widget.conversationId);
 
       if (!mounted) return;
       setState(() {
@@ -121,7 +72,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
       });
       if (widget.highlightLatest && !_didHighlight && _entries.isNotEmpty) {
         _didHighlight = true;
-        widget.onSelect?.call(_toConversationEntry(_entries.last));
+        widget.onSelect?.call(_entries.last);
       }
     } catch (_) {
       if (!mounted) return;
@@ -144,20 +95,17 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
     }
   }
 
-  bool _shouldReveal(_Entry e) {
+  bool _shouldReveal(ConversationEntry e) {
     final String? myId = SupabaseProvider.client.auth.currentUser?.id;
     // Moon-saved: non rivelare
-    final bool isMoon = e.isFromMoonSaved == true ||
-        (e.honoo != null && (e.honoo!.isFromMoonSaved == true));
+    final bool isMoon = e.isFromMoonSaved == true || (e.honoo != null && (e.honoo!.isFromMoonSaved == true));
     if (isMoon) return false;
 
     // Creato da me: non rivelare
     if (e.ownerId != null && myId != null && e.ownerId == myId) return false;
 
     // Reply?
-    final bool isReply = e.honoo != null
-        ? (e.honoo!.type == HonooType.answer)
-        : (e.hinoo != null && e.hinoo!.type == HinooType.answer);
+    final bool isReply = e.honoo != null ? (e.honoo!.type == HonooType.answer) : (e.hinoo != null && e.hinoo!.type == HinooType.answer);
 
     return isReply;
   }
@@ -177,30 +125,29 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
           final revIndex = _entries.length - 1 - index;
           final e = _entries[revIndex];
           final GlobalKey repaintKey = GlobalKey();
-          final card = e.when(
-            honoo: (h) => RepaintBoundary(
+          final card = e.kind == ConversationEntryKind.honoo
+              ? RepaintBoundary(
               key: repaintKey,
               child: HonooCard(
-                honoo: h,
+                honoo: e.honoo!,
                 onDownloadTap: () => _downloadFromBoundary(
                   repaintKey: repaintKey,
-                  baseName: e.honoo != null ? 'honoo' : 'hinoo',
+                  baseName: 'honoo',
                 ),
               ),
-            ),
-            hinoo: (d) => RepaintBoundary(
+            )
+              : RepaintBoundary(
               key: repaintKey,
               child: HinooViewer(
-                draft: d,
+                draft: e.hinoo!,
                 maxHeight: widget.maxHeight,
                 maxWidth: widget.maxWidth,
                 onDownloadTap: () => _downloadFromBoundary(
                   repaintKey: repaintKey,
-                  baseName: e.honoo != null ? 'honoo' : 'hinoo',
+                  baseName: 'hinoo',
                 ),
               ),
-            ),
-          );
+            );
           final Widget page = SizedBox.expand(child: card);
           if (index == 0 && _shouldReveal(e)) {
             final screenH = MediaQuery.of(context).size.height;
@@ -228,12 +175,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
     super.dispose();
   }
 
-  ConversationEntry _toConversationEntry(_Entry e) {
-    return e.when(
-      honoo: (h) => ConversationEntry.honoo(h),
-      hinoo: (d) => ConversationEntry.hinoo(d, ownerId: e.ownerId, isFromMoonSaved: e.isFromMoonSaved),
-    );
-  }
+  // mapping handled by service
 }
 
 extension on _UnifiedThreadViewState {
@@ -241,70 +183,9 @@ extension on _UnifiedThreadViewState {
     required GlobalKey repaintKey,
     required String baseName,
   }) async {
-    try {
-      final RenderRepaintBoundary? boundary = repaintKey.currentContext
-          ?.findRenderObject() as RenderRepaintBoundary?;
-      if (boundary == null) {
-        throw Exception('Impossibile scaricare: boundary non trovata.');
-      }
-
-      double pixelRatio = 3.0;
-      final ui.Size logicalSize = boundary.size;
-      if (logicalSize.height > 0) {
-        const double targetHeight = 1920.0;
-        final double ratioH = targetHeight / logicalSize.height;
-        if (ratioH.isFinite && ratioH > 0) pixelRatio = ratioH;
-      }
-
-      final ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      final bytes = byteData?.buffer.asUint8List();
-      if (bytes == null || bytes.isEmpty) {
-        throw Exception('PNG vuoto o nullo.');
-      }
-
-      final saver = getDownloadSaver();
-      final String filename = '${baseName}_${DateTime.now().millisecondsSinceEpoch}.png';
-      await saver.save([DownloadImage(filename: filename, bytes: bytes)]);
-
-      if (!mounted) return;
-      showHonooToast(context, message: 'Download avviato.');
-    } catch (e) {
-      if (!mounted) return;
-      showHonooToast(context, message: 'Errore download: $e');
-    }
+    if (!mounted) return;
+    await captureAndSave(context, repaintKey: repaintKey, baseName: baseName);
   }
 }
 
-class _Entry {
-  final Honoo? honoo;
-  final HinooDraft? hinoo;
-  final DateTime createdAt;
-  final String? ownerId;
-  final bool isFromMoonSaved;
-
-  _Entry._(this.honoo, this.hinoo, this.createdAt, {this.ownerId, this.isFromMoonSaved = false});
-  factory _Entry.honoo(Honoo h) => _Entry._(h, null, DateTime.tryParse(h.createdAt) ?? DateTime.now(), ownerId: h.userId);
-  factory _Entry.hinoo(HinooDraft d, {String? ownerId, bool isFromMoonSaved = false}) =>
-      _Entry._(null, d, DateTime.now(), ownerId: ownerId, isFromMoonSaved: isFromMoonSaved);
-
-  T when<T>({required T Function(Honoo) honoo, required T Function(HinooDraft) hinoo}) {
-    if (this.honoo != null) return honoo(this.honoo!);
-    return hinoo(this.hinoo!);
-  }
-}
-
-enum ConversationEntryKind { honoo, hinoo }
-
-class ConversationEntry {
-  final ConversationEntryKind kind;
-  final Honoo? honoo;
-  final HinooDraft? hinoo;
-  final String? ownerId;
-  final bool isFromMoonSaved;
-
-  ConversationEntry._(this.kind, {this.honoo, this.hinoo, this.ownerId, this.isFromMoonSaved = false});
-  factory ConversationEntry.honoo(Honoo h) => ConversationEntry._(ConversationEntryKind.honoo, honoo: h, ownerId: h.userId, isFromMoonSaved: h.isFromMoonSaved);
-  factory ConversationEntry.hinoo(HinooDraft d, {String? ownerId, bool isFromMoonSaved = false}) =>
-      ConversationEntry._(ConversationEntryKind.hinoo, hinoo: d, ownerId: ownerId, isFromMoonSaved: isFromMoonSaved);
-}
+// ConversationEntry now lives in lib/Entities/conversation_entry.dart

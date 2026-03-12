@@ -39,6 +39,7 @@ import 'reply_honoo_page.dart';
 import 'new_hinoo_page.dart';
 import 'home_page.dart';
 import 'placeholder_page.dart';
+import 'package:honoo/Entities/conversation_entry.dart';
 
 class ChestPage extends StatefulWidget {
   const ChestPage({
@@ -101,7 +102,6 @@ class _ChestPageState extends State<ChestPage> {
   int _currentIndex = 0;
   // Data lists for normal vs conversation mode
   List<_ChestItem> _itemsNormal = const [];
-  List<_ChestItem> _itemsConversation = const [];
   List<_HinooRow> _hinoo = const [];
   final Map<String, DateTime> _honooLatestReplies = {};
   final Map<String, DateTime> _hinooLatestReplies = {};
@@ -110,6 +110,8 @@ class _ChestPageState extends State<ChestPage> {
   bool _isHinooLoading = true;
   bool _isRefreshingReplies = false;
   Timer? _replyRefreshTimer;
+  RealtimeChannel? _replyRealtimeChan;
+  Timer? _replyRealtimeDebounce;
   final cs.CarouselController _carouselController = cs.CarouselController();
   // Performance guard: avoid redundant regrouping when inputs haven't changed
   String? _lastRebuildSignature;
@@ -132,15 +134,14 @@ class _ChestPageState extends State<ChestPage> {
     super.initState();
     _loadAll();
     _maybeShowScrignoHint();
-    _replyRefreshTimer = Timer.periodic(
-      const Duration(seconds: 60),
-      (_) => _refreshReplies(),
-    );
+    _subscribeRepliesRealtime();
   }
 
   @override
   void dispose() {
     _replyRefreshTimer?.cancel();
+    _replyRealtimeDebounce?.cancel();
+    _replyRealtimeChan?.unsubscribe();
     super.dispose();
   }
 
@@ -164,6 +165,30 @@ class _ChestPageState extends State<ChestPage> {
         duration: const Duration(milliseconds: 2200),
       );
     });
+  }
+
+  void _subscribeRepliesRealtime() {
+    final uid = SupabaseProvider.client.auth.currentUser?.id;
+    if (uid == null) return;
+    void scheduleRefresh() {
+      _replyRealtimeDebounce?.cancel();
+      _replyRealtimeDebounce = Timer(const Duration(milliseconds: 250), () {
+        if (mounted) _refreshReplies();
+      });
+    }
+    final c = SupabaseProvider.client;
+    _replyRealtimeChan = c.channel('chest-replies-$uid')
+      ..on(
+        RealtimeListenTypes.postgresChanges,
+        ChannelFilter(event: '*', schema: 'public', table: 'honoo'),
+        (dynamic _, [dynamic __]) => scheduleRefresh(),
+      )
+      ..on(
+        RealtimeListenTypes.postgresChanges,
+        ChannelFilter(event: '*', schema: 'public', table: 'hinoo'),
+        (dynamic _, [dynamic __]) => scheduleRefresh(),
+      )
+      ..subscribe();
   }
 
   void _showScrignoInfo() {
@@ -516,145 +541,7 @@ class _ChestPageState extends State<ChestPage> {
     }
   }
 
-  Future<void> _loadConversation(String conversationId) async {
-    // Fetch honoo and hinoo rows for a conversation and merge into unified list
-    final client = SupabaseProvider.client;
-    try {
-      // HONOO in conversation
-      final honooRows = await client
-          .from('honoo')
-          .select(
-              'id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id,conversation_id')
-          .eq('conversation_id', conversationId)
-          .order('created_at', ascending: true);
-
-      final List<_ChestItem> merged = [];
-      if (honooRows is List) {
-        for (final r in honooRows.whereType<Map<String, dynamic>>()) {
-          try {
-            final h = Honoo.fromMap(r);
-            final dt = DateTime.tryParse(h.createdAt) ??
-                DateTime.fromMillisecondsSinceEpoch(0);
-            merged.add(_ChestItem.honoo(h, dt));
-          } catch (_) {}
-        }
-      }
-
-      // HINOO in conversation (fallback if is_from_moon_saved not available)
-      Future<List<dynamic>> fetchConvHinoo() async {
-        try {
-          final rows = await client
-              .from('hinoo')
-              .select(
-                  'id,pages,type,recipient_tag,reply_to,created_at,user_id,conversation_id,is_from_moon_saved')
-              .eq('conversation_id', conversationId)
-              .order('created_at', ascending: true);
-          if (rows is List) return rows;
-          if (rows is Map) return [rows];
-          return const [];
-        } on PostgrestException catch (e) {
-          final combined = '${e.message} ${e.details ?? ''} ${e.hint ?? ''}';
-          if (!combined.contains('is_from_moon_saved')) rethrow;
-          final rows = await client
-              .from('hinoo')
-              .select(
-                  'id,pages,type,recipient_tag,reply_to,created_at,user_id,conversation_id')
-              .eq('conversation_id', conversationId)
-              .order('created_at', ascending: true);
-          if (rows is List) return rows;
-          if (rows is Map) return [rows];
-          return const [];
-        }
-      }
-
-      final hinooRows = await fetchConvHinoo();
-      for (final r in hinooRows.whereType<Map<String, dynamic>>()) {
-        final pages = r['pages'];
-        if (pages is! List) continue;
-        final draft = HinooDraft(
-          pages: pages
-              .whereType<Map<String, dynamic>>()
-              .map((e) => HinooSlide.fromJson(e))
-              .toList(),
-          type: _hinooTypeFrom(r['type'] as String?),
-          recipientTag: r['recipient_tag'] as String?,
-          replyTo: r['reply_to'] as String?,
-          conversationId: r['conversation_id']?.toString(),
-          isFromMoonSaved: (r['is_from_moon_saved'] as bool?) ?? false,
-        );
-        // deterministic fallback to epoch to avoid unstable ordering
-        final created = DateTime.tryParse((r['created_at'] ?? '').toString()) ??
-            DateTime.fromMillisecondsSinceEpoch(0);
-        final String? id = r['id']?.toString();
-        if (id != null && id.isNotEmpty) {
-          merged.add(
-            _ChestItem.hinoo(
-              _HinooRow(
-                id: id,
-                draft: draft,
-                createdAt: created,
-                isFromMoonSaved: (r['is_from_moon_saved'] as bool?) ?? false,
-                ownerId: r['user_id']?.toString(),
-                conversationId: r['conversation_id']?.toString(),
-              ),
-            ),
-          );
-        }
-      }
-
-      // Sort by createdAt DESC so newest is index 0; tie-break with stable id
-      merged.sort((a, b) {
-        final int byCreated = b.createdAt.compareTo(a.createdAt);
-        if (byCreated != 0) return byCreated;
-        // stable id: honoo.dbId or hinoo.id
-        String idA = a.when(honoo: (h) => h.dbId ?? '', hinoo: (row) => row.id);
-        String idB = b.when(honoo: (h) => h.dbId ?? '', hinoo: (row) => row.id);
-        return idA.compareTo(idB);
-      });
-
-      if (!mounted) return;
-      if (merged.isEmpty) {
-        setState(() {
-          _itemsConversation = const [];
-        });
-        _exitConversation();
-        return;
-      }
-      // If conversation has only one element, avoid locking the carousel into conversation mode.
-      if (merged.length <= 1) {
-        setState(() {
-          _itemsConversation = merged;
-        });
-        _exitConversation();
-        return;
-      }
-      setState(() {
-        _itemsConversation = merged;
-        // Always start from newest item (index 0)
-        _currentIndex = 0;
-      });
-      // Ensure PageView (Carousel) jumps to page 0 in conversation mode
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        if (_mode == ChestMode.conversation) {
-          try {
-            _carouselController.jumpToPage(0);
-          } catch (_) {}
-          // Trigger bounce once when entering a conversation, if there is another entry to reveal
-          if (_itemsConversation.length > 1 &&
-              (_bouncedConvId != conversationId)) {
-            _runConversationBounce();
-            _bouncedConvId = conversationId;
-          }
-        }
-      });
-    } catch (_) {
-      if (!mounted) return;
-      setState(() {
-        _itemsConversation = const [];
-      });
-    }
-  }
+  // conversation loading removed — UnifiedThreadView handles it
 
   String? _convIdOfItem(_ChestItem it) => it.when(
         honoo: (h) => h.conversationId,
@@ -681,7 +568,7 @@ class _ChestPageState extends State<ChestPage> {
     if (pc == null || !pc.hasClients) return;
     final position = pc.position;
     // Ensure current item is part of a conversation with at least 2 elements
-    final items = _mode == ChestMode.normal ? _itemsNormal : _itemsConversation;
+    final items = _itemsNormal;
     final int i = _currentIndex;
     if (i < 0 || i >= items.length) return;
     final String? cid = _convIdOfItem(items[i]);
@@ -1561,29 +1448,16 @@ class _ChestPageState extends State<ChestPage> {
       hinoo: (row) {
         final String? convId = row.conversationId ?? row.draft.conversationId;
         if (convId != null && convId.isNotEmpty && _mode == ChestMode.normal) {
-          // Enter conversation mode structurally, then feed same builder
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (!mounted) return;
-            if (_activeConversationId == convId &&
-                _mode == ChestMode.conversation) return;
-            setState(() {
-              _previousIndexBeforeConversation = _currentIndex;
-              _mode = ChestMode.conversation;
-              _activeConversationId = convId;
-              _currentIndex = 0;
-            });
-            // Reset the controller to the first page (newest entry)
-            try {
-              _carouselController.jumpToPage(0);
-            } catch (_) {}
-            _loadConversation(convId);
-          });
-          return SizedBox(
-            width: cardW,
-            height: cardMaxH,
-            child: const Center(
-              child: LoadingSpinner(color: Colors.white),
-            ),
+          return UnifiedThreadView(
+            conversationId: convId,
+            maxWidth: targetMaxW,
+            maxHeight: availableCenterH,
+            isActive: isActive,
+            onSelect: (e) => setState(() => _selectedConvEntry = e),
+            highlightLatest: widget.highlightLatest &&
+                (widget.focusConversationId != null &&
+                    widget.focusConversationId == convId),
+            onDownloadTap: () => _handleDownloadForItem(item, repaintKey),
           );
         }
         final replies = _hinooRepliesByRoot[row.id] ?? const [];
@@ -1736,8 +1610,7 @@ class _ChestPageState extends State<ChestPage> {
             if (ctrl.isLoading.value || _isHinooLoading) {
               return const Center(child: LoadingSpinner(color: Colors.white));
             }
-            final items =
-                _mode == ChestMode.normal ? _itemsNormal : _itemsConversation;
+            final items = _itemsNormal;
             if (items.isEmpty) {
               return Center(
                 child: Text(
@@ -1841,8 +1714,7 @@ class _ChestPageState extends State<ChestPage> {
           },
           footerBuilder: (ctx, mode, footerIconSize, footerGap,
               footerTopSpacing, footerBottomSpacing) {
-            final items =
-                _mode == ChestMode.normal ? _itemsNormal : _itemsConversation;
+            final items = _itemsNormal;
             final _ChestItem? current =
                 items.isEmpty ? null : items[_currentIndex];
             return _footerForItem(
