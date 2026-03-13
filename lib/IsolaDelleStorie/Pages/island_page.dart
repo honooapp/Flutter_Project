@@ -103,7 +103,7 @@ class _IslandPageState extends State<IslandPage> {
                                   fontSize: 18,
                                 ),
                             const SizedBox(height: 12),
-                                exampleImage('assets/honooesempio.png'),
+                                exampleImage('assets/hinooesempio.png'),
                             const SizedBox(height: 20),
                                 FormattedText(
                                   inputText: full.substring(idx2EndWithBreaks),
@@ -111,7 +111,7 @@ class _IslandPageState extends State<IslandPage> {
                                   fontSize: 18,
                                 ),
                                 const SizedBox(height: 16),
-                                exampleImage('assets/honooesempio.png'),
+                                exampleImage('assets/hinooesempio.png'),
                                 const SizedBox(height: 8),
                               ],
                             );
@@ -169,7 +169,7 @@ class _IslandPageState extends State<IslandPage> {
                                 fontSize: 18,
                               ),
                               const SizedBox(height: 12),
-                              exampleImage('assets/honooesempio.png'),
+                              exampleImage('assets/hinooesempio.png'),
                               const SizedBox(height: 20),
 
                               // Remaining content
@@ -200,7 +200,7 @@ class _IslandPageState extends State<IslandPage> {
                                 fontSize: 18,
                               ),
                               const SizedBox(height: 12),
-                              exampleImage('assets/honooesempio.png'),
+                              exampleImage('assets/hinooesempio.png'),
                               const SizedBox(height: 12),
                             ],
                           );
