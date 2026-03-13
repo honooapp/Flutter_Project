@@ -118,7 +118,8 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
       height: widget.maxHeight,
       child: PageView.builder(
         scrollDirection: Axis.vertical,
-        physics: const BouncingScrollPhysics(),
+        pageSnapping: true,
+        physics: const PageScrollPhysics(),
         itemCount: _entries.length,
         itemBuilder: (context, index) {
           // Ordine inverso: ultimo (più recente) in cima

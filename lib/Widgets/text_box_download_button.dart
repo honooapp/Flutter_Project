@@ -20,6 +20,9 @@ class TextBoxDownloadButton extends StatelessWidget {
       message: tooltip,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
+        // Reclamare il gesto immediatamente sul down evita che il carosello
+        // orizzontale/verticale rubi l'evento trasformandolo in uno swipe.
+        onPanDown: (_) {},
         onVerticalDragStart: (_) {},
         onHorizontalDragStart: (_) {},
         child: Material(

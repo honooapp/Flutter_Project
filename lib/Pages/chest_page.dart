@@ -65,7 +65,6 @@ class _ChestPageState extends State<ChestPage> {
   String? _activeConversationId;
   int? _previousIndexBeforeConversation;
   bool _isBouncing = false;
-  String? _bouncedConvId;
   // removed unused selected conversation index (not needed for rendering)
 
   static const String _scrignoInfoPrefKey = 'scrigno_info_seen_v1';
@@ -1671,14 +1670,10 @@ class _ChestPageState extends State<ChestPage> {
                 }
                 final bool isFirstOfGroup = hasConv &&
                     (i == 0 || _convIdOfItem(items[i - 1]) != cid);
-                if (hasConv && hasSibling &&
-                    (widget.highlightLatest || isFirstOfGroup) &&
-                    (_bouncedConvId != cid)) {
+                if (hasConv && hasSibling && isFirstOfGroup) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     if (!mounted) return;
-                    if (_bouncedConvId == cid) return;
                     _runConversationBounce();
-                    _bouncedConvId = cid;
                   });
                 }
               }
@@ -1687,10 +1682,7 @@ class _ChestPageState extends State<ChestPage> {
                 layoutMode == ResponsiveLayoutMode.wideDesktop ||
                 layoutMode == ResponsiveLayoutMode.largeDesktop;
             if (!isDesktop || items.length <= 1) {
-              return AbsorbPointer(
-                absorbing: _isBouncing,
-                child: slider,
-              );
+              return slider;
             }
             return DesktopCarouselArrows(
               canPrev: _currentIndex > 0,
