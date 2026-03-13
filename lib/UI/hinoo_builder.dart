@@ -564,7 +564,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
                 scaleEnabled: interactive,
                 minScale: _bgMinInteractiveScale,
                 maxScale: _bgMaxScale,
-                boundaryMargin: const EdgeInsets.all(200),
+                // Evita spazi bianchi: pan limitato ai bordi del canvas
+                boundaryMargin: EdgeInsets.zero,
                 child: fitted,
               ),
             );

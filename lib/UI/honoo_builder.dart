@@ -631,7 +631,8 @@ class HonooBuilderState extends State<HonooBuilder> {
                             scaleEnabled: true,
                             minScale: _imageMinScale,
                             maxScale: _imageMaxScale,
-                            boundaryMargin: const EdgeInsets.all(200),
+                            // Evita spazi bianchi: non permettere pan oltre i bordi
+                            boundaryMargin: EdgeInsets.zero,
                             child: SizedBox.expand(
                               child: Image(
                                 image: MemoryImage(_imageBytes!),
