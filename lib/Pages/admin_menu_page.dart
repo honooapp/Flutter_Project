@@ -43,6 +43,8 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
   };
   Timer? _statsRefreshTimer;
   RealtimeChannel? _statsChannel;
+  bool _loadingPendingInvites = false;
+  List<Map<String, dynamic>> _pendingInvites = const [];
 
 
   @override
@@ -55,6 +57,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
         _loadVisits();
         _loadMoonCounts();
         _loadDailyCounts();
+        _loadPendingInvites();
         _subscribeStats();
         _statsRefreshTimer = Timer.periodic(
           const Duration(seconds: 30),
@@ -62,6 +65,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
             _loadVisits();
             _loadMoonCounts();
             _loadDailyCounts();
+            _loadPendingInvites();
           },
         );
       }
@@ -85,6 +89,8 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
       _loadDailyCounts();
     }
 
+    void refreshInv(dynamic _, [dynamic __]) => _loadPendingInvites();
+
     _statsChannel!
         .on(
           RealtimeListenTypes.postgresChanges,
@@ -100,8 +106,25 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
           RealtimeListenTypes.postgresChanges,
           ChannelFilter(event: '*', schema: 'public', table: 'site_visits'),
           refresh,
+        )
+        .on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(event: '*', schema: 'public', table: 'house_invites'),
+          refreshInv,
         );
     _statsChannel!.subscribe();
+  }
+
+  Future<void> _loadPendingInvites() async {
+    if (_loadingPendingInvites) return;
+    setState(() => _loadingPendingInvites = true);
+    try {
+      final list = await _adminService.fetchPendingInvites(newestFirst: true);
+      if (!mounted) return;
+      setState(() => _pendingInvites = list);
+    } finally {
+      if (mounted) setState(() => _loadingPendingInvites = false);
+    }
   }
 
   Future<void> _loadEmailHints() async {
@@ -296,6 +319,35 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    if (_pendingInvites.isNotEmpty) ...[
+                      Text(
+                        'Richieste di casa',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.arvo(
+                          color: HonooColor.onBackground,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      ..._pendingInvites.map((row) {
+                        final String email = (row['email']?.toString() ?? '').trim();
+                        final String userId = (row['user_id']?.toString() ?? '').trim();
+                        final String label = email.isNotEmpty ? email : (userId.isNotEmpty ? userId : 'Richiesta');
+                        final String when = (row['created_at']?.toString() ?? '');
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Text(
+                            '• $label — $when',
+                            style: GoogleFonts.lora(
+                              color: HonooColor.onBackground.withOpacity(0.9),
+                              fontSize: 14,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      const SizedBox(height: 20),
+                    ],
                     const SizedBox(height: 24),
                     Text(
                       'Menu Admin',

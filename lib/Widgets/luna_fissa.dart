@@ -44,7 +44,9 @@ class _LunaFissaState extends State<LunaFissa>
     with WidgetsBindingObserver {
   final AdminService _adminService = AdminService();
   bool _isAdmin = false;
+  int _pendingRequests = 0;
   StreamSubscription<AuthState>? _authSub;
+  RealtimeChannel? _invitesChannel;
 
   @override
   void initState() {
@@ -80,6 +82,35 @@ class _LunaFissaState extends State<LunaFissa>
     debugPrint('[LunaFissa] uid=${user?.id} admin=$isAdmin');
     if (!mounted) return;
     setState(() => _isAdmin = isAdmin);
+    if (isAdmin) {
+      _loadPendingRequestsCount();
+      _subscribeInvites();
+    } else {
+      _invitesChannel?.unsubscribe();
+      _invitesChannel = null;
+      if (mounted) setState(() => _pendingRequests = 0);
+    }
+  }
+
+  Future<void> _loadPendingRequestsCount() async {
+    try {
+      final c = await _adminService.fetchPendingInviteCount();
+      if (mounted) setState(() => _pendingRequests = c);
+    } catch (_) {}
+  }
+
+  void _subscribeInvites() {
+    try {
+      _invitesChannel?.unsubscribe();
+      _invitesChannel = SupabaseProvider.client.channel('admin-house-invites');
+      _invitesChannel!
+          .on(
+            RealtimeListenTypes.postgresChanges,
+            ChannelFilter(event: '*', schema: 'public', table: 'house_invites'),
+            (_, [__]) => _loadPendingRequestsCount(),
+          )
+          .subscribe();
+    } catch (_) {}
   }
 
   @override
@@ -130,23 +161,34 @@ class _LunaFissaState extends State<LunaFissa>
     if (widget.showAdminEntry && _isAdmin) {
       actions.add(SizedBox(height: iconSize * 0.35));
       actions.add(
-        IconButton(
-          icon: Image.asset(
-            'assets/icons/venceslao.png',
-            width: iconSize,
-            height: iconSize,
-          ),
-          iconSize: iconSize,
-          splashRadius: (iconSize / 2) + 6,
-          tooltip: 'Admin',
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const AdminMenuPage(),
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            IconButton(
+              icon: Image.asset(
+                'assets/icons/venceslao.png',
+                width: iconSize,
+                height: iconSize,
               ),
-            );
-          },
+              iconSize: iconSize,
+              splashRadius: (iconSize / 2) + 6,
+              tooltip: 'Admin',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AdminMenuPage(),
+                  ),
+                );
+              },
+            ),
+            if (_pendingRequests > 0)
+              Positioned(
+                top: -4,
+                right: -4,
+                child: _AdminBadge(count: _pendingRequests),
+              ),
+          ],
         ),
       );
     }
@@ -165,6 +207,36 @@ class _LunaFissaState extends State<LunaFissa>
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: actions,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AdminBadge extends StatelessWidget {
+  const _AdminBadge({required this.count});
+  final int count;
+  @override
+  Widget build(BuildContext context) {
+    final String label = count > 99 ? '99+' : count.toString();
+    final double size = count > 9 ? 18 : 16;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      height: size,
+      constraints: BoxConstraints(minWidth: size),
+      decoration: BoxDecoration(
+        color: Colors.redAccent,
+        borderRadius: BorderRadius.circular(size / 2),
+        border: Border.all(color: Colors.black, width: 1.5),
+      ),
+      child: Center(
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),

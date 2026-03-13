@@ -23,6 +23,8 @@ import 'package:honoo/Controller/honoo_controller.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:honoo/Widgets/busy_overlay.dart';
+import 'package:honoo/Services/admin_service.dart';
+import 'package:honoo/Services/house_invite_service.dart';
 
 import '../../Pages/home_page.dart';
 import '../../Pages/shared_conversations_page.dart';
@@ -56,6 +58,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
   bool _checkedKnocks = false;
   bool _checkingPendingKnocks = false;
   bool _isKnocking = false;
+  bool _hasOwnHouse = false;
+  bool _hasPendingOrAcceptedInvite = false;
+  bool _requestBusy = false;
   DateTime? _lastKnockToastAt;
   final Set<String> _pendingKnockTags = {};
   final List<_PendingKnock> _pendingKnocks = [];
@@ -440,14 +445,215 @@ class _CampanelliPageState extends State<CampanelliPage> {
     ];
   }
 
+  Future<void> _handleInviteRequestTap() async {
+    if (_requestBusy) return;
+    _requestBusy = true;
+    try {
+      if (_hasOwnHouse) {
+        if (mounted) {
+          showHonooToast(context, message: 'Hai già una casa.');
+        }
+        return;
+      }
+      if (_hasPendingOrAcceptedInvite) {
+        if (mounted) {
+          showHonooToast(context, message: 'Hai già una richiesta in corso.');
+        }
+        return;
+      }
+
+      final user = SupabaseProvider.client.auth.currentUser;
+      if (user == null) {
+        if (!mounted) return;
+        showHonooToast(context, message: 'Accedi prima per richiedere una casa.');
+        return;
+      }
+
+    final String email = user.email ?? '';
+    final admin = AdminService();
+    final bool isAdmin = await admin.isCurrentUserAdmin();
+
+    if (!mounted) return;
+
+    if (!isAdmin) {
+      // Utente normale: prova a registrare la richiesta su house_invites (se consentito da RLS)
+      try {
+        final payload = <String, dynamic>{
+          'user_id': user.id,
+          if (email.isNotEmpty) 'email': email,
+          'status': 'pending',
+          'created_at': DateTime.now().toIso8601String(),
+        };
+        await SupabaseProvider.client.from('house_invites').insert(payload);
+        _hasPendingOrAcceptedInvite = true;
+      } catch (_) {
+        // ignora: in ambienti dove RLS non consente l'insert, continua con solo feedback
+      }
+
+      // Feedback locale
+      if (!mounted) {
+        _requestBusy = false;
+        return;
+      }
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: true,
+        builder: (_) => HonooDialogShell(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Richiesta inviata',
+                  style: HonooDialogStyles.title(),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  email.isNotEmpty
+                      ? '$email ha richiesto una casa sull\'Isola.'
+                      : 'Hai richiesto una casa sull\'Isola.',
+                  style: HonooDialogStyles.body(),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'OK',
+                      style: GoogleFonts.libreFranklin(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      return;
+    }
+
+    // Admin: mostra dialogo con Non ora / Invita
+    final bool? invite = await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => HonooDialogShell(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Richiesta ricevuta',
+                style: HonooDialogStyles.title(),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                email.isNotEmpty
+                    ? '$email ha richiesto una casa sull\'Isola.'
+                    : 'Un utente ha richiesto una casa sull\'Isola.',
+                style: HonooDialogStyles.body(),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: Text(
+                        'Non ora',
+                        style: HonooDialogStyles.secondaryAction(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'Invita',
+                        style: GoogleFonts.libreFranklin(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (invite == true) {
+      if (!mounted) return;
+      try {
+        final adminUid = user.id;
+        if (email.isEmpty) {
+          showHonooToast(context, message: 'Email utente non disponibile.');
+          return;
+        }
+        final ok = await admin.inviteByEmailOnly(adminUid: adminUid, email: email);
+        if (!mounted) return;
+        showHonooToast(
+          context,
+          message: ok ? 'Invito inviato.' : 'Invito già presente o non inviabile.',
+        );
+      } catch (e) {
+        if (!mounted) return;
+        showHonooToast(context, message: 'Errore invito: $e');
+      }
+    }
+    } finally {
+      _requestBusy = false;
+    }
+  }
+
   List<_CampanelloPageData> _buildCampanelloPages(
     List<_CampanelloEntry> campanelli,
   ) {
-    return [
+    final pages = <_CampanelloPageData>[
       _CampanelloPageData.intro(Utility().campanelliText),
       for (final campanello in campanelli)
         _CampanelloPageData.campanello(campanello.campanello),
     ];
+
+    // Se l'utente non ha ancora una casa/campanello e non ha inviti pendenti, aggiungi pagina CTA
+    if (!_hasOwnHouse && !_hasPendingOrAcceptedInvite) {
+      pages.add(
+        _CampanelloPageData.intro(
+          'Vuoi\n anche tu\n una casa\n sull\'Isola?\n\nClicca qui',
+        ),
+      );
+    }
+
+    return pages;
   }
 
   ImageProvider _houseBackgroundProvider(
@@ -513,6 +719,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
           setState(() {
             _userEntries = const [];
             _ownedHinooIds = const [];
+            _hasOwnHouse = false;
           });
         }
         return;
@@ -599,6 +806,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
         setState(() {
           _userEntries = entries;
           _ownedHinooIds = List<String>.from(ownedHinooIds);
+          _hasOwnHouse = ownedHinooIds.isNotEmpty;
           _unlockedCampanelli.addAll(
             entries
                 .where((entry) => entry.campanello.ownerId == user.id)
@@ -606,6 +814,11 @@ class _CampanelliPageState extends State<CampanelliPage> {
           );
         });
       }
+      // Verifica inviti pendenti/accettati per nascondere CTA se già invitato
+      try {
+        final hasInvite = await HouseInviteService().hasPendingOrAcceptedInvite(user.id);
+        if (mounted) setState(() => _hasPendingOrAcceptedInvite = hasInvite);
+      } catch (_) {}
       _subscribeOwnerAccessChannel();
       if (!_checkedKnocks) {
         _checkedKnocks = true;
@@ -1408,6 +1621,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                             data: campanelloPages[pageIndex],
                                             width: canvasSize.width,
                                             height: canvasSize.height,
+                                            onRequestTap: _handleInviteRequestTap,
                                           );
                                         },
                                         );
@@ -1951,11 +2165,13 @@ class _CampanelloCard extends StatelessWidget {
     required this.data,
     required this.width,
     required this.height,
+    this.onRequestTap,
   });
 
   final _CampanelloPageData data;
   final double width;
   final double height;
+  final VoidCallback? onRequestTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1973,11 +2189,7 @@ class _CampanelloCard extends StatelessWidget {
         vertical: verticalPadding,
       ),
       child: Center(
-        child: Text(
-          data.text,
-          style: textStyle,
-          textAlign: TextAlign.center,
-        ),
+        child: _buildText(textStyle),
       ),
     );
 
@@ -2008,6 +2220,44 @@ class _CampanelloCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildText(TextStyle textStyle) {
+    // Rende "Clicca qui" sottolineato e cliccabile se presente
+    final String raw = data.text;
+    final idx = raw.toLowerCase().lastIndexOf('clicca qui');
+    if (idx < 0 || onRequestTap == null) {
+      return Text(raw, style: textStyle, textAlign: TextAlign.center);
+    }
+
+    final String before = raw.substring(0, idx);
+    final String link = raw.substring(idx, idx + 'clicca qui'.length);
+    final String after = raw.substring(idx + 'clicca qui'.length);
+    return RichText(
+      textAlign: TextAlign.center,
+      text: TextSpan(
+        style: textStyle,
+        children: [
+          TextSpan(text: before),
+          WidgetSpan(
+            alignment: PlaceholderAlignment.baseline,
+            baseline: TextBaseline.alphabetic,
+            child: InkWell(
+              onTap: onRequestTap,
+              child: Text(
+                link,
+                style: textStyle.copyWith(
+                  decoration: TextDecoration.underline,
+                  decorationColor: textStyle.color,
+                  decorationThickness: 2.5,
+                ),
+              ),
+            ),
+          ),
+          TextSpan(text: after),
+        ],
       ),
     );
   }

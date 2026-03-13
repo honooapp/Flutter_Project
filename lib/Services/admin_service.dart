@@ -219,6 +219,25 @@ class AdminService {
     return true;
   }
 
+  Future<List<Map<String, dynamic>>> fetchPendingInvites({bool newestFirst = true}) async {
+    final rows = await _client
+        .from('house_invites')
+        .select('id,email,user_id,created_at,status')
+        .eq('status', 'pending')
+        .order('created_at', ascending: !newestFirst);
+    if (rows is! List) return const [];
+    return rows.whereType<Map<String, dynamic>>().toList();
+  }
+
+  Future<int> fetchPendingInviteCount() async {
+    final rows = await _client
+        .from('house_invites')
+        .select('id')
+        .eq('status', 'pending');
+    if (rows is! List) return 0;
+    return rows.length;
+  }
+
   Future<bool> hasCasaForUser(String userId) async {
     if (userId.trim().isEmpty) return false;
     final rows = await _client
