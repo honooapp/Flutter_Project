@@ -1607,23 +1607,30 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                         },
                                       ),
                                       child: () {
-                                        final pv = PageView.builder(
-                                        controller: _campanelloPageController,
-                                        scrollDirection: Axis.horizontal,
-                                        physics: pagePhysics,
-                                        itemCount: campanelloPages.length,
-                                        onPageChanged: (index) {
-                                          setState(
-                                              () => _campanelloIndex = index);
-                                        },
-                                        itemBuilder: (context, pageIndex) {
-                                          return _CampanelloCard(
-                                            data: campanelloPages[pageIndex],
-                                            width: canvasSize.width,
-                                            height: canvasSize.height,
-                                            onRequestTap: _handleInviteRequestTap,
-                                          );
-                                        },
+                                        final pvViewport = SizedBox(
+                                          width: canvasSize.width,
+                                          height: canvasSize.height,
+                                          child: PageView.builder(
+                                            controller:
+                                                _campanelloPageController,
+                                            scrollDirection: Axis.horizontal,
+                                            physics: pagePhysics,
+                                            itemCount: campanelloPages.length,
+                                            onPageChanged: (index) {
+                                              setState(() =>
+                                                  _campanelloIndex = index);
+                                            },
+                                            itemBuilder: (context, pageIndex) {
+                                              return _CampanelloCard(
+                                                data:
+                                                    campanelloPages[pageIndex],
+                                                width: canvasSize.width,
+                                                height: canvasSize.height,
+                                                onRequestTap:
+                                                    _handleInviteRequestTap,
+                                              );
+                                            },
+                                          ),
                                         );
                                         final bool isDesktop =
                                             layoutMode ==
@@ -1637,24 +1644,31 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                                         .largeDesktop;
                                         if (!isDesktop ||
                                             campanelloPages.length <= 1) {
-                                          return pv;
+                                          return pvViewport;
                                         }
-                                        return DesktopCarouselArrows(
-                                          canPrev: _campanelloIndex > 0,
-                                          canNext: _campanelloIndex <
-                                              campanelloPages.length - 1,
-                                          onPrev: () => _animatePage(
-                                            _campanelloPageController,
-                                            delta: -1,
-                                            maxIndex: maxCampanelloIndex,
+                                        // Su desktop, allarga l'area esterna per ospitare le frecce
+                                        const double arrowGutter = 160;
+                                        return SizedBox(
+                                          width:
+                                              canvasSize.width + arrowGutter,
+                                          height: canvasSize.height,
+                                          child: DesktopCarouselArrows(
+                                            canPrev: _campanelloIndex > 0,
+                                            canNext: _campanelloIndex <
+                                                campanelloPages.length - 1,
+                                            onPrev: () => _animatePage(
+                                              _campanelloPageController,
+                                              delta: -1,
+                                              maxIndex: maxCampanelloIndex,
+                                            ),
+                                            onNext: () => _animatePage(
+                                              _campanelloPageController,
+                                              delta: 1,
+                                              maxIndex: maxCampanelloIndex,
+                                            ),
+                                            arrowColor: Colors.white,
+                                            child: Center(child: pvViewport),
                                           ),
-                                          onNext: () => _animatePage(
-                                            _campanelloPageController,
-                                            delta: 1,
-                                            maxIndex: maxCampanelloIndex,
-                                          ),
-                                          arrowColor: Colors.white,
-                                          child: pv,
                                         );
                                       }(),
                                       ),
