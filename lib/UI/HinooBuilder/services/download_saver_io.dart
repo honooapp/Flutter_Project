@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:honoo/env/env.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 
 import 'download_saver_base.dart';
 
@@ -13,6 +14,29 @@ class _DownloadSaverIo implements DownloadSaver {
     }
 
     if (Platform.isAndroid || Platform.isIOS) {
+      // Prova a salvare direttamente in Galleria/Foto
+      int ok = 0;
+      for (final img in images) {
+        try {
+          final result = await ImageGallerySaver.saveImage(
+            img.bytes,
+            quality: 100,
+            name: img.filename.replaceAll('.png', ''),
+          );
+          final success = _extractSuccess(result);
+          if (success) ok++;
+        } catch (_) {
+          // continua su fallback
+        }
+      }
+
+      if (ok == images.length && ok > 0) {
+        return images.length == 1
+            ? 'Immagine salvata nella galleria.'
+            : 'Immagini salvate nella galleria.';
+      }
+
+      // Fallback: apri il foglio di condivisione
       final List<XFile> files = images
           .map((img) => XFile.fromData(
                 img.bytes,
@@ -70,3 +94,13 @@ class _DownloadSaverIo implements DownloadSaver {
 }
 
 DownloadSaver getDownloadSaverImpl() => _DownloadSaverIo();
+
+bool _extractSuccess(dynamic result) {
+  try {
+    if (result is Map) {
+      final success = result['isSuccess'] == true || result['success'] == true;
+      return success;
+    }
+  } catch (_) {}
+  return false;
+}

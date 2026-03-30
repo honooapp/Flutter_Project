@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build web bundle
+      - name: Build web bundle (CanvasKit)
         env:
           SUPABASE_URL: ${{ secrets.PROD_SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.PROD_SUPABASE_ANON_KEY }}
@@ -39,6 +39,7 @@ jobs:
           if [ "$DISABLE_PWA" = "true" ]; then PWA_FLAG="--pwa-strategy=none"; else PWA_FLAG=""; fi
           flutter build web \
             --release $PWA_FLAG \
+            --web-renderer canvaskit \
             --dart-define=SUPABASE_URL=$SUPABASE_URL \
             --dart-define=SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
 
