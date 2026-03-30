@@ -21,6 +21,8 @@ import 'package:honoo/Services/supabase_provider.dart';
 import '../Services/hinoo_storage_uploader.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Utility/heic_converter.dart' as heic;
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:honoo/web/heic_converter.dart' as heicweb;
 import 'package:honoo/UI/HinooBuilder/dialogs/anteprima_png.dart';
 import 'package:honoo/UI/HinooBuilder/dialogs/download_hinoo_dialog.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
@@ -796,11 +798,47 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
       // Preview locale immediata
       Uint8List bytes = await selected.readAsBytes();
-      final name = (selected.name).toLowerCase();
-      if (name.endsWith('.heic') || name.endsWith('.heif')) {
-        final converted = await heic.heicToPng(bytes);
-        if (converted != null && converted.isNotEmpty) {
-          bytes = converted;
+      String uploadExt = 'png';
+      bool wasHeic = false;
+      if (kIsWeb) {
+        try {
+          // Web: preferisci WEBP, fallback PNG
+          final converted = await heicweb.convertHeicToWebSafe(bytes, selected.name);
+          if (converted != null && converted.isNotEmpty) {
+            bytes = converted;
+            wasHeic = true;
+            uploadExt = 'webp';
+          } else {
+            final String lower = selected.name.toLowerCase();
+            if (lower.endsWith('.heic') || lower.endsWith('.heif')) {
+              // HEIC non convertibile dal browser → notifica utente e interrompi
+              if (mounted) {
+                showHonooToast(context, message: 'Formato HEIC non supportato dal browser');
+              }
+              setState(() => _isUploadingBg = false);
+              return; // non procedere con upload
+            }
+          }
+        } catch (e) {
+          debugPrint('HEIC web conversion failed (hinoo): $e');
+          final String lower = selected.name.toLowerCase();
+          if (lower.endsWith('.heic') || lower.endsWith('.heif')) {
+            if (mounted) {
+              showHonooToast(context, message: 'Formato HEIC non supportato dal browser');
+            }
+            setState(() => _isUploadingBg = false);
+            return;
+          }
+        }
+      } else {
+        final name = (selected.name).toLowerCase();
+        if (name.endsWith('.heic') || name.endsWith('.heif')) {
+          wasHeic = true;
+          final converted = await heic.heicToPng(bytes);
+          if (converted != null && converted.isNotEmpty) {
+            bytes = converted;
+            uploadExt = 'png';
+          }
         }
       }
       final Matrix4 initialMatrix = await _fitBackgroundToCanvas(bytes);
@@ -816,7 +854,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
       });
       _bgController.value = initialMatrix;
 
-      await _persistBgUrl(bytes, selected.name);
+      await _persistBgUrl(bytes, selected.name, uploadExt: uploadExt, wasHeic: wasHeic);
       if (!mounted) return;
       setState(() {
         _isUploadingBg = false;
@@ -838,7 +876,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
     }
   }
 
-  Future<void> _persistBgUrl(Uint8List bytes, String originalName) async {
+  Future<void> _persistBgUrl(Uint8List bytes, String originalName, {required String uploadExt, required bool wasHeic}) async {
     try {
       final client = SupabaseProvider.client;
       final user = client.auth.currentUser;
@@ -850,10 +888,18 @@ class _HinooBuilderState extends State<HinooBuilder> {
         return; // opzionale: consenti preview locale senza upload
       }
 
-      // Converte sempre in PNG per compatibilità (HEIC/WEBP su web/mobile)
-      final Uint8List pngBytes = await _toPng(bytes);
+      // Web-safe: se proveniva da HEIC su web e abbiamo convertito a WEBP, carica WEBP; altrimenti PNG
+      Uint8List toUpload = bytes;
+      String finalExt = uploadExt;
+      if (finalExt != 'webp') {
+        // Forza PNG solo se non già WEBP
+        final Uint8List pngBytes = await _toPng(bytes);
+        toUpload = pngBytes;
+        finalExt = 'png';
+      }
+
       final url = await HinooStorageUploader.uploadBackground(
-          bytes: pngBytes, ext: 'png', userId: user.id);
+          bytes: toUpload, ext: finalExt, userId: user.id);
       setState(() {
         _bgPublicUrl = url;
       });
@@ -873,10 +919,17 @@ class _HinooBuilderState extends State<HinooBuilder> {
           _bgPublicUrl = null;
           _isUploadingBg = false;
         });
-        showHonooToast(
-          context,
-          message: 'Caricamento sfondo fallito. Riprova.',
-        );
+        if (kIsWeb && e.toString().toLowerCase().contains('heic')) {
+          showHonooToast(
+            context,
+            message: 'Formato HEIC non supportato dal browser',
+          );
+        } else {
+          showHonooToast(
+            context,
+            message: 'Caricamento sfondo fallito. Riprova.',
+          );
+        }
       }
     }
   }

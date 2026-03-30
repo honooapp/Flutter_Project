@@ -17,6 +17,8 @@ import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
 import 'package:honoo/Widgets/width_limited_multiline_field.dart';
 import 'package:honoo/Widgets/text_box_download_button.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:honoo/web/heic_converter.dart' as heicweb;
 
 import '../Pages/email_login_page.dart';
 import '../Services/honoo_image_uploader.dart';
@@ -178,12 +180,39 @@ class HonooBuilderState extends State<HonooBuilder> {
       if (selected == null) return;
 
       Uint8List bytes = await selected.readAsBytes();
-      // Gestione HEIC su Web: converti a PNG se possibile
-      final name = (selected.name).toLowerCase();
-      if (name.endsWith('.heic') || name.endsWith('.heif')) {
-        final converted = await heic.heicToPng(bytes);
-        if (converted != null && converted.isNotEmpty) {
-          bytes = converted;
+      // Web: conversione HEIC → WEBP (fallback PNG) prima della preview
+      if (kIsWeb) {
+        try {
+          final converted = await heicweb.convertHeicToWebSafe(bytes, selected.name);
+          if (converted != null && converted.isNotEmpty) {
+            bytes = converted;
+          } else {
+            final lower = selected.name.toLowerCase();
+            if (lower.endsWith('.heic') || lower.endsWith('.heif')) {
+              if (mounted) {
+                showHonooToast(context, message: 'Formato HEIC non supportato dal browser');
+              }
+              return;
+            }
+          }
+        } catch (e) {
+          debugPrint('HEIC web conversion failed (honoo): $e');
+          final lower = selected.name.toLowerCase();
+          if (lower.endsWith('.heic') || lower.endsWith('.heif')) {
+            if (mounted) {
+              showHonooToast(context, message: 'Formato HEIC non supportato dal browser');
+            }
+            return;
+          }
+        }
+      } else {
+        // Mobile/desktop: comportamento invariato (eventuale HEIC gestito dai codec nativi)
+        final name = (selected.name).toLowerCase();
+        if (name.endsWith('.heic') || name.endsWith('.heif')) {
+          final converted = await heic.heicToPng(bytes);
+          if (converted != null && converted.isNotEmpty) {
+            bytes = converted;
+          }
         }
       }
 
