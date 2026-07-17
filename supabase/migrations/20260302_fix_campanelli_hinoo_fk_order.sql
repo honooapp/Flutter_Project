@@ -3,12 +3,18 @@
 
 do $$
 begin
+  -- Questa migrazione può essere eseguita anche su ambienti in cui la feature
+  -- campanelli non è installata.
+  if to_regclass('public.campanelli') is null then
+    return;
+  end if;
+
   -- 1) Drop existing FK if present
   if exists (
     select 1
     from pg_constraint
     where conname = 'campanelli_hinoo_id_fkey'
-      and conrelid = 'public.campanelli'::regclass
+      and conrelid = to_regclass('public.campanelli')
   ) then
     alter table public.campanelli
       drop constraint campanelli_hinoo_id_fkey;
@@ -22,7 +28,7 @@ begin
     select 1
     from pg_constraint
     where conname = 'campanelli_hinoo_id_fkey'
-      and conrelid = 'public.campanelli'::regclass
+      and conrelid = to_regclass('public.campanelli')
   ) then
     alter table public.campanelli
       add constraint campanelli_hinoo_id_fkey
@@ -30,4 +36,3 @@ begin
   end if;
 end
 $$;
-
