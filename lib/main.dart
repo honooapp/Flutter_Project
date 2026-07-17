@@ -4,6 +4,7 @@ import 'package:honoo/IsolaDelleStorie/Controller/exercise_controller.dart';
 import 'package:sizer/sizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'env/env.dart';
+import 'Utility/app_logger.dart';
 
 import 'Pages/auth_gate.dart';
 import 'Pages/chest_page.dart';
@@ -26,7 +27,10 @@ Future<void> main() async {
       await Supabase.instance.client.auth
           .refreshSession()
           .timeout(const Duration(seconds: 5));
-    } catch (_) {}
+    } catch (error, stackTrace) {
+      AppLogger.warning('Refresh iniziale della sessione non riuscito',
+          scope: 'bootstrap', error: error, stackTrace: stackTrace);
+    }
     ExerciseController().init();
     runApp(const MyApp());
   } catch (e) {
@@ -42,8 +46,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final GlobalKey<NavigatorState> _navigatorKey =
-      GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   StreamSubscription<AuthState>? _authSub;
 
   @override

@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Services/supabase_provider.dart';
-import 'package:honoo/Utility/replies_seen_tracker.dart';
+import 'package:honoo/Services/home_service.dart';
+import 'package:honoo/Utility/app_logger.dart';
 import '../Utility/utility.dart';
 import '../Widgets/honoo_app_title.dart';
 import 'placeholder_page.dart';
@@ -24,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   int _replyCount = 0;
   Timer? _replyRefreshTimer;
   bool _visitRecorded = false;
+  final HomeService _homeService = const HomeService();
 
   @override
   void initState() {
@@ -48,41 +50,25 @@ class _HomePageState extends State<HomePage> {
     final user = SupabaseProvider.client.auth.currentUser;
     if (user == null) return;
     try {
-      final lastSeen = await RepliesSeenTracker.lastSeen();
-      final honooRows = await SupabaseProvider.client
-          .from('honoo')
-          .select('created_at,user_id')
-          .eq('destination', 'reply')
-          .eq('recipient_tag', user.id)
-          .neq('user_id', user.id);
-      final hinooRows = await SupabaseProvider.client
-          .from('hinoo')
-          .select('created_at,user_id')
-          .eq('type', 'answer')
-          .eq('recipient_tag', user.id)
-          .neq('user_id', user.id);
-      int count = 0;
-      for (final r in (honooRows as List)) {
-        final dt = DateTime.tryParse((r['created_at'] ?? '').toString());
-        if (dt != null && (lastSeen == null || dt.isAfter(lastSeen))) count++;
-      }
-      for (final r in (hinooRows as List)) {
-        final dt = DateTime.tryParse((r['created_at'] ?? '').toString());
-        if (dt != null && (lastSeen == null || dt.isAfter(lastSeen))) count++;
-      }
+      final count = await _homeService.fetchUnreadReplyCount(user.id);
       if (!mounted) return;
       if (count != _replyCount) {
         setState(() => _replyCount = count);
       }
-    } catch (_) {}
+    } catch (error, stackTrace) {
+      AppLogger.warning('Impossibile aggiornare il contatore risposte',
+          scope: 'HomePage', error: error, stackTrace: stackTrace);
+    }
   }
 
   Future<void> _recordVisit() async {
     if (_visitRecorded) return;
     _visitRecorded = true;
     try {
-      await SupabaseProvider.client.rpc('increment_site_visit');
-    } catch (_) {
+      await _homeService.recordVisit();
+    } catch (error, stackTrace) {
+      AppLogger.warning('Impossibile registrare la visita',
+          scope: 'HomePage', error: error, stackTrace: stackTrace);
       _visitRecorded = false;
     }
   }
@@ -90,6 +76,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: const Key('home_screen_root'),
       backgroundColor: HonooColor.background,
       body: LayoutBuilder(
         builder: (context, constraints) {
