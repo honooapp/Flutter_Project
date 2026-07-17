@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../Entities/campanelli_entry.dart';
 import '../Entities/hinoo.dart';
+import '../Entities/pending_knock.dart';
 import '../Services/campanelli_repository.dart';
 
 @immutable
@@ -10,6 +11,7 @@ class CampanelliLoadState {
     this.entries = const [],
     this.shareRows = const [],
     this.ownedHinooIds = const [],
+    this.pendingKnocks = const [],
     this.isLoading = false,
     this.error,
   });
@@ -17,6 +19,7 @@ class CampanelliLoadState {
   final List<CampanelliEntry> entries;
   final List<dynamic> shareRows;
   final List<String> ownedHinooIds;
+  final List<PendingKnock> pendingKnocks;
   final bool isLoading;
   final Object? error;
 
@@ -24,6 +27,7 @@ class CampanelliLoadState {
     List<CampanelliEntry>? entries,
     List<dynamic>? shareRows,
     List<String>? ownedHinooIds,
+    List<PendingKnock>? pendingKnocks,
     bool? isLoading,
     Object? error,
     bool clearError = false,
@@ -32,6 +36,7 @@ class CampanelliLoadState {
       entries: entries ?? this.entries,
       shareRows: shareRows ?? this.shareRows,
       ownedHinooIds: ownedHinooIds ?? this.ownedHinooIds,
+      pendingKnocks: pendingKnocks ?? this.pendingKnocks,
       isLoading: isLoading ?? this.isLoading,
       error: clearError ? null : error ?? this.error,
     );
@@ -100,11 +105,70 @@ class CampanelliController extends ChangeNotifier {
         entries: List<CampanelliEntry>.unmodifiable(entries),
         shareRows: List<dynamic>.unmodifiable(shareRows),
         ownedHinooIds: List<String>.unmodifiable(ownedHinooIds),
+        pendingKnocks: _state.pendingKnocks,
       ));
     } catch (error) {
       _publish(CampanelliLoadState(error: error));
     }
     return _state;
+  }
+
+  Future<List<PendingKnock>> loadPendingKnocks(
+    List<String> ownedHinooIds,
+  ) async {
+    if (ownedHinooIds.isEmpty) {
+      _replacePendingKnocks(const []);
+      return const [];
+    }
+    final rows = await _repository.fetchPendingKnockRows(ownedHinooIds);
+    final knocks = rows
+        .whereType<Map>()
+        .map(_pendingKnockFromRow)
+        .whereType<PendingKnock>()
+        .toList(growable: false);
+    _replacePendingKnocks(knocks);
+    return _state.pendingKnocks;
+  }
+
+  bool addPendingKnockRow(Map<dynamic, dynamic> row) {
+    final knock = _pendingKnockFromRow(row);
+    if (knock == null) return false;
+    final updated = <PendingKnock>[
+      ..._state.pendingKnocks.where((item) => item.id != knock.id),
+      knock,
+    ];
+    _replacePendingKnocks(updated);
+    return true;
+  }
+
+  void removePendingKnock(String id) {
+    _replacePendingKnocks(
+      _state.pendingKnocks.where((item) => item.id != id).toList(),
+    );
+  }
+
+  Set<String> get pendingKnockTags => Set<String>.unmodifiable(
+        _state.pendingKnocks.map((knock) => knock.targetTag),
+      );
+
+  PendingKnock? _pendingKnockFromRow(Map<dynamic, dynamic> row) {
+    final id = row['id']?.toString() ?? '';
+    final targetTag = row['target_house_tag']?.toString() ?? '';
+    if (id.isEmpty || targetTag.isEmpty) return null;
+    final rawCreatedAt = row['created_at']?.toString() ?? '';
+    return PendingKnock(
+      id: id,
+      targetTag: targetTag,
+      createdAt: DateTime.tryParse(rawCreatedAt) ?? DateTime.now(),
+      hinooId: row['hinoo_id']?.toString(),
+      honooId: row['honoo_id']?.toString(),
+    );
+  }
+
+  void _replacePendingKnocks(Iterable<PendingKnock> knocks) {
+    _publish(_state.copyWith(
+      pendingKnocks: List<PendingKnock>.unmodifiable(knocks),
+    ));
   }
 
   static List<double>? _parseTransform(dynamic raw) {

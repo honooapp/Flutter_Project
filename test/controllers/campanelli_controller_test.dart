@@ -91,4 +91,47 @@ void main() {
     verify(() => repository.fetchShareSettingsRows(const [])).called(1);
     verify(() => repository.fetchHinooRows(const [])).called(1);
   });
+
+  test('carica e mappa le bussate pendenti', () async {
+    when(() => repository.fetchPendingKnockRows(['hinoo-1']))
+        .thenAnswer((_) async => const [
+              {
+                'id': 'knock-1',
+                'target_house_tag': 'hinoo-1',
+                'created_at': '2026-07-17T10:00:00Z',
+                'honoo_id': 'honoo-1',
+              },
+              {'id': '', 'target_house_tag': 'invalid'},
+            ]);
+
+    final knocks = await controller.loadPendingKnocks(['hinoo-1']);
+
+    expect(knocks, hasLength(1));
+    expect(knocks.single.id, 'knock-1');
+    expect(knocks.single.createdAt, DateTime.parse('2026-07-17T10:00:00Z'));
+    expect(controller.pendingKnockTags, {'hinoo-1'});
+  });
+
+  test('Realtime sostituisce duplicati e rimuove per id', () {
+    expect(
+      controller.addPendingKnockRow(const {
+        'id': 'knock-1',
+        'target_house_tag': 'hinoo-1',
+        'created_at': '2026-07-17T10:00:00Z',
+      }),
+      isTrue,
+    );
+    controller.addPendingKnockRow(const {
+      'id': 'knock-1',
+      'target_house_tag': 'hinoo-2',
+      'created_at': '2026-07-17T11:00:00Z',
+    });
+
+    expect(controller.state.pendingKnocks, hasLength(1));
+    expect(controller.state.pendingKnocks.single.targetTag, 'hinoo-2');
+
+    controller.removePendingKnock('knock-1');
+    expect(controller.state.pendingKnocks, isEmpty);
+    expect(controller.pendingKnockTags, isEmpty);
+  });
 }

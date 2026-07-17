@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:honoo/Entities/hinoo.dart';
+import 'package:honoo/Entities/pending_knock.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Controller/hinoo_controller.dart';
 import 'package:honoo/Controller/campanelli_controller.dart';
@@ -70,8 +71,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
   bool _hasPendingOrAcceptedInvite = false;
   bool _requestBusy = false;
   DateTime? _lastKnockToastAt;
-  final Set<String> _pendingKnockTags = {};
-  final List<_PendingKnock> _pendingKnocks = [];
+  List<PendingKnock> get _pendingKnocks =>
+      _campanelliController.state.pendingKnocks;
+  Set<String> get _pendingKnockTags => _campanelliController.pendingKnockTags;
   List<String> _ownedHinooIds = const [];
   Timer? _pendingKnockRefreshTimer;
   RealtimeChannel? _ownerAccessChannel;
@@ -818,79 +820,59 @@ class _CampanelliPageState extends State<CampanelliPage> {
           table: 'house_access',
         );
       }
-      _ownerAccessChannel =
-          SupabaseProvider.client.channel('house-access-owner-${user.id}')
-            ..on(
-              RealtimeListenTypes.postgresChanges,
-              insertFilter,
-              (payload, [ref]) {
-                try {
-                  final Map? record =
-                      payload is Map ? payload['new'] as Map? : null;
-                  if (record == null) return;
-                  final String? tag = record['target_house_tag']?.toString();
-                  final dynamic granted = record['granted_at'];
-                  if (tag == null || tag.isEmpty) return;
-                  if (!_ownedHinooIds.contains(tag)) return;
-                  if (granted != null) return; // only pending knocks
-                  // Append pending knock and show toast (debounced)
-                  final String id = record['id']?.toString() ?? '';
-                  final String? raw = record['created_at']?.toString();
-                  final DateTime createdAt = raw == null || raw.isEmpty
-                      ? DateTime.now()
-                      : DateTime.parse(raw);
-                  final String? hinooId = record['hinoo_id']?.toString();
-                  final String? honooId = record['honoo_id']?.toString();
-                  if (!mounted) return;
-                  setState(() {
-                    _pendingKnocks.add(
-                      _PendingKnock(
-                        id: id,
-                        targetTag: tag,
-                        createdAt: createdAt,
-                        hinooId: hinooId,
-                        honooId: honooId,
-                      ),
-                    );
-                    _pendingKnockTags.add(tag);
-                  });
-                  final now = DateTime.now();
-                  if (_lastKnockToastAt == null ||
-                      now.difference(_lastKnockToastAt!) >
-                          const Duration(seconds: 3)) {
-                    _lastKnockToastAt = now;
-                    showHonooToast(context,
-                        message: 'Qualcuno ha bussato alla tua casa');
-                  }
-                } catch (_) {}
-              },
-            )
-            ..on(
-              RealtimeListenTypes.postgresChanges,
-              ChannelFilter(
-                event: 'DELETE',
-                schema: 'public',
-                table: 'house_access',
-              ),
-              (payload, [ref]) {
-                // keep local list in sync if deletions happen
-                try {
-                  final Map? oldRec =
-                      payload is Map ? payload['old'] as Map? : null;
-                  if (oldRec == null) return;
-                  final String? id = oldRec['id']?.toString();
-                  if (id == null) return;
-                  if (!mounted) return;
-                  setState(() {
-                    _pendingKnocks.removeWhere((k) => k.id == id);
-                    _pendingKnockTags
-                      ..clear()
-                      ..addAll(_pendingKnocks.map((k) => k.targetTag));
-                  });
-                } catch (_) {}
-              },
-            )
-            ..subscribe();
+      _ownerAccessChannel = SupabaseProvider.client
+          .channel('house-access-owner-${user.id}')
+        ..on(
+          RealtimeListenTypes.postgresChanges,
+          insertFilter,
+          (payload, [ref]) {
+            try {
+              final Map? record =
+                  payload is Map ? payload['new'] as Map? : null;
+              if (record == null) return;
+              final String? tag = record['target_house_tag']?.toString();
+              final dynamic granted = record['granted_at'];
+              if (tag == null || tag.isEmpty) return;
+              if (!_ownedHinooIds.contains(tag)) return;
+              if (granted != null) return; // only pending knocks
+              // Append pending knock and show toast (debounced)
+              if (!mounted) return;
+              final added = _campanelliController.addPendingKnockRow(record);
+              if (!added) return;
+              setState(() {});
+              final now = DateTime.now();
+              if (_lastKnockToastAt == null ||
+                  now.difference(_lastKnockToastAt!) >
+                      const Duration(seconds: 3)) {
+                _lastKnockToastAt = now;
+                showHonooToast(context,
+                    message: 'Qualcuno ha bussato alla tua casa');
+              }
+            } catch (_) {}
+          },
+        )
+        ..on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(
+            event: 'DELETE',
+            schema: 'public',
+            table: 'house_access',
+          ),
+          (payload, [ref]) {
+            // keep local list in sync if deletions happen
+            try {
+              final Map? oldRec =
+                  payload is Map ? payload['old'] as Map? : null;
+              if (oldRec == null) return;
+              final String? id = oldRec['id']?.toString();
+              if (id == null) return;
+              if (!mounted) return;
+              _campanelliController.removePendingKnock(id);
+              setState(() {});
+            } catch (_) {}
+          },
+        )
+        ..subscribe();
     } catch (_) {
       // In test or when Realtime not available, safely ignore
     }
@@ -984,47 +966,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
   }
 
   Future<void> _checkPendingKnocks(List<String> hinooIds) async {
-    if (hinooIds.isEmpty) return;
     try {
-      final rows = await _campanelliRepository.fetchPendingKnockRows(hinooIds);
-      if (rows.isEmpty) {
-        if (!mounted) return;
-        setState(() {
-          _pendingKnocks.clear();
-          _pendingKnockTags.clear();
-        });
-        return;
-      }
-      final List<_PendingKnock> knocks = [];
-      for (final row in rows.whereType<Map>()) {
-        final String id = row['id']?.toString() ?? '';
-        final String tag = row['target_house_tag']?.toString() ?? '';
-        if (id.isEmpty || tag.isEmpty) continue;
-        final String? raw = row['created_at']?.toString();
-        final DateTime createdAt =
-            raw == null || raw.isEmpty ? DateTime.now() : DateTime.parse(raw);
-        final String? hinooId = row['hinoo_id']?.toString();
-        final String? honooId = row['honoo_id']?.toString();
-        knocks.add(
-          _PendingKnock(
-            id: id,
-            targetTag: tag,
-            createdAt: createdAt,
-            hinooId: hinooId,
-            honooId: honooId,
-          ),
-        );
-      }
-
+      await _campanelliController.loadPendingKnocks(hinooIds);
       if (!mounted) return;
-      setState(() {
-        _pendingKnocks
-          ..clear()
-          ..addAll(knocks);
-        _pendingKnockTags
-          ..clear()
-          ..addAll(knocks.map((k) => k.targetTag));
-      });
+      setState(() {});
     } catch (_) {}
   }
 
@@ -1084,7 +1029,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
   }
 
   Future<void> _approvePendingKnock(
-    _PendingKnock knock,
+    PendingKnock knock,
     _CampanelloEntry entry, {
     HinooDraft? draft,
     Honoo? honoo,
@@ -1125,12 +1070,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
     }
 
     if (!mounted) return;
-    setState(() {
-      _pendingKnocks.removeWhere((item) => item.id == knock.id);
-      _pendingKnockTags
-        ..clear()
-        ..addAll(_pendingKnocks.map((item) => item.targetTag));
-    });
+    _campanelliController.removePendingKnock(knock.id);
+    setState(() {});
     showHonooToast(context, message: 'Casa aperta.');
     // Light haptic on owner approval as further confirmation
     try {
@@ -1138,7 +1079,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
     } catch (_) {}
   }
 
-  Future<void> _openPendingKnock(_PendingKnock knock) async {
+  Future<void> _openPendingKnock(PendingKnock knock) async {
     final entry = _entryForTag(knock.targetTag);
     if (entry == null) return;
     if (knock.hinooId == null && knock.honooId == null) {
@@ -1266,7 +1207,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
   Future<void> _openPendingKnocksDialog() async {
     if (_pendingKnocks.isEmpty) return;
-    final List<_PendingKnock> sorted = List<_PendingKnock>.from(_pendingKnocks)
+    final List<PendingKnock> sorted = List<PendingKnock>.from(_pendingKnocks)
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     await showDialog<void>(
       context: context,
@@ -1996,22 +1937,6 @@ class _PendingHonooPage extends StatelessWidget {
       ),
     );
   }
-}
-
-class _PendingKnock {
-  final String id;
-  final String targetTag;
-  final DateTime createdAt;
-  final String? hinooId;
-  final String? honooId;
-
-  const _PendingKnock({
-    required this.id,
-    required this.targetTag,
-    required this.createdAt,
-    this.hinooId,
-    this.honooId,
-  });
 }
 
 enum _KnockMessageChoice { none, honoo, hinoo }
