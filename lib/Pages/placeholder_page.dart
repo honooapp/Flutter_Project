@@ -505,6 +505,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
 
     // Questo è il corpo della pagina
     final Widget pageBody = Scaffold(
+      key: const Key('public_landing_screen_root'),
       backgroundColor: Colors.transparent,
       body: Row(
         children: [

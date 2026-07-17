@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export PATH="/Users/andreea/StudioProjects/development/flutter_honoo/bin:$PATH"
-export SUPABASE_URL="https://lnuzzrlkcbhxuzxyekbp.supabase.co"
-export SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxudXp6cmxrY2JoeHV6eHlla2JwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4NDk5MDAsImV4cCI6MjA3NTQyNTkwMH0.702f03BMEJTyUfM6O4P-zFpAezQ8Nq0bqaD_KWuWphI"
-export TEST_EMAIL="honoo-ci@example.com"
-export TEST_PASSWORD="a-tua-password"
-export TEST_IMAGE_URL="https://lnuzzrlkcbhxuzxyekbp.supabase.co/storage/v1/object/public/test-assets/sample.png"
+: "${SUPABASE_URL:?Set SUPABASE_URL first}"
+: "${SUPABASE_ANON_KEY:?Set SUPABASE_ANON_KEY first}"
+: "${TEST_EMAIL:?Set TEST_EMAIL first}"
+: "${TEST_PASSWORD:?Set TEST_PASSWORD first}"
+: "${TEST_IMAGE_URL:?Set TEST_IMAGE_URL first}"
 
-flutter test \
+fvm flutter test \
   --concurrency=1 \
   --reporter=expanded \
   --dart-define=SUPABASE_URL="$SUPABASE_URL" \

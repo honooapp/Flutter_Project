@@ -3,21 +3,21 @@ set -euo pipefail
 
 echo "== Honoo local checks: inviti casa + messaggi =="
 
-if ! command -v flutter >/dev/null 2>&1; then
-  echo "Flutter non trovato nel PATH." >&2
+if ! command -v fvm >/dev/null 2>&1; then
+  echo "FVM non trovato nel PATH." >&2
   exit 1
 fi
 
-echo "Flutter: $(flutter --version | head -n 1)"
+echo "Flutter: $(fvm flutter --version | head -n 1)"
 
 echo "\n[1/4] flutter analyze"
-flutter analyze
+fvm flutter analyze
 
 echo "\n[2/4] flutter test (opzionale)"
 if [ "${SKIP_TESTS:-0}" = "1" ]; then
   echo "SKIP_TESTS=1 -> test saltati"
 else
-  flutter test
+  fvm flutter test
 fi
 
 echo "\n[3/4] Verifica migrazioni Supabase"

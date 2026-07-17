@@ -7,9 +7,7 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('smoke: app shows first frame', (tester) async {
-    try {
-      app.main();
-    } catch (_) {}
+    await app.main();
     await tester.pumpAndSettle(const Duration(seconds: 12));
     expect(find.byType(MaterialApp), findsWidgets);
   });

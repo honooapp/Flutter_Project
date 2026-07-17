@@ -6,6 +6,14 @@ class LiveConfig {
   static const email = String.fromEnvironment('HONOO_LIVE_EMAIL');
   static const pass = String.fromEnvironment('HONOO_LIVE_PASSWORD');
   static const testImageUrl = String.fromEnvironment('HONOO_TEST_IMAGE_URL');
+  static const userAEmail =
+      String.fromEnvironment('HONOO_TEST_USER_A_EMAIL');
+  static const userAPassword =
+      String.fromEnvironment('HONOO_TEST_USER_A_PASSWORD');
+  static const userBEmail =
+      String.fromEnvironment('HONOO_TEST_USER_B_EMAIL');
+  static const userBPassword =
+      String.fromEnvironment('HONOO_TEST_USER_B_PASSWORD');
 
   static bool get isValid =>
       supaUrl.isNotEmpty &&
@@ -13,4 +21,12 @@ class LiveConfig {
       email.isNotEmpty &&
       pass.isNotEmpty &&
       testImageUrl.isNotEmpty;
+
+  static bool get hasConversationUsers =>
+      supaUrl.isNotEmpty &&
+      supaAnon.isNotEmpty &&
+      userAEmail.isNotEmpty &&
+      userAPassword.isNotEmpty &&
+      userBEmail.isNotEmpty &&
+      userBPassword.isNotEmpty;
 }
