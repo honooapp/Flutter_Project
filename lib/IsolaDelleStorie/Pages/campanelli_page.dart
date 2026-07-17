@@ -23,7 +23,6 @@ import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:honoo/Widgets/busy_overlay.dart';
 import 'package:honoo/Services/admin_service.dart';
 import 'package:honoo/Services/house_invite_service.dart';
@@ -76,8 +75,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
   Set<String> get _pendingKnockTags => _campanelliController.pendingKnockTags;
   List<String> _ownedHinooIds = const [];
   Timer? _pendingKnockRefreshTimer;
-  RealtimeChannel? _ownerAccessChannel;
-  RealtimeChannel? _visitorAccessChannel;
   final Map<String, Set<_CasaShareMode>> _shareModesByCampanello = {
     campanelloSirenaId: {_CasaShareMode.honoo},
     campanelloPalombaroId: {_CasaShareMode.hinoo},
@@ -801,78 +798,26 @@ class _CampanelliPageState extends State<CampanelliPage> {
     try {
       final user = SupabaseProvider.client.auth.currentUser;
       if (user == null) return;
-      // Re-subscribe if needed
-      _ownerAccessChannel?.unsubscribe();
-      // Build filter to limit INSERT events to owned target tags
-      ChannelFilter insertFilter;
-      if (_ownedHinooIds.isNotEmpty) {
-        final list = _ownedHinooIds.join(',');
-        insertFilter = ChannelFilter(
-          event: 'INSERT',
-          schema: 'public',
-          table: 'house_access',
-          filter: 'target_house_tag=in.($list)',
-        );
-      } else {
-        insertFilter = ChannelFilter(
-          event: 'INSERT',
-          schema: 'public',
-          table: 'house_access',
-        );
-      }
-      _ownerAccessChannel = SupabaseProvider.client
-          .channel('house-access-owner-${user.id}')
-        ..on(
-          RealtimeListenTypes.postgresChanges,
-          insertFilter,
-          (payload, [ref]) {
-            try {
-              final Map? record =
-                  payload is Map ? payload['new'] as Map? : null;
-              if (record == null) return;
-              final String? tag = record['target_house_tag']?.toString();
-              final dynamic granted = record['granted_at'];
-              if (tag == null || tag.isEmpty) return;
-              if (!_ownedHinooIds.contains(tag)) return;
-              if (granted != null) return; // only pending knocks
-              // Append pending knock and show toast (debounced)
-              if (!mounted) return;
-              final added = _campanelliController.addPendingKnockRow(record);
-              if (!added) return;
-              setState(() {});
-              final now = DateTime.now();
-              if (_lastKnockToastAt == null ||
-                  now.difference(_lastKnockToastAt!) >
-                      const Duration(seconds: 3)) {
-                _lastKnockToastAt = now;
-                showHonooToast(context,
-                    message: 'Qualcuno ha bussato alla tua casa');
-              }
-            } catch (_) {}
-          },
-        )
-        ..on(
-          RealtimeListenTypes.postgresChanges,
-          ChannelFilter(
-            event: 'DELETE',
-            schema: 'public',
-            table: 'house_access',
-          ),
-          (payload, [ref]) {
-            // keep local list in sync if deletions happen
-            try {
-              final Map? oldRec =
-                  payload is Map ? payload['old'] as Map? : null;
-              if (oldRec == null) return;
-              final String? id = oldRec['id']?.toString();
-              if (id == null) return;
-              if (!mounted) return;
-              _campanelliController.removePendingKnock(id);
-              setState(() {});
-            } catch (_) {}
-          },
-        )
-        ..subscribe();
+      _campanelliController.startOwnerRealtime(
+        userId: user.id,
+        ownedHinooIds: _ownedHinooIds,
+        onPendingKnock: (_) {
+          if (!mounted) return;
+          setState(() {});
+          final now = DateTime.now();
+          if (_lastKnockToastAt == null ||
+              now.difference(_lastKnockToastAt!) > const Duration(seconds: 3)) {
+            _lastKnockToastAt = now;
+            showHonooToast(
+              context,
+              message: 'Qualcuno ha bussato alla tua casa',
+            );
+          }
+        },
+        onPendingRemoved: () {
+          if (mounted) setState(() {});
+        },
+      );
     } catch (_) {
       // In test or when Realtime not available, safely ignore
     }
@@ -882,43 +827,22 @@ class _CampanelliPageState extends State<CampanelliPage> {
     try {
       final user = SupabaseProvider.client.auth.currentUser;
       if (user == null) return;
-      _visitorAccessChannel?.unsubscribe();
-      _visitorAccessChannel = SupabaseProvider.client
-          .channel('house-access-visitor-${user.id}')
-        ..on(
-          RealtimeListenTypes.postgresChanges,
-          ChannelFilter(
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'house_access',
-            filter: 'visitor_id=eq.${user.id}',
-          ),
-          (payload, [ref]) async {
-            try {
-              final Map? record =
-                  payload is Map ? payload['new'] as Map? : null;
-              if (record == null) return;
-              final dynamic granted = record['granted_at'];
-              if (granted == null) return;
-              final String? tag = record['target_house_tag']?.toString();
-              if (tag == null || tag.isEmpty) return;
-              if (!mounted) return;
-              showHonooToast(context, message: 'La casa è stata aperta');
-              // Light haptic feedback on house open
-              try {
-                HapticFeedback.lightImpact();
-              } catch (_) {}
-              await _goToCampanelloByTag(tag);
-              await _hintCampanelloBounce();
-              // unlock the specific campanello for this session
-              final entry = _entryForTag(tag);
-              if (entry != null && mounted) {
-                setState(() => _unlockedCampanelli.add(entry.campanello.id));
-              }
-            } catch (_) {}
-          },
-        )
-        ..subscribe();
+      _campanelliController.startVisitorRealtime(
+        userId: user.id,
+        onAccessGranted: (tag) async {
+          if (!mounted) return;
+          showHonooToast(context, message: 'La casa è stata aperta');
+          try {
+            HapticFeedback.lightImpact();
+          } catch (_) {}
+          await _goToCampanelloByTag(tag);
+          await _hintCampanelloBounce();
+          final entry = _entryForTag(tag);
+          if (entry != null && mounted) {
+            setState(() => _unlockedCampanelli.add(entry.campanello.id));
+          }
+        },
+      );
     } catch (_) {
       // In test or when Realtime not available, safely ignore
     }
@@ -1298,8 +1222,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
   @override
   void dispose() {
     _pendingKnockRefreshTimer?.cancel();
-    _ownerAccessChannel?.unsubscribe();
-    _visitorAccessChannel?.unsubscribe();
     _pageController.dispose();
     _campanelloPageController.dispose();
     _campanelliController.dispose();

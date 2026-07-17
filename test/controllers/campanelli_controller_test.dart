@@ -1,10 +1,47 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Controller/campanelli_controller.dart';
 import 'package:honoo/Services/campanelli_repository.dart';
+import 'package:honoo/Services/campanelli_realtime_service.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _MockCampanelliRepository extends Mock
     implements CampanelliDataRepository {}
+
+class _FakeSubscription implements CampanelliRealtimeSubscription {
+  bool closed = false;
+
+  @override
+  void close() => closed = true;
+}
+
+class _FakeRealtimeGateway implements CampanelliRealtimeGateway {
+  final ownerSubscription = _FakeSubscription();
+  final visitorSubscription = _FakeSubscription();
+  void Function(Map<String, dynamic>)? onPendingInsert;
+  void Function(String)? onDelete;
+  void Function(String)? onAccessGranted;
+
+  @override
+  CampanelliRealtimeSubscription subscribeOwner({
+    required String userId,
+    required List<String> ownedHinooIds,
+    required void Function(Map<String, dynamic> row) onPendingInsert,
+    required void Function(String id) onDelete,
+  }) {
+    this.onPendingInsert = onPendingInsert;
+    this.onDelete = onDelete;
+    return ownerSubscription;
+  }
+
+  @override
+  CampanelliRealtimeSubscription subscribeVisitor({
+    required String userId,
+    required void Function(String targetTag) onAccessGranted,
+  }) {
+    this.onAccessGranted = onAccessGranted;
+    return visitorSubscription;
+  }
+}
 
 void main() {
   late _MockCampanelliRepository repository;
@@ -133,5 +170,43 @@ void main() {
     controller.removePendingKnock('knock-1');
     expect(controller.state.pendingKnocks, isEmpty);
     expect(controller.pendingKnockTags, isEmpty);
+  });
+
+  test('inoltra eventi Realtime e chiude le sottoscrizioni', () {
+    final realtime = _FakeRealtimeGateway();
+    final realtimeController = CampanelliController(
+      repository: repository,
+      realtimeGateway: realtime,
+    );
+    var insertEvents = 0;
+    var deleteEvents = 0;
+    String? grantedTag;
+
+    realtimeController.startOwnerRealtime(
+      userId: 'user-1',
+      ownedHinooIds: const ['hinoo-1'],
+      onPendingKnock: (_) => insertEvents++,
+      onPendingRemoved: () => deleteEvents++,
+    );
+    realtimeController.startVisitorRealtime(
+      userId: 'user-1',
+      onAccessGranted: (tag) => grantedTag = tag,
+    );
+    realtime.onPendingInsert!(const {
+      'id': 'knock-1',
+      'target_house_tag': 'hinoo-1',
+      'created_at': '2026-07-17T12:00:00Z',
+    });
+    realtime.onDelete!('knock-1');
+    realtime.onAccessGranted!('hinoo-1');
+
+    expect(insertEvents, 1);
+    expect(deleteEvents, 1);
+    expect(grantedTag, 'hinoo-1');
+    expect(realtimeController.state.pendingKnocks, isEmpty);
+
+    realtimeController.dispose();
+    expect(realtime.ownerSubscription.closed, isTrue);
+    expect(realtime.visitorSubscription.closed, isTrue);
   });
 }

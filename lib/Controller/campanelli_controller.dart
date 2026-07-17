@@ -4,6 +4,7 @@ import '../Entities/campanelli_entry.dart';
 import '../Entities/hinoo.dart';
 import '../Entities/pending_knock.dart';
 import '../Services/campanelli_repository.dart';
+import '../Services/campanelli_realtime_service.dart';
 
 @immutable
 class CampanelliLoadState {
@@ -44,10 +45,20 @@ class CampanelliLoadState {
 }
 
 class CampanelliController extends ChangeNotifier {
-  CampanelliController({CampanelliDataRepository? repository})
-      : _repository = repository ?? CampanelliDataRepository();
+  CampanelliController({
+    CampanelliDataRepository? repository,
+    CampanelliRealtimeGateway? realtimeGateway,
+  })  : _repository = repository ?? CampanelliDataRepository(),
+        _configuredRealtimeGateway = realtimeGateway;
 
   final CampanelliDataRepository _repository;
+  final CampanelliRealtimeGateway? _configuredRealtimeGateway;
+  CampanelliRealtimeGateway? _defaultRealtimeGateway;
+  CampanelliRealtimeGateway get _realtimeGateway =>
+      _configuredRealtimeGateway ??
+      (_defaultRealtimeGateway ??= SupabaseCampanelliRealtimeGateway());
+  CampanelliRealtimeSubscription? _ownerSubscription;
+  CampanelliRealtimeSubscription? _visitorSubscription;
   CampanelliLoadState _state = const CampanelliLoadState();
 
   CampanelliLoadState get state => _state;
@@ -151,6 +162,53 @@ class CampanelliController extends ChangeNotifier {
         _state.pendingKnocks.map((knock) => knock.targetTag),
       );
 
+  void startOwnerRealtime({
+    required String userId,
+    required List<String> ownedHinooIds,
+    required void Function(PendingKnock knock) onPendingKnock,
+    required void Function() onPendingRemoved,
+  }) {
+    _ownerSubscription?.close();
+    _ownerSubscription = _realtimeGateway.subscribeOwner(
+      userId: userId,
+      ownedHinooIds: ownedHinooIds,
+      onPendingInsert: (row) {
+        if (!addPendingKnockRow(row)) return;
+        final id = row['id']?.toString() ?? '';
+        PendingKnock? knock;
+        for (final item in _state.pendingKnocks) {
+          if (item.id == id) {
+            knock = item;
+            break;
+          }
+        }
+        if (knock != null) onPendingKnock(knock);
+      },
+      onDelete: (id) {
+        removePendingKnock(id);
+        onPendingRemoved();
+      },
+    );
+  }
+
+  void startVisitorRealtime({
+    required String userId,
+    required void Function(String targetTag) onAccessGranted,
+  }) {
+    _visitorSubscription?.close();
+    _visitorSubscription = _realtimeGateway.subscribeVisitor(
+      userId: userId,
+      onAccessGranted: onAccessGranted,
+    );
+  }
+
+  void stopRealtime() {
+    _ownerSubscription?.close();
+    _visitorSubscription?.close();
+    _ownerSubscription = null;
+    _visitorSubscription = null;
+  }
+
   PendingKnock? _pendingKnockFromRow(Map<dynamic, dynamic> row) {
     final id = row['id']?.toString() ?? '';
     final targetTag = row['target_house_tag']?.toString() ?? '';
@@ -185,5 +243,11 @@ class CampanelliController extends ChangeNotifier {
   void _publish(CampanelliLoadState value) {
     _state = value;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    stopRealtime();
+    super.dispose();
   }
 }
