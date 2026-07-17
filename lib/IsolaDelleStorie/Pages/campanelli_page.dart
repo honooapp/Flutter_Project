@@ -164,7 +164,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
   Future<void> _handleKnock(CampanelloData campanello) async {
     if (_isKnocking) return;
     // Light haptic feedback on knock intent
-    try { HapticFeedback.lightImpact(); } catch (_) {}
+    try {
+      HapticFeedback.lightImpact();
+    } catch (_) {}
     if (_isCampanelloUnlocked(campanello.id)) {
       await _showEnterDialog(campanello.id);
       return;
@@ -214,13 +216,15 @@ class _CampanelliPageState extends State<CampanelliPage> {
         );
         _hideBusyOverlay();
         if (mounted) {
-          showHonooToast(context, message: 'Bussata inviata. Attendi risposta.');
+          showHonooToast(context,
+              message: 'Bussata inviata. Attendi risposta.');
         }
       } catch (e) {
         debugPrint('house_access insert error: $e');
         _hideBusyOverlay();
         if (mounted) {
-          showHonooToast(context, message: 'Invio non riuscito. Ritenta tra poco.');
+          showHonooToast(context,
+              message: 'Invio non riuscito. Ritenta tra poco.');
         }
       }
     } finally {
@@ -274,7 +278,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
     final double target = (start + bump)
         .clamp(position.minScrollExtent, position.maxScrollExtent);
 
-    await _pageController.animateTo(target, duration: _kAnimFast, curve: _kCurve);
+    await _pageController.animateTo(target,
+        duration: _kAnimFast, curve: _kCurve);
     await _pageController.animateTo(start, duration: _kAnimMed, curve: _kCurve);
   }
 
@@ -335,8 +340,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
       ),
     );
   }
-
-  
 
   Future<void> _saveShareModes(
     CampanelloData campanello,
@@ -467,127 +470,64 @@ class _CampanelliPageState extends State<CampanelliPage> {
       final user = SupabaseProvider.client.auth.currentUser;
       if (user == null) {
         if (!mounted) return;
-        showHonooToast(context, message: 'Accedi prima per richiedere una casa.');
+        showHonooToast(context,
+            message: 'Accedi prima per richiedere una casa.');
         return;
       }
 
-    final String email = user.email ?? '';
-    final admin = AdminService();
-    final bool isAdmin = await admin.isCurrentUserAdmin();
+      final String email = user.email ?? '';
+      final admin = AdminService();
+      final bool isAdmin = await admin.isCurrentUserAdmin();
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    if (!isAdmin) {
-      // Utente normale: prova a registrare la richiesta su house_invites (se consentito da RLS)
-      try {
-        final payload = <String, dynamic>{
-          'user_id': user.id,
-          if (email.isNotEmpty) 'email': email,
-          'status': 'pending',
-          'created_at': DateTime.now().toIso8601String(),
-        };
-        await SupabaseProvider.client.from('house_invites').insert(payload);
-        _hasPendingOrAcceptedInvite = true;
-      } catch (_) {
-        // ignora: in ambienti dove RLS non consente l'insert, continua con solo feedback
-      }
+      if (!isAdmin) {
+        // Utente normale: prova a registrare la richiesta su house_invites (se consentito da RLS)
+        try {
+          final payload = <String, dynamic>{
+            'user_id': user.id,
+            if (email.isNotEmpty) 'email': email,
+            'status': 'pending',
+            'created_at': DateTime.now().toIso8601String(),
+          };
+          await SupabaseProvider.client.from('house_invites').insert(payload);
+          _hasPendingOrAcceptedInvite = true;
+        } catch (_) {
+          // ignora: in ambienti dove RLS non consente l'insert, continua con solo feedback
+        }
 
-      // Feedback locale
-      if (!mounted) {
-        _requestBusy = false;
-        return;
-      }
-      await showDialog<void>(
-        context: context,
-        barrierDismissible: true,
-        builder: (_) => HonooDialogShell(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Richiesta inviata',
-                  style: HonooDialogStyles.title(),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  email.isNotEmpty
-                      ? '$email ha richiesto una casa sull\'Isola.'
-                      : 'Hai richiesto una casa sull\'Isola.',
-                  style: HonooDialogStyles.body(),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      'OK',
-                      style: GoogleFonts.libreFranklin(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-      return;
-    }
-
-    // Admin: mostra dialogo con Non ora / Invita
-    final bool? invite = await showDialog<bool>(
-      context: context,
-      barrierDismissible: true,
-      builder: (_) => HonooDialogShell(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Richiesta ricevuta',
-                style: HonooDialogStyles.title(),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                email.isNotEmpty
-                    ? '$email ha richiesto una casa sull\'Isola.'
-                    : 'Un utente ha richiesto una casa sull\'Isola.',
-                style: HonooDialogStyles.body(),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
-              Row(
+        // Feedback locale
+        if (!mounted) {
+          _requestBusy = false;
+          return;
+        }
+        await showDialog<void>(
+          context: context,
+          barrierDismissible: true,
+          builder: (_) => HonooDialogShell(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child: Text(
-                        'Non ora',
-                        style: HonooDialogStyles.secondaryAction(),
-                      ),
-                    ),
+                  Text(
+                    'Richiesta inviata',
+                    style: HonooDialogStyles.title(),
+                    textAlign: TextAlign.center,
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
+                  const SizedBox(height: 12),
+                  Text(
+                    email.isNotEmpty
+                        ? '$email ha richiesto una casa sull\'Isola.'
+                        : 'Hai richiesto una casa sull\'Isola.',
+                    style: HonooDialogStyles.body(),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(true),
+                      onPressed: () => Navigator.of(context).pop(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.black,
@@ -598,7 +538,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
                         elevation: 0,
                       ),
                       child: Text(
-                        'Invita',
+                        'OK',
                         style: GoogleFonts.libreFranklin(
                           fontWeight: FontWeight.w700,
                         ),
@@ -607,31 +547,97 @@ class _CampanelliPageState extends State<CampanelliPage> {
                   ),
                 ],
               ),
-            ],
+            ),
+          ),
+        );
+        return;
+      }
+
+      // Admin: mostra dialogo con Non ora / Invita
+      final bool? invite = await showDialog<bool>(
+        context: context,
+        barrierDismissible: true,
+        builder: (_) => HonooDialogShell(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Richiesta ricevuta',
+                  style: HonooDialogStyles.title(),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  email.isNotEmpty
+                      ? '$email ha richiesto una casa sull\'Isola.'
+                      : 'Un utente ha richiesto una casa sull\'Isola.',
+                  style: HonooDialogStyles.body(),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: Text(
+                          'Non ora',
+                          style: HonooDialogStyles.secondaryAction(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Invita',
+                          style: GoogleFonts.libreFranklin(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
 
-    if (invite == true) {
-      if (!mounted) return;
-      try {
-        final adminUid = user.id;
-        if (email.isEmpty) {
-          showHonooToast(context, message: 'Email utente non disponibile.');
-          return;
+      if (invite == true) {
+        if (!mounted) return;
+        try {
+          final adminUid = user.id;
+          if (email.isEmpty) {
+            showHonooToast(context, message: 'Email utente non disponibile.');
+            return;
+          }
+          final ok =
+              await admin.inviteByEmailOnly(adminUid: adminUid, email: email);
+          if (!mounted) return;
+          showHonooToast(
+            context,
+            message:
+                ok ? 'Invito inviato.' : 'Invito già presente o non inviabile.',
+          );
+        } catch (e) {
+          if (!mounted) return;
+          showHonooToast(context, message: 'Errore invito: $e');
         }
-        final ok = await admin.inviteByEmailOnly(adminUid: adminUid, email: email);
-        if (!mounted) return;
-        showHonooToast(
-          context,
-          message: ok ? 'Invito inviato.' : 'Invito già presente o non inviabile.',
-        );
-      } catch (e) {
-        if (!mounted) return;
-        showHonooToast(context, message: 'Errore invito: $e');
       }
-    }
     } finally {
       _requestBusy = false;
     }
@@ -785,8 +791,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
             ),
             casa: CasaData(
               id: casaId,
-              backgroundImage:
-                  _houseBackgroundProvider(houseImageUrl, slide.backgroundImage),
+              backgroundImage: _houseBackgroundProvider(
+                  houseImageUrl, slide.backgroundImage),
               bgTransform: bgTransform,
               bgScale: slide.bgScale,
               bgOffsetX: slide.bgOffsetX,
@@ -810,7 +816,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
       }
       // Verifica inviti pendenti/accettati per nascondere CTA se già invitato
       try {
-        final hasInvite = await HouseInviteService().hasPendingOrAcceptedInvite(user.id);
+        final hasInvite =
+            await HouseInviteService().hasPendingOrAcceptedInvite(user.id);
         if (mounted) setState(() => _hasPendingOrAcceptedInvite = hasInvite);
       } catch (_) {}
       _subscribeOwnerAccessChannel();
@@ -855,73 +862,79 @@ class _CampanelliPageState extends State<CampanelliPage> {
           table: 'house_access',
         );
       }
-      _ownerAccessChannel = SupabaseProvider.client.channel('house-access-owner-${user.id}')
-        ..on(
-          RealtimeListenTypes.postgresChanges,
-          insertFilter,
-          (payload, [ref]) {
-            try {
-              final Map? record = payload is Map ? payload['new'] as Map? : null;
-              if (record == null) return;
-              final String? tag = record['target_house_tag']?.toString();
-              final dynamic granted = record['granted_at'];
-              if (tag == null || tag.isEmpty) return;
-              if (!_ownedHinooIds.contains(tag)) return;
-              if (granted != null) return; // only pending knocks
-              // Append pending knock and show toast (debounced)
-              final String id = record['id']?.toString() ?? '';
-              final String? raw = record['created_at']?.toString();
-              final DateTime createdAt =
-                  raw == null || raw.isEmpty ? DateTime.now() : DateTime.parse(raw);
-              final String? hinooId = record['hinoo_id']?.toString();
-              final String? honooId = record['honoo_id']?.toString();
-              if (!mounted) return;
-              setState(() {
-                _pendingKnocks.add(
-                  _PendingKnock(
-                    id: id,
-                    targetTag: tag,
-                    createdAt: createdAt,
-                    hinooId: hinooId,
-                    honooId: honooId,
-                  ),
-                );
-                _pendingKnockTags.add(tag);
-              });
-              final now = DateTime.now();
-              if (_lastKnockToastAt == null ||
-                  now.difference(_lastKnockToastAt!) > const Duration(seconds: 3)) {
-                _lastKnockToastAt = now;
-                showHonooToast(context, message: 'Qualcuno ha bussato alla tua casa');
-              }
-            } catch (_) {}
-          },
-        )
-        ..on(
-          RealtimeListenTypes.postgresChanges,
-          ChannelFilter(
-            event: 'DELETE',
-            schema: 'public',
-            table: 'house_access',
-          ),
-          (payload, [ref]) {
-            // keep local list in sync if deletions happen
-            try {
-              final Map? oldRec = payload is Map ? payload['old'] as Map? : null;
-              if (oldRec == null) return;
-              final String? id = oldRec['id']?.toString();
-              if (id == null) return;
-              if (!mounted) return;
-              setState(() {
-                _pendingKnocks.removeWhere((k) => k.id == id);
-                _pendingKnockTags
-                  ..clear()
-                  ..addAll(_pendingKnocks.map((k) => k.targetTag));
-              });
-            } catch (_) {}
-          },
-        )
-        ..subscribe();
+      _ownerAccessChannel =
+          SupabaseProvider.client.channel('house-access-owner-${user.id}')
+            ..on(
+              RealtimeListenTypes.postgresChanges,
+              insertFilter,
+              (payload, [ref]) {
+                try {
+                  final Map? record =
+                      payload is Map ? payload['new'] as Map? : null;
+                  if (record == null) return;
+                  final String? tag = record['target_house_tag']?.toString();
+                  final dynamic granted = record['granted_at'];
+                  if (tag == null || tag.isEmpty) return;
+                  if (!_ownedHinooIds.contains(tag)) return;
+                  if (granted != null) return; // only pending knocks
+                  // Append pending knock and show toast (debounced)
+                  final String id = record['id']?.toString() ?? '';
+                  final String? raw = record['created_at']?.toString();
+                  final DateTime createdAt = raw == null || raw.isEmpty
+                      ? DateTime.now()
+                      : DateTime.parse(raw);
+                  final String? hinooId = record['hinoo_id']?.toString();
+                  final String? honooId = record['honoo_id']?.toString();
+                  if (!mounted) return;
+                  setState(() {
+                    _pendingKnocks.add(
+                      _PendingKnock(
+                        id: id,
+                        targetTag: tag,
+                        createdAt: createdAt,
+                        hinooId: hinooId,
+                        honooId: honooId,
+                      ),
+                    );
+                    _pendingKnockTags.add(tag);
+                  });
+                  final now = DateTime.now();
+                  if (_lastKnockToastAt == null ||
+                      now.difference(_lastKnockToastAt!) >
+                          const Duration(seconds: 3)) {
+                    _lastKnockToastAt = now;
+                    showHonooToast(context,
+                        message: 'Qualcuno ha bussato alla tua casa');
+                  }
+                } catch (_) {}
+              },
+            )
+            ..on(
+              RealtimeListenTypes.postgresChanges,
+              ChannelFilter(
+                event: 'DELETE',
+                schema: 'public',
+                table: 'house_access',
+              ),
+              (payload, [ref]) {
+                // keep local list in sync if deletions happen
+                try {
+                  final Map? oldRec =
+                      payload is Map ? payload['old'] as Map? : null;
+                  if (oldRec == null) return;
+                  final String? id = oldRec['id']?.toString();
+                  if (id == null) return;
+                  if (!mounted) return;
+                  setState(() {
+                    _pendingKnocks.removeWhere((k) => k.id == id);
+                    _pendingKnockTags
+                      ..clear()
+                      ..addAll(_pendingKnocks.map((k) => k.targetTag));
+                  });
+                } catch (_) {}
+              },
+            )
+            ..subscribe();
     } catch (_) {
       // In test or when Realtime not available, safely ignore
     }
@@ -932,7 +945,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
       final user = SupabaseProvider.client.auth.currentUser;
       if (user == null) return;
       _visitorAccessChannel?.unsubscribe();
-      _visitorAccessChannel = SupabaseProvider.client.channel('house-access-visitor-${user.id}')
+      _visitorAccessChannel = SupabaseProvider.client
+          .channel('house-access-visitor-${user.id}')
         ..on(
           RealtimeListenTypes.postgresChanges,
           ChannelFilter(
@@ -943,7 +957,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
           ),
           (payload, [ref]) async {
             try {
-              final Map? record = payload is Map ? payload['new'] as Map? : null;
+              final Map? record =
+                  payload is Map ? payload['new'] as Map? : null;
               if (record == null) return;
               final dynamic granted = record['granted_at'];
               if (granted == null) return;
@@ -952,7 +967,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
               if (!mounted) return;
               showHonooToast(context, message: 'La casa è stata aperta');
               // Light haptic feedback on house open
-              try { HapticFeedback.lightImpact(); } catch (_) {}
+              try {
+                HapticFeedback.lightImpact();
+              } catch (_) {}
               await _goToCampanelloByTag(tag);
               await _hintCampanelloBounce();
               // unlock the specific campanello for this session
@@ -1160,7 +1177,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
     });
     showHonooToast(context, message: 'Casa aperta.');
     // Light haptic on owner approval as further confirmation
-    try { HapticFeedback.lightImpact(); } catch (_) {}
+    try {
+      HapticFeedback.lightImpact();
+    } catch (_) {}
   }
 
   Future<void> _openPendingKnock(_PendingKnock knock) async {
@@ -1237,8 +1256,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -1259,8 +1278,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -1351,8 +1370,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                     },
                                     child: Text(
                                       _formatPendingTimestamp(knock.createdAt),
-                                      style:
-                                          HonooDialogStyles.tertiaryAction(),
+                                      style: HonooDialogStyles.tertiaryAction(),
                                       textAlign: TextAlign.center,
                                     ),
                                   ),
@@ -1400,13 +1418,15 @@ class _CampanelliPageState extends State<CampanelliPage> {
           final double maxHeight = constraints.maxHeight;
           final ResponsiveLayoutMode layoutMode =
               ResponsiveLayout.modeForWidth(maxWidth);
-          final double targetMaxWidth = layoutMode == ResponsiveLayoutMode.mobile
-              ? maxWidth
-              : ResponsiveLayout.contentMaxWidth(maxWidth);
+          final double targetMaxWidth =
+              layoutMode == ResponsiveLayoutMode.mobile
+                  ? maxWidth
+                  : ResponsiveLayout.contentMaxWidth(maxWidth);
 
           final double footerIconSize =
               ResponsiveLayout.footerIconSizeForMode(layoutMode);
-          final double footerGap = ResponsiveLayout.footerGapForMode(layoutMode);
+          final double footerGap =
+              ResponsiveLayout.footerGapForMode(layoutMode);
           final bool isMobile = layoutMode == ResponsiveLayoutMode.mobile;
           final double footerBottomPadding =
               ResponsiveLayout.footerBottomPaddingForMode(layoutMode) +
@@ -1414,14 +1434,12 @@ class _CampanelliPageState extends State<CampanelliPage> {
           final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
           final double footerSpacing = footerBottomPadding + safeBottom;
           final double footerTopSpacing = footerSpacing / 2;
-          final double footerBottomSpacing =
-              footerSpacing - footerTopSpacing;
+          final double footerBottomSpacing = footerSpacing - footerTopSpacing;
 
           final double footerReserved =
               footerIconSize + footerTopSpacing + footerBottomSpacing;
           final double availableHeight =
-              (maxHeight - footerReserved)
-                  .clamp(0.0, double.infinity);
+              (maxHeight - footerReserved).clamp(0.0, double.infinity);
           final double scrignoSize = math.min(
             footerIconSize * 4,
             math.min(maxWidth, availableHeight),
@@ -1445,9 +1463,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
               (houseCampanelloIndex - 1).clamp(0, campanelli.length - 1);
           final bool showCampanello = safeCampanelloIndex > 0;
           final bool showFooter = _verticalPageIndex == 0;
-          final CampanelloData? activeCampanello = showCampanello
-              ? campanelli[casaIndex].campanello
-              : null;
+          final CampanelloData? activeCampanello =
+              showCampanello ? campanelli[casaIndex].campanello : null;
           final user = SupabaseProvider.client.auth.currentUser;
           final String? activeCampanelloId =
               activeCampanello?.campanelloHinooId;
@@ -1464,8 +1481,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
           final bool isOwnCampanello = activeCampanello != null &&
               user != null &&
               activeCampanello.ownerId == user.id;
-          final ScrollPhysics pagePhysics = const PageScrollPhysics()
-              .applyTo(const BouncingScrollPhysics());
+          final ScrollPhysics pagePhysics =
+              const PageScrollPhysics().applyTo(const BouncingScrollPhysics());
           const int verticalPages = 2;
           final int maxCampanelloIndex =
               math.max(0, campanelloPages.length - 1);
@@ -1567,8 +1584,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                 height: canvasSize.height,
                                 child: MouseRegion(
                                   onEnter: (_) => _isHoveringCampanelli = true,
-                                  onExit: (_) =>
-                                      _isHoveringCampanelli = false,
+                                  onExit: (_) => _isHoveringCampanelli = false,
                                   child: Listener(
                                     onPointerSignal: (event) {
                                       if (event is PointerScrollEvent) {
@@ -1580,9 +1596,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                       }
                                     },
                                     child: ScrollConfiguration(
-                                      behavior:
-                                          ScrollConfiguration.of(context)
-                                              .copyWith(
+                                      behavior: ScrollConfiguration.of(context)
+                                          .copyWith(
                                         dragDevices: {
                                           PointerDeviceKind.touch,
                                           PointerDeviceKind.mouse,
@@ -1616,16 +1631,14 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                             },
                                           ),
                                         );
-                                        final bool isDesktop =
+                                        final bool isDesktop = layoutMode ==
+                                                ResponsiveLayoutMode.desktop ||
                                             layoutMode ==
-                                                    ResponsiveLayoutMode
-                                                        .desktop ||
-                                                layoutMode ==
-                                                    ResponsiveLayoutMode
-                                                        .wideDesktop ||
-                                                layoutMode ==
-                                                    ResponsiveLayoutMode
-                                                        .largeDesktop;
+                                                ResponsiveLayoutMode
+                                                    .wideDesktop ||
+                                            layoutMode ==
+                                                ResponsiveLayoutMode
+                                                    .largeDesktop;
                                         if (!isDesktop ||
                                             campanelloPages.length <= 1) {
                                           return pvViewport;
@@ -1633,8 +1646,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                         // Su desktop, allarga l'area esterna per ospitare le frecce
                                         const double arrowGutter = 160;
                                         return SizedBox(
-                                          width:
-                                              canvasSize.width + arrowGutter,
+                                          width: canvasSize.width + arrowGutter,
                                           height: canvasSize.height,
                                           child: DesktopCarouselArrows(
                                             canPrev: _campanelloIndex > 0,
@@ -1655,11 +1667,11 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                           ),
                                         );
                                       }(),
-                                      ),
                                     ),
                                   ),
                                 ),
                               ),
+                            ),
                           ),
                           casaUnlocked
                               ? AnimatedSwitcher(
@@ -1868,7 +1880,8 @@ class _PendingHinooPage extends StatelessWidget {
           final layoutMode = ResponsiveLayout.modeForWidth(viewW);
           final double footerIconSize =
               ResponsiveLayout.footerIconSizeForMode(layoutMode);
-          final double footerGap = ResponsiveLayout.footerGapForMode(layoutMode);
+          final double footerGap =
+              ResponsiveLayout.footerGapForMode(layoutMode);
           final double footerBottomPadding =
               ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
           final double footerSpacing = footerBottomPadding + safeBottom;
@@ -1955,7 +1968,8 @@ class _PendingHonooPage extends StatelessWidget {
           final layoutMode = ResponsiveLayout.modeForWidth(viewW);
           final double footerIconSize =
               ResponsiveLayout.footerIconSizeForMode(layoutMode);
-          final double footerGap = ResponsiveLayout.footerGapForMode(layoutMode);
+          final double footerGap =
+              ResponsiveLayout.footerGapForMode(layoutMode);
           final double footerBottomPadding =
               ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
           final double footerSpacing = footerBottomPadding + safeBottom;
@@ -2156,7 +2170,6 @@ class _CampanelloPageData {
     );
   }
 }
-
 
 class _CampanelloCard extends StatelessWidget {
   const _CampanelloCard({
@@ -2451,8 +2464,9 @@ class _CasaMultiShareDialogState extends State<_CasaMultiShareDialog> {
                   child: OutlinedButton(
                     onPressed: () => _toggle(mode),
                     style: OutlinedButton.styleFrom(
-                      backgroundColor:
-                          _selected.contains(mode) ? Colors.white : Colors.transparent,
+                      backgroundColor: _selected.contains(mode)
+                          ? Colors.white
+                          : Colors.transparent,
                       foregroundColor: Colors.black,
                       side: BorderSide(
                         color: _selected.contains(mode)
@@ -2570,63 +2584,63 @@ class _CasaMultiShareDialogState extends State<_CasaMultiShareDialog> {
   }
 }
 
-  Future<_CasaShareMode?> _showVisitorShareChoiceDialog(
-    BuildContext context,
-    Set<_CasaShareMode> modes,
-  ) async {
-    return showDialog<_CasaShareMode>(
-      context: context,
-      barrierDismissible: true,
-      builder: (_) => HonooDialogShell(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Cosa vuoi aprire?',
-                style: HonooDialogStyles.title(),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              ...modes.map(
-                (mode) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(mode),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 0,
+Future<_CasaShareMode?> _showVisitorShareChoiceDialog(
+  BuildContext context,
+  Set<_CasaShareMode> modes,
+) async {
+  return showDialog<_CasaShareMode>(
+    context: context,
+    barrierDismissible: true,
+    builder: (_) => HonooDialogShell(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Cosa vuoi aprire?',
+              style: HonooDialogStyles.title(),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ...modes.map(
+              (mode) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(mode),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
                       ),
-                      child: Text(
-                        mode.label,
-                        style: HonooDialogStyles.primaryAction(),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      mode.label,
+                      style: HonooDialogStyles.primaryAction(),
                     ),
                   ),
                 ),
               ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                style: TextButton.styleFrom(foregroundColor: Colors.white54),
-                child: Text(
-                  'Chiudi',
-                  style: HonooDialogStyles.tertiaryAction(),
-                ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: TextButton.styleFrom(foregroundColor: Colors.white54),
+              child: Text(
+                'Chiudi',
+                style: HonooDialogStyles.tertiaryAction(),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
