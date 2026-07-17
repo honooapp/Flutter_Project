@@ -25,7 +25,7 @@ class MockQueryChain extends Mock
 
   dynamic _nextResponse() {
     if (_responses.isEmpty) {
-      return <String, dynamic>{};
+      return <dynamic>[];
     }
     return _responses.removeFirst();
   }
@@ -99,6 +99,7 @@ class SupabaseTestHarness {
     when(() => chain.limit(any())).thenAnswer((_) => chain);
     when(() => chain.or(any())).thenAnswer((_) => chain);
     when(() => chain.in_(any(), any())).thenAnswer((_) => chain);
+    when(() => chain.is_(any(), any())).thenAnswer((_) => chain);
     when(() => chain.delete()).thenAnswer((_) => chain);
     when(() => chain.update(any())).thenAnswer((_) => chain);
     when(() => chain.maybeSingle()).thenAnswer((_) => chain);

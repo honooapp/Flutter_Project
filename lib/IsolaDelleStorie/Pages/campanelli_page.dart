@@ -25,6 +25,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:honoo/Widgets/busy_overlay.dart';
 import 'package:honoo/Services/admin_service.dart';
 import 'package:honoo/Services/house_invite_service.dart';
+import 'package:honoo/Services/house_access_service.dart';
+import 'package:honoo/Services/campanelli_repository.dart';
 
 import '../../Pages/home_page.dart';
 import '../../Pages/shared_conversations_page.dart';
@@ -41,6 +43,9 @@ class CampanelliPage extends StatefulWidget {
 }
 
 class _CampanelliPageState extends State<CampanelliPage> {
+  final HouseAccessService _houseAccessService = const HouseAccessService();
+  final CampanelliDataRepository _campanelliRepository =
+      CampanelliDataRepository();
   // Animations: centralize durations/curves to avoid magic numbers
   static const Duration _kAnimFast = Duration(milliseconds: 220);
   static const Duration _kAnimMed = Duration(milliseconds: 240);
@@ -235,12 +240,12 @@ class _CampanelliPageState extends State<CampanelliPage> {
     if (campanello.ownerId == user.id) return;
 
     try {
-      await SupabaseProvider.client.from('house_access').insert({
-        'target_house_tag': targetTag,
-        'visitor_id': user.id,
-        if (hinooId != null && hinooId.isNotEmpty) 'hinoo_id': hinooId,
-        if (honooId != null && honooId.isNotEmpty) 'honoo_id': honooId,
-      });
+      await _houseAccessService.sendKnock(
+        targetHouseTag: targetTag,
+        visitorId: user.id,
+        hinooId: hinooId,
+        honooId: honooId,
+      );
     } catch (_) {}
   }
 
@@ -346,14 +351,11 @@ class _CampanelliPageState extends State<CampanelliPage> {
     }
 
     final List<String> values = modes.map((m) => m.dbValue).toList();
-    final String? single = values.isNotEmpty ? values.first : null;
-    await SupabaseProvider.client.from('house_share_settings').upsert({
-      'owner_id': user.id,
-      'campanello_hinoo_id': campanello.campanelloHinooId,
-      'share_mode': single, // retrocompatibilità
-      'share_modes': values,
-      'updated_at': DateTime.now().toIso8601String(),
-    }, onConflict: 'campanello_hinoo_id');
+    await _houseAccessService.saveShareModes(
+      ownerId: user.id,
+      campanelloHinooId: campanello.campanelloHinooId!,
+      modes: values,
+    );
 
     if (!mounted) return;
     setState(() => _shareModesByCampanello[shareKey] = modes);
@@ -692,14 +694,12 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
     setState(() => _isLoadingUserEntries = true);
     try {
-      final rows = await SupabaseProvider.client
-          .from('case')
-          .select('campanello_hinoo_id,owner_id,house_image_url,bg_transform');
+      final rows = await _campanelliRepository.fetchHouseRows();
 
       final Map<String, String> ownerByHinooId = {};
       final Map<String, Map<String, dynamic>> casaByHinooId = {};
       final List<String> ownedHinooIds = [];
-      for (final row in (rows as List)) {
+      for (final row in rows) {
         if (row is! Map) continue;
         final String? hinooId = row['campanello_hinoo_id'] as String?;
         final String? ownerId = row['owner_id'] as String?;
@@ -725,12 +725,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
         return;
       }
 
-      final shareRows = await SupabaseProvider.client
-          .from('house_share_settings')
-          .select('campanello_hinoo_id,share_mode,share_modes')
-          .in_('campanello_hinoo_id', hinooIds);
+      final shareRows =
+          await _campanelliRepository.fetchShareSettingsRows(hinooIds);
 
-      for (final row in (shareRows as List)) {
+      for (final row in shareRows) {
         if (row is! Map) continue;
         final String? hinooId = row['campanello_hinoo_id'] as String?;
         final List<dynamic>? modes = row['share_modes'] as List<dynamic>?;
@@ -751,21 +749,17 @@ class _CampanelliPageState extends State<CampanelliPage> {
         }
       }
 
-      final hinooRows = await SupabaseProvider.client
-          .from('hinoo')
-          .select('id,pages')
-          .in_('id', hinooIds);
+      final hinooRows = await _campanelliRepository.fetchHinooRows(hinooIds);
 
       final List<_CampanelloEntry> entries = [];
-      for (final row in (hinooRows as List)) {
+      for (final row in hinooRows) {
         if (row is! Map) continue;
         final String id = row['id']?.toString() ?? '';
         final pages = row['pages'];
         if (id.isEmpty || pages is! List || pages.isEmpty) continue;
         final firstPage = pages.first;
         if (firstPage is! Map) continue;
-        final slide = HinooSlide.fromJson(
-            firstPage.cast<String, dynamic>());
+        final slide = HinooSlide.fromJson(firstPage.cast<String, dynamic>());
         final String text = slide.text.trim();
         if (text.isEmpty) continue;
 
@@ -1009,20 +1003,17 @@ class _CampanelliPageState extends State<CampanelliPage> {
     final double target = (start + bump)
         .clamp(position.minScrollExtent, position.maxScrollExtent);
     try {
-      await _campanelloPageController.animateTo(target, duration: _kBounceIn, curve: _kCurve);
-      await _campanelloPageController.animateTo(start, duration: _kBounceOut, curve: _kCurve);
+      await _campanelloPageController.animateTo(target,
+          duration: _kBounceIn, curve: _kCurve);
+      await _campanelloPageController.animateTo(start,
+          duration: _kBounceOut, curve: _kCurve);
     } catch (_) {}
   }
 
   Future<void> _checkPendingKnocks(List<String> hinooIds) async {
     if (hinooIds.isEmpty) return;
     try {
-      final rows = await SupabaseProvider.client
-          .from('house_access')
-          .select('id,target_house_tag,created_at,hinoo_id,honoo_id')
-          .in_('target_house_tag', hinooIds)
-          .is_('granted_at', null);
-      if (rows is! List) return;
+      final rows = await _campanelliRepository.fetchPendingKnockRows(hinooIds);
       if (rows.isEmpty) {
         if (!mounted) return;
         setState(() {
@@ -1100,11 +1091,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
   }
 
   Future<HinooDraft?> _fetchHinooDraft(String hinooId) async {
-    final row = await SupabaseProvider.client
-        .from('hinoo')
-        .select('pages,type,recipient_tag,created_at')
-        .eq('id', hinooId)
-        .maybeSingle();
+    final row = await _campanelliRepository.fetchHinooForKnock(hinooId);
     if (row == null || row['pages'] is! List) return null;
     final List<dynamic> pages = row['pages'] as List;
     return HinooDraft(
@@ -1118,11 +1105,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
   }
 
   Future<Honoo?> _fetchHonoo(String honooId) async {
-    final row = await SupabaseProvider.client
-        .from('honoo')
-        .select('id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id')
-        .eq('id', honooId)
-        .maybeSingle();
+    final row = await _campanelliRepository.fetchHonooForKnock(honooId);
     if (row == null) return null;
     return Honoo.fromMap(row.cast<String, dynamic>());
   }
@@ -1139,9 +1122,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
       if (modes == null || modes.isEmpty || !mounted) return _hideBusyOverlay();
       await _saveShareModes(entry.campanello, modes);
       try {
-        await SupabaseProvider.client.from('house_access').update({
-          'granted_at': DateTime.now().toIso8601String(),
-        }).eq('id', knock.id);
+        await _campanelliRepository.grantHouseAccess(
+          knockId: knock.id,
+          grantedAt: DateTime.now(),
+        );
       } catch (e) {
         debugPrint('house_access grant error: $e');
         if (mounted) {
