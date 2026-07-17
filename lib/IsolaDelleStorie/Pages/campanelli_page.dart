@@ -687,15 +687,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
     return const AssetImage(userCampanelloBg);
   }
 
-  List<double>? _parseTransform(dynamic raw) {
-    if (raw is! List) return null;
-    try {
-      return raw.map((e) => (e as num).toDouble()).toList();
-    } catch (_) {
-      return null;
-    }
-  }
-
   Future<void> _loadUserEntries() async {
     if (_isLoadingUserEntries) return;
     final user = SupabaseProvider.client.auth.currentUser;
@@ -705,24 +696,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
     try {
       final loadState = await _campanelliController.load(user.id);
       if (loadState.error != null) throw loadState.error!;
-      final rows = loadState.houseRows;
-
-      final Map<String, String> ownerByHinooId = {};
-      final Map<String, Map<String, dynamic>> casaByHinooId = {};
       final List<String> ownedHinooIds = loadState.ownedHinooIds;
-      for (final row in rows) {
-        if (row is! Map) continue;
-        final String? hinooId = row['campanello_hinoo_id'] as String?;
-        final String? ownerId = row['owner_id'] as String?;
-        if (hinooId == null || hinooId.isEmpty) continue;
-        if (ownerId == null || ownerId.isEmpty) continue;
-        ownerByHinooId[hinooId] = ownerId;
-        casaByHinooId[hinooId] = Map<String, dynamic>.from(row);
-      }
-
-      final List<String> hinooIds = ownerByHinooId.keys.toList();
-
-      if (hinooIds.isEmpty) {
+      if (loadState.entries.isEmpty) {
         if (mounted) {
           setState(() {
             _userEntries = const [];
@@ -756,52 +731,32 @@ class _CampanelliPageState extends State<CampanelliPage> {
         }
       }
 
-      final hinooRows = loadState.hinooRows;
-
-      final List<_CampanelloEntry> entries = [];
-      for (final row in hinooRows) {
-        if (row is! Map) continue;
-        final String id = row['id']?.toString() ?? '';
-        final pages = row['pages'];
-        if (id.isEmpty || pages is! List || pages.isEmpty) continue;
-        final firstPage = pages.first;
-        if (firstPage is! Map) continue;
-        final slide = HinooSlide.fromJson(firstPage.cast<String, dynamic>());
-        final String text = slide.text.trim();
-        if (text.isEmpty) continue;
-
-        final String? ownerId = ownerByHinooId[id];
-        if (ownerId == null) continue;
-        final String casaId = 'casa_$id';
-        final Map<String, dynamic> casaRow =
-            casaByHinooId[id] ?? const <String, dynamic>{};
-        final String? houseImageUrl = casaRow['house_image_url'] as String?;
-        final List<double>? bgTransform =
-            _parseTransform(casaRow['bg_transform']);
-        entries.add(
-          _CampanelloEntry(
-            campanello: CampanelloData(
-              id: 'campanello_$id',
-              campanelloHinooId: id,
-              ownerId: ownerId,
-              backgroundImage: _campanelloBackgroundProvider(
-                slide.backgroundImage,
-              ),
-              text: text,
-              linkedHouseId: casaId,
+      final entries = loadState.entries.map((entry) {
+        final casaId = 'casa_${entry.hinooId}';
+        return _CampanelloEntry(
+          campanello: CampanelloData(
+            id: 'campanello_${entry.hinooId}',
+            campanelloHinooId: entry.hinooId,
+            ownerId: entry.ownerId,
+            backgroundImage: _campanelloBackgroundProvider(
+              entry.campanelloBackgroundUrl,
             ),
-            casa: CasaData(
-              id: casaId,
-              backgroundImage: _houseBackgroundProvider(
-                  houseImageUrl, slide.backgroundImage),
-              bgTransform: bgTransform,
-              bgScale: slide.bgScale,
-              bgOffsetX: slide.bgOffsetX,
-              bgOffsetY: slide.bgOffsetY,
+            text: entry.text,
+            linkedHouseId: casaId,
+          ),
+          casa: CasaData(
+            id: casaId,
+            backgroundImage: _houseBackgroundProvider(
+              entry.houseImageUrl,
+              entry.campanelloBackgroundUrl,
             ),
+            bgTransform: entry.bgTransform,
+            bgScale: entry.bgScale,
+            bgOffsetX: entry.bgOffsetX,
+            bgOffsetY: entry.bgOffsetY,
           ),
         );
-      }
+      }).toList(growable: false);
 
       if (mounted) {
         setState(() {

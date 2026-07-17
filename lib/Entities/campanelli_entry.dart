@@ -1,0 +1,26 @@
+import 'package:flutter/foundation.dart';
+
+@immutable
+class CampanelliEntry {
+  const CampanelliEntry({
+    required this.hinooId,
+    required this.ownerId,
+    required this.text,
+    required this.campanelloBackgroundUrl,
+    required this.houseImageUrl,
+    required this.bgTransform,
+    required this.bgScale,
+    required this.bgOffsetX,
+    required this.bgOffsetY,
+  });
+
+  final String hinooId;
+  final String ownerId;
+  final String text;
+  final String? campanelloBackgroundUrl;
+  final String? houseImageUrl;
+  final List<double>? bgTransform;
+  final double bgScale;
+  final double bgOffsetX;
+  final double bgOffsetY;
+}

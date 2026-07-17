@@ -22,6 +22,8 @@ void main() {
           {
             'campanello_hinoo_id': 'hinoo-owned',
             'owner_id': 'user-1',
+            'house_image_url': 'house.png',
+            'bg_transform': [1, 0, 0, 1],
           },
           {
             'campanello_hinoo_id': 'hinoo-other',
@@ -33,7 +35,19 @@ void main() {
               {'campanello_hinoo_id': 'hinoo-owned'}
             ]);
     when(() => repository.fetchHinooRows(any())).thenAnswer((_) async => const [
-          {'id': 'hinoo-owned'}
+          {
+            'id': 'hinoo-owned',
+            'pages': [
+              {
+                'text': ' Il mio campanello ',
+                'backgroundImage': 'bell.png',
+                'isTextWhite': true,
+                'bgScale': 1.2,
+                'bgOffsetX': 0.1,
+                'bgOffsetY': -0.2,
+              }
+            ],
+          }
         ]);
 
     final loadingStates = <bool>[];
@@ -45,6 +59,11 @@ void main() {
     expect(loadingStates, [true, false]);
     expect(state.error, isNull);
     expect(state.ownedHinooIds, ['hinoo-owned']);
+    expect(state.entries, hasLength(1));
+    expect(state.entries.single.text, 'Il mio campanello');
+    expect(state.entries.single.ownerId, 'user-1');
+    expect(state.entries.single.houseImageUrl, 'house.png');
+    expect(state.entries.single.bgTransform, [1.0, 0.0, 0.0, 1.0]);
     verify(() => repository.fetchShareSettingsRows(
           ['hinoo-owned', 'hinoo-other'],
         )).called(1);
@@ -57,7 +76,7 @@ void main() {
 
     expect(state.isLoading, isFalse);
     expect(state.error, isA<StateError>());
-    expect(state.houseRows, isEmpty);
+    expect(state.entries, isEmpty);
   });
 
   test('con nessuna casa evita le query successive', () async {
