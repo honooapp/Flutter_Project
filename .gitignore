@@ -48,3 +48,6 @@ flutter
 flutter.working.backup
 
 pubspec.lock
+
+# Local live-test credentials
+live.env
