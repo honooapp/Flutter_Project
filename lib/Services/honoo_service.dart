@@ -51,42 +51,16 @@ class HonooService {
 
   /// Pubblica un nuovo honoo
   static Future<void> publishHonoo(Honoo honoo) async {
-    try {
-      await _client.from('honoo').insert(honoo.toInsertMap());
-    } on PostgrestException catch (e) {
-      final msg = e.message.toLowerCase();
-      if (msg.contains('conversation_id')) {
-        final payload = Map<String, dynamic>.from(honoo.toInsertMap())
-          ..remove('conversation_id');
-        await _client.from('honoo').insert(payload);
-        return;
-      }
-      rethrow;
-    }
+    await _client.from('honoo').insert(honoo.toInsertMap());
   }
 
   static Future<String> publishHonooAndReturnId(Honoo honoo) async {
     Map<String, dynamic>? row;
-    try {
-      row = await _client
-          .from('honoo')
-          .insert(honoo.toInsertMap())
-          .select('id')
-          .maybeSingle();
-    } on PostgrestException catch (e) {
-      final msg = e.message.toLowerCase();
-      if (msg.contains('conversation_id')) {
-        final payload = Map<String, dynamic>.from(honoo.toInsertMap())
-          ..remove('conversation_id');
-        row = await _client
-            .from('honoo')
-            .insert(payload)
-            .select('id')
-            .maybeSingle();
-      } else {
-        rethrow;
-      }
-    }
+    row = await _client
+        .from('honoo')
+        .insert(honoo.toInsertMap())
+        .select('id')
+        .maybeSingle();
     final id = row?['id']?.toString() ?? '';
     if (id.isEmpty) {
       throw Exception('publishHonoo: id mancante');
@@ -133,6 +107,7 @@ class HonooService {
       'reply_to': h.replyTo,
       'recipient_tag': h.recipientTag,
       'user_id': uid,
+      'conversation_id': h.conversationId ?? h.dbId,
       if (h.isFromMoonSaved) 'is_from_moon_saved': true,
     };
 

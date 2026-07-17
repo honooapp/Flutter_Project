@@ -28,12 +28,14 @@ class NewHonooPage extends StatefulWidget {
     this.recipientTag,
     this.returnSavedId = false,
     this.conversationId,
+    this.replyTo,
   });
 
   final HonooType? forcedType;
   final String? recipientTag;
   final bool returnSavedId;
   final String? conversationId;
+  final String? replyTo;
 
   @override
   State<NewHonooPage> createState() => _NewHonooPageState();
@@ -220,7 +222,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
       DateTime.now().toIso8601String(),
       user.id,
       type,
-      null,
+      widget.replyTo,
       widget.recipientTag,
     )..conversationId = conversationId;
 

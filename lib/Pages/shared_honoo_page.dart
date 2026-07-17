@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Widgets/busy_overlay.dart';
 import 'package:flutter/services.dart';
 import 'package:honoo/Entities/honoo.dart';
+import 'package:honoo/Entities/conversation_link.dart';
 import 'package:honoo/Services/honoo_service.dart';
 import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
@@ -15,6 +16,7 @@ import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'package:honoo/Utility/app_logger.dart';
 
 import 'home_page.dart';
 import 'placeholder_page.dart';
@@ -47,15 +49,17 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
   Future<void> _loadHonoo() async {
     setState(() => _isLoading = true);
     try {
-      final list =
-          await HonooService.fetchUserHonoo(widget.ownerId, 'chest');
+      final list = await HonooService.fetchUserHonoo(widget.ownerId, 'chest');
       if (!mounted) return;
       setState(() {
         _items = list;
-        _currentIndex = _items.isEmpty ? 0 : _currentIndex.clamp(0, _items.length - 1);
+        _currentIndex =
+            _items.isEmpty ? 0 : _currentIndex.clamp(0, _items.length - 1);
         _isLoading = false;
       });
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.warning('Caricamento Honoo condivisi non riuscito',
+          scope: 'SharedHonooPage', error: error, stackTrace: stackTrace);
       if (!mounted) return;
       setState(() => _isLoading = false);
     }
@@ -108,10 +112,11 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                       enlargeCenterPage: false,
                       enableInfiniteScroll: false,
                       disableCenter: true,
-                      scrollPhysics: (layoutMode == ResponsiveLayoutMode.mobile ||
-                              layoutMode == ResponsiveLayoutMode.tablet)
-                          ? const BouncingScrollPhysics()
-                          : const PageScrollPhysics(),
+                      scrollPhysics:
+                          (layoutMode == ResponsiveLayoutMode.mobile ||
+                                  layoutMode == ResponsiveLayoutMode.tablet)
+                              ? const BouncingScrollPhysics()
+                              : const PageScrollPhysics(),
                       onPageChanged: (index, reason) {
                         setState(() => _currentIndex = index);
                       },
@@ -131,20 +136,20 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
         Widget base = content;
         if (isDesktop && _items.length > 1 && !_isLoading) {
           base = DesktopCarouselArrows(
-          canPrev: _currentIndex > 0,
-          canNext: _currentIndex < _items.length - 1,
-          onPrev: () => _carouselController.animateToPage(
-            (_currentIndex - 1).clamp(0, _items.length - 1),
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeOutCubic,
-          ),
-          onNext: () => _carouselController.animateToPage(
-            (_currentIndex + 1).clamp(0, _items.length - 1),
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeOutCubic,
-          ),
-          arrowColor: Colors.white,
-          child: content,
+            canPrev: _currentIndex > 0,
+            canNext: _currentIndex < _items.length - 1,
+            onPrev: () => _carouselController.animateToPage(
+              (_currentIndex - 1).clamp(0, _items.length - 1),
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+            ),
+            onNext: () => _carouselController.animateToPage(
+              (_currentIndex + 1).clamp(0, _items.length - 1),
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+            ),
+            arrowColor: Colors.white,
+            child: content,
           );
         }
         return Actions(
@@ -166,8 +171,10 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
           },
           child: Shortcuts(
             shortcuts: <LogicalKeySet, Intent>{
-              LogicalKeySet(LogicalKeyboardKey.arrowLeft): const _ArrowIntent(-1),
-              LogicalKeySet(LogicalKeyboardKey.arrowRight): const _ArrowIntent(1),
+              LogicalKeySet(LogicalKeyboardKey.arrowLeft):
+                  const _ArrowIntent(-1),
+              LogicalKeySet(LogicalKeyboardKey.arrowRight):
+                  const _ArrowIntent(1),
             },
             child: Focus(
               autofocus: true,
@@ -205,7 +212,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                 splashRadius: 25,
                 tooltip: 'Rispondi',
                 onPressed: () async {
-                setState(() => _replying = true);
+                  setState(() => _replying = true);
                   final ctx = context;
                   final nav = Navigator.of(ctx);
                   final messenger = ScaffoldMessenger.of(ctx);
@@ -243,7 +250,8 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.white,
                                   foregroundColor: Colors.black,
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 14),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
                                   ),
@@ -267,7 +275,8 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.white,
                                   foregroundColor: Colors.black,
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 14),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
                                   ),
@@ -287,7 +296,8 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                                       locked = true;
                                       Navigator.of(ctx).pop();
                                     },
-                              style: TextButton.styleFrom(foregroundColor: Colors.white54),
+                              style: TextButton.styleFrom(
+                                  foregroundColor: Colors.white54),
                               child: Text(
                                 'Annulla',
                                 style: HonooDialogStyles.tertiaryAction(),
@@ -302,14 +312,14 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                   if (choice == null) return;
                   if (choice == _ReplyChoice.honoo) {
                     final sent = await nav.push<bool>(
-                       MaterialPageRoute(
-                         builder: (_) => ReplyHonooPage(
-                           originalHonoo: current,
-                           initialHintText: 'Scrivi la tua risposta...',
-                           initialImageHint: 'Aggiungi un’immagine (opzionale)',
-                         ),
-                       ),
-                     );
+                      MaterialPageRoute(
+                        builder: (_) => ReplyHonooPage(
+                          originalHonoo: current,
+                          initialHintText: 'Scrivi la tua risposta...',
+                          initialImageHint: 'Aggiungi un’immagine (opzionale)',
+                        ),
+                      ),
+                    );
                     if (sent == true && mounted) {
                       // ignore: use_build_context_synchronously
                       showHonooToast(ctx, message: 'Risposta inviata.');
@@ -319,7 +329,8 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                         // ignore: use_build_context_synchronously
                         context: ctx,
                         barrierDismissible: false,
-                        builder: (_) => const BusyOverlay(message: 'Apro la conversazione...'),
+                        builder: (_) => const BusyOverlay(
+                            message: 'Apro la conversazione...'),
                       );
                       messenger.hideCurrentSnackBar();
                       // ignore: use_build_context_synchronously
@@ -336,22 +347,29 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                     }
                   } else if (choice == _ReplyChoice.hinoo) {
                     if (!context.mounted) return;
+                    final parentId = current.dbId;
+                    if (parentId == null || parentId.isEmpty) return;
+                    final link = ConversationLink.fromParent(
+                      parentId: parentId,
+                      parentConversationId: current.conversationId,
+                      recipientId: current.userId,
+                    );
                     final rootNav = Navigator.of(context, rootNavigator: true);
                     final dialogContext = rootNav.context;
-                    showHonooToast(context, message: 'Risposta inviata.');
                     await showDialog<void>(
                       context: dialogContext,
                       barrierDismissible: false,
-                      builder: (_) => const BusyOverlay(message: 'Apro la conversazione...'),
+                      builder: (_) => const BusyOverlay(
+                          message: 'Apro la conversazione...'),
                     );
                     if (!context.mounted) return;
                     await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => NewHinooPage(
                           forcedType: HinooType.answer,
-                          recipientTag: current.userId,
-                          // Collega la risposta alla conversazione dell'honoo
-                          conversationId: current.conversationId ?? current.dbId,
+                          recipientTag: link.recipientId,
+                          replyTo: link.replyTo,
+                          conversationId: link.conversationId,
                         ),
                       ),
                     );

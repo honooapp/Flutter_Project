@@ -27,6 +27,8 @@ class SupabaseChestRealtimeGateway implements ChestRealtimeGateway {
     required void Function() onChange,
   }) {
     void notify(dynamic _, [dynamic __]) => onChange();
+    final accessToken = _client.auth.currentSession?.accessToken;
+    if (accessToken != null) _client.realtime.setAuth(accessToken);
 
     final channel = _client.channel('chest-replies-$userId')
       ..on(

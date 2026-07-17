@@ -85,6 +85,7 @@ void main() {
       type: HinooType.answer,
       recipientTag: 'recipient-1',
       replyTo: 'root-1',
+      conversationId: 'conversation-1',
     );
 
     await HinooService.publishHinoo(draft);
@@ -95,5 +96,6 @@ void main() {
     expect(captured['type'], 'answer');
     expect(captured['reply_to'], 'root-1');
     expect(captured['recipient_tag'], 'recipient-1');
+    expect(captured['conversation_id'], 'conversation-1');
   });
 }

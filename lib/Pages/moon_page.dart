@@ -3,13 +3,14 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:honoo/Services/supabase_provider.dart';
+import 'package:honoo/Services/content_feed_service.dart';
 import 'package:honoo/Services/admin_service.dart';
 import 'package:honoo/Services/honoo_service.dart';
 import 'package:honoo/Services/hinoo_service.dart';
 
 import '../Entities/hinoo.dart';
 import '../Entities/honoo.dart';
+import '../Entities/conversation_link.dart';
 import 'home_page.dart';
 import '../UI/hinoo_viewer.dart';
 import '../UI/hinoo_typography.dart';
@@ -29,6 +30,7 @@ import 'new_hinoo_page.dart';
 import 'new_honoo_page.dart';
 import '../Controller/honoo_controller.dart';
 import '../Controller/hinoo_controller.dart';
+import '../Utility/app_logger.dart';
 
 class MoonPage extends StatefulWidget {
   const MoonPage({super.key, this.initialItemId});
@@ -47,6 +49,7 @@ class _MoonPageState extends State<MoonPage> {
   final cs.CarouselController _carouselController = cs.CarouselController();
   DateTime? _lastScroll;
   final AdminService _adminService = AdminService();
+  final ContentFeedService _contentFeedService = const ContentFeedService();
   // Elementi per cui l'utente ha appena inviato una risposta in questa sessione
   final Set<String> _repliedItemIds = <String>{};
 
@@ -62,7 +65,9 @@ class _MoonPageState extends State<MoonPage> {
       final isAdmin = await _adminService.isCurrentUserAdmin();
       if (!mounted) return;
       setState(() => _isAdmin = isAdmin);
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.warning('Verifica ruolo admin non riuscita',
+          scope: 'MoonPage', error: error, stackTrace: stackTrace);
       if (!mounted) return;
       setState(() => _isAdmin = false);
     }
@@ -70,15 +75,11 @@ class _MoonPageState extends State<MoonPage> {
 
   Future<void> _loadMoonContent() async {
     try {
-      final rows = await SupabaseProvider.client
-          .from('moon_public')
-          .select('id,user_id,kind,pages,text,image_url,recipient_tag,created_at')
-          .order('created_at', ascending: false);
+      final rows = await _contentFeedService.fetchMoonRows();
 
       final List<_MoonItem> items = [];
 
-      for (final row in (rows as List)) {
-        if (row is! Map) continue;
+      for (final row in rows) {
         final String kind = row['kind']?.toString() ?? '';
         final created =
             DateTime.tryParse((row['created_at'] ?? '').toString()) ??
@@ -103,13 +104,14 @@ class _MoonPageState extends State<MoonPage> {
                   .toList(),
               type: HinooType.moon,
               recipientTag: row['recipient_tag'] as String?,
+              conversationId: row['conversation_id']?.toString(),
             );
             final String? hinooId = row['id']?.toString();
             final String? ownerId = row['user_id']?.toString();
             // Non mostrare risposte (type answer) sulla Luna
             if (HinooType.moon == draft.type) {
-              items.add(
-                  _MoonItem.hinoo(draft, created, hinooId: hinooId, ownerId: ownerId));
+              items.add(_MoonItem.hinoo(draft, created,
+                  hinooId: hinooId, ownerId: ownerId));
             }
           }
         }
@@ -127,15 +129,18 @@ class _MoonPageState extends State<MoonPage> {
       }
       setState(() {
         _items = items;
-        _currentIndex = initialIndex.clamp(0, items.isEmpty ? 0 : items.length - 1);
+        _currentIndex =
+            initialIndex.clamp(0, items.isEmpty ? 0 : items.length - 1);
         _isLoading = false;
       });
-    } catch (e) {
-      debugPrint('Errore caricamento Moon: $e');
+    } catch (e, stackTrace) {
+      AppLogger.error('Caricamento Luna non riuscito',
+          scope: 'MoonPage', error: e, stackTrace: stackTrace);
       if (mounted) {
         showHonooToast(
           context,
-          message: 'Errore caricamento Moon: $e',
+          message:
+              'Non riesco a caricare la Luna. Controlla la connessione e riprova.',
         );
       }
       setState(() => _isLoading = false);
@@ -155,7 +160,8 @@ class _MoonPageState extends State<MoonPage> {
         },
       ),
       bodyBuilder: (context, viewW, availableH, layoutMode) {
-        final _MoonItem? current = _items.isEmpty ? null : _items[_currentIndex];
+        final _MoonItem? current =
+            _items.isEmpty ? null : _items[_currentIndex];
         final HonooBuilderMetrics honooMetrics =
             ResponsiveLayout.honooBuilderMetrics(
           availableHeight: availableH,
@@ -210,7 +216,8 @@ class _MoonPageState extends State<MoonPage> {
               onPressed: _saveCurrentToChest,
             ),
             () {
-              final _MoonItem? curr = _items.isEmpty ? null : _items[_currentIndex];
+              final _MoonItem? curr =
+                  _items.isEmpty ? null : _items[_currentIndex];
               String? keyId;
               if (curr != null) {
                 keyId = curr.honoo?.dbId ?? curr.hinooId;
@@ -299,10 +306,8 @@ class _MoonPageState extends State<MoonPage> {
       child = FocusableActionDetector(
         autofocus: true,
         shortcuts: {
-          LogicalKeySet(LogicalKeyboardKey.arrowLeft):
-              const _ArrowIntent(-1),
-          LogicalKeySet(LogicalKeyboardKey.arrowRight):
-              const _ArrowIntent(1),
+          LogicalKeySet(LogicalKeyboardKey.arrowLeft): const _ArrowIntent(-1),
+          LogicalKeySet(LogicalKeyboardKey.arrowRight): const _ArrowIntent(1),
         },
         actions: {
           _ArrowIntent: CallbackAction<_ArrowIntent>(
@@ -351,8 +356,8 @@ class _MoonPageState extends State<MoonPage> {
                     itemBuilder: (context, index, realIndex) {
                       final item = _items[index];
                       return Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: horizontalPadding),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: horizontalPadding),
                         child: _buildMoonItem(
                           item,
                           availableHeight,
@@ -425,11 +430,11 @@ class _MoonPageState extends State<MoonPage> {
       final draft = item.hinoo!;
       identity =
           'moon_hinoo_${draft.hashCode}_${item.createdAt.toIso8601String()}';
-    final Size hinooSize = ResponsiveLayout.fitAspectRatio(
-      maxWidth,
-      maxHeight,
-      HinooTypography.aspectRatio,
-    );
+      final Size hinooSize = ResponsiveLayout.fitAspectRatio(
+        maxWidth,
+        maxHeight,
+        HinooTypography.aspectRatio,
+      );
       final double cardW = hinooSize.width;
       final double cardH = hinooSize.height;
       final Widget viewer = HinooViewer(
@@ -594,12 +599,13 @@ class _MoonPageState extends State<MoonPage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(_ReplyChoice.honoo),
+                  onPressed: () =>
+                      Navigator.of(context).pop(_ReplyChoice.honoo),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -615,12 +621,13 @@ class _MoonPageState extends State<MoonPage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(_ReplyChoice.hinoo),
+                  onPressed: () =>
+                      Navigator.of(context).pop(_ReplyChoice.hinoo),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -669,6 +676,15 @@ class _MoonPageState extends State<MoonPage> {
       }
     } else if (choice == _ReplyChoice.honoo && current.hinoo != null) {
       // Risposta ad un hinoo con un honoo
+      final parentId = current.hinooId;
+      if (parentId == null || parentId.isEmpty) return;
+      final recipientId = current.ownerId;
+      if (recipientId == null || recipientId.isEmpty) return;
+      final link = ConversationLink.fromParent(
+        parentId: parentId,
+        parentConversationId: current.hinoo!.conversationId,
+        recipientId: recipientId,
+      );
       await _ensureMoonItemInChest(current);
       if (!mounted) return;
       await Navigator.push(
@@ -676,8 +692,9 @@ class _MoonPageState extends State<MoonPage> {
         MaterialPageRoute(
           builder: (_) => NewHonooPage(
             forcedType: HonooType.answer,
-            recipientTag: current.ownerId,
-            conversationId: current.hinooId,
+            recipientTag: link.recipientId,
+            replyTo: link.replyTo,
+            conversationId: link.conversationId,
             returnSavedId: false,
           ),
         ),
@@ -692,6 +709,13 @@ class _MoonPageState extends State<MoonPage> {
     } else if (choice == _ReplyChoice.hinoo && current.hinoo != null) {
       final String? replyTo = current.hinooId;
       if (replyTo == null || replyTo.isEmpty) return;
+      final recipientId = current.ownerId;
+      if (recipientId == null || recipientId.isEmpty) return;
+      final link = ConversationLink.fromParent(
+        parentId: replyTo,
+        parentConversationId: current.hinoo!.conversationId,
+        recipientId: recipientId,
+      );
       await _ensureMoonItemInChest(current);
       if (!mounted) return;
       await Navigator.push(
@@ -699,8 +723,9 @@ class _MoonPageState extends State<MoonPage> {
         MaterialPageRoute(
           builder: (_) => NewHinooPage(
             forcedType: HinooType.answer,
-            recipientTag: current.ownerId,
-            replyTo: replyTo,
+            recipientTag: link.recipientId,
+            replyTo: link.replyTo,
+            conversationId: link.conversationId,
           ),
         ),
       );
@@ -713,6 +738,13 @@ class _MoonPageState extends State<MoonPage> {
       );
     } else if (choice == _ReplyChoice.hinoo && current.honoo != null) {
       // Risposta ad un honoo con un hinoo
+      final parentId = current.honoo!.dbId;
+      if (parentId == null || parentId.isEmpty) return;
+      final link = ConversationLink.fromParent(
+        parentId: parentId,
+        parentConversationId: current.honoo!.conversationId,
+        recipientId: current.honoo!.userId,
+      );
       await _ensureMoonItemInChest(current);
       if (!mounted) return;
       await Navigator.push(
@@ -720,9 +752,9 @@ class _MoonPageState extends State<MoonPage> {
         MaterialPageRoute(
           builder: (_) => NewHinooPage(
             forcedType: HinooType.answer,
-            recipientTag: current.honoo!.userId,
-            conversationId: current.honoo!.dbId,
-            // replyTo assente: thread eterogeneo non collegabile per schema attuale
+            recipientTag: link.recipientId,
+            replyTo: link.replyTo,
+            conversationId: link.conversationId,
           ),
         ),
       );

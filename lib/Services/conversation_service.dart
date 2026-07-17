@@ -38,29 +38,52 @@ class ConversationService {
       );
       final ownerId = r['user_id']?.toString();
       final bool isFromMoonSaved = (r['is_from_moon_saved'] as bool?) ?? false;
-      entries.add(_Entry.hinoo(draft, ownerId: ownerId, isFromMoonSaved: isFromMoonSaved));
+      entries.add(_Entry.hinoo(
+        draft,
+        createdAt: DateTime.tryParse(r['created_at']?.toString() ?? '') ??
+            DateTime.fromMillisecondsSinceEpoch(0),
+        ownerId: ownerId,
+        isFromMoonSaved: isFromMoonSaved,
+      ));
     }
     entries.sort((a, b) => a.createdAt.compareTo(b.createdAt));
     return entries
         .map((e) => e.when(
               honoo: (h) => ConversationEntry.honoo(h),
-              hinoo: (d) => ConversationEntry.hinoo(d, ownerId: e.ownerId, isFromMoonSaved: e.isFromMoonSaved),
+              hinoo: (d) => ConversationEntry.hinoo(
+                d,
+                createdAt: e.createdAt,
+                ownerId: e.ownerId,
+                isFromMoonSaved: e.isFromMoonSaved,
+              ),
             ))
         .toList();
   }
 
   static RealtimeChannel subscribeConversation(String conversationId, void Function() onChange) {
     void refresh(dynamic _, [dynamic __]) => onChange();
+    final accessToken = _client.auth.currentSession?.accessToken;
+    if (accessToken != null) _client.realtime.setAuth(accessToken);
     final chan = _client.channel('conv-$conversationId');
     chan
         .on(
           RealtimeListenTypes.postgresChanges,
-          ChannelFilter(event: '*', schema: 'public', table: 'honoo'),
+          ChannelFilter(
+            event: '*',
+            schema: 'public',
+            table: 'honoo',
+            filter: 'conversation_id=eq.$conversationId',
+          ),
           refresh,
         )
         .on(
           RealtimeListenTypes.postgresChanges,
-          ChannelFilter(event: '*', schema: 'public', table: 'hinoo'),
+          ChannelFilter(
+            event: '*',
+            schema: 'public',
+            table: 'hinoo',
+            filter: 'conversation_id=eq.$conversationId',
+          ),
           refresh,
         )
         .subscribe();
@@ -83,12 +106,17 @@ class _Entry {
 
   _Entry._(this.honoo, this.hinoo, this.createdAt, {this.ownerId, this.isFromMoonSaved = false});
   factory _Entry.honoo(Honoo h) => _Entry._(h, null, DateTime.tryParse(h.createdAt) ?? DateTime.now(), ownerId: h.userId, isFromMoonSaved: h.isFromMoonSaved);
-  factory _Entry.hinoo(HinooDraft d, {String? ownerId, bool isFromMoonSaved = false}) =>
-      _Entry._(null, d, DateTime.now(), ownerId: ownerId, isFromMoonSaved: isFromMoonSaved);
+  factory _Entry.hinoo(
+    HinooDraft d, {
+    required DateTime createdAt,
+    String? ownerId,
+    bool isFromMoonSaved = false,
+  }) =>
+      _Entry._(null, d, createdAt,
+          ownerId: ownerId, isFromMoonSaved: isFromMoonSaved);
 
   T when<T>({required T Function(Honoo) honoo, required T Function(HinooDraft) hinoo}) {
     if (this.honoo != null) return honoo(this.honoo!);
     return hinoo(this.hinoo!);
   }
 }
-

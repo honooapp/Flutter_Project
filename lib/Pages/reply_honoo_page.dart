@@ -8,6 +8,7 @@ import 'package:sizer/sizer.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
 import '../Entities/honoo.dart';
+import '../Entities/conversation_link.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
 import 'chest_page.dart';
@@ -61,6 +62,11 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
 
     final String replyTarget =
         widget.originalHonoo.dbId ?? widget.originalHonoo.id.toString();
+    final link = ConversationLink.fromParent(
+      parentId: replyTarget,
+      parentConversationId: widget.originalHonoo.conversationId,
+      recipientId: widget.originalHonoo.userId,
+    );
     final newHonoo = Honoo(
         0,
         _text,
@@ -69,9 +75,9 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
         now,
         SupabaseProvider.client.auth.currentUser!.id,
         HonooType.answer,
-        replyTarget,
-        widget.originalHonoo.recipientTag)
-      ..conversationId = widget.originalHonoo.conversationId ?? widget.originalHonoo.dbId;
+        link.replyTo,
+        link.recipientId)
+      ..conversationId = link.conversationId;
 
     try {
       // Assicura che il root sia nello Scrigno se arriviamo dalla Luna
@@ -160,10 +166,10 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
                 ),
                 ResponsiveFooterAction(
                   asset: "assets/icons/reply.svg",
-                  semanticsLabel: 'Invia',
+                  semanticsLabel: 'Invia risposta',
                   size: 44,
                   splashRadius: 28,
-                  tooltip: 'Invia',
+                  tooltip: 'Invia risposta',
                   colorFilter: const ColorFilter.mode(
                     Colors.white,
                     BlendMode.srcIn,

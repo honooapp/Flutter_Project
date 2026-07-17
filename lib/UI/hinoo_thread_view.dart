@@ -1,8 +1,8 @@
 // rimosso carousel per rendering a lista separata
 import 'package:flutter/material.dart';
 import 'package:honoo/Entities/hinoo.dart';
+import 'package:honoo/Entities/hinoo_thread_entry.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
- 
 
 class HinooThreadView extends StatefulWidget {
   const HinooThreadView({
@@ -44,12 +44,14 @@ class _HinooThreadViewState extends State<HinooThreadView>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    _introCurve = CurvedAnimation(parent: _introController, curve: Curves.easeOutBack);
+    _introCurve =
+        CurvedAnimation(parent: _introController, curve: Curves.easeOutBack);
     _bounceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 220),
     );
-    _bounceCurve = CurvedAnimation(parent: _bounceController, curve: Curves.easeOutBack);
+    _bounceCurve =
+        CurvedAnimation(parent: _bounceController, curve: Curves.easeOutBack);
     _hintController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 360),
@@ -95,7 +97,8 @@ class _HinooThreadViewState extends State<HinooThreadView>
     final slider = LayoutBuilder(builder: (ctx, c) {
       final double h = c.maxHeight.isFinite ? c.maxHeight : widget.maxHeight;
       final dy = (1.0 - _introCurve.value) * 12.0 - (_bounceCurve.value * 6.0);
-      final scale = 1.0 - (1.0 - _introCurve.value) * 0.01 - (_bounceCurve.value * 0.005);
+      final scale =
+          1.0 - (1.0 - _introCurve.value) * 0.01 - (_bounceCurve.value * 0.005);
       // Micro-rimbalzo: max ~12px per non spostare sensibilmente il primo messaggio
       if (items.length > 1 && !_hinted) {
         _hinted = true;
@@ -143,7 +146,8 @@ class _HinooThreadViewState extends State<HinooThreadView>
           ).animate(animation);
           return SlideTransition(position: offset, child: child);
         }
-        final curved = CurvedAnimation(parent: animation, curve: Curves.elasticOut);
+        final curved =
+            CurvedAnimation(parent: animation, curve: Curves.elasticOut);
         final offset = Tween<Offset>(
           begin: const Offset(0, 0.28),
           end: Offset.zero,
@@ -160,19 +164,4 @@ class _HinooThreadViewState extends State<HinooThreadView>
       child: slider,
     );
   }
-
-}
-
-class HinooThreadEntry {
-  const HinooThreadEntry({
-    required this.draft,
-    required this.authorId,
-    required this.isReply,
-    this.createdAt,
-  });
-
-  final HinooDraft draft;
-  final String? authorId;
-  final bool isReply;
-  final DateTime? createdAt;
 }

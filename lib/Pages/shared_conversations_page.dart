@@ -1,10 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:honoo/Entities/honoo.dart';
-import 'package:honoo/Services/honoo_service.dart';
-// import removed: no direct use of HonooCard in this page
-import 'package:honoo/UI/honoo_thread_view.dart';
+import 'package:honoo/Services/content_feed_service.dart';
+import 'package:honoo/UI/unified_thread_view.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
@@ -12,6 +10,7 @@ import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
 import 'package:honoo/UI/thread_layout_scaffold.dart';
+import 'package:honoo/Utility/app_logger.dart';
 
 // import removed: no direct use of HonooController here
 
@@ -29,30 +28,39 @@ class SharedConversationsPage extends StatefulWidget {
 }
 
 class _SharedConversationsPageState extends State<SharedConversationsPage> {
-  List<Honoo> _roots = const [];
+  List<String> _conversationIds = const [];
   bool _isLoadingRoots = true;
   int _currentRootIndex = 0;
   final cs.CarouselController _rootCarousel = cs.CarouselController();
+  final ContentFeedService _contentFeedService = const ContentFeedService();
 
   @override
   void initState() {
     super.initState();
-    _loadHonoo();
+    _loadConversations();
   }
 
-  Future<void> _loadHonoo() async {
+  Future<void> _loadConversations() async {
     setState(() => _isLoadingRoots = true);
     try {
-      final list =
-          await HonooService.fetchUserHonoo(widget.ownerId, 'chest');
+      final rows = await _contentFeedService
+          .fetchSharedConversationRoots(widget.ownerId);
+      final list = rows
+          .map((row) => row['conversation_id']?.toString() ?? '')
+          .where((id) => id.isNotEmpty)
+          .toList(growable: false);
       if (!mounted) return;
       setState(() {
-        _roots = list;
+        _conversationIds = list;
         _currentRootIndex =
-            _roots.isEmpty ? 0 : _currentRootIndex.clamp(0, _roots.length - 1);
+            list.isEmpty ? 0 : _currentRootIndex.clamp(0, list.length - 1);
         _isLoadingRoots = false;
       });
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.warning('Caricamento conversazioni condivise non riuscito',
+          scope: 'SharedConversationsPage',
+          error: error,
+          stackTrace: stackTrace);
       if (!mounted) return;
       setState(() => _isLoadingRoots = false);
     }
@@ -80,7 +88,7 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
       bodyBuilder: (context, viewW, availableH, layoutMode) {
         final Widget threads = _isLoadingRoots
             ? const Center(child: LoadingSpinner())
-            : (_roots.isEmpty
+            : (_conversationIds.isEmpty
                 ? Center(
                     child: Text(
                       'Nessuna conversazione condivisa',
@@ -105,12 +113,19 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
                         setState(() => _currentRootIndex = index);
                       },
                     ),
-                    items: _roots
+                    items: _conversationIds
                         .map(
-                          (root) => SizedBox(
+                          (conversationId) => SizedBox(
                             width: viewW,
                             height: availableH,
-                            child: HonooThreadView(root: root),
+                            child: UnifiedThreadView(
+                              conversationId: conversationId,
+                              maxWidth: viewW,
+                              maxHeight: availableH,
+                              isActive: _conversationIds.indexOf(
+                                      conversationId) ==
+                                  _currentRootIndex,
+                            ),
                           ),
                         )
                         .toList(),
@@ -119,19 +134,21 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
         final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
             layoutMode == ResponsiveLayoutMode.wideDesktop ||
             layoutMode == ResponsiveLayoutMode.largeDesktop;
-        if (!isDesktop || _roots.length <= 1 || _isLoadingRoots) {
+        if (!isDesktop ||
+            _conversationIds.length <= 1 ||
+            _isLoadingRoots) {
           return threads;
         }
         return DesktopCarouselArrows(
           canPrev: _currentRootIndex > 0,
-          canNext: _currentRootIndex < _roots.length - 1,
+          canNext: _currentRootIndex < _conversationIds.length - 1,
           onPrev: () => _rootCarousel.animateToPage(
-            (_currentRootIndex - 1).clamp(0, _roots.length - 1),
+            (_currentRootIndex - 1).clamp(0, _conversationIds.length - 1),
             duration: const Duration(milliseconds: 220),
             curve: Curves.easeOutCubic,
           ),
           onNext: () => _rootCarousel.animateToPage(
-            (_currentRootIndex + 1).clamp(0, _roots.length - 1),
+            (_currentRootIndex + 1).clamp(0, _conversationIds.length - 1),
             duration: const Duration(milliseconds: 220),
             curve: Curves.easeOutCubic,
           ),

@@ -4,7 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/honoo.dart';
-import 'package:honoo/Services/supabase_provider.dart';
+import 'package:honoo/Entities/conversation_link.dart';
+import 'package:honoo/Services/content_feed_service.dart';
+import 'package:honoo/Utility/app_logger.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
@@ -36,6 +38,7 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
   int _currentIndex = 0;
   final cs.CarouselController _carouselController = cs.CarouselController();
   bool _replying = false;
+  final ContentFeedService _contentFeedService = const ContentFeedService();
 
   @override
   void initState() {
@@ -46,25 +49,23 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
   Future<void> _loadHinoo() async {
     setState(() => _isLoading = true);
     try {
-      final rows = await SupabaseProvider.client
-          .from('hinoo')
-          .select('id,pages,type,recipient_tag,created_at')
-          .eq('user_id', widget.ownerId)
-          .eq('type', 'personal')
-          .order('created_at', ascending: false);
+      final rows =
+          await _contentFeedService.fetchSharedHinooRows(widget.ownerId);
 
       final list = <_SharedHinooItem>[];
-      for (final row in (rows as List)) {
+      for (final row in rows) {
         final pages = row['pages'];
         if (pages is! List) continue;
         final draft = HinooDraft(
-            pages: pages
-                .whereType<Map<String, dynamic>>()
-                .map((entry) => HinooSlide.fromJson(entry))
-                .toList(),
-            type: HinooType.personal,
-            recipientTag: row['recipient_tag'] as String?,
-          );
+          pages: pages
+              .whereType<Map<String, dynamic>>()
+              .map((entry) => HinooSlide.fromJson(entry))
+              .toList(),
+          type: HinooType.personal,
+          recipientTag: row['recipient_tag'] as String?,
+          replyTo: row['reply_to']?.toString(),
+          conversationId: row['conversation_id']?.toString(),
+        );
         final String id = row['id']?.toString() ?? '';
         if (id.isEmpty) continue;
         list.add(_SharedHinooItem(id: id, draft: draft));
@@ -73,10 +74,13 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
       if (!mounted) return;
       setState(() {
         _items = list;
-        _currentIndex = _items.isEmpty ? 0 : _currentIndex.clamp(0, _items.length - 1);
+        _currentIndex =
+            _items.isEmpty ? 0 : _currentIndex.clamp(0, _items.length - 1);
         _isLoading = false;
       });
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.warning('Caricamento Hinoo condivisi non riuscito',
+          scope: 'SharedHinooPage', error: error, stackTrace: stackTrace);
       if (!mounted) return;
       setState(() => _isLoading = false);
     }
@@ -124,10 +128,11 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                       enlargeCenterPage: false,
                       enableInfiniteScroll: false,
                       disableCenter: true,
-                      scrollPhysics: (layoutMode == ResponsiveLayoutMode.mobile ||
-                              layoutMode == ResponsiveLayoutMode.tablet)
-                          ? const BouncingScrollPhysics()
-                          : const PageScrollPhysics(),
+                      scrollPhysics:
+                          (layoutMode == ResponsiveLayoutMode.mobile ||
+                                  layoutMode == ResponsiveLayoutMode.tablet)
+                              ? const BouncingScrollPhysics()
+                              : const PageScrollPhysics(),
                       onPageChanged: (index, reason) {
                         setState(() => _currentIndex = index);
                       },
@@ -188,8 +193,10 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
           },
           child: Shortcuts(
             shortcuts: <LogicalKeySet, Intent>{
-              LogicalKeySet(LogicalKeyboardKey.arrowLeft): const _ArrowIntent(-1),
-              LogicalKeySet(LogicalKeyboardKey.arrowRight): const _ArrowIntent(1),
+              LogicalKeySet(LogicalKeyboardKey.arrowLeft):
+                  const _ArrowIntent(-1),
+              LogicalKeySet(LogicalKeyboardKey.arrowRight):
+                  const _ArrowIntent(1),
             },
             child: Focus(
               autofocus: true,
@@ -227,7 +234,7 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                 splashRadius: 25,
                 tooltip: 'Rispondi',
                 onPressed: () async {
-                setState(() => _replying = true);
+                  setState(() => _replying = true);
                   final ctx = context;
                   bool locked = false;
                   final _ReplyChoice? choice = await showDialog<_ReplyChoice>(
@@ -236,9 +243,9 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                     builder: (_) => HonooDialogShell(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
                             Text(
                               'Vuoi rispondere con\n un honoo o un hinoo?',
                               style: HonooDialogStyles.title(),
@@ -318,30 +325,35 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                           ],
                         ),
                       ),
-                  ),
+                    ),
                   );
                   if (!mounted) return;
                   if (choice == null) return;
                   final _SharedHinooItem current = _items[_currentIndex];
+                  final link = ConversationLink.fromParent(
+                    parentId: current.id,
+                    parentConversationId: current.draft.conversationId,
+                    recipientId: widget.ownerId,
+                  );
                   if (choice == _ReplyChoice.hinoo) {
                     if (!context.mounted) return;
                     // Usa State.context dopo l'await precedente
                     final rootNav = Navigator.of(context, rootNavigator: true);
                     final dialogContext = rootNav.context;
-                    showHonooToast(context, message: 'Risposta inviata.');
                     await showDialog<void>(
                       context: dialogContext,
                       barrierDismissible: false,
-                      builder: (_) => const BusyOverlay(message: 'Apro la conversazione...'),
+                      builder: (_) => const BusyOverlay(
+                          message: 'Apro la conversazione...'),
                     );
                     if (!context.mounted) return;
                     await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => NewHinooPage(
                           forcedType: HinooType.answer,
-                          recipientTag: widget.ownerId,
-                          replyTo: current.id,
-                          conversationId: current.id,
+                          recipientTag: link.recipientId,
+                          replyTo: link.replyTo,
+                          conversationId: link.conversationId,
                         ),
                       ),
                     );
@@ -367,7 +379,8 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                                 height: 28,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2.5,
-                                  valueColor: AlwaysStoppedAnimation(Colors.white),
+                                  valueColor:
+                                      AlwaysStoppedAnimation(Colors.white),
                                 ),
                               ),
                               SizedBox(height: 16),
@@ -386,8 +399,9 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                       MaterialPageRoute(
                         builder: (_) => NewHonooPage(
                           forcedType: HonooType.answer,
-                          recipientTag: widget.ownerId,
-                          conversationId: current.id,
+                          recipientTag: link.recipientId,
+                          replyTo: link.replyTo,
+                          conversationId: link.conversationId,
                           returnSavedId: false,
                         ),
                       ),

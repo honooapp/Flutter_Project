@@ -33,6 +33,7 @@ import 'new_hinoo_page.dart';
 import 'home_page.dart';
 import 'placeholder_page.dart';
 import 'package:honoo/Entities/conversation_entry.dart';
+import 'package:honoo/Entities/conversation_link.dart';
 
 class ChestPage extends StatefulWidget {
   const ChestPage({
@@ -443,14 +444,19 @@ class _ChestPageState extends State<ChestPage> {
     } else {
       final String? replyTo = current.dbId;
       if (replyTo == null || replyTo.isEmpty) return;
+      final link = ConversationLink.fromParent(
+        parentId: replyTo,
+        parentConversationId: current.conversationId,
+        recipientId: current.userId,
+      );
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => NewHinooPage(
             forcedType: HinooType.answer,
-            recipientTag: current.recipientTag,
-            replyTo: replyTo,
-            conversationId: replyTo,
+            recipientTag: link.recipientId,
+            replyTo: link.replyTo,
+            conversationId: link.conversationId,
           ),
         ),
       );
@@ -461,9 +467,15 @@ class _ChestPageState extends State<ChestPage> {
     final _ReplyChoice? choice = await _showReplyChoice();
     if (choice == null || !mounted) return;
     if (choice == _ReplyChoice.honoo) {
-      final String replyTo = current.id;
-      final String recipient = current.ownerId ?? current.draft.recipientTag ?? '';
+      final String recipient =
+          current.ownerId ?? current.draft.recipientTag ?? '';
       if (recipient.isEmpty) return;
+      final link = ConversationLink.fromParent(
+        parentId: current.id,
+        parentConversationId:
+            current.conversationId ?? current.draft.conversationId,
+        recipientId: recipient,
+      );
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -476,23 +488,34 @@ class _ChestPageState extends State<ChestPage> {
               current.createdAt.toIso8601String(),
               recipient,
               HonooType.personal,
-              replyTo,
-              recipient,
-            )..dbId = replyTo,
+              link.replyTo,
+              link.recipientId,
+            )
+              ..dbId = link.replyTo
+              ..conversationId = link.conversationId,
             initialHintText: 'Scrivi la tua risposta...',
             initialImageHint: 'Aggiungi un’immagine (opzionale)',
           ),
         ),
       );
     } else {
+      final String recipient =
+          current.ownerId ?? current.draft.recipientTag ?? '';
+      if (recipient.isEmpty) return;
+      final link = ConversationLink.fromParent(
+        parentId: current.id,
+        parentConversationId:
+            current.conversationId ?? current.draft.conversationId,
+        recipientId: recipient,
+      );
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => NewHinooPage(
             forcedType: HinooType.answer,
-            recipientTag: current.draft.recipientTag,
-            replyTo: current.id,
-            conversationId: current.id,
+            recipientTag: link.recipientId,
+            replyTo: link.replyTo,
+            conversationId: link.conversationId,
           ),
         ),
       );

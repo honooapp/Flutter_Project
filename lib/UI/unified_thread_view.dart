@@ -53,11 +53,19 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
       TweenSequenceItem(tween: Tween(begin: -1.0, end: 0.0), weight: 50),
     ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     _load();
-    _subscribe();
+    _syncSubscription();
   }
 
-  void _subscribe() {
-    _chan = ConversationService.subscribeConversation(widget.conversationId, _load);
+  void _syncSubscription() {
+    if (!widget.isActive) {
+      _chan?.unsubscribe();
+      _chan = null;
+      return;
+    }
+    _chan ??= ConversationService.subscribeConversation(
+      widget.conversationId,
+      _load,
+    );
   }
 
   Future<void> _load() async {
@@ -83,6 +91,20 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
   @override
   void didUpdateWidget(covariant UnifiedThreadView oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.conversationId != widget.conversationId) {
+      _chan?.unsubscribe();
+      _chan = null;
+      _didHighlight = false;
+      _hasPlayedReveal = false;
+      _load();
+    }
+    if (oldWidget.isActive != widget.isActive ||
+        oldWidget.conversationId != widget.conversationId) {
+      _syncSubscription();
+      if (widget.isActive && !oldWidget.isActive) {
+        _load();
+      }
+    }
     if (widget.isActive && !_hasPlayedReveal && mounted) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
