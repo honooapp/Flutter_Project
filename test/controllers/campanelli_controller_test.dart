@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Controller/campanelli_controller.dart';
 import 'package:honoo/Services/campanelli_repository.dart';
@@ -208,5 +210,46 @@ void main() {
     realtimeController.dispose();
     expect(realtime.ownerSubscription.closed, isTrue);
     expect(realtime.visitorSubscription.closed, isTrue);
+  });
+
+  test('impedisce refresh periodici concorrenti', () async {
+    final response = Completer<List<dynamic>>();
+    when(() => repository.fetchPendingKnockRows(['hinoo-1']))
+        .thenAnswer((_) => response.future);
+    var changes = 0;
+
+    final first = controller.refreshPendingKnocks(
+      ['hinoo-1'],
+      onChanged: () => changes++,
+    );
+    final second = await controller.refreshPendingKnocks(
+      ['hinoo-1'],
+      onChanged: () => changes++,
+    );
+    response.complete(const []);
+
+    expect(second, isFalse);
+    expect(await first, isTrue);
+    expect(changes, 1);
+    verify(() => repository.fetchPendingKnockRows(['hinoo-1'])).called(1);
+  });
+
+  test('timer periodico viene fermato dal controller', () async {
+    when(() => repository.fetchPendingKnockRows(['hinoo-1']))
+        .thenAnswer((_) async => const []);
+    var changes = 0;
+
+    await controller.startPendingKnockRefresh(
+      ownedHinooIds: ['hinoo-1'],
+      onChanged: () => changes++,
+      interval: const Duration(milliseconds: 20),
+    );
+    await Future<void>.delayed(const Duration(milliseconds: 55));
+    controller.stopPendingKnockRefresh();
+    final stoppedAt = changes;
+    await Future<void>.delayed(const Duration(milliseconds: 40));
+
+    expect(stoppedAt, greaterThanOrEqualTo(2));
+    expect(changes, stoppedAt);
   });
 }

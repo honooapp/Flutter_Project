@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
@@ -63,8 +62,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
   List<_CampanelloEntry> _userEntries = const [];
   bool _isLoadingUserEntries = false;
   bool _isHoveringCampanelli = false;
-  bool _checkedKnocks = false;
-  bool _checkingPendingKnocks = false;
   bool _isKnocking = false;
   bool _hasOwnHouse = false;
   bool _hasPendingOrAcceptedInvite = false;
@@ -74,7 +71,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
       _campanelliController.state.pendingKnocks;
   Set<String> get _pendingKnockTags => _campanelliController.pendingKnockTags;
   List<String> _ownedHinooIds = const [];
-  Timer? _pendingKnockRefreshTimer;
   final Map<String, Set<_CasaShareMode>> _shareModesByCampanello = {
     campanelloSirenaId: {_CasaShareMode.honoo},
     campanelloPalombaroId: {_CasaShareMode.hinoo},
@@ -114,10 +110,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
   void initState() {
     super.initState();
     _loadUserEntries();
-    _pendingKnockRefreshTimer = Timer.periodic(
-      const Duration(seconds: 60),
-      (_) => _refreshPendingKnocks(),
-    );
     _subscribeVisitorAccessChannel();
   }
 
@@ -776,10 +768,12 @@ class _CampanelliPageState extends State<CampanelliPage> {
         if (mounted) setState(() => _hasPendingOrAcceptedInvite = hasInvite);
       } catch (_) {}
       _subscribeOwnerAccessChannel();
-      if (!_checkedKnocks) {
-        _checkedKnocks = true;
-        await _checkPendingKnocks(ownedHinooIds);
-      }
+      await _campanelliController.startPendingKnockRefresh(
+        ownedHinooIds: ownedHinooIds,
+        onChanged: () {
+          if (mounted) setState(() {});
+        },
+      );
     } catch (_) {
       if (mounted) {
         setState(() {
@@ -887,25 +881,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
       await _campanelloPageController.animateTo(start,
           duration: _kBounceOut, curve: _kCurve);
     } catch (_) {}
-  }
-
-  Future<void> _checkPendingKnocks(List<String> hinooIds) async {
-    try {
-      await _campanelliController.loadPendingKnocks(hinooIds);
-      if (!mounted) return;
-      setState(() {});
-    } catch (_) {}
-  }
-
-  Future<void> _refreshPendingKnocks() async {
-    if (_checkingPendingKnocks) return;
-    if (_ownedHinooIds.isEmpty) return;
-    _checkingPendingKnocks = true;
-    try {
-      await _checkPendingKnocks(_ownedHinooIds);
-    } finally {
-      _checkingPendingKnocks = false;
-    }
   }
 
   _CampanelloEntry? _entryForTag(String? tag) {
@@ -1221,7 +1196,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
   @override
   void dispose() {
-    _pendingKnockRefreshTimer?.cancel();
     _pageController.dispose();
     _campanelloPageController.dispose();
     _campanelliController.dispose();

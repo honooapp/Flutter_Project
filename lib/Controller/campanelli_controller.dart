@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../Entities/campanelli_entry.dart';
@@ -59,6 +61,8 @@ class CampanelliController extends ChangeNotifier {
       (_defaultRealtimeGateway ??= SupabaseCampanelliRealtimeGateway());
   CampanelliRealtimeSubscription? _ownerSubscription;
   CampanelliRealtimeSubscription? _visitorSubscription;
+  Timer? _pendingKnockRefreshTimer;
+  bool _isRefreshingPendingKnocks = false;
   CampanelliLoadState _state = const CampanelliLoadState();
 
   CampanelliLoadState get state => _state;
@@ -139,6 +143,42 @@ class CampanelliController extends ChangeNotifier {
         .toList(growable: false);
     _replacePendingKnocks(knocks);
     return _state.pendingKnocks;
+  }
+
+  Future<void> startPendingKnockRefresh({
+    required List<String> ownedHinooIds,
+    required void Function() onChanged,
+    Duration interval = const Duration(seconds: 60),
+  }) async {
+    _pendingKnockRefreshTimer?.cancel();
+    final ids = List<String>.unmodifiable(ownedHinooIds);
+    await refreshPendingKnocks(ids, onChanged: onChanged);
+    _pendingKnockRefreshTimer = Timer.periodic(
+      interval,
+      (_) => unawaited(refreshPendingKnocks(ids, onChanged: onChanged)),
+    );
+  }
+
+  Future<bool> refreshPendingKnocks(
+    List<String> ownedHinooIds, {
+    required void Function() onChanged,
+  }) async {
+    if (_isRefreshingPendingKnocks || ownedHinooIds.isEmpty) return false;
+    _isRefreshingPendingKnocks = true;
+    try {
+      await loadPendingKnocks(ownedHinooIds);
+      onChanged();
+      return true;
+    } catch (_) {
+      return false;
+    } finally {
+      _isRefreshingPendingKnocks = false;
+    }
+  }
+
+  void stopPendingKnockRefresh() {
+    _pendingKnockRefreshTimer?.cancel();
+    _pendingKnockRefreshTimer = null;
   }
 
   bool addPendingKnockRow(Map<dynamic, dynamic> row) {
@@ -247,6 +287,7 @@ class CampanelliController extends ChangeNotifier {
 
   @override
   void dispose() {
+    stopPendingKnockRefresh();
     stopRealtime();
     super.dispose();
   }
