@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Controller/hinoo_controller.dart';
+import 'package:honoo/Controller/campanelli_controller.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
 import 'package:honoo/Utility/utility.dart';
@@ -46,6 +47,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
   final HouseAccessService _houseAccessService = const HouseAccessService();
   final CampanelliDataRepository _campanelliRepository =
       CampanelliDataRepository();
+  late final CampanelliController _campanelliController =
+      CampanelliController(repository: _campanelliRepository);
   // Animations: centralize durations/curves to avoid magic numbers
   static const Duration _kAnimFast = Duration(milliseconds: 220);
   static const Duration _kAnimMed = Duration(milliseconds: 240);
@@ -700,11 +703,13 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
     setState(() => _isLoadingUserEntries = true);
     try {
-      final rows = await _campanelliRepository.fetchHouseRows();
+      final loadState = await _campanelliController.load(user.id);
+      if (loadState.error != null) throw loadState.error!;
+      final rows = loadState.houseRows;
 
       final Map<String, String> ownerByHinooId = {};
       final Map<String, Map<String, dynamic>> casaByHinooId = {};
-      final List<String> ownedHinooIds = [];
+      final List<String> ownedHinooIds = loadState.ownedHinooIds;
       for (final row in rows) {
         if (row is! Map) continue;
         final String? hinooId = row['campanello_hinoo_id'] as String?;
@@ -713,9 +718,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
         if (ownerId == null || ownerId.isEmpty) continue;
         ownerByHinooId[hinooId] = ownerId;
         casaByHinooId[hinooId] = Map<String, dynamic>.from(row);
-        if (ownerId == user.id) {
-          ownedHinooIds.add(hinooId);
-        }
       }
 
       final List<String> hinooIds = ownerByHinooId.keys.toList();
@@ -731,8 +733,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
         return;
       }
 
-      final shareRows =
-          await _campanelliRepository.fetchShareSettingsRows(hinooIds);
+      final shareRows = loadState.shareRows;
 
       for (final row in shareRows) {
         if (row is! Map) continue;
@@ -755,7 +756,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
         }
       }
 
-      final hinooRows = await _campanelliRepository.fetchHinooRows(hinooIds);
+      final hinooRows = loadState.hinooRows;
 
       final List<_CampanelloEntry> entries = [];
       for (final row in hinooRows) {
@@ -1405,6 +1406,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
     _visitorAccessChannel?.unsubscribe();
     _pageController.dispose();
     _campanelloPageController.dispose();
+    _campanelliController.dispose();
     super.dispose();
   }
 
