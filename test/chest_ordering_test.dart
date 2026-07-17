@@ -1,73 +1,90 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:honoo/Controller/chest_organizer.dart';
 
 class _Item {
-  final DateTime createdAt;
+  const _Item({
+    required this.id,
+    required this.createdAt,
+    this.latestReply,
+    this.conversationId,
+  });
+
   final String id;
+  final DateTime createdAt;
   final DateTime? latestReply;
-  const _Item({required this.createdAt, required this.id, this.latestReply});
+  final String? conversationId;
 }
 
-int _cmpOtherItems(_Item a, _Item b) {
-  final int byCreated = b.createdAt.compareTo(a.createdAt);
-  if (byCreated != 0) return byCreated;
-  return a.id.compareTo(b.id);
-}
-
-int _cmpConversationItems(_Item a, _Item b) {
-  final DateTime? aReply = a.latestReply;
-  final DateTime? bReply = b.latestReply;
-  if (aReply == null && bReply == null) {
-    final int byCreated = b.createdAt.compareTo(a.createdAt);
-    if (byCreated != 0) return byCreated;
-    return a.id.compareTo(b.id);
-  }
-  if (aReply == null) return 1;
-  if (bReply == null) return -1;
-  final int byLatest = bReply.compareTo(aReply);
-  if (byLatest != 0) return byLatest;
-  final int byCreated = b.createdAt.compareTo(a.createdAt);
-  if (byCreated != 0) return byCreated;
-  return a.id.compareTo(b.id);
+ChestOrganization<_Item> _organize(List<_Item> items) {
+  return ChestOrganizer.organize<_Item>(
+    items: items,
+    createdAtOf: (item) => item.createdAt,
+    stableIdOf: (item) => item.id,
+    latestReplyOf: (item) => item.latestReply,
+    conversationIdOf: (item) => item.conversationId,
+  );
 }
 
 void main() {
-  group('Chest ordering determinism', () {
-    test('otherItems: createdAt DESC, then stable id', () {
-      final now = DateTime(2024, 1, 1, 12, 0, 0);
-      final items = <_Item>[
+  group('ChestOrganizer', () {
+    test('ordina gli elementi normali per data DESC e id stabile', () {
+      final now = DateTime(2024, 1, 1, 12);
+      final result = _organize([
         _Item(createdAt: now, id: 'b'),
         _Item(createdAt: now, id: 'a'),
         _Item(createdAt: now.add(const Duration(seconds: 1)), id: 'z'),
         _Item(createdAt: now.subtract(const Duration(seconds: 1)), id: 'm'),
-      ];
-      items.sort(_cmpOtherItems);
-      expect(items.map((e) => e.id).toList(), ['z', 'a', 'b', 'm']);
+      ]);
+
+      expect(result.items.map((item) => item.id), ['z', 'a', 'b', 'm']);
+      expect(result.conversationItemCount, 0);
     });
 
-    test('conversationItems: latestReply DESC, then createdAt DESC, then id', () {
-      final t1 = DateTime(2024, 1, 1, 12, 0, 0);
+    test('mette prima le conversazioni ordinate per ultima risposta', () {
+      final t1 = DateTime(2024, 1, 1, 12);
       final t2 = t1.add(const Duration(seconds: 10));
-      final t3 = t1.add(const Duration(seconds: 20));
-      final items = <_Item>[
+      final result = _organize([
         _Item(createdAt: t1, id: 'c', latestReply: t2),
-        _Item(createdAt: t2, id: 'b', latestReply: t2), // same latest, newer createdAt
-        _Item(createdAt: t2, id: 'a', latestReply: t2), // same latest & createdAt, id tie-breaker
-        _Item(createdAt: t3, id: 'z', latestReply: t1), // older latestReply
-      ];
-      items.sort(_cmpConversationItems);
-      expect(items.map((e) => e.id).toList(), ['b', 'a', 'c', 'z']);
+        _Item(createdAt: t2, id: 'b', latestReply: t2),
+        _Item(createdAt: t2, id: 'a', latestReply: t2),
+        _Item(createdAt: t2, id: 'normal'),
+      ]);
+
+      expect(result.items.map((item) => item.id), ['a', 'b', 'c', 'normal']);
+      expect(result.conversationItemCount, 3);
     });
 
-    test('epoch fallback sorts last under DESC createdAt', () {
-      final epoch = DateTime.fromMillisecondsSinceEpoch(0);
-      final real = DateTime(2024, 1, 1, 0, 0, 0);
-      final items = <_Item>[
-        _Item(createdAt: epoch, id: 'e'),
-        _Item(createdAt: real, id: 'r'),
+    test('raggruppa la stessa conversazione e mostra prima il più recente', () {
+      final t1 = DateTime(2024, 1, 1, 12);
+      final t2 = t1.add(const Duration(seconds: 10));
+      final result = _organize([
+        _Item(
+          createdAt: t1,
+          id: 'root',
+          latestReply: t2,
+          conversationId: 'conversation-1',
+        ),
+        _Item(createdAt: t2, id: 'outside'),
+        _Item(
+          createdAt: t2,
+          id: 'reply',
+          conversationId: 'conversation-1',
+        ),
+      ]);
+
+      expect(result.items.map((item) => item.id), ['reply', 'root', 'outside']);
+    });
+
+    test('non modifica la lista ricevuta', () {
+      final input = [
+        _Item(createdAt: DateTime(2024, 1, 2), id: 'new'),
+        _Item(createdAt: DateTime(2024, 1, 1), id: 'old'),
       ];
-      items.sort(_cmpOtherItems);
-      expect(items.map((e) => e.id).toList(), ['r', 'e']);
+
+      final result = _organize(input.reversed.toList());
+
+      expect(result.items.map((item) => item.id), ['new', 'old']);
+      expect(() => result.items.add(input.first), throwsUnsupportedError);
     });
   });
 }
-
