@@ -8,7 +8,7 @@ Essentials for developing and maintaining **honoo** with the current architectur
 
 | Item            | Details                                                                |
 |-----------------|-------------------------------------------------------------------------|
-| Framework       | Flutter 3.10.0 (stable) + Dart 3.0.0                                    |
+| Framework       | Flutter 3.19.6 (stable) + Dart 3.3.4                                    |
 | Targets         | Web (primary), Android/iOS/Desktop supported via Flutter scaffolding    |
 | Backend         | Supabase (PostgreSQL + Auth + Storage)                                  |
 | Design Language | Typography via Google Fonts (Lora), extensive SVG assets               |
@@ -121,7 +121,7 @@ Golden tests rely on `test/test_config.dart` (fixes DPI). If fonts cause 400s, p
 * **GitHub Pages** is the hosting surface.
   - New workflow: `.github/workflows/deploy-gh-pages.yml`.
   - Triggers: push tags `v*` or manual dispatch.
-  - Steps: checkout → Flutter 3.10.0 → `flutter build web --release` → add `CNAME` (`honoo.it`) → deploy via `peaceiris/actions-gh-pages`.
+  - Steps: checkout → Flutter 3.19.6 → `flutter build web --release` → add `CNAME` (`honoo.it`) → deploy via `peaceiris/actions-gh-pages`.
   - Secrets needed: `PROD_SUPABASE_URL`, `PROD_SUPABASE_ANON_KEY`.
 * For manual builds, `build/web` mirrors what peanut produced previously. Keep the base href at `/` because `gh-pages` has a `CNAME`.
 * Ensure DNS for `honoo.it` points the apex to GitHub Pages IPs.
@@ -137,7 +137,7 @@ Golden tests rely on `test/test_config.dart` (fixes DPI). If fonts cause 400s, p
   - `push` tags `v*`, or manual.
   - Produces `gh-pages` build.
 
-Keep workflows in sync with Flutter version upgrades — both install Flutter 3.10.0 via `subosito/flutter-action`.
+Keep workflows in sync with Flutter version upgrades — both install Flutter 3.19.6 via `subosito/flutter-action`.
 
 ---
 
@@ -163,7 +163,7 @@ Keep workflows in sync with Flutter version upgrades — both install Flutter 3.
 ## 12. Quick Start Checklist (New Work Session)
 
 1. `git pull` latest `main`.
-2. Confirm Flutter 3.10.0 is active (`flutter --version`).
+2. Confirm Flutter 3.19.6 is active (`fvm flutter --version`).
 3. `flutter pub get`.
 4. Run `flutter analyze`.
 5. Launch web app with correct `--dart-define` values.
