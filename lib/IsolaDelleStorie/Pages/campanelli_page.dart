@@ -17,7 +17,7 @@ import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
 import 'package:honoo/Utility/utility.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
-import 'package:honoo/Widgets/responsive_footer_bar.dart';
+import 'package:honoo/Widgets/campanelli_footer.dart';
 import 'package:honoo/UI/hinoo_typography.dart';
 import 'package:honoo/Widgets/pending_knocks_dialog.dart';
 import 'package:honoo/Entities/honoo.dart';
@@ -1455,113 +1455,24 @@ class _CampanelliPageState extends State<CampanelliPage> {
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    child: ResponsiveFooterBar(
-                      useSafeArea: false,
+                    child: CampanelliFooter(
+                      iconSize: footerIconSize,
                       bottomPadding: footerBottomSpacing,
                       desiredGap: footerGap,
-                      minGap: 16,
-                      height: footerIconSize,
-                      actions: [
-                        ResponsiveFooterAction(
-                          asset: "assets/icons/home.svg",
-                          semanticsLabel: 'Home',
-                          colorFilter: const ColorFilter.mode(
-                            HonooColor.onBackground,
-                            BlendMode.srcIn,
-                          ),
-                          size: footerIconSize,
-                          splashRadius: 25,
-                          tooltip: 'Home',
-                          onPressed: () {
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (_) => const HomePage()),
-                              (route) => false,
-                            );
-                          },
-                        ),
-                        if (showCampanello && !isOwnCampanello && !_isKnocking)
-                          ResponsiveFooterAction(
-                            asset: "assets/icons/campanello_bianco.png",
-                            semanticsLabel: 'Campanello',
-                            size: footerIconSize,
-                            splashRadius: 25,
-                            tooltip: 'Campanello',
-                            onPressed: () => _handleKnock(activeCampanello!),
-                            icon: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                Image.asset(
-                                  "assets/icons/campanello_bianco.png",
-                                  width: footerIconSize,
-                                  height: footerIconSize,
-                                  fit: BoxFit.contain,
-                                ),
-                                if (hasPendingKnock)
-                                  Positioned(
-                                    top: -4,
-                                    right: -4,
-                                    child: _PendingKnockBadge(
-                                      count: pendingKnockCount,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        if (showCampanello && !isOwnCampanello && _isKnocking)
-                          ResponsiveFooterAction(
-                            asset: "assets/icons/campanello_bianco.png",
-                            semanticsLabel: 'Campanello',
-                            size: footerIconSize,
-                            splashRadius: 25,
-                            tooltip: 'Campanello',
-                            onPressed: null,
-                            icon: SizedBox(
-                              width: footerIconSize,
-                              height: footerIconSize,
-                            ),
-                          ),
-                        if (!showCampanello && hasAnyPendingKnock)
-                          ResponsiveFooterAction(
-                            asset: "assets/icons/campanello_bianco.png",
-                            semanticsLabel: 'Campanelli',
-                            size: footerIconSize,
-                            splashRadius: 25,
-                            tooltip: 'Bussate in attesa',
-                            onPressed: _openPendingKnocksDialog,
-                            icon: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                Image.asset(
-                                  "assets/icons/campanello_bianco.png",
-                                  width: footerIconSize,
-                                  height: footerIconSize,
-                                  fit: BoxFit.contain,
-                                ),
-                                Positioned(
-                                  top: -4,
-                                  right: -4,
-                                  child: _PendingKnockBadge(
-                                    count: pendingKnockCount,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        if (!showCampanello && !hasAnyPendingKnock)
-                          ResponsiveFooterAction(
-                            asset: "assets/icons/campanello_bianco.png",
-                            semanticsLabel: 'Campanelli',
-                            size: footerIconSize,
-                            splashRadius: 25,
-                            tooltip: 'Bussate in attesa',
-                            onPressed: null,
-                            icon: SizedBox(
-                              width: footerIconSize,
-                              height: footerIconSize,
-                            ),
-                          ),
-                      ],
+                      showCampanello: showCampanello,
+                      isOwnCampanello: isOwnCampanello,
+                      isKnocking: _isKnocking,
+                      hasPendingKnock: hasPendingKnock,
+                      hasAnyPendingKnock: hasAnyPendingKnock,
+                      pendingKnockCount: pendingKnockCount,
+                      onHome: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (_) => const HomePage()),
+                          (route) => false,
+                        );
+                      },
+                      onKnock: () => _handleKnock(activeCampanello!),
+                      onOpenPendingKnocks: _openPendingKnocksDialog,
                     ),
                   ),
               ],
@@ -1580,41 +1491,6 @@ class _ArrowIntent extends Intent {
 
   final Axis axis;
   final int delta;
-}
-
-class _PendingKnockBadge extends StatelessWidget {
-  const _PendingKnockBadge({required this.count});
-
-  final int count;
-
-  @override
-  Widget build(BuildContext context) {
-    final String label = count > 99 ? '99+' : count.toString();
-    final double size = count > 9 ? 18 : 16;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      height: size,
-      constraints: BoxConstraints(minWidth: size),
-      decoration: BoxDecoration(
-        color: Colors.redAccent,
-        borderRadius: BorderRadius.circular(size / 2),
-        border: Border.all(
-          color: HonooColor.background,
-          width: 1.5,
-        ),
-      ),
-      child: Center(
-        child: Text(
-          label,
-          style: GoogleFonts.libreFranklin(
-            color: Colors.white,
-            fontSize: 10,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class CampanelloData {
