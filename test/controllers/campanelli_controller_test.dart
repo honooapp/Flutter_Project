@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Controller/campanelli_controller.dart';
+import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Services/campanelli_repository.dart';
 import 'package:honoo/Services/campanelli_realtime_service.dart';
 import 'package:mocktail/mocktail.dart';
@@ -149,6 +150,48 @@ void main() {
     expect(knocks.single.id, 'knock-1');
     expect(knocks.single.createdAt, DateTime.parse('2026-07-17T10:00:00Z'));
     expect(controller.pendingKnockTags, {'hinoo-1'});
+  });
+
+  test('mappa il contenuto Hinoo associato alla bussata', () async {
+    when(() => repository.fetchHinooForKnock('hinoo-1'))
+        .thenAnswer((_) async => const {
+              'pages': [
+                {
+                  'text': 'Messaggio lungo',
+                  'backgroundImage': 'background.png',
+                  'isTextWhite': true,
+                }
+              ],
+              'recipient_tag': 'owner-1',
+            });
+
+    final draft = await controller.fetchPendingHinoo('hinoo-1');
+
+    expect(draft, isNotNull);
+    expect(draft!.type, HinooType.answer);
+    expect(draft.recipientTag, 'owner-1');
+    expect(draft.pages.single.text, 'Messaggio lungo');
+  });
+
+  test('mappa il contenuto Honoo associato alla bussata', () async {
+    when(() => repository.fetchHonooForKnock('honoo-1'))
+        .thenAnswer((_) async => const {
+              'id': 'honoo-1',
+              'text': 'Messaggio breve',
+              'image_url': 'image.png',
+              'destination': 'reply',
+              'created_at': '2026-07-17T10:00:00Z',
+              'updated_at': '2026-07-17T10:00:00Z',
+              'user_id': 'visitor-1',
+              'recipient_tag': 'owner-1',
+            });
+
+    final honoo = await controller.fetchPendingHonoo('honoo-1');
+
+    expect(honoo, isNotNull);
+    expect(honoo!.dbId, 'honoo-1');
+    expect(honoo.text, 'Messaggio breve');
+    expect(honoo.recipientTag, 'owner-1');
   });
 
   test('Realtime sostituisce duplicati e rimuove per id', () {

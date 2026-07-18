@@ -907,26 +907,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
         '${two(local.hour)}:${two(local.minute)}';
   }
 
-  Future<HinooDraft?> _fetchHinooDraft(String hinooId) async {
-    final row = await _campanelliRepository.fetchHinooForKnock(hinooId);
-    if (row == null || row['pages'] is! List) return null;
-    final List<dynamic> pages = row['pages'] as List;
-    return HinooDraft(
-      pages: pages
-          .whereType<Map<String, dynamic>>()
-          .map((entry) => HinooSlide.fromJson(entry))
-          .toList(),
-      type: HinooType.answer,
-      recipientTag: row['recipient_tag'] as String?,
-    );
-  }
-
-  Future<Honoo?> _fetchHonoo(String honooId) async {
-    final row = await _campanelliRepository.fetchHonooForKnock(honooId);
-    if (row == null) return null;
-    return Honoo.fromMap(row.cast<String, dynamic>());
-  }
-
   Future<void> _approvePendingKnock(
     PendingKnock knock,
     _CampanelloEntry entry, {
@@ -999,7 +979,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
     }
 
     if (knock.hinooId != null && knock.hinooId!.isNotEmpty) {
-      final draft = await _fetchHinooDraft(knock.hinooId!);
+      final draft =
+          await _campanelliController.fetchPendingHinoo(knock.hinooId!);
       if (draft == null || !mounted) return;
       final bool? approved = await Navigator.of(context).push<bool>(
         MaterialPageRoute(
@@ -1014,7 +995,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
     }
 
     if (knock.honooId != null && knock.honooId!.isNotEmpty) {
-      final honoo = await _fetchHonoo(knock.honooId!);
+      final honoo =
+          await _campanelliController.fetchPendingHonoo(knock.honooId!);
       if (honoo == null || !mounted) return;
       final bool? approved = await Navigator.of(context).push<bool>(
         MaterialPageRoute(

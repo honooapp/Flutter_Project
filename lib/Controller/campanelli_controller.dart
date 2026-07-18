@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../Entities/campanelli_entry.dart';
 import '../Entities/hinoo.dart';
+import '../Entities/honoo.dart';
 import '../Entities/pending_knock.dart';
 import '../Services/campanelli_repository.dart';
 import '../Services/campanelli_realtime_service.dart';
@@ -143,6 +144,26 @@ class CampanelliController extends ChangeNotifier {
         .toList(growable: false);
     _replacePendingKnocks(knocks);
     return _state.pendingKnocks;
+  }
+
+  Future<HinooDraft?> fetchPendingHinoo(String hinooId) async {
+    final row = await _repository.fetchHinooForKnock(hinooId);
+    if (row == null || row['pages'] is! List) return null;
+    final pages = row['pages'] as List;
+    return HinooDraft(
+      pages: pages
+          .whereType<Map<String, dynamic>>()
+          .map(HinooSlide.fromJson)
+          .toList(growable: false),
+      type: HinooType.answer,
+      recipientTag: row['recipient_tag'] as String?,
+    );
+  }
+
+  Future<Honoo?> fetchPendingHonoo(String honooId) async {
+    final row = await _repository.fetchHonooForKnock(honooId);
+    if (row == null) return null;
+    return Honoo.fromMap(row);
   }
 
   Future<void> startPendingKnockRefresh({
