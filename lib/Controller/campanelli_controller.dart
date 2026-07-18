@@ -215,6 +215,34 @@ class CampanelliController extends ChangeNotifier {
     removePendingKnock(knockId);
   }
 
+  Future<void> sendHouseKnock({
+    required String targetHouseTag,
+    required String visitorId,
+    String? hinooId,
+    String? honooId,
+  }) {
+    return _repository.sendHouseKnock(
+      targetHouseTag: targetHouseTag,
+      visitorId: visitorId,
+      hinooId: hinooId,
+      honooId: honooId,
+    );
+  }
+
+  Future<void> saveShareModes({
+    required String ownerId,
+    required String campanelloHinooId,
+    required List<String> modes,
+    DateTime? updatedAt,
+  }) {
+    return _repository.saveShareModes(
+      ownerId: ownerId,
+      campanelloHinooId: campanelloHinooId,
+      modes: modes,
+      updatedAt: updatedAt ?? DateTime.now(),
+    );
+  }
+
   Future<bool> refreshHouseInviteState(String userId) async {
     final hasInvite =
         await _houseInviteService.hasPendingOrAcceptedInvite(userId);

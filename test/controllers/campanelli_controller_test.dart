@@ -245,6 +245,52 @@ void main() {
     expect(controller.state.pendingKnocks, isEmpty);
   });
 
+  test('invia una bussata attraverso il repository', () async {
+    when(() => repository.sendHouseKnock(
+          targetHouseTag: 'hinoo-1',
+          visitorId: 'visitor-1',
+          hinooId: 'message-1',
+          honooId: null,
+        )).thenAnswer((_) async {});
+
+    await controller.sendHouseKnock(
+      targetHouseTag: 'hinoo-1',
+      visitorId: 'visitor-1',
+      hinooId: 'message-1',
+    );
+
+    verify(() => repository.sendHouseKnock(
+          targetHouseTag: 'hinoo-1',
+          visitorId: 'visitor-1',
+          hinooId: 'message-1',
+          honooId: null,
+        )).called(1);
+  });
+
+  test('salva le modalità di condivisione attraverso il repository', () async {
+    final updatedAt = DateTime.utc(2026, 7, 18, 12);
+    when(() => repository.saveShareModes(
+          ownerId: 'owner-1',
+          campanelloHinooId: 'hinoo-1',
+          modes: ['honoo', 'conversations'],
+          updatedAt: updatedAt,
+        )).thenAnswer((_) async {});
+
+    await controller.saveShareModes(
+      ownerId: 'owner-1',
+      campanelloHinooId: 'hinoo-1',
+      modes: const ['honoo', 'conversations'],
+      updatedAt: updatedAt,
+    );
+
+    verify(() => repository.saveShareModes(
+          ownerId: 'owner-1',
+          campanelloHinooId: 'hinoo-1',
+          modes: ['honoo', 'conversations'],
+          updatedAt: updatedAt,
+        )).called(1);
+  });
+
   test('mantiene la bussata pendente se la concessione fallisce', () async {
     final approvedAt = DateTime.utc(2026, 7, 18, 10, 30);
     controller.addPendingKnockRow(const {

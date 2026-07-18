@@ -74,6 +74,20 @@ class CampanelliDataRepository {
     }).eq('id', knockId);
   }
 
+  Future<void> sendHouseKnock({
+    required String targetHouseTag,
+    required String visitorId,
+    String? hinooId,
+    String? honooId,
+  }) async {
+    await _client.from('house_access').insert({
+      'target_house_tag': targetHouseTag,
+      'visitor_id': visitorId,
+      if (hinooId != null && hinooId.isNotEmpty) 'hinoo_id': hinooId,
+      if (honooId != null && honooId.isNotEmpty) 'honoo_id': honooId,
+    });
+  }
+
   Future<void> saveShareModes({
     required String ownerId,
     required String campanelloHinooId,

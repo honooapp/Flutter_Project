@@ -10,6 +10,7 @@ import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/casa_share_mode.dart';
 import 'package:honoo/Entities/campanelli_realtime_event.dart';
 import 'package:honoo/Entities/campanelli_view_data.dart';
+import 'package:honoo/Entities/knock_message_choice.dart';
 import 'package:honoo/Entities/pending_knock.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Controller/hinoo_controller.dart';
@@ -22,13 +23,14 @@ import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Widgets/campanelli_footer.dart';
 import 'package:honoo/Widgets/campanello_card.dart';
 import 'package:honoo/Widgets/casa_section.dart';
+import 'package:honoo/Widgets/casa_share_dialogs.dart';
+import 'package:honoo/Widgets/knock_message_dialog.dart';
 import 'package:honoo/Widgets/pending_knocks_dialog.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
 import 'package:honoo/Widgets/busy_overlay.dart';
 import 'package:honoo/Services/admin_service.dart';
-import 'package:honoo/Services/house_access_service.dart';
 import 'package:honoo/Services/campanelli_repository.dart';
 
 import '../../Pages/home_page.dart';
@@ -48,7 +50,6 @@ class CampanelliPage extends StatefulWidget {
 }
 
 class _CampanelliPageState extends State<CampanelliPage> {
-  final HouseAccessService _houseAccessService = const HouseAccessService();
   final CampanelliDataRepository _campanelliRepository =
       CampanelliDataRepository();
   late final CampanelliController _campanelliController =
@@ -99,12 +100,14 @@ class _CampanelliPageState extends State<CampanelliPage> {
     campanelloPalombaroId,
   };
 
-  Future<void> _showBusyOverlay(String message) async {
+  void _showBusyOverlay(String message) {
     if (!mounted) return;
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => BusyOverlay(message: message),
+    unawaited(
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => BusyOverlay(message: message),
+      ),
     );
   }
 
@@ -175,12 +178,12 @@ class _CampanelliPageState extends State<CampanelliPage> {
       return;
     }
 
-    final _KnockMessageChoice? choice = await _showKnockMessageDialog();
+    final KnockMessageChoice? choice = await _showKnockMessageDialog();
     if (choice == null || !mounted) return;
 
     String? hinooId;
     String? honooId;
-    if (choice == _KnockMessageChoice.hinoo) {
+    if (choice == KnockMessageChoice.hinoo) {
       final String? result = await Navigator.of(context).push<String>(
         MaterialPageRoute(
           builder: (_) => NewHinooPage(
@@ -193,7 +196,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
       if (!mounted) return;
       if (result == null || result.isEmpty) return;
       hinooId = result;
-    } else if (choice == _KnockMessageChoice.honoo) {
+    } else if (choice == KnockMessageChoice.honoo) {
       final String? result = await Navigator.of(context).push<String>(
         MaterialPageRoute(
           builder: (_) => NewHonooPage(
@@ -210,10 +213,20 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
     setState(() => _isKnocking = true);
     try {
-      await _showBusyOverlay('Invio la bussata...');
+      _showBusyOverlay('Invio la bussata...');
       try {
-        await _sendHouseKnock(
-          campanello,
+        final user = SupabaseProvider.client.auth.currentUser;
+        final targetTag = campanello.campanelloHinooId;
+        if (user == null ||
+            targetTag == null ||
+            targetTag.isEmpty ||
+            campanello.ownerId == user.id) {
+          _hideBusyOverlay();
+          return;
+        }
+        await _campanelliController.sendHouseKnock(
+          targetHouseTag: targetTag,
+          visitorId: user.id,
           hinooId: hinooId,
           honooId: honooId,
         );
@@ -234,26 +247,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
       if (mounted) setState(() => _isKnocking = false);
     }
     // waiting realtime approval update
-  }
-
-  Future<void> _sendHouseKnock(
-    CampanelloData campanello, {
-    String? hinooId,
-    String? honooId,
-  }) async {
-    final user = SupabaseProvider.client.auth.currentUser;
-    final String? targetTag = campanello.campanelloHinooId;
-    if (user == null || targetTag == null || targetTag.isEmpty) return;
-    if (campanello.ownerId == user.id) return;
-
-    try {
-      await _houseAccessService.sendKnock(
-        targetHouseTag: targetTag,
-        visitorId: user.id,
-        hinooId: hinooId,
-        honooId: honooId,
-      );
-    } catch (_) {}
   }
 
   Future<void> _showEnterDialog(String campanelloId) async {
@@ -305,7 +298,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
       final selected = await showDialog<Set<CasaShareMode>>(
         context: context,
         barrierDismissible: true,
-        builder: (_) => _CasaMultiShareDialog(
+        builder: (_) => CasaMultiShareDialog(
           onConfirm: (picked) => _saveShareModes(campanello, picked),
         ),
       );
@@ -327,8 +320,11 @@ class _CampanelliPageState extends State<CampanelliPage> {
       return;
     }
 
-    final CasaShareMode? choice =
-        await _showVisitorShareChoiceDialog(context, modes);
+    final CasaShareMode? choice = await showDialog<CasaShareMode>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => VisitorShareChoiceDialog(modes: modes!),
+    );
     if (choice != null) {
       _openSharedContent(choice, campanello);
     }
@@ -338,7 +334,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
     return showDialog<Set<CasaShareMode>>(
       context: context,
       barrierDismissible: true,
-      builder: (_) => _CasaMultiShareDialog(
+      builder: (_) => CasaMultiShareDialog(
         onConfirm: (modes) async {},
       ),
     );
@@ -357,7 +353,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
     }
 
     final List<String> values = modes.map((m) => m.dbValue).toList();
-    await _houseAccessService.saveShareModes(
+    await _campanelliController.saveShareModes(
       ownerId: user.id,
       campanelloHinooId: campanello.campanelloHinooId!,
       modes: values,
@@ -915,7 +911,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
     HinooDraft? draft,
     Honoo? honoo,
   }) async {
-    await _showBusyOverlay('Apro la casa...');
+    _showBusyOverlay('Apro la casa...');
     try {
       final Set<CasaShareMode>? modes = await _showOwnerMultiShareDialog();
       if (modes == null || modes.isEmpty || !mounted) return;
@@ -1020,79 +1016,11 @@ class _CampanelliPageState extends State<CampanelliPage> {
     }
   }
 
-  Future<_KnockMessageChoice?> _showKnockMessageDialog() {
-    return showDialog<_KnockMessageChoice>(
+  Future<KnockMessageChoice?> _showKnockMessageDialog() {
+    return showDialog<KnockMessageChoice>(
       context: context,
       barrierDismissible: true,
-      builder: (_) => HonooDialogShell(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Vuoi inviare un messaggio\nprima di bussare?',
-                style: HonooDialogStyles.title(),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () =>
-                      Navigator.of(context).pop(_KnockMessageChoice.hinoo),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    'Scrivi un hinoo',
-                    style: HonooDialogStyles.primaryAction(),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () =>
-                      Navigator.of(context).pop(_KnockMessageChoice.honoo),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    'Scrivi un honoo',
-                    style: HonooDialogStyles.primaryAction(),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () =>
-                    Navigator.of(context).pop(_KnockMessageChoice.none),
-                style: TextButton.styleFrom(foregroundColor: Colors.white70),
-                child: Text(
-                  'No, bussa e basta',
-                  style: HonooDialogStyles.tertiaryAction(),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      builder: (_) => const KnockMessageDialog(),
     );
   }
 
@@ -1487,8 +1415,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
   }
 }
 
-enum _KnockMessageChoice { none, honoo, hinoo }
-
 class _ArrowIntent extends Intent {
   const _ArrowIntent(this.axis, this.delta);
 
@@ -1504,232 +1430,4 @@ class _CampanelloEntry {
     required this.campanello,
     required this.casa,
   });
-}
-
-// (Rimosso il vecchio dialogo single-choice non più usato)
-
-class _CasaMultiShareDialog extends StatefulWidget {
-  const _CasaMultiShareDialog({required this.onConfirm});
-
-  final Future<void> Function(Set<CasaShareMode> modes) onConfirm;
-
-  @override
-  State<_CasaMultiShareDialog> createState() => _CasaMultiShareDialogState();
-}
-
-class _CasaMultiShareDialogState extends State<_CasaMultiShareDialog> {
-  final Set<CasaShareMode> _selected = {};
-  bool _saving = false;
-
-  void _toggle(CasaShareMode mode) {
-    setState(() {
-      if (_selected.contains(mode)) {
-        _selected.remove(mode);
-      } else {
-        _selected.add(mode);
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return HonooDialogShell(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Cosa vuoi condividere?',
-              style: HonooDialogStyles.title(),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ...CasaShareMode.values.map(
-              (mode) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: () => _toggle(mode),
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: _selected.contains(mode)
-                          ? Colors.white
-                          : Colors.transparent,
-                      foregroundColor: Colors.black,
-                      side: BorderSide(
-                        color: _selected.contains(mode)
-                            ? Colors.white
-                            : Colors.white24,
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (_selected.contains(mode))
-                          const Icon(Icons.check, size: 18),
-                        if (_selected.contains(mode)) const SizedBox(width: 8),
-                        Text(
-                          mode.label,
-                          style: HonooDialogStyles.primaryAction(),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 4),
-            if (_saving)
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation(Colors.black),
-                          backgroundColor: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        'Salvo...',
-                        style: HonooDialogStyles.primaryAction(),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else if (_selected.isNotEmpty)
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    final nav = Navigator.of(context);
-                    setState(() => _saving = true);
-                    try {
-                      await widget.onConfirm(_selected);
-                      if (!mounted) return;
-                      nav.pop(_selected);
-                    } finally {
-                      if (mounted) setState(() => _saving = false);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    'Condividi',
-                    style: HonooDialogStyles.primaryAction(),
-                  ),
-                ),
-              ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              style: TextButton.styleFrom(foregroundColor: Colors.white54),
-              child: Text(
-                'Annulla',
-                style: HonooDialogStyles.tertiaryAction(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-Future<CasaShareMode?> _showVisitorShareChoiceDialog(
-  BuildContext context,
-  Set<CasaShareMode> modes,
-) async {
-  return showDialog<CasaShareMode>(
-    context: context,
-    barrierDismissible: true,
-    builder: (_) => HonooDialogShell(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Cosa vuoi aprire?',
-              style: HonooDialogStyles.title(),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ...modes.map(
-              (mode) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(mode),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      mode.label,
-                      style: HonooDialogStyles.primaryAction(),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              style: TextButton.styleFrom(foregroundColor: Colors.white54),
-              child: Text(
-                'Chiudi',
-                style: HonooDialogStyles.tertiaryAction(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
 }
