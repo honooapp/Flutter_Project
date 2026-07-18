@@ -19,10 +19,7 @@ import 'package:honoo/Utility/utility.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/UI/hinoo_typography.dart';
-import 'package:honoo/UI/hinoo_viewer.dart';
-import 'package:honoo/Widgets/honoo_app_title.dart';
 import 'package:honoo/Widgets/pending_knocks_dialog.dart';
-import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
@@ -37,6 +34,8 @@ import '../../Pages/shared_hinoo_page.dart';
 import '../../Pages/shared_honoo_page.dart';
 import '../../Pages/new_hinoo_page.dart';
 import '../../Pages/new_honoo_page.dart';
+import 'pending_hinoo_page.dart';
+import 'pending_honoo_page.dart';
 
 class CampanelliPage extends StatefulWidget {
   const CampanelliPage({super.key});
@@ -992,7 +991,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
       if (draft == null || !mounted) return;
       final bool? approved = await Navigator.of(context).push<bool>(
         MaterialPageRoute(
-          builder: (_) => _PendingHinooPage(draft: draft),
+          builder: (_) => PendingHinooPage(draft: draft),
         ),
       );
 
@@ -1008,7 +1007,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
       if (honoo == null || !mounted) return;
       final bool? approved = await Navigator.of(context).push<bool>(
         MaterialPageRoute(
-          builder: (_) => _PendingHonooPage(honoo: honoo),
+          builder: (_) => PendingHonooPage(honoo: honoo),
         ),
       );
 
@@ -1567,184 +1566,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
                   ),
               ],
             ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _PendingHinooPage extends StatelessWidget {
-  const _PendingHinooPage({required this.draft});
-
-  final HinooDraft draft;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: HonooColor.background,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final double viewW = constraints.maxWidth;
-          final double viewH = constraints.maxHeight;
-          final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
-          final layoutMode = ResponsiveLayout.modeForWidth(viewW);
-          final double footerIconSize =
-              ResponsiveLayout.footerIconSizeForMode(layoutMode);
-          final double footerGap =
-              ResponsiveLayout.footerGapForMode(layoutMode);
-          final double footerBottomPadding =
-              ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
-          final double footerSpacing = footerBottomPadding + safeBottom;
-          final double footerTopSpacing = footerSpacing / 2;
-          final double footerBottomSpacing = footerSpacing - footerTopSpacing;
-          const double headerH = 52;
-          final double targetMaxW = viewW;
-          final double footerReserved =
-              footerIconSize + footerTopSpacing + footerBottomSpacing;
-          final double availableH =
-              (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
-
-          return Column(
-            children: [
-              SizedBox(
-                height: headerH,
-                child: Center(
-                  child: HonooAppTitle(
-                    onTap: () => Navigator.of(context).pop(false),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Center(
-                  child: SizedBox(
-                    width: targetMaxW,
-                    height: availableH,
-                    child: HinooViewer(
-                      draft: draft,
-                      maxHeight: availableH,
-                      maxWidth: targetMaxW,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: footerTopSpacing),
-              ResponsiveFooterBar(
-                useSafeArea: false,
-                bottomPadding: footerBottomSpacing,
-                desiredGap: footerGap,
-                minGap: 16,
-                height: footerIconSize,
-                actions: [
-                  ResponsiveFooterAction(
-                    asset: "assets/icons/cancella.svg",
-                    semanticsLabel: 'Annulla',
-                    size: footerIconSize,
-                    splashRadius: 25,
-                    tooltip: 'Non ora',
-                    onPressed: () => Navigator.of(context).pop(false),
-                  ),
-                  ResponsiveFooterAction(
-                    asset: "assets/icons/ok.svg",
-                    semanticsLabel: 'OK',
-                    size: footerIconSize,
-                    splashRadius: 25,
-                    tooltip: 'Apri',
-                    onPressed: () => Navigator.of(context).pop(true),
-                  ),
-                ],
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _PendingHonooPage extends StatelessWidget {
-  const _PendingHonooPage({required this.honoo});
-
-  final Honoo honoo;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: HonooColor.background,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final double viewW = constraints.maxWidth;
-          final double viewH = constraints.maxHeight;
-          final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
-          final layoutMode = ResponsiveLayout.modeForWidth(viewW);
-          final double footerIconSize =
-              ResponsiveLayout.footerIconSizeForMode(layoutMode);
-          final double footerGap =
-              ResponsiveLayout.footerGapForMode(layoutMode);
-          final double footerBottomPadding =
-              ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
-          final double footerSpacing = footerBottomPadding + safeBottom;
-          final double footerTopSpacing = footerSpacing / 2;
-          final double footerBottomSpacing = footerSpacing - footerTopSpacing;
-          const double headerH = 52;
-          final double targetMaxW = ResponsiveLayout.contentMaxWidth(viewW);
-          final double footerReserved =
-              footerIconSize + footerTopSpacing + footerBottomSpacing;
-          final double availableH =
-              (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
-          final HonooBuilderMetrics metrics =
-              ResponsiveLayout.honooBuilderMetrics(
-            availableHeight: availableH,
-            maxWidth: targetMaxW,
-            mode: layoutMode,
-          );
-
-          return Column(
-            children: [
-              SizedBox(
-                height: headerH,
-                child: Center(
-                  child: HonooAppTitle(
-                    onTap: () => Navigator.of(context).pop(false),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Center(
-                  child: SizedBox(
-                    width: metrics.width,
-                    height: metrics.height,
-                    child: HonooCard(honoo: honoo),
-                  ),
-                ),
-              ),
-              SizedBox(height: footerTopSpacing),
-              ResponsiveFooterBar(
-                useSafeArea: false,
-                bottomPadding: footerBottomSpacing,
-                desiredGap: footerGap,
-                minGap: 16,
-                height: footerIconSize,
-                actions: [
-                  ResponsiveFooterAction(
-                    asset: "assets/icons/cancella.svg",
-                    semanticsLabel: 'Annulla',
-                    size: footerIconSize,
-                    splashRadius: 25,
-                    tooltip: 'Non ora',
-                    onPressed: () => Navigator.of(context).pop(false),
-                  ),
-                  ResponsiveFooterAction(
-                    asset: "assets/icons/ok.svg",
-                    semanticsLabel: 'OK',
-                    size: footerIconSize,
-                    splashRadius: 25,
-                    tooltip: 'Apri',
-                    onPressed: () => Navigator.of(context).pop(true),
-                  ),
-                ],
-              ),
-            ],
           );
         },
       ),
