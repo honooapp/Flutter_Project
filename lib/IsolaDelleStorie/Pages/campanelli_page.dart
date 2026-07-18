@@ -21,6 +21,7 @@ import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/UI/hinoo_typography.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
+import 'package:honoo/Widgets/pending_knocks_dialog.dart';
 import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
@@ -1100,85 +1101,11 @@ class _CampanelliPageState extends State<CampanelliPage> {
     await showDialog<void>(
       context: context,
       barrierDismissible: true,
-      builder: (_) => HonooDialogShell(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Bussate in attesa',
-                style: HonooDialogStyles.title(),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 260),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      for (final knock in sorted)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                                await _openPendingKnock(knock);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: Colors.black,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 14,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                elevation: 0,
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    _pendingLabelForTag(knock.targetTag),
-                                    style: HonooDialogStyles.primaryAction(),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  const SizedBox(height: 6),
-                                  GestureDetector(
-                                    onTap: () async {
-                                      Navigator.of(context).pop();
-                                      await _openPendingKnock(knock);
-                                    },
-                                    child: Text(
-                                      _formatPendingTimestamp(knock.createdAt),
-                                      style: HonooDialogStyles.tertiaryAction(),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                style: TextButton.styleFrom(foregroundColor: Colors.white54),
-                child: Text(
-                  'Chiudi',
-                  style: HonooDialogStyles.tertiaryAction(),
-                ),
-              ),
-            ],
-          ),
-        ),
+      builder: (_) => PendingKnocksDialog(
+        knocks: sorted,
+        labelForKnock: (knock) => _pendingLabelForTag(knock.targetTag),
+        timestampForKnock: (knock) => _formatPendingTimestamp(knock.createdAt),
+        onOpen: _openPendingKnock,
       ),
     );
   }
