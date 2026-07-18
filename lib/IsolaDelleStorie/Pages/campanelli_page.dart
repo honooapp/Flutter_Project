@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/casa_share_mode.dart';
 import 'package:honoo/Entities/campanelli_realtime_event.dart';
+import 'package:honoo/Entities/campanelli_view_data.dart';
 import 'package:honoo/Entities/pending_knock.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Controller/hinoo_controller.dart';
@@ -16,9 +17,11 @@ import 'package:honoo/Controller/campanelli_controller.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
 import 'package:honoo/Utility/utility.dart';
+import 'package:honoo/UI/hinoo_typography.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Widgets/campanelli_footer.dart';
-import 'package:honoo/UI/hinoo_typography.dart';
+import 'package:honoo/Widgets/campanello_card.dart';
+import 'package:honoo/Widgets/casa_section.dart';
 import 'package:honoo/Widgets/pending_knocks_dialog.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
@@ -638,19 +641,19 @@ class _CampanelliPageState extends State<CampanelliPage> {
     }
   }
 
-  List<_CampanelloPageData> _buildCampanelloPages(
+  List<CampanelloPageData> _buildCampanelloPages(
     List<_CampanelloEntry> campanelli,
   ) {
-    final pages = <_CampanelloPageData>[
-      _CampanelloPageData.intro(Utility().campanelliText),
+    final pages = <CampanelloPageData>[
+      CampanelloPageData.intro(Utility().campanelliText),
       for (final campanello in campanelli)
-        _CampanelloPageData.campanello(campanello.campanello),
+        CampanelloPageData.campanello(campanello.campanello),
     ];
 
     // Se l'utente non ha ancora una casa/campanello e non ha inviti pendenti, aggiungi pagina CTA
     if (!_hasOwnHouse && !_hasPendingOrAcceptedInvite) {
       pages.add(
-        _CampanelloPageData.intro(
+        CampanelloPageData.intro(
           'Vuoi\n anche tu\n una casa\n sull\'Isola?\n\nClicca qui',
         ),
       );
@@ -1163,7 +1166,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
           final double casaHeight =
               isMobile ? availableHeight : canvasSize.height;
           final List<_CampanelloEntry> campanelli = _buildCampanelli();
-          final List<_CampanelloPageData> campanelloPages =
+          final List<CampanelloPageData> campanelloPages =
               _buildCampanelloPages(campanelli);
           final int safeCampanelloIndex =
               _campanelloIndex.clamp(0, campanelloPages.length - 1);
@@ -1330,7 +1333,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                                   _campanelloIndex = index);
                                             },
                                             itemBuilder: (context, pageIndex) {
-                                              return _CampanelloCard(
+                                              return CampanelloCard(
                                                 data:
                                                     campanelloPages[pageIndex],
                                                 width: canvasSize.width,
@@ -1413,7 +1416,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                     );
                                   },
                                   child: Center(
-                                    child: _CasaSection(
+                                    child: CasaSection(
                                       key: ValueKey(
                                         '${campanelli[casaIndex].casa.id}_open',
                                       ),
@@ -1430,7 +1433,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                   ),
                                 )
                               : Center(
-                                  child: _CasaSection(
+                                  child: CasaSection(
                                     key: ValueKey(
                                       '${campanelli[casaIndex].casa.id}_closed',
                                     ),
@@ -1493,42 +1496,6 @@ class _ArrowIntent extends Intent {
   final int delta;
 }
 
-class CampanelloData {
-  final String id;
-  final String? campanelloHinooId;
-  final String? ownerId;
-  final ImageProvider backgroundImage;
-  final String text;
-  final String linkedHouseId;
-
-  const CampanelloData({
-    required this.id,
-    required this.campanelloHinooId,
-    required this.ownerId,
-    required this.backgroundImage,
-    required this.text,
-    required this.linkedHouseId,
-  });
-}
-
-class CasaData {
-  final String id;
-  final ImageProvider backgroundImage;
-  final List<double>? bgTransform;
-  final double bgScale;
-  final double bgOffsetX;
-  final double bgOffsetY;
-
-  const CasaData({
-    required this.id,
-    required this.backgroundImage,
-    this.bgTransform,
-    required this.bgScale,
-    required this.bgOffsetX,
-    required this.bgOffsetY,
-  });
-}
-
 class _CampanelloEntry {
   final CampanelloData campanello;
   final CasaData casa;
@@ -1537,237 +1504,6 @@ class _CampanelloEntry {
     required this.campanello,
     required this.casa,
   });
-}
-
-class _CampanelloPageData {
-  final bool isIntro;
-  final String text;
-  final CampanelloData? campanello;
-
-  const _CampanelloPageData._({
-    required this.isIntro,
-    required this.text,
-    this.campanello,
-  });
-
-  factory _CampanelloPageData.intro(String text) {
-    return _CampanelloPageData._(isIntro: true, text: text);
-  }
-
-  factory _CampanelloPageData.campanello(CampanelloData campanello) {
-    return _CampanelloPageData._(
-      isIntro: false,
-      text: campanello.text,
-      campanello: campanello,
-    );
-  }
-}
-
-class _CampanelloCard extends StatelessWidget {
-  const _CampanelloCard({
-    required this.data,
-    required this.width,
-    required this.height,
-    this.onRequestTap,
-  });
-
-  final _CampanelloPageData data;
-  final double width;
-  final double height;
-  final VoidCallback? onRequestTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final double verticalPadding = HinooTypography.verticalPadding(width);
-    final TextStyle textStyle = GoogleFonts.lora(
-      fontSize: 18,
-      height: HinooTypography.lineHeight,
-      color: HonooColor.onBackground,
-      fontWeight: FontWeight.w400,
-    );
-
-    final Widget text = Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: HinooTypography.horizontalPadding,
-        vertical: verticalPadding,
-      ),
-      child: Center(
-        child: _buildText(textStyle),
-      ),
-    );
-
-    if (data.isIntro) {
-      return Center(
-        child: SizedBox(
-          width: width,
-          height: height,
-          child: text,
-        ),
-      );
-    }
-
-    return Center(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: SizedBox(
-          width: width,
-          height: height,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Image(
-                image: data.campanello!.backgroundImage,
-                fit: BoxFit.cover,
-              ),
-              text,
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildText(TextStyle textStyle) {
-    // Rende "Clicca qui" sottolineato e cliccabile se presente
-    final String raw = data.text;
-    final idx = raw.toLowerCase().lastIndexOf('clicca qui');
-    if (idx < 0 || onRequestTap == null) {
-      return Text(raw, style: textStyle, textAlign: TextAlign.center);
-    }
-
-    final String before = raw.substring(0, idx);
-    final String link = raw.substring(idx, idx + 'clicca qui'.length);
-    final String after = raw.substring(idx + 'clicca qui'.length);
-    return RichText(
-      textAlign: TextAlign.center,
-      text: TextSpan(
-        style: textStyle,
-        children: [
-          TextSpan(text: before),
-          WidgetSpan(
-            alignment: PlaceholderAlignment.baseline,
-            baseline: TextBaseline.alphabetic,
-            child: InkWell(
-              onTap: onRequestTap,
-              child: Text(
-                link,
-                style: textStyle.copyWith(
-                  decoration: TextDecoration.underline,
-                  decorationColor: textStyle.color,
-                  decorationThickness: 2.5,
-                ),
-              ),
-            ),
-          ),
-          TextSpan(text: after),
-        ],
-      ),
-    );
-  }
-}
-
-class _CasaSection extends StatelessWidget {
-  const _CasaSection({
-    super.key,
-    required this.casa,
-    required this.isUnlocked,
-    required this.scrignoAsset,
-    this.onScrignoTap,
-    required this.footerIconSize,
-    required this.scrignoSize,
-    required this.footerBottomSpacing,
-    required this.width,
-    required this.height,
-  });
-
-  final CasaData casa;
-  final bool isUnlocked;
-  final String scrignoAsset;
-  final VoidCallback? onScrignoTap;
-  final double footerIconSize;
-  final double scrignoSize;
-  final double footerBottomSpacing;
-  final double width;
-  final double height;
-
-  @override
-  Widget build(BuildContext context) {
-    const double designWidth = 1080;
-    const double designHeight = 1920;
-    final double scaleX = width / designWidth;
-    final double scaleY = height / designHeight;
-
-    Matrix4 buildTransform() {
-      final List<double>? transform = casa.bgTransform;
-      if (transform != null && transform.length == 16) {
-        final List<double> m = List<double>.from(transform);
-        m[12] *= scaleX;
-        m[13] *= scaleY;
-        return Matrix4.fromList(m);
-      }
-
-      final double tx = casa.bgOffsetX * scaleX;
-      final double ty = casa.bgOffsetY * scaleY;
-      return Matrix4.identity()
-        ..translate(tx, ty)
-        ..scale(casa.bgScale);
-    }
-
-    final Matrix4 transform = buildTransform();
-
-    return SizedBox(
-      width: width,
-      height: height,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          if (isUnlocked)
-            ClipRect(
-              child: Transform(
-                transform: transform,
-                alignment: Alignment.center,
-                child: Image(
-                  image: casa.backgroundImage,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            )
-          else
-            Container(color: HonooColor.background),
-          if (!isUnlocked)
-            Center(
-              child: Text(
-                'Casa chiusa',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.lora(
-                  fontSize: 18,
-                  color: HonooColor.onBackground,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-          Positioned(
-            bottom: footerBottomSpacing,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: GestureDetector(
-                onTap: onScrignoTap,
-                child: SizedBox(
-                  width: scrignoSize,
-                  height: scrignoSize,
-                  child: FittedBox(
-                    fit: BoxFit.contain,
-                    child: Image.asset(scrignoAsset),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 // (Rimosso il vecchio dialogo single-choice non più usato)
