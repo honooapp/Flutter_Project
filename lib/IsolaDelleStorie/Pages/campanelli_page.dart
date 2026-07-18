@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
@@ -7,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/casa_share_mode.dart';
+import 'package:honoo/Entities/campanelli_realtime_event.dart';
 import 'package:honoo/Entities/pending_knock.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Controller/hinoo_controller.dart';
@@ -67,6 +69,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
   bool get _hasPendingOrAcceptedInvite =>
       _campanelliController.state.hasPendingOrAcceptedInvite;
   DateTime? _lastKnockToastAt;
+  late final StreamSubscription<CampanelliRealtimeEvent>
+      _realtimeEventsSubscription;
   List<PendingKnock> get _pendingKnocks =>
       _campanelliController.state.pendingKnocks;
   Set<String> get _pendingKnockTags => _campanelliController.pendingKnockTags;
@@ -109,6 +113,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
   @override
   void initState() {
     super.initState();
+    _realtimeEventsSubscription =
+        _campanelliController.realtimeEvents.listen(_handleRealtimeEvent);
     _loadUserEntries();
     _subscribeVisitorAccessChannel();
   }
@@ -787,22 +793,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
       _campanelliController.startOwnerRealtime(
         userId: user.id,
         ownedHinooIds: _ownedHinooIds,
-        onPendingKnock: (_) {
-          if (!mounted) return;
-          setState(() {});
-          final now = DateTime.now();
-          if (_lastKnockToastAt == null ||
-              now.difference(_lastKnockToastAt!) > const Duration(seconds: 3)) {
-            _lastKnockToastAt = now;
-            showHonooToast(
-              context,
-              message: 'Qualcuno ha bussato alla tua casa',
-            );
-          }
-        },
-        onPendingRemoved: () {
-          if (mounted) setState(() {});
-        },
       );
     } catch (_) {
       // In test or when Realtime not available, safely ignore
@@ -815,22 +805,39 @@ class _CampanelliPageState extends State<CampanelliPage> {
       if (user == null) return;
       _campanelliController.startVisitorRealtime(
         userId: user.id,
-        onAccessGranted: (tag) async {
-          if (!mounted) return;
-          showHonooToast(context, message: 'La casa è stata aperta');
-          try {
-            HapticFeedback.lightImpact();
-          } catch (_) {}
-          await _goToCampanelloByTag(tag);
-          await _hintCampanelloBounce();
-          final entry = _entryForTag(tag);
-          if (entry != null && mounted) {
-            setState(() => _unlockedCampanelli.add(entry.campanello.id));
-          }
-        },
       );
     } catch (_) {
       // In test or when Realtime not available, safely ignore
+    }
+  }
+
+  Future<void> _handleRealtimeEvent(CampanelliRealtimeEvent event) async {
+    if (!mounted) return;
+    switch (event) {
+      case CampanelliPendingKnockReceived():
+        setState(() {});
+        final now = DateTime.now();
+        if (_lastKnockToastAt == null ||
+            now.difference(_lastKnockToastAt!) > const Duration(seconds: 3)) {
+          _lastKnockToastAt = now;
+          showHonooToast(
+            context,
+            message: 'Qualcuno ha bussato alla tua casa',
+          );
+        }
+      case CampanelliPendingKnockRemoved():
+        setState(() {});
+      case CampanelliAccessGranted(:final targetTag):
+        showHonooToast(context, message: 'La casa è stata aperta');
+        try {
+          HapticFeedback.lightImpact();
+        } catch (_) {}
+        await _goToCampanelloByTag(targetTag);
+        await _hintCampanelloBounce();
+        final entry = _entryForTag(targetTag);
+        if (entry != null && mounted) {
+          setState(() => _unlockedCampanelli.add(entry.campanello.id));
+        }
     }
   }
 
@@ -1178,6 +1185,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
   @override
   void dispose() {
+    _realtimeEventsSubscription.cancel();
     _pageController.dispose();
     _campanelloPageController.dispose();
     _campanelliController.dispose();

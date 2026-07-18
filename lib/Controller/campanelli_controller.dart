@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../Entities/campanelli_entry.dart';
+import '../Entities/campanelli_realtime_event.dart';
 import '../Entities/hinoo.dart';
 import '../Entities/honoo.dart';
 import '../Entities/pending_knock.dart';
@@ -86,8 +87,11 @@ class CampanelliController extends ChangeNotifier {
   Timer? _pendingKnockRefreshTimer;
   bool _isRefreshingPendingKnocks = false;
   CampanelliLoadState _state = const CampanelliLoadState();
+  final StreamController<CampanelliRealtimeEvent> _realtimeEvents =
+      StreamController<CampanelliRealtimeEvent>.broadcast();
 
   CampanelliLoadState get state => _state;
+  Stream<CampanelliRealtimeEvent> get realtimeEvents => _realtimeEvents.stream;
 
   Future<CampanelliLoadState> load(String userId) async {
     if (_state.isLoading) return _state;
@@ -302,8 +306,6 @@ class CampanelliController extends ChangeNotifier {
   void startOwnerRealtime({
     required String userId,
     required List<String> ownedHinooIds,
-    required void Function(PendingKnock knock) onPendingKnock,
-    required void Function() onPendingRemoved,
   }) {
     _ownerSubscription?.close();
     _ownerSubscription = _realtimeGateway.subscribeOwner(
@@ -319,23 +321,26 @@ class CampanelliController extends ChangeNotifier {
             break;
           }
         }
-        if (knock != null) onPendingKnock(knock);
+        if (knock != null) {
+          _realtimeEvents.add(CampanelliPendingKnockReceived(knock));
+        }
       },
       onDelete: (id) {
         removePendingKnock(id);
-        onPendingRemoved();
+        _realtimeEvents.add(CampanelliPendingKnockRemoved(id));
       },
     );
   }
 
   void startVisitorRealtime({
     required String userId,
-    required void Function(String targetTag) onAccessGranted,
   }) {
     _visitorSubscription?.close();
     _visitorSubscription = _realtimeGateway.subscribeVisitor(
       userId: userId,
-      onAccessGranted: onAccessGranted,
+      onAccessGranted: (targetTag) {
+        _realtimeEvents.add(CampanelliAccessGranted(targetTag));
+      },
     );
   }
 
@@ -386,6 +391,7 @@ class CampanelliController extends ChangeNotifier {
   void dispose() {
     stopPendingKnockRefresh();
     stopRealtime();
+    _realtimeEvents.close();
     super.dispose();
   }
 }

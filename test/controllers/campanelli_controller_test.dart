@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Controller/campanelli_controller.dart';
 import 'package:honoo/Entities/hinoo.dart';
+import 'package:honoo/Entities/campanelli_realtime_event.dart';
 import 'package:honoo/Services/campanelli_repository.dart';
 import 'package:honoo/Services/campanelli_realtime_service.dart';
 import 'package:honoo/Services/house_invite_service.dart';
@@ -331,25 +332,24 @@ void main() {
     expect(controller.pendingKnockTags, isEmpty);
   });
 
-  test('inoltra eventi Realtime e chiude le sottoscrizioni', () {
+  test('pubblica eventi Realtime tipizzati e chiude le sottoscrizioni',
+      () async {
     final realtime = _FakeRealtimeGateway();
     final realtimeController = CampanelliController(
       repository: repository,
       realtimeGateway: realtime,
     );
-    var insertEvents = 0;
-    var deleteEvents = 0;
-    String? grantedTag;
+    final events = <CampanelliRealtimeEvent>[];
+    final eventsSubscription = realtimeController.realtimeEvents.listen(
+      events.add,
+    );
 
     realtimeController.startOwnerRealtime(
       userId: 'user-1',
       ownedHinooIds: const ['hinoo-1'],
-      onPendingKnock: (_) => insertEvents++,
-      onPendingRemoved: () => deleteEvents++,
     );
     realtimeController.startVisitorRealtime(
       userId: 'user-1',
-      onAccessGranted: (tag) => grantedTag = tag,
     );
     realtime.onPendingInsert!(const {
       'id': 'knock-1',
@@ -358,12 +358,25 @@ void main() {
     });
     realtime.onDelete!('knock-1');
     realtime.onAccessGranted!('hinoo-1');
+    await Future<void>.delayed(Duration.zero);
 
-    expect(insertEvents, 1);
-    expect(deleteEvents, 1);
-    expect(grantedTag, 'hinoo-1');
+    expect(events, hasLength(3));
+    expect(events[0], isA<CampanelliPendingKnockReceived>());
+    expect(
+      (events[0] as CampanelliPendingKnockReceived).knock.id,
+      'knock-1',
+    );
+    expect(
+      (events[1] as CampanelliPendingKnockRemoved).knockId,
+      'knock-1',
+    );
+    expect(
+      (events[2] as CampanelliAccessGranted).targetTag,
+      'hinoo-1',
+    );
     expect(realtimeController.state.pendingKnocks, isEmpty);
 
+    await eventsSubscription.cancel();
     realtimeController.dispose();
     expect(realtime.ownerSubscription.closed, isTrue);
     expect(realtime.visitorSubscription.closed, isTrue);
