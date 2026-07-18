@@ -4,7 +4,6 @@ import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/casa_share_mode.dart';
@@ -25,6 +24,7 @@ import 'package:honoo/Widgets/campanello_card.dart';
 import 'package:honoo/Widgets/casa_section.dart';
 import 'package:honoo/Widgets/casa_share_dialogs.dart';
 import 'package:honoo/Widgets/knock_message_dialog.dart';
+import 'package:honoo/Widgets/house_invite_dialogs.dart';
 import 'package:honoo/Widgets/pending_knocks_dialog.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
@@ -498,51 +498,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
         await showDialog<void>(
           context: context,
           barrierDismissible: true,
-          builder: (_) => HonooDialogShell(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Richiesta inviata',
-                    style: HonooDialogStyles.title(),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    email.isNotEmpty
-                        ? '$email ha richiesto una casa sull\'Isola.'
-                        : 'Hai richiesto una casa sull\'Isola.',
-                    style: HonooDialogStyles.body(),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        'OK',
-                        style: GoogleFonts.libreFranklin(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          builder: (_) => HouseRequestSentDialog(email: email),
         );
         return;
       }
@@ -551,64 +507,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
       final bool? invite = await showDialog<bool>(
         context: context,
         barrierDismissible: true,
-        builder: (_) => HonooDialogShell(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Richiesta ricevuta',
-                  style: HonooDialogStyles.title(),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  email.isNotEmpty
-                      ? '$email ha richiesto una casa sull\'Isola.'
-                      : 'Un utente ha richiesto una casa sull\'Isola.',
-                  style: HonooDialogStyles.body(),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: Text(
-                          'Non ora',
-                          style: HonooDialogStyles.secondaryAction(),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () => Navigator.of(context).pop(true),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: Text(
-                          'Invita',
-                          style: GoogleFonts.libreFranklin(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
+        builder: (_) => HouseRequestReceivedDialog(email: email),
       );
 
       if (invite == true) {
