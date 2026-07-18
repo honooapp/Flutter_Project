@@ -916,19 +916,28 @@ class _CampanelliPageState extends State<CampanelliPage> {
     await _showBusyOverlay('Apro la casa...');
     try {
       final Set<_CasaShareMode>? modes = await _showOwnerMultiShareDialog();
-      if (modes == null || modes.isEmpty || !mounted) return _hideBusyOverlay();
-      await _saveShareModes(entry.campanello, modes);
+      if (modes == null || modes.isEmpty || !mounted) return;
+      final user = SupabaseProvider.client.auth.currentUser;
+      final campanelloHinooId = entry.campanello.campanelloHinooId;
+      if (user == null || campanelloHinooId == null) return;
       try {
-        await _campanelliRepository.grantHouseAccess(
+        await _campanelliController.approvePendingKnock(
           knockId: knock.id,
-          grantedAt: DateTime.now(),
+          ownerId: user.id,
+          campanelloHinooId: campanelloHinooId,
+          shareModes: modes.map((mode) => mode.dbValue).toList(growable: false),
         );
+        if (mounted) {
+          setState(() {
+            _shareModesByCampanello[_shareKeyFor(entry.campanello)] = modes;
+          });
+        }
       } catch (e) {
         debugPrint('house_access grant error: $e');
         if (mounted) {
           showHonooToast(context, message: 'Operazione non riuscita. Ritenta.');
         }
-        return _hideBusyOverlay();
+        return;
       }
     } finally {
       _hideBusyOverlay();
@@ -949,7 +958,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
     }
 
     if (!mounted) return;
-    _campanelliController.removePendingKnock(knock.id);
     setState(() {});
     showHonooToast(context, message: 'Casa aperta.');
     // Light haptic on owner approval as further confirmation

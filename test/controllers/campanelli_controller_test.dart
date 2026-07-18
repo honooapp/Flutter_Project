@@ -194,6 +194,79 @@ void main() {
     expect(honoo.recipientTag, 'owner-1');
   });
 
+  test('approva la bussata e la rimuove dallo stato', () async {
+    final approvedAt = DateTime.utc(2026, 7, 18, 10, 30);
+    controller.addPendingKnockRow(const {
+      'id': 'knock-1',
+      'target_house_tag': 'hinoo-1',
+      'created_at': '2026-07-18T10:00:00Z',
+    });
+    when(() => repository.saveShareModes(
+          ownerId: 'owner-1',
+          campanelloHinooId: 'hinoo-1',
+          modes: ['honoo', 'hinoo'],
+          updatedAt: approvedAt,
+        )).thenAnswer((_) async {});
+    when(() => repository.grantHouseAccess(
+          knockId: 'knock-1',
+          grantedAt: approvedAt,
+        )).thenAnswer((_) async {});
+
+    await controller.approvePendingKnock(
+      knockId: 'knock-1',
+      ownerId: 'owner-1',
+      campanelloHinooId: 'hinoo-1',
+      shareModes: const ['honoo', 'hinoo'],
+      approvedAt: approvedAt,
+    );
+
+    verifyInOrder([
+      () => repository.saveShareModes(
+            ownerId: 'owner-1',
+            campanelloHinooId: 'hinoo-1',
+            modes: ['honoo', 'hinoo'],
+            updatedAt: approvedAt,
+          ),
+      () => repository.grantHouseAccess(
+            knockId: 'knock-1',
+            grantedAt: approvedAt,
+          ),
+    ]);
+    expect(controller.state.pendingKnocks, isEmpty);
+  });
+
+  test('mantiene la bussata pendente se la concessione fallisce', () async {
+    final approvedAt = DateTime.utc(2026, 7, 18, 10, 30);
+    controller.addPendingKnockRow(const {
+      'id': 'knock-1',
+      'target_house_tag': 'hinoo-1',
+      'created_at': '2026-07-18T10:00:00Z',
+    });
+    when(() => repository.saveShareModes(
+          ownerId: any(named: 'ownerId'),
+          campanelloHinooId: any(named: 'campanelloHinooId'),
+          modes: any(named: 'modes'),
+          updatedAt: any(named: 'updatedAt'),
+        )).thenAnswer((_) async {});
+    when(() => repository.grantHouseAccess(
+          knockId: any(named: 'knockId'),
+          grantedAt: any(named: 'grantedAt'),
+        )).thenThrow(StateError('offline'));
+
+    await expectLater(
+      controller.approvePendingKnock(
+        knockId: 'knock-1',
+        ownerId: 'owner-1',
+        campanelloHinooId: 'hinoo-1',
+        shareModes: const ['honoo'],
+        approvedAt: approvedAt,
+      ),
+      throwsStateError,
+    );
+
+    expect(controller.state.pendingKnocks.single.id, 'knock-1');
+  });
+
   test('Realtime sostituisce duplicati e rimuove per id', () {
     expect(
       controller.addPendingKnockRow(const {

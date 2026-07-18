@@ -74,6 +74,21 @@ class CampanelliDataRepository {
     }).eq('id', knockId);
   }
 
+  Future<void> saveShareModes({
+    required String ownerId,
+    required String campanelloHinooId,
+    required List<String> modes,
+    required DateTime updatedAt,
+  }) async {
+    await _client.from('house_share_settings').upsert({
+      'owner_id': ownerId,
+      'campanello_hinoo_id': campanelloHinooId,
+      'share_mode': modes.isEmpty ? null : modes.first,
+      'share_modes': modes,
+      'updated_at': updatedAt.toIso8601String(),
+    }, onConflict: 'campanello_hinoo_id');
+  }
+
   static List<dynamic> _asList(dynamic rows) {
     if (rows is List) return rows;
     if (rows is Map) return [rows];

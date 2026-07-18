@@ -121,4 +121,28 @@ void main() {
         })).called(1);
     verify(() => houseAccess.eq('id', 'knock-1')).called(1);
   });
+
+  test('saveShareModes mantiene payload e chiave di conflitto', () async {
+    final updatedAt = DateTime.utc(2026, 7, 18, 10, 30);
+    when(() => settings.upsert(
+          any(),
+          onConflict: any(named: 'onConflict'),
+        )).thenAnswer((_) => settings);
+    settings.queueResponse(<String, dynamic>{});
+
+    await repository.saveShareModes(
+      ownerId: 'owner-1',
+      campanelloHinooId: 'hinoo-1',
+      modes: const ['honoo', 'hinoo'],
+      updatedAt: updatedAt,
+    );
+
+    verify(() => settings.upsert({
+          'owner_id': 'owner-1',
+          'campanello_hinoo_id': 'hinoo-1',
+          'share_mode': 'honoo',
+          'share_modes': ['honoo', 'hinoo'],
+          'updated_at': '2026-07-18T10:30:00.000Z',
+        }, onConflict: 'campanello_hinoo_id')).called(1);
+  });
 }

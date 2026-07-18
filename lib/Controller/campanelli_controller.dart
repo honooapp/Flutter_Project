@@ -166,6 +166,27 @@ class CampanelliController extends ChangeNotifier {
     return Honoo.fromMap(row);
   }
 
+  Future<void> approvePendingKnock({
+    required String knockId,
+    required String ownerId,
+    required String campanelloHinooId,
+    required List<String> shareModes,
+    DateTime? approvedAt,
+  }) async {
+    final timestamp = approvedAt ?? DateTime.now();
+    await _repository.saveShareModes(
+      ownerId: ownerId,
+      campanelloHinooId: campanelloHinooId,
+      modes: shareModes,
+      updatedAt: timestamp,
+    );
+    await _repository.grantHouseAccess(
+      knockId: knockId,
+      grantedAt: timestamp,
+    );
+    removePendingKnock(knockId);
+  }
+
   Future<void> startPendingKnockRefresh({
     required List<String> ownedHinooIds,
     required void Function() onChanged,
