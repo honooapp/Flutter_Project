@@ -5,10 +5,13 @@ import 'package:honoo/Controller/campanelli_controller.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Services/campanelli_repository.dart';
 import 'package:honoo/Services/campanelli_realtime_service.dart';
+import 'package:honoo/Services/house_invite_service.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _MockCampanelliRepository extends Mock
     implements CampanelliDataRepository {}
+
+class _MockHouseInviteService extends Mock implements HouseInviteService {}
 
 class _FakeSubscription implements CampanelliRealtimeSubscription {
   bool closed = false;
@@ -48,11 +51,16 @@ class _FakeRealtimeGateway implements CampanelliRealtimeGateway {
 
 void main() {
   late _MockCampanelliRepository repository;
+  late _MockHouseInviteService houseInviteService;
   late CampanelliController controller;
 
   setUp(() {
     repository = _MockCampanelliRepository();
-    controller = CampanelliController(repository: repository);
+    houseInviteService = _MockHouseInviteService();
+    controller = CampanelliController(
+      repository: repository,
+      houseInviteService: houseInviteService,
+    );
   });
 
   tearDown(() => controller.dispose());
@@ -99,6 +107,7 @@ void main() {
     expect(loadingStates, [true, false]);
     expect(state.error, isNull);
     expect(state.ownedHinooIds, ['hinoo-owned']);
+    expect(state.hasOwnHouse, isTrue);
     expect(state.entries, hasLength(1));
     expect(state.entries.single.text, 'Il mio campanello');
     expect(state.entries.single.ownerId, 'user-1');
@@ -265,6 +274,38 @@ void main() {
     );
 
     expect(controller.state.pendingKnocks.single.id, 'knock-1');
+  });
+
+  test('carica lo stato invito e impedisce richieste concorrenti', () async {
+    when(() => houseInviteService.hasPendingOrAcceptedInvite('user-1'))
+        .thenAnswer((_) async => true);
+
+    expect(await controller.refreshHouseInviteState('user-1'), isTrue);
+    expect(controller.state.hasPendingOrAcceptedInvite, isTrue);
+    expect(controller.beginInviteRequest(), isTrue);
+    expect(controller.beginInviteRequest(), isFalse);
+    expect(controller.state.isInviteRequestBusy, isTrue);
+
+    controller.endInviteRequest();
+    expect(controller.state.isInviteRequestBusy, isFalse);
+  });
+
+  test('registra la richiesta e aggiorna lo stato solo dopo il successo',
+      () async {
+    final createdAt = DateTime.utc(2026, 7, 18, 12);
+    when(() => houseInviteService.createPendingRequest(
+          userId: 'user-1',
+          email: 'user@example.com',
+          createdAt: createdAt,
+        )).thenAnswer((_) async {});
+
+    await controller.createPendingHouseRequest(
+      userId: 'user-1',
+      email: 'user@example.com',
+      createdAt: createdAt,
+    );
+
+    expect(controller.state.hasPendingOrAcceptedInvite, isTrue);
   });
 
   test('Realtime sostituisce duplicati e rimuove per id', () {

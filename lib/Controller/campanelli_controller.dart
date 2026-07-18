@@ -8,6 +8,7 @@ import '../Entities/honoo.dart';
 import '../Entities/pending_knock.dart';
 import '../Services/campanelli_repository.dart';
 import '../Services/campanelli_realtime_service.dart';
+import '../Services/house_invite_service.dart';
 
 @immutable
 class CampanelliLoadState {
@@ -16,6 +17,9 @@ class CampanelliLoadState {
     this.shareRows = const [],
     this.ownedHinooIds = const [],
     this.pendingKnocks = const [],
+    this.hasOwnHouse = false,
+    this.hasPendingOrAcceptedInvite = false,
+    this.isInviteRequestBusy = false,
     this.isLoading = false,
     this.error,
   });
@@ -24,6 +28,9 @@ class CampanelliLoadState {
   final List<dynamic> shareRows;
   final List<String> ownedHinooIds;
   final List<PendingKnock> pendingKnocks;
+  final bool hasOwnHouse;
+  final bool hasPendingOrAcceptedInvite;
+  final bool isInviteRequestBusy;
   final bool isLoading;
   final Object? error;
 
@@ -32,6 +39,9 @@ class CampanelliLoadState {
     List<dynamic>? shareRows,
     List<String>? ownedHinooIds,
     List<PendingKnock>? pendingKnocks,
+    bool? hasOwnHouse,
+    bool? hasPendingOrAcceptedInvite,
+    bool? isInviteRequestBusy,
     bool? isLoading,
     Object? error,
     bool clearError = false,
@@ -41,6 +51,10 @@ class CampanelliLoadState {
       shareRows: shareRows ?? this.shareRows,
       ownedHinooIds: ownedHinooIds ?? this.ownedHinooIds,
       pendingKnocks: pendingKnocks ?? this.pendingKnocks,
+      hasOwnHouse: hasOwnHouse ?? this.hasOwnHouse,
+      hasPendingOrAcceptedInvite:
+          hasPendingOrAcceptedInvite ?? this.hasPendingOrAcceptedInvite,
+      isInviteRequestBusy: isInviteRequestBusy ?? this.isInviteRequestBusy,
       isLoading: isLoading ?? this.isLoading,
       error: clearError ? null : error ?? this.error,
     );
@@ -51,11 +65,18 @@ class CampanelliController extends ChangeNotifier {
   CampanelliController({
     CampanelliDataRepository? repository,
     CampanelliRealtimeGateway? realtimeGateway,
+    HouseInviteService? houseInviteService,
   })  : _repository = repository ?? CampanelliDataRepository(),
-        _configuredRealtimeGateway = realtimeGateway;
+        _configuredRealtimeGateway = realtimeGateway,
+        _configuredHouseInviteService = houseInviteService;
 
   final CampanelliDataRepository _repository;
   final CampanelliRealtimeGateway? _configuredRealtimeGateway;
+  final HouseInviteService? _configuredHouseInviteService;
+  HouseInviteService? _defaultHouseInviteService;
+  HouseInviteService get _houseInviteService =>
+      _configuredHouseInviteService ??
+      (_defaultHouseInviteService ??= HouseInviteService());
   CampanelliRealtimeGateway? _defaultRealtimeGateway;
   CampanelliRealtimeGateway get _realtimeGateway =>
       _configuredRealtimeGateway ??
@@ -122,6 +143,9 @@ class CampanelliController extends ChangeNotifier {
         shareRows: List<dynamic>.unmodifiable(shareRows),
         ownedHinooIds: List<String>.unmodifiable(ownedHinooIds),
         pendingKnocks: _state.pendingKnocks,
+        hasOwnHouse: ownedHinooIds.isNotEmpty,
+        hasPendingOrAcceptedInvite: _state.hasPendingOrAcceptedInvite,
+        isInviteRequestBusy: _state.isInviteRequestBusy,
       ));
     } catch (error) {
       _publish(CampanelliLoadState(error: error));
@@ -185,6 +209,37 @@ class CampanelliController extends ChangeNotifier {
       grantedAt: timestamp,
     );
     removePendingKnock(knockId);
+  }
+
+  Future<bool> refreshHouseInviteState(String userId) async {
+    final hasInvite =
+        await _houseInviteService.hasPendingOrAcceptedInvite(userId);
+    _publish(_state.copyWith(hasPendingOrAcceptedInvite: hasInvite));
+    return hasInvite;
+  }
+
+  bool beginInviteRequest() {
+    if (_state.isInviteRequestBusy) return false;
+    _publish(_state.copyWith(isInviteRequestBusy: true));
+    return true;
+  }
+
+  void endInviteRequest() {
+    if (!_state.isInviteRequestBusy) return;
+    _publish(_state.copyWith(isInviteRequestBusy: false));
+  }
+
+  Future<void> createPendingHouseRequest({
+    required String userId,
+    required String email,
+    DateTime? createdAt,
+  }) async {
+    await _houseInviteService.createPendingRequest(
+      userId: userId,
+      email: email,
+      createdAt: createdAt ?? DateTime.now(),
+    );
+    _publish(_state.copyWith(hasPendingOrAcceptedInvite: true));
   }
 
   Future<void> startPendingKnockRefresh({

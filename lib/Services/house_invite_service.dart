@@ -8,11 +8,8 @@ class HouseInviteService {
   final SupabaseClient _client;
 
   Future<bool> hasCasa(String userId) async {
-    final rows = await _client
-        .from('case')
-        .select('id')
-        .eq('owner_id', userId)
-        .limit(1);
+    final rows =
+        await _client.from('case').select('id').eq('owner_id', userId).limit(1);
     return rows is List && rows.isNotEmpty;
   }
 
@@ -21,13 +18,25 @@ class HouseInviteService {
         .from('house_invites')
         .select('status')
         .eq('user_id', userId)
-        .in_('status', ['pending', 'accepted'])
-        .limit(1);
+        .in_('status', ['pending', 'accepted']).limit(1);
     if (rows is! List || rows.isEmpty) return false;
     final row = rows.first;
     if (row is! Map) return false;
     final status = row['status']?.toString();
     return status == 'pending' || status == 'accepted';
+  }
+
+  Future<void> createPendingRequest({
+    required String userId,
+    required String email,
+    required DateTime createdAt,
+  }) async {
+    await _client.from('house_invites').insert({
+      'user_id': userId,
+      if (email.isNotEmpty) 'email': email,
+      'status': 'pending',
+      'created_at': createdAt.toIso8601String(),
+    });
   }
 
   Future<void> syncInvitesForEmail(String email) async {
@@ -41,14 +50,12 @@ class HouseInviteService {
   Future<void> markInvitesAccepted(String userId) async {
     await _client
         .from('house_invites')
-        .update({'status': 'accepted'})
-        .eq('user_id', userId);
+        .update({'status': 'accepted'}).eq('user_id', userId);
   }
 
   Future<void> markInvitesDeclined(String userId) async {
     await _client
         .from('house_invites')
-        .update({'status': 'declined'})
-        .eq('user_id', userId);
+        .update({'status': 'declined'}).eq('user_id', userId);
   }
 }

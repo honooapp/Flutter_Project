@@ -24,7 +24,6 @@ import 'package:honoo/Controller/honoo_controller.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
 import 'package:honoo/Widgets/busy_overlay.dart';
 import 'package:honoo/Services/admin_service.dart';
-import 'package:honoo/Services/house_invite_service.dart';
 import 'package:honoo/Services/house_access_service.dart';
 import 'package:honoo/Services/campanelli_repository.dart';
 
@@ -63,9 +62,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
   bool _isLoadingUserEntries = false;
   bool _isHoveringCampanelli = false;
   bool _isKnocking = false;
-  bool _hasOwnHouse = false;
-  bool _hasPendingOrAcceptedInvite = false;
-  bool _requestBusy = false;
+  bool get _hasOwnHouse => _campanelliController.state.hasOwnHouse;
+  bool get _hasPendingOrAcceptedInvite =>
+      _campanelliController.state.hasPendingOrAcceptedInvite;
   DateTime? _lastKnockToastAt;
   List<PendingKnock> get _pendingKnocks =>
       _campanelliController.state.pendingKnocks;
@@ -445,8 +444,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
   }
 
   Future<void> _handleInviteRequestTap() async {
-    if (_requestBusy) return;
-    _requestBusy = true;
+    if (!_campanelliController.beginInviteRequest()) return;
     try {
       if (_hasOwnHouse) {
         if (mounted) {
@@ -478,21 +476,17 @@ class _CampanelliPageState extends State<CampanelliPage> {
       if (!isAdmin) {
         // Utente normale: prova a registrare la richiesta su house_invites (se consentito da RLS)
         try {
-          final payload = <String, dynamic>{
-            'user_id': user.id,
-            if (email.isNotEmpty) 'email': email,
-            'status': 'pending',
-            'created_at': DateTime.now().toIso8601String(),
-          };
-          await SupabaseProvider.client.from('house_invites').insert(payload);
-          _hasPendingOrAcceptedInvite = true;
+          await _campanelliController.createPendingHouseRequest(
+            userId: user.id,
+            email: email,
+          );
         } catch (_) {
           // ignora: in ambienti dove RLS non consente l'insert, continua con solo feedback
         }
 
         // Feedback locale
         if (!mounted) {
-          _requestBusy = false;
+          _campanelliController.endInviteRequest();
           return;
         }
         await showDialog<void>(
@@ -633,7 +627,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
         }
       }
     } finally {
-      _requestBusy = false;
+      _campanelliController.endInviteRequest();
     }
   }
 
@@ -693,7 +687,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
           setState(() {
             _userEntries = const [];
             _ownedHinooIds = const [];
-            _hasOwnHouse = false;
           });
         }
         return;
@@ -753,7 +746,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
         setState(() {
           _userEntries = entries;
           _ownedHinooIds = List<String>.from(ownedHinooIds);
-          _hasOwnHouse = ownedHinooIds.isNotEmpty;
           _unlockedCampanelli.addAll(
             entries
                 .where((entry) => entry.campanello.ownerId == user.id)
@@ -763,9 +755,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
       }
       // Verifica inviti pendenti/accettati per nascondere CTA se già invitato
       try {
-        final hasInvite =
-            await HouseInviteService().hasPendingOrAcceptedInvite(user.id);
-        if (mounted) setState(() => _hasPendingOrAcceptedInvite = hasInvite);
+        await _campanelliController.refreshHouseInviteState(user.id);
+        if (mounted) setState(() {});
       } catch (_) {}
       _subscribeOwnerAccessChannel();
       await _campanelliController.startPendingKnockRefresh(

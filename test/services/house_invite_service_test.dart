@@ -51,8 +51,7 @@ void main() {
     when(() => chain.limit(any())).thenAnswer((_) => chain);
   });
 
-  test('hasPendingOrAcceptedInvite filtra status pending/accepted',
-      () async {
+  test('hasPendingOrAcceptedInvite filtra status pending/accepted', () async {
     chain.queueResponse([
       {'status': 'pending'}
     ]);
@@ -65,5 +64,24 @@ void main() {
     verify(() => chain.eq('user_id', 'user-1')).called(1);
     verify(() => chain.in_('status', ['pending', 'accepted'])).called(1);
     verify(() => chain.limit(1)).called(1);
+  });
+
+  test('createPendingRequest mantiene il payload della richiesta', () async {
+    final createdAt = DateTime.utc(2026, 7, 18, 12);
+    when(() => chain.insert(any())).thenAnswer((_) => chain);
+    chain.queueResponse(<String, dynamic>{});
+
+    await service.createPendingRequest(
+      userId: 'user-1',
+      email: 'user@example.com',
+      createdAt: createdAt,
+    );
+
+    verify(() => chain.insert({
+          'user_id': 'user-1',
+          'email': 'user@example.com',
+          'status': 'pending',
+          'created_at': '2026-07-18T12:00:00.000Z',
+        })).called(1);
   });
 }
