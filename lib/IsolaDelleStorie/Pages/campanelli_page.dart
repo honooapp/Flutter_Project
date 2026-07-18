@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:honoo/Entities/hinoo.dart';
+import 'package:honoo/Entities/casa_share_mode.dart';
 import 'package:honoo/Entities/pending_knock.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Controller/hinoo_controller.dart';
@@ -70,9 +71,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
       _campanelliController.state.pendingKnocks;
   Set<String> get _pendingKnockTags => _campanelliController.pendingKnockTags;
   List<String> _ownedHinooIds = const [];
-  final Map<String, Set<_CasaShareMode>> _shareModesByCampanello = {
-    campanelloSirenaId: {_CasaShareMode.honoo},
-    campanelloPalombaroId: {_CasaShareMode.hinoo},
+  final Map<String, Set<CasaShareMode>> _shareModesByCampanello = {
+    campanelloSirenaId: {CasaShareMode.honoo},
+    campanelloPalombaroId: {CasaShareMode.hinoo},
   };
 
   static const String campanelloSirenaId = 'campanello_sirena';
@@ -287,12 +288,12 @@ class _CampanelliPageState extends State<CampanelliPage> {
     }
 
     final String shareKey = _shareKeyFor(campanello);
-    Set<_CasaShareMode>? modes = _shareModesByCampanello[shareKey];
+    Set<CasaShareMode>? modes = _shareModesByCampanello[shareKey];
     final user = SupabaseProvider.client.auth.currentUser;
     final bool isOwner = user != null && campanello.ownerId == user.id;
 
     if ((modes == null || modes.isEmpty) && isOwner) {
-      final selected = await showDialog<Set<_CasaShareMode>>(
+      final selected = await showDialog<Set<CasaShareMode>>(
         context: context,
         barrierDismissible: true,
         builder: (_) => _CasaMultiShareDialog(
@@ -317,15 +318,15 @@ class _CampanelliPageState extends State<CampanelliPage> {
       return;
     }
 
-    final _CasaShareMode? choice =
+    final CasaShareMode? choice =
         await _showVisitorShareChoiceDialog(context, modes);
     if (choice != null) {
       _openSharedContent(choice, campanello);
     }
   }
 
-  Future<Set<_CasaShareMode>?> _showOwnerMultiShareDialog() {
-    return showDialog<Set<_CasaShareMode>>(
+  Future<Set<CasaShareMode>?> _showOwnerMultiShareDialog() {
+    return showDialog<Set<CasaShareMode>>(
       context: context,
       barrierDismissible: true,
       builder: (_) => _CasaMultiShareDialog(
@@ -336,7 +337,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
   Future<void> _saveShareModes(
     CampanelloData campanello,
-    Set<_CasaShareMode> modes,
+    Set<CasaShareMode> modes,
   ) async {
     final user = SupabaseProvider.client.auth.currentUser;
     final shareKey = _shareKeyFor(campanello);
@@ -357,7 +358,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
     setState(() => _shareModesByCampanello[shareKey] = modes);
   }
 
-  void _openSharedContent(_CasaShareMode mode, CampanelloData campanello) {
+  void _openSharedContent(CasaShareMode mode, CampanelloData campanello) {
     final ownerId = campanello.ownerId;
     if (ownerId == null || ownerId.isEmpty) {
       showHonooMessageDialog(
@@ -370,7 +371,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
     }
 
     switch (mode) {
-      case _CasaShareMode.honoo:
+      case CasaShareMode.honoo:
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -378,7 +379,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
           ),
         );
         return;
-      case _CasaShareMode.hinoo:
+      case CasaShareMode.hinoo:
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -386,7 +387,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
           ),
         );
         return;
-      case _CasaShareMode.conversations:
+      case CasaShareMode.conversations:
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -698,16 +699,16 @@ class _CampanelliPageState extends State<CampanelliPage> {
         if (row is! Map) continue;
         final String? hinooId = row['campanello_hinoo_id'] as String?;
         final List<dynamic>? modes = row['share_modes'] as List<dynamic>?;
-        Set<_CasaShareMode> selected = {};
+        Set<CasaShareMode> selected = {};
         if (modes != null) {
           for (final v in modes) {
-            final parsed = _CasaShareModeMapper.fromDb(v?.toString());
+            final parsed = CasaShareMode.fromDb(v?.toString());
             if (parsed != null) selected.add(parsed);
           }
         }
         if (selected.isEmpty) {
           final String? mode = row['share_mode'] as String?;
-          final parsed = _CasaShareModeMapper.fromDb(mode);
+          final parsed = CasaShareMode.fromDb(mode);
           if (parsed != null) selected = {parsed};
         }
         if (hinooId != null && selected.isNotEmpty) {
@@ -906,7 +907,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
   }) async {
     await _showBusyOverlay('Apro la casa...');
     try {
-      final Set<_CasaShareMode>? modes = await _showOwnerMultiShareDialog();
+      final Set<CasaShareMode>? modes = await _showOwnerMultiShareDialog();
       if (modes == null || modes.isEmpty || !mounted) return;
       final user = SupabaseProvider.client.auth.currentUser;
       final campanelloHinooId = entry.campanello.campanelloHinooId;
@@ -2137,61 +2138,22 @@ class _CasaSection extends StatelessWidget {
   }
 }
 
-enum _CasaShareMode { honoo, hinoo, conversations }
-
-extension _CasaShareModeMapper on _CasaShareMode {
-  String get label {
-    switch (this) {
-      case _CasaShareMode.honoo:
-        return 'I miei honoo';
-      case _CasaShareMode.hinoo:
-        return 'I miei hinoo';
-      case _CasaShareMode.conversations:
-        return 'Le mie conversazioni';
-    }
-  }
-
-  String get dbValue {
-    switch (this) {
-      case _CasaShareMode.honoo:
-        return 'honoo';
-      case _CasaShareMode.hinoo:
-        return 'hinoo';
-      case _CasaShareMode.conversations:
-        return 'conversations';
-    }
-  }
-
-  static _CasaShareMode? fromDb(String? value) {
-    switch (value) {
-      case 'honoo':
-        return _CasaShareMode.honoo;
-      case 'hinoo':
-        return _CasaShareMode.hinoo;
-      case 'conversations':
-        return _CasaShareMode.conversations;
-      default:
-        return null;
-    }
-  }
-}
-
 // (Rimosso il vecchio dialogo single-choice non più usato)
 
 class _CasaMultiShareDialog extends StatefulWidget {
   const _CasaMultiShareDialog({required this.onConfirm});
 
-  final Future<void> Function(Set<_CasaShareMode> modes) onConfirm;
+  final Future<void> Function(Set<CasaShareMode> modes) onConfirm;
 
   @override
   State<_CasaMultiShareDialog> createState() => _CasaMultiShareDialogState();
 }
 
 class _CasaMultiShareDialogState extends State<_CasaMultiShareDialog> {
-  final Set<_CasaShareMode> _selected = {};
+  final Set<CasaShareMode> _selected = {};
   bool _saving = false;
 
-  void _toggle(_CasaShareMode mode) {
+  void _toggle(CasaShareMode mode) {
     setState(() {
       if (_selected.contains(mode)) {
         _selected.remove(mode);
@@ -2215,7 +2177,7 @@ class _CasaMultiShareDialogState extends State<_CasaMultiShareDialog> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            ..._CasaShareMode.values.map(
+            ...CasaShareMode.values.map(
               (mode) => Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: SizedBox(
@@ -2343,11 +2305,11 @@ class _CasaMultiShareDialogState extends State<_CasaMultiShareDialog> {
   }
 }
 
-Future<_CasaShareMode?> _showVisitorShareChoiceDialog(
+Future<CasaShareMode?> _showVisitorShareChoiceDialog(
   BuildContext context,
-  Set<_CasaShareMode> modes,
+  Set<CasaShareMode> modes,
 ) async {
-  return showDialog<_CasaShareMode>(
+  return showDialog<CasaShareMode>(
     context: context,
     barrierDismissible: true,
     builder: (_) => HonooDialogShell(
