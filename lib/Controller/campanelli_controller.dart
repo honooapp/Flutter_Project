@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../Entities/campanelli_entry.dart';
+import '../Entities/casa_request_result.dart';
+import '../Entities/casa_share_mode.dart';
 import '../Entities/campanelli_realtime_event.dart';
 import '../Entities/hinoo.dart';
 import '../Entities/honoo.dart';
@@ -10,12 +12,15 @@ import '../Entities/pending_knock.dart';
 import '../Services/campanelli_repository.dart';
 import '../Services/campanelli_realtime_service.dart';
 import '../Services/house_invite_service.dart';
+import '../Services/admin_service.dart';
+import '../Services/supabase_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 @immutable
 class CampanelliLoadState {
   const CampanelliLoadState({
     this.entries = const [],
-    this.shareRows = const [],
+    this.shareModesByCampanello = const {},
     this.ownedHinooIds = const [],
     this.pendingKnocks = const [],
     this.hasOwnHouse = false,
@@ -26,7 +31,7 @@ class CampanelliLoadState {
   });
 
   final List<CampanelliEntry> entries;
-  final List<dynamic> shareRows;
+  final Map<String, Set<CasaShareMode>> shareModesByCampanello;
   final List<String> ownedHinooIds;
   final List<PendingKnock> pendingKnocks;
   final bool hasOwnHouse;
@@ -37,7 +42,7 @@ class CampanelliLoadState {
 
   CampanelliLoadState copyWith({
     List<CampanelliEntry>? entries,
-    List<dynamic>? shareRows,
+    Map<String, Set<CasaShareMode>>? shareModesByCampanello,
     List<String>? ownedHinooIds,
     List<PendingKnock>? pendingKnocks,
     bool? hasOwnHouse,
@@ -49,7 +54,8 @@ class CampanelliLoadState {
   }) {
     return CampanelliLoadState(
       entries: entries ?? this.entries,
-      shareRows: shareRows ?? this.shareRows,
+      shareModesByCampanello:
+          shareModesByCampanello ?? this.shareModesByCampanello,
       ownedHinooIds: ownedHinooIds ?? this.ownedHinooIds,
       pendingKnocks: pendingKnocks ?? this.pendingKnocks,
       hasOwnHouse: hasOwnHouse ?? this.hasOwnHouse,
@@ -67,13 +73,24 @@ class CampanelliController extends ChangeNotifier {
     CampanelliDataRepository? repository,
     CampanelliRealtimeGateway? realtimeGateway,
     HouseInviteService? houseInviteService,
+    AdminService? adminService,
+    SupabaseClient? client,
   })  : _repository = repository ?? CampanelliDataRepository(),
         _configuredRealtimeGateway = realtimeGateway,
-        _configuredHouseInviteService = houseInviteService;
+        _configuredHouseInviteService = houseInviteService,
+        _configuredAdminService = adminService,
+        _configuredClient = client;
 
   final CampanelliDataRepository _repository;
   final CampanelliRealtimeGateway? _configuredRealtimeGateway;
   final HouseInviteService? _configuredHouseInviteService;
+  final AdminService? _configuredAdminService;
+  final SupabaseClient? _configuredClient;
+  AdminService? _defaultAdminService;
+  AdminService get _adminService =>
+      _configuredAdminService ??
+      (_defaultAdminService ??= AdminService(client: _configuredClient));
+  SupabaseClient get _client => _configuredClient ?? SupabaseProvider.client;
   HouseInviteService? _defaultHouseInviteService;
   HouseInviteService get _houseInviteService =>
       _configuredHouseInviteService ??
@@ -115,6 +132,7 @@ class CampanelliController extends ChangeNotifier {
       }
 
       final shareRows = await _repository.fetchShareSettingsRows(hinooIds);
+      final shareModes = _parseShareModes(shareRows);
       final hinooRows = await _repository.fetchHinooRows(hinooIds);
       final entries = <CampanelliEntry>[];
       for (final row in hinooRows) {
@@ -144,7 +162,7 @@ class CampanelliController extends ChangeNotifier {
       }
       _publish(CampanelliLoadState(
         entries: List<CampanelliEntry>.unmodifiable(entries),
-        shareRows: List<dynamic>.unmodifiable(shareRows),
+        shareModesByCampanello: shareModes,
         ownedHinooIds: List<String>.unmodifiable(ownedHinooIds),
         pendingKnocks: _state.pendingKnocks,
         hasOwnHouse: ownedHinooIds.isNotEmpty,
@@ -234,13 +252,29 @@ class CampanelliController extends ChangeNotifier {
     required String campanelloHinooId,
     required List<String> modes,
     DateTime? updatedAt,
-  }) {
-    return _repository.saveShareModes(
+  }) async {
+    await _repository.saveShareModes(
       ownerId: ownerId,
       campanelloHinooId: campanelloHinooId,
       modes: modes,
       updatedAt: updatedAt ?? DateTime.now(),
     );
+    final parsed = <CasaShareMode>{};
+    for (final mode in modes) {
+      final value = CasaShareMode.fromDb(mode);
+      if (value != null) parsed.add(value);
+    }
+    final updated = <String, Set<CasaShareMode>>{
+      ..._state.shareModesByCampanello,
+      if (parsed.isEmpty)
+        campanelloHinooId: <CasaShareMode>{}
+      else
+        campanelloHinooId: Set<CasaShareMode>.unmodifiable(parsed),
+    };
+    _publish(_state.copyWith(
+      shareModesByCampanello:
+          Map<String, Set<CasaShareMode>>.unmodifiable(updated),
+    ));
   }
 
   Future<bool> refreshHouseInviteState(String userId) async {
@@ -248,6 +282,93 @@ class CampanelliController extends ChangeNotifier {
         await _houseInviteService.hasPendingOrAcceptedInvite(userId);
     _publish(_state.copyWith(hasPendingOrAcceptedInvite: hasInvite));
     return hasInvite;
+  }
+
+  Future<CasaRequestResult> requestHouseInvite() async {
+    final user = _client.auth.currentUser;
+    if (user == null) return CasaRequestResult.sessionAbsent;
+    try {
+      if (await _houseInviteService.hasCasa(user.id) || _state.hasOwnHouse) {
+        return CasaRequestResult.alreadyPresent;
+      }
+      if (await _houseInviteService.hasPendingOrAcceptedInvite(user.id) ||
+          _state.hasPendingOrAcceptedInvite) {
+        return CasaRequestResult.alreadyPresent;
+      }
+      if (await _adminService.isCurrentUserAdmin()) {
+        return CasaRequestResult.administrator;
+      }
+      await _houseInviteService.createPendingRequest(
+        userId: user.id,
+        email: user.email ?? '',
+        createdAt: DateTime.now(),
+      );
+      _publish(_state.copyWith(hasPendingOrAcceptedInvite: true));
+      return CasaRequestResult.success;
+    } catch (error) {
+      return _classifyError(error);
+    }
+  }
+
+  Future<CasaAdminInviteResult> sendAdminInvite() async {
+    final user = _client.auth.currentUser;
+    if (user == null) return CasaAdminInviteResult.sessionAbsent;
+    final email = user.email ?? '';
+    if (email.trim().isEmpty) return CasaAdminInviteResult.backendUnavailable;
+    try {
+      final sent = await _adminService.inviteByEmailOnly(
+        adminUid: user.id,
+        email: email,
+      );
+      return sent
+          ? CasaAdminInviteResult.success
+          : CasaAdminInviteResult.alreadyPresent;
+    } catch (error) {
+      final result = _classifyError(error);
+      switch (result) {
+        case CasaRequestResult.rlsError:
+          return CasaAdminInviteResult.rlsError;
+        case CasaRequestResult.sessionAbsent:
+          return CasaAdminInviteResult.sessionAbsent;
+        default:
+          return CasaAdminInviteResult.backendUnavailable;
+      }
+    }
+  }
+
+  static CasaRequestResult _classifyError(Object error) {
+    if (error is PostgrestException &&
+        (error.code == '42501' || error.code == 'PGRST301')) {
+      return CasaRequestResult.rlsError;
+    }
+    if (error is PostgrestException && error.code == '23505') {
+      return CasaRequestResult.alreadyPresent;
+    }
+    return CasaRequestResult.backendUnavailable;
+  }
+
+  static Map<String, Set<CasaShareMode>> _parseShareModes(List<dynamic> rows) {
+    final parsed = <String, Set<CasaShareMode>>{};
+    for (final row in rows.whereType<Map>()) {
+      final id = row['campanello_hinoo_id']?.toString();
+      if (id == null || id.isEmpty) continue;
+      final selected = <CasaShareMode>{};
+      final rawModes = row['share_modes'];
+      if (rawModes is List) {
+        for (final raw in rawModes) {
+          final mode = CasaShareMode.fromDb(raw?.toString());
+          if (mode != null) selected.add(mode);
+        }
+      }
+      if (selected.isEmpty) {
+        final mode = CasaShareMode.fromDb(row['share_mode']?.toString());
+        if (mode != null) selected.add(mode);
+      }
+      if (selected.isNotEmpty) {
+        parsed[id] = Set<CasaShareMode>.unmodifiable(selected);
+      }
+    }
+    return Map<String, Set<CasaShareMode>>.unmodifiable(parsed);
   }
 
   bool beginInviteRequest() {

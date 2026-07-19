@@ -3,16 +3,25 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Controller/campanelli_controller.dart';
 import 'package:honoo/Entities/hinoo.dart';
+import 'package:honoo/Entities/casa_request_result.dart';
 import 'package:honoo/Entities/campanelli_realtime_event.dart';
+import 'package:honoo/Services/admin_service.dart';
 import 'package:honoo/Services/campanelli_repository.dart';
 import 'package:honoo/Services/campanelli_realtime_service.dart';
 import 'package:honoo/Services/house_invite_service.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class _MockCampanelliRepository extends Mock
     implements CampanelliDataRepository {}
 
 class _MockHouseInviteService extends Mock implements HouseInviteService {}
+
+class _MockAdminService extends Mock implements AdminService {}
+
+class _MockSupabaseClient extends Mock implements SupabaseClient {}
+
+class _MockGoTrueClient extends Mock implements GoTrueClient {}
 
 class _FakeSubscription implements CampanelliRealtimeSubscription {
   bool closed = false;
@@ -53,14 +62,23 @@ class _FakeRealtimeGateway implements CampanelliRealtimeGateway {
 void main() {
   late _MockCampanelliRepository repository;
   late _MockHouseInviteService houseInviteService;
+  late _MockAdminService adminService;
+  late _MockSupabaseClient client;
+  late _MockGoTrueClient auth;
   late CampanelliController controller;
 
   setUp(() {
     repository = _MockCampanelliRepository();
     houseInviteService = _MockHouseInviteService();
+    adminService = _MockAdminService();
+    client = _MockSupabaseClient();
+    auth = _MockGoTrueClient();
+    when(() => client.auth).thenReturn(auth);
     controller = CampanelliController(
       repository: repository,
       houseInviteService: houseInviteService,
+      adminService: adminService,
+      client: client,
     );
   });
 
@@ -353,6 +371,105 @@ void main() {
     );
 
     expect(controller.state.hasPendingOrAcceptedInvite, isTrue);
+  });
+
+  group('richiesta Casa tipizzata', () {
+    const user = User(
+      id: 'user-1',
+      appMetadata: {},
+      userMetadata: {},
+      aud: 'authenticated',
+      createdAt: '2026-07-18T12:00:00Z',
+      email: 'user@example.com',
+    );
+
+    setUp(() {
+      when(() => auth.currentUser).thenReturn(user);
+      when(() => houseInviteService.hasCasa('user-1'))
+          .thenAnswer((_) async => false);
+      when(() => houseInviteService.hasPendingOrAcceptedInvite('user-1'))
+          .thenAnswer((_) async => false);
+      when(() => adminService.isCurrentUserAdmin())
+          .thenAnswer((_) async => false);
+    });
+
+    test('senza sessione restituisce sessionAbsent', () async {
+      when(() => auth.currentUser).thenReturn(null);
+
+      expect(
+        await controller.requestHouseInvite(),
+        CasaRequestResult.sessionAbsent,
+      );
+    });
+
+    test('richiesta normale restituisce success', () async {
+      when(() => houseInviteService.createPendingRequest(
+            userId: 'user-1',
+            email: 'user@example.com',
+            createdAt: any(named: 'createdAt'),
+          )).thenAnswer((_) async {});
+
+      expect(
+        await controller.requestHouseInvite(),
+        CasaRequestResult.success,
+      );
+      expect(controller.state.hasPendingOrAcceptedInvite, isTrue);
+    });
+
+    test('richiesta duplicata restituisce alreadyPresent', () async {
+      when(() => houseInviteService.hasPendingOrAcceptedInvite('user-1'))
+          .thenAnswer((_) async => true);
+
+      expect(
+        await controller.requestHouseInvite(),
+        CasaRequestResult.alreadyPresent,
+      );
+      verifyNever(() => houseInviteService.createPendingRequest(
+            userId: any(named: 'userId'),
+            email: any(named: 'email'),
+            createdAt: any(named: 'createdAt'),
+          ));
+    });
+
+    test('amministratore restituisce administrator senza creare richiesta',
+        () async {
+      when(() => adminService.isCurrentUserAdmin())
+          .thenAnswer((_) async => true);
+
+      expect(
+        await controller.requestHouseInvite(),
+        CasaRequestResult.administrator,
+      );
+      verifyNever(() => houseInviteService.createPendingRequest(
+            userId: any(named: 'userId'),
+            email: any(named: 'email'),
+            createdAt: any(named: 'createdAt'),
+          ));
+    });
+
+    test('classifica RLS e backend non disponibili', () async {
+      when(() => houseInviteService.createPendingRequest(
+            userId: any(named: 'userId'),
+            email: any(named: 'email'),
+            createdAt: any(named: 'createdAt'),
+          )).thenThrow(
+        const PostgrestException(message: 'not allowed', code: '42501'),
+      );
+      expect(
+        await controller.requestHouseInvite(),
+        CasaRequestResult.rlsError,
+      );
+
+      when(() => houseInviteService.createPendingRequest(
+            userId: any(named: 'userId'),
+            email: any(named: 'email'),
+            createdAt: any(named: 'createdAt'),
+          )).thenThrow(StateError('offline'));
+      expect(
+        await controller.requestHouseInvite(),
+        CasaRequestResult.backendUnavailable,
+      );
+    });
   });
 
   test('Realtime sostituisce duplicati e rimuove per id', () {

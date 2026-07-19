@@ -16,6 +16,22 @@ class CampanelloData {
   final ImageProvider backgroundImage;
   final String text;
   final String linkedHouseId;
+
+  factory CampanelloData.fromBackend({
+    required Map<String, dynamic> row,
+    required ImageProvider backgroundImage,
+    required String text,
+    required String linkedHouseId,
+  }) {
+    return CampanelloData(
+      id: row['id']?.toString() ?? '',
+      campanelloHinooId: row['campanello_hinoo_id']?.toString(),
+      ownerId: row['owner_id']?.toString(),
+      backgroundImage: backgroundImage,
+      text: text,
+      linkedHouseId: linkedHouseId,
+    );
+  }
 }
 
 class CasaData {
@@ -34,6 +50,33 @@ class CasaData {
   final double bgScale;
   final double bgOffsetX;
   final double bgOffsetY;
+
+  factory CasaData.fromBackend({
+    required Map<String, dynamic> row,
+    required ImageProvider backgroundImage,
+    required double bgScale,
+    required double bgOffsetX,
+    required double bgOffsetY,
+  }) {
+    return CasaData(
+      id: row['id']?.toString() ?? '',
+      backgroundImage: backgroundImage,
+      bgTransform: _parseTransform(row['bg_transform']),
+      bgScale: bgScale,
+      bgOffsetX: bgOffsetX,
+      bgOffsetY: bgOffsetY,
+    );
+  }
+
+  static List<double>? _parseTransform(dynamic raw) {
+    if (raw is! List) return null;
+    final values = <double>[];
+    for (final value in raw) {
+      if (value is! num) return null;
+      values.add(value.toDouble());
+    }
+    return List<double>.unmodifiable(values);
+  }
 }
 
 class CampanelloPageData {

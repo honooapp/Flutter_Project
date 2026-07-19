@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/casa_share_mode.dart';
+import 'package:honoo/Entities/casa_request_result.dart';
 import 'package:honoo/Entities/campanelli_realtime_event.dart';
 import 'package:honoo/Entities/campanelli_view_data.dart';
 import 'package:honoo/Entities/knock_message_choice.dart';
@@ -30,7 +31,6 @@ import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
 import 'package:honoo/Widgets/busy_overlay.dart';
-import 'package:honoo/Services/admin_service.dart';
 import 'package:honoo/Services/campanelli_repository.dart';
 
 import '../../Pages/home_page.dart';
@@ -79,11 +79,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
       _campanelliController.state.pendingKnocks;
   Set<String> get _pendingKnockTags => _campanelliController.pendingKnockTags;
   List<String> _ownedHinooIds = const [];
-  final Map<String, Set<CasaShareMode>> _shareModesByCampanello = {
-    campanelloSirenaId: {CasaShareMode.honoo},
-    campanelloPalombaroId: {CasaShareMode.hinoo},
-  };
-
   static const String campanelloSirenaId = 'campanello_sirena';
   static const String campanelloPalombaroId = 'campanello_palombaro';
   static const String casaSirenaId = 'casa_sirena';
@@ -290,7 +285,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
     }
 
     final String shareKey = _shareKeyFor(campanello);
-    Set<CasaShareMode>? modes = _shareModesByCampanello[shareKey];
+    Set<CasaShareMode>? modes =
+        _campanelliController.state.shareModesByCampanello[shareKey];
     final user = SupabaseProvider.client.auth.currentUser;
     final bool isOwner = user != null && campanello.ownerId == user.id;
 
@@ -345,10 +341,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
     Set<CasaShareMode> modes,
   ) async {
     final user = SupabaseProvider.client.auth.currentUser;
-    final shareKey = _shareKeyFor(campanello);
-
     if (user == null || campanello.campanelloHinooId == null) {
-      setState(() => _shareModesByCampanello[shareKey] = modes);
       return;
     }
 
@@ -360,7 +353,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
     );
 
     if (!mounted) return;
-    setState(() => _shareModesByCampanello[shareKey] = modes);
   }
 
   void _openSharedContent(CasaShareMode mode, CampanelloData campanello) {
@@ -465,74 +457,66 @@ class _CampanelliPageState extends State<CampanelliPage> {
         return;
       }
 
-      final user = SupabaseProvider.client.auth.currentUser;
-      if (user == null) {
-        if (!mounted) return;
-        showHonooToast(context,
-            message: 'Accedi prima per richiedere una casa.');
-        return;
-      }
-
-      final String email = user.email ?? '';
-      final admin = AdminService();
-      final bool isAdmin = await admin.isCurrentUserAdmin();
-
+      final String email =
+          SupabaseProvider.client.auth.currentUser?.email ?? '';
+      final result = await _campanelliController.requestHouseInvite();
       if (!mounted) return;
-
-      if (!isAdmin) {
-        // Utente normale: prova a registrare la richiesta su house_invites (se consentito da RLS)
-        try {
-          await _campanelliController.createPendingHouseRequest(
-            userId: user.id,
-            email: email,
+      switch (result) {
+        case CasaRequestResult.success:
+          await showDialog<void>(
+            context: context,
+            barrierDismissible: true,
+            builder: (_) => HouseRequestSentDialog(email: email),
           );
-        } catch (_) {
-          // ignora: in ambienti dove RLS non consente l'insert, continua con solo feedback
-        }
-
-        // Feedback locale
-        if (!mounted) {
-          _campanelliController.endInviteRequest();
-          return;
-        }
-        await showDialog<void>(
-          context: context,
-          barrierDismissible: true,
-          builder: (_) => HouseRequestSentDialog(email: email),
-        );
-        return;
-      }
-
-      // Admin: mostra dialogo con Non ora / Invita
-      final bool? invite = await showDialog<bool>(
-        context: context,
-        barrierDismissible: true,
-        builder: (_) => HouseRequestReceivedDialog(email: email),
-      );
-
-      if (invite == true) {
-        if (!mounted) return;
-        try {
-          final adminUid = user.id;
-          if (email.isEmpty) {
-            showHonooToast(context, message: 'Email utente non disponibile.');
-            return;
+        case CasaRequestResult.administrator:
+          final invite = await showDialog<bool>(
+            context: context,
+            barrierDismissible: true,
+            builder: (_) => HouseRequestReceivedDialog(email: email),
+          );
+          if (invite == true && mounted) {
+            final inviteResult = await _campanelliController.sendAdminInvite();
+            if (mounted) {
+              showHonooToast(context,
+                  message: _adminInviteMessage(inviteResult));
+            }
           }
-          final ok =
-              await admin.inviteByEmailOnly(adminUid: adminUid, email: email);
-          if (!mounted) return;
-          showHonooToast(
-            context,
-            message:
-                ok ? 'Invito inviato.' : 'Invito già presente o non inviabile.',
-          );
-        } catch (e) {
-          if (!mounted) return;
-          showHonooToast(context, message: 'Errore invito: $e');
-        }
+        default:
+          showHonooToast(context, message: _requestMessage(result));
       }
     } finally {
       _campanelliController.endInviteRequest();
+    }
+  }
+
+  String _requestMessage(CasaRequestResult result) {
+    switch (result) {
+      case CasaRequestResult.alreadyPresent:
+        return 'Hai già una casa o una richiesta in corso.';
+      case CasaRequestResult.rlsError:
+        return 'La richiesta non è autorizzata dal backend.';
+      case CasaRequestResult.sessionAbsent:
+        return 'Accedi prima per richiedere una casa.';
+      case CasaRequestResult.backendUnavailable:
+        return 'Backend non disponibile. Ritenta più tardi.';
+      case CasaRequestResult.success:
+      case CasaRequestResult.administrator:
+        return 'Operazione non disponibile.';
+    }
+  }
+
+  String _adminInviteMessage(CasaAdminInviteResult result) {
+    switch (result) {
+      case CasaAdminInviteResult.success:
+        return 'Invito inviato.';
+      case CasaAdminInviteResult.alreadyPresent:
+        return 'Invito già presente.';
+      case CasaAdminInviteResult.rlsError:
+        return 'Invito non autorizzato dal backend.';
+      case CasaAdminInviteResult.sessionAbsent:
+        return 'Sessione assente.';
+      case CasaAdminInviteResult.backendUnavailable:
+        return 'Backend non disponibile. Ritenta più tardi.';
     }
   }
 
@@ -597,49 +581,27 @@ class _CampanelliPageState extends State<CampanelliPage> {
         return;
       }
 
-      final shareRows = loadState.shareRows;
-
-      for (final row in shareRows) {
-        if (row is! Map) continue;
-        final String? hinooId = row['campanello_hinoo_id'] as String?;
-        final List<dynamic>? modes = row['share_modes'] as List<dynamic>?;
-        Set<CasaShareMode> selected = {};
-        if (modes != null) {
-          for (final v in modes) {
-            final parsed = CasaShareMode.fromDb(v?.toString());
-            if (parsed != null) selected.add(parsed);
-          }
-        }
-        if (selected.isEmpty) {
-          final String? mode = row['share_mode'] as String?;
-          final parsed = CasaShareMode.fromDb(mode);
-          if (parsed != null) selected = {parsed};
-        }
-        if (hinooId != null && selected.isNotEmpty) {
-          _shareModesByCampanello[hinooId] = selected;
-        }
-      }
-
       final entries = loadState.entries.map((entry) {
         final casaId = 'casa_${entry.hinooId}';
         return _CampanelloEntry(
-          campanello: CampanelloData(
-            id: 'campanello_${entry.hinooId}',
-            campanelloHinooId: entry.hinooId,
-            ownerId: entry.ownerId,
+          campanello: CampanelloData.fromBackend(
+            row: {
+              'id': 'campanello_${entry.hinooId}',
+              'campanello_hinoo_id': entry.hinooId,
+              'owner_id': entry.ownerId,
+            },
             backgroundImage: _campanelloBackgroundProvider(
               entry.campanelloBackgroundUrl,
             ),
             text: entry.text,
             linkedHouseId: casaId,
           ),
-          casa: CasaData(
-            id: casaId,
+          casa: CasaData.fromBackend(
+            row: {'id': casaId, 'bg_transform': entry.bgTransform},
             backgroundImage: _houseBackgroundProvider(
               entry.houseImageUrl,
               entry.campanelloBackgroundUrl,
             ),
-            bgTransform: entry.bgTransform,
             bgScale: entry.bgScale,
             bgOffsetX: entry.bgOffsetX,
             bgOffsetY: entry.bgOffsetY,
@@ -825,9 +787,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
           shareModes: modes.map((mode) => mode.dbValue).toList(growable: false),
         );
         if (mounted) {
-          setState(() {
-            _shareModesByCampanello[_shareKeyFor(entry.campanello)] = modes;
-          });
+          setState(() {});
         }
       } catch (e) {
         debugPrint('house_access grant error: $e');
