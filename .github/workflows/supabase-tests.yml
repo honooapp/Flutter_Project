@@ -13,6 +13,14 @@ on:
         default: "false"
 
 jobs:
+  migration_lint:
+    name: Migration structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify migration ordering and safety markers
+        run: bash tool/check_supabase_migrations.sh
+
   readonly:
     name: Read-only (analyze + supabase tests)
     runs-on: macos-latest

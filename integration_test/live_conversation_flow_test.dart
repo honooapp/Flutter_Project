@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:honoo/testing/live_config.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -12,10 +13,14 @@ void main() {
 
     final a = SupabaseClient(LiveConfig.supaUrl, LiveConfig.supaAnon);
     final b = SupabaseClient(LiveConfig.supaUrl, LiveConfig.supaAnon);
-    final marker = 'codex-conversation-${DateTime.now().microsecondsSinceEpoch}';
+    final marker =
+        'codex-conversation-${DateTime.now().microsecondsSinceEpoch}';
     final createdHonoo = <String>[];
     final createdHinoo = <String>[];
+    final createdStorageObjects = <String, List<String>>{};
     RealtimeChannel? channel;
+    RealtimeChannel? reconnectedChannel;
+    String? expectedRealtimeDeleteId;
 
     await a.auth.signInWithPassword(
       email: LiveConfig.userAEmail,
@@ -26,6 +31,20 @@ void main() {
       password: LiveConfig.userBPassword,
     );
     final aId = a.auth.currentUser!.id;
+    final bId = b.auth.currentUser!.id;
+    a.storage.setAuth(a.auth.currentSession!.accessToken);
+    b.storage.setAuth(b.auth.currentSession!.accessToken);
+
+    // Superfici autenticate di Scrigno e Campanelli: le query devono riuscire
+    // per entrambi gli utenti anche quando il risultato è vuoto.
+    await a.from('honoo').select('id').eq('user_id', aId).limit(10);
+    await a.from('hinoo').select('id').eq('user_id', aId).limit(10);
+    await b.from('honoo').select('id').eq('user_id', bId).limit(10);
+    await b.from('hinoo').select('id').eq('user_id', bId).limit(10);
+    await a.from('campanelli').select('id').eq('owner_id', aId).limit(1);
+    await b.from('campanelli').select('id').eq('owner_id', bId).limit(1);
+    await a.from('case').select('id').eq('owner_id', aId).limit(1);
+    await b.from('case').select('id').eq('owner_id', bId).limit(1);
 
     Future<Map<String, dynamic>> insertHonoo(
       SupabaseClient client, {
@@ -84,6 +103,28 @@ void main() {
     }
 
     try {
+      // Verifica upload e rimozione nel bucket hinoo con un oggetto temporaneo.
+      // honoo-images viene verificato separatamente: la policy storica non
+      // consente la SELECT necessaria alla rimozione via Storage API e non va
+      // modificata implicitamente da questo test.
+      final storageProbe = Uint8List.fromList(<int>[137, 80, 78, 71]);
+      for (final bucket in <String>['hinoo']) {
+        final path = '$aId/codex-live/$marker.png';
+        createdStorageObjects[bucket] = <String>[path];
+        try {
+          await a.storage.from(bucket).uploadBinary(
+                path,
+                storageProbe,
+                fileOptions: const FileOptions(
+                  upsert: false,
+                  contentType: 'image/png',
+                ),
+              );
+        } catch (error) {
+          throw StateError('Upload Storage fallito per $bucket: $error');
+        }
+      }
+
       final honooRoot = await insertHonoo(
         a,
         text: 'root honoo',
@@ -92,7 +133,8 @@ void main() {
       final honooRootId = honooRoot['id'].toString();
       final honooConversationId = honooRoot['conversation_id'].toString();
       expect(honooConversationId, honooRootId,
-          reason: 'La radice honoo deve inizializzare conversation_id col suo id');
+          reason:
+              'La radice honoo deve inizializzare conversation_id col suo id');
 
       await insertHonoo(
         b,
@@ -119,7 +161,8 @@ void main() {
       final hinooRootId = hinooRoot['id'].toString();
       final hinooConversationId = hinooRoot['conversation_id'].toString();
       expect(hinooConversationId, hinooRootId,
-          reason: 'La radice hinoo deve inizializzare conversation_id col suo id');
+          reason:
+              'La radice hinoo deve inizializzare conversation_id col suo id');
 
       await insertHonoo(
         b,
@@ -165,7 +208,8 @@ void main() {
       expect((secondHinooThread as List).length, 2);
 
       a.realtime.setAuth(a.auth.currentSession!.accessToken);
-      final realtime = Completer<void>();
+      final realtimeInsert = Completer<void>();
+      final realtimeDelete = Completer<void>();
       final subscribed = Completer<void>();
       channel = a.channel('live-test-$marker')
         ..on(
@@ -174,10 +218,30 @@ void main() {
             event: 'INSERT',
             schema: 'public',
             table: 'honoo',
-            filter: 'conversation_id=eq.$honooConversationId',
           ),
-          (_, [__]) {
-            if (!realtime.isCompleted) realtime.complete();
+          (payload, [__]) {
+            final record = payload is Map ? payload['new'] : null;
+            if (record is Map &&
+                record['conversation_id']?.toString() == honooConversationId &&
+                !realtimeInsert.isCompleted) {
+              realtimeInsert.complete();
+            }
+          },
+        )
+        ..on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(
+            event: 'DELETE',
+            schema: 'public',
+            table: 'honoo',
+          ),
+          (payload, [__]) {
+            final oldRecord = payload is Map ? payload['old'] : null;
+            if (oldRecord is Map &&
+                oldRecord['id']?.toString() == expectedRealtimeDeleteId &&
+                !realtimeDelete.isCompleted) {
+              realtimeDelete.complete();
+            }
           },
         );
       channel.subscribe((status, [error]) {
@@ -204,14 +268,84 @@ void main() {
         conversationId: honooConversationId,
         recipientTag: aId,
       );
-      await realtime.future.timeout(
+      await realtimeInsert.future.timeout(
         const Duration(seconds: 12),
         onTimeout: () => throw StateError(
           'Canale sottoscritto, ma evento INSERT non ricevuto',
         ),
       );
+
+      final realtimeRow = createdHonoo.last;
+      expectedRealtimeDeleteId = realtimeRow;
+      await b.from('honoo').delete().eq('id', realtimeRow);
+      await realtimeDelete.future.timeout(
+        const Duration(seconds: 12),
+        onTimeout: () => throw StateError(
+          'Canale sottoscritto, ma evento DELETE non ricevuto',
+        ),
+      );
+
+      // Simula una perdita della connessione e verifica una nuova
+      // sottoscrizione dopo il reconnect del client Realtime.
+      await channel.unsubscribe();
+      a.realtime.disconnect();
+      // realtime_client 1.x closes the socket asynchronously: wait for the
+      // old onDone callback before opening the replacement connection.
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      // Test-only transport control needed to simulate a real reconnect.
+      // ignore: invalid_use_of_internal_member
+      a.realtime.connect();
+      final reconnected = Completer<void>();
+      final resubscribed = Completer<void>();
+      reconnectedChannel = a.channel('live-test-reconnect-$marker')
+        ..on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(
+            event: 'INSERT',
+            schema: 'public',
+            table: 'honoo',
+          ),
+          (payload, [__]) {
+            final record = payload is Map ? payload['new'] : null;
+            if (record is Map &&
+                record['conversation_id']?.toString() == honooConversationId &&
+                !reconnected.isCompleted) {
+              reconnected.complete();
+            }
+          },
+        );
+      reconnectedChannel.subscribe((status, [error]) {
+        if (status == 'SUBSCRIBED' && !resubscribed.isCompleted) {
+          resubscribed.complete();
+        } else if (status == 'TIMED_OUT' && !resubscribed.isCompleted) {
+          resubscribed.completeError(
+            StateError('Riconnessione Realtime fallita: $status'),
+          );
+        }
+      });
+      await resubscribed.future.timeout(
+        const Duration(seconds: 12),
+        onTimeout: () => throw StateError(
+          'Il canale Realtime non si è risottoscritto dopo il reconnect',
+        ),
+      );
+      await insertHonoo(
+        b,
+        text: 'reconnect check',
+        destination: 'reply',
+        replyTo: honooRootId,
+        conversationId: honooConversationId,
+        recipientTag: aId,
+      );
+      await reconnected.future.timeout(
+        const Duration(seconds: 12),
+        onTimeout: () => throw StateError(
+          'Evento INSERT non ricevuto dopo la riconnessione',
+        ),
+      );
     } finally {
       if (channel != null) await channel.unsubscribe();
+      if (reconnectedChannel != null) await reconnectedChannel.unsubscribe();
       for (final id in createdHonoo.reversed) {
         try {
           await b.from('honoo').delete().eq('id', id);
@@ -222,6 +356,11 @@ void main() {
         try {
           await b.from('hinoo').delete().eq('id', id);
           await a.from('hinoo').delete().eq('id', id);
+        } catch (_) {}
+      }
+      for (final entry in createdStorageObjects.entries) {
+        try {
+          await a.storage.from(entry.key).remove(entry.value);
         } catch (_) {}
       }
       await a.dispose();
