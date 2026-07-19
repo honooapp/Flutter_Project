@@ -1,4 +1,13 @@
 -- Conversation integrity: backfill + trigger-based enforcement (idempotent, non-destructive)
+--
+-- Keep the column creation in the same migration that first consumes the
+-- column. This matters on a clean local reset: the remote-schema snapshot
+-- predates conversation_id, while the backfill below reads it immediately.
+alter table if exists public.honoo
+  add column if not exists conversation_id text;
+
+alter table if exists public.hinoo
+  add column if not exists conversation_id text;
 
 -- ==========================
 -- 1) Backfill existing data
@@ -121,4 +130,3 @@ begin
     for each row execute function public.enforce_conversation_integrity();
   end if;
 end $$;
-

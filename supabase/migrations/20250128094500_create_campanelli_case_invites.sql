@@ -4,7 +4,8 @@ create table if not exists public.campanelli (
   id uuid primary key default gen_random_uuid(),
   owner_id uuid not null references auth.users(id) on delete cascade,
   hinoo_id uuid,
-  house_id uuid references public."case"(id),
+  -- The FK is added below, after both sides of the circular relationship exist.
+  house_id uuid,
   created_at timestamptz not null default now()
 );
 
