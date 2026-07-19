@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../Entities/chest_item.dart';
 import '../Entities/conversation_entry.dart';
-import '../Entities/hinoo.dart';
 import '../Entities/hinoo_thread_entry.dart';
 import '../Entities/honoo.dart';
 import '../UI/hinoo_thread_view.dart';
@@ -21,7 +20,6 @@ class ChestItemView extends StatelessWidget {
     required this.honooMetrics,
     required this.repaintKey,
     required this.hinooRepliesByRoot,
-    required this.currentUserId,
     required this.isNormalMode,
     required this.isActive,
     required this.highlightLatest,
@@ -36,7 +34,6 @@ class ChestItemView extends StatelessWidget {
   final HonooBuilderMetrics honooMetrics;
   final GlobalKey repaintKey;
   final Map<String, List<HinooThreadEntry>> hinooRepliesByRoot;
-  final String? currentUserId;
   final bool isNormalMode;
   final bool isActive;
   final bool highlightLatest;
@@ -80,8 +77,6 @@ class ChestItemView extends StatelessWidget {
               child: RepaintBoundary(key: repaintKey, child: content),
             ),
           );
-    final styledCard = _applyContentBorder(card, isThread: isThread);
-
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 250),
       child: KeyedSubtree(
@@ -89,7 +84,7 @@ class ChestItemView extends StatelessWidget {
         child: SizedBox(
           width: maxWidth,
           height: availableHeight,
-          child: styledCard,
+          child: card,
         ),
       ),
     );
@@ -152,30 +147,4 @@ class ChestItemView extends StatelessWidget {
         onDownloadTap: onDownload,
       );
 
-  Widget _applyContentBorder(Widget card, {required bool isThread}) {
-    if (isThread) return card;
-    final showRedBorder = item.when(
-      honoo: (honoo) =>
-          honoo.type == HonooType.answer && honoo.userId != currentUserId,
-      hinoo: (hinoo) =>
-          hinoo.draft.type == HinooType.answer &&
-          (hinoo.ownerId ?? '') != currentUserId,
-    );
-    final showWhiteBorder = item.when(
-      honoo: (honoo) =>
-          honoo.isFromMoonSaved == true && honoo.userId != currentUserId,
-      hinoo: (hinoo) =>
-          hinoo.isFromMoonSaved && (hinoo.ownerId ?? '') != currentUserId,
-    );
-    if (!showRedBorder && !showWhiteBorder) return card;
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: showRedBorder ? Colors.red : Colors.white,
-          width: 6,
-        ),
-      ),
-      child: card,
-    );
-  }
 }

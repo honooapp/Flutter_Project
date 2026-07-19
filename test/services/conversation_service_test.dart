@@ -11,7 +11,8 @@ void main() {
   late SupabaseTestHarness harness;
 
   setUp(() {
-    harness = SupabaseTestHarness(withAuthenticatedUser: true)..enableOverrides();
+    harness = SupabaseTestHarness(withAuthenticatedUser: true)
+      ..enableOverrides();
   });
 
   tearDown(() {
@@ -61,5 +62,35 @@ void main() {
     expect(result.last.createdAt, DateTime.parse('2026-01-01T11:00:00Z'));
     verify(() => honoo.eq('conversation_id', 'conversation-1')).called(1);
     verify(() => hinoo.eq('conversation_id', 'conversation-1')).called(1);
+  });
+
+  test('riconosce una vecchia risposta Hinoo anche senza reply_to', () async {
+    final honoo = harness.stubTable('honoo');
+    final hinoo = harness.stubTable('hinoo');
+    honoo.queueResponse(<Map<String, dynamic>>[]);
+    hinoo.queueResponse(<Map<String, dynamic>>[
+      {
+        'id': 'hinoo-legacy-reply',
+        'pages': <Map<String, dynamic>>[
+          {
+            'text': 'risposta',
+            'backgroundImage': 'bg.png',
+            'isTextWhite': true,
+          },
+        ],
+        'type': 'personal',
+        'reply_to': null,
+        'recipient_tag': 'recipient-1',
+        'conversation_id': 'conversation-1',
+        'created_at': '2026-01-01T11:00:00Z',
+        'user_id': 'user-2',
+        'is_from_moon_saved': false,
+      },
+    ]);
+
+    final result =
+        await ConversationService.fetchConversation('conversation-1');
+
+    expect(result.single.hinoo!.type.name, 'answer');
   });
 }

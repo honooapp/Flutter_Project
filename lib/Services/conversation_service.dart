@@ -4,19 +4,30 @@ import 'package:honoo/Entities/conversation_entry.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'reliability_policy.dart';
+
 class ConversationService {
   static SupabaseClient get _client => SupabaseProvider.client;
 
-  static Future<List<ConversationEntry>> fetchConversation(String conversationId) async {
+  static Future<List<ConversationEntry>> fetchConversation(
+          String conversationId) =>
+      const ReliabilityPolicy().read(
+        () => _fetchConversation(conversationId),
+      );
+
+  static Future<List<ConversationEntry>> _fetchConversation(
+      String conversationId) async {
     final honooRows = await _client
         .from('honoo')
-        .select('id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id,conversation_id,is_from_moon_saved')
+        .select(
+            'id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id,conversation_id,is_from_moon_saved')
         .eq('conversation_id', conversationId)
         .order('created_at', ascending: true);
 
     final hinooRows = await _client
         .from('hinoo')
-        .select('id,pages,type,recipient_tag,reply_to,created_at,user_id,conversation_id,is_from_moon_saved')
+        .select(
+            'id,pages,type,recipient_tag,reply_to,created_at,user_id,conversation_id,is_from_moon_saved')
         .eq('conversation_id', conversationId)
         .order('created_at', ascending: true);
 
@@ -28,16 +39,29 @@ class ConversationService {
     for (final r in (hinooRows as List)) {
       final pages = r['pages'];
       if (pages is! List) continue;
+      final replyTo = r['reply_to']?.toString();
+      final recipientTag = r['recipient_tag']?.toString();
+      final conversationId = r['conversation_id']?.toString();
+      final bool isFromMoonSaved = (r['is_from_moon_saved'] as bool?) ?? false;
+      // Compatibilita con risposte create quando reply_to non veniva
+      // persistito: destinatario + conversation_id identificano comunque
+      // inequivocabilmente un messaggio della conversazione.
+      final bool isReply = replyTo?.isNotEmpty == true ||
+          (!isFromMoonSaved &&
+              recipientTag?.isNotEmpty == true &&
+              conversationId?.isNotEmpty == true);
       final draft = HinooDraft(
-        pages: pages.whereType<Map<String, dynamic>>().map(HinooSlide.fromJson).toList(),
-        type: _fromDbType(r['type'] as String?),
-        recipientTag: r['recipient_tag'] as String?,
-        replyTo: r['reply_to'] as String?,
-        conversationId: r['conversation_id']?.toString(),
-        isFromMoonSaved: (r['is_from_moon_saved'] as bool?) ?? false,
+        pages: pages
+            .whereType<Map<String, dynamic>>()
+            .map(HinooSlide.fromJson)
+            .toList(),
+        type: isReply ? HinooType.answer : _fromDbType(r['type'] as String?),
+        recipientTag: recipientTag,
+        replyTo: replyTo,
+        conversationId: conversationId,
+        isFromMoonSaved: isFromMoonSaved,
       );
       final ownerId = r['user_id']?.toString();
-      final bool isFromMoonSaved = (r['is_from_moon_saved'] as bool?) ?? false;
       entries.add(_Entry.hinoo(
         draft,
         createdAt: DateTime.tryParse(r['created_at']?.toString() ?? '') ??
@@ -60,7 +84,8 @@ class ConversationService {
         .toList();
   }
 
-  static RealtimeChannel subscribeConversation(String conversationId, void Function() onChange) {
+  static RealtimeChannel subscribeConversation(
+      String conversationId, void Function() onChange) {
     void refresh(dynamic _, [dynamic __]) => onChange();
     final accessToken = _client.auth.currentSession?.accessToken;
     if (accessToken != null) _client.realtime.setAuth(accessToken);
@@ -72,7 +97,6 @@ class ConversationService {
             event: '*',
             schema: 'public',
             table: 'honoo',
-            filter: 'conversation_id=eq.$conversationId',
           ),
           refresh,
         )
@@ -82,7 +106,6 @@ class ConversationService {
             event: '*',
             schema: 'public',
             table: 'hinoo',
-            filter: 'conversation_id=eq.$conversationId',
           ),
           refresh,
         )
@@ -104,8 +127,11 @@ class _Entry {
   final String? ownerId;
   final bool isFromMoonSaved;
 
-  _Entry._(this.honoo, this.hinoo, this.createdAt, {this.ownerId, this.isFromMoonSaved = false});
-  factory _Entry.honoo(Honoo h) => _Entry._(h, null, DateTime.tryParse(h.createdAt) ?? DateTime.now(), ownerId: h.userId, isFromMoonSaved: h.isFromMoonSaved);
+  _Entry._(this.honoo, this.hinoo, this.createdAt,
+      {this.ownerId, this.isFromMoonSaved = false});
+  factory _Entry.honoo(Honoo h) =>
+      _Entry._(h, null, DateTime.tryParse(h.createdAt) ?? DateTime.now(),
+          ownerId: h.userId, isFromMoonSaved: h.isFromMoonSaved);
   factory _Entry.hinoo(
     HinooDraft d, {
     required DateTime createdAt,
@@ -115,7 +141,9 @@ class _Entry {
       _Entry._(null, d, createdAt,
           ownerId: ownerId, isFromMoonSaved: isFromMoonSaved);
 
-  T when<T>({required T Function(Honoo) honoo, required T Function(HinooDraft) hinoo}) {
+  T when<T>(
+      {required T Function(Honoo) honoo,
+      required T Function(HinooDraft) hinoo}) {
     if (this.honoo != null) return honoo(this.honoo!);
     return hinoo(this.hinoo!);
   }

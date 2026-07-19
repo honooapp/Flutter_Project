@@ -46,7 +46,11 @@ class ChestHinooItem {
     if (pages is! List || id == null || id.isEmpty) return null;
 
     final typeValue = row['type']?.toString();
-    final type = typeValue == 'moon' || typeValue == 'public'
+    final replyTo = row['reply_to']?.toString();
+    final hasReplyTarget = replyTo != null && replyTo.isNotEmpty;
+    final type = hasReplyTarget
+        ? HinooType.answer
+        : typeValue == 'moon' || typeValue == 'public'
         ? HinooType.moon
         : typeValue == 'answer'
             ? HinooType.answer
@@ -62,7 +66,7 @@ class ChestHinooItem {
             .toList(),
         type: type,
         recipientTag: row['recipient_tag'] as String?,
-        replyTo: row['reply_to'] as String?,
+        replyTo: replyTo,
         conversationId: row['conversation_id']?.toString(),
         isFromMoonSaved: isFromMoonSaved,
       ),

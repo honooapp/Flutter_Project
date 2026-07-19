@@ -119,13 +119,12 @@ void main() {
       HonooType.answer,
       'root-1',
       'recipient-1',
-    );
+    )..conversationId = 'conversation-1';
 
     await HonooService.publishHonoo(honoo);
 
-    final captured =
-        verify(() => chain.insert(captureAny())).captured.single
-            as Map<String, dynamic>;
+    final captured = verify(() => chain.insert(captureAny())).captured.single
+        as Map<String, dynamic>;
     expect(captured['destination'], 'reply');
     expect(captured['reply_to'], 'root-1');
     expect(captured['recipient_tag'], 'recipient-1');

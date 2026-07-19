@@ -16,8 +16,8 @@ class ChestRepository {
           .select(
               'id,pages,type,reply_to,recipient_tag,created_at,is_from_moon_saved,user_id,conversation_id')
           .eq('user_id', userId)
-          .in_('type', ['personal', 'moon']).order('created_at',
-              ascending: false);
+          .in_('type', ['personal', 'answer'])
+          .order('created_at', ascending: false);
       return _asList(rows);
     } on PostgrestException catch (error) {
       final combined =
@@ -29,8 +29,8 @@ class ChestRepository {
           .select(
               'id,pages,type,reply_to,recipient_tag,created_at,user_id,conversation_id')
           .eq('user_id', userId)
-          .in_('type', ['personal', 'moon']).order('created_at',
-              ascending: false);
+          .in_('type', ['personal', 'answer'])
+          .order('created_at', ascending: false);
       return _asList(rows);
     }
   }

@@ -6,6 +6,7 @@ import 'package:honoo/Pages/admin_menu_page.dart';
 import 'package:honoo/Pages/email_login_page.dart';
 import 'package:honoo/Pages/moon_page.dart';
 import 'package:honoo/Services/admin_service.dart';
+import 'package:honoo/Services/app_failure.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -40,8 +41,7 @@ class LunaFissa extends StatefulWidget {
   State<LunaFissa> createState() => _LunaFissaState();
 }
 
-class _LunaFissaState extends State<LunaFissa>
-    with WidgetsBindingObserver {
+class _LunaFissaState extends State<LunaFissa> with WidgetsBindingObserver {
   final AdminService _adminService = AdminService();
   bool _isAdmin = false;
   int _pendingRequests = 0;
@@ -96,7 +96,10 @@ class _LunaFissaState extends State<LunaFissa>
     try {
       final c = await _adminService.fetchPendingInviteCount();
       if (mounted) setState(() => _pendingRequests = c);
-    } catch (_) {}
+    } catch (error, stackTrace) {
+      final failure = AppFailure.from(error, stackTrace);
+      debugPrint('[LunaFissa] pending invite count failed: $failure');
+    }
   }
 
   void _subscribeInvites() {
@@ -110,7 +113,10 @@ class _LunaFissaState extends State<LunaFissa>
             (_, [__]) => _loadPendingRequestsCount(),
           )
           .subscribe();
-    } catch (_) {}
+    } catch (error, stackTrace) {
+      final failure = AppFailure.from(error, stackTrace);
+      debugPrint('[LunaFissa] realtime subscription failed: $failure');
+    }
   }
 
   @override

@@ -90,12 +90,32 @@ void main() {
 
     await HinooService.publishHinoo(draft);
 
-    final captured =
-        verify(() => chain.insert(captureAny())).captured.single
-            as Map<String, dynamic>;
+    final captured = verify(() => chain.insert(captureAny())).captured.single
+        as Map<String, dynamic>;
     expect(captured['type'], 'answer');
     expect(captured['reply_to'], 'root-1');
     expect(captured['recipient_tag'], 'recipient-1');
     expect(captured['conversation_id'], 'conversation-1');
+  });
+
+  test('publishHinoo: non salva una risposta senza reply_to', () async {
+    const draft = HinooDraft(
+      pages: [
+        HinooSlide(
+          text: 'Testo reply',
+          backgroundImage: 'bg.png',
+          isTextWhite: true,
+        ),
+      ],
+      type: HinooType.answer,
+      recipientTag: 'recipient-1',
+      conversationId: 'conversation-1',
+    );
+
+    expect(
+      () => HinooService.publishHinoo(draft),
+      throwsA(isA<ArgumentError>()),
+    );
+    verifyNever(() => chain.insert(any()));
   });
 }

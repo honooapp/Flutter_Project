@@ -72,7 +72,9 @@ class HinooStorageUploader {
           bytes,
           fileOptions: FileOptions(
             upsert: false,
-            cacheControl: 'public, max-age=31536000',
+            // storage_client sends this as a multipart field and Supabase
+            // expects seconds only (not a complete HTTP Cache-Control value).
+            cacheControl: '31536000',
             contentType: _contentTypeForExt(safeExt),
           ),
         );

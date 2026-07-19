@@ -41,6 +41,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
   RealtimeChannel? _chan;
   bool _didHighlight = false;
   bool _hasPlayedReveal = false;
+  final PageController _pageController = PageController();
   late AnimationController _controller;
   late Animation<double> _liftAnimation;
 
@@ -78,9 +79,10 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
         _entries = entries;
         _loading = false;
       });
+      _showLatestReceivedAndReveal();
       if (widget.highlightLatest && !_didHighlight && _entries.isNotEmpty) {
         _didHighlight = true;
-        widget.onSelect?.call(_entries.last);
+        widget.onSelect?.call(_entryToShowFirst);
       }
     } catch (_) {
       if (!mounted) return;
@@ -103,18 +105,41 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
       _syncSubscription();
       if (widget.isActive && !oldWidget.isActive) {
         _load();
+      } else if (!widget.isActive && oldWidget.isActive) {
+        _hasPlayedReveal = false;
+        _controller.reset();
       }
     }
-    if (widget.isActive && !_hasPlayedReveal && mounted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        // Attiva reveal solo se la prima card (più recente) è una reply di altri (non moon-saved, non mia)
-        if (_entries.isNotEmpty && _shouldReveal(_entries.last)) {
-          _controller.forward();
-          _hasPlayedReveal = true;
-        }
-      });
+    if (widget.isActive) _showLatestReceivedAndReveal();
+  }
+
+  ConversationEntry get _entryToShowFirst {
+    for (final entry in _entries.reversed) {
+      if (_shouldReveal(entry)) return entry;
     }
+    return _entries.last;
+  }
+
+  int get _pageToShowFirst {
+    final reversed = _entries.reversed.toList(growable: false);
+    final receivedIndex = reversed.indexWhere(_shouldReveal);
+    return receivedIndex < 0 ? 0 : receivedIndex;
+  }
+
+  void _showLatestReceivedAndReveal() {
+    if (!widget.isActive || _entries.isEmpty || !mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !widget.isActive || _entries.isEmpty) return;
+      final targetPage = _pageToShowFirst;
+      if (_pageController.hasClients) {
+        _pageController.jumpToPage(targetPage);
+      }
+      final entry = _entries.reversed.elementAt(targetPage);
+      if (!_hasPlayedReveal && _shouldReveal(entry)) {
+        _hasPlayedReveal = true;
+        _controller.forward(from: 0);
+      }
+    });
   }
 
   bool _shouldReveal(ConversationEntry e) {
@@ -139,6 +164,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
       width: widget.maxWidth,
       height: widget.maxHeight,
       child: PageView.builder(
+        controller: _pageController,
         scrollDirection: Axis.vertical,
         pageSnapping: true,
         physics: const PageScrollPhysics(),
@@ -165,6 +191,8 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
                 draft: e.hinoo!,
                 maxHeight: widget.maxHeight,
                 maxWidth: widget.maxWidth,
+                isReply: e.hinoo!.type == HinooType.answer,
+                authorId: e.ownerId,
                 onDownloadTap: () => _downloadFromBoundary(
                   repaintKey: repaintKey,
                   baseName: 'hinoo',
@@ -172,7 +200,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
               ),
             );
           final Widget page = SizedBox.expand(child: card);
-          if (index == 0 && _shouldReveal(e)) {
+          if (index == _pageToShowFirst && _shouldReveal(e)) {
             final screenH = MediaQuery.of(context).size.height;
             return AnimatedBuilder(
               animation: _liftAnimation,
@@ -194,6 +222,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
   @override
   void dispose() {
     _chan?.unsubscribe();
+    _pageController.dispose();
     _controller.dispose();
     super.dispose();
   }

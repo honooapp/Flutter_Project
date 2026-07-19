@@ -58,7 +58,6 @@ class _ChestPageState extends State<ChestPage> {
   ChestMode _mode = ChestMode.normal;
   String? _activeConversationId;
   int? _previousIndexBeforeConversation;
-  bool _isBouncing = false;
   // removed unused selected conversation index (not needed for rendering)
 
   final HonooController ctrl = HonooController();
@@ -236,79 +235,6 @@ class _ChestPageState extends State<ChestPage> {
         honoo: (h) => h.conversationId,
         hinoo: (row) => row.conversationId ?? row.draft.conversationId,
       );
-
-  PageController? _findPageController() {
-    try {
-      final dynamic cc = _carouselController;
-      // Try direct pageController
-      final dynamic pc1 = (cc as dynamic).pageController;
-      if (pc1 is PageController) return pc1;
-      // Try via state
-      final dynamic state = (cc as dynamic).state;
-      final dynamic pc2 = state?.pageController;
-      if (pc2 is PageController) return pc2;
-    } catch (_) {}
-    return null;
-  }
-
-  Future<void> _runConversationBounce() async {
-    if (!mounted || _isBouncing) return;
-    final pc = _findPageController();
-    if (pc == null || !pc.hasClients) return;
-    final position = pc.position;
-    // Ensure current item is part of a conversation with at least 2 elements
-    final items = _itemsNormal;
-    final int i = _currentIndex;
-    if (i < 0 || i >= items.length) return;
-    final String? cid = _convIdOfItem(items[i]);
-    if (cid == null || cid.isEmpty) return;
-    // Robust sibling check: any other item with same conv id and different identity
-    bool hasSibling = false;
-    for (int k = 0; k < items.length; k++) {
-      if (k == i) continue;
-      if (_convIdOfItem(items[k]) == cid) {
-        hasSibling = true;
-        break;
-      }
-    }
-    if (!hasSibling) return;
-    // Pick a visible sibling direction: prefer next, fallback to previous
-    int dir = 0;
-    if (i + 1 < items.length && _convIdOfItem(items[i + 1]) == cid) {
-      dir = 1;
-    } else if (i - 1 >= 0 && _convIdOfItem(items[i - 1]) == cid) {
-      dir = -1;
-    }
-    if (dir == 0) return;
-
-    final double extent = position.viewportDimension;
-    if (extent <= 0) return;
-    final double start = position.pixels;
-    final double targetUnclamped = start + extent * 0.5 * dir;
-    final double target = targetUnclamped
-        .clamp(position.minScrollExtent, position.maxScrollExtent)
-        .toDouble();
-    setState(() => _isBouncing = true);
-    try {
-      await position.animateTo(
-        target,
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.easeOut,
-      );
-      if (!mounted) return;
-      await position.animateTo(
-        start,
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.elasticOut,
-      );
-    } catch (_) {
-      // ignore runtime animation errors
-    } finally {
-      if (mounted) {
-        setState(() => _isBouncing = false);
-      }
-    }
-  }
 
   // ignore: unused_element
   void _exitConversation() {
@@ -685,7 +611,6 @@ class _ChestPageState extends State<ChestPage> {
       honooMetrics: honooMetrics,
       repaintKey: repaintKey,
       hinooRepliesByRoot: _hinooRepliesByRoot,
-      currentUserId: SupabaseProvider.client.auth.currentUser?.id,
       isNormalMode: _mode == ChestMode.normal,
       isActive: isActive,
       highlightLatest: widget.highlightLatest,
@@ -765,37 +690,10 @@ class _ChestPageState extends State<ChestPage> {
                 );
               },
             );
-            // Trigger bounce in normal mode when highlighting latest or when selecting first of a conversation group
-            if (_mode == ChestMode.normal && !_isBouncing) {
-              final int i = _currentIndex;
-              if (i >= 0 && i < items.length) {
-                final String? cid = _convIdOfItem(items[i]);
-                final bool hasConv = cid != null && cid.isNotEmpty;
-                // Sibling validation (>= 2 elements in conversation)
-                bool hasSibling = false;
-                if (hasConv) {
-                  for (int k = 0; k < items.length; k++) {
-                    if (k == i) continue;
-                    if (_convIdOfItem(items[k]) == cid) {
-                      hasSibling = true;
-                      break;
-                    }
-                  }
-                }
-                final bool isFirstOfGroup =
-                    hasConv && (i == 0 || _convIdOfItem(items[i - 1]) != cid);
-                if (hasConv && hasSibling && isFirstOfGroup) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (!mounted) return;
-                    _runConversationBounce();
-                  });
-                }
-              }
-            }
-            final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
-                layoutMode == ResponsiveLayoutMode.wideDesktop ||
-                layoutMode == ResponsiveLayoutMode.largeDesktop;
-            if (!isDesktop || items.length <= 1) {
+            // Il reveal della conversazione viene gestito da
+            // UnifiedThreadView usando i messaggi reali del thread. Qui ogni
+            // conversazione occupa ormai una sola slide del carosello.
+            if (items.length <= 1) {
               return slider;
             }
             return DesktopCarouselArrows(
@@ -812,10 +710,7 @@ class _ChestPageState extends State<ChestPage> {
                 curve: Curves.easeOutCubic,
               ),
               arrowColor: Colors.white,
-              child: AbsorbPointer(
-                absorbing: _isBouncing,
-                child: slider,
-              ),
+              child: slider,
             );
           },
           footerBuilder: (ctx, mode, footerIconSize, footerGap,

@@ -54,7 +54,7 @@ void main() {
       expect(result.conversationItemCount, 3);
     });
 
-    test('raggruppa la stessa conversazione e mostra prima il più recente', () {
+    test('mostra una sola slide per conversazione usando il più recente', () {
       final t1 = DateTime(2024, 1, 1, 12);
       final t2 = t1.add(const Duration(seconds: 10));
       final result = _organize([
@@ -72,7 +72,7 @@ void main() {
         ),
       ]);
 
-      expect(result.items.map((item) => item.id), ['reply', 'root', 'outside']);
+      expect(result.items.map((item) => item.id), ['reply', 'outside']);
     });
 
     test('non modifica la lista ricevuta', () {

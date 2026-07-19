@@ -38,6 +38,18 @@ class HonooService {
     return (response as List).map((e) => Honoo.fromMap(e)).toList();
   }
 
+  /// Radici personali e risposte scritte dall'utente che devono comparire
+  /// come un solo accesso alla relativa conversazione nello Scrigno.
+  static Future<List<Honoo>> fetchUserChestHonoo(String userId) async {
+    final response = await _client
+        .from('honoo')
+        .select('*')
+        .eq('user_id', userId)
+        .in_('destination', ['chest', 'reply']).order('created_at',
+            ascending: false);
+    return (response as List).map((e) => Honoo.fromMap(e)).toList();
+  }
+
   /// Tutte le reply indirizzate a recipientTag (se usi i tag poetici)
   static Future<List<Honoo>> fetchRepliesForUser(String recipientTag) async {
     final response = await _client
@@ -51,10 +63,12 @@ class HonooService {
 
   /// Pubblica un nuovo honoo
   static Future<void> publishHonoo(Honoo honoo) async {
+    _validateConversationLink(honoo);
     await _client.from('honoo').insert(honoo.toInsertMap());
   }
 
   static Future<String> publishHonooAndReturnId(Honoo honoo) async {
+    _validateConversationLink(honoo);
     Map<String, dynamic>? row;
     row = await _client
         .from('honoo')
@@ -66,6 +80,17 @@ class HonooService {
       throw Exception('publishHonoo: id mancante');
     }
     return id;
+  }
+
+  static void _validateConversationLink(Honoo honoo) {
+    if (honoo.type != HonooType.answer) return;
+    if ((honoo.replyTo ?? '').trim().isEmpty ||
+        (honoo.conversationId ?? '').trim().isEmpty ||
+        (honoo.recipientTag ?? '').trim().isEmpty) {
+      throw ArgumentError(
+        'Una risposta Honoo richiede reply_to, conversation_id e destinatario.',
+      );
+    }
   }
 
   /// Aggiorna la destination (chest|moon|reply) per id (UUID DB)
@@ -111,11 +136,8 @@ class HonooService {
       if (h.isFromMoonSaved) 'is_from_moon_saved': true,
     };
 
-    final inserted = await _client
-        .from('honoo')
-        .insert(payload)
-        .select()
-        .maybeSingle();
+    final inserted =
+        await _client.from('honoo').insert(payload).select().maybeSingle();
 
     return inserted != null;
   }

@@ -29,7 +29,7 @@ void main() {
 
     expect(result, rows);
     verify(() => hinoo.eq('user_id', 'user-1')).called(1);
-    verify(() => hinoo.in_('type', ['personal', 'moon'])).called(1);
+    verify(() => hinoo.in_('type', ['personal', 'answer'])).called(1);
     verify(() => hinoo.order('created_at', ascending: false)).called(1);
   });
 

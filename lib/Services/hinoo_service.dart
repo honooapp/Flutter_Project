@@ -26,7 +26,19 @@ class HinooService {
     return HinooType.personal;
   }
 
+  static void _validateConversationLink(HinooDraft draft) {
+    if (draft.type != HinooType.answer) return;
+    if ((draft.replyTo ?? '').trim().isEmpty ||
+        (draft.conversationId ?? '').trim().isEmpty ||
+        (draft.recipientTag ?? '').trim().isEmpty) {
+      throw ArgumentError(
+        'Una risposta Hinoo richiede reply_to, conversation_id e destinatario.',
+      );
+    }
+  }
+
   static Future<void> publishHinoo(HinooDraft draft) async {
+    _validateConversationLink(draft);
     final userId = _client.auth.currentUser?.id;
     if (userId == null) throw 'Utente non autenticato';
 
@@ -44,21 +56,15 @@ class HinooService {
 
     try {
       debugPrint('[HinooService] publishHinoo data=$data');
-      final res = await _client
-          .from(_table)
-          .insert(data)
-          .select()
-          .maybeSingle();
+      final res =
+          await _client.from(_table).insert(data).select().maybeSingle();
       if (res == null) throw 'publishHinoo: insert fallita';
     } on PostgrestException catch (e) {
       if (_isMissingMoonSavedColumn(e)) {
         final fallback = Map<String, dynamic>.from(data)
           ..remove('is_from_moon_saved');
-        final res = await _client
-            .from(_table)
-            .insert(fallback)
-            .select()
-            .maybeSingle();
+        final res =
+            await _client.from(_table).insert(fallback).select().maybeSingle();
         if (res == null) throw 'publishHinoo: insert fallita';
         return;
       }
@@ -83,6 +89,7 @@ class HinooService {
   }
 
   static Future<String> publishHinooAndReturnId(HinooDraft draft) async {
+    _validateConversationLink(draft);
     final userId = _client.auth.currentUser?.id;
     if (userId == null) throw 'Utente non autenticato';
 
@@ -100,11 +107,8 @@ class HinooService {
 
     try {
       debugPrint('[HinooService] publishHinoo data=$data');
-      final res = await _client
-          .from(_table)
-          .insert(data)
-          .select()
-          .maybeSingle();
+      final res =
+          await _client.from(_table).insert(data).select().maybeSingle();
       if (res == null) throw 'publishHinoo: insert fallita';
       final id = res['id']?.toString() ?? '';
       if (id.isEmpty) throw 'publishHinoo: id mancante';
@@ -113,11 +117,8 @@ class HinooService {
       if (_isMissingMoonSavedColumn(e)) {
         final fallback = Map<String, dynamic>.from(data)
           ..remove('is_from_moon_saved');
-        final res = await _client
-            .from(_table)
-            .insert(fallback)
-            .select()
-            .maybeSingle();
+        final res =
+            await _client.from(_table).insert(fallback).select().maybeSingle();
         if (res == null) throw 'publishHinoo: insert fallita';
         final id = res['id']?.toString() ?? '';
         if (id.isEmpty) throw 'publishHinoo: id mancante';

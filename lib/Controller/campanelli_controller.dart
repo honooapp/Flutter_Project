@@ -13,6 +13,7 @@ import '../Services/campanelli_repository.dart';
 import '../Services/campanelli_realtime_service.dart';
 import '../Services/house_invite_service.dart';
 import '../Services/admin_service.dart';
+import '../Services/app_failure.dart';
 import '../Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -419,7 +420,9 @@ class CampanelliController extends ChangeNotifier {
       await loadPendingKnocks(ownedHinooIds);
       onChanged();
       return true;
-    } catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint('[CampanelliController] pending knock refresh failed: '
+          '${AppFailure.from(error, stackTrace)}');
       return false;
     } finally {
       _isRefreshingPendingKnocks = false;
@@ -526,7 +529,9 @@ class CampanelliController extends ChangeNotifier {
       return List<double>.unmodifiable(
         raw.map((value) => (value as num).toDouble()),
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint('[CampanelliController] invalid transform: '
+          '${AppFailure.from(error, stackTrace)}');
       return null;
     }
   }

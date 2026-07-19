@@ -21,6 +21,7 @@ import 'package:honoo/Services/supabase_provider.dart';
 import '../Services/hinoo_storage_uploader.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Utility/heic_converter.dart' as heic;
+import 'package:honoo/Utility/image_upload_encoder.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:honoo/web/heic_converter.dart' as heicweb;
 import 'package:honoo/UI/HinooBuilder/dialogs/anteprima_png.dart';
@@ -546,10 +547,11 @@ class _HinooBuilderState extends State<HinooBuilder> {
                   ? Image.memory(
                       _localBgPreviewBytes!,
                       fit: BoxFit.cover, // riempi sempre il canvas 9:16
+                      alignment: Alignment.center,
                     )
                   : const Image(
-                      image:
-                          AssetImage('assets/images/hinoo_default_1080x1920.png'),
+                      image: AssetImage(
+                          'assets/images/hinoo_default_1080x1920.png'),
                       fit: BoxFit.cover,
                     ),
             );
@@ -650,7 +652,6 @@ class _HinooBuilderState extends State<HinooBuilder> {
       _applySlideState(_pages[_current]);
     });
   }
-
 
   // Elimina pagina corrente (con conferma)
   Future<void> _deleteCurrentPage() async {
@@ -798,22 +799,20 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
       // Preview locale immediata
       Uint8List bytes = await selected.readAsBytes();
-      String uploadExt = 'png';
-      bool wasHeic = false;
       if (kIsWeb) {
         try {
           // Web: preferisci WEBP, fallback PNG
-          final converted = await heicweb.convertHeicToWebSafe(bytes, selected.name);
+          final converted =
+              await heicweb.convertHeicToWebSafe(bytes, selected.name);
           if (converted != null && converted.isNotEmpty) {
             bytes = converted;
-            wasHeic = true;
-            uploadExt = 'webp';
           } else {
             final String lower = selected.name.toLowerCase();
             if (lower.endsWith('.heic') || lower.endsWith('.heif')) {
               // HEIC non convertibile dal browser → notifica utente e interrompi
               if (mounted) {
-                showHonooToast(context, message: 'Formato HEIC non supportato dal browser');
+                showHonooToast(context,
+                    message: 'Formato HEIC non supportato dal browser');
               }
               setState(() => _isUploadingBg = false);
               return; // non procedere con upload
@@ -824,7 +823,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
           final String lower = selected.name.toLowerCase();
           if (lower.endsWith('.heic') || lower.endsWith('.heif')) {
             if (mounted) {
-              showHonooToast(context, message: 'Formato HEIC non supportato dal browser');
+              showHonooToast(context,
+                  message: 'Formato HEIC non supportato dal browser');
             }
             setState(() => _isUploadingBg = false);
             return;
@@ -833,11 +833,9 @@ class _HinooBuilderState extends State<HinooBuilder> {
       } else {
         final name = (selected.name).toLowerCase();
         if (name.endsWith('.heic') || name.endsWith('.heif')) {
-          wasHeic = true;
           final converted = await heic.heicToPng(bytes);
           if (converted != null && converted.isNotEmpty) {
             bytes = converted;
-            uploadExt = 'png';
           }
         }
       }
@@ -854,7 +852,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
       });
       _bgController.value = initialMatrix;
 
-      await _persistBgUrl(bytes, selected.name, uploadExt: uploadExt, wasHeic: wasHeic);
+      await _persistBgUrl(bytes);
       if (!mounted) return;
       setState(() {
         _isUploadingBg = false;
@@ -876,7 +874,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
     }
   }
 
-  Future<void> _persistBgUrl(Uint8List bytes, String originalName, {required String uploadExt, required bool wasHeic}) async {
+  Future<void> _persistBgUrl(Uint8List bytes) async {
     try {
       final client = SupabaseProvider.client;
       final user = client.auth.currentUser;
@@ -888,15 +886,12 @@ class _HinooBuilderState extends State<HinooBuilder> {
         return; // opzionale: consenti preview locale senza upload
       }
 
-      // Web-safe: se proveniva da HEIC su web e abbiamo convertito a WEBP, carica WEBP; altrimenti PNG
-      Uint8List toUpload = bytes;
-      String finalExt = uploadExt;
-      if (finalExt != 'webp') {
-        // Forza PNG solo se non già WEBP
-        final Uint8List pngBytes = await _toPng(bytes);
-        toUpload = pngBytes;
-        finalExt = 'png';
-      }
+      // Normalizza JPEG/PNG/WebP (e gli HEIC già convertiti) in un JPEG
+      // orientato e limitato: evita il limite Storage con foto moderne da
+      // telefono/tablet e rende identico il comportamento su web e mobile.
+      final encoded = await encodeImageForUpload(bytes);
+      final Uint8List toUpload = encoded.bytes;
+      final String finalExt = encoded.extension;
 
       final url = await HinooStorageUploader.uploadBackground(
           bytes: toUpload, ext: finalExt, userId: user.id);
@@ -934,33 +929,15 @@ class _HinooBuilderState extends State<HinooBuilder> {
     }
   }
 
-  Future<Uint8List> _toPng(Uint8List src) async {
-    try {
-      final codec = await ui.instantiateImageCodec(src);
-      final frame = await codec.getNextFrame();
-      final ui.Image image = frame.image;
-      final bd = await image.toByteData(format: ui.ImageByteFormat.png);
-      final bytes = bd?.buffer.asUint8List();
-      if (bytes != null && bytes.isNotEmpty) return bytes;
-    } catch (_) {}
-    return src; // fallback: restituisci originale
-  }
-
   Future<Matrix4> _fitBackgroundToCanvas(Uint8List bytes) async {
     try {
-      final ui.Image image = await decodeImageFromList(bytes);
-      const double canvasW = HinooTypography.baselineCanvasWidth;
-      const double canvasH = HinooTypography.baselineCanvasHeight;
-      final double scaleX = canvasW / image.width;
-      final double scaleY = canvasH / image.height;
-      // Fit iniziale: "riempi" (cover). Occupa tutto lo spazio disponibile senza deformazioni.
-      final double scale = math.max(scaleX, scaleY);
-      final double tx = (canvasW - (image.width * scale)) / 2;
-      final double ty = (canvasH - (image.height * scale)) / 2;
-      return Matrix4.identity()
-        ..translate(tx, ty)
-        ..scale(scale);
-    } catch (_) {
+      // Verifica che i byte siano decodificabili. Il riempimento e il
+      // centraggio sono gia applicati da Image con BoxFit.cover: aggiungere
+      // qui un secondo fit basato sui pixel originali spostava la fotografia.
+      await decodeImageFromList(bytes);
+      return Matrix4.identity();
+    } catch (error, stackTrace) {
+      debugPrint('[HinooBuilder] image validation failed: $error\n$stackTrace');
       return Matrix4.identity();
     }
   }

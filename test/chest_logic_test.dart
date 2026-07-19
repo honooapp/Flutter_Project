@@ -58,7 +58,7 @@ List<TItem> buildNormalList({
 
   List<TItem> result = [...conv, ...other];
 
-  // Regroup contiguously by conversationId; sort each group by sortTs DESC.
+  // Collapse every conversationId to one carousel slide, newest first.
   if (result.isNotEmpty) {
     final itemsCopy = List<TItem>.of(result);
     final int n = itemsCopy.length;
@@ -92,7 +92,7 @@ List<TItem> buildNormalList({
         continue;
       }
       group.sort((a, b) => b.sortTs.compareTo(a.sortTs));
-      regrouped.addAll(group);
+      regrouped.add(group.first);
       for (final g in groupIdx) {
         consumed.add(g);
       }
@@ -171,13 +171,7 @@ void main() {
         honooLatestReplyById: {'R': reply.createdAt, 'R1': reply.createdAt},
         hinooLatestReplyById: const {},
       );
-      // Should keep both elements and place them contiguously as a conversation group (newest first)
-      final idxRoot = out.indexWhere((e) => e.id == 'R');
-      final idxReply = out.indexWhere((e) => e.id == 'R1');
-      expect(idxRoot != -1 && idxReply != -1, true);
-      expect((idxReply - idxRoot).abs(), 1);
-      // reply appears before root in the group due to DESC
-      expect(idxReply < idxRoot, true);
+      expect(out.map((e) => e.id).toList(), ['R1']);
     });
 
     test('Conversation internal order (reply before root in conversation mode)', () {
@@ -225,16 +219,12 @@ void main() {
         honooLatestReplyById: {'A': replyToA.createdAt, 'A2': replyToA.createdAt},
         hinooLatestReplyById: {'B': replyToA.createdAt},
       );
-      // Ensure all C1 items are contiguous and appear only once as a single block
+      // The whole conversation is represented by one carousel slide.
       final indices = <int>[];
       for (int i = 0; i < list.length; i++) {
         if (list[i].conversationId == 'C1') indices.add(i);
       }
-      expect(indices.isNotEmpty, true);
-      // Contiguous segment
-      for (int i = 1; i < indices.length; i++) {
-        expect(indices[i], indices[i - 1] + 1);
-      }
+      expect(indices.length, 1);
     });
 
     test('Normal mode: conversations ordered by latest activity', () {
@@ -287,4 +277,3 @@ void main() {
     });
   });
 }
-

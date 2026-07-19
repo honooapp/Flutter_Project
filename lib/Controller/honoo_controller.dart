@@ -22,7 +22,7 @@ class HonooController {
   Future<void> loadChest() async {
     isLoading.value = true;
     try {
-      final chest = await HonooService.fetchUserHonoo(_uid, 'chest');
+      final chest = await HonooService.fetchUserChestHonoo(_uid);
 
       // Popola cache iniziale
       _personal

@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:honoo/Services/supabase_provider.dart';
+import 'package:honoo/Services/app_failure.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AdminUserRecord {
@@ -22,7 +24,9 @@ class AdminService {
         return res['admin_is_admin'] as bool;
       }
       return res == true;
-    } catch (_) {
+    } catch (error, stackTrace) {
+      final failure = AppFailure.from(error, stackTrace);
+      debugPrint('[AdminService] admin check failed: $failure');
       return false;
     }
   }
@@ -108,8 +112,14 @@ class AdminService {
       row = res;
     }
     if (row != null) {
-      honooCount = ((row['honoo_count'] ?? row['honoo'] ?? row['count_honoo']) as num?)?.toInt() ?? 0;
-      hinooCount = ((row['hinoo_count'] ?? row['hinoo'] ?? row['count_hinoo']) as num?)?.toInt() ?? 0;
+      honooCount =
+          ((row['honoo_count'] ?? row['honoo'] ?? row['count_honoo']) as num?)
+                  ?.toInt() ??
+              0;
+      hinooCount =
+          ((row['hinoo_count'] ?? row['hinoo'] ?? row['count_hinoo']) as num?)
+                  ?.toInt() ??
+              0;
     }
     return {
       'honoo': honooCount,
@@ -140,14 +150,21 @@ class AdminService {
       }
       return 0;
     }
+
     if (row != null) {
       final Map r = row;
-      counts['chest_honoo'] = asInt(r, ['chest_honoo', 'honoo_chest', 'count_chest_honoo']);
-      counts['chest_hinoo'] = asInt(r, ['chest_hinoo', 'hinoo_chest', 'count_chest_hinoo']);
-      counts['moon_honoo'] = asInt(r, ['moon_honoo', 'honoo_moon', 'count_moon_honoo']);
-      counts['moon_hinoo'] = asInt(r, ['moon_hinoo', 'hinoo_moon', 'count_moon_hinoo']);
-      counts['reply_honoo'] = asInt(r, ['reply_honoo', 'honoo_reply', 'count_reply_honoo']);
-      counts['reply_hinoo'] = asInt(r, ['reply_hinoo', 'hinoo_reply', 'count_reply_hinoo']);
+      counts['chest_honoo'] =
+          asInt(r, ['chest_honoo', 'honoo_chest', 'count_chest_honoo']);
+      counts['chest_hinoo'] =
+          asInt(r, ['chest_hinoo', 'hinoo_chest', 'count_chest_hinoo']);
+      counts['moon_honoo'] =
+          asInt(r, ['moon_honoo', 'honoo_moon', 'count_moon_honoo']);
+      counts['moon_hinoo'] =
+          asInt(r, ['moon_hinoo', 'hinoo_moon', 'count_moon_hinoo']);
+      counts['reply_honoo'] =
+          asInt(r, ['reply_honoo', 'honoo_reply', 'count_reply_honoo']);
+      counts['reply_hinoo'] =
+          asInt(r, ['reply_hinoo', 'hinoo_reply', 'count_reply_hinoo']);
     }
     return counts;
   }
@@ -213,13 +230,13 @@ class AdminService {
         .from('house_invites')
         .select('id,status')
         .ilike('email', email)
-        .in_('status', ['pending', 'accepted'])
-        .limit(1);
+        .in_('status', ['pending', 'accepted']).limit(1);
     if (rows is! List || rows.isEmpty) return false;
     return true;
   }
 
-  Future<List<Map<String, dynamic>>> fetchPendingInvites({bool newestFirst = true}) async {
+  Future<List<Map<String, dynamic>>> fetchPendingInvites(
+      {bool newestFirst = true}) async {
     final rows = await _client
         .from('house_invites')
         .select('id,email,user_id,created_at,status')
@@ -240,11 +257,8 @@ class AdminService {
 
   Future<bool> hasCasaForUser(String userId) async {
     if (userId.trim().isEmpty) return false;
-    final rows = await _client
-        .from('case')
-        .select('id')
-        .eq('owner_id', userId)
-        .limit(1);
+    final rows =
+        await _client.from('case').select('id').eq('owner_id', userId).limit(1);
     return rows is List && rows.isNotEmpty;
   }
 
@@ -260,10 +274,8 @@ class AdminService {
 
   Future<Set<String>> fetchExistingCaseOwners(List<String> userIds) async {
     if (userIds.isEmpty) return {};
-    final rows = await _client
-        .from('case')
-        .select('owner_id')
-        .in_('owner_id', userIds);
+    final rows =
+        await _client.from('case').select('owner_id').in_('owner_id', userIds);
 
     final existing = <String>{};
     for (final row in (rows as List)) {
@@ -274,7 +286,8 @@ class AdminService {
     return existing;
   }
 
-  Future<Set<String>> fetchExistingCampanelliOwners(List<String> userIds) async {
+  Future<Set<String>> fetchExistingCampanelliOwners(
+      List<String> userIds) async {
     if (userIds.isEmpty) return {};
     final rows = await _client
         .from('campanelli')
@@ -356,7 +369,9 @@ class AdminService {
         return await _client.rpc(fn);
       }
       return await _client.rpc(fn, params: params);
-    } catch (_) {
+    } catch (error, stackTrace) {
+      final failure = AppFailure.from(error, stackTrace);
+      debugPrint('[AdminService] RPC $fn failed: $failure');
       return null;
     }
   }

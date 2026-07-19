@@ -13,6 +13,7 @@ import 'package:honoo/Entities/campanelli_view_data.dart';
 import 'package:honoo/Entities/knock_message_choice.dart';
 import 'package:honoo/Entities/pending_knock.dart';
 import 'package:honoo/Services/supabase_provider.dart';
+import 'package:honoo/Services/app_failure.dart';
 import 'package:honoo/Controller/hinoo_controller.dart';
 import 'package:honoo/Controller/campanelli_controller.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
@@ -167,7 +168,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
     // Light haptic feedback on knock intent
     try {
       HapticFeedback.lightImpact();
-    } catch (_) {}
+    } catch (error, stackTrace) {
+      debugPrint(
+          '[Campanelli] haptic failed: ${AppFailure.from(error, stackTrace)}');
+    }
     if (_isCampanelloUnlocked(campanello.id)) {
       await _showEnterDialog(campanello.id);
       return;
@@ -624,7 +628,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
       try {
         await _campanelliController.refreshHouseInviteState(user.id);
         if (mounted) setState(() {});
-      } catch (_) {}
+      } catch (error, stackTrace) {
+        debugPrint(
+            '[Campanelli] invite state failed: ${AppFailure.from(error, stackTrace)}');
+      }
       _subscribeOwnerAccessChannel();
       await _campanelliController.startPendingKnockRefresh(
         ownedHinooIds: ownedHinooIds,
@@ -632,7 +639,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
           if (mounted) setState(() {});
         },
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint(
+          '[Campanelli] user entries failed: ${AppFailure.from(error, stackTrace)}');
       if (mounted) {
         setState(() {
           _userEntries = const [];
@@ -654,7 +663,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
         userId: user.id,
         ownedHinooIds: _ownedHinooIds,
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint(
+          '[Campanelli] owner realtime failed: ${AppFailure.from(error, stackTrace)}');
       // In test or when Realtime not available, safely ignore
     }
   }
@@ -666,7 +677,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
       _campanelliController.startVisitorRealtime(
         userId: user.id,
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint(
+          '[Campanelli] visitor realtime failed: ${AppFailure.from(error, stackTrace)}');
       // In test or when Realtime not available, safely ignore
     }
   }
@@ -691,7 +704,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
         showHonooToast(context, message: 'La casa è stata aperta');
         try {
           HapticFeedback.lightImpact();
-        } catch (_) {}
+        } catch (error, stackTrace) {
+          debugPrint(
+              '[Campanelli] haptic failed: ${AppFailure.from(error, stackTrace)}');
+        }
         await _goToCampanelloByTag(targetTag);
         await _hintCampanelloBounce();
         final entry = _entryForTag(targetTag);
@@ -739,7 +755,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
           duration: _kBounceIn, curve: _kCurve);
       await _campanelloPageController.animateTo(start,
           duration: _kBounceOut, curve: _kCurve);
-    } catch (_) {}
+    } catch (error, stackTrace) {
+      debugPrint(
+          '[Campanelli] bounce animation failed: ${AppFailure.from(error, stackTrace)}');
+    }
   }
 
   _CampanelloEntry? _entryForTag(String? tag) {
@@ -805,13 +824,19 @@ class _CampanelliPageState extends State<CampanelliPage> {
         final HinooDraft personalDraft =
             draft.copyWith(type: HinooType.personal, recipientTag: null);
         await HinooController().saveToChest(personalDraft);
-      } catch (_) {}
+      } catch (error, stackTrace) {
+        debugPrint(
+            '[Campanelli] save hinoo failed: ${AppFailure.from(error, stackTrace)}');
+      }
     }
 
     if (honoo != null) {
       try {
         await HonooController().saveToChest(honoo);
-      } catch (_) {}
+      } catch (error, stackTrace) {
+        debugPrint(
+            '[Campanelli] save honoo failed: ${AppFailure.from(error, stackTrace)}');
+      }
     }
 
     if (!mounted) return;
@@ -820,7 +845,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
     // Light haptic on owner approval as further confirmation
     try {
       HapticFeedback.lightImpact();
-    } catch (_) {}
+    } catch (error, stackTrace) {
+      debugPrint(
+          '[Campanelli] haptic failed: ${AppFailure.from(error, stackTrace)}');
+    }
   }
 
   Future<void> _openPendingKnock(PendingKnock knock) async {

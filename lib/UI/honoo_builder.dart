@@ -25,11 +25,19 @@ import '../Services/honoo_image_uploader.dart';
 import '../UI/HinooBuilder/overlays/cambia_sfondo.dart';
 
 class HonooBuilder extends StatefulWidget {
+  static const int maxTextCharacters = 144;
   static const double baselineImageSize = 360.0;
   static const double baselineGap = 9.0;
   static const double baselineTextHeight = baselineImageSize / 2;
   static const double baselineTotalHeight =
       baselineImageSize + baselineGap + baselineTextHeight;
+
+  @visibleForTesting
+  static double baselineIconSizeForDisplay(
+    double displaySize,
+    double canvasScale,
+  ) =>
+      displaySize / (canvasScale > 0 ? canvasScale : 1);
 
   final void Function(String text, String imageUrl)? onHonooChanged;
   final ValueChanged<bool>? onFocusChanged;
@@ -38,6 +46,7 @@ class HonooBuilder extends StatefulWidget {
   final String? imageHint;
   final VoidCallback? onDownloadTap;
   final bool showDownloadButton;
+  final double? imageConfirmIconDisplaySize;
 
   const HonooBuilder({
     super.key,
@@ -48,6 +57,7 @@ class HonooBuilder extends StatefulWidget {
     this.imageHint,
     this.onDownloadTap,
     this.showDownloadButton = true,
+    this.imageConfirmIconDisplaySize,
   });
 
   @override
@@ -67,7 +77,8 @@ class HonooBuilderState extends State<HonooBuilder> {
 
   // trasformazioni zoom/pan
   final TransformationController _imageController = TransformationController();
-  static const double _imageMinScale = 1.0; // non permettere zoom-out sotto il fill
+  static const double _imageMinScale =
+      1.0; // non permettere zoom-out sotto il fill
   static const double _imageMaxScale = 5.0;
   double _imageScale = _imageMinScale;
 
@@ -183,14 +194,16 @@ class HonooBuilderState extends State<HonooBuilder> {
       // Web: conversione HEIC → WEBP (fallback PNG) prima della preview
       if (kIsWeb) {
         try {
-          final converted = await heicweb.convertHeicToWebSafe(bytes, selected.name);
+          final converted =
+              await heicweb.convertHeicToWebSafe(bytes, selected.name);
           if (converted != null && converted.isNotEmpty) {
             bytes = converted;
           } else {
             final lower = selected.name.toLowerCase();
             if (lower.endsWith('.heic') || lower.endsWith('.heif')) {
               if (mounted) {
-                showHonooToast(context, message: 'Formato HEIC non supportato dal browser');
+                showHonooToast(context,
+                    message: 'Formato HEIC non supportato dal browser');
               }
               return;
             }
@@ -200,7 +213,8 @@ class HonooBuilderState extends State<HonooBuilder> {
           final lower = selected.name.toLowerCase();
           if (lower.endsWith('.heic') || lower.endsWith('.heif')) {
             if (mounted) {
-              showHonooToast(context, message: 'Formato HEIC non supportato dal browser');
+              showHonooToast(context,
+                  message: 'Formato HEIC non supportato dal browser');
             }
             return;
           }
@@ -256,9 +270,11 @@ class HonooBuilderState extends State<HonooBuilder> {
         if (!mounted) return null;
       }
       final Size logical = boundary.size;
-      // Limita la dimensione finale per evitare OOM (target max lato ~ 2048px)
-      const double maxOut = 2048.0;
-      final double longEdge = logical.width > logical.height ? logical.width : logical.height;
+      // 1080 px è sufficiente per la card e mantiene il PNG sotto i limiti
+      // usuali di Supabase anche con fotografie molto dettagliate.
+      const double maxOut = 1080.0;
+      final double longEdge =
+          logical.width > logical.height ? logical.width : logical.height;
       double pixelRatio = deviceRatio;
       if (longEdge * deviceRatio > maxOut && longEdge > 0) {
         pixelRatio = (maxOut / longEdge).clamp(1.0, deviceRatio);
@@ -497,7 +513,7 @@ class HonooBuilderState extends State<HonooBuilder> {
                           width: HonooBuilder.baselineImageSize,
                           height: HonooBuilder.baselineImageSize,
                           color: Colors.white, // cornice neutra come “foglio”
-                          child: _buildImageArea(),
+                          child: _buildImageArea(scale),
                         ),
                       ),
                     ],
@@ -545,7 +561,9 @@ class HonooBuilderState extends State<HonooBuilder> {
                   maxCharsPerLine: 32,
                   onChanged: () => setState(() {}),
                   additionalInputFormatters: [
-                    LengthLimitingTextInputFormatter(144),
+                    LengthLimitingTextInputFormatter(
+                      HonooBuilder.maxTextCharacters,
+                    ),
                   ],
                   horizontalPadding: const EdgeInsets.symmetric(horizontal: 22),
                   decoration: InputDecoration(
@@ -577,13 +595,13 @@ class HonooBuilderState extends State<HonooBuilder> {
                   child: Builder(
                     builder: (_) {
                       final int used = _textCtrl.text.characters.length;
-                      final Color color = used >= 144
+                      final Color color = used >= HonooBuilder.maxTextCharacters
                           ? HonooColor.secondary
                           : (used >= 120
                               ? Colors.orangeAccent
                               : HonooColor.onTertiary.withOpacity(0.75));
                       return Text(
-                        '$used/144',
+                        '$used/${HonooBuilder.maxTextCharacters}',
                         style: GoogleFonts.arvo(
                           color: color,
                           fontSize: 12,
@@ -610,7 +628,13 @@ class HonooBuilderState extends State<HonooBuilder> {
     );
   }
 
-  Widget _buildImageArea() {
+  Widget _buildImageArea(double canvasScale) {
+    final double confirmIconSize = widget.imageConfirmIconDisplaySize == null
+        ? 44
+        : HonooBuilder.baselineIconSizeForDisplay(
+            widget.imageConfirmIconDisplaySize!,
+            canvasScale,
+          );
     return GestureDetector(
       onTap: _imageConfirmed ? null : _pickImage,
       child: ClipRRect(
@@ -703,13 +727,18 @@ class HonooBuilderState extends State<HonooBuilder> {
                                 ),
                               )
                             : IconButton(
-                                iconSize: 44,
+                                constraints: BoxConstraints.tightFor(
+                                  width: confirmIconSize,
+                                  height: confirmIconSize,
+                                ),
+                                padding: EdgeInsets.zero,
+                                iconSize: confirmIconSize,
                                 onPressed: _confirmImage,
                                 tooltip: 'Conferma immagine',
                                 icon: SvgPicture.asset(
                                   'assets/icons/ok.svg',
-                                  width: 44,
-                                  height: 44,
+                                  width: confirmIconSize,
+                                  height: confirmIconSize,
                                 ),
                               ),
                       ),

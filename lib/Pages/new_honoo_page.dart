@@ -50,7 +50,6 @@ class _NewHonooPageState extends State<NewHonooPage> {
   String _text = '';
   String _imageUrl = '';
 
-
   /// cache dell’URL immagine definitiva (dopo upload/risoluzione)
   String? _finalImageUrlCache;
 
@@ -152,8 +151,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
         barrierDismissible: true,
         builder: (_) => const HonooConfirmDialog(
           title: 'Devi prima accedere',
-          message:
-          '\nVuoi andare alla pagina di login?',
+          message: '\nVuoi andare alla pagina di login?',
           confirmLabel: 'Vai al login',
         ),
       );
@@ -267,8 +265,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
           barrierDismissible: true,
           builder: (_) => const HonooConfirmDialog(
             title: "L'honoo è stato salvato nel tuo Scrigno.",
-            message:
-                'Vuoi spedirlo anche sulla Luna, per mostrarlo a tutti?',
+            message: 'Vuoi spedirlo anche sulla Luna, per mostrarlo a tutti?',
             confirmLabel: 'Sì',
             cancelLabel: 'No',
           ),
@@ -306,9 +303,8 @@ class _NewHonooPageState extends State<NewHonooPage> {
       if (!mounted) return;
       showHonooToast(
         context,
-        message: ok
-            ? "L'honoo è anche sulla Luna."
-            : 'Già presente sulla Luna.',
+        message:
+            ok ? "L'honoo è anche sulla Luna." : 'Già presente sulla Luna.',
       );
     } catch (e, st) {
       debugPrint('duplicateToMoon failed: $e\n$st');
@@ -356,8 +352,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
         barrierDismissible: true,
         builder: (_) => const HonooConfirmDialog(
           title: 'Devi prima accedere',
-          message:
-              '\nVuoi andare alla pagina di login?',
+          message: '\nVuoi andare alla pagina di login?',
           confirmLabel: 'Vai al login',
         ),
       );
@@ -470,8 +465,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
             final double footerContentH = footerIconSize;
             final double footerSpacing = footerBottomPadding + safeBottom;
             final double footerTopSpacing = footerSpacing / 2;
-            final double footerBottomSpacing =
-                footerSpacing - footerTopSpacing;
+            final double footerBottomSpacing = footerSpacing - footerTopSpacing;
 
             // Altezza riservata al footer (3 pulsanti)
             final double footerReserved =
@@ -480,7 +474,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
             // Altezza disponibile per il box honoo
             final double availableH =
                 (viewH - headerH - contentTopPadding - footerReserved)
-                .clamp(0.0, double.infinity);
+                    .clamp(0.0, double.infinity);
 
             final HonooBuilderMetrics metrics =
                 ResponsiveLayout.honooBuilderMetrics(
@@ -529,6 +523,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                                     key: _builderKey,
                                     onHonooChanged: _onHonooChanged,
                                     onFocusChanged: _onBuilderFocusChanged,
+                                    imageConfirmIconDisplaySize: footerIconSize,
                                   ),
                                 ),
                                 if (_shouldShowCanvasControls)
@@ -570,8 +565,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                         tooltip: 'Home',
                         onPressed: () {
                           Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (_) => const HomePage()),
+                            MaterialPageRoute(builder: (_) => const HomePage()),
                             (route) => false,
                           );
                         },
@@ -619,7 +613,6 @@ class _NewHonooPageState extends State<NewHonooPage> {
                     ],
                   ),
                 ),
-
               ],
             );
           },

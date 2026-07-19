@@ -63,13 +63,16 @@ void main() {
     final captured = verify(() => fileApi.uploadBinary(
           captureAny(), // path
           any<Uint8List>(),
-          fileOptions: any(named: 'fileOptions', that: isA<FileOptions>()),
+          fileOptions: captureAny(named: 'fileOptions'),
         )).captured;
 
     final String path = captured.first as String;
+    final options = captured.last as FileOptions;
     // path = u1/exports/<uuid>.png
     expect(path, allOf([contains('u1/exports/'), endsWith('.png')]));
     verify(() => fileApi.getPublicUrl(path)).called(1);
+
+    expect(options.cacheControl, '31536000');
   });
 
   test(

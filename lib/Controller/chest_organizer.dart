@@ -79,7 +79,9 @@ class ChestOrganizer {
       }
 
       group.sort(compareCreatedAt);
-      regrouped.addAll(group);
+      // Ogni conversazione occupa una sola slide del carosello. La slide
+      // renderizza poi l'intero thread tramite UnifiedThreadView.
+      regrouped.add(group.first);
       consumed.addAll(groupIndexes);
     }
 

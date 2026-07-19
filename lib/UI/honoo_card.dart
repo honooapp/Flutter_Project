@@ -188,10 +188,12 @@ class HonooCard extends StatelessWidget {
 
         final String? currentUserId = SupabaseProvider.client.auth.currentUser?.id;
         final bool isOwn = currentUserId != null && currentUserId == honoo.userId;
-        final bool showReplyBorder = isReply && !isOwn;
+        // La cornice rossa identifica semanticamente una risposta per entrambi
+        // i partecipanti. La bianca resta esclusiva dei salvataggi dalla Luna.
+        final bool showReplyBorder = isReply;
         final bool showMoonSavedBorder = !showReplyBorder && honoo.isFromMoonSaved && !isOwn;
         final Widget wrapped = (showReplyBorder || showMoonSavedBorder)
-            ? Container(
+            ? DecoratedBox(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
