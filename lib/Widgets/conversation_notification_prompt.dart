@@ -10,14 +10,7 @@ class ConversationNotificationPrompt {
   static Future<bool> shouldOfferForFirstConversation(
     String userId, {
     ContentFeedService contentFeedService = const ContentFeedService(),
-    ReplySystemNotification? notification,
   }) async {
-    final systemNotification =
-        notification ?? ReplySystemNotification.platform();
-    if (systemNotification.permission != ReplyNotificationPermission.prompt) {
-      return false;
-    }
-
     try {
       return !await contentFeedService.hasConversationRoots(userId);
     } catch (_) {

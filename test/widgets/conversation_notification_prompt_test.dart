@@ -39,13 +39,10 @@ class _FakeReplyNotification extends ReplySystemNotification {
 
 void main() {
   test('propone le notifiche solo prima della prima conversazione', () async {
-    final notification = _FakeReplyNotification();
-
     expect(
       await ConversationNotificationPrompt.shouldOfferForFirstConversation(
         'user-1',
         contentFeedService: const _FakeContentFeedService(false),
-        notification: notification,
       ),
       isTrue,
     );
@@ -53,7 +50,6 @@ void main() {
       await ConversationNotificationPrompt.shouldOfferForFirstConversation(
         'user-1',
         contentFeedService: const _FakeContentFeedService(true),
-        notification: notification,
       ),
       isFalse,
     );
