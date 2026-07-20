@@ -30,6 +30,7 @@ class HonooImageUploader {
             bytes,
             fileOptions: FileOptions(
               upsert: false,
+              cacheControl: '31536000',
               contentType: _contentTypeFromExt(ext),
             ),
           );
@@ -60,6 +61,7 @@ class HonooImageUploader {
             bytes,
             fileOptions: FileOptions(
               upsert: false,
+              cacheControl: '31536000',
               contentType: _contentTypeFromExt(ext),
             ),
           );

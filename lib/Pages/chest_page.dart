@@ -17,6 +17,7 @@ import '../Entities/hinoo_thread_entry.dart';
 
 import '../Utility/honoo_colors.dart';
 import '../Utility/responsive_layout.dart';
+import '../Utility/network_image_prefetch.dart';
 
 import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/loading_spinner.dart';
@@ -228,6 +229,22 @@ class _ChestPageState extends State<ChestPage> {
         _currentIndex >= _itemsNormal.length) {
       _currentIndex = _itemsNormal.isEmpty ? 0 : _itemsNormal.length - 1;
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _prefetchChestFrom(_currentIndex);
+    });
+  }
+
+  void _prefetchChestFrom(int index) {
+    if (_itemsNormal.isEmpty) return;
+    final end = (index + 2).clamp(0, _itemsNormal.length);
+    final urls = <String?>[];
+    for (final item in _itemsNormal.sublist(index, end)) {
+      item.when(
+        honoo: (honoo) => urls.addAll(honooImageUrls(honoo)),
+        hinoo: (hinoo) => urls.addAll(hinooImageUrls(hinoo.draft)),
+      );
+    }
+    prefetchImageUrls(context, urls);
   }
 
   // conversation loading removed — UnifiedThreadView handles it
@@ -692,9 +709,10 @@ class _ChestPageState extends State<ChestPage> {
                 enlargeCenterPage: false,
                 disableCenter: true,
                 scrollPhysics: horizPhysics,
-                onPageChanged: (i, _) => setState(() {
-                  _currentIndex = i;
-                }),
+                onPageChanged: (i, _) {
+                  setState(() => _currentIndex = i);
+                  _prefetchChestFrom(i);
+                },
               ),
               itemBuilder: (context, index, realIdx) {
                 final bool isActive = _currentIndex == index;

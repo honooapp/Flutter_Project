@@ -9,6 +9,7 @@ import 'package:honoo/UI/hinoo_viewer.dart';
 import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Utility/download_capture.dart';
+import 'package:honoo/Utility/network_image_prefetch.dart';
 // rendering a lista con separatori; rimosso carousel verticale
 
 class UnifiedThreadView extends StatefulWidget {
@@ -87,6 +88,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
         _entries = entries;
         _loading = false;
       });
+      _prefetchEntriesFrom(_pageToShowFirst);
       _showLatestReceivedAndReveal();
       if (widget.highlightLatest && !_didHighlight && _entries.isNotEmpty) {
         _didHighlight = true;
@@ -96,6 +98,21 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
       if (!mounted) return;
       setState(() => _loading = false);
     }
+  }
+
+  void _prefetchEntriesFrom(int pageIndex) {
+    if (_entries.isEmpty) return;
+    final reversed = _entries.reversed.toList(growable: false);
+    final end = (pageIndex + 2).clamp(0, reversed.length);
+    final urls = <String?>[];
+    for (final entry in reversed.sublist(pageIndex, end)) {
+      if (entry.honoo != null) {
+        urls.addAll(honooImageUrls(entry.honoo!));
+      } else if (entry.hinoo != null) {
+        urls.addAll(hinooImageUrls(entry.hinoo!));
+      }
+    }
+    prefetchImageUrls(context, urls);
   }
 
   @override
@@ -183,6 +200,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
         scrollDirection: Axis.vertical,
         pageSnapping: true,
         physics: const PageScrollPhysics(),
+        onPageChanged: _prefetchEntriesFrom,
         itemCount: _entries.length,
         itemBuilder: (context, index) {
           // Ordine inverso: ultimo (più recente) in cima
