@@ -8,13 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Apri gli occhi: c’è l’Isola davanti a te.">
 
-    <!-- Mostra subito lo stesso sfondo della landing mentre Flutter si avvia. -->
-    <link
-      rel="preload"
-      href="assets/assets/background.webp"
-      as="image"
-      type="image/webp"
-      fetchpriority="high">
     <style>
       html, body {
         width: 100%;
@@ -23,13 +16,18 @@
         background-color: #010e22;
       }
 
-      body {
-        background-image:
-          url("assets/assets/background.webp"),
-          url("data:image/webp;base64,UklGRuICAABXRUJQVlA4INYCAAAwDwCdASpAACQAPsFKoEqnpCMhsrkpmPAYCWwAnTL2f0yMbe3Go6MMiWgP2Ag0TxW8Cc3HZLkdY+3yPgAeupTcuER7Qf4Lhi4YK8z1Fhu8N8ilU8XRcFZzStFqd2TB/7h2rBbr8O/wq5zm9Rsy4HOiYVtG00Tzizmy7coIcP2bJHhYAP70d38RVv0brHDxFYsvL3XckkSgRj416R5hZUfM/FFnFUaTcucp7SY+MNAxJsCrhHuypk7VavgSGlQKY4eFR7v3evhJ9U+mwVUbTht2hxTzaGEUGc3K52fs2keahAD1vht2mZWtlEMEmn4K3UPSFsGK5GC1u0XnzJ7e6WPfhktKBXQ9YEGt7asDqraXaDUvWEp3/OBb/6yOLo0qB2nK28mF1WCvWpcsMUN60azGviR3UJ4Mr9jTmKhVImU5d/A6iaZzWv7VQ0T2gnGlwKVY3o02puXgn2IuXckh39Cdf8+NcejjxzNZ4GQAE/y3ETLDj9PLU97abK9pSNTAnPSTXTxTJ5pHWyVnhxt+59mlfx2LQfUrPGs+sMuvu28ef9VZujdgwjPt0wMHzB0hklFfKzruXzCanEJykyPXPQa6VA4nU3mHpiqEA069sZonTje91tl85Lcq4TjzRiqfpRn4h0JynVI1Ogvo03l6i6/xvBOBvOaVh4GK8fncXOgV7rKhxOybN0ysZ5S7ic4D/tqtlvhABq75dHj1Ft25tOlriu7u5/Lg72OT3r0g+uM/GiQ3TiZ0JRU96TEqBld27DQrUwVP43wglhXRELM+Mra2iRqmjqauvQ+ONO4yVbnTSf61+tAMkVLbnaJa9KhIbGVwFzgIG+7hjy9d/Sm+FxI8OIAN6GzIZp7mzuWcuxXdpmGhMSTq09GqQkbmHj4WvMcrv2I0334p70sFJ5sGkK/XWEBD8ZNmJ40Qjq/CmrMh7o+DsntYXj3PO40HXszwlPyUjJAAAAA=");
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
+      #landing-background {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 120ms ease-out;
+      }
+
+      #landing-background.is-loaded {
+        opacity: 1;
       }
     </style>
 
@@ -58,15 +56,24 @@
     </script>
 
     <!-- Supporto HEIC su web (conversione client-side in PNG) -->
-    <script src="https://unpkg.com/heic2any/dist/heic2any.min.js" defer></script>
+    <script src="https://unpkg.com/heic2any/dist/heic2any.min.js" async></script>
 
     <script src="flutter.js" defer></script>
   </head>
   <body>
+    <!-- Sfondo lossless: non blocca il bootstrap e riusa la cache di Flutter. -->
+    <img
+      id="landing-background"
+      src="assets/assets/background.webp"
+      alt=""
+      aria-hidden="true"
+      decoding="async"
+      fetchpriority="low"
+      onload="this.classList.add('is-loaded')">
     <noscript>Per usare honoo è necessario abilitare JavaScript.</noscript>
     <!-- Service Worker DISABILITATO temporaneamente per evitare problemi di cache -->
     <script>
-      window.addEventListener('load', function (ev) {
+      window.addEventListener('DOMContentLoaded', function () {
         _flutter.loader.loadEntrypoint({
           <!--
           serviceWorker: {
