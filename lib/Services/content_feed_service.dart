@@ -5,6 +5,27 @@ import 'supabase_provider.dart';
 class ContentFeedService {
   const ContentFeedService();
 
+  /// Indica se l'utente ha già creato almeno una radice di conversazione.
+  /// Le risposte non contano: il prompt notifiche deve seguire il primo
+  /// contenuto personale salvato nello Scrigno.
+  Future<bool> hasConversationRoots(String ownerId) async {
+    final honooRows = await SupabaseProvider.client
+        .from('honoo')
+        .select('id')
+        .eq('user_id', ownerId)
+        .eq('destination', 'chest')
+        .limit(1);
+    if ((honooRows as List).isNotEmpty) return true;
+
+    final hinooRows = await SupabaseProvider.client
+        .from('hinoo')
+        .select('id')
+        .eq('user_id', ownerId)
+        .eq('type', 'personal')
+        .limit(1);
+    return (hinooRows as List).isNotEmpty;
+  }
+
   Future<List<Map<String, dynamic>>> fetchMoonRows() async {
     final rows = await SupabaseProvider.client
         .from('moon_public')
@@ -68,9 +89,8 @@ class ContentFeedService {
     return combined.where((row) {
       final id = row['id']?.toString() ?? '';
       final conversationId = row['conversation_id']?.toString();
-      final effectiveId = conversationId?.isNotEmpty == true
-          ? conversationId!
-          : id;
+      final effectiveId =
+          conversationId?.isNotEmpty == true ? conversationId! : id;
       if (effectiveId.isEmpty || !seen.add(effectiveId)) return false;
       row['conversation_id'] = effectiveId;
       return true;

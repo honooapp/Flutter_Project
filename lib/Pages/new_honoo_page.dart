@@ -19,6 +19,7 @@ import '../UI/HonooBuilder/dialogs/name_honoo_dialog.dart';
 import 'placeholder_page.dart';
 import '../Utility/responsive_layout.dart';
 import '../Widgets/responsive_footer_bar.dart';
+import '../Widgets/conversation_notification_prompt.dart';
 import 'package:uuid/uuid.dart';
 
 class NewHonooPage extends StatefulWidget {
@@ -226,6 +227,11 @@ class _NewHonooPageState extends State<NewHonooPage> {
       widget.recipientTag,
     )..conversationId = conversationId;
 
+    final bool shouldOfferNotifications = type == HonooType.personal &&
+        await ConversationNotificationPrompt.shouldOfferForFirstConversation(
+          user.id,
+        );
+
     try {
       if (widget.returnSavedId) {
         final id = await HonooService.publishHonooAndReturnId(newHonoo);
@@ -242,6 +248,11 @@ class _NewHonooPageState extends State<NewHonooPage> {
         _finalImageUrlCache = finalImageUrl;
         _lastSavedRawImage = _imageUrl;
       });
+
+      if (shouldOfferNotifications) {
+        await ConversationNotificationPrompt.show(context);
+        if (!mounted) return;
+      }
 
       if (type == HonooType.answer) {
         // Risposta: messaggio dedicato e vai allo Scrigno con focus conversazione + sobbalzo

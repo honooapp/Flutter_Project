@@ -23,6 +23,7 @@ import 'home_page.dart';
 import 'placeholder_page.dart';
 import '../Entities/hinoo.dart';
 import 'casa_builder_page.dart';
+import '../Widgets/conversation_notification_prompt.dart';
 
 class NewHinooPage extends StatefulWidget {
   const NewHinooPage({
@@ -285,6 +286,13 @@ class _NewHinooPageState extends State<NewHinooPage>
       return;
     }
 
+    final userId = SupabaseProvider.client.auth.currentUser?.id;
+    final bool shouldOfferNotifications = userId != null &&
+        hinooDraft.type == HinooType.personal &&
+        await ConversationNotificationPrompt.shouldOfferForFirstConversation(
+          userId,
+        );
+
     try {
       if (widget.returnSavedId) {
         final hinooId = await _controller.saveToChestAndReturnId(hinooDraft);
@@ -309,6 +317,10 @@ class _NewHinooPageState extends State<NewHinooPage>
       if (!mounted) return;
       setState(() => _savedToChest = true);
       _chestBounceController.forward(from: 0);
+      if (shouldOfferNotifications) {
+        await ConversationNotificationPrompt.show(context);
+        if (!mounted) return;
+      }
       final bool isAnswer =
           (hinooDraft.type == HinooType.answer) || widget.isReply;
       if (isAnswer) {

@@ -13,7 +13,6 @@ import 'placeholder_page.dart';
 // Widgets riutilizzabili
 import '../Widgets/sea_footer_bar.dart';
 import '../Widgets/luna_fissa.dart';
-import '../Widgets/reply_notification_button.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -178,19 +177,6 @@ class _HomePageState extends State<HomePage> {
 
               // 🌙 LUNA FISSA (riutilizzabile ovunque)
               const LunaFissa(showAdminEntry: true),
-
-              // CAMPANELLO FISSO, speculare alla luna solo nella homepage.
-              Positioned(
-                top: MediaQuery.viewPaddingOf(context).top +
-                    (maxWidth >= 1200 ? 16 : 8),
-                left: maxWidth >= 1200 ? 16 : 8,
-                child: Material(
-                  color: Colors.transparent,
-                  child: ReplyNotificationButton(
-                    iconSize: LunaFissa.iconSizeForWidth(maxWidth),
-                  ),
-                ),
-              ),
             ],
           );
         },
