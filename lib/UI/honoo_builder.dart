@@ -420,7 +420,9 @@ class HonooBuilderState extends State<HonooBuilder> {
       return;
     }
 
-    final Uint8List? bytes = await _captureHonooAsPng();
+    final Uint8List? bytes = await TextBoxDownloadButton.hideWhileCapturing(
+      _captureHonooAsPng,
+    );
     if (bytes == null || bytes.isEmpty) {
       if (!context.mounted) return;
       showHonooToast(context, message: 'Impossibile generare il file PNG.');
