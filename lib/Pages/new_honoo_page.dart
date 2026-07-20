@@ -29,6 +29,7 @@ class NewHonooPage extends StatefulWidget {
     this.returnSavedId = false,
     this.conversationId,
     this.replyTo,
+    this.returnToPreviousOnAnswer = false,
   });
 
   final HonooType? forcedType;
@@ -36,6 +37,7 @@ class NewHonooPage extends StatefulWidget {
   final bool returnSavedId;
   final String? conversationId;
   final String? replyTo;
+  final bool returnToPreviousOnAnswer;
 
   @override
   State<NewHonooPage> createState() => _NewHonooPageState();
@@ -248,6 +250,10 @@ class _NewHonooPageState extends State<NewHonooPage> {
           message:
               "L'honoo adesso è nel tuo Scrigno, e, soprattutto nello Scrigno di quacun altro.",
         );
+        if (widget.returnToPreviousOnAnswer) {
+          Navigator.pop(context, conversationId);
+          return;
+        }
         await Navigator.push(
           context,
           MaterialPageRoute(

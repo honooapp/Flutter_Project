@@ -21,6 +21,7 @@ class UnifiedThreadView extends StatefulWidget {
     this.highlightLatest = false,
     this.isActive = false,
     this.onDownloadTap,
+    this.refreshToken = 0,
   });
 
   final String conversationId;
@@ -30,12 +31,14 @@ class UnifiedThreadView extends StatefulWidget {
   final bool highlightLatest;
   final bool isActive;
   final VoidCallback? onDownloadTap;
+  final int refreshToken;
 
   @override
   State<UnifiedThreadView> createState() => _UnifiedThreadViewState();
 }
 
-class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTickerProviderStateMixin {
+class _UnifiedThreadViewState extends State<UnifiedThreadView>
+    with SingleTickerProviderStateMixin {
   bool _loading = true;
   List<ConversationEntry> _entries = const [];
   RealtimeChannel? _chan;
@@ -48,7 +51,8 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 450));
+    _controller = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 450));
     _liftAnimation = TweenSequence<double>([
       TweenSequenceItem(tween: Tween(begin: 0.0, end: -1.0), weight: 50),
       TweenSequenceItem(tween: Tween(begin: -1.0, end: 0.0), weight: 50),
@@ -70,9 +74,13 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
   }
 
   Future<void> _load() async {
-    setState(() => _loading = true);
+    if (!mounted) return;
+    if (_entries.isEmpty) {
+      setState(() => _loading = true);
+    }
     try {
-      final entries = await ConversationService.fetchConversation(widget.conversationId);
+      final entries =
+          await ConversationService.fetchConversation(widget.conversationId);
 
       if (!mounted) return;
       setState(() {
@@ -98,6 +106,10 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
       _chan = null;
       _didHighlight = false;
       _hasPlayedReveal = false;
+      _load();
+    }
+    if (oldWidget.refreshToken != widget.refreshToken &&
+        oldWidget.conversationId == widget.conversationId) {
       _load();
     }
     if (oldWidget.isActive != widget.isActive ||
@@ -145,14 +157,17 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
   bool _shouldReveal(ConversationEntry e) {
     final String? myId = SupabaseProvider.client.auth.currentUser?.id;
     // Moon-saved: non rivelare
-    final bool isMoon = e.isFromMoonSaved == true || (e.honoo != null && (e.honoo!.isFromMoonSaved == true));
+    final bool isMoon = e.isFromMoonSaved == true ||
+        (e.honoo != null && (e.honoo!.isFromMoonSaved == true));
     if (isMoon) return false;
 
     // Creato da me: non rivelare
     if (e.ownerId != null && myId != null && e.ownerId == myId) return false;
 
     // Reply?
-    final bool isReply = e.honoo != null ? (e.honoo!.type == HonooType.answer) : (e.hinoo != null && e.hinoo!.type == HinooType.answer);
+    final bool isReply = e.honoo != null
+        ? (e.honoo!.type == HonooType.answer)
+        : (e.hinoo != null && e.hinoo!.type == HinooType.answer);
 
     return isReply;
   }
@@ -176,29 +191,29 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
           final GlobalKey repaintKey = GlobalKey();
           final card = e.kind == ConversationEntryKind.honoo
               ? RepaintBoundary(
-              key: repaintKey,
-              child: HonooCard(
-                honoo: e.honoo!,
-                onDownloadTap: () => _downloadFromBoundary(
-                  repaintKey: repaintKey,
-                  baseName: 'honoo',
-                ),
-              ),
-            )
+                  key: repaintKey,
+                  child: HonooCard(
+                    honoo: e.honoo!,
+                    onDownloadTap: () => _downloadFromBoundary(
+                      repaintKey: repaintKey,
+                      baseName: 'honoo',
+                    ),
+                  ),
+                )
               : RepaintBoundary(
-              key: repaintKey,
-              child: HinooViewer(
-                draft: e.hinoo!,
-                maxHeight: widget.maxHeight,
-                maxWidth: widget.maxWidth,
-                isReply: e.hinoo!.type == HinooType.answer,
-                authorId: e.ownerId,
-                onDownloadTap: () => _downloadFromBoundary(
-                  repaintKey: repaintKey,
-                  baseName: 'hinoo',
-                ),
-              ),
-            );
+                  key: repaintKey,
+                  child: HinooViewer(
+                    draft: e.hinoo!,
+                    maxHeight: widget.maxHeight,
+                    maxWidth: widget.maxWidth,
+                    isReply: e.hinoo!.type == HinooType.answer,
+                    authorId: e.ownerId,
+                    onDownloadTap: () => _downloadFromBoundary(
+                      repaintKey: repaintKey,
+                      baseName: 'hinoo',
+                    ),
+                  ),
+                );
           final Widget page = SizedBox.expand(child: card);
           if (index == _pageToShowFirst && _shouldReveal(e)) {
             final screenH = MediaQuery.of(context).size.height;
@@ -206,7 +221,8 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView> with SingleTicker
               animation: _liftAnimation,
               builder: (context, childWidget) {
                 final double offsetY = _liftAnimation.value * (screenH * 0.4);
-                return Transform.translate(offset: Offset(0, offsetY), child: childWidget);
+                return Transform.translate(
+                    offset: Offset(0, offsetY), child: childWidget);
               },
               child: page,
             );

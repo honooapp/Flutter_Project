@@ -24,7 +24,10 @@ class ReplyHonooPage extends StatefulWidget {
     required this.originalHonoo,
     this.initialHintText = 'Scrivi la tua risposta...',
     this.initialImageHint = 'Aggiungi un’immagine (opzionale)',
+    this.returnToPreviousOnAnswer = false,
   });
+
+  final bool returnToPreviousOnAnswer;
 
   @override
   State<ReplyHonooPage> createState() => _ReplyHonooPageState();
@@ -83,8 +86,8 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
       // Assicura che il root sia nello Scrigno se arriviamo dalla Luna
       if (widget.originalHonoo.type == HonooType.moon) {
         try {
-          await HonooController()
-              .saveToChest(widget.originalHonoo.copyWith(isFromMoonSaved: true));
+          await HonooController().saveToChest(
+              widget.originalHonoo.copyWith(isFromMoonSaved: true));
         } catch (_) {}
       }
 
@@ -100,8 +103,14 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
       _sentOnce = true;
       if (!mounted) return;
       // Vai allo Scrigno con focus sulla conversazione e sobbalzo sulla risposta
-      final convId = newHonoo.conversationId ?? widget.originalHonoo.conversationId ?? widget.originalHonoo.dbId;
+      final convId = newHonoo.conversationId ??
+          widget.originalHonoo.conversationId ??
+          widget.originalHonoo.dbId;
       if (convId != null && convId.isNotEmpty) {
+        if (widget.returnToPreviousOnAnswer) {
+          Navigator.pop(context, convId);
+          return;
+        }
         await Navigator.push(
           context,
           MaterialPageRoute(
