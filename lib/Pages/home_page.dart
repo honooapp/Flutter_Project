@@ -95,23 +95,14 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   SizedBox(
                     height: 52,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        HonooAppTitle(
-                          onTap: () {
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (_) => const PlaceholderPage()),
-                              (route) => false,
-                            );
-                          },
-                        ),
-                        const Positioned(
-                          right: 8,
-                          child: ReplyNotificationButton(),
-                        ),
-                      ],
+                    child: HonooAppTitle(
+                      onTap: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (_) => const PlaceholderPage()),
+                          (route) => false,
+                        );
+                      },
                     ),
                   ),
                   Expanded(
@@ -187,6 +178,19 @@ class _HomePageState extends State<HomePage> {
 
               // 🌙 LUNA FISSA (riutilizzabile ovunque)
               const LunaFissa(showAdminEntry: true),
+
+              // CAMPANELLO FISSO, speculare alla luna solo nella homepage.
+              Positioned(
+                top: MediaQuery.viewPaddingOf(context).top +
+                    (maxWidth >= 1200 ? 16 : 8),
+                left: maxWidth >= 1200 ? 16 : 8,
+                child: Material(
+                  color: Colors.transparent,
+                  child: ReplyNotificationButton(
+                    iconSize: LunaFissa.iconSizeForWidth(maxWidth),
+                  ),
+                ),
+              ),
             ],
           );
         },

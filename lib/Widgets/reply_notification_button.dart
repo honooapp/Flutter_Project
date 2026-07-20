@@ -4,9 +4,14 @@ import '../Services/reply_system_notification.dart';
 import 'honoo_dialogs.dart';
 
 class ReplyNotificationButton extends StatefulWidget {
-  const ReplyNotificationButton({super.key, this.notification});
+  const ReplyNotificationButton({
+    super.key,
+    this.notification,
+    this.iconSize,
+  });
 
   final ReplySystemNotification? notification;
+  final double? iconSize;
 
   @override
   State<ReplyNotificationButton> createState() =>
@@ -40,6 +45,8 @@ class _ReplyNotificationButtonState extends State<ReplyNotificationButton> {
     return IconButton(
       key: const Key('configure_reply_notifications'),
       onPressed: _configure,
+      iconSize: widget.iconSize,
+      splashRadius: widget.iconSize == null ? null : (widget.iconSize! / 2) + 6,
       icon: Icon(
         enabled ? Icons.notifications_active : Icons.notifications_none,
         color: Colors.white,
