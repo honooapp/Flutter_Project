@@ -13,6 +13,7 @@ import 'placeholder_page.dart';
 // Widgets riutilizzabili
 import '../Widgets/sea_footer_bar.dart';
 import '../Widgets/luna_fissa.dart';
+import '../Widgets/reply_notification_button.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -94,16 +95,23 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   SizedBox(
                     height: 52,
-                    child: Center(
-                      child: HonooAppTitle(
-                        onTap: () {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (_) => const PlaceholderPage()),
-                            (route) => false,
-                          );
-                        },
-                      ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        HonooAppTitle(
+                          onTap: () {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (_) => const PlaceholderPage()),
+                              (route) => false,
+                            );
+                          },
+                        ),
+                        const Positioned(
+                          right: 8,
+                          child: ReplyNotificationButton(),
+                        ),
+                      ],
                     ),
                   ),
                   Expanded(

@@ -10,6 +10,7 @@ import 'Pages/auth_gate.dart';
 import 'Pages/chest_page.dart';
 import 'Utility/honoo_colors.dart';
 import 'Widgets/global_invite_listener.dart';
+import 'Widgets/global_reply_notification_listener.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -105,11 +106,14 @@ class _MyAppState extends State<MyApp> {
             '/chest': (context) => const ChestPage(),
           },
         );
-        return SafeArea(
-          child: GlobalInviteListener(
-            navigatorKey: _navigatorKey,
-            enabled: true,
-            child: app,
+        return GlobalReplyNotificationListener(
+          navigatorKey: _navigatorKey,
+          child: SafeArea(
+            child: GlobalInviteListener(
+              navigatorKey: _navigatorKey,
+              enabled: true,
+              child: app,
+            ),
           ),
         );
       },

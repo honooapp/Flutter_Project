@@ -67,6 +67,7 @@ class ConversationService {
         createdAt: DateTime.tryParse(r['created_at']?.toString() ?? '') ??
             DateTime.fromMillisecondsSinceEpoch(0),
         ownerId: ownerId,
+        id: r['id']?.toString(),
         isFromMoonSaved: isFromMoonSaved,
       ));
     }
@@ -78,6 +79,7 @@ class ConversationService {
                 d,
                 createdAt: e.createdAt,
                 ownerId: e.ownerId,
+                id: e.id,
                 isFromMoonSaved: e.isFromMoonSaved,
               ),
             ))
@@ -125,21 +127,23 @@ class _Entry {
   final HinooDraft? hinoo;
   final DateTime createdAt;
   final String? ownerId;
+  final String? id;
   final bool isFromMoonSaved;
 
   _Entry._(this.honoo, this.hinoo, this.createdAt,
-      {this.ownerId, this.isFromMoonSaved = false});
+      {this.ownerId, this.id, this.isFromMoonSaved = false});
   factory _Entry.honoo(Honoo h) =>
       _Entry._(h, null, DateTime.tryParse(h.createdAt) ?? DateTime.now(),
-          ownerId: h.userId, isFromMoonSaved: h.isFromMoonSaved);
+          ownerId: h.userId, id: h.dbId, isFromMoonSaved: h.isFromMoonSaved);
   factory _Entry.hinoo(
     HinooDraft d, {
     required DateTime createdAt,
     String? ownerId,
+    String? id,
     bool isFromMoonSaved = false,
   }) =>
       _Entry._(null, d, createdAt,
-          ownerId: ownerId, isFromMoonSaved: isFromMoonSaved);
+          ownerId: ownerId, id: id, isFromMoonSaved: isFromMoonSaved);
 
   T when<T>(
       {required T Function(Honoo) honoo,

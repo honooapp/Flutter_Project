@@ -8,14 +8,19 @@ class ConversationEntry {
   final Honoo? honoo;
   final HinooDraft? hinoo;
   final String? ownerId;
+  final String? id;
+  final String? replyTo;
   final bool isFromMoonSaved;
   final DateTime createdAt;
 
-  ConversationEntry._(this.kind, {
+  ConversationEntry._(
+    this.kind, {
     required this.createdAt,
     this.honoo,
     this.hinoo,
     this.ownerId,
+    this.id,
+    this.replyTo,
     this.isFromMoonSaved = false,
   });
 
@@ -25,6 +30,8 @@ class ConversationEntry {
         createdAt: DateTime.tryParse(h.createdAt) ??
             DateTime.fromMillisecondsSinceEpoch(0),
         ownerId: h.userId,
+        id: h.dbId,
+        replyTo: h.replyTo,
         isFromMoonSaved: h.isFromMoonSaved,
       );
 
@@ -32,6 +39,7 @@ class ConversationEntry {
     HinooDraft d, {
     required DateTime createdAt,
     String? ownerId,
+    String? id,
     bool isFromMoonSaved = false,
   }) =>
       ConversationEntry._(
@@ -39,6 +47,8 @@ class ConversationEntry {
         hinoo: d,
         createdAt: createdAt,
         ownerId: ownerId,
+        id: id,
+        replyTo: d.replyTo,
         isFromMoonSaved: isFromMoonSaved,
       );
 }

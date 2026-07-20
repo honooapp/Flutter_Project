@@ -23,6 +23,8 @@ class UnifiedThreadView extends StatefulWidget {
     this.isActive = false,
     this.onDownloadTap,
     this.refreshToken = 0,
+    this.conversationLoader,
+    this.currentUserId,
   });
 
   final String conversationId;
@@ -33,6 +35,9 @@ class UnifiedThreadView extends StatefulWidget {
   final bool isActive;
   final VoidCallback? onDownloadTap;
   final int refreshToken;
+  final Future<List<ConversationEntry>> Function(String conversationId)?
+      conversationLoader;
+  final String? currentUserId;
 
   @override
   State<UnifiedThreadView> createState() => _UnifiedThreadViewState();
@@ -53,10 +58,28 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   void initState() {
     super.initState();
     _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 450));
+        vsync: this, duration: const Duration(milliseconds: 900));
     _liftAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: -1.0), weight: 50),
-      TweenSequenceItem(tween: Tween(begin: -1.0, end: 0.0), weight: 50),
+      TweenSequenceItem(
+        tween: Tween(begin: 0.0, end: -1.0)
+            .chain(CurveTween(curve: Curves.easeOutCubic)),
+        weight: 40,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: -1.0, end: -0.84)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 12,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: -0.84, end: -1.0)
+            .chain(CurveTween(curve: Curves.easeIn)),
+        weight: 12,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: -1.0, end: 0.0)
+            .chain(CurveTween(curve: Curves.easeInOutCubic)),
+        weight: 36,
+      ),
     ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     _load();
     _syncSubscription();
@@ -68,10 +91,14 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
       _chan = null;
       return;
     }
-    _chan ??= ConversationService.subscribeConversation(
-      widget.conversationId,
-      _load,
-    );
+    try {
+      _chan ??= ConversationService.subscribeConversation(
+        widget.conversationId,
+        _load,
+      );
+    } catch (_) {
+      _chan = null;
+    }
   }
 
   Future<void> _load() async {
@@ -80,8 +107,9 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
       setState(() => _loading = true);
     }
     try {
-      final entries =
-          await ConversationService.fetchConversation(widget.conversationId);
+      final loader =
+          widget.conversationLoader ?? ConversationService.fetchConversation;
+      final entries = await loader(widget.conversationId);
 
       if (!mounted) return;
       setState(() {
@@ -172,7 +200,8 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   }
 
   bool _shouldReveal(ConversationEntry e) {
-    final String? myId = SupabaseProvider.client.auth.currentUser?.id;
+    final String? myId =
+        widget.currentUserId ?? SupabaseProvider.client.auth.currentUser?.id;
     // Moon-saved: non rivelare
     final bool isMoon = e.isFromMoonSaved == true ||
         (e.honoo != null && (e.honoo!.isFromMoonSaved == true));
@@ -187,6 +216,50 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
         : (e.hinoo != null && e.hinoo!.type == HinooType.answer);
 
     return isReply;
+  }
+
+  ConversationEntry? _answeredEntryFor(ConversationEntry reply) {
+    final replyTo = reply.replyTo;
+    if (replyTo != null && replyTo.isNotEmpty) {
+      for (final entry in _entries.reversed) {
+        if (entry.id == replyTo) return entry;
+      }
+    }
+    final replyIndex = _entries.indexOf(reply);
+    return replyIndex > 0 ? _entries[replyIndex - 1] : null;
+  }
+
+  Widget _entryCard(ConversationEntry entry, {String? keyName}) {
+    final GlobalKey repaintKey = GlobalKey();
+    final card = entry.kind == ConversationEntryKind.honoo
+        ? RepaintBoundary(
+            key: repaintKey,
+            child: HonooCard(
+              honoo: entry.honoo!,
+              onDownloadTap: () => _downloadFromBoundary(
+                repaintKey: repaintKey,
+                baseName: 'honoo',
+              ),
+            ),
+          )
+        : RepaintBoundary(
+            key: repaintKey,
+            child: HinooViewer(
+              draft: entry.hinoo!,
+              maxHeight: widget.maxHeight,
+              maxWidth: widget.maxWidth,
+              isReply: entry.hinoo!.type == HinooType.answer,
+              authorId: entry.ownerId,
+              onDownloadTap: () => _downloadFromBoundary(
+                repaintKey: repaintKey,
+                baseName: 'hinoo',
+              ),
+            ),
+          );
+    return SizedBox.expand(
+      key: keyName == null ? null : Key(keyName),
+      child: card,
+    );
   }
 
   @override
@@ -206,41 +279,37 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
           // Ordine inverso: ultimo (più recente) in cima
           final revIndex = _entries.length - 1 - index;
           final e = _entries[revIndex];
-          final GlobalKey repaintKey = GlobalKey();
-          final card = e.kind == ConversationEntryKind.honoo
-              ? RepaintBoundary(
-                  key: repaintKey,
-                  child: HonooCard(
-                    honoo: e.honoo!,
-                    onDownloadTap: () => _downloadFromBoundary(
-                      repaintKey: repaintKey,
-                      baseName: 'honoo',
-                    ),
-                  ),
-                )
-              : RepaintBoundary(
-                  key: repaintKey,
-                  child: HinooViewer(
-                    draft: e.hinoo!,
-                    maxHeight: widget.maxHeight,
-                    maxWidth: widget.maxWidth,
-                    isReply: e.hinoo!.type == HinooType.answer,
-                    authorId: e.ownerId,
-                    onDownloadTap: () => _downloadFromBoundary(
-                      repaintKey: repaintKey,
-                      baseName: 'hinoo',
-                    ),
-                  ),
-                );
-          final Widget page = SizedBox.expand(child: card);
+          final Widget page = _entryCard(e);
           if (index == _pageToShowFirst && _shouldReveal(e)) {
-            final screenH = MediaQuery.of(context).size.height;
+            final answeredEntry = _answeredEntryFor(e);
+            final answeredPage = answeredEntry == null
+                ? null
+                : Transform.translate(
+                    offset: Offset(0, widget.maxHeight * 0.52),
+                    child: _entryCard(
+                      answeredEntry,
+                      keyName: 'reply_reveal_parent',
+                    ),
+                  );
             return AnimatedBuilder(
               animation: _liftAnimation,
               builder: (context, childWidget) {
-                final double offsetY = _liftAnimation.value * (screenH * 0.4);
-                return Transform.translate(
-                    offset: Offset(0, offsetY), child: childWidget);
+                final double revealHeight = widget.maxHeight * 0.48;
+                return ClipRect(
+                  child: Stack(
+                    children: [
+                      if (answeredPage != null) answeredPage,
+                      Transform.translate(
+                        key: const Key('reply_reveal_foreground'),
+                        offset: Offset(
+                          0,
+                          _liftAnimation.value * revealHeight,
+                        ),
+                        child: childWidget,
+                      ),
+                    ],
+                  ),
+                );
               },
               child: page,
             );
