@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install ripgrep
+        run: sudo apt-get update && sudo apt-get install --yes ripgrep
       - name: Verify migration ordering and safety markers
         run: bash tool/check_supabase_migrations.sh
 
@@ -30,6 +32,12 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.19.6'
+      - name: Install FVM
+        run: |
+          dart pub global activate fvm 3.2.1
+          echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+      - name: Prepare Flutter SDK in FVM
+        run: fvm install 3.19.6
       - name: Flutter pub get
         run: flutter pub get
       - name: Analyze
@@ -54,6 +62,12 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.19.6'
+      - name: Install FVM
+        run: |
+          dart pub global activate fvm 3.2.1
+          echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+      - name: Prepare Flutter SDK in FVM
+        run: fvm install 3.19.6
       - name: Flutter pub get
         run: flutter pub get
       - name: Run CRUD tests (ENABLE_WRITE_TESTS=1)

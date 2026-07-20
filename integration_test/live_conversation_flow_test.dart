@@ -7,7 +7,6 @@ import 'package:test/test.dart';
 
 void main() {
   test('LIVE: quattro incroci, RLS, ordine e Realtime', () async {
-    if (!LiveConfig.liveRun) return;
     expect(LiveConfig.hasConversationUsers, isTrue,
         reason: 'Configurazione dei due utenti live incompleta');
 
@@ -366,5 +365,9 @@ void main() {
       await a.dispose();
       await b.dispose();
     }
-  }, timeout: const Timeout(Duration(minutes: 2)));
+  },
+      skip: LiveConfig.liveRun
+          ? false
+          : 'Set HONOO_LIVE_RUN=true per eseguire il test live',
+      timeout: const Timeout(Duration(minutes: 2)));
 }
