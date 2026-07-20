@@ -1,6 +1,6 @@
 # honoo
 
-honoo è una piattaforma narrativa multimediale Flutter: permette di creare e condividere **Honoo** (cartoline brevi) e **Hinoo** (composizioni verticali), conservarli nello Scrigno, pubblicarli sulla Luna e costruire conversazioni. L'Isola delle Storie aggiunge percorsi ed esercizi narrativi.
+honoo è una piattaforma narrativa multimediale Flutter: permette di creare e condividere **honoo** (una breve composizione di 144 caratteri e un'immagine quadrata) e **hinoo** (immagine di sfondo e testo libero), conservarli nello Scrigno, pubblicarli sulla Luna e costruire conversazioni. L'Isola delle Storie aggiunge percorsi ed esercizi narrativi.
 
 Il client usa Supabase per autenticazione, PostgreSQL, Storage e Realtime. Il target principale è Flutter Web; il progetto mantiene anche gli scaffold mobile e desktop.
 
