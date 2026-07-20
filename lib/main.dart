@@ -23,18 +23,26 @@ Future<void> main() async {
       url: supabaseUrl,
       anonKey: supabaseAnon,
     ).timeout(const Duration(seconds: 5));
-    try {
-      await Supabase.instance.client.auth
-          .refreshSession()
-          .timeout(const Duration(seconds: 5));
-    } catch (error, stackTrace) {
-      AppLogger.warning('Refresh iniziale della sessione non riuscito',
-          scope: 'bootstrap', error: error, stackTrace: stackTrace);
-    }
     ExerciseController().init();
     runApp(const MyApp());
+    unawaited(_refreshSessionInBackground());
   } catch (e) {
     runApp(_BootErrorApp(message: 'Errore inizializzazione: $e'));
+  }
+}
+
+Future<void> _refreshSessionInBackground() async {
+  try {
+    await Supabase.instance.client.auth
+        .refreshSession()
+        .timeout(const Duration(seconds: 5));
+  } catch (error, stackTrace) {
+    AppLogger.warning(
+      'Refresh iniziale della sessione non riuscito',
+      scope: 'bootstrap',
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 }
 
