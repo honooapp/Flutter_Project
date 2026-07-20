@@ -13,3 +13,20 @@ class DownloadImage {
   final String filename;
   final Uint8List bytes;
 }
+
+String sanitizeDownloadFilename(String filename) {
+  final String trimmed = filename.trim();
+  final int dotIndex = trimmed.lastIndexOf('.');
+  final bool hasExtension = dotIndex > 0 && dotIndex < trimmed.length - 1;
+  String stem = hasExtension ? trimmed.substring(0, dotIndex) : trimmed;
+  String extension = hasExtension ? trimmed.substring(dotIndex) : '';
+
+  stem = stem
+      .replaceAll(RegExp(r'[<>:"/\\|?*\x00-\x1F]'), '_')
+      .replaceAll(RegExp(r'[. ]+$'), '')
+      .trim();
+  extension = extension.replaceAll(RegExp(r'[^A-Za-z0-9.]'), '').toLowerCase();
+
+  if (stem.isEmpty) stem = 'honoo';
+  return '$stem$extension';
+}

@@ -351,15 +351,19 @@ class _HinooBuilderState extends State<HinooBuilder> {
       }());
       final ui.Image image =
           await boundary.toImage(pixelRatio: effectivePixelRatio);
-      assert(() {
-        debugPrint(
-          'Hinoo export image size: ${image.width}x${image.height}',
-        );
-        return true;
-      }());
-      final ByteData? byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
-      return byteData?.buffer.asUint8List();
+      try {
+        assert(() {
+          debugPrint(
+            'Hinoo export image size: ${image.width}x${image.height}',
+          );
+          return true;
+        }());
+        final ByteData? byteData =
+            await image.toByteData(format: ui.ImageByteFormat.png);
+        return byteData?.buffer.asUint8List();
+      } finally {
+        image.dispose();
+      }
     } catch (e) {
       debugPrint('capture canvas error: $e');
       return null;

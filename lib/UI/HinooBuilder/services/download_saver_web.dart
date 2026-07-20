@@ -11,24 +11,26 @@ class _DownloadSaverWeb implements DownloadSaver {
       return 'Nessuna immagine da scaricare.';
     }
 
-    final bool iosSafari = _isIosSafari();
+    final bool iosBrowser = _isIosBrowser();
     for (final DownloadImage img in images) {
       // Alcuni browser mobile (iOS Safari) ignorano download programmatici.
       // Usiamo un fallback aprendolo in una nuova scheda.
-      final String mime = iosSafari ? 'application/octet-stream' : 'image/png';
+      final String mime = iosBrowser ? 'application/octet-stream' : 'image/png';
       final html.Blob blob = html.Blob(<dynamic>[img.bytes], mime);
       final String url = html.Url.createObjectUrlFromBlob(blob);
 
       try {
-        if (iosSafari) {
+        if (iosBrowser) {
           // Fallback: apri in una nuova scheda; l’utente può salvare dall’UI
-          html.window.open(url, '_blank');
-          // Ritarda la revoca per dare tempo al browser di consumare l’URL
-          await Future<void>.delayed(const Duration(milliseconds: 200));
-          html.Url.revokeObjectUrl(url);
+          final dynamic opened = html.window.open(url, '_blank');
+          if (opened == null) {
+            html.window.location.assign(url);
+          } else {
+            _revokeLater(url);
+          }
         } else {
           final html.AnchorElement anchor = html.AnchorElement(href: url)
-            ..download = img.filename
+            ..download = sanitizeDownloadFilename(img.filename)
             ..rel = 'noopener'
             ..target = '_self'
             ..style.display = 'none';
@@ -39,9 +41,12 @@ class _DownloadSaverWeb implements DownloadSaver {
         }
       } catch (_) {
         // Ultimo fallback generico: prova ad aprire in nuova scheda
-        html.window.open(url, '_blank');
-        await Future<void>.delayed(const Duration(milliseconds: 200));
-        html.Url.revokeObjectUrl(url);
+        final dynamic opened = html.window.open(url, '_blank');
+        if (opened == null) {
+          html.window.location.assign(url);
+        } else {
+          _revokeLater(url);
+        }
       }
     }
 
@@ -53,12 +58,11 @@ class _DownloadSaverWeb implements DownloadSaver {
 
 DownloadSaver getDownloadSaverImpl() => _DownloadSaverWeb();
 
-bool _isIosSafari() {
+bool _isIosBrowser() {
   final ua = html.window.navigator.userAgent.toLowerCase();
-  final bool isIOS = ua.contains('iphone') || ua.contains('ipad') || ua.contains('ipod');
-  final bool isSafari = ua.contains('safari') &&
-      !ua.contains('crios') && // Chrome iOS
-      !ua.contains('fxios') && // Firefox iOS
-      !ua.contains('edgios'); // Edge iOS
-  return isIOS && isSafari;
+  return ua.contains('iphone') || ua.contains('ipad') || ua.contains('ipod');
+}
+
+void _revokeLater(String url) {
+  Timer(const Duration(seconds: 30), () => html.Url.revokeObjectUrl(url));
 }
