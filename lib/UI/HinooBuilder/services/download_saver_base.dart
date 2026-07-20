@@ -30,3 +30,15 @@ String sanitizeDownloadFilename(String filename) {
   if (stem.isEmpty) stem = 'honoo';
   return '$stem$extension';
 }
+
+bool isMobileOrTabletBrowser(
+  String userAgent, {
+  int maxTouchPoints = 0,
+}) {
+  final String normalized = userAgent.toLowerCase();
+  return normalized.contains('android') ||
+      normalized.contains('iphone') ||
+      normalized.contains('ipad') ||
+      normalized.contains('ipod') ||
+      (normalized.contains('macintosh') && maxTouchPoints > 1);
+}

@@ -1,6 +1,8 @@
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 import 'dart:async';
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:js_util' as js_util;
 
 import 'download_saver_base.dart';
 
@@ -9,6 +11,12 @@ class _DownloadSaverWeb implements DownloadSaver {
   Future<String> save(List<DownloadImage> images, {String? message}) async {
     if (images.isEmpty) {
       return 'Nessuna immagine da scaricare.';
+    }
+
+    if (_isMobileOrTabletBrowser() && await _shareWithSystem(images, message)) {
+      return images.length == 1
+          ? 'Scegli “Salva immagine” per aggiungerla alla galleria.'
+          : 'Scegli “Salva immagini” per aggiungerle alla galleria.';
     }
 
     final bool iosBrowser = _isIosBrowser();
@@ -61,6 +69,62 @@ DownloadSaver getDownloadSaverImpl() => _DownloadSaverWeb();
 bool _isIosBrowser() {
   final ua = html.window.navigator.userAgent.toLowerCase();
   return ua.contains('iphone') || ua.contains('ipad') || ua.contains('ipod');
+}
+
+bool _isMobileOrTabletBrowser() {
+  return isMobileOrTabletBrowser(
+    html.window.navigator.userAgent,
+    maxTouchPoints: html.window.navigator.maxTouchPoints ?? 0,
+  );
+}
+
+Future<bool> _shareWithSystem(
+  List<DownloadImage> images,
+  String? message,
+) async {
+  final html.Navigator navigator = html.window.navigator;
+  if (!js_util.hasProperty(navigator, 'share')) return false;
+
+  final List<html.File> files = images
+      .map(
+        (DownloadImage image) => html.File(
+          <Object>[image.bytes],
+          sanitizeDownloadFilename(image.filename),
+          <String, dynamic>{'type': 'image/png'},
+        ),
+      )
+      .toList(growable: false);
+  final Object shareData = js_util.newObject();
+  js_util.setProperty(shareData, 'files', files);
+  js_util.setProperty(shareData, 'title', 'Honoo');
+  if (message != null && message.trim().isNotEmpty) {
+    js_util.setProperty(shareData, 'text', message.trim());
+  }
+
+  if (js_util.hasProperty(navigator, 'canShare')) {
+    try {
+      final bool canShare =
+          js_util.callMethod<bool>(navigator, 'canShare', <Object>[shareData]);
+      if (!canShare) return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  try {
+    final Object promise =
+        js_util.callMethod<Object>(navigator, 'share', <Object>[shareData]);
+    await js_util.promiseToFuture<dynamic>(promise);
+    return true;
+  } catch (error) {
+    // Un annullamento volontario non deve avviare un download inatteso.
+    try {
+      if (js_util.getProperty<String>(error, 'name') == 'AbortError') {
+        return true;
+      }
+    } catch (_) {}
+    return false;
+  }
 }
 
 void _revokeLater(String url) {
