@@ -31,38 +31,31 @@ class DesktopCarouselArrows extends StatelessWidget {
       fit: StackFit.expand,
       children: [
         child,
-        // Full overlay hit areas: left and right halves
-        Positioned.fill(
-          child: Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: canPrev ? onPrev : null,
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: canNext ? onNext : null,
-                ),
-              ),
-            ],
-          ),
-        ),
         if (canPrev)
           Positioned(
             left: horizontalInset,
             top: 0,
             bottom: 0,
             child: Center(
-              child: IgnorePointer(
-                child: SvgPicture.asset(
-                  'assets/icons/arrow_left.svg',
-                  width: arrowSize,
-                  height: arrowSize,
-                  colorFilter: ColorFilter.mode(arrowColor, BlendMode.srcIn),
-                  semanticsLabel: 'Indietro',
+              child: Tooltip(
+                message: 'Indietro',
+                child: GestureDetector(
+                  key: const ValueKey<String>('desktop_carousel_prev'),
+                  behavior: HitTestBehavior.opaque,
+                  onTap: onPrev,
+                  child: SizedBox.square(
+                    dimension: arrowSize + 16,
+                    child: Center(
+                      child: SvgPicture.asset(
+                        'assets/icons/arrow_left.svg',
+                        width: arrowSize,
+                        height: arrowSize,
+                        colorFilter:
+                            ColorFilter.mode(arrowColor, BlendMode.srcIn),
+                        semanticsLabel: 'Indietro',
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -73,13 +66,25 @@ class DesktopCarouselArrows extends StatelessWidget {
             top: 0,
             bottom: 0,
             child: Center(
-              child: IgnorePointer(
-                child: SvgPicture.asset(
-                  'assets/icons/arrow_right.svg',
-                  width: arrowSize,
-                  height: arrowSize,
-                  colorFilter: ColorFilter.mode(arrowColor, BlendMode.srcIn),
-                  semanticsLabel: 'Avanti',
+              child: Tooltip(
+                message: 'Avanti',
+                child: GestureDetector(
+                  key: const ValueKey<String>('desktop_carousel_next'),
+                  behavior: HitTestBehavior.opaque,
+                  onTap: onNext,
+                  child: SizedBox.square(
+                    dimension: arrowSize + 16,
+                    child: Center(
+                      child: SvgPicture.asset(
+                        'assets/icons/arrow_right.svg',
+                        width: arrowSize,
+                        height: arrowSize,
+                        colorFilter:
+                            ColorFilter.mode(arrowColor, BlendMode.srcIn),
+                        semanticsLabel: 'Avanti',
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),

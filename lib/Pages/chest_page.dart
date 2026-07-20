@@ -728,7 +728,10 @@ class _ChestPageState extends State<ChestPage> {
             // Il reveal della conversazione viene gestito da
             // UnifiedThreadView usando i messaggi reali del thread. Qui ogni
             // conversazione occupa ormai una sola slide del carosello.
-            if (items.length <= 1) {
+            final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
+                layoutMode == ResponsiveLayoutMode.wideDesktop ||
+                layoutMode == ResponsiveLayoutMode.largeDesktop;
+            if (!isDesktop || items.length <= 1) {
               return slider;
             }
             return DesktopCarouselArrows(
