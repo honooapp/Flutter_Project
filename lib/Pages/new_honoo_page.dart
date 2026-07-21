@@ -613,20 +613,21 @@ class _NewHonooPageState extends State<NewHonooPage> {
                             : 'Salva honoo',
                         onPressed: _submitHonoo,
                       ),
-                      ResponsiveFooterAction(
-                        asset: "assets/icons/piuma.svg",
-                        semanticsLabel: 'Piuma',
-                        size: footerIconSize,
-                        splashRadius: 25,
-                        tooltip: 'Scrivi hinoo',
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const NewHinooPage()),
-                          );
-                        },
-                      ),
+                      if (widget.forcedType != HonooType.answer)
+                        ResponsiveFooterAction(
+                          asset: "assets/icons/piuma.svg",
+                          semanticsLabel: 'Piuma',
+                          size: footerIconSize,
+                          splashRadius: 25,
+                          tooltip: 'Scrivi hinoo',
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const NewHinooPage()),
+                            );
+                          },
+                        ),
                     ],
                   ),
                 ),
