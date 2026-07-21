@@ -5,6 +5,7 @@ import 'package:sizer/sizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'env/env.dart';
 import 'Utility/app_logger.dart';
+import 'Utility/app_diagnostics.dart';
 
 import 'Pages/auth_gate.dart';
 import 'Pages/chest_page.dart';
@@ -14,6 +15,7 @@ import 'Widgets/global_reply_notification_listener.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  AppDiagnostics.installGlobalHandlers();
   try {
     final supabaseUrl = readEnv('SUPABASE_URL');
     final supabaseAnon = readEnv('SUPABASE_ANON_KEY');
@@ -28,15 +30,20 @@ Future<void> main() async {
     runApp(const MyApp());
     unawaited(_refreshSessionInBackground());
   } catch (e) {
+    AppDiagnostics.record(
+      code: 'bootstrap_failed',
+      scope: 'bootstrap',
+      error: e,
+    );
     runApp(_BootErrorApp(message: 'Errore inizializzazione: $e'));
   }
 }
 
 Future<void> _refreshSessionInBackground() async {
   try {
-    await Supabase.instance.client.auth
-        .refreshSession()
-        .timeout(const Duration(seconds: 5));
+    await Supabase.instance.client.auth.refreshSession().timeout(
+      const Duration(seconds: 5),
+    );
   } catch (error, stackTrace) {
     AppLogger.warning(
       'Refresh iniziale della sessione non riuscito',
@@ -102,9 +109,7 @@ class _MyAppState extends State<MyApp> {
             ),
           ),
           home: const AuthGate(),
-          routes: {
-            '/chest': (context) => const ChestPage(),
-          },
+          routes: {'/chest': (context) => const ChestPage()},
         );
         return GlobalReplyNotificationListener(
           navigatorKey: _navigatorKey,
@@ -133,10 +138,7 @@ class _BootErrorApp extends StatelessWidget {
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
-            child: Text(
-              message,
-              textAlign: TextAlign.center,
-            ),
+            child: Text(message, textAlign: TextAlign.center),
           ),
         ),
       ),

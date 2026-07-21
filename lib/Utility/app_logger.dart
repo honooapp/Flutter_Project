@@ -1,5 +1,7 @@
 import 'dart:developer' as developer;
 
+import 'package:flutter/foundation.dart';
+
 /// Logging centralizzato. Non passare token, password o payload sensibili.
 class AppLogger {
   const AppLogger._();
@@ -17,8 +19,8 @@ class AppLogger {
     developer.log(
       message,
       name: scope,
-      error: error,
-      stackTrace: stackTrace,
+      error: kReleaseMode ? error?.runtimeType : error,
+      stackTrace: kReleaseMode ? null : stackTrace,
       level: 900,
     );
   }
@@ -32,8 +34,8 @@ class AppLogger {
     developer.log(
       message,
       name: scope,
-      error: error,
-      stackTrace: stackTrace,
+      error: kReleaseMode ? error?.runtimeType : error,
+      stackTrace: kReleaseMode ? null : stackTrace,
       level: 1000,
     );
   }
