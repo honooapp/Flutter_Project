@@ -245,7 +245,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
         await showHonooMessageDialog(
           context,
           message:
-              "L'honoo adesso è nel tuo Scrigno, e, soprattutto nello Scrigno di qualcun altro.",
+              "L'honoo adesso è nel tuo Scrigno, e, soprattutto nello Scrigno di quacun altro.",
         );
         if (!mounted) return;
         Navigator.of(context).pushAndRemoveUntil(
