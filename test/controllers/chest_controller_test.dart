@@ -15,21 +15,27 @@ class _FakeRealtimeSubscription implements ChestRealtimeSubscription {
   bool closed = false;
 
   @override
-  void close() => closed = true;
+  Future<void> close() async => closed = true;
 }
 
 class _FakeRealtimeGateway implements ChestRealtimeGateway {
   String? userId;
   void Function()? onChange;
-  final subscription = _FakeRealtimeSubscription();
+  void Function(ChestRealtimeConnectionStatus, Object?)? onStatus;
+  final subscriptions = <_FakeRealtimeSubscription>[];
+  _FakeRealtimeSubscription get subscription => subscriptions.last;
 
   @override
   ChestRealtimeSubscription subscribe({
     required String userId,
     required void Function() onChange,
+    required void Function(ChestRealtimeConnectionStatus, Object?) onStatus,
   }) {
     this.userId = userId;
     this.onChange = onChange;
+    this.onStatus = onStatus;
+    final subscription = _FakeRealtimeSubscription();
+    subscriptions.add(subscription);
     return subscription;
   }
 }
@@ -39,6 +45,7 @@ class _FailingRealtimeGateway implements ChestRealtimeGateway {
   ChestRealtimeSubscription subscribe({
     required String userId,
     required void Function() onChange,
+    required void Function(ChestRealtimeConnectionStatus, Object?) onStatus,
   }) {
     throw StateError('Realtime non disponibile');
   }
@@ -168,6 +175,44 @@ void main() {
     controller.stopRealtime();
 
     expect(realtimeGateway.subscription.closed, isTrue);
+  });
+
+  test('una disconnessione Realtime crea una nuova sottoscrizione', () async {
+    final reconnectingController = ChestController(
+      repository: repository,
+      realtimeGateway: realtimeGateway,
+      realtimeReconnectBaseDelay: const Duration(milliseconds: 5),
+      realtimeReconnectMaxDelay: const Duration(milliseconds: 10),
+    );
+    addTearDown(reconnectingController.dispose);
+
+    reconnectingController.startRealtime(
+      'user-1',
+      refreshInterval: const Duration(hours: 1),
+    );
+    final firstSubscription = realtimeGateway.subscription;
+    realtimeGateway.onStatus!(
+      ChestRealtimeConnectionStatus.disconnected,
+      StateError('offline'),
+    );
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+
+    expect(realtimeGateway.subscriptions, hasLength(2));
+    expect(firstSubscription.closed, isTrue);
+  });
+
+  test('la riconciliazione periodica può aggiornare tutto lo Scrigno',
+      () async {
+    var reconciliations = 0;
+    controller.startRealtime(
+      'user-1',
+      refreshInterval: const Duration(milliseconds: 5),
+      onPeriodicReconcile: () async => reconciliations++,
+    );
+
+    await Future<void>.delayed(const Duration(milliseconds: 18));
+
+    expect(reconciliations, greaterThanOrEqualTo(1));
   });
 
   test('un errore Realtime non impedisce l’avvio del controller', () {
