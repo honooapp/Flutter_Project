@@ -56,7 +56,7 @@ class TextBoxDownloadButton extends StatelessWidget {
                 width: size,
                 height: size,
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.55),
+                  color: Colors.black.withValues(alpha: 0.55),
                   borderRadius: BorderRadius.circular(size / 2),
                 ),
                 child: Icon(

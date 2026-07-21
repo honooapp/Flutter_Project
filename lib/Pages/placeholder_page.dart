@@ -513,7 +513,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           Align(
             alignment: Alignment.center,
             child: Container(
-              color: HonooColor.background.withOpacity(isPhone ? 1 : 0.7),
+              color: HonooColor.background.withValues(alpha: isPhone ? 1 : 0.7),
               constraints: BoxConstraints(
                 maxWidth: contentWidth,
               ),

@@ -98,7 +98,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
           height: pillHeight,
           padding: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.55),
+            color: Colors.black.withValues(alpha: 0.55),
             borderRadius: BorderRadius.circular(pillHeight / 2),
           ),
           child: Row(

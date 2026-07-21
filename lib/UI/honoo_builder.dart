@@ -36,8 +36,7 @@ class HonooBuilder extends StatefulWidget {
   static double baselineIconSizeForDisplay(
     double displaySize,
     double canvasScale,
-  ) =>
-      displaySize / (canvasScale > 0 ? canvasScale : 1);
+  ) => displaySize / (canvasScale > 0 ? canvasScale : 1);
 
   final void Function(String text, String imageUrl)? onHonooChanged;
   final ValueChanged<bool>? onFocusChanged;
@@ -155,8 +154,9 @@ class HonooBuilderState extends State<HonooBuilder> {
   }
 
   void _updateImageScale(double scale) {
-    final double clamped =
-        scale.clamp(_imageMinScale, _imageMaxScale).toDouble();
+    final double clamped = scale
+        .clamp(_imageMinScale, _imageMaxScale)
+        .toDouble();
 
     final Matrix4 current = _imageController.value.clone();
     final Float64List values = current.storage;
@@ -170,8 +170,8 @@ class HonooBuilderState extends State<HonooBuilder> {
     final double adjustedTy = ty * (safeScale / clamped);
 
     _imageController.value = Matrix4.identity()
-      ..translate(adjustedTx, adjustedTy)
-      ..scale(clamped);
+      ..translateByDouble(adjustedTx, adjustedTy, 0, 1)
+      ..scaleByDouble(clamped, clamped, clamped, 1);
 
     setState(() => _imageScale = clamped);
   }
@@ -186,24 +186,29 @@ class HonooBuilderState extends State<HonooBuilder> {
   Future<void> _pickImage() async {
     try {
       final picker = ImagePicker();
-      final XFile? selected =
-          await picker.pickImage(source: ImageSource.gallery);
+      final XFile? selected = await picker.pickImage(
+        source: ImageSource.gallery,
+      );
       if (selected == null) return;
 
       Uint8List bytes = await selected.readAsBytes();
       // Web: conversione HEIC → WEBP (fallback PNG) prima della preview
       if (kIsWeb) {
         try {
-          final converted =
-              await heicweb.convertHeicToWebSafe(bytes, selected.name);
+          final converted = await heicweb.convertHeicToWebSafe(
+            bytes,
+            selected.name,
+          );
           if (converted != null && converted.isNotEmpty) {
             bytes = converted;
           } else {
             final lower = selected.name.toLowerCase();
             if (lower.endsWith('.heic') || lower.endsWith('.heif')) {
               if (mounted) {
-                showHonooToast(context,
-                    message: 'Formato HEIC non supportato dal browser');
+                showHonooToast(
+                  context,
+                  message: 'Formato HEIC non supportato dal browser',
+                );
               }
               return;
             }
@@ -213,8 +218,10 @@ class HonooBuilderState extends State<HonooBuilder> {
           final lower = selected.name.toLowerCase();
           if (lower.endsWith('.heic') || lower.endsWith('.heif')) {
             if (mounted) {
-              showHonooToast(context,
-                  message: 'Formato HEIC non supportato dal browser');
+              showHonooToast(
+                context,
+                message: 'Formato HEIC non supportato dal browser',
+              );
             }
             return;
           }
@@ -251,8 +258,9 @@ class HonooBuilderState extends State<HonooBuilder> {
   }
 
   Future<Uint8List?> _captureZoomedImagePng() async {
-    final boundary = _imageBoundaryKey.currentContext?.findRenderObject()
-        as RenderRepaintBoundary?;
+    final boundary =
+        _imageBoundaryKey.currentContext?.findRenderObject()
+            as RenderRepaintBoundary?;
     if (boundary == null) return null;
 
     try {
@@ -273,16 +281,18 @@ class HonooBuilderState extends State<HonooBuilder> {
       // 1080 px è sufficiente per la card e mantiene il PNG sotto i limiti
       // usuali di Supabase anche con fotografie molto dettagliate.
       const double maxOut = 1080.0;
-      final double longEdge =
-          logical.width > logical.height ? logical.width : logical.height;
+      final double longEdge = logical.width > logical.height
+          ? logical.width
+          : logical.height;
       double pixelRatio = deviceRatio;
       if (longEdge * deviceRatio > maxOut && longEdge > 0) {
         pixelRatio = (maxOut / longEdge).clamp(1.0, deviceRatio);
       }
       final ui.Image img = await boundary.toImage(pixelRatio: pixelRatio);
       try {
-        final ByteData? bd =
-            await img.toByteData(format: ui.ImageByteFormat.png);
+        final ByteData? bd = await img.toByteData(
+          format: ui.ImageByteFormat.png,
+        );
         return bd?.buffer.asUint8List();
       } finally {
         img.dispose();
@@ -314,9 +324,7 @@ class HonooBuilderState extends State<HonooBuilder> {
       if (goLogin == true && mounted) {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => const EmailLoginPage(),
-          ),
+          MaterialPageRoute(builder: (_) => const EmailLoginPage()),
         );
       }
       return;
@@ -329,14 +337,18 @@ class HonooBuilderState extends State<HonooBuilder> {
     if (png == null || png.isEmpty) {
       if (!mounted) return;
       setState(() => _isUploadingFinal = false);
-      showHonooToast(context,
-          message: 'Impossibile confermare: PNG non generato.');
+      showHonooToast(
+        context,
+        message: 'Impossibile confermare: PNG non generato.',
+      );
       return;
     }
 
     // 2) upload su supabase
-    final String? publicUrl =
-        await HonooImageUploader.uploadImageBytes(png, '.png');
+    final String? publicUrl = await HonooImageUploader.uploadImageBytes(
+      png,
+      '.png',
+    );
     if (publicUrl == null || publicUrl.isEmpty) {
       if (!mounted) return;
       setState(() => _isUploadingFinal = false);
@@ -356,8 +368,9 @@ class HonooBuilderState extends State<HonooBuilder> {
   }
 
   Future<Uint8List?> _captureHonooAsPng() async {
-    final boundary = _captureKey.currentContext?.findRenderObject()
-        as RenderRepaintBoundary?;
+    final boundary =
+        _captureKey.currentContext?.findRenderObject()
+            as RenderRepaintBoundary?;
     if (boundary == null) return null;
 
     try {
@@ -370,8 +383,9 @@ class HonooBuilderState extends State<HonooBuilder> {
       if (!mounted) return null;
       final Size logical = boundary.size;
       const double maxOut = 2560.0;
-      final double longEdge =
-          logical.width > logical.height ? logical.width : logical.height;
+      final double longEdge = logical.width > logical.height
+          ? logical.width
+          : logical.height;
       double pixelRatio = deviceRatio;
       if (longEdge * deviceRatio > maxOut && longEdge > 0) {
         pixelRatio = (maxOut / longEdge).clamp(1.0, deviceRatio);
@@ -395,11 +409,15 @@ class HonooBuilderState extends State<HonooBuilder> {
         );
 
         canvas.drawImage(
-            base, Offset(framePx.toDouble(), framePx.toDouble()), Paint());
+          base,
+          Offset(framePx.toDouble(), framePx.toDouble()),
+          Paint(),
+        );
 
         framed = await recorder.endRecording().toImage(newWidth, newHeight);
-        final ByteData? byteData =
-            await framed.toByteData(format: ui.ImageByteFormat.png);
+        final ByteData? byteData = await framed.toByteData(
+          format: ui.ImageByteFormat.png,
+        );
         return byteData?.buffer.asUint8List();
       } finally {
         framed?.dispose();
@@ -438,9 +456,9 @@ class HonooBuilderState extends State<HonooBuilder> {
         : fallbackName;
 
     // ✅ NON uso saveBytes (così non tocchi download_saver.dart)
-    final String message = await saver.save(
-      [DownloadImage(filename: '$rawName.png', bytes: bytes)],
-    );
+    final String message = await saver.save([
+      DownloadImage(filename: '$rawName.png', bytes: bytes),
+    ]);
 
     if (!context.mounted) return;
     showHonooToast(context, message: message);
@@ -477,8 +495,10 @@ class HonooBuilderState extends State<HonooBuilder> {
         final double rawH = constraints.maxHeight.isFinite
             ? constraints.maxHeight
             : media.size.height;
-        final double availH =
-            (rawH - media.padding.vertical).clamp(0.0, double.infinity);
+        final double availH = (rawH - media.padding.vertical).clamp(
+          0.0,
+          double.infinity,
+        );
 
         if (availW <= 0 || availH <= 0) return const SizedBox.shrink();
 
@@ -488,8 +508,9 @@ class HonooBuilderState extends State<HonooBuilder> {
 
         final double scaleW = availW / HonooBuilder.baselineImageSize;
         final double scaleH = (availH - eps) / baselineTotalHeight;
-        final double scale =
-            math.min(scaleW, scaleH).clamp(0.0, double.infinity);
+        final double scale = math
+            .min(scaleW, scaleH)
+            .clamp(0.0, double.infinity);
 
         final double displayW = HonooBuilder.baselineImageSize * scale;
         final double displayH = baselineTotalHeight * scale;
@@ -547,7 +568,7 @@ class HonooBuilderState extends State<HonooBuilder> {
         borderRadius: BorderRadius.circular(5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -609,8 +630,10 @@ class HonooBuilderState extends State<HonooBuilder> {
                       final Color color = used >= HonooBuilder.maxTextCharacters
                           ? HonooColor.secondary
                           : (used >= 120
-                              ? Colors.orangeAccent
-                              : HonooColor.onTertiary.withOpacity(0.75));
+                                ? Colors.orangeAccent
+                                : HonooColor.onTertiary.withValues(
+                                    alpha: 0.75,
+                                  ));
                       return Text(
                         '$used/${HonooBuilder.maxTextCharacters}',
                         style: GoogleFonts.arvo(

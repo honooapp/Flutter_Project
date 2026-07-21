@@ -6,8 +6,8 @@ Il client usa Supabase per autenticazione, PostgreSQL, Storage e Realtime. Il ta
 
 ## Toolchain
 
-- Flutter 3.19.6
-- Dart 3.3.4
+- Flutter 3.44.6
+- Dart 3.12.2
 - Supabase Flutter 1.10.25
 
 La versione Flutter è fissata in `.fvmrc` e nei workflow GitHub Actions.
@@ -55,7 +55,6 @@ Il deploy GitHub Pages è esclusivamente manuale tramite il workflow `Deploy to 
 
 ```bash
 fvm flutter build web --release \
-  --web-renderer canvaskit \
   --dart-define=SUPABASE_URL=<url> \
   --dart-define=SUPABASE_ANON_KEY=<anon-key>
 ```

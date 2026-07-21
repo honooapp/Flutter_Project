@@ -8,7 +8,7 @@ Essentials for developing and maintaining **honoo** with the current architectur
 
 | Item            | Details                                                                |
 |-----------------|-------------------------------------------------------------------------|
-| Framework       | Flutter 3.19.6 (stable) + Dart 3.3.4                                    |
+| Framework       | Flutter 3.44.6 (stable) + Dart 3.12.2                                   |
 | Targets         | Web (primary), Android/iOS/Desktop supported via Flutter scaffolding    |
 | Backend         | Supabase (PostgreSQL + Auth + Storage)                                  |
 | Design Language | Typography via Google Fonts (Lora), extensive SVG assets               |
@@ -142,7 +142,7 @@ Golden tests rely on `test/test_config.dart` (fixes DPI). If fonts cause 400s, p
   - Scheduled daily and manually dispatchable against staging.
   - Always checks conversation CRUD, RLS and Realtime; the browser UI flow is opt-in on manual runs.
 
-Keep workflows in sync with Flutter version upgrades — both install Flutter 3.19.6 via `subosito/flutter-action`.
+Keep workflows in sync with Flutter version upgrades — all install Flutter 3.44.6 via `subosito/flutter-action`.
 
 ---
 
@@ -168,7 +168,7 @@ Keep workflows in sync with Flutter version upgrades — both install Flutter 3.
 ## 12. Quick Start Checklist (New Work Session)
 
 1. `git pull` latest `main`.
-2. Confirm Flutter 3.19.6 is active (`fvm flutter --version`).
+2. Confirm Flutter 3.44.6 is active (`fvm flutter --version`).
 3. `flutter pub get`.
 4. Run `flutter analyze`.
 5. Launch web app with correct `--dart-define` values.

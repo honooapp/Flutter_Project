@@ -42,16 +42,13 @@ class ChestState {
 
 class ChestController extends ValueNotifier<ChestState> {
   ChestController({
-    required ChestRepository repository,
+    required this._repository,
     ChestRealtimeGateway? realtimeGateway,
     ReliabilityPolicy reliabilityPolicy = const ReliabilityPolicy(),
-    Duration realtimeReconnectBaseDelay = const Duration(seconds: 1),
-    Duration realtimeReconnectMaxDelay = const Duration(seconds: 30),
+    this._realtimeReconnectBaseDelay = const Duration(seconds: 1),
+    this._realtimeReconnectMaxDelay = const Duration(seconds: 30),
   })  : _realtimeGateway = realtimeGateway ?? SupabaseChestRealtimeGateway(),
-        _repository = repository,
         _reliability = reliabilityPolicy,
-        _realtimeReconnectBaseDelay = realtimeReconnectBaseDelay,
-        _realtimeReconnectMaxDelay = realtimeReconnectMaxDelay,
         super(ChestState());
 
   final ChestRepository _repository;
