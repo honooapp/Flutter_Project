@@ -14,7 +14,8 @@ void main() {
   late SupabaseTestHarness harness;
 
   setUp(() {
-    harness = SupabaseTestHarness(withAuthenticatedUser: true)..enableOverrides();
+    harness = SupabaseTestHarness(withAuthenticatedUser: true)
+      ..enableOverrides();
   });
 
   tearDown(() {
@@ -110,11 +111,20 @@ void main() {
     await tester.pump();
   }
 
-  testWidgets('Honoo di risposta ha cornice rossa anche per autore',
-      (tester) async {
+  testWidgets('Honoo di risposta proprio non ha cornice', (tester) async {
     await pumpHonoo(
       tester,
       honoo(type: HonooType.answer, owner: 'test_user'),
+    );
+
+    expect(borderWithColor(HonooColor.secondary), findsNothing);
+    expect(borderWithColor(Colors.white), findsNothing);
+  });
+
+  testWidgets('Honoo ricevuto in risposta ha cornice rossa', (tester) async {
+    await pumpHonoo(
+      tester,
+      honoo(type: HonooType.answer),
     );
 
     expect(borderWithColor(HonooColor.secondary), findsWidgets);
@@ -132,13 +142,24 @@ void main() {
     expect(borderWithColor(HonooColor.secondary), findsNothing);
   });
 
-  testWidgets('Hinoo di risposta ha cornice rossa anche per autore',
-      (tester) async {
+  testWidgets('Hinoo di risposta proprio non ha cornice', (tester) async {
     await pumpHinoo(
       tester,
       draft: hinoo(fromMoon: true),
       isReply: true,
       authorId: 'test_user',
+    );
+
+    expect(borderWithColor(HonooColor.secondary), findsNothing);
+    expect(borderWithColor(Colors.white), findsNothing);
+  });
+
+  testWidgets('Hinoo ricevuto in risposta ha cornice rossa', (tester) async {
+    await pumpHinoo(
+      tester,
+      draft: hinoo(),
+      isReply: true,
+      authorId: 'other_user',
     );
 
     expect(borderWithColor(HonooColor.secondary), findsWidgets);

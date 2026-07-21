@@ -8,6 +8,16 @@ allprojects {
 rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
+    project.plugins.withId("com.android.library") {
+        if (project.name == "image_gallery_saver") {
+            project.android.namespace = "com.example.imagegallerysaver"
+            project.android.compileSdk = 34
+            project.android.compileOptions {
+                sourceCompatibility JavaVersion.VERSION_17
+                targetCompatibility JavaVersion.VERSION_17
+            }
+        }
+    }
 }
 subprojects {
     project.evaluationDependsOn(':app')

@@ -23,6 +23,7 @@ import 'home_page.dart';
 import 'placeholder_page.dart';
 import '../Entities/hinoo.dart';
 import 'casa_builder_page.dart';
+import '../Widgets/conversation_notification_prompt.dart';
 
 class NewHinooPage extends StatefulWidget {
   const NewHinooPage({
@@ -34,6 +35,7 @@ class NewHinooPage extends StatefulWidget {
     this.returnSavedId = false,
     this.replyTo,
     this.conversationId,
+    this.returnToPreviousOnAnswer = false,
   });
 
   final bool isReply;
@@ -43,6 +45,7 @@ class NewHinooPage extends StatefulWidget {
   final bool returnSavedId;
   final String? replyTo;
   final String? conversationId;
+  final bool returnToPreviousOnAnswer;
 
   @override
   State<NewHinooPage> createState() => _NewHinooPageState();
@@ -276,11 +279,19 @@ class _NewHinooPageState extends State<NewHinooPage>
       if (hasMissingText) {
         showHonooToast(context, message: writeHint);
       } else {
-        final errorText = 'Bozza non valida:\n- ${validationErrors.join('\n- ')}';
+        final errorText =
+            'Bozza non valida:\n- ${validationErrors.join('\n- ')}';
         showHonooToast(context, message: errorText);
       }
       return;
     }
+
+    final userId = SupabaseProvider.client.auth.currentUser?.id;
+    final bool shouldOfferNotifications = userId != null &&
+        hinooDraft.type == HinooType.personal &&
+        await ConversationNotificationPrompt.shouldOfferForFirstConversation(
+          userId,
+        );
 
     try {
       if (widget.returnSavedId) {
@@ -306,7 +317,12 @@ class _NewHinooPageState extends State<NewHinooPage>
       if (!mounted) return;
       setState(() => _savedToChest = true);
       _chestBounceController.forward(from: 0);
-      final bool isAnswer = (hinooDraft.type == HinooType.answer) || widget.isReply;
+      if (shouldOfferNotifications) {
+        await ConversationNotificationPrompt.show(context);
+        if (!mounted) return;
+      }
+      final bool isAnswer =
+          (hinooDraft.type == HinooType.answer) || widget.isReply;
       if (isAnswer) {
         await showHonooMessageDialog(
           context,
@@ -326,8 +342,7 @@ class _NewHinooPageState extends State<NewHinooPage>
           barrierDismissible: true,
           builder: (_) => const HonooConfirmDialog(
             title: "L'hinoo è stato salvato nel tuo Scrigno.",
-            message:
-                'Vuoi spedirlo anche sulla Luna, per mostrarlo a tutti?',
+            message: 'Vuoi spedirlo anche sulla Luna, per mostrarlo a tutti?',
             confirmLabel: 'Sì',
             cancelLabel: 'No',
           ),
@@ -350,7 +365,6 @@ class _NewHinooPageState extends State<NewHinooPage>
           }
         }
       }
-
     } catch (e) {
       if (!mounted) return;
       showHonooToast(context, message: 'Errore: $e');
@@ -465,8 +479,7 @@ class _NewHinooPageState extends State<NewHinooPage>
         barrierDismissible: true,
         builder: (_) => const HonooConfirmDialog(
           title: 'Devi prima accedere',
-          message:
-              'Vuoi andare alla pagina di login?',
+          message: 'Vuoi andare alla pagina di login?',
           confirmLabel: 'Vai al login',
         ),
       );
@@ -578,16 +591,12 @@ class _NewHinooPageState extends State<NewHinooPage>
                 ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
             final double footerSpacing = footerBottomPadding + safeBottom;
             final double footerTopSpacing = footerSpacing / 2;
-            final double footerBottomSpacing =
-                footerSpacing - footerTopSpacing;
+            final double footerBottomSpacing = footerSpacing - footerTopSpacing;
             final double footerReserved =
                 footerIconSize + footerTopSpacing + footerBottomSpacing;
 
             final double availableH =
-                (viewH -
-                        _titleH -
-                        contentTopPadding -
-                        footerReserved)
+                (viewH - _titleH - contentTopPadding - footerReserved)
                     .clamp(0.0, double.infinity);
 
             const double ar = 9 / 16;
@@ -632,21 +641,21 @@ class _NewHinooPageState extends State<NewHinooPage>
                         child: Stack(
                           children: [
                             Positioned.fill(
-            child: ClipRect(
-                child: HinooBuilder(
-                  key: _builderKey,
-                  onHinooChanged: _onHinooChanged,
-                  onPngExported: _onPngExported,
-                  hintText: _kWriteHint,
-                  backgroundPromptText: widget.isCampanello
-                      ? 'Scrivi qui\n'
-                          'tutto quello che vuoi\n'
-                          'per la pagina\n'
-                          'del tuo campanello'
-                      : null,
-                ),
-              ),
-            ),
+                              child: ClipRect(
+                                child: HinooBuilder(
+                                  key: _builderKey,
+                                  onHinooChanged: _onHinooChanged,
+                                  onPngExported: _onPngExported,
+                                  hintText: _kWriteHint,
+                                  backgroundPromptText: widget.isCampanello
+                                      ? 'Scrivi qui\n'
+                                          'tutto quello che vuoi\n'
+                                          'per la pagina\n'
+                                          'del tuo campanello'
+                                      : null,
+                                ),
+                              ),
+                            ),
                             Positioned(
                               top: 8,
                               right: 8,
@@ -738,12 +747,16 @@ class _NewHinooPageState extends State<NewHinooPage>
                         if (_isWriteStep && _currentTextLength > 0)
                           ResponsiveFooterAction(
                             asset: "assets/icons/ok.svg",
-                            semanticsLabel: ((widget.isReply || widget.forcedType == HinooType.answer)
-                                    ? 'Invia'
-                                    : (widget.isCampanello ? 'Salva il campanello' : 'OK')),
+                            semanticsLabel: ((widget.isReply ||
+                                    widget.forcedType == HinooType.answer)
+                                ? 'Invia'
+                                : (widget.isCampanello
+                                    ? 'Salva il campanello'
+                                    : 'OK')),
                             size: footerIconSize,
                             splashRadius: 25,
-                            tooltip: (widget.isReply || widget.forcedType == HinooType.answer)
+                            tooltip: (widget.isReply ||
+                                    widget.forcedType == HinooType.answer)
                                 ? 'Invia'
                                 : (widget.isCampanello
                                     ? 'Salva il campanello'

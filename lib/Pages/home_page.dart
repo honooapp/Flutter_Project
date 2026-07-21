@@ -94,16 +94,14 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   SizedBox(
                     height: 52,
-                    child: Center(
-                      child: HonooAppTitle(
-                        onTap: () {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (_) => const PlaceholderPage()),
-                            (route) => false,
-                          );
-                        },
-                      ),
+                    child: HonooAppTitle(
+                      onTap: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (_) => const PlaceholderPage()),
+                          (route) => false,
+                        );
+                      },
                     ),
                   ),
                   Expanded(

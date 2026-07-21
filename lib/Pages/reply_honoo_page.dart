@@ -24,7 +24,10 @@ class ReplyHonooPage extends StatefulWidget {
     required this.originalHonoo,
     this.initialHintText = 'Scrivi la tua risposta...',
     this.initialImageHint = 'Aggiungi un’immagine (opzionale)',
+    this.returnToPreviousOnAnswer = false,
   });
+
+  final bool returnToPreviousOnAnswer;
 
   @override
   State<ReplyHonooPage> createState() => _ReplyHonooPageState();
@@ -83,8 +86,8 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
       // Assicura che il root sia nello Scrigno se arriviamo dalla Luna
       if (widget.originalHonoo.type == HonooType.moon) {
         try {
-          await HonooController()
-              .saveToChest(widget.originalHonoo.copyWith(isFromMoonSaved: true));
+          await HonooController().saveToChest(
+              widget.originalHonoo.copyWith(isFromMoonSaved: true));
         } catch (_) {}
       }
 

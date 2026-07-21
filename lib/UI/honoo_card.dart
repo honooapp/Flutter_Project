@@ -65,7 +65,7 @@ class HonooCard extends StatelessWidget {
         const double cornerRadius = 5;
 
         final Color gapColor = honoo.type == HonooType.moon
-            ? HonooColor.background
+            ? HonooColor.tertiary
             : cardBg;
 
         final Widget content = Card(
@@ -188,9 +188,9 @@ class HonooCard extends StatelessWidget {
 
         final String? currentUserId = SupabaseProvider.client.auth.currentUser?.id;
         final bool isOwn = currentUserId != null && currentUserId == honoo.userId;
-        // La cornice rossa identifica semanticamente una risposta per entrambi
-        // i partecipanti. La bianca resta esclusiva dei salvataggi dalla Luna.
-        final bool showReplyBorder = isReply;
+        // La cornice rossa segnala soltanto una risposta ricevuta.
+        // I propri messaggi mantengono il rendering normale.
+        final bool showReplyBorder = isReply && !isOwn;
         final bool showMoonSavedBorder = !showReplyBorder && honoo.isFromMoonSaved && !isOwn;
         final Widget wrapped = (showReplyBorder || showMoonSavedBorder)
             ? DecoratedBox(

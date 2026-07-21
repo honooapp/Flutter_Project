@@ -20,20 +20,10 @@ void main() {
     harness.disableOverrides();
   });
 
-  testWidgets('AuthGate: senza sessione → mostra una schermata di login',
+  testWidgets('AuthGate: senza sessione mostra subito la landing',
       (tester) async {
     await tester.pumpWidget(const MaterialApp(home: AuthGate()));
-    await tester.pumpAndSettle();
 
-    // Heuristica: in assenza di sessione dovremmo vedere almeno 1 TextField (email)
-    // o un testo che contiene "Login" / "Accedi".
-    final hasField = find.byType(TextField).evaluate().isNotEmpty;
-    final hasLoginText = find
-            .textContaining('Login', findRichText: true)
-            .evaluate()
-            .isNotEmpty ||
-        find.textContaining('Accedi', findRichText: true).evaluate().isNotEmpty;
-    final hasPlaceholder = find.byType(PlaceholderPage).evaluate().isNotEmpty;
-    expect(hasField || hasLoginText || hasPlaceholder, isTrue);
+    expect(find.byType(PlaceholderPage), findsOneWidget);
   });
 }

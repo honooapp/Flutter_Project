@@ -7,6 +7,7 @@ import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Entities/conversation_link.dart';
 import 'package:honoo/Services/content_feed_service.dart';
 import 'package:honoo/Utility/app_logger.dart';
+import 'package:honoo/Utility/network_image_prefetch.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
@@ -78,12 +79,22 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
             _items.isEmpty ? 0 : _currentIndex.clamp(0, _items.length - 1);
         _isLoading = false;
       });
+      _prefetchFrom(_currentIndex);
     } catch (error, stackTrace) {
       AppLogger.warning('Caricamento Hinoo condivisi non riuscito',
           scope: 'SharedHinooPage', error: error, stackTrace: stackTrace);
       if (!mounted) return;
       setState(() => _isLoading = false);
     }
+  }
+
+  void _prefetchFrom(int index) {
+    if (_items.isEmpty) return;
+    final end = (index + 2).clamp(0, _items.length);
+    prefetchImageUrls(
+      context,
+      _items.sublist(index, end).expand((item) => hinooImageUrls(item.draft)),
+    );
   }
 
   void _goHome() {
@@ -135,6 +146,7 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                               : const PageScrollPhysics(),
                       onPageChanged: (index, reason) {
                         setState(() => _currentIndex = index);
+                        _prefetchFrom(index);
                       },
                     ),
                     items: _items

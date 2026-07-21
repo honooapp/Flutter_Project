@@ -2,7 +2,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:honoo/Pages/placeholder_page.dart';
-import 'package:honoo/Widgets/loading_spinner.dart';
 import 'home_page.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -17,12 +16,6 @@ class AuthGate extends StatefulWidget {
 class _AuthGateState extends State<AuthGate> {
   StreamSubscription<AuthState>? _authSub;
   bool _navigated = false;
-
-  Future<Session?> _resolveSession() async {
-    // piccolo respiro per dare tempo all'idratazione da localStorage
-    await Future<void>.delayed(const Duration(milliseconds: 20));
-    return SupabaseProvider.client.auth.currentSession; // 1.x
-  }
 
   @override
   void initState() {
@@ -56,25 +49,7 @@ class _AuthGateState extends State<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Session?>(
-      future:
-          _resolveSession(), // la tua funzione che fa un piccolo delay e poi legge currentSession
-      builder: (context, snap) {
-        // ⛳ 1) Finché la Future NON è terminata → spinner
-        if (snap.connectionState != ConnectionState.done) {
-          return const Scaffold(
-            body: Center(child: LoadingSpinner()),
-          );
-        }
-
-        // ⛳ 2) La Future è terminata → sessione presente?
-        final session = snap.data; // può essere null
-        if (session != null) {
-          return const HomePage(); // utente loggato
-        } else {
-          return const PlaceholderPage(); // utente NON loggato
-        }
-      },
-    );
+    final Session? session = SupabaseProvider.client.auth.currentSession;
+    return session != null ? const HomePage() : const PlaceholderPage();
   }
 }
