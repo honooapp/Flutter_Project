@@ -25,11 +25,13 @@ if [[ "${HONOO_LIVE_RUN:-false}" != "true" ]]; then
 fi
 
 echo "Esecuzione test conversazioni live (credenziali nascoste)."
-live_test_device="${LIVE_TEST_DEVICE:-macos}"
-fvm flutter test \
-  -d "$live_test_device" \
+flutter_runner=(fvm flutter)
+if [[ "${CI:-}" == "true" ]]; then
+  flutter_runner=(flutter)
+fi
+"${flutter_runner[@]}" test \
   --reporter=expanded \
-  integration_test/live_conversation_flow_test.dart \
+  test/live/live_conversation_flow_test.dart \
   --dart-define=HONOO_LIVE_RUN=true \
   --dart-define=HONOO_SUPABASE_URL="$HONOO_SUPABASE_URL" \
   --dart-define=HONOO_SUPABASE_ANON_KEY="$HONOO_SUPABASE_ANON_KEY" \

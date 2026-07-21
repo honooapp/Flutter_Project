@@ -18,8 +18,8 @@ concurrency:
 jobs:
   conversation:
     name: Conversation CRUD, RLS and Realtime
-    runs-on: macos-latest
-    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment: staging
     permissions:
       contents: read
@@ -38,12 +38,6 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.44.6'
-      - name: Install FVM
-        run: |
-          dart pub global activate fvm 3.2.1
-          echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
-      - name: Prepare Flutter SDK in FVM
-        run: fvm install 3.44.6
       - name: Install dependencies
         run: flutter pub get
       - name: Run live conversation checks
