@@ -1,7 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Controller/chest_controller.dart';
+import 'package:honoo/Entities/chest_item.dart';
+import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Services/chest_realtime_service.dart';
 import 'package:honoo/Services/chest_repository.dart';
+import 'package:honoo/Services/hinoo_service.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _MockChestRepository extends Mock implements ChestRepository {}
@@ -73,6 +76,8 @@ void main() {
         }
       ],
     );
+    when(() => repository.fetchHinooMoonFingerprints('user-1'))
+        .thenAnswer((_) async => const {});
 
     await controller.loadHinoo('user-1');
 
@@ -83,6 +88,34 @@ void main() {
       () => controller.value.hinoo.add(controller.value.hinoo.single),
       throwsUnsupportedError,
     );
+  });
+
+  test('loadHinoo marca il contenuto già pubblicato sulla Luna', () async {
+    const row = {
+      'id': 'h-1',
+      'pages': [
+        {
+          'backgroundImage': 'background.png',
+          'text': 'Testo',
+          'isTextWhite': true,
+        }
+      ],
+      'type': 'personal',
+      'created_at': '2024-01-01T00:00:00Z',
+      'user_id': 'user-1',
+    };
+    final draft = ChestHinooItem.fromDatabaseRow(row)!.draft;
+    final fingerprint = HinooService.fingerprint(
+      draft.copyWith(type: HinooType.moon),
+    );
+    when(() => repository.fetchHinooRows('user-1'))
+        .thenAnswer((_) async => [row]);
+    when(() => repository.fetchHinooMoonFingerprints('user-1'))
+        .thenAnswer((_) async => {fingerprint});
+
+    await controller.loadHinoo('user-1');
+
+    expect(controller.value.hinoo.single.isOnMoon, isTrue);
   });
 
   test('loadReplies deduplica e conserva la risposta più recente', () async {

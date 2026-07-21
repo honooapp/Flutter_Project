@@ -8,7 +8,7 @@ import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Widgets/chest_footer.dart';
 
 void main() {
-  ChestItem honooItem(HonooType type) {
+  ChestItem honooItem(HonooType type, {bool isOnMoon = false}) {
     final honoo = Honoo(
       1,
       'Test',
@@ -17,11 +17,11 @@ void main() {
       '2026-01-01T00:00:00Z',
       type == HonooType.answer ? 'another-user' : 'current-user',
       type,
-    );
+    )..isOnMoon = isOnMoon;
     return ChestItem.honoo(honoo, DateTime.utc(2026));
   }
 
-  ChestItem hinooItem() => ChestItem.hinoo(
+  ChestItem hinooItem({bool isOnMoon = false}) => ChestItem.hinoo(
         ChestHinooItem(
           id: 'hinoo-1',
           draft: const HinooDraft(
@@ -36,6 +36,7 @@ void main() {
           createdAt: DateTime.utc(2026),
           isFromMoonSaved: false,
           ownerId: 'current-user',
+          isOnMoon: isOnMoon,
         ),
       );
 
@@ -121,6 +122,25 @@ void main() {
     await tester.tap(find.byTooltip('Cancella'));
     expect(sent, isTrue);
     expect(deleted, isTrue);
+  });
+
+  testWidgets('Honoo già sulla Luna non mostra una seconda azione Luna',
+      (tester) async {
+    await pumpFooter(
+      tester,
+      item: honooItem(HonooType.personal, isOnMoon: true),
+    );
+
+    expect(find.byTooltip('Spedisci sulla Luna'), findsNothing);
+    expect(find.byTooltip('Cancella'), findsOneWidget);
+  });
+
+  testWidgets('Hinoo già sulla Luna non mostra una seconda azione Luna',
+      (tester) async {
+    await pumpFooter(tester, item: hinooItem(isOnMoon: true));
+
+    expect(find.byTooltip('Spedisci sulla Luna'), findsNothing);
+    expect(find.byTooltip('Cancella'), findsOneWidget);
   });
 
   testWidgets('contenuto ricevuto mostra solo Home, Info e Cancella',

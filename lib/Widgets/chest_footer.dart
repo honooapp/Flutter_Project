@@ -80,8 +80,9 @@ class ChestFooter extends StatelessWidget {
     final isPersonal = honoo.type == HonooType.personal;
     final hasReplies = honoo.hasReplies == true;
     final isFromMoonSaved = honoo.isFromMoonSaved == true;
+    final isOnMoon = honoo.isOnMoon == true;
 
-    if (isPersonal && !hasReplies && !isFromMoonSaved) {
+    if (isPersonal && !hasReplies && !isFromMoonSaved && !isOnMoon) {
       actions.add(_moonAction(() => onSendHonooToMoon(honoo)));
     } else if (hasReplies && !isFromMoonSaved) {
       actions.add(
@@ -122,8 +123,8 @@ class ChestFooter extends StatelessWidget {
     ChestHinooItem hinoo,
   ) {
     final isPersonal = hinoo.draft.type == HinooType.personal;
-    final isFromMoonSaved = hinoo.draft.type == HinooType.moon;
-    if (isPersonal && !isFromMoonSaved) {
+    final isFromMoonSaved = hinoo.isFromMoonSaved;
+    if (isPersonal && !isFromMoonSaved && !hinoo.isOnMoon) {
       actions.add(_moonAction(() => onSendHinooToMoon(hinoo)));
     } else if (isFromMoonSaved) {
       actions.add(_replyAction(() => onReplyToHinoo(hinoo)));

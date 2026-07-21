@@ -17,6 +17,7 @@ class Honoo {
 
   // Nuovi flag lato app
   bool isFromMoonSaved;
+  bool isOnMoon;
   bool hasReplies;
 
   Honoo(
@@ -31,6 +32,7 @@ class Honoo {
     this.recipientTag,
   ])  : dbId = null,
         isFromMoonSaved = false,
+        isOnMoon = false,
         hasReplies = false,
         conversationId = null;
 
@@ -56,6 +58,7 @@ class Honoo {
 
     // Flag opzionali se esistono a DB, altrimenti false
     h.isFromMoonSaved = (map['is_from_moon_saved'] as bool?) ?? false;
+    h.isOnMoon = false;
     h.hasReplies = (map['has_replies'] as bool?) ?? false;
     h.conversationId = map['conversation_id']?.toString();
 
@@ -116,6 +119,7 @@ class Honoo {
     String? replyTo,
     String? recipientTag,
     bool? isFromMoonSaved,
+    bool? isOnMoon,
     bool? hasReplies,
     String? conversationId,
   }) {
@@ -132,6 +136,7 @@ class Honoo {
     );
     h.dbId = dbId ?? this.dbId;
     h.isFromMoonSaved = isFromMoonSaved ?? this.isFromMoonSaved;
+    h.isOnMoon = isOnMoon ?? this.isOnMoon;
     h.hasReplies = hasReplies ?? this.hasReplies;
     h.conversationId = conversationId ?? this.conversationId;
     return h;

@@ -9,6 +9,19 @@ class ChestRepository {
 
   final SupabaseClient _client;
 
+  Future<Set<String>> fetchHinooMoonFingerprints(String userId) async {
+    final rows = await _client
+        .from('hinoo')
+        .select('fingerprint')
+        .eq('user_id', userId)
+        .eq('type', 'moon');
+    return _asList(rows)
+        .map((row) => row is Map ? row['fingerprint']?.toString() : null)
+        .whereType<String>()
+        .where((fingerprint) => fingerprint.isNotEmpty)
+        .toSet();
+  }
+
   Future<List<dynamic>> fetchHinooRows(String userId) async {
     try {
       final rows = await _client

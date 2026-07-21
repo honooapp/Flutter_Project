@@ -294,14 +294,20 @@ class _ChestPageState extends State<ChestPage> {
   }
 
   Future<void> _sendHonooToMoon(Honoo honoo) async {
-    final ok = await HonooController().sendToMoon(honoo);
-    if (!mounted) return;
-    showHonooToast(
-      context,
-      message: ok
-          ? "L'honoo è anche sulla Luna."
-          : "L'honoo era già presente sulla Luna.",
-    );
+    try {
+      final ok = await HonooController().sendToMoon(honoo);
+      if (!mounted) return;
+      setState(_rebuildItems);
+      showHonooToast(
+        context,
+        message: ok
+            ? "L'honoo è anche sulla Luna."
+            : "L'honoo era già presente sulla Luna.",
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showHonooToast(context, message: 'Errore: $error');
+    }
   }
 
   Future<void> _deleteHonoo(Honoo honoo) async {
@@ -324,6 +330,7 @@ class _ChestPageState extends State<ChestPage> {
     try {
       final result = await _hinooController.sendToMoon(hinoo.draft);
       if (!mounted) return;
+      _chestController.markHinooOnMoon(hinoo.id);
       final text = result == HinooMoonResult.published
           ? "L'hinoo è anche sulla Luna."
           : "L'hinoo era già presente sulla Luna.";

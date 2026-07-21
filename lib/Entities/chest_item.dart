@@ -30,6 +30,7 @@ class ChestHinooItem {
     required this.createdAt,
     required this.isFromMoonSaved,
     required this.ownerId,
+    this.isOnMoon = false,
     this.conversationId,
   });
 
@@ -38,6 +39,7 @@ class ChestHinooItem {
   final DateTime createdAt;
   final bool isFromMoonSaved;
   final String? ownerId;
+  final bool isOnMoon;
   final String? conversationId;
 
   static ChestHinooItem? fromDatabaseRow(Map<dynamic, dynamic> row) {
@@ -73,6 +75,7 @@ class ChestHinooItem {
       createdAt: DateTime.tryParse((row['created_at'] ?? '').toString()) ??
           DateTime.fromMillisecondsSinceEpoch(0),
       isFromMoonSaved: isFromMoonSaved,
+      isOnMoon: (row['is_on_moon'] as bool?) ?? false,
       ownerId: row['user_id']?.toString(),
       conversationId: row['conversation_id']?.toString(),
     );

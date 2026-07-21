@@ -23,11 +23,24 @@ class HonooController {
     isLoading.value = true;
     try {
       final chest = await HonooService.fetchUserChestHonoo(_uid);
+      List<Honoo> moon = const [];
+      try {
+        moon = await HonooService.fetchUserHonoo(_uid, 'moon');
+      } catch (error) {
+        debugPrint('loadChest moon lookup error: $error');
+      }
+      final moonContent = moon.map((h) => (h.text, h.image)).toSet();
 
       // Popola cache iniziale
       _personal
         ..clear()
-        ..addAll(chest);
+        ..addAll(
+          chest.map(
+            (h) => h.copyWith(
+              isOnMoon: moonContent.contains((h.text, h.image)),
+            ),
+          ),
+        );
 
       // === Calcolo hasReplies con una query IN (...) su reply_to ===
       // prendo tutti gli uuid (dbId) disponibili
@@ -95,12 +108,17 @@ class HonooController {
   Future<bool> sendToMoon(Honoo h) async {
     try {
       final inserted = await HonooService.duplicateToMoon(h);
-      // Se vuoi, qui puoi anche marcare in cache un flag tipo `isFromMoonSaved`
-      // e fare version.value++; se modifichi la UI locale.
+      final index = _personal.indexWhere(
+        (item) => item.dbId != null && item.dbId == h.dbId,
+      );
+      if (index >= 0) {
+        _personal[index] = _personal[index].copyWith(isOnMoon: true);
+        version.value++;
+      }
       return inserted;
     } catch (e) {
       debugPrint('duplicateToMoon error: $e');
-      return false; // la UI potrà distinguere tra "già presente" ed errore? vedi nota sotto
+      rethrow;
     }
   }
 

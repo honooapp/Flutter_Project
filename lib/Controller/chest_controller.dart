@@ -7,6 +7,7 @@ import '../Entities/hinoo.dart';
 import '../Entities/hinoo_thread_entry.dart';
 import '../Services/chest_repository.dart';
 import '../Services/chest_realtime_service.dart';
+import '../Services/hinoo_service.dart';
 
 class ChestState {
   ChestState({
@@ -127,6 +128,32 @@ class ChestController extends ValueNotifier<ChestState> {
     );
   }
 
+  void markHinooOnMoon(String id) {
+    value = ChestState(
+      hinoo: value.hinoo
+          .map(
+            (item) => item.id == id
+                ? ChestHinooItem(
+                    id: item.id,
+                    draft: item.draft,
+                    createdAt: item.createdAt,
+                    isFromMoonSaved: item.isFromMoonSaved,
+                    ownerId: item.ownerId,
+                    isOnMoon: true,
+                    conversationId: item.conversationId,
+                  )
+                : item,
+          )
+          .toList(),
+      honooLatestReplies: value.honooLatestReplies,
+      hinooLatestReplies: value.hinooLatestReplies,
+      hinooRepliesByRoot: value.hinooRepliesByRoot,
+      isHinooLoading: value.isHinooLoading,
+      isReplyLoading: value.isReplyLoading,
+      error: value.error,
+    );
+  }
+
   Future<void> loadHinoo(String userId) async {
     value = ChestState(
       hinoo: value.hinoo,
@@ -139,11 +166,32 @@ class ChestController extends ValueNotifier<ChestState> {
 
     try {
       final rows = await _repository.fetchHinooRows(userId);
+      Set<String> moonFingerprints = const {};
+      try {
+        moonFingerprints = await _repository.fetchHinooMoonFingerprints(userId);
+      } catch (_) {
+        // Il contenuto dello Scrigno resta utilizzabile anche se il controllo
+        // dello stato Luna non è temporaneamente disponibile.
+      }
       final hinoo = rows
           .whereType<Map>()
           .map(ChestHinooItem.fromDatabaseRow)
           .whereType<ChestHinooItem>()
-          .toList(growable: false);
+          .map((item) {
+        final fingerprint = HinooService.fingerprint(
+          item.draft.copyWith(type: HinooType.moon),
+        );
+        if (!moonFingerprints.contains(fingerprint)) return item;
+        return ChestHinooItem(
+          id: item.id,
+          draft: item.draft,
+          createdAt: item.createdAt,
+          isFromMoonSaved: item.isFromMoonSaved,
+          ownerId: item.ownerId,
+          isOnMoon: true,
+          conversationId: item.conversationId,
+        );
+      }).toList(growable: false);
       value = ChestState(
         hinoo: List.unmodifiable(hinoo),
         honooLatestReplies: value.honooLatestReplies,

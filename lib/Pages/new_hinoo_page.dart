@@ -324,24 +324,15 @@ class _NewHinooPageState extends State<NewHinooPage>
       final bool isAnswer =
           (hinooDraft.type == HinooType.answer) || widget.isReply;
       if (isAnswer) {
-        showHonooToast(
+        await showHonooMessageDialog(
           context,
           message:
               "L'hinoo adesso è nel tuo Scrigno,\n e,\n soprattutto,\n nello Scrigno di qualcun altro.",
         );
-        if (widget.returnToPreviousOnAnswer) {
-          Navigator.pop(context, widget.conversationId ?? widget.replyTo);
-          return;
-        }
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ChestPage(
-              focusReplies: true,
-              focusConversationId: widget.conversationId,
-              highlightLatest: true,
-            ),
-          ),
+        if (!mounted) return;
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const HomePage()),
+          (route) => false,
         );
         return;
       }
@@ -364,6 +355,10 @@ class _NewHinooPageState extends State<NewHinooPage>
                 ? "L'hinoo è anche sulla Luna."
                 : 'hinoo già presente sulla Luna.';
             showHonooToast(context, message: text);
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const HomePage()),
+              (route) => false,
+            );
           } catch (e) {
             if (!mounted) return;
             showHonooToast(context, message: 'Errore: $e');
