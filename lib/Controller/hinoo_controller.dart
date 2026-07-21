@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Services/hinoo_service.dart';
 import 'package:honoo/Services/hinoo_storage_uploader.dart';
+import 'package:honoo/Services/duplication_result.dart';
 
 import '../Entities/hinoo.dart';
 
@@ -91,8 +92,10 @@ class HinooController {
     }
 
     final sanitized = draft.copyWith(type: HinooType.moon);
-    final ok = await HinooService.duplicateToMoon(sanitized);
-    return ok ? HinooMoonResult.published : HinooMoonResult.alreadyPresent;
+    final result = await HinooService.duplicateToMoon(sanitized);
+    return result == DuplicationResult.inserted
+        ? HinooMoonResult.published
+        : HinooMoonResult.alreadyPresent;
   }
 
   /// (Opzionale) autosave bozza

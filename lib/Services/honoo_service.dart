@@ -1,8 +1,11 @@
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Entities/honoo.dart';
+import 'duplication_result.dart';
+import 'reliability_policy.dart';
 
 class HonooService {
+  static const ReliabilityPolicy _reliability = ReliabilityPolicy();
   //sostituisci fuori dal test con il tuo client
   //static final _client = Supabase.instance.client;
 
@@ -18,63 +21,65 @@ class HonooService {
 
   /// Honoo pubblici (Luna)
   static Future<List<Honoo>> fetchPublicHonoo() async {
-    final response = await _client
+    final response = await _reliability.read(() async => await _client
         .from('honoo')
         .select('*')
         .eq('destination', 'moon')
-        .order('created_at', ascending: false);
+        .order('created_at', ascending: false));
     return (response as List).map((e) => Honoo.fromMap(e)).toList();
   }
 
   /// Honoo dell’utente per una certa destination (es. 'chest')
   static Future<List<Honoo>> fetchUserHonoo(
       String userId, String destination) async {
-    final response = await _client
+    final response = await _reliability.read(() async => await _client
         .from('honoo')
         .select('*')
         .eq('destination', destination)
         .eq('user_id', userId)
-        .order('created_at', ascending: false);
+        .order('created_at', ascending: false));
     return (response as List).map((e) => Honoo.fromMap(e)).toList();
   }
 
   /// Radici personali e risposte scritte dall'utente che devono comparire
   /// come un solo accesso alla relativa conversazione nello Scrigno.
   static Future<List<Honoo>> fetchUserChestHonoo(String userId) async {
-    final response = await _client
+    final response = await _reliability.read(() async => await _client
         .from('honoo')
         .select('*')
         .eq('user_id', userId)
         .in_('destination', ['chest', 'reply']).order('created_at',
-            ascending: false);
+            ascending: false));
     return (response as List).map((e) => Honoo.fromMap(e)).toList();
   }
 
   /// Tutte le reply indirizzate a recipientTag (se usi i tag poetici)
   static Future<List<Honoo>> fetchRepliesForUser(String recipientTag) async {
-    final response = await _client
+    final response = await _reliability.read(() async => await _client
         .from('honoo')
         .select('*')
         .eq('destination', 'reply')
         .eq('recipient_tag', recipientTag)
-        .order('created_at', ascending: false);
+        .order('created_at', ascending: false));
     return (response as List).map((e) => Honoo.fromMap(e)).toList();
   }
 
   /// Pubblica un nuovo honoo
   static Future<void> publishHonoo(Honoo honoo) async {
     _validateConversationLink(honoo);
-    await _client.from('honoo').insert(honoo.toInsertMap());
+    await _reliability.write(
+      () async => await _client.from('honoo').insert(honoo.toInsertMap()),
+    );
   }
 
   static Future<String> publishHonooAndReturnId(Honoo honoo) async {
     _validateConversationLink(honoo);
     Map<String, dynamic>? row;
-    row = await _client
+    row = await _reliability.write(() async => await _client
         .from('honoo')
         .insert(honoo.toInsertMap())
         .select('id')
-        .maybeSingle();
+        .maybeSingle());
     final id = row?['id']?.toString() ?? '';
     if (id.isEmpty) {
       throw Exception('publishHonoo: id mancante');
@@ -98,32 +103,19 @@ class HonooService {
     required String id,
     required String destination,
   }) async {
-    await _client.from('honoo').update({
-      'destination': destination,
-    }).eq('id', id);
+    await _reliability.write(() async => await _client.from('honoo').update({
+          'destination': destination,
+        }).eq('id', id));
   }
 
   /// Duplica un honoo salvandolo nello scrigno dell'utente corrente.
-  /// Restituisce true se inserito ora, false se già presente.
-  static Future<bool> duplicateToChest(Honoo h) async {
+  /// L'indice univoco sul fingerprint rende inserimento e deduplica atomici.
+  static Future<DuplicationResult> duplicateToChest(Honoo h) async {
     final session = _client.auth.currentSession;
     if (session == null) {
       throw Exception('Nessuna sessione attiva');
     }
     final uid = session.user.id;
-
-    final existing = await _client
-        .from('honoo')
-        .select('id')
-        .eq('user_id', uid)
-        .eq('destination', 'chest')
-        .eq('text', h.text)
-        .eq('image_url', h.image.isEmpty ? null : h.image)
-        .limit(1);
-
-    if (existing != null && existing.isNotEmpty) {
-      return false;
-    }
 
     final payload = <String, dynamic>{
       'text': h.text,
@@ -133,54 +125,53 @@ class HonooService {
       'recipient_tag': h.recipientTag,
       'user_id': uid,
       'conversation_id': h.conversationId ?? h.dbId,
+      'fingerprint': fingerprint(h),
       if (h.isFromMoonSaved) 'is_from_moon_saved': true,
     };
-
-    final inserted =
-        await _client.from('honoo').insert(payload).select().maybeSingle();
-
-    return inserted != null;
+    return _insertDuplicate(payload);
   }
 
   /// Duplica un honoo dello scrigno pubblicandolo sulla Luna (nuova INSERT).
   /// Non tocca l'originale in 'chest'.
-  static Future<bool> duplicateToMoon(Honoo h) async {
+  static Future<DuplicationResult> duplicateToMoon(Honoo h) async {
     final session = _client.auth.currentSession;
     if (session == null) {
       throw Exception('Nessuna sessione attiva');
     }
     final uid = session.user.id;
 
-    // esiste già?
-    final existing = await _client
-        .from('honoo')
-        .select('id')
-        .eq('user_id', uid)
-        .eq('destination', 'moon')
-        .eq('text', h.text)
-        .eq('image_url', (h.image.isEmpty) ? null : h.image)
-        .limit(1);
-
-    if (existing != null && existing.isNotEmpty) {
-      // già presente
-      return false;
-    }
-
-    // inserisci
     final payload = <String, dynamic>{
       'text': h.text,
       'image_url': (h.image.isEmpty) ? null : h.image,
       'destination': 'moon',
       'reply_to': null,
       'recipient_tag': null,
-      'user_id': uid, // se hai un trigger che lo mette da solo, puoi ometterlo
+      'user_id': uid,
+      'fingerprint': fingerprint(h),
     };
-    await _client.from('honoo').insert(payload);
-    return true;
+    return _insertDuplicate(payload);
+  }
+
+  static String fingerprint(Honoo h) => '${h.text}\u001f${h.image}';
+
+  static Future<DuplicationResult> _insertDuplicate(
+    Map<String, dynamic> payload,
+  ) {
+    return _reliability.write(() async {
+      try {
+        await _client.from('honoo').insert(payload);
+        return DuplicationResult.inserted;
+      } on PostgrestException catch (error) {
+        if (error.code == '23505') return DuplicationResult.alreadyPresent;
+        rethrow;
+      }
+    });
   }
 
   /// Hard delete dal DB (tabella 'honoo')
   static Future<void> deleteHonooById(String id) async {
-    await _client.from('honoo').delete().eq('id', id);
+    await _reliability.write(
+      () async => await _client.from('honoo').delete().eq('id', id),
+    );
   }
 }

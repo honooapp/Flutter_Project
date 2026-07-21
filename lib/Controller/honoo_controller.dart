@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import '../Entities/honoo.dart';
 import '../Services/honoo_service.dart';
+import '../Services/duplication_result.dart';
 
 /// Repository + cache in memoria (niente mock)
 class HonooController {
@@ -105,9 +106,9 @@ class HonooController {
   /// Ritorna:
   ///  - true  => inserito ora ("Spedito sulla Luna")
   ///  - false => già presente ("Già presente sulla Luna")
-  Future<bool> sendToMoon(Honoo h) async {
+  Future<DuplicationResult> sendToMoon(Honoo h) async {
     try {
-      final inserted = await HonooService.duplicateToMoon(h);
+      final result = await HonooService.duplicateToMoon(h);
       final index = _personal.indexWhere(
         (item) => item.dbId != null && item.dbId == h.dbId,
       );
@@ -115,28 +116,28 @@ class HonooController {
         _personal[index] = _personal[index].copyWith(isOnMoon: true);
         version.value++;
       }
-      return inserted;
+      return result;
     } catch (e) {
       debugPrint('duplicateToMoon error: $e');
       rethrow;
     }
   }
 
-  Future<bool> saveToChest(Honoo h) async {
+  Future<DuplicationResult> saveToChest(Honoo h) async {
     try {
-      final inserted = await HonooService.duplicateToChest(h);
-      if (inserted) {
+      final result = await HonooService.duplicateToChest(h);
+      if (result == DuplicationResult.inserted) {
         await loadChest();
       }
-      return inserted;
+      return result;
     } catch (e) {
       debugPrint('duplicateToChest error: $e');
-      return false;
+      rethrow;
     }
   }
 
   Future<void> deleteHonoo(Honoo h) async {
-    final String? id = (h.dbId ?? h.id) as String?;
+    final String? id = h.dbId;
     if (id == null || id.isEmpty) {
       debugPrint('deleteHonoo: id mancante');
       return;
@@ -144,7 +145,7 @@ class HonooController {
 
     await HonooService.deleteHonooById(id);
 
-    _personal.removeWhere((x) => (x.dbId ?? x.id) == id);
+    _personal.removeWhere((x) => x.dbId == id);
     version.value++;
   }
 
@@ -156,7 +157,7 @@ class HonooController {
 
     await HonooService.deleteHonooById(id);
 
-    _personal.removeWhere((x) => (x.dbId ?? x.id) == id);
+    _personal.removeWhere((x) => x.dbId == id);
     version.value++;
   }
 }

@@ -2,9 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Entities/hinoo.dart';
+import 'duplication_result.dart';
+import 'reliability_policy.dart';
 
 class HinooService {
   static const String _table = 'hinoo';
+  static const ReliabilityPolicy _reliability = ReliabilityPolicy();
 
   // Iniezione client per i test
   static SupabaseClient? _testClient;
@@ -54,38 +57,9 @@ class HinooService {
       'created_at': DateTime.now().toIso8601String(),
     };
 
-    try {
-      debugPrint('[HinooService] publishHinoo data=$data');
-      final res =
-          await _client.from(_table).insert(data).select().maybeSingle();
-      if (res == null) throw 'publishHinoo: insert fallita';
-    } on PostgrestException catch (e) {
-      if (_isMissingMoonSavedColumn(e)) {
-        final fallback = Map<String, dynamic>.from(data)
-          ..remove('is_from_moon_saved');
-        final res =
-            await _client.from(_table).insert(fallback).select().maybeSingle();
-        if (res == null) throw 'publishHinoo: insert fallita';
-        return;
-      }
-      debugPrint(
-          '[HinooService] publishHinoo error: ${e.message} details=${e.details} hint=${e.hint} code=${e.code}');
-      String msg = e.message;
-      final details = e.details;
-      final hint = e.hint;
-      final code = e.code;
-      if (msg.isEmpty && code != null && code.isNotEmpty) {
-        msg = code;
-      }
-      if (msg.isEmpty) {
-        msg = 'sconosciuto';
-      }
-      final extra = [
-        if (details != null && details.isNotEmpty) details,
-        if (hint != null && hint.isNotEmpty) 'hint: $hint',
-      ].join(' — ');
-      throw 'Errore salvataggio hinoo: $msg${extra.isNotEmpty ? ' ($extra)' : ''}';
-    }
+    debugPrint('[HinooService] publishHinoo data=$data');
+    final res = await _insertPublished(data);
+    if (res == null) throw 'publishHinoo: insert fallita';
   }
 
   static Future<String> publishHinooAndReturnId(HinooDraft draft) async {
@@ -105,65 +79,36 @@ class HinooService {
       'created_at': DateTime.now().toIso8601String(),
     };
 
-    try {
-      debugPrint('[HinooService] publishHinoo data=$data');
-      final res =
-          await _client.from(_table).insert(data).select().maybeSingle();
-      if (res == null) throw 'publishHinoo: insert fallita';
-      final id = res['id']?.toString() ?? '';
-      if (id.isEmpty) throw 'publishHinoo: id mancante';
-      return id;
-    } on PostgrestException catch (e) {
-      if (_isMissingMoonSavedColumn(e)) {
+    debugPrint('[HinooService] publishHinoo data=$data');
+    final res = await _insertPublished(data);
+    if (res == null) throw 'publishHinoo: insert fallita';
+    final id = res['id']?.toString() ?? '';
+    if (id.isEmpty) throw 'publishHinoo: id mancante';
+    return id;
+  }
+
+  static Future<Map<String, dynamic>?> _insertPublished(
+    Map<String, dynamic> data,
+  ) {
+    return _reliability.write(() async {
+      try {
+        return await _client.from(_table).insert(data).select().maybeSingle();
+      } on PostgrestException catch (error) {
+        if (!_isMissingMoonSavedColumn(error)) rethrow;
         final fallback = Map<String, dynamic>.from(data)
           ..remove('is_from_moon_saved');
-        final res =
-            await _client.from(_table).insert(fallback).select().maybeSingle();
-        if (res == null) throw 'publishHinoo: insert fallita';
-        final id = res['id']?.toString() ?? '';
-        if (id.isEmpty) throw 'publishHinoo: id mancante';
-        return id;
+        return _client.from(_table).insert(fallback).select().maybeSingle();
       }
-      debugPrint(
-          '[HinooService] publishHinoo error: ${e.message} details=${e.details} hint=${e.hint} code=${e.code}');
-      String msg = e.message;
-      final details = e.details;
-      final hint = e.hint;
-      final code = e.code;
-      if (msg.isEmpty && code != null && code.isNotEmpty) {
-        msg = code;
-      }
-      if (msg.isEmpty) {
-        msg = 'sconosciuto';
-      }
-      final extra = [
-        if (details != null && details.isNotEmpty) details,
-        if (hint != null && hint.isNotEmpty) 'hint: $hint',
-      ].join(' — ');
-      throw 'Errore salvataggio hinoo: $msg${extra.isNotEmpty ? ' ($extra)' : ''}';
-    }
+    });
   }
 
   /// Inserisce un record type='moon' se non già presente (dedup su fingerprint)
-  static Future<bool> duplicateToMoon(HinooDraft draft) async {
+  static Future<DuplicationResult> duplicateToMoon(HinooDraft draft) async {
     final userId = _client.auth.currentUser?.id;
     if (userId == null) throw 'Utente non autenticato';
 
     final sanitized = draft.copyWith(type: HinooType.moon);
     final fp = fingerprint(sanitized);
-
-    // Verifica duplicato nella STESSA tabella
-    final existing = await _client
-        .from(_table)
-        .select('id')
-        .eq('user_id', userId)
-        .eq('type', 'moon')
-        .eq('fingerprint', fp)
-        .limit(1);
-
-    if (existing is List && existing.isNotEmpty) {
-      return false;
-    }
 
     final data = {
       'user_id': userId,
@@ -176,38 +121,13 @@ class HinooService {
       'created_at': DateTime.now().toIso8601String(),
     };
 
-    try {
-      debugPrint('[HinooService] duplicateToMoon data=$data');
-      await _client.from(_table).insert(data);
-      return true;
-    } on PostgrestException catch (e) {
-      if (_isMissingMoonSavedColumn(e)) {
-        final fallback = Map<String, dynamic>.from(data)
-          ..remove('is_from_moon_saved');
-        await _client.from(_table).insert(fallback);
-        return true;
-      }
-      debugPrint(
-          '[HinooService] duplicateToMoon error: ${e.message} details=${e.details} hint=${e.hint} code=${e.code}');
-      String msg = e.message;
-      final details = e.details;
-      final hint = e.hint;
-      final code = e.code;
-      if (msg.isEmpty && code != null && code.isNotEmpty) {
-        msg = code;
-      }
-      if (msg.isEmpty) {
-        msg = 'sconosciuto';
-      }
-      final extra = [
-        if (details != null && details.isNotEmpty) details,
-        if (hint != null && hint.isNotEmpty) 'hint: $hint',
-      ].join(' — ');
-      throw 'Errore pubblicazione Luna: $msg${extra.isNotEmpty ? ' ($extra)' : ''}';
-    }
+    debugPrint('[HinooService] duplicateToMoon data=$data');
+    return _insertDuplicate(data);
   }
 
-  static Future<bool> duplicateMoonToChest(HinooDraft draft) async {
+  static Future<DuplicationResult> duplicateMoonToChest(
+    HinooDraft draft,
+  ) async {
     final userId = _client.auth.currentUser?.id;
     if (userId == null) throw 'Utente non autenticato';
 
@@ -216,18 +136,6 @@ class HinooService {
       isFromMoonSaved: true,
     );
     final fp = fingerprint(sanitized);
-
-    final existing = await _client
-        .from(_table)
-        .select('id')
-        .eq('user_id', userId)
-        .eq('type', 'personal')
-        .eq('fingerprint', fp)
-        .limit(1);
-
-    if (existing is List && existing.isNotEmpty) {
-      return false;
-    }
 
     final data = {
       'user_id': userId,
@@ -241,23 +149,39 @@ class HinooService {
       'created_at': DateTime.now().toIso8601String(),
     };
 
-    try {
-      await _client.from(_table).insert(data);
-      return true;
-    } on PostgrestException catch (e) {
-      if (_isMissingMoonSavedColumn(e)) {
+    return _insertDuplicate(data);
+  }
+
+  static Future<DuplicationResult> _insertDuplicate(
+    Map<String, dynamic> data,
+  ) {
+    return _reliability.write(() async {
+      try {
+        await _client.from(_table).insert(data);
+        return DuplicationResult.inserted;
+      } on PostgrestException catch (error) {
+        if (error.code == '23505') return DuplicationResult.alreadyPresent;
+        if (!_isMissingMoonSavedColumn(error)) rethrow;
         final fallback = Map<String, dynamic>.from(data)
           ..remove('is_from_moon_saved');
-        await _client.from(_table).insert(fallback);
-        return true;
+        try {
+          await _client.from(_table).insert(fallback);
+          return DuplicationResult.inserted;
+        } on PostgrestException catch (fallbackError) {
+          if (fallbackError.code == '23505') {
+            return DuplicationResult.alreadyPresent;
+          }
+          rethrow;
+        }
       }
-      rethrow;
-    }
+    });
   }
 
   static Future<void> deleteHinooById(String id) async {
     if (id.trim().isEmpty) return;
-    await _client.from(_table).delete().eq('id', id);
+    await _reliability.write(
+      () => _client.from(_table).delete().eq('id', id),
+    );
   }
 
   static String fingerprint(HinooDraft d) {

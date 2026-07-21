@@ -3,10 +3,12 @@ import 'dart:typed_data';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+import 'reliability_policy.dart';
 
 class HinooStorageUploader {
   static const String bucket = 'hinoo';
   static const Uuid _uuid = Uuid();
+  static const ReliabilityPolicy _reliability = ReliabilityPolicy();
 
   // Getter iniettabile nei test
   static SupabaseClient get _client =>
@@ -67,17 +69,19 @@ class HinooStorageUploader {
     final id = _uuid.v4();
     final path = '$userId/$safeFolder/$id.$safeExt';
 
-    await _client.storage.from(bucket).uploadBinary(
-          path,
-          bytes,
-          fileOptions: FileOptions(
-            upsert: false,
-            // storage_client sends this as a multipart field and Supabase
-            // expects seconds only (not a complete HTTP Cache-Control value).
-            cacheControl: '31536000',
-            contentType: _contentTypeForExt(safeExt),
+    await _reliability.write(
+      () => _client.storage.from(bucket).uploadBinary(
+            path,
+            bytes,
+            fileOptions: FileOptions(
+              upsert: false,
+              // storage_client sends this as a multipart field and Supabase
+              // expects seconds only (not a complete HTTP Cache-Control value).
+              cacheControl: '31536000',
+              contentType: _contentTypeForExt(safeExt),
+            ),
           ),
-        );
+    );
 
     return _client.storage.from(bucket).getPublicUrl(path);
   }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Controller/chest_controller.dart';
 import 'package:honoo/Entities/chest_item.dart';
@@ -202,5 +204,24 @@ void main() {
 
     await Future<void>.delayed(const Duration(milliseconds: 200));
     verify(() => repository.fetchHonooReplyRows('user-1')).called(1);
+  });
+
+  test('un refresh arrivato durante il caricamento viene accodato', () async {
+    final firstResponse = Completer<List<dynamic>>();
+    var callCount = 0;
+    when(() => repository.fetchHonooReplyRows('user-1')).thenAnswer((_) {
+      callCount++;
+      return callCount == 1 ? firstResponse.future : Future.value(const []);
+    });
+    when(() => repository.fetchHinooReplyRows('user-1', const []))
+        .thenAnswer((_) async => const []);
+
+    final runningRefresh = controller.refreshReplies('user-1');
+    await Future<void>.delayed(Duration.zero);
+    await controller.refreshReplies('user-1');
+    firstResponse.complete(const []);
+    await runningRefresh;
+
+    verify(() => repository.fetchHonooReplyRows('user-1')).called(2);
   });
 }
