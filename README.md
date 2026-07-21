@@ -40,13 +40,18 @@ fvm flutter test
 
 # Integration test su Chrome; target predefinito: smoke_app_starts_test.dart
 ./tool/run_integration_tests.sh
+
+# Test live di conversazioni, RLS e Realtime su staging
+cp live.env.example live.env
+# Compilare live.env, poi abilitare esplicitamente le scritture live
+HONOO_LIVE_RUN=true ./tool/run_live_conversation_test.sh
 ```
 
-I test live richiedono le define descritte in `lib/testing/live_config.dart`. Non inserire credenziali reali negli script o nel repository.
+I test live leggono variabili d'ambiente o il file JSON locale `live.env`; le variabili d'ambiente hanno precedenza. `live.env` è ignorato da Git: non inserire credenziali reali negli script o nel repository. Il workflow `Live Supabase E2E` esegue ogni giorno su staging i controlli CRUD, RLS e Realtime; il flusso UI è attivabile manualmente.
 
 ## Build e rilascio
 
-Il deploy GitHub Pages parte da tag `v*` o da workflow manuale e usa Flutter 3.19.6.
+Il deploy GitHub Pages è esclusivamente manuale tramite il workflow `Deploy to GitHub Pages`. Richiede la conferma `DEPLOY`, valida che il commit scelto appartenga a `main`, applica opzionalmente le migrazioni Supabase e pubblica solo dopo il loro successo. Il workflow usa l'environment GitHub `production`, che deve avere approvazioni e secret configurati.
 
 ```bash
 fvm flutter build web --release \
@@ -55,6 +60,6 @@ fvm flutter build web --release \
   --dart-define=SUPABASE_ANON_KEY=<anon-key>
 ```
 
-Per il flusso completo di commit, tag e release è disponibile `tool/release.sh`.
+I tag restano utili per identificare le versioni, ma non avviano automaticamente una pubblicazione. Per il flusso locale di commit e tag è disponibile `tool/release.sh`.
 
 Le attività editoriali e tecniche ancora aperte sono raccolte in [TODO.md](TODO.md).

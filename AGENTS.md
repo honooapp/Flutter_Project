@@ -119,10 +119,12 @@ Golden tests rely on `test/test_config.dart` (fixes DPI). If fonts cause 400s, p
 ## 8. Deployment
 
 * **GitHub Pages** is the hosting surface.
-  - New workflow: `.github/workflows/deploy-gh-pages.yml`.
-  - Triggers: push tags `v*` or manual dispatch.
-  - Steps: checkout → Flutter 3.19.6 → `flutter build web --release` → add `CNAME` (`honoo.it`) → deploy via `peaceiris/actions-gh-pages`.
-  - Secrets needed: `PROD_SUPABASE_URL`, `PROD_SUPABASE_ANON_KEY`.
+  - Workflow: `.github/workflows/deploy-gh-pages.yml`.
+  - Trigger: manual dispatch only, with `DEPLOY` confirmation and a commit reachable from `main`.
+  - Optional database migration gate runs before the web build; publishing starts only after it succeeds.
+  - Steps: validate release → optional Supabase migrations → Flutter web release build → add `CNAME` (`honoo.it`) → deploy via `peaceiris/actions-gh-pages`.
+  - Environment: `production`, with required reviewers recommended.
+  - Secrets needed for every release: `PROD_SUPABASE_URL`, `PROD_SUPABASE_ANON_KEY`. Migration releases also need `SUPABASE_ACCESS_TOKEN`, `PROD_SUPABASE_PROJECT_REF`, `PROD_SUPABASE_DB_PASSWORD`.
 * For manual builds, `build/web` mirrors what peanut produced previously. Keep the base href at `/` because `gh-pages` has a `CNAME`.
 * Ensure DNS for `honoo.it` points the apex to GitHub Pages IPs.
 
@@ -134,8 +136,11 @@ Golden tests rely on `test/test_config.dart` (fixes DPI). If fonts cause 400s, p
   - `push` to `main` and every PR.
   - Jobs: analysis + staging read-only suite, optional CRUD (manual).
 * **Deploy to Pages (`deploy-gh-pages.yml`)**
-  - `push` tags `v*`, or manual.
-  - Produces `gh-pages` build.
+  - Manual only; validates the selected `main` commit and gates build/deploy on optional production migrations.
+  - Produces the `gh-pages` build.
+* **Live Supabase E2E (`live-supabase-e2e.yml`)**
+  - Scheduled daily and manually dispatchable against staging.
+  - Always checks conversation CRUD, RLS and Realtime; the browser UI flow is opt-in on manual runs.
 
 Keep workflows in sync with Flutter version upgrades — both install Flutter 3.19.6 via `subosito/flutter-action`.
 
@@ -171,7 +176,7 @@ Keep workflows in sync with Flutter version upgrades — both install Flutter 3.
 7. Add / update tests where applicable.
 8. `flutter test` and (if relevant) run Supabase smoke suite.
 9. Commit with clear message; open PR targeting `main`.
-10. Tag release (`git tag vYYYY-MM-DD && git push --tags`) when ready; Pages deploy workflow will publish.
+10. Merge to `main`, then manually dispatch `Deploy to GitHub Pages` with the target commit and `DEPLOY` confirmation.
 
 ---
 
@@ -193,10 +198,12 @@ flutter build web --release \
   --dart-define=SUPABASE_URL=... \
   --dart-define=SUPABASE_ANON_KEY=...
 
-# Manual deploy trigger (if needed)
-git tag v2025-10-14            # use date-based tags
-git push --tags
-# If the tag already exists, append suffixes: v2025-10-14.1, .2, ...
+# Safe production release (prefer the GitHub UI when approvals are enabled)
+gh workflow run deploy-gh-pages.yml \
+  -f release_ref=<main-commit> \
+  -f confirm_production=DEPLOY \
+  -f apply_migrations=true \
+  -f disable_pwa=true
 ```
 
 ---
