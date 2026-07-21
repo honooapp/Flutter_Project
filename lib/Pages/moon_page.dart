@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Services/content_feed_service.dart';
 import 'package:honoo/Services/admin_service.dart';
 import 'package:honoo/Services/honoo_service.dart';
+import 'package:honoo/Services/duplication_result.dart';
 import 'package:honoo/Services/hinoo_service.dart';
 
 import '../Entities/hinoo.dart';
@@ -525,7 +526,7 @@ class _MoonPageState extends State<MoonPage> {
         if (!mounted) return;
         showHonooToast(
           context,
-          message: saved
+          message: saved == DuplicationResult.inserted
               ? 'honoo salvato nello Scrigno.'
               : 'Era già nel tuo Scrigno.',
         );

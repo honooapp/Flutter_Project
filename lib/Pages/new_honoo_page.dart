@@ -8,6 +8,7 @@ import '../Entities/honoo.dart';
 import '../Services/honoo_image_uploader.dart';
 import '../UI/honoo_builder.dart';
 import 'package:honoo/Services/honoo_service.dart';
+import 'package:honoo/Services/duplication_result.dart';
 
 import 'email_login_page.dart';
 import 'chest_page.dart';
@@ -311,13 +312,14 @@ class _NewHonooPageState extends State<NewHonooPage> {
         null,
       );
 
-      final ok = await HonooService.duplicateToMoon(honooForMoon);
+      final result = await HonooService.duplicateToMoon(honooForMoon);
 
       if (!mounted) return false;
       showHonooToast(
         context,
-        message:
-            ok ? "L'honoo è anche sulla Luna." : 'Già presente sulla Luna.',
+        message: result == DuplicationResult.inserted
+            ? "L'honoo è anche sulla Luna."
+            : 'Già presente sulla Luna.',
       );
       return true;
     } catch (e, st) {

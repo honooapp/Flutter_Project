@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:carousel_slider/carousel_slider.dart' as cs;
@@ -5,6 +7,7 @@ import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Services/chest_repository.dart';
 import 'package:honoo/Services/download_capture_service.dart';
 import 'package:honoo/Services/chest_hint_service.dart';
+import 'package:honoo/Services/duplication_result.dart';
 
 import '../Controller/honoo_controller.dart';
 import '../Controller/hinoo_controller.dart';
@@ -72,6 +75,8 @@ class _ChestPageState extends State<ChestPage> {
 
   int _currentIndex = 0;
   int _conversationRefreshToken = 0;
+  Object? _honooLoadError;
+  bool _isMutating = false;
   // Data lists for normal vs conversation mode
   List<ChestItem> _itemsNormal = const [];
   List<ChestHinooItem> get _hinoo => _chestController.value.hinoo;
@@ -104,10 +109,8 @@ class _ChestPageState extends State<ChestPage> {
   void initState() {
     super.initState();
     _chestController.addListener(_onChestStateChanged);
-    _loadAll();
+    unawaited(_initialize());
     _maybeShowScrignoHint();
-    final uid = SupabaseProvider.client.auth.currentUser?.id;
-    if (uid != null) _chestController.startRealtime(uid);
   }
 
   @override
@@ -141,9 +144,12 @@ class _ChestPageState extends State<ChestPage> {
   }
 
   Future<void> _loadAll() async {
+    if (mounted) setState(() => _honooLoadError = null);
     try {
       await ctrl.loadChest();
-    } catch (_) {}
+    } catch (error) {
+      if (mounted) setState(() => _honooLoadError = error);
+    }
     final uid = SupabaseProvider.client.auth.currentUser?.id;
     if (uid == null) {
       _chestController.completeWithoutUser();
@@ -152,6 +158,18 @@ class _ChestPageState extends State<ChestPage> {
     await _chestController.loadHinoo(uid);
     await _chestController.refreshReplies(uid);
   }
+
+  Future<void> _initialize() async {
+    await _loadAll();
+    if (!mounted) return;
+    final uid = SupabaseProvider.client.auth.currentUser?.id;
+    if (uid != null) _chestController.startRealtime(uid);
+  }
+
+  Object? get _loadError =>
+      _honooLoadError ??
+      _chestController.value.hinooError ??
+      _chestController.value.replyError;
 
   String _stableIdOf(ChestItem it) {
     return it.when(
@@ -274,39 +292,50 @@ class _ChestPageState extends State<ChestPage> {
     required double gap,
     required double bottomPadding,
   }) {
-    return ChestFooter(
-      item: item,
-      selectedConversationEntry: _selectedConvEntry,
-      currentUserId: SupabaseProvider.client.auth.currentUser?.id,
-      iconSize: iconSize,
-      gap: gap,
-      bottomPadding: bottomPadding,
-      onHome: _goHome,
-      onInfo: _showScrignoInfo,
-      onSendHonooToMoon: _sendHonooToMoon,
-      onReplyToHonoo: _showReplyChoiceForHonoo,
-      onDeleteHonoo: _deleteHonoo,
-      onSendHinooToMoon: _sendHinooToMoon,
-      onReplyToHinoo: _showReplyChoiceForHinoo,
-      onDeleteHinoo: _deleteHinoo,
-      onSendConversationEntryToMoon: _sendConversationEntryToMoon,
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 160),
+      opacity: _isMutating ? 0.55 : 1,
+      child: IgnorePointer(
+        ignoring: _isMutating,
+        child: ChestFooter(
+          item: item,
+          selectedConversationEntry: _selectedConvEntry,
+          currentUserId: SupabaseProvider.client.auth.currentUser?.id,
+          iconSize: iconSize,
+          gap: gap,
+          bottomPadding: bottomPadding,
+          onHome: _goHome,
+          onInfo: _showScrignoInfo,
+          onSendHonooToMoon: _sendHonooToMoon,
+          onReplyToHonoo: _showReplyChoiceForHonoo,
+          onDeleteHonoo: _deleteHonoo,
+          onSendHinooToMoon: _sendHinooToMoon,
+          onReplyToHinoo: _showReplyChoiceForHinoo,
+          onDeleteHinoo: _deleteHinoo,
+          onSendConversationEntryToMoon: _sendConversationEntryToMoon,
+        ),
+      ),
     );
   }
 
   Future<void> _sendHonooToMoon(Honoo honoo) async {
+    if (_isMutating) return;
+    setState(() => _isMutating = true);
     try {
-      final ok = await HonooController().sendToMoon(honoo);
+      final result = await HonooController().sendToMoon(honoo);
       if (!mounted) return;
       setState(_rebuildItems);
       showHonooToast(
         context,
-        message: ok
+        message: result == DuplicationResult.inserted
             ? "L'honoo è anche sulla Luna."
             : "L'honoo era già presente sulla Luna.",
       );
     } catch (error) {
       if (!mounted) return;
       showHonooToast(context, message: 'Errore: $error');
+    } finally {
+      if (mounted) setState(() => _isMutating = false);
     }
   }
 
@@ -316,17 +345,28 @@ class _ChestPageState extends State<ChestPage> {
       target: HonooDeletionTarget.honoo,
     );
     if (!mounted || confirmed != true) return;
-    final String? id = (honoo.dbId ?? honoo.id) as String?;
+    final String? id = honoo.dbId;
     if (id == null || id.isEmpty) {
       showHonooToast(context, message: 'Impossibile cancellare: id mancante.');
       return;
     }
-    await ctrl.deleteHonooById(id);
-    if (!mounted) return;
-    showHonooToast(context, message: 'honoo eliminato.');
+    setState(() => _isMutating = true);
+    try {
+      await ctrl.deleteHonooById(id);
+      if (!mounted) return;
+      showHonooToast(context, message: 'honoo eliminato.');
+    } catch (error) {
+      if (!mounted) return;
+      showHonooToast(context,
+          message: 'Errore durante l\'eliminazione: $error');
+    } finally {
+      if (mounted) setState(() => _isMutating = false);
+    }
   }
 
   Future<void> _sendHinooToMoon(ChestHinooItem hinoo) async {
+    if (_isMutating) return;
+    setState(() => _isMutating = true);
     try {
       final result = await _hinooController.sendToMoon(hinoo.draft);
       if (!mounted) return;
@@ -338,13 +378,24 @@ class _ChestPageState extends State<ChestPage> {
     } catch (error) {
       if (!mounted) return;
       showHonooToast(context, message: 'Errore: $error');
+    } finally {
+      if (mounted) setState(() => _isMutating = false);
     }
   }
 
   Future<void> _sendConversationEntryToMoon(ConversationEntry entry) async {
+    if (_isMutating) return;
+    setState(() => _isMutating = true);
     try {
       if (entry.kind == ConversationEntryKind.honoo) {
-        await _sendHonooToMoon(entry.honoo!);
+        final result = await HonooController().sendToMoon(entry.honoo!);
+        if (!mounted) return;
+        showHonooToast(
+          context,
+          message: result == DuplicationResult.inserted
+              ? "L'honoo è anche sulla Luna."
+              : "L'honoo era già presente sulla Luna.",
+        );
       } else {
         final result = await _hinooController.sendToMoon(entry.hinoo!);
         if (!mounted) return;
@@ -356,6 +407,8 @@ class _ChestPageState extends State<ChestPage> {
     } catch (error) {
       if (!mounted) return;
       showHonooToast(context, message: 'Errore: $error');
+    } finally {
+      if (mounted) setState(() => _isMutating = false);
     }
   }
 
@@ -366,6 +419,8 @@ class _ChestPageState extends State<ChestPage> {
     );
     if (confirmed != true) return;
 
+    if (_isMutating) return;
+    setState(() => _isMutating = true);
     try {
       await _chestRepository.deleteHinoo(current.id);
 
@@ -375,6 +430,8 @@ class _ChestPageState extends State<ChestPage> {
     } catch (e) {
       if (!mounted) return;
       showHonooToast(context, message: 'Errore durante l\'eliminazione: $e');
+    } finally {
+      if (mounted) setState(() => _isMutating = false);
     }
   }
 
@@ -663,6 +720,39 @@ class _ChestPageState extends State<ChestPage> {
     );
   }
 
+  Widget _buildLoadError({required bool compact}) {
+    return Material(
+      color: Colors.black.withOpacity(compact ? 0.72 : 0),
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              compact
+                  ? 'Scrigno non aggiornato: mostro gli ultimi dati disponibili.'
+                  : 'Non riesco a caricare lo Scrigno.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.libreFranklin(
+                color: HonooColor.onBackground,
+                fontSize: compact ? 13 : 17,
+              ),
+            ),
+            TextButton.icon(
+              onPressed: () => unawaited(_loadAll()),
+              icon: const Icon(Icons.refresh, color: Colors.white),
+              label: const Text(
+                'Riprova',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -687,11 +777,15 @@ class _ChestPageState extends State<ChestPage> {
               maxWidth: viewW,
               mode: layoutMode,
             );
-            if (ctrl.isLoading.value || _isHinooLoading) {
+            final items = _itemsNormal;
+            final loadError = _loadError;
+            if ((ctrl.isLoading.value || _isHinooLoading) && items.isEmpty) {
               return const Center(child: LoadingSpinner(color: Colors.white));
             }
-            final items = _itemsNormal;
             if (items.isEmpty) {
+              if (loadError != null) {
+                return Center(child: _buildLoadError(compact: false));
+              }
               return Center(
                 child: Text(
                   'Nessun contenuto nello scrigno',
@@ -732,6 +826,19 @@ class _ChestPageState extends State<ChestPage> {
                 );
               },
             );
+            final visibleSlider = loadError == null
+                ? slider
+                : Stack(
+                    children: [
+                      Positioned.fill(child: slider),
+                      Positioned(
+                        top: 8,
+                        left: 16,
+                        right: 16,
+                        child: Center(child: _buildLoadError(compact: true)),
+                      ),
+                    ],
+                  );
             // Il reveal della conversazione viene gestito da
             // UnifiedThreadView usando i messaggi reali del thread. Qui ogni
             // conversazione occupa ormai una sola slide del carosello.
@@ -739,7 +846,7 @@ class _ChestPageState extends State<ChestPage> {
                 layoutMode == ResponsiveLayoutMode.wideDesktop ||
                 layoutMode == ResponsiveLayoutMode.largeDesktop;
             if (!isDesktop || items.length <= 1) {
-              return slider;
+              return visibleSlider;
             }
             return DesktopCarouselArrows(
               canPrev: _currentIndex > 0,
@@ -755,7 +862,7 @@ class _ChestPageState extends State<ChestPage> {
                 curve: Curves.easeOutCubic,
               ),
               arrowColor: Colors.white,
-              child: slider,
+              child: visibleSlider,
             );
           },
           footerBuilder: (ctx, mode, footerIconSize, footerGap,

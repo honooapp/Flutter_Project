@@ -4,10 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+import 'reliability_policy.dart';
 
 class HonooImageUploader {
   static final _client = SupabaseProvider.client;
   static const String _bucket = 'honoo-images'; // <-- bucket pubblico
+  static const ReliabilityPolicy _reliability = ReliabilityPolicy();
 
   /// Mobile (Android/iOS): carica da path locale e restituisce la public URL.
   static Future<String?> uploadImageFromPath(String path) async {
@@ -25,15 +27,17 @@ class HonooImageUploader {
       final fileName = '${const Uuid().v4()}$ext';
       final storagePath = '$uid/uploads/$fileName'; // per-utente
 
-      await _client.storage.from(_bucket).uploadBinary(
-            storagePath,
-            bytes,
-            fileOptions: FileOptions(
-              upsert: false,
-              cacheControl: '31536000',
-              contentType: _contentTypeFromExt(ext),
+      await _reliability.write(
+        () => _client.storage.from(_bucket).uploadBinary(
+              storagePath,
+              bytes,
+              fileOptions: FileOptions(
+                upsert: false,
+                cacheControl: '31536000',
+                contentType: _contentTypeFromExt(ext),
+              ),
             ),
-          );
+      );
 
       return _client.storage.from(_bucket).getPublicUrl(storagePath);
     } catch (e) {
@@ -56,15 +60,17 @@ class HonooImageUploader {
       final fileName = '${const Uuid().v4()}$ext';
       final storagePath = '$uid/uploads/$fileName'; // per-utente
 
-      await _client.storage.from(_bucket).uploadBinary(
-            storagePath,
-            bytes,
-            fileOptions: FileOptions(
-              upsert: false,
-              cacheControl: '31536000',
-              contentType: _contentTypeFromExt(ext),
+      await _reliability.write(
+        () => _client.storage.from(_bucket).uploadBinary(
+              storagePath,
+              bytes,
+              fileOptions: FileOptions(
+                upsert: false,
+                cacheControl: '31536000',
+                contentType: _contentTypeFromExt(ext),
+              ),
             ),
-          );
+      );
 
       return _client.storage.from(_bucket).getPublicUrl(storagePath);
     } catch (e) {

@@ -1,8 +1,8 @@
-
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
+import 'package:honoo/Services/duplication_result.dart';
 import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
@@ -84,39 +84,39 @@ class _ConversationPageState extends State<ConversationPage> {
           mode: layoutMode,
         );
 
-          final Widget carousel = _isLoading
-              ? const Center(child: LoadingSpinner())
-              : (_thread.isEmpty
-                  ? Center(
-                      child: Text(
-                        'Nessuna conversazione',
-                        style: GoogleFonts.libreFranklin(
-                          color: HonooColor.onBackground,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                        ),
+        final Widget carousel = _isLoading
+            ? const Center(child: LoadingSpinner())
+            : (_thread.isEmpty
+                ? Center(
+                    child: Text(
+                      'Nessuna conversazione',
+                      style: GoogleFonts.libreFranklin(
+                        color: HonooColor.onBackground,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
                       ),
-                    )
-                  : cs.CarouselSlider(
-                      carouselController: _carouselController,
-                      options: cs.CarouselOptions(
-                        scrollDirection: Axis.vertical,
+                    ),
+                  )
+                : cs.CarouselSlider(
+                    carouselController: _carouselController,
+                    options: cs.CarouselOptions(
+                      scrollDirection: Axis.vertical,
+                      height: honooMetrics.height,
+                      viewportFraction: 1.0,
+                      enlargeCenterPage: false,
+                      enableInfiniteScroll: false,
+                      onPageChanged: (index, reason) {
+                        setState(() => _currentIndex = index);
+                      },
+                    ),
+                    items: _thread.map((h) {
+                      return SizedBox(
+                        width: honooMetrics.width,
                         height: honooMetrics.height,
-                        viewportFraction: 1.0,
-                        enlargeCenterPage: false,
-                        enableInfiniteScroll: false,
-                        onPageChanged: (index, reason) {
-                          setState(() => _currentIndex = index);
-                        },
-                      ),
-                      items: _thread.map((h) {
-                        return SizedBox(
-                          width: honooMetrics.width,
-                          height: honooMetrics.height,
-                          child: HonooCard(honoo: h),
-                        );
-                      }).toList(),
-                    ));
+                        child: HonooCard(honoo: h),
+                      );
+                    }).toList(),
+                  ));
 
         return carousel;
       },
@@ -164,7 +164,7 @@ class _ConversationPageState extends State<ConversationPage> {
                           if (!context.mounted) return;
                           showHonooToast(
                             context,
-                            message: saved
+                            message: saved == DuplicationResult.inserted
                                 ? 'honoo salvato nel tuo Scrigno.'
                                 : 'Era già nel tuo Scrigno.',
                           );
@@ -202,7 +202,8 @@ class _ConversationPageState extends State<ConversationPage> {
                             builder: (context) => ReplyHonooPage(
                               originalHonoo: honoo,
                               initialHintText: 'Scrivi la tua risposta...',
-                              initialImageHint: 'Aggiungi un’immagine (opzionale)',
+                              initialImageHint:
+                                  'Aggiungi un’immagine (opzionale)',
                             ),
                           ),
                         );

@@ -6,6 +6,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:honoo/Services/hinoo_service.dart';
+import 'package:honoo/Services/duplication_result.dart';
 import 'package:honoo/Entities/hinoo.dart';
 
 class _MockClient extends Mock implements SupabaseClient {}
@@ -13,6 +14,12 @@ class _MockClient extends Mock implements SupabaseClient {}
 class _MockAuth extends Mock implements GoTrueClient {}
 
 class _MockUser extends Mock implements User {}
+
+class _QueuedError {
+  const _QueuedError(this.error);
+
+  final Object error;
+}
 
 class _MockQueryChain extends Mock
     implements
@@ -22,6 +29,7 @@ class _MockQueryChain extends Mock
   final Queue<dynamic> _responses = Queue<dynamic>();
 
   void queueResponse(dynamic value) => _responses.add(value);
+  void queueError(Object error) => _responses.add(_QueuedError(error));
 
   @override
   dynamic noSuchMethod(Invocation invocation) {
@@ -30,6 +38,7 @@ class _MockQueryChain extends Mock
       final onValue =
           invocation.positionalArguments[0] as dynamic Function(dynamic);
       final result = _responses.isEmpty ? null : _responses.removeFirst();
+      if (result is _QueuedError) throw result.error;
       return Future.value(onValue(result));
     }
     return super.noSuchMethod(invocation);
@@ -88,38 +97,29 @@ void main() {
           recipientTag: null,
         );
 
-    test('se ESISTE già un duplicato → ritorna false e NON inserisce',
+    test('il conflitto univoco atomico viene riconosciuto come duplicato',
         () async {
-      chain.queueResponse([
-        {'id': 99}
-      ]);
+      chain.queueError(
+        const PostgrestException(message: 'duplicate', code: '23505'),
+      );
 
       final res = await HinooService.duplicateToMoon(sampleDraft());
 
-      expect(res, isFalse);
+      expect(res, DuplicationResult.alreadyPresent);
       verify(() => client.from('hinoo')).called(1);
-      verify(() => chain.select('id')).called(1);
-      verify(() => chain.eq('user_id', 'u-1')).called(1);
-      verify(() => chain.eq('type', 'moon')).called(1);
-      verify(() => chain.eq('fingerprint', any<String>())).called(1);
-      verify(() => chain.limit(1)).called(1);
-      verifyNever(() => chain.insert(any()));
+      verify(() => chain.insert(any())).called(1);
+      verifyNever(() => chain.select(any()));
     });
 
-    test('se NON esiste duplicato → fa insert e ritorna true', () async {
-      chain.queueResponse(<Map<String, dynamic>>[]);
+    test('senza conflitto inserisce e ritorna inserted', () async {
       chain.queueResponse(<String, dynamic>{});
 
       final res = await HinooService.duplicateToMoon(sampleDraft());
 
-      expect(res, isTrue);
-      verify(() => client.from('hinoo')).called(greaterThanOrEqualTo(1));
-      verify(() => chain.select('id')).called(1);
-      verify(() => chain.eq('user_id', 'u-1')).called(1);
-      verify(() => chain.eq('type', 'moon')).called(1);
-      verify(() => chain.eq('fingerprint', any<String>())).called(1);
-      verify(() => chain.limit(1)).called(1);
+      expect(res, DuplicationResult.inserted);
+      verify(() => client.from('hinoo')).called(1);
       verify(() => chain.insert(any())).called(1);
+      verifyNever(() => chain.select(any()));
     });
   });
 }

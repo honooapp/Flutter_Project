@@ -8,6 +8,7 @@ import '../Entities/hinoo.dart';
 import 'hinoo_typography.dart';
 import '../Utility/honoo_colors.dart';
 import '../Utility/network_image_prefetch.dart';
+import '../Widgets/smooth_image.dart';
 import '../Widgets/text_box_download_button.dart';
 
 class HinooViewer extends StatefulWidget {
@@ -318,7 +319,11 @@ class HinooSlideView extends StatelessWidget {
             child: Transform(
               transform: transform,
               alignment: Alignment.center,
-              child: Image(image: bg, fit: BoxFit.cover),
+              child: SmoothImage(
+                image: bg,
+                fit: BoxFit.cover,
+                placeholderColor: HonooColor.background,
+              ),
             ),
           ),
           Positioned.fill(

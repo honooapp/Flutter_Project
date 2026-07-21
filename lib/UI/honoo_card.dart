@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../Entities/honoo.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import '../Utility/honoo_colors.dart';
+import '../Widgets/smooth_image.dart';
 import '../Widgets/text_box_download_button.dart';
 
 class HonooCard extends StatelessWidget {
@@ -64,9 +65,8 @@ class HonooCard extends StatelessWidget {
 
         const double cornerRadius = 5;
 
-        final Color gapColor = honoo.type == HonooType.moon
-            ? HonooColor.tertiary
-            : cardBg;
+        final Color gapColor =
+            honoo.type == HonooType.moon ? HonooColor.tertiary : cardBg;
 
         final Widget content = Card(
           color: cardBg,
@@ -129,20 +129,17 @@ class HonooCard extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 SizedBox(
                   width: imageSize,
                   height: gap,
                   child: ColoredBox(color: gapColor),
                 ),
-
                 SizedBox(
                   width: imageSize,
                   height: imageSize,
                   child: Container(
                     decoration: BoxDecoration(
                       color: HonooColor.tertiary,
-                      border: Border.all(color: Colors.black12),
                       borderRadius: BorderRadius.circular(cornerRadius),
                       boxShadow: [
                         BoxShadow(
@@ -151,15 +148,17 @@ class HonooCard extends StatelessWidget {
                           offset: const Offset(0, 2),
                         ),
                       ],
-                      image: hasImage
-                          ? DecorationImage(
-                              image: NetworkImage(imageUrl),
-                              fit: BoxFit.cover,
-                            )
-                          : null,
                     ),
+                    foregroundDecoration: BoxDecoration(
+                      border: Border.all(color: Colors.black12),
+                      borderRadius: BorderRadius.circular(cornerRadius),
+                    ),
+                    clipBehavior: Clip.antiAlias,
                     child: hasImage
-                        ? const SizedBox.shrink()
+                        ? SmoothImage(
+                            image: NetworkImage(imageUrl),
+                            placeholderColor: HonooColor.tertiary,
+                          )
                         : Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -186,20 +185,22 @@ class HonooCard extends StatelessWidget {
           ),
         );
 
-        final String? currentUserId = SupabaseProvider.client.auth.currentUser?.id;
-        final bool isOwn = currentUserId != null && currentUserId == honoo.userId;
+        final String? currentUserId =
+            SupabaseProvider.client.auth.currentUser?.id;
+        final bool isOwn =
+            currentUserId != null && currentUserId == honoo.userId;
         // La cornice rossa segnala soltanto una risposta ricevuta.
         // I propri messaggi mantengono il rendering normale.
         final bool showReplyBorder = isReply && !isOwn;
-        final bool showMoonSavedBorder = !showReplyBorder && honoo.isFromMoonSaved && !isOwn;
+        final bool showMoonSavedBorder =
+            !showReplyBorder && honoo.isFromMoonSaved && !isOwn;
         final Widget wrapped = (showReplyBorder || showMoonSavedBorder)
             ? DecoratedBox(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: showReplyBorder
-                        ? HonooColor.secondary
-                        : Colors.white,
+                    color:
+                        showReplyBorder ? HonooColor.secondary : Colors.white,
                     width: 6,
                   ),
                 ),

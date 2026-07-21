@@ -1,13 +1,18 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_provider.dart';
+import 'reliability_policy.dart';
 
 /// Accesso dati dello Scrigno. Non contiene stato, mapping UI o ordinamento.
 class ChestRepository {
-  ChestRepository({SupabaseClient? client})
-      : _client = client ?? SupabaseProvider.client;
+  ChestRepository({
+    SupabaseClient? client,
+    ReliabilityPolicy reliabilityPolicy = const ReliabilityPolicy(),
+  })  : _client = client ?? SupabaseProvider.client,
+        _reliability = reliabilityPolicy;
 
   final SupabaseClient _client;
+  final ReliabilityPolicy _reliability;
 
   Future<Set<String>> fetchHinooMoonFingerprints(String userId) async {
     final rows = await _client
@@ -29,8 +34,8 @@ class ChestRepository {
           .select(
               'id,pages,type,reply_to,recipient_tag,created_at,is_from_moon_saved,user_id,conversation_id')
           .eq('user_id', userId)
-          .in_('type', ['personal', 'answer'])
-          .order('created_at', ascending: false);
+          .in_('type', ['personal', 'answer']).order('created_at',
+              ascending: false);
       return _asList(rows);
     } on PostgrestException catch (error) {
       final combined =
@@ -42,8 +47,8 @@ class ChestRepository {
           .select(
               'id,pages,type,reply_to,recipient_tag,created_at,user_id,conversation_id')
           .eq('user_id', userId)
-          .in_('type', ['personal', 'answer'])
-          .order('created_at', ascending: false);
+          .in_('type', ['personal', 'answer']).order('created_at',
+              ascending: false);
       return _asList(rows);
     }
   }
@@ -86,7 +91,9 @@ class ChestRepository {
   }
 
   Future<void> deleteHinoo(String id) async {
-    await _client.from('hinoo').delete().eq('id', id);
+    await _reliability.write(
+      () async => await _client.from('hinoo').delete().eq('id', id),
+    );
   }
 
   static List<dynamic> _asList(dynamic rows) {
