@@ -308,20 +308,15 @@ class _NewHinooPageState extends State<NewHinooPage>
       _chestBounceController.forward(from: 0);
       final bool isAnswer = (hinooDraft.type == HinooType.answer) || widget.isReply;
       if (isAnswer) {
-        showHonooToast(
+        await showHonooMessageDialog(
           context,
           message:
               "L'hinoo adesso è nel tuo Scrigno,\n e,\n soprattutto,\n nello Scrigno di qualcun altro.",
         );
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ChestPage(
-              focusReplies: true,
-              focusConversationId: widget.conversationId,
-              highlightLatest: true,
-            ),
-          ),
+        if (!mounted) return;
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const HomePage()),
+          (route) => false,
         );
         return;
       }

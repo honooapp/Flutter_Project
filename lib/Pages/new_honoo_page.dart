@@ -242,21 +242,15 @@ class _NewHonooPageState extends State<NewHonooPage> {
       });
 
       if (type == HonooType.answer) {
-        // Risposta: messaggio dedicato e vai allo Scrigno con focus conversazione + sobbalzo
-        showHonooToast(
+        await showHonooMessageDialog(
           context,
           message:
-              "L'honoo adesso è nel tuo Scrigno, e, soprattutto nello Scrigno di quacun altro.",
+              "L'honoo adesso è nel tuo Scrigno, e, soprattutto nello Scrigno di qualcun altro.",
         );
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ChestPage(
-              focusReplies: true,
-              focusConversationId: conversationId,
-              highlightLatest: true,
-            ),
-          ),
+        if (!mounted) return;
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const HomePage()),
+          (route) => false,
         );
         return;
       } else {

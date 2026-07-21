@@ -11,7 +11,7 @@ import '../Entities/honoo.dart';
 import '../Entities/conversation_link.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
-import 'chest_page.dart';
+import 'home_page.dart';
 
 class ReplyHonooPage extends StatefulWidget {
   final Honoo originalHonoo;
@@ -92,29 +92,17 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
 
       if (!mounted) return;
 
-      showHonooToast(
+      _sentOnce = true;
+      await showHonooMessageDialog(
         context,
         message:
             "L'honoo adesso è nel tuo Scrigno,\n e,\n soprattutto,\nnello Scrigno di qualcun altro.",
       );
-      _sentOnce = true;
       if (!mounted) return;
-      // Vai allo Scrigno con focus sulla conversazione e sobbalzo sulla risposta
-      final convId = newHonoo.conversationId ?? widget.originalHonoo.conversationId ?? widget.originalHonoo.dbId;
-      if (convId != null && convId.isNotEmpty) {
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ChestPage(
-              focusReplies: true,
-              focusConversationId: convId,
-              highlightLatest: true,
-            ),
-          ),
-        );
-      } else {
-        Navigator.pop(context, true);
-      }
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const HomePage()),
+        (route) => false,
+      );
     } catch (e) {
       debugPrint('Errore invio reply: $e');
       if (!mounted) return;

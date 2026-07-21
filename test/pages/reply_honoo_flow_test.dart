@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:honoo/Pages/home_page.dart';
 import 'package:honoo/Pages/reply_honoo_page.dart';
 import 'package:honoo/Entities/honoo.dart';
+import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:sizer/sizer.dart';
 
 import '../test_supabase_helper.dart';
@@ -16,7 +19,13 @@ void main() {
   setUp(() {
     harness = SupabaseTestHarness(withAuthenticatedUser: true);
     harness.enableOverrides();
-    harness.stubTable('honoo');
+    final honoo = harness.stubTable('honoo');
+    final hinoo = harness.stubTable('hinoo');
+    when(() => honoo.neq(any(), any())).thenAnswer((_) => honoo);
+    when(() => hinoo.neq(any(), any())).thenAnswer((_) => hinoo);
+    final visit = MockQueryChain();
+    when(() => harness.client.rpc('increment_site_visit'))
+        .thenAnswer((_) => visit);
   });
 
   tearDown(() {
@@ -24,7 +33,7 @@ void main() {
   });
 
   testWidgets(
-      'ReplyHonooPage: si costruisce, accetta input e mostra azione di invio',
+      'ReplyHonooPage: dopo la conferma della risposta torna alla Home',
       (tester) async {
     final original = Honoo(
       1,
@@ -60,7 +69,19 @@ void main() {
 
     await tester.tap(sendButton);
     await tester.pump();
-    await tester.pump(const Duration(seconds: 1));
+    await tester.pump();
+
+    expect(find.byType(HonooMessageDialog), findsOneWidget);
+    Navigator.of(
+      tester.element(find.byType(HonooMessageDialog)),
+      rootNavigator: true,
+    ).pop();
     await tester.pumpAndSettle();
+
+    expect(find.byType(HomePage), findsOneWidget);
+    expect(find.byType(ReplyHonooPage), findsNothing);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(seconds: 25));
   });
 }
