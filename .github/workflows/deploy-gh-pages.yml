@@ -1,25 +1,107 @@
-name: Deploy Web to GitHub Pages
+name: Safe production release
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
     inputs:
-      DISABLE_PWA:
-        description: 'Disabilita service worker (build di test)'
-        required: false
-        default: 'false'
+      release_ref:
+        description: 'Tag, branch or commit SHA da pubblicare'
+        required: true
+        default: 'main'
+      confirm_production:
+        description: 'Scrivi DEPLOY per confermare il rilascio in produzione'
+        required: true
+      apply_migrations:
+        description: 'Verifica e applica le migrazioni Supabase prima del frontend'
+        required: true
+        type: boolean
+        default: true
+      disable_pwa:
+        description: 'Disabilita service worker (solo build diagnostiche)'
+        required: true
+        type: boolean
+        default: false
 
-permissions:
-  contents: write
+concurrency:
+  group: production-release
+  cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  validate-release:
+    name: Validate release request
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - name: Require explicit production confirmation
+        env:
+          CONFIRM_PRODUCTION: ${{ inputs.confirm_production }}
+        run: |
+          if [ "$CONFIRM_PRODUCTION" != "DEPLOY" ]; then
+            echo "Release cancelled: confirm_production must be DEPLOY."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v6
         with:
+          ref: ${{ inputs.release_ref }}
+          fetch-depth: 0
+
+      - name: Require a release commit reachable from main
+        run: |
+          git fetch origin main
+          git merge-base --is-ancestor HEAD origin/main
+
+      - name: Verify migration structure
+        run: bash tool/check_supabase_migrations.sh
+
+  migrate-production:
+    name: Migrate production database
+    needs: validate-release
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.release_ref }}
+          fetch-depth: 0
+
+      - name: Setup Supabase CLI
+        if: ${{ inputs.apply_migrations }}
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.109.1
+
+      - name: Verify and apply pending migrations
+        if: ${{ inputs.apply_migrations }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          PROJECT_REF: ${{ secrets.PROD_SUPABASE_PROJECT_REF }}
+          DB_PASSWORD: ${{ secrets.PROD_SUPABASE_DB_PASSWORD }}
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN"
+          test -n "$PROJECT_REF"
+          test -n "$DB_PASSWORD"
+          supabase link --project-ref "$PROJECT_REF" --password "$DB_PASSWORD"
+          supabase migration list --linked
+          supabase db push --linked --dry-run
+          supabase db push --linked
+
+      - name: Record intentional migration skip
+        if: ${{ !inputs.apply_migrations }}
+        run: echo "Database migration explicitly disabled for this release."
+
+  build-and-deploy:
+    name: Build and deploy web
+    needs: migrate-production
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.release_ref }}
           fetch-depth: 0
 
       - name: Setup Flutter 3.19.6
@@ -34,20 +116,22 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.PROD_SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.PROD_SUPABASE_ANON_KEY }}
-          DISABLE_PWA: ${{ github.event.inputs.DISABLE_PWA }}
+          DISABLE_PWA: ${{ inputs.disable_pwa }}
         run: |
+          test -n "$SUPABASE_URL"
+          test -n "$SUPABASE_ANON_KEY"
           if [ "$DISABLE_PWA" = "true" ]; then PWA_FLAG="--pwa-strategy=none"; else PWA_FLAG=""; fi
           flutter build web \
             --release $PWA_FLAG \
             --web-renderer canvaskit \
-            --dart-define=SUPABASE_URL=$SUPABASE_URL \
-            --dart-define=SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
+            --dart-define=SUPABASE_URL="$SUPABASE_URL" \
+            --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY"
 
       - name: Add CNAME for custom domain
         run: echo honoo.it > build/web/CNAME
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: build/web

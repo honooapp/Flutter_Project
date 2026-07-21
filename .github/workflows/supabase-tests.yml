@@ -17,7 +17,7 @@ jobs:
     name: Migration structure
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install ripgrep
         run: sudo apt-get update && sudo apt-get install --yes ripgrep
       - name: Verify migration ordering and safety markers
@@ -27,7 +27,7 @@ jobs:
     name: Read-only (analyze + supabase tests)
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -57,7 +57,7 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.run_crud == 'true' }}
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Flutter 3.19.6
         uses: subosito/flutter-action@v2
         with:
@@ -84,7 +84,7 @@ jobs:
     name: Web build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Flutter 3.19.6
         uses: subosito/flutter-action@v2
         with:
