@@ -138,7 +138,7 @@ class _HinooViewerState extends State<HinooViewer> {
             child: Container(
               width: baselineW,
               height: baselineH,
-              decoration: widget.isReply
+              decoration: widget.isReply && !isOwn
                   ? BoxDecoration(
                       border: Border.all(color: HonooColor.secondary, width: 6),
                       borderRadius: BorderRadius.circular(12),

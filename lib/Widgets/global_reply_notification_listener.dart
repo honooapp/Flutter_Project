@@ -16,12 +16,15 @@ class GlobalReplyNotificationListener extends StatefulWidget {
     required this.navigatorKey,
     this.enabled = true,
     this.systemNotification,
+    this.replyEventStream,
   });
 
   final Widget child;
   final GlobalKey<NavigatorState> navigatorKey;
   final bool enabled;
   final ReplySystemNotification? systemNotification;
+  @visibleForTesting
+  final Stream<ReplyNotificationEvent>? replyEventStream;
 
   @override
   State<GlobalReplyNotificationListener> createState() =>
@@ -33,6 +36,7 @@ class _GlobalReplyNotificationListenerState
   late final ReplySystemNotification _systemNotification =
       widget.systemNotification ?? ReplySystemNotification.platform();
   StreamSubscription<AuthState>? _authSubscription;
+  StreamSubscription<ReplyNotificationEvent>? _replyEventSubscription;
   RealtimeChannel? _honooChannel;
   RealtimeChannel? _hinooChannel;
   String? _activeUserId;
@@ -56,6 +60,11 @@ class _GlobalReplyNotificationListenerState
   }
 
   void _start() {
+    final testEvents = widget.replyEventStream;
+    if (testEvents != null) {
+      _replyEventSubscription ??= testEvents.listen(_handleEvent);
+      return;
+    }
     _authSubscription ??=
         SupabaseProvider.client.auth.onAuthStateChange.listen((state) {
       _handleSession(state.session);
@@ -125,6 +134,10 @@ class _GlobalReplyNotificationListenerState
     );
     if (event == null) return;
 
+    _handleEvent(event);
+  }
+
+  void _handleEvent(ReplyNotificationEvent event) {
     final now = DateTime.now();
     final eventKey = '${event.kind.name}:${event.conversationId}';
     if (_lastEventKey == eventKey &&
@@ -170,6 +183,8 @@ class _GlobalReplyNotificationListenerState
   }
 
   void _stopChannels() {
+    _replyEventSubscription?.cancel();
+    _replyEventSubscription = null;
     _honooChannel?.unsubscribe();
     _hinooChannel?.unsubscribe();
     _honooChannel = null;
