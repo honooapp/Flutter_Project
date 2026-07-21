@@ -19,6 +19,7 @@ import '../UI/HonooBuilder/dialogs/name_honoo_dialog.dart';
 import 'placeholder_page.dart';
 import '../Utility/responsive_layout.dart';
 import '../Widgets/responsive_footer_bar.dart';
+import '../Widgets/conversation_notification_prompt.dart';
 import 'package:uuid/uuid.dart';
 
 class NewHonooPage extends StatefulWidget {
@@ -29,6 +30,7 @@ class NewHonooPage extends StatefulWidget {
     this.returnSavedId = false,
     this.conversationId,
     this.replyTo,
+    this.returnToPreviousOnAnswer = false,
   });
 
   final HonooType? forcedType;
@@ -36,6 +38,7 @@ class NewHonooPage extends StatefulWidget {
   final bool returnSavedId;
   final String? conversationId;
   final String? replyTo;
+  final bool returnToPreviousOnAnswer;
 
   @override
   State<NewHonooPage> createState() => _NewHonooPageState();
@@ -224,6 +227,11 @@ class _NewHonooPageState extends State<NewHonooPage> {
       widget.recipientTag,
     )..conversationId = conversationId;
 
+    final bool shouldOfferNotifications = type == HonooType.personal &&
+        await ConversationNotificationPrompt.shouldOfferForFirstConversation(
+          user.id,
+        );
+
     try {
       if (widget.returnSavedId) {
         final id = await HonooService.publishHonooAndReturnId(newHonoo);
@@ -241,6 +249,11 @@ class _NewHonooPageState extends State<NewHonooPage> {
         _lastSavedRawImage = _imageUrl;
       });
 
+      if (shouldOfferNotifications) {
+        await ConversationNotificationPrompt.show(context);
+        if (!mounted) return;
+      }
+
       if (type == HonooType.answer) {
         // Risposta: messaggio dedicato e vai allo Scrigno con focus conversazione + sobbalzo
         showHonooToast(
@@ -248,6 +261,10 @@ class _NewHonooPageState extends State<NewHonooPage> {
           message:
               "L'honoo adesso è nel tuo Scrigno, e, soprattutto nello Scrigno di quacun altro.",
         );
+        if (widget.returnToPreviousOnAnswer) {
+          Navigator.pop(context, conversationId);
+          return;
+        }
         await Navigator.push(
           context,
           MaterialPageRoute(
@@ -596,20 +613,21 @@ class _NewHonooPageState extends State<NewHonooPage> {
                             : 'Salva honoo',
                         onPressed: _submitHonoo,
                       ),
-                      ResponsiveFooterAction(
-                        asset: "assets/icons/piuma.svg",
-                        semanticsLabel: 'Piuma',
-                        size: footerIconSize,
-                        splashRadius: 25,
-                        tooltip: 'Scrivi hinoo',
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const NewHinooPage()),
-                          );
-                        },
-                      ),
+                      if (widget.forcedType != HonooType.answer)
+                        ResponsiveFooterAction(
+                          asset: "assets/icons/piuma.svg",
+                          semanticsLabel: 'Piuma',
+                          size: footerIconSize,
+                          splashRadius: 25,
+                          tooltip: 'Scrivi hinoo',
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const NewHinooPage()),
+                            );
+                          },
+                        ),
                     ],
                   ),
                 ),

@@ -26,6 +26,7 @@ class ChestItemView extends StatelessWidget {
     required this.focusConversationId,
     required this.onSelectConversationEntry,
     required this.onDownload,
+    required this.conversationRefreshToken,
   });
 
   final ChestItem item;
@@ -40,6 +41,7 @@ class ChestItemView extends StatelessWidget {
   final String? focusConversationId;
   final ValueChanged<ConversationEntry> onSelectConversationEntry;
   final VoidCallback onDownload;
+  final int conversationRefreshToken;
 
   @override
   Widget build(BuildContext context) {
@@ -145,6 +147,6 @@ class ChestItemView extends StatelessWidget {
         highlightLatest:
             highlightLatest && focusConversationId == conversationId,
         onDownloadTap: onDownload,
+        refreshToken: conversationRefreshToken,
       );
-
 }

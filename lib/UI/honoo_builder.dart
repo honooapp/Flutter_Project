@@ -280,8 +280,13 @@ class HonooBuilderState extends State<HonooBuilder> {
         pixelRatio = (maxOut / longEdge).clamp(1.0, deviceRatio);
       }
       final ui.Image img = await boundary.toImage(pixelRatio: pixelRatio);
-      final ByteData? bd = await img.toByteData(format: ui.ImageByteFormat.png);
-      return bd?.buffer.asUint8List();
+      try {
+        final ByteData? bd =
+            await img.toByteData(format: ui.ImageByteFormat.png);
+        return bd?.buffer.asUint8List();
+      } finally {
+        img.dispose();
+      }
     } catch (e) {
       debugPrint('Errore capture zoomed image: $e');
       return null;
@@ -372,30 +377,34 @@ class HonooBuilderState extends State<HonooBuilder> {
         pixelRatio = (maxOut / longEdge).clamp(1.0, deviceRatio);
       }
       final ui.Image base = await boundary.toImage(pixelRatio: pixelRatio);
+      ui.Image? framed;
+      try {
+        final int framePx = (framePadding * pixelRatio).round();
+        final int newWidth = base.width + framePx * 2;
+        final int newHeight = base.height + framePx * 2;
 
-      final int framePx = (framePadding * pixelRatio).round();
-      final int newWidth = base.width + framePx * 2;
-      final int newHeight = base.height + framePx * 2;
+        final ui.PictureRecorder recorder = ui.PictureRecorder();
+        final Canvas canvas = Canvas(
+          recorder,
+          Rect.fromLTWH(0, 0, newWidth.toDouble(), newHeight.toDouble()),
+        );
 
-      final ui.PictureRecorder recorder = ui.PictureRecorder();
-      final Canvas canvas = Canvas(
-        recorder,
-        Rect.fromLTWH(0, 0, newWidth.toDouble(), newHeight.toDouble()),
-      );
+        canvas.drawRect(
+          Rect.fromLTWH(0, 0, newWidth.toDouble(), newHeight.toDouble()),
+          Paint()..color = HonooColor.background,
+        );
 
-      canvas.drawRect(
-        Rect.fromLTWH(0, 0, newWidth.toDouble(), newHeight.toDouble()),
-        Paint()..color = HonooColor.background,
-      );
+        canvas.drawImage(
+            base, Offset(framePx.toDouble(), framePx.toDouble()), Paint());
 
-      canvas.drawImage(
-          base, Offset(framePx.toDouble(), framePx.toDouble()), Paint());
-
-      final ui.Image framed =
-          await recorder.endRecording().toImage(newWidth, newHeight);
-      final ByteData? byteData =
-          await framed.toByteData(format: ui.ImageByteFormat.png);
-      return byteData?.buffer.asUint8List();
+        framed = await recorder.endRecording().toImage(newWidth, newHeight);
+        final ByteData? byteData =
+            await framed.toByteData(format: ui.ImageByteFormat.png);
+        return byteData?.buffer.asUint8List();
+      } finally {
+        framed?.dispose();
+        base.dispose();
+      }
     } catch (e) {
       debugPrint('Errore cattura honoo: $e');
       return null;
@@ -411,7 +420,9 @@ class HonooBuilderState extends State<HonooBuilder> {
       return;
     }
 
-    final Uint8List? bytes = await _captureHonooAsPng();
+    final Uint8List? bytes = await TextBoxDownloadButton.hideWhileCapturing(
+      _captureHonooAsPng,
+    );
     if (bytes == null || bytes.isEmpty) {
       if (!context.mounted) return;
       showHonooToast(context, message: 'Impossibile generare il file PNG.');
@@ -427,12 +438,12 @@ class HonooBuilderState extends State<HonooBuilder> {
         : fallbackName;
 
     // ✅ NON uso saveBytes (così non tocchi download_saver.dart)
-    await saver.save(
+    final String message = await saver.save(
       [DownloadImage(filename: '$rawName.png', bytes: bytes)],
     );
 
     if (!context.mounted) return;
-    showHonooToast(context, message: 'Download avviato.');
+    showHonooToast(context, message: message);
   }
 
   void resetContent() {

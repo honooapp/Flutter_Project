@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import '../UI/HinooBuilder/services/download_saver.dart';
+import '../Widgets/text_box_download_button.dart';
 
 typedef DownloadSaverFactory = DownloadSaver Function();
 typedef DownloadTimestampFactory = int Function();
@@ -40,23 +41,26 @@ class DownloadCaptureService {
       throw Exception('Impossibile scaricare: boundary non trovata.');
     }
 
-    final image = await boundary.toImage(
-      pixelRatio: pixelRatioForHeight(boundary.size.height),
-    );
-    try {
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      final bytes = byteData?.buffer.asUint8List();
-      if (bytes == null || bytes.isEmpty) {
-        throw Exception('PNG vuoto o nullo.');
-      }
-
-      final filename = '${baseName}_${_timestampFactory()}.png';
-      return _saverFactory().save(
-        [DownloadImage(filename: filename, bytes: bytes)],
-        message: message,
+    final bytes = await TextBoxDownloadButton.hideWhileCapturing(() async {
+      final image = await boundary.toImage(
+        pixelRatio: pixelRatioForHeight(boundary.size.height),
       );
-    } finally {
-      image.dispose();
-    }
+      try {
+        final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+        final bytes = byteData?.buffer.asUint8List();
+        if (bytes == null || bytes.isEmpty) {
+          throw Exception('PNG vuoto o nullo.');
+        }
+        return bytes;
+      } finally {
+        image.dispose();
+      }
+    });
+
+    final filename = '${baseName}_${_timestampFactory()}.png';
+    return _saverFactory().save(
+      [DownloadImage(filename: filename, bytes: bytes)],
+      message: message,
+    );
   }
 }

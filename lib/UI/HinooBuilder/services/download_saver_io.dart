@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:honoo/env/env.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'download_saver_base.dart';
 
@@ -17,17 +18,15 @@ class _DownloadSaverIo implements DownloadSaver {
       // Prova a salvare direttamente in Galleria/Foto
       int ok = 0;
       for (final img in images) {
-        try {
-          final result = await ImageGallerySaver.saveImage(
-            img.bytes,
-            quality: 100,
-            name: img.filename.replaceAll('.png', ''),
-          );
-          final success = _extractSuccess(result);
-          if (success) ok++;
-        } catch (_) {
-          // continua su fallback
+        final String filename = sanitizeDownloadFilename(img.filename);
+        bool success = await _saveToGallery(img, filename);
+        if (!success && Platform.isAndroid) {
+          final PermissionStatus status = await Permission.storage.request();
+          if (status.isGranted) {
+            success = await _saveToGallery(img, filename);
+          }
         }
+        if (success) ok++;
       }
 
       if (ok == images.length && ok > 0) {
@@ -40,7 +39,7 @@ class _DownloadSaverIo implements DownloadSaver {
       final List<XFile> files = images
           .map((img) => XFile.fromData(
                 img.bytes,
-                name: img.filename,
+                name: sanitizeDownloadFilename(img.filename),
                 mimeType: 'image/png',
               ))
           .toList(growable: false);
@@ -51,12 +50,30 @@ class _DownloadSaverIo implements DownloadSaver {
     final Directory targetDir = await _resolveDownloadDirectory();
     final List<String> savedPaths = <String>[];
     for (final DownloadImage img in images) {
-      final String filePath = _joinPaths(targetDir.path, img.filename);
+      final String filename = sanitizeDownloadFilename(img.filename);
+      final String filePath = _joinPaths(targetDir.path, filename);
       final File file = File(filePath);
       await file.writeAsBytes(img.bytes, flush: true);
       savedPaths.add(file.path);
     }
     return 'Immagini salvate in ${targetDir.path}';
+  }
+
+  Future<bool> _saveToGallery(
+    DownloadImage image,
+    String filename,
+  ) async {
+    try {
+      final dynamic result = await ImageGallerySaver.saveImage(
+        image.bytes,
+        quality: 100,
+        name:
+            filename.replaceFirst(RegExp(r'\.png$', caseSensitive: false), ''),
+      );
+      return _extractSuccess(result);
+    } catch (_) {
+      return false;
+    }
   }
 
   Future<Directory> _resolveDownloadDirectory() async {

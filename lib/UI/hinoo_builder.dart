@@ -27,6 +27,7 @@ import 'package:honoo/web/heic_converter.dart' as heicweb;
 import 'package:honoo/UI/HinooBuilder/dialogs/anteprima_png.dart';
 import 'package:honoo/UI/HinooBuilder/dialogs/download_hinoo_dialog.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
+import 'package:honoo/Widgets/text_box_download_button.dart';
 import 'package:honoo/UI/HinooBuilder/dialogs/name_hinoo_dialog.dart';
 import 'package:honoo/UI/hinoo_export_spec.dart';
 import 'package:honoo/UI/hinoo_typography.dart';
@@ -283,8 +284,9 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
     try {
       await _waitForNextFrame();
-      final Uint8List? bytes =
-          await _captureCurrentCanvasBytes(exportMode: exportMode);
+      final Uint8List? bytes = await TextBoxDownloadButton.hideWhileCapturing(
+        () => _captureCurrentCanvasBytes(exportMode: exportMode),
+      );
       if (bytes != null) {
         final String filename = _resolveFileName(fileBaseName);
         images.add(DownloadImage(filename: filename, bytes: bytes));
@@ -351,15 +353,19 @@ class _HinooBuilderState extends State<HinooBuilder> {
       }());
       final ui.Image image =
           await boundary.toImage(pixelRatio: effectivePixelRatio);
-      assert(() {
-        debugPrint(
-          'Hinoo export image size: ${image.width}x${image.height}',
-        );
-        return true;
-      }());
-      final ByteData? byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
-      return byteData?.buffer.asUint8List();
+      try {
+        assert(() {
+          debugPrint(
+            'Hinoo export image size: ${image.width}x${image.height}',
+          );
+          return true;
+        }());
+        final ByteData? byteData =
+            await image.toByteData(format: ui.ImageByteFormat.png);
+        return byteData?.buffer.asUint8List();
+      } finally {
+        image.dispose();
+      }
     } catch (e) {
       debugPrint('capture canvas error: $e');
       return null;

@@ -17,6 +17,7 @@ import '../Entities/hinoo_thread_entry.dart';
 
 import '../Utility/honoo_colors.dart';
 import '../Utility/responsive_layout.dart';
+import '../Utility/network_image_prefetch.dart';
 
 import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/loading_spinner.dart';
@@ -70,6 +71,7 @@ class _ChestPageState extends State<ChestPage> {
   final ChestHintService _chestHintService = ChestHintService();
 
   int _currentIndex = 0;
+  int _conversationRefreshToken = 0;
   // Data lists for normal vs conversation mode
   List<ChestItem> _itemsNormal = const [];
   List<ChestHinooItem> get _hinoo => _chestController.value.hinoo;
@@ -227,6 +229,22 @@ class _ChestPageState extends State<ChestPage> {
         _currentIndex >= _itemsNormal.length) {
       _currentIndex = _itemsNormal.isEmpty ? 0 : _itemsNormal.length - 1;
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _prefetchChestFrom(_currentIndex);
+    });
+  }
+
+  void _prefetchChestFrom(int index) {
+    if (_itemsNormal.isEmpty) return;
+    final end = (index + 2).clamp(0, _itemsNormal.length);
+    final urls = <String?>[];
+    for (final item in _itemsNormal.sublist(index, end)) {
+      item.when(
+        honoo: (honoo) => urls.addAll(honooImageUrls(honoo)),
+        hinoo: (hinoo) => urls.addAll(hinooImageUrls(hinoo.draft)),
+      );
+    }
+    prefetchImageUrls(context, urls);
   }
 
   // conversation loading removed — UnifiedThreadView handles it
@@ -357,16 +375,18 @@ class _ChestPageState extends State<ChestPage> {
     final _ReplyChoice? choice = await _showReplyChoice();
     if (choice == null || !mounted) return;
     if (choice == _ReplyChoice.honoo) {
-      Navigator.push(
+      final result = await Navigator.push<Object?>(
         context,
         MaterialPageRoute(
           builder: (context) => ReplyHonooPage(
             originalHonoo: current,
             initialHintText: 'Scrivi la tua risposta...',
             initialImageHint: 'Aggiungi un’immagine (opzionale)',
+            returnToPreviousOnAnswer: true,
           ),
         ),
       );
+      _refreshConversationInPlace(result is String ? result : null);
     } else {
       final String? replyTo = current.dbId;
       if (replyTo == null || replyTo.isEmpty) return;
@@ -375,7 +395,7 @@ class _ChestPageState extends State<ChestPage> {
         parentConversationId: current.conversationId,
         recipientId: current.userId,
       );
-      Navigator.push(
+      final result = await Navigator.push<Object?>(
         context,
         MaterialPageRoute(
           builder: (context) => NewHinooPage(
@@ -383,9 +403,11 @@ class _ChestPageState extends State<ChestPage> {
             recipientTag: link.recipientId,
             replyTo: link.replyTo,
             conversationId: link.conversationId,
+            returnToPreviousOnAnswer: true,
           ),
         ),
       );
+      _refreshConversationInPlace(result is String ? result : null);
     }
   }
 
@@ -402,7 +424,7 @@ class _ChestPageState extends State<ChestPage> {
             current.conversationId ?? current.draft.conversationId,
         recipientId: recipient,
       );
-      Navigator.push(
+      final result = await Navigator.push<Object?>(
         context,
         MaterialPageRoute(
           builder: (context) => ReplyHonooPage(
@@ -421,9 +443,11 @@ class _ChestPageState extends State<ChestPage> {
               ..conversationId = link.conversationId,
             initialHintText: 'Scrivi la tua risposta...',
             initialImageHint: 'Aggiungi un’immagine (opzionale)',
+            returnToPreviousOnAnswer: true,
           ),
         ),
       );
+      _refreshConversationInPlace(result is String ? result : null);
     } else {
       final String recipient =
           current.ownerId ?? current.draft.recipientTag ?? '';
@@ -434,7 +458,7 @@ class _ChestPageState extends State<ChestPage> {
             current.conversationId ?? current.draft.conversationId,
         recipientId: recipient,
       );
-      Navigator.push(
+      final result = await Navigator.push<Object?>(
         context,
         MaterialPageRoute(
           builder: (context) => NewHinooPage(
@@ -442,10 +466,19 @@ class _ChestPageState extends State<ChestPage> {
             recipientTag: link.recipientId,
             replyTo: link.replyTo,
             conversationId: link.conversationId,
+            returnToPreviousOnAnswer: true,
           ),
         ),
       );
+      _refreshConversationInPlace(result is String ? result : null);
     }
+  }
+
+  void _refreshConversationInPlace(String? conversationId) {
+    if (!mounted || conversationId == null || conversationId.isEmpty) return;
+    setState(() {
+      _conversationRefreshToken++;
+    });
   }
 
   Future<_ReplyChoice?> _showReplyChoice() {
@@ -619,6 +652,7 @@ class _ChestPageState extends State<ChestPage> {
         setState(() => _selectedConvEntry = entry);
       },
       onDownload: () => _handleDownloadForItem(item, repaintKey),
+      conversationRefreshToken: _conversationRefreshToken,
     );
   }
 
@@ -675,9 +709,10 @@ class _ChestPageState extends State<ChestPage> {
                 enlargeCenterPage: false,
                 disableCenter: true,
                 scrollPhysics: horizPhysics,
-                onPageChanged: (i, _) => setState(() {
-                  _currentIndex = i;
-                }),
+                onPageChanged: (i, _) {
+                  setState(() => _currentIndex = i);
+                  _prefetchChestFrom(i);
+                },
               ),
               itemBuilder: (context, index, realIdx) {
                 final bool isActive = _currentIndex == index;
@@ -693,7 +728,10 @@ class _ChestPageState extends State<ChestPage> {
             // Il reveal della conversazione viene gestito da
             // UnifiedThreadView usando i messaggi reali del thread. Qui ogni
             // conversazione occupa ormai una sola slide del carosello.
-            if (items.length <= 1) {
+            final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
+                layoutMode == ResponsiveLayoutMode.wideDesktop ||
+                layoutMode == ResponsiveLayoutMode.largeDesktop;
+            if (!isDesktop || items.length <= 1) {
               return slider;
             }
             return DesktopCarouselArrows(

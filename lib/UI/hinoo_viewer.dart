@@ -7,6 +7,7 @@ import 'package:honoo/Services/supabase_provider.dart';
 import '../Entities/hinoo.dart';
 import 'hinoo_typography.dart';
 import '../Utility/honoo_colors.dart';
+import '../Utility/network_image_prefetch.dart';
 import '../Widgets/text_box_download_button.dart';
 
 class HinooViewer extends StatefulWidget {
@@ -43,6 +44,31 @@ class _HinooViewerState extends State<HinooViewer> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _prefetchPagesFrom(0);
+  }
+
+  @override
+  void didUpdateWidget(covariant HinooViewer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.draft != widget.draft) {
+      _prefetchPagesFrom(0);
+    }
+  }
+
+  void _prefetchPagesFrom(int index) {
+    if (widget.draft.pages.isEmpty) return;
+    final end = (index + 2).clamp(0, widget.draft.pages.length);
+    prefetchImageUrls(
+      context,
+      widget.draft.pages
+          .sublist(index.clamp(0, widget.draft.pages.length - 1), end)
+          .map((page) => page.backgroundImage),
+    );
+  }
+
+  @override
   void dispose() {
     _snapTimer?.cancel();
     _vController.dispose();
@@ -59,8 +85,7 @@ class _HinooViewerState extends State<HinooViewer> {
         widget.maxWidth > 0 &&
         widget.maxHeight.isFinite &&
         widget.maxHeight > 0) {
-      scale =
-          (widget.maxWidth / baselineW).clamp(0.0, double.infinity);
+      scale = (widget.maxWidth / baselineW).clamp(0.0, double.infinity);
       final double scaleH =
           (widget.maxHeight / baselineH).clamp(0.0, double.infinity);
       scale = scale < scaleH ? scale : scaleH;
@@ -93,8 +118,7 @@ class _HinooViewerState extends State<HinooViewer> {
             final double? page = _vController.page;
             final int current = page?.round() ?? _vController.initialPage;
             final int maxIndex = widget.draft.pages.length - 1;
-            final int target =
-                (current + intent.delta).clamp(0, maxIndex);
+            final int target = (current + intent.delta).clamp(0, maxIndex);
             if (target == current) return null;
             _vController.animateToPage(
               target,
@@ -114,7 +138,7 @@ class _HinooViewerState extends State<HinooViewer> {
             child: Container(
               width: baselineW,
               height: baselineH,
-              decoration: widget.isReply
+              decoration: widget.isReply && !isOwn
                   ? BoxDecoration(
                       border: Border.all(color: HonooColor.secondary, width: 6),
                       borderRadius: BorderRadius.circular(12),
@@ -168,6 +192,7 @@ class _HinooViewerState extends State<HinooViewer> {
                           // disabilita scroll interno in contesti di thread verticale a pagina intera
                           physics: const NeverScrollableScrollPhysics(),
                           allowImplicitScrolling: true,
+                          onPageChanged: _prefetchPagesFrom,
                           itemCount: widget.draft.pages.length,
                           itemBuilder: (context, index) {
                             return HinooSlideView(

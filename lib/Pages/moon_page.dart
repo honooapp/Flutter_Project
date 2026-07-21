@@ -31,6 +31,7 @@ import 'new_honoo_page.dart';
 import '../Controller/honoo_controller.dart';
 import '../Controller/hinoo_controller.dart';
 import '../Utility/app_logger.dart';
+import '../Utility/network_image_prefetch.dart';
 
 class MoonPage extends StatefulWidget {
   const MoonPage({super.key, this.initialItemId});
@@ -133,6 +134,7 @@ class _MoonPageState extends State<MoonPage> {
             initialIndex.clamp(0, items.isEmpty ? 0 : items.length - 1);
         _isLoading = false;
       });
+      _prefetchFrom(_currentIndex);
     } catch (e, stackTrace) {
       AppLogger.error('Caricamento Luna non riuscito',
           scope: 'MoonPage', error: e, stackTrace: stackTrace);
@@ -145,6 +147,20 @@ class _MoonPageState extends State<MoonPage> {
       }
       setState(() => _isLoading = false);
     }
+  }
+
+  void _prefetchFrom(int index) {
+    if (_items.isEmpty) return;
+    final end = (index + 2).clamp(0, _items.length);
+    final urls = <String?>[];
+    for (final item in _items.sublist(index, end)) {
+      if (item.honoo != null) {
+        urls.addAll(honooImageUrls(item.honoo!));
+      } else if (item.hinoo != null) {
+        urls.addAll(hinooImageUrls(item.hinoo!));
+      }
+    }
+    prefetchImageUrls(context, urls);
   }
 
   @override
@@ -351,6 +367,7 @@ class _MoonPageState extends State<MoonPage> {
                       scrollPhysics: const PageScrollPhysics(),
                       onPageChanged: (index, _) {
                         setState(() => _currentIndex = index);
+                        _prefetchFrom(index);
                       },
                     ),
                     itemBuilder: (context, index, realIndex) {
