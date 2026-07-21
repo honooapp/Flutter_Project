@@ -55,7 +55,7 @@ class ChestPage extends StatefulWidget {
   State<ChestPage> createState() => _ChestPageState();
 }
 
-class _ChestPageState extends State<ChestPage> {
+class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
   // Conversational mode support
   // Structural only: no layout/axis/animation changes.
   // Two modes: normal chest vs conversation view fed into the same builder.
@@ -77,6 +77,8 @@ class _ChestPageState extends State<ChestPage> {
   int _conversationRefreshToken = 0;
   Object? _honooLoadError;
   bool _isMutating = false;
+  bool _isReconciling = false;
+  bool _reconcilePending = false;
   // Data lists for normal vs conversation mode
   List<ChestItem> _itemsNormal = const [];
   List<ChestHinooItem> get _hinoo => _chestController.value.hinoo;
@@ -108,6 +110,7 @@ class _ChestPageState extends State<ChestPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _chestController.addListener(_onChestStateChanged);
     unawaited(_initialize());
     _maybeShowScrignoHint();
@@ -115,9 +118,28 @@ class _ChestPageState extends State<ChestPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _chestController.removeListener(_onChestStateChanged);
     _chestController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    unawaited(_resumeRealtimeAndReconcile());
+  }
+
+  Future<void> _resumeRealtimeAndReconcile() async {
+    await _reconcileAll();
+    if (!mounted) return;
+    final uid = SupabaseProvider.client.auth.currentUser?.id;
+    if (uid != null) {
+      _chestController.startRealtime(
+        uid,
+        onPeriodicReconcile: _reconcileAll,
+      );
+    }
   }
 
   void _onChestStateChanged() {
@@ -160,10 +182,31 @@ class _ChestPageState extends State<ChestPage> {
   }
 
   Future<void> _initialize() async {
-    await _loadAll();
+    await _reconcileAll();
     if (!mounted) return;
     final uid = SupabaseProvider.client.auth.currentUser?.id;
-    if (uid != null) _chestController.startRealtime(uid);
+    if (uid != null) {
+      _chestController.startRealtime(
+        uid,
+        onPeriodicReconcile: _reconcileAll,
+      );
+    }
+  }
+
+  Future<void> _reconcileAll() async {
+    if (_isReconciling) {
+      _reconcilePending = true;
+      return;
+    }
+    _isReconciling = true;
+    try {
+      do {
+        _reconcilePending = false;
+        await _loadAll();
+      } while (_reconcilePending && mounted);
+    } finally {
+      _isReconciling = false;
+    }
   }
 
   Object? get _loadError =>
