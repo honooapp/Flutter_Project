@@ -33,6 +33,22 @@ void main() {
     verify(() => hinoo.order('created_at', ascending: false)).called(1);
   });
 
+  test('fetchHinooMoonFingerprints restituisce i fingerprint pubblicati',
+      () async {
+    hinoo.queueResponse([
+      {'fingerprint': 'fp-1'},
+      {'fingerprint': null},
+      {'fingerprint': 'fp-2'},
+    ]);
+
+    final result = await repository.fetchHinooMoonFingerprints('user-1');
+
+    expect(result, {'fp-1', 'fp-2'});
+    verify(() => hinoo.select('fingerprint')).called(1);
+    verify(() => hinoo.eq('user_id', 'user-1')).called(1);
+    verify(() => hinoo.eq('type', 'moon')).called(1);
+  });
+
   test('deleteHinoo elimina esclusivamente la riga indicata', () async {
     hinoo.queueResponse(<String, dynamic>{});
 

@@ -345,6 +345,10 @@ class _NewHinooPageState extends State<NewHinooPage>
                 ? "L'hinoo è anche sulla Luna."
                 : 'hinoo già presente sulla Luna.';
             showHonooToast(context, message: text);
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const HomePage()),
+              (route) => false,
+            );
           } catch (e) {
             if (!mounted) return;
             showHonooToast(context, message: 'Errore: $e');

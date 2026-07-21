@@ -271,7 +271,13 @@ class _NewHonooPageState extends State<NewHonooPage> {
           ),
         );
         if (sendToMoon == true && mounted) {
-          await _submitToMoon();
+          final sent = await _submitToMoon();
+          if (sent && mounted) {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const HomePage()),
+              (route) => false,
+            );
+          }
         }
       }
     } catch (e, st) {
@@ -281,7 +287,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
     }
   }
 
-  Future<void> _submitToMoon() async {
+  Future<bool> _submitToMoon() async {
     try {
       final String? finalImageUrl =
           _finalImageUrlCache ?? await _resolveFinalImageUrl(_imageUrl);
@@ -300,12 +306,13 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
       final ok = await HonooService.duplicateToMoon(honooForMoon);
 
-      if (!mounted) return;
+      if (!mounted) return false;
       showHonooToast(
         context,
         message:
             ok ? "L'honoo è anche sulla Luna." : 'Già presente sulla Luna.',
       );
+      return true;
     } catch (e, st) {
       debugPrint('duplicateToMoon failed: $e\n$st');
       if (mounted) {
@@ -314,6 +321,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
           message: 'Errore: $e',
         );
       }
+      return false;
     }
   }
 
