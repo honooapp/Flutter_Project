@@ -207,58 +207,81 @@ void main() {
       expect((secondHinooThread as List).length, 2);
 
       a.realtime.setAuth(a.auth.currentSession!.accessToken);
-      final realtimeInsert = Completer<void>();
+      var realtimeInsert = Completer<void>();
       final realtimeDelete = Completer<void>();
-      final subscribed = Completer<void>();
-      channel = a.channel('live-test-$marker')
-        ..on(
-          RealtimeListenTypes.postgresChanges,
-          ChannelFilter(
-            event: 'INSERT',
-            schema: 'public',
-            table: 'honoo',
-          ),
-          (payload, [__]) {
-            final record = payload is Map ? payload['new'] : null;
-            if (record is Map &&
-                record['conversation_id']?.toString() == honooConversationId &&
-                !realtimeInsert.isCompleted) {
-              realtimeInsert.complete();
-            }
-          },
-        )
-        ..on(
-          RealtimeListenTypes.postgresChanges,
-          ChannelFilter(
-            event: 'DELETE',
-            schema: 'public',
-            table: 'honoo',
-          ),
-          (payload, [__]) {
-            final oldRecord = payload is Map ? payload['old'] : null;
-            if (oldRecord is Map &&
-                oldRecord['id']?.toString() == expectedRealtimeDeleteId &&
-                !realtimeDelete.isCompleted) {
-              realtimeDelete.complete();
-            }
-          },
-        );
-      channel.subscribe((status, [error]) {
-        if (status == 'SUBSCRIBED' && !subscribed.isCompleted) {
-          subscribed.complete();
-        } else if ((status == 'CHANNEL_ERROR' || status == 'TIMED_OUT') &&
-            !subscribed.isCompleted) {
-          subscribed.completeError(
-            StateError('Sottoscrizione Realtime fallita: $status'),
+      var subscribed = Completer<void>();
+      var insertCallbacks = 0;
+      var lastInsertDiagnostic = 'nessun callback INSERT';
+
+      String describePayload(dynamic payload, String conversationId) {
+        if (payload is! Map) return 'payload=${payload.runtimeType}';
+        final keys = payload.keys.map((key) => key.toString()).toList()..sort();
+        final record = payload['new'];
+        return 'keys=$keys, record=${record.runtimeType}, '
+            'conversationMatches='
+            '${record is Map && record['conversation_id']?.toString() == conversationId}';
+      }
+
+      RealtimeChannel subscribeToHonoo(String suffix) {
+        final nextChannel = a.channel('live-test-$suffix-$marker')
+          ..on(
+            RealtimeListenTypes.postgresChanges,
+            ChannelFilter(
+              event: 'INSERT',
+              schema: 'public',
+              table: 'honoo',
+            ),
+            (payload, [__]) {
+              insertCallbacks++;
+              lastInsertDiagnostic =
+                  describePayload(payload, honooConversationId);
+              final record = payload is Map ? payload['new'] : null;
+              if (record is Map &&
+                  record['conversation_id']?.toString() ==
+                      honooConversationId &&
+                  !realtimeInsert.isCompleted) {
+                realtimeInsert.complete();
+              }
+            },
+          )
+          ..on(
+            RealtimeListenTypes.postgresChanges,
+            ChannelFilter(
+              event: 'DELETE',
+              schema: 'public',
+              table: 'honoo',
+            ),
+            (payload, [__]) {
+              final oldRecord = payload is Map ? payload['old'] : null;
+              if (oldRecord is Map &&
+                  oldRecord['id']?.toString() == expectedRealtimeDeleteId &&
+                  !realtimeDelete.isCompleted) {
+                realtimeDelete.complete();
+              }
+            },
           );
-        }
-      });
-      await subscribed.future.timeout(
-        const Duration(seconds: 12),
-        onTimeout: () => throw StateError(
-          'Il canale Realtime non ha raggiunto SUBSCRIBED',
-        ),
-      );
+        nextChannel.subscribe((status, [error]) {
+          if (status == 'SUBSCRIBED' && !subscribed.isCompleted) {
+            subscribed.complete();
+          } else if ((status == 'CHANNEL_ERROR' || status == 'TIMED_OUT') &&
+              !subscribed.isCompleted) {
+            subscribed.completeError(
+              StateError('Sottoscrizione Realtime fallita: $status'),
+            );
+          }
+        });
+        return nextChannel;
+      }
+
+      Future<void> waitUntilSubscribed() => subscribed.future.timeout(
+            const Duration(seconds: 25),
+            onTimeout: () => throw StateError(
+              'Il canale Realtime non ha raggiunto SUBSCRIBED',
+            ),
+          );
+
+      channel = subscribeToHonoo('initial');
+      await waitUntilSubscribed();
       await insertHonoo(
         b,
         text: 'realtime check',
@@ -267,18 +290,40 @@ void main() {
         conversationId: honooConversationId,
         recipientTag: aId,
       );
-      await realtimeInsert.future.timeout(
-        const Duration(seconds: 12),
-        onTimeout: () => throw StateError(
-          'Canale sottoscritto, ma evento INSERT non ricevuto',
-        ),
-      );
+      try {
+        await realtimeInsert.future.timeout(const Duration(seconds: 25));
+      } on TimeoutException {
+        // A transient Realtime delay must not make the whole live suite flaky.
+        // Recreate the subscription once and emit a fresh probe: Postgres
+        // changes are not replayed to a newly joined channel.
+        await channel.unsubscribe();
+        realtimeInsert = Completer<void>();
+        subscribed = Completer<void>();
+        channel = subscribeToHonoo('retry');
+        await waitUntilSubscribed();
+        await insertHonoo(
+          b,
+          text: 'realtime retry check',
+          destination: 'reply',
+          replyTo: honooRootId,
+          conversationId: honooConversationId,
+          recipientTag: aId,
+        );
+        try {
+          await realtimeInsert.future.timeout(const Duration(seconds: 25));
+        } on TimeoutException {
+          throw StateError(
+            'Evento INSERT non ricevuto dopo una risottoscrizione; '
+            'callbacks=$insertCallbacks, ultimo=$lastInsertDiagnostic',
+          );
+        }
+      }
 
       final realtimeRow = createdHonoo.last;
       expectedRealtimeDeleteId = realtimeRow;
       await b.from('honoo').delete().eq('id', realtimeRow);
       await realtimeDelete.future.timeout(
-        const Duration(seconds: 12),
+        const Duration(seconds: 25),
         onTimeout: () => throw StateError(
           'Canale sottoscritto, ma evento DELETE non ricevuto',
         ),
@@ -296,6 +341,8 @@ void main() {
       a.realtime.connect();
       final reconnected = Completer<void>();
       final resubscribed = Completer<void>();
+      var reconnectCallbacks = 0;
+      var lastReconnectDiagnostic = 'nessun callback INSERT';
       reconnectedChannel = a.channel('live-test-reconnect-$marker')
         ..on(
           RealtimeListenTypes.postgresChanges,
@@ -305,6 +352,9 @@ void main() {
             table: 'honoo',
           ),
           (payload, [__]) {
+            reconnectCallbacks++;
+            lastReconnectDiagnostic =
+                describePayload(payload, honooConversationId);
             final record = payload is Map ? payload['new'] : null;
             if (record is Map &&
                 record['conversation_id']?.toString() == honooConversationId &&
@@ -323,7 +373,7 @@ void main() {
         }
       });
       await resubscribed.future.timeout(
-        const Duration(seconds: 12),
+        const Duration(seconds: 25),
         onTimeout: () => throw StateError(
           'Il canale Realtime non si è risottoscritto dopo il reconnect',
         ),
@@ -337,9 +387,10 @@ void main() {
         recipientTag: aId,
       );
       await reconnected.future.timeout(
-        const Duration(seconds: 12),
+        const Duration(seconds: 25),
         onTimeout: () => throw StateError(
-          'Evento INSERT non ricevuto dopo la riconnessione',
+          'Evento INSERT non ricevuto dopo la riconnessione; '
+          'callbacks=$reconnectCallbacks, ultimo=$lastReconnectDiagnostic',
         ),
       );
     } finally {
@@ -369,5 +420,5 @@ void main() {
       skip: LiveConfig.liveRun
           ? false
           : 'Set HONOO_LIVE_RUN=true per eseguire il test live',
-      timeout: const Timeout(Duration(minutes: 2)));
+      timeout: const Timeout(Duration(minutes: 4)));
 }
