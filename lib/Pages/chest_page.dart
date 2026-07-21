@@ -67,8 +67,9 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
   final HonooController ctrl = HonooController();
   final HinooController _hinooController = HinooController();
   late final ChestRepository _chestRepository = ChestRepository();
-  late final ChestController _chestController =
-      ChestController(repository: _chestRepository);
+  late final ChestController _chestController = ChestController(
+    repository: _chestRepository,
+  );
   final DownloadCaptureService _downloadCaptureService =
       DownloadCaptureService();
   final ChestHintService _chestHintService = ChestHintService();
@@ -90,7 +91,8 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       _chestController.value.hinooRepliesByRoot;
   ConversationEntry? _selectedConvEntry;
   bool get _isHinooLoading => _chestController.value.isHinooLoading;
-  final cs.CarouselController _carouselController = cs.CarouselController();
+  final cs.CarouselSliderController _carouselController =
+      cs.CarouselSliderController();
   // Performance guard: avoid redundant regrouping when inputs haven't changed
   String? _lastRebuildSignature;
   int _rebuildCalls = 0; // debug counter
@@ -135,10 +137,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
     if (!mounted) return;
     final uid = SupabaseProvider.client.auth.currentUser?.id;
     if (uid != null) {
-      _chestController.startRealtime(
-        uid,
-        onPeriodicReconcile: _reconcileAll,
-      );
+      _chestController.startRealtime(uid, onPeriodicReconcile: _reconcileAll);
     }
   }
 
@@ -186,10 +185,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
     if (!mounted) return;
     final uid = SupabaseProvider.client.auth.currentUser?.id;
     if (uid != null) {
-      _chestController.startRealtime(
-        uid,
-        onPeriodicReconcile: _reconcileAll,
-      );
+      _chestController.startRealtime(uid, onPeriodicReconcile: _reconcileAll);
     }
   }
 
@@ -215,10 +211,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       _chestController.value.replyError;
 
   String _stableIdOf(ChestItem it) {
-    return it.when(
-      honoo: (h) => (h.dbId ?? ''),
-      hinoo: (row) => row.id,
-    );
+    return it.when(honoo: (h) => (h.dbId ?? ''), hinoo: (row) => row.id);
   }
 
   void _rebuildItems() {
@@ -246,14 +239,16 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
     _lastRebuildSignature = sig;
     final honooItems = ctrl.personal.map<ChestItem>((h) {
       // Use updated_at when available to satisfy ordering by last activity/edit
-      final DateTime dt = DateTime.tryParse(h.updatedAt) ??
+      final DateTime dt =
+          DateTime.tryParse(h.updatedAt) ??
           DateTime.tryParse(h.createdAt) ??
           DateTime.fromMillisecondsSinceEpoch(0);
       return ChestItem.honoo(h, dt);
     }).toList();
 
-    final hinooItems =
-        _hinoo.map<ChestItem>((r) => ChestItem.hinoo(r)).toList();
+    final hinooItems = _hinoo
+        .map<ChestItem>((r) => ChestItem.hinoo(r))
+        .toList();
 
     final items = [...honooItems, ...hinooItems];
     final organization = ChestOrganizer.organize<ChestItem>(
@@ -311,9 +306,9 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
   // conversation loading removed — UnifiedThreadView handles it
 
   String? _convIdOfItem(ChestItem it) => it.when(
-        honoo: (h) => h.conversationId,
-        hinoo: (row) => row.conversationId ?? row.draft.conversationId,
-      );
+    honoo: (h) => h.conversationId,
+    hinoo: (row) => row.conversationId ?? row.draft.conversationId,
+  );
 
   // ignore: unused_element
   void _exitConversation() {
@@ -400,8 +395,10 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       showHonooToast(context, message: 'honoo eliminato.');
     } catch (error) {
       if (!mounted) return;
-      showHonooToast(context,
-          message: 'Errore durante l\'eliminazione: $error');
+      showHonooToast(
+        context,
+        message: 'Errore durante l\'eliminazione: $error',
+      );
     } finally {
       if (mounted) setState(() => _isMutating = false);
     }
@@ -535,19 +532,20 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         context,
         MaterialPageRoute(
           builder: (context) => ReplyHonooPage(
-            originalHonoo: Honoo(
-              0,
-              '',
-              '',
-              current.createdAt.toIso8601String(),
-              current.createdAt.toIso8601String(),
-              recipient,
-              HonooType.personal,
-              link.replyTo,
-              link.recipientId,
-            )
-              ..dbId = link.replyTo
-              ..conversationId = link.conversationId,
+            originalHonoo:
+                Honoo(
+                    0,
+                    '',
+                    '',
+                    current.createdAt.toIso8601String(),
+                    current.createdAt.toIso8601String(),
+                    recipient,
+                    HonooType.personal,
+                    link.replyTo,
+                    link.recipientId,
+                  )
+                  ..dbId = link.replyTo
+                  ..conversationId = link.conversationId,
             initialHintText: 'Scrivi la tua risposta...',
             initialImageHint: 'Aggiungi un’immagine (opzionale)',
             returnToPreviousOnAnswer: true,
@@ -613,7 +611,9 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -635,7 +635,9 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -667,7 +669,9 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
   // =========================
 
   Future<void> _handleDownloadForItem(
-      ChestItem item, GlobalKey repaintKey) async {
+    ChestItem item,
+    GlobalKey repaintKey,
+  ) async {
     final user = SupabaseProvider.client.auth.currentUser;
     if (user == null) {
       if (!mounted) return;
@@ -697,23 +701,24 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
 
     if (!okMin) {
       if (!mounted) return;
-      showHonooToast(context,
-          message: 'Scrivi almeno 1 carattere prima di scaricare');
+      showHonooToast(
+        context,
+        message: 'Scrivi almeno 1 carattere prima di scaricare',
+      );
       return;
     }
 
     try {
       final message = await _downloadCaptureService.captureAndSave(
         repaintKey: repaintKey,
-        baseName: item.when(
-          honoo: (_) => 'honoo',
-          hinoo: (_) => 'hinoo',
-        ),
+        baseName: item.when(honoo: (_) => 'honoo', hinoo: (_) => 'hinoo'),
         message: 'creato con honoo',
       );
       if (!mounted) return;
-      showHonooToast(context,
-          message: message.isNotEmpty ? message : 'Download avviato.');
+      showHonooToast(
+        context,
+        message: message.isNotEmpty ? message : 'Download avviato.',
+      );
     } catch (e) {
       if (!mounted) return;
       showHonooToast(context, message: 'Errore download: $e');
@@ -765,7 +770,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
 
   Widget _buildLoadError({required bool compact}) {
     return Material(
-      color: Colors.black.withOpacity(compact ? 0.72 : 0),
+      color: Colors.black.withValues(alpha: compact ? 0.72 : 0),
       borderRadius: BorderRadius.circular(12),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -816,10 +821,10 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
           bodyBuilder: (ctx, viewW, availableH, layoutMode) {
             final HonooBuilderMetrics honooMetrics =
                 ResponsiveLayout.honooBuilderMetrics(
-              availableHeight: availableH,
-              maxWidth: viewW,
-              mode: layoutMode,
-            );
+                  availableHeight: availableH,
+                  maxWidth: viewW,
+                  mode: layoutMode,
+                );
             final items = _itemsNormal;
             final loadError = _loadError;
             if ((ctrl.isLoading.value || _isHinooLoading) && items.isEmpty) {
@@ -885,7 +890,8 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
             // Il reveal della conversazione viene gestito da
             // UnifiedThreadView usando i messaggi reali del thread. Qui ogni
             // conversazione occupa ormai una sola slide del carosello.
-            final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
+            final bool isDesktop =
+                layoutMode == ResponsiveLayoutMode.desktop ||
                 layoutMode == ResponsiveLayoutMode.wideDesktop ||
                 layoutMode == ResponsiveLayoutMode.largeDesktop;
             if (!isDesktop || items.length <= 1) {
@@ -908,18 +914,26 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
               child: visibleSlider,
             );
           },
-          footerBuilder: (ctx, mode, footerIconSize, footerGap,
-              footerTopSpacing, footerBottomSpacing) {
-            final items = _itemsNormal;
-            final ChestItem? current =
-                items.isEmpty ? null : items[_currentIndex];
-            return _footerForItem(
-              current,
-              iconSize: footerIconSize,
-              gap: footerGap,
-              bottomPadding: footerBottomSpacing,
-            );
-          },
+          footerBuilder:
+              (
+                ctx,
+                mode,
+                footerIconSize,
+                footerGap,
+                footerTopSpacing,
+                footerBottomSpacing,
+              ) {
+                final items = _itemsNormal;
+                final ChestItem? current = items.isEmpty
+                    ? null
+                    : items[_currentIndex];
+                return _footerForItem(
+                  current,
+                  iconSize: footerIconSize,
+                  gap: footerGap,
+                  bottomPadding: footerBottomSpacing,
+                );
+              },
         );
       },
     );
@@ -929,7 +943,4 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
 enum _ReplyChoice { honoo, hinoo }
 
 // Public enum for Chest mode selection (local to this file usage)
-enum ChestMode {
-  normal,
-  conversation,
-}
+enum ChestMode { normal, conversation }

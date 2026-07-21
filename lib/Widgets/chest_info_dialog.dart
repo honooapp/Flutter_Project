@@ -67,7 +67,7 @@ class ChestInfoDialog extends StatelessWidget {
                           height: maxHeight,
                           padding: const EdgeInsets.fromLTRB(16, 40, 16, 16),
                           decoration: BoxDecoration(
-                            color: HonooColor.wave1.withOpacity(0.6),
+                            color: HonooColor.wave1.withValues(alpha: 0.6),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: SingleChildScrollView(

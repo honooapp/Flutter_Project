@@ -1,7 +1,7 @@
-// ignore_for_file: avoid_web_libraries_in_flutter
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
 
-// ignore: deprecated_member_use
-import 'dart:html' as html;
+import 'package:web/web.dart' as web;
 
 import 'reply_system_notification.dart';
 
@@ -13,17 +13,17 @@ class _WebReplySystemNotification extends ReplySystemNotification {
 
   @override
   ReplyNotificationPermission get permission {
-    if (!html.Notification.supported) {
+    if (!_isSupported) {
       return ReplyNotificationPermission.unsupported;
     }
-    return _mapPermission(html.Notification.permission);
+    return _mapPermission(web.Notification.permission);
   }
 
   @override
   Future<ReplyNotificationPermission> requestPermission() async {
-    if (!html.Notification.supported) return permission;
-    final result = await html.Notification.requestPermission();
-    return _mapPermission(result);
+    if (!_isSupported) return permission;
+    final result = await web.Notification.requestPermission().toDart;
+    return _mapPermission(result.toDart);
   }
 
   @override
@@ -33,18 +33,22 @@ class _WebReplySystemNotification extends ReplySystemNotification {
     required void Function() onTap,
   }) {
     if (permission != ReplyNotificationPermission.granted) return;
-    final notification = html.Notification(
+    final notification = web.Notification(
       'Nuova risposta su honoo',
-      body: 'Hai ricevuto una risposta al tuo $contentLabel.',
-      icon: 'icons/Icon-192.png',
-      tag: 'honoo-reply-$conversationId',
+      web.NotificationOptions(
+        body: 'Hai ricevuto una risposta al tuo $contentLabel.',
+        icon: 'icons/Icon-192.png',
+        tag: 'honoo-reply-$conversationId',
+      ),
     );
-    notification.onClick.first.then((_) {
+    notification.onclick = ((web.Event _) {
       notification.close();
       onTap();
-    });
+    }).toJS;
   }
 }
+
+bool get _isSupported => web.window.hasProperty('Notification'.toJS).toDart;
 
 ReplyNotificationPermission _mapPermission(String? value) {
   switch (value) {

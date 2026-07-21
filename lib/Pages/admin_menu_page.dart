@@ -277,7 +277,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
       hintText: 'Email utente',
       hintStyle: GoogleFonts.lora(color: Colors.white70, fontSize: 16),
       filled: true,
-      fillColor: Colors.white.withOpacity(0.08),
+      fillColor: Colors.white.withValues(alpha: 0.08),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: Colors.white24),
@@ -340,7 +340,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                           child: Text(
                             '• $label — $when',
                             style: GoogleFonts.lora(
-                              color: HonooColor.onBackground.withOpacity(0.9),
+                              color: HonooColor.onBackground.withValues(alpha: 0.9),
                               fontSize: 14,
                             ),
                           ),
@@ -363,7 +363,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                       'Invita gli utenti a creare la loro casa.',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.lora(
-                        color: HonooColor.onBackground.withOpacity(0.8),
+                        color: HonooColor.onBackground.withValues(alpha: 0.8),
                         fontSize: 16,
                       ),
                     ),
@@ -483,7 +483,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                         return Align(
                           alignment: Alignment.topCenter,
                           child: Material(
-                            color: Colors.black.withOpacity(0.85),
+                            color: Colors.black.withValues(alpha: 0.85),
                             borderRadius: BorderRadius.circular(12),
                             child: ConstrainedBox(
                               constraints:
@@ -623,7 +623,7 @@ class _VisitRow extends StatelessWidget {
         '$label: $count',
         textAlign: TextAlign.center,
         style: GoogleFonts.lora(
-          color: HonooColor.onBackground.withOpacity(0.85),
+          color: HonooColor.onBackground.withValues(alpha: 0.85),
           fontSize: 16,
         ),
       ),
@@ -665,7 +665,7 @@ class _RollingCount extends StatelessWidget {
           Text(
             '$label: ',
             style: GoogleFonts.lora(
-              color: HonooColor.onBackground.withOpacity(0.85),
+              color: HonooColor.onBackground.withValues(alpha: 0.85),
               fontSize: 16,
             ),
           ),

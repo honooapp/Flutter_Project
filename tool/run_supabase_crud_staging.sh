@@ -10,7 +10,11 @@ set -euo pipefail
 export ENABLE_WRITE_TESTS=1
 
 echo "Running Supabase REST CRUD tests on staging..."
-fvm flutter test \
+flutter_runner=(fvm flutter)
+if [[ "${CI:-}" == "true" ]]; then
+  flutter_runner=(flutter)
+fi
+"${flutter_runner[@]}" test \
   --concurrency=1 \
   --reporter expanded \
   test/supabase/supabase_rest_crud_test.dart

@@ -48,7 +48,8 @@ class _MoonPageState extends State<MoonPage> {
   bool _isAdmin = false;
   List<_MoonItem> _items = [];
   int _currentIndex = 0;
-  final cs.CarouselController _carouselController = cs.CarouselController();
+  final cs.CarouselSliderController _carouselController =
+      cs.CarouselSliderController();
   DateTime? _lastScroll;
   final AdminService _adminService = AdminService();
   final ContentFeedService _contentFeedService = const ContentFeedService();
@@ -68,8 +69,12 @@ class _MoonPageState extends State<MoonPage> {
       if (!mounted) return;
       setState(() => _isAdmin = isAdmin);
     } catch (error, stackTrace) {
-      AppLogger.warning('Verifica ruolo admin non riuscita',
-          scope: 'MoonPage', error: error, stackTrace: stackTrace);
+      AppLogger.warning(
+        'Verifica ruolo admin non riuscita',
+        scope: 'MoonPage',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (!mounted) return;
       setState(() => _isAdmin = false);
     }
@@ -85,7 +90,7 @@ class _MoonPageState extends State<MoonPage> {
         final String kind = row['kind']?.toString() ?? '';
         final created =
             DateTime.tryParse((row['created_at'] ?? '').toString()) ??
-                DateTime.fromMillisecondsSinceEpoch(0);
+            DateTime.fromMillisecondsSinceEpoch(0);
         if (kind == 'honoo') {
           final honoo = Honoo.fromMap(row.cast<String, dynamic>());
           final String? ownerId = row['user_id']?.toString();
@@ -112,8 +117,14 @@ class _MoonPageState extends State<MoonPage> {
             final String? ownerId = row['user_id']?.toString();
             // Non mostrare risposte (type answer) sulla Luna
             if (HinooType.moon == draft.type) {
-              items.add(_MoonItem.hinoo(draft, created,
-                  hinooId: hinooId, ownerId: ownerId));
+              items.add(
+                _MoonItem.hinoo(
+                  draft,
+                  created,
+                  hinooId: hinooId,
+                  ownerId: ownerId,
+                ),
+              );
             }
           }
         }
@@ -131,14 +142,20 @@ class _MoonPageState extends State<MoonPage> {
       }
       setState(() {
         _items = items;
-        _currentIndex =
-            initialIndex.clamp(0, items.isEmpty ? 0 : items.length - 1);
+        _currentIndex = initialIndex.clamp(
+          0,
+          items.isEmpty ? 0 : items.length - 1,
+        );
         _isLoading = false;
       });
       _prefetchFrom(_currentIndex);
     } catch (e, stackTrace) {
-      AppLogger.error('Caricamento Luna non riuscito',
-          scope: 'MoonPage', error: e, stackTrace: stackTrace);
+      AppLogger.error(
+        'Caricamento Luna non riuscito',
+        scope: 'MoonPage',
+        error: e,
+        stackTrace: stackTrace,
+      );
       if (mounted) {
         showHonooToast(
           context,
@@ -177,18 +194,21 @@ class _MoonPageState extends State<MoonPage> {
         },
       ),
       bodyBuilder: (context, viewW, availableH, layoutMode) {
-        final _MoonItem? current =
-            _items.isEmpty ? null : _items[_currentIndex];
+        final _MoonItem? current = _items.isEmpty
+            ? null
+            : _items[_currentIndex];
         final HonooBuilderMetrics honooMetrics =
             ResponsiveLayout.honooBuilderMetrics(
-          availableHeight: availableH,
-          maxWidth: viewW,
-          mode: layoutMode,
-        );
-        final bool isCompact = layoutMode == ResponsiveLayoutMode.mobile ||
+              availableHeight: availableH,
+              maxWidth: viewW,
+              mode: layoutMode,
+            );
+        final bool isCompact =
+            layoutMode == ResponsiveLayoutMode.mobile ||
             layoutMode == ResponsiveLayoutMode.tablet;
-        final double displayHeight =
-            (current?.honoo != null) ? honooMetrics.height : availableH;
+        final double displayHeight = (current?.honoo != null)
+            ? honooMetrics.height
+            : availableH;
         return SizedBox(
           width: viewW,
           height: displayHeight,
@@ -202,93 +222,100 @@ class _MoonPageState extends State<MoonPage> {
           ),
         );
       },
-      footerBuilder: (context, mode, footerIconSize, footerGap,
-          footerTopSpacing, footerBottomSpacing) {
-        return ResponsiveFooterBar(
-          useSafeArea: false,
-          bottomPadding: footerBottomSpacing,
-          desiredGap: footerGap,
-          minGap: 16,
-          height: footerIconSize,
-          actions: [
-            ResponsiveFooterAction(
-              asset: 'assets/icons/home_onTertiary.svg',
-              semanticsLabel: 'Home',
-              size: footerIconSize,
-              splashRadius: 25,
-              tooltip: 'Home',
-              onPressed: () {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const HomePage()),
-                  (route) => false,
-                );
-              },
-            ),
-            ResponsiveFooterAction(
-              asset: 'assets/icons/heart.svg',
-              semanticsLabel: 'Heart',
-              size: footerIconSize,
-              splashRadius: 25,
-              tooltip: 'Salva nel tuo Cuore',
-              onPressed: _saveCurrentToChest,
-            ),
-            () {
-              final _MoonItem? curr =
-                  _items.isEmpty ? null : _items[_currentIndex];
-              String? keyId;
-              if (curr != null) {
-                keyId = curr.honoo?.dbId ?? curr.hinooId;
-              }
-              final bool showSeeConversation =
-                  keyId != null && _repliedItemIds.contains(keyId);
-              if (showSeeConversation) {
-                return ResponsiveFooterAction(
-                  asset: 'assets/icons/reply.svg',
-                  semanticsLabel: 'Vedi conversazione',
+      footerBuilder:
+          (
+            context,
+            mode,
+            footerIconSize,
+            footerGap,
+            footerTopSpacing,
+            footerBottomSpacing,
+          ) {
+            return ResponsiveFooterBar(
+              useSafeArea: false,
+              bottomPadding: footerBottomSpacing,
+              desiredGap: footerGap,
+              minGap: 16,
+              height: footerIconSize,
+              actions: [
+                ResponsiveFooterAction(
+                  asset: 'assets/icons/home_onTertiary.svg',
+                  semanticsLabel: 'Home',
                   size: footerIconSize,
                   splashRadius: 25,
-                  tooltip: 'Vedi conversazione',
-                  colorFilter: const ColorFilter.mode(
-                    HonooColor.secondary,
-                    BlendMode.srcIn,
-                  ),
-                  onPressed: () async {
-                    if (!mounted) return;
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const ChestPage(
-                                focusReplies: true,
-                              )),
+                  tooltip: 'Home',
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const HomePage()),
+                      (route) => false,
                     );
                   },
-                );
-              }
-              return ResponsiveFooterAction(
-                asset: 'assets/icons/reply.svg',
-                semanticsLabel: 'Reply',
-                size: footerIconSize,
-                splashRadius: 25,
-                tooltip: 'Rispondi',
-                onPressed: () => _showReplyChoice(),
-              );
-            }(),
-            if (_isAdmin)
-              ResponsiveFooterAction(
-                asset: 'assets/icons/cancella.svg',
-                semanticsLabel: 'Elimina',
-                size: footerIconSize,
-                colorFilter: const ColorFilter.mode(
-                  Colors.black,
-                  BlendMode.srcIn,
                 ),
-                splashRadius: 25,
-                tooltip: 'Elimina',
-                onPressed: _deleteCurrentFromMoon,
-              ),
-          ],
-        );
-      },
+                ResponsiveFooterAction(
+                  asset: 'assets/icons/heart.svg',
+                  semanticsLabel: 'Heart',
+                  size: footerIconSize,
+                  splashRadius: 25,
+                  tooltip: 'Salva nel tuo Cuore',
+                  onPressed: _saveCurrentToChest,
+                ),
+                () {
+                  final _MoonItem? curr = _items.isEmpty
+                      ? null
+                      : _items[_currentIndex];
+                  String? keyId;
+                  if (curr != null) {
+                    keyId = curr.honoo?.dbId ?? curr.hinooId;
+                  }
+                  final bool showSeeConversation =
+                      keyId != null && _repliedItemIds.contains(keyId);
+                  if (showSeeConversation) {
+                    return ResponsiveFooterAction(
+                      asset: 'assets/icons/reply.svg',
+                      semanticsLabel: 'Vedi conversazione',
+                      size: footerIconSize,
+                      splashRadius: 25,
+                      tooltip: 'Vedi conversazione',
+                      colorFilter: const ColorFilter.mode(
+                        HonooColor.secondary,
+                        BlendMode.srcIn,
+                      ),
+                      onPressed: () async {
+                        if (!mounted) return;
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ChestPage(focusReplies: true),
+                          ),
+                        );
+                      },
+                    );
+                  }
+                  return ResponsiveFooterAction(
+                    asset: 'assets/icons/reply.svg',
+                    semanticsLabel: 'Reply',
+                    size: footerIconSize,
+                    splashRadius: 25,
+                    tooltip: 'Rispondi',
+                    onPressed: () => _showReplyChoice(),
+                  );
+                }(),
+                if (_isAdmin)
+                  ResponsiveFooterAction(
+                    asset: 'assets/icons/cancella.svg',
+                    semanticsLabel: 'Elimina',
+                    size: footerIconSize,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.black,
+                      BlendMode.srcIn,
+                    ),
+                    splashRadius: 25,
+                    tooltip: 'Elimina',
+                    onPressed: _deleteCurrentFromMoon,
+                  ),
+              ],
+            );
+          },
     );
   }
 
@@ -374,8 +401,9 @@ class _MoonPageState extends State<MoonPage> {
                     itemBuilder: (context, index, realIndex) {
                       final item = _items[index];
                       return Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: horizontalPadding),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: horizontalPadding,
+                        ),
                         child: _buildMoonItem(
                           item,
                           availableHeight,
@@ -434,8 +462,9 @@ class _MoonPageState extends State<MoonPage> {
       final honoo = item.honoo!;
       final String? dbId = honoo.dbId;
       final int localId = honoo.id;
-      final String fallback =
-          localId != 0 ? localId.toString() : item.createdAt.toIso8601String();
+      final String fallback = localId != 0
+          ? localId.toString()
+          : item.createdAt.toIso8601String();
       identity = 'moon_honoo_${dbId ?? fallback}';
       content = Center(
         child: SizedBox(
@@ -462,17 +491,10 @@ class _MoonPageState extends State<MoonPage> {
       );
       content = Center(
         child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: cardH,
-            maxWidth: cardW,
-          ),
+          constraints: BoxConstraints(maxHeight: cardH, maxWidth: cardW),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: SizedBox(
-              width: cardW,
-              height: cardH,
-              child: viewer,
-            ),
+            child: SizedBox(width: cardW, height: cardH, child: viewer),
           ),
         ),
       );
@@ -482,10 +504,7 @@ class _MoonPageState extends State<MoonPage> {
       duration: const Duration(milliseconds: 300),
       switchInCurve: Curves.easeOutCubic,
       switchOutCurve: Curves.easeInCubic,
-      child: KeyedSubtree(
-        key: ValueKey(identity),
-        child: content,
-      ),
+      child: KeyedSubtree(key: ValueKey(identity), child: content),
     );
   }
 
@@ -623,7 +642,9 @@ class _MoonPageState extends State<MoonPage> {
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -645,7 +666,9 @@ class _MoonPageState extends State<MoonPage> {
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -720,9 +743,7 @@ class _MoonPageState extends State<MoonPage> {
       if (!mounted) return;
       await Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (_) => const ChestPage(focusReplies: true),
-        ),
+        MaterialPageRoute(builder: (_) => const ChestPage(focusReplies: true)),
       );
     } else if (choice == _ReplyChoice.hinoo && current.hinoo != null) {
       final String? replyTo = current.hinooId;
@@ -750,9 +771,7 @@ class _MoonPageState extends State<MoonPage> {
       if (!mounted) return;
       await Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (_) => const ChestPage(focusReplies: true),
-        ),
+        MaterialPageRoute(builder: (_) => const ChestPage(focusReplies: true)),
       );
     } else if (choice == _ReplyChoice.hinoo && current.honoo != null) {
       // Risposta ad un honoo con un hinoo
@@ -779,9 +798,7 @@ class _MoonPageState extends State<MoonPage> {
       if (!mounted) return;
       await Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (_) => const ChestPage(focusReplies: true),
-        ),
+        MaterialPageRoute(builder: (_) => const ChestPage(focusReplies: true)),
       );
     }
   }
@@ -797,10 +814,7 @@ class _MoonPageState extends State<MoonPage> {
       }
     } catch (_) {
       if (!mounted) return;
-      showHonooToast(
-        context,
-        message: 'Errore salvataggio nello scrigno.',
-      );
+      showHonooToast(context, message: 'Errore salvataggio nello scrigno.');
     }
   }
 }
@@ -834,14 +848,7 @@ class _MoonItem {
     DateTime createdAt, {
     String? hinooId,
     String? ownerId,
-  }) =>
-      _MoonItem._(
-        null,
-        h,
-        createdAt,
-        hinooId: hinooId,
-        ownerId: ownerId,
-      );
+  }) => _MoonItem._(null, h, createdAt, hinooId: hinooId, ownerId: ownerId);
 }
 
 enum _ReplyChoice { honoo, hinoo }

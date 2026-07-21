@@ -105,8 +105,9 @@ class _HinooBuilderState extends State<HinooBuilder> {
     if (_pages.isEmpty) {
       _pages.add(_createEmptySlide());
     }
-    _textController
-        .addListener(() => _onCanvasTextChanged(_textController.text));
+    _textController.addListener(
+      () => _onCanvasTextChanged(_textController.text),
+    );
     _bgController.addListener(_handleBgTransform);
     _bgScale = _extractScaleFromMatrix(_bgController.value);
   }
@@ -166,8 +167,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
     final double adjustedTx = tx * (safeScale / clamped);
     final double adjustedTy = ty * (safeScale / clamped);
     final Matrix4 updated = Matrix4.identity()
-      ..translate(adjustedTx, adjustedTy)
-      ..scale(clamped);
+      ..translateByDouble(adjustedTx, adjustedTy, 0, 1)
+      ..scaleByDouble(clamped, clamped, clamped, 1);
     _bgController.value = updated;
   }
 
@@ -211,7 +212,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
     }
 
     _bgScale = _extractScaleFromMatrix(_bgController.value);
-    _bgChosen = _localBgPreviewBytes != null ||
+    _bgChosen =
+        _localBgPreviewBytes != null ||
         (_bgPublicUrl != null && _bgPublicUrl!.isNotEmpty);
   }
 
@@ -256,8 +258,10 @@ class _HinooBuilderState extends State<HinooBuilder> {
     final BuildContext currentContext = context;
     final HinooExportMode exportMode = _resolveExportMode();
     bool progressVisible = false;
-    final NavigatorState rootNavigator =
-        Navigator.of(currentContext, rootNavigator: true);
+    final NavigatorState rootNavigator = Navigator.of(
+      currentContext,
+      rootNavigator: true,
+    );
     Future<void> dismissProgressDialogIfNeeded() async {
       if (!mounted || !progressVisible) {
         return;
@@ -302,18 +306,12 @@ class _HinooBuilderState extends State<HinooBuilder> {
       );
       await dismissProgressDialogIfNeeded();
       if (!currentContext.mounted) return;
-      showHonooToast(
-        currentContext,
-        message: message,
-      );
+      showHonooToast(currentContext, message: message);
     } catch (e) {
       if (mounted) {
         await dismissProgressDialogIfNeeded();
         if (!currentContext.mounted) return;
-        showHonooToast(
-          currentContext,
-          message: 'Errore download: $e',
-        );
+        showHonooToast(currentContext, message: 'Errore download: $e');
       }
     } finally {
       if (mounted) {
@@ -326,15 +324,17 @@ class _HinooBuilderState extends State<HinooBuilder> {
     HinooExportMode exportMode = HinooExportMode.mobile,
   }) async {
     try {
-      final RenderRepaintBoundary? boundary = _captureKey.currentContext
-          ?.findRenderObject() as RenderRepaintBoundary?;
+      final RenderRepaintBoundary? boundary =
+          _captureKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
       if (boundary == null) return null;
       final HinooExportSpec exportSpec = getHinooExportSpec(exportMode);
       // Limita il pixel ratio per evitare OOM nella generazione PNG
       final Size logical = boundary.size;
       const double maxOut = 2560.0; // lato lungo massimo del PNG esportato
-      final double longEdge =
-          logical.width > logical.height ? logical.width : logical.height;
+      final double longEdge = logical.width > logical.height
+          ? logical.width
+          : logical.height;
       double effectivePixelRatio = exportSpec.pixelRatio;
       if (longEdge > 0) {
         final double maxPr = maxOut / longEdge;
@@ -351,17 +351,17 @@ class _HinooBuilderState extends State<HinooBuilder> {
         );
         return true;
       }());
-      final ui.Image image =
-          await boundary.toImage(pixelRatio: effectivePixelRatio);
+      final ui.Image image = await boundary.toImage(
+        pixelRatio: effectivePixelRatio,
+      );
       try {
         assert(() {
-          debugPrint(
-            'Hinoo export image size: ${image.width}x${image.height}',
-          );
+          debugPrint('Hinoo export image size: ${image.width}x${image.height}');
           return true;
         }());
-        final ByteData? byteData =
-            await image.toByteData(format: ui.ImageByteFormat.png);
+        final ByteData? byteData = await image.toByteData(
+          format: ui.ImageByteFormat.png,
+        );
         return byteData?.buffer.asUint8List();
       } finally {
         image.dispose();
@@ -374,10 +374,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
   HinooExportMode _resolveExportMode() {
     final double logicalWidth = MediaQuery.of(context).size.width;
-    return resolveHinooExportMode(
-      logicalWidth: logicalWidth,
-      isWeb: kIsWeb,
-    );
+    return resolveHinooExportMode(logicalWidth: logicalWidth, isWeb: kIsWeb);
   }
 
   Future<void> _waitForNextFrame() async {
@@ -404,8 +401,9 @@ class _HinooBuilderState extends State<HinooBuilder> {
     if (slide is Map) {
       final dynamic raw = slide['bgTransform'];
       if (raw is List && raw.length == 16) {
-        final List<double> values =
-            raw.map((dynamic e) => (e as num).toDouble()).toList();
+        final List<double> values = raw
+            .map((dynamic e) => (e as num).toDouble())
+            .toList();
         return Matrix4.fromList(values);
       }
     }
@@ -448,7 +446,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
       'currentIndex': _current,
       'text': _textController.text,
       'textLength': _textController.text.trim().length,
-      'textColor': _txtColor.value,
+      'textColor': _txtColor.toARGB32(),
       'hasBg': _localBgPreviewBytes != null || _bgPublicUrl != null,
       'bgUrl': _bgPublicUrl,
       'bgTransform': currentTransform?.storage.toList(),
@@ -531,9 +529,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
           elevation: 0,
           margin: EdgeInsets.zero,
           color: Colors.black,
-          shape: RoundedRectangleBorder(
-            borderRadius: canvasRadius,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: canvasRadius),
           clipBehavior: Clip.antiAlias,
           child: _buildCanvasContents(context),
         ),
@@ -557,11 +553,13 @@ class _HinooBuilderState extends State<HinooBuilder> {
                     )
                   : const Image(
                       image: AssetImage(
-                          'assets/images/hinoo_default_1080x1920.png'),
+                        'assets/images/hinoo_default_1080x1920.png',
+                      ),
                       fit: BoxFit.cover,
                     ),
             );
-            final bool interactive = (_step == _WizardStep.changeBg &&
+            final bool interactive =
+                (_step == _WizardStep.changeBg &&
                 _bgChosen &&
                 _localBgPreviewBytes != null);
             if (!interactive && _bgLockedMatrix != null) {
@@ -608,8 +606,11 @@ class _HinooBuilderState extends State<HinooBuilder> {
               child: IconButton(
                 iconSize: 44,
                 onPressed: _confirmBgAndLock,
-                icon: SvgPicture.asset('assets/icons/ok.svg',
-                    width: 44, height: 44),
+                icon: SvgPicture.asset(
+                  'assets/icons/ok.svg',
+                  width: 44,
+                  height: 44,
+                ),
                 tooltip: 'Conferma sfondo',
               ),
             ),
@@ -620,8 +621,10 @@ class _HinooBuilderState extends State<HinooBuilder> {
                 _txtColor = c;
                 // Propaga il colore su TUTTE le pagine per anteprime fedeli
                 for (var i = 0; i < _pages.length; i++) {
-                  _pages[i] =
-                      _copySlideWithTextColor(_pages[i], _txtColor.value);
+                  _pages[i] = _copySlideWithTextColor(
+                    _pages[i],
+                    _txtColor.toARGB32(),
+                  );
                 }
                 _step = _WizardStep.writeText;
               });
@@ -708,8 +711,9 @@ class _HinooBuilderState extends State<HinooBuilder> {
   }
 
   Future<void> _renderCanvasAsPng() async {
-    final Uint8List? bytes =
-        await _captureCurrentCanvasBytes(exportMode: _resolveExportMode());
+    final Uint8List? bytes = await _captureCurrentCanvasBytes(
+      exportMode: _resolveExportMode(),
+    );
     if (bytes == null) return;
     setState(() {
       _lastPreviewBytes = bytes;
@@ -728,7 +732,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
     }
 
     final saver = getDownloadSaver();
-    final filename = _exportFilenameHint ??
+    final filename =
+        _exportFilenameHint ??
         'hinoo_${DateTime.now().millisecondsSinceEpoch}.png';
     try {
       final message = await saver.save([
@@ -736,18 +741,12 @@ class _HinooBuilderState extends State<HinooBuilder> {
       ]);
       if (!mounted) return;
       if (message.isNotEmpty) {
-        showHonooToast(
-          context,
-          message: message,
-        );
+        showHonooToast(context, message: message);
       }
     } catch (e) {
       debugPrint('Errore durante il salvataggio/condivisione: $e');
       if (mounted) {
-        showHonooToast(
-          context,
-          message: 'Errore durante il salvataggio: $e',
-        );
+        showHonooToast(context, message: 'Errore durante il salvataggio: $e');
       }
     } finally {
       if (mounted) {
@@ -765,10 +764,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
   void _confirmBgAndLock() {
     if (_isUploadingBg) {
-      showHonooToast(
-        context,
-        message: 'Attendi il caricamento dello sfondo.',
-      );
+      showHonooToast(context, message: 'Attendi il caricamento dello sfondo.');
       return;
     }
     if (!_bgChosen &&
@@ -799,8 +795,9 @@ class _HinooBuilderState extends State<HinooBuilder> {
   Future<void> _pickAndUploadBackground() async {
     try {
       final picker = ImagePicker();
-      final XFile? selected =
-          await picker.pickImage(source: ImageSource.gallery);
+      final XFile? selected = await picker.pickImage(
+        source: ImageSource.gallery,
+      );
       if (selected == null) return;
 
       // Preview locale immediata
@@ -808,8 +805,10 @@ class _HinooBuilderState extends State<HinooBuilder> {
       if (kIsWeb) {
         try {
           // Web: preferisci WEBP, fallback PNG
-          final converted =
-              await heicweb.convertHeicToWebSafe(bytes, selected.name);
+          final converted = await heicweb.convertHeicToWebSafe(
+            bytes,
+            selected.name,
+          );
           if (converted != null && converted.isNotEmpty) {
             bytes = converted;
           } else {
@@ -817,8 +816,10 @@ class _HinooBuilderState extends State<HinooBuilder> {
             if (lower.endsWith('.heic') || lower.endsWith('.heif')) {
               // HEIC non convertibile dal browser → notifica utente e interrompi
               if (mounted) {
-                showHonooToast(context,
-                    message: 'Formato HEIC non supportato dal browser');
+                showHonooToast(
+                  context,
+                  message: 'Formato HEIC non supportato dal browser',
+                );
               }
               setState(() => _isUploadingBg = false);
               return; // non procedere con upload
@@ -829,8 +830,10 @@ class _HinooBuilderState extends State<HinooBuilder> {
           final String lower = selected.name.toLowerCase();
           if (lower.endsWith('.heic') || lower.endsWith('.heif')) {
             if (mounted) {
-              showHonooToast(context,
-                  message: 'Formato HEIC non supportato dal browser');
+              showHonooToast(
+                context,
+                message: 'Formato HEIC non supportato dal browser',
+              );
             }
             setState(() => _isUploadingBg = false);
             return;
@@ -872,10 +875,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
         });
       }
       if (mounted) {
-        showHonooToast(
-          context,
-          message: 'Errore sfondo: $e',
-        );
+        showHonooToast(context, message: 'Errore sfondo: $e');
       }
     }
   }
@@ -900,7 +900,10 @@ class _HinooBuilderState extends State<HinooBuilder> {
       final String finalExt = encoded.extension;
 
       final url = await HinooStorageUploader.uploadBackground(
-          bytes: toUpload, ext: finalExt, userId: user.id);
+        bytes: toUpload,
+        ext: finalExt,
+        userId: user.id,
+      );
       setState(() {
         _bgPublicUrl = url;
       });
@@ -954,12 +957,12 @@ class _HinooBuilderState extends State<HinooBuilder> {
   // Utility basiche per slide (se non hai un model)
   // ============================================================================
   dynamic _createEmptySlide() => {
-        'text': '',
-        'bgUrl': _bgPublicUrl,
-        'textColor': _txtColor.value,
-        if (_effectiveBgTransform() != null)
-          'bgTransform': _effectiveBgTransform()!.storage.toList(),
-      };
+    'text': '',
+    'bgUrl': _bgPublicUrl,
+    'textColor': _txtColor.toARGB32(),
+    if (_effectiveBgTransform() != null)
+      'bgTransform': _effectiveBgTransform()!.storage.toList(),
+  };
 
   dynamic _copySlideWithText(dynamic slide, String text) {
     if (slide is Map) return {...slide, 'text': text};
@@ -978,10 +981,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
 
   dynamic _copySlideWithBgTransform(dynamic slide, Matrix4 m) {
     if (slide is Map) {
-      return {
-        ...slide,
-        'bgTransform': m.storage.toList(),
-      };
+      return {...slide, 'bgTransform': m.storage.toList()};
     }
     return slide;
   }

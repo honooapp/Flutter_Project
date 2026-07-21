@@ -32,7 +32,8 @@ class ConversationPage extends StatefulWidget {
 }
 
 class _ConversationPageState extends State<ConversationPage> {
-  final cs.CarouselController _carouselController = cs.CarouselController();
+  final cs.CarouselSliderController _carouselController =
+      cs.CarouselSliderController();
 
   bool _isLoading = true;
   List<Honoo> _thread = []; // padre + reply in ordine cronologico
@@ -79,139 +80,147 @@ class _ConversationPageState extends State<ConversationPage> {
       bodyBuilder: (context, viewW, availableH, layoutMode) {
         final HonooBuilderMetrics honooMetrics =
             ResponsiveLayout.honooBuilderMetrics(
-          availableHeight: availableH,
-          maxWidth: viewW,
-          mode: layoutMode,
-        );
+              availableHeight: availableH,
+              maxWidth: viewW,
+              mode: layoutMode,
+            );
 
         final Widget carousel = _isLoading
             ? const Center(child: LoadingSpinner())
             : (_thread.isEmpty
-                ? Center(
-                    child: Text(
-                      'Nessuna conversazione',
-                      style: GoogleFonts.libreFranklin(
-                        color: HonooColor.onBackground,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
+                  ? Center(
+                      child: Text(
+                        'Nessuna conversazione',
+                        style: GoogleFonts.libreFranklin(
+                          color: HonooColor.onBackground,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
-                    ),
-                  )
-                : cs.CarouselSlider(
-                    carouselController: _carouselController,
-                    options: cs.CarouselOptions(
-                      scrollDirection: Axis.vertical,
-                      height: honooMetrics.height,
-                      viewportFraction: 1.0,
-                      enlargeCenterPage: false,
-                      enableInfiniteScroll: false,
-                      onPageChanged: (index, reason) {
-                        setState(() => _currentIndex = index);
-                      },
-                    ),
-                    items: _thread.map((h) {
-                      return SizedBox(
-                        width: honooMetrics.width,
+                    )
+                  : cs.CarouselSlider(
+                      carouselController: _carouselController,
+                      options: cs.CarouselOptions(
+                        scrollDirection: Axis.vertical,
                         height: honooMetrics.height,
-                        child: HonooCard(honoo: h),
-                      );
-                    }).toList(),
-                  ));
+                        viewportFraction: 1.0,
+                        enlargeCenterPage: false,
+                        enableInfiniteScroll: false,
+                        onPageChanged: (index, reason) {
+                          setState(() => _currentIndex = index);
+                        },
+                      ),
+                      items: _thread.map((h) {
+                        return SizedBox(
+                          width: honooMetrics.width,
+                          height: honooMetrics.height,
+                          child: HonooCard(honoo: h),
+                        );
+                      }).toList(),
+                    ));
 
         return carousel;
       },
-      footerBuilder: (context, layoutMode, footerIconSize, footerGap,
-          footerTopSpacing, footerBottomSpacing) {
-        return ResponsiveFooterBar(
-          useSafeArea: false,
-          bottomPadding: footerBottomSpacing,
-          desiredGap: footerGap,
-          minGap: 16,
-          height: footerIconSize,
-          actions: [
-            ResponsiveFooterAction(
-              asset: "assets/icons/home.svg",
-              semanticsLabel: 'Home',
-              colorFilter: const ColorFilter.mode(
-                HonooColor.onBackground,
-                BlendMode.srcIn,
-              ),
-              size: footerIconSize,
-              splashRadius: 25,
-              tooltip: 'Home',
-              onPressed: () {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const HomePage()),
-                  (route) => false,
-                );
-              },
-            ),
-            if (!widget.readOnly)
-              ResponsiveFooterAction(
-                asset: "assets/icons/broken_heart.svg",
-                semanticsLabel: 'Broken heart',
-                size: footerIconSize,
-                splashRadius: 25,
-                tooltip: 'Cuore spezzato',
-                onPressed: (_thread.isEmpty || _savingToChest)
-                    ? null
-                    : () async {
-                        setState(() => _savingToChest = true);
-                        try {
-                          final honoo = _thread[_currentIndex];
-                          final saved =
-                              await HonooController().saveToChest(honoo);
-                          if (!context.mounted) return;
-                          showHonooToast(
-                            context,
-                            message: saved == DuplicationResult.inserted
-                                ? 'honoo salvato nel tuo Scrigno.'
-                                : 'Era già nel tuo Scrigno.',
-                          );
-                        } catch (e) {
-                          if (!context.mounted) return;
-                          showHonooToast(
-                            context,
-                            message: 'Errore durante il salvataggio: $e',
-                          );
-                        } finally {
-                          if (mounted) {
-                            setState(() => _savingToChest = false);
-                          }
-                        }
-                      },
-              ),
-            if (!widget.readOnly)
-              ResponsiveFooterAction(
-                asset: "assets/icons/reply.svg",
-                semanticsLabel: 'Reply',
-                colorFilter: const ColorFilter.mode(
-                  HonooColor.onBackground,
-                  BlendMode.srcIn,
+      footerBuilder:
+          (
+            context,
+            layoutMode,
+            footerIconSize,
+            footerGap,
+            footerTopSpacing,
+            footerBottomSpacing,
+          ) {
+            return ResponsiveFooterBar(
+              useSafeArea: false,
+              bottomPadding: footerBottomSpacing,
+              desiredGap: footerGap,
+              minGap: 16,
+              height: footerIconSize,
+              actions: [
+                ResponsiveFooterAction(
+                  asset: "assets/icons/home.svg",
+                  semanticsLabel: 'Home',
+                  colorFilter: const ColorFilter.mode(
+                    HonooColor.onBackground,
+                    BlendMode.srcIn,
+                  ),
+                  size: footerIconSize,
+                  splashRadius: 25,
+                  tooltip: 'Home',
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const HomePage()),
+                      (route) => false,
+                    );
+                  },
                 ),
-                size: footerIconSize,
-                splashRadius: 25,
-                tooltip: 'Rispondi',
-                onPressed: (_thread.isEmpty || _savingToChest)
-                    ? null
-                    : () {
-                        final honoo = _thread[_currentIndex];
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ReplyHonooPage(
-                              originalHonoo: honoo,
-                              initialHintText: 'Scrivi la tua risposta...',
-                              initialImageHint:
-                                  'Aggiungi un’immagine (opzionale)',
-                            ),
-                          ),
-                        );
-                      },
-              ),
-          ],
-        );
-      },
+                if (!widget.readOnly)
+                  ResponsiveFooterAction(
+                    asset: "assets/icons/broken_heart.svg",
+                    semanticsLabel: 'Broken heart',
+                    size: footerIconSize,
+                    splashRadius: 25,
+                    tooltip: 'Cuore spezzato',
+                    onPressed: (_thread.isEmpty || _savingToChest)
+                        ? null
+                        : () async {
+                            setState(() => _savingToChest = true);
+                            try {
+                              final honoo = _thread[_currentIndex];
+                              final saved = await HonooController().saveToChest(
+                                honoo,
+                              );
+                              if (!context.mounted) return;
+                              showHonooToast(
+                                context,
+                                message: saved == DuplicationResult.inserted
+                                    ? 'honoo salvato nel tuo Scrigno.'
+                                    : 'Era già nel tuo Scrigno.',
+                              );
+                            } catch (e) {
+                              if (!context.mounted) return;
+                              showHonooToast(
+                                context,
+                                message: 'Errore durante il salvataggio: $e',
+                              );
+                            } finally {
+                              if (mounted) {
+                                setState(() => _savingToChest = false);
+                              }
+                            }
+                          },
+                  ),
+                if (!widget.readOnly)
+                  ResponsiveFooterAction(
+                    asset: "assets/icons/reply.svg",
+                    semanticsLabel: 'Reply',
+                    colorFilter: const ColorFilter.mode(
+                      HonooColor.onBackground,
+                      BlendMode.srcIn,
+                    ),
+                    size: footerIconSize,
+                    splashRadius: 25,
+                    tooltip: 'Rispondi',
+                    onPressed: (_thread.isEmpty || _savingToChest)
+                        ? null
+                        : () {
+                            final honoo = _thread[_currentIndex];
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ReplyHonooPage(
+                                  originalHonoo: honoo,
+                                  initialHintText: 'Scrivi la tua risposta...',
+                                  initialImageHint:
+                                      'Aggiungi un’immagine (opzionale)',
+                                ),
+                              ),
+                            );
+                          },
+                  ),
+              ],
+            );
+          },
     );
   }
 }
