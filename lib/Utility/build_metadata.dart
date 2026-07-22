@@ -1,12 +1,15 @@
+const _buildSha = String.fromEnvironment(
+  'BUILD_SHA',
+  defaultValue: 'development',
+);
+const _buildRef = String.fromEnvironment('BUILD_REF', defaultValue: 'local');
+
 class BuildMetadata {
   const BuildMetadata._();
 
   static const version = '1.1.0+2';
-  static const sha = String.fromEnvironment(
-    'BUILD_SHA',
-    defaultValue: 'development',
-  );
-  static const ref = String.fromEnvironment('BUILD_REF', defaultValue: 'local');
+  static const sha = _buildSha;
+  static const ref = _buildRef;
 
   static String get shortSha => abbreviateSha(sha);
 

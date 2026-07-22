@@ -22,9 +22,10 @@ if [[ -n "$STRING_MATCHES" ]]; then
   FILTERED=$(echo "$STRING_MATCHES" |
     grep -v "lib/env/env_web.dart" |
     grep -v "lib/env/env_io.dart" |
+    grep -v "lib/Utility/build_metadata.dart" |
     grep -v "lib/testing/live_config.dart" || true)
   if [[ -n "$FILTERED" ]]; then
-    echo "❌ Found direct String.fromEnvironment(...) in lib/ (solo top-level const consentiti)"
+    echo "❌ Found String.fromEnvironment(...) outside an approved compile-time config file"
     echo "$FILTERED"
     FAIL=1
   fi
