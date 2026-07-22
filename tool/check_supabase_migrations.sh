@@ -6,7 +6,10 @@ set -euo pipefail
 # this release gate cannot fail only because of the runner image.
 if ! command -v rg >/dev/null 2>&1; then
   rg() {
-    grep -E "$@"
+    case "${1:-}" in
+      *F*) grep "$@" ;;
+      *) grep -E "$@" ;;
+    esac
   }
 fi
 
