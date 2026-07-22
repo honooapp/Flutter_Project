@@ -696,8 +696,6 @@ class _MoonPageState extends State<MoonPage> {
 
     if (choice == null || !mounted) return;
     if (choice == _ReplyChoice.honoo && current.honoo != null) {
-      await _ensureMoonItemInChest(current);
-      if (!mounted) return;
       final sent = await Navigator.push<bool>(
         context,
         MaterialPageRoute(
