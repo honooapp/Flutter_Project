@@ -31,6 +31,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    outputs:
+      release_sha: ${{ steps.release.outputs.sha }}
     steps:
       - name: Require explicit production confirmation
         env:
@@ -51,6 +53,10 @@ jobs:
           git fetch origin main
           git merge-base --is-ancestor HEAD origin/main
 
+      - name: Resolve immutable release commit
+        id: release
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
       - name: Verify migration structure
         run: bash tool/check_supabase_migrations.sh
 
@@ -64,7 +70,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.release_ref }}
+          ref: ${{ needs.validate-release.outputs.release_sha }}
           fetch-depth: 0
 
       - name: Setup Supabase CLI
@@ -94,14 +100,14 @@ jobs:
 
   build-and-deploy:
     name: Build and deploy web
-    needs: migrate-production
+    needs: [validate-release, migrate-production]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ inputs.release_ref }}
+          ref: ${{ needs.validate-release.outputs.release_sha }}
           fetch-depth: 0
 
       - name: Setup Flutter 3.44.6
@@ -117,6 +123,8 @@ jobs:
           SUPABASE_URL: ${{ secrets.PROD_SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.PROD_SUPABASE_ANON_KEY }}
           DISABLE_PWA: ${{ inputs.disable_pwa }}
+          BUILD_SHA: ${{ needs.validate-release.outputs.release_sha }}
+          BUILD_REF: ${{ inputs.release_ref }}
         run: |
           test -n "$SUPABASE_URL"
           test -n "$SUPABASE_ANON_KEY"
@@ -124,7 +132,9 @@ jobs:
           flutter build web \
             --release $PWA_FLAG \
             --dart-define=SUPABASE_URL="$SUPABASE_URL" \
-            --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY"
+            --dart-define=SUPABASE_ANON_KEY="$SUPABASE_ANON_KEY" \
+            --dart-define=BUILD_SHA="$BUILD_SHA" \
+            --dart-define=BUILD_REF="$BUILD_REF"
 
       - name: Add CNAME for custom domain
         run: echo honoo.it > build/web/CNAME
@@ -134,4 +144,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: build/web
-          commit_message: Deploy web build for ${{ github.sha }}
+          commit_message: Deploy web build for ${{ needs.validate-release.outputs.release_sha }}
