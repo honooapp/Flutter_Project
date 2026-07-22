@@ -193,8 +193,7 @@ class HonooCard extends StatelessWidget {
         // La cornice rossa segnala soltanto una risposta ricevuta.
         // I propri messaggi mantengono il rendering normale.
         final bool showReplyBorder = isReply && !isOwn;
-        final bool showMoonSavedBorder =
-            !showReplyBorder && honoo.isFromMoonSaved && !isOwn;
+        final bool showMoonSavedBorder = !isReply && honoo.isFromMoonSaved;
         final Widget wrapped = (showReplyBorder || showMoonSavedBorder)
             ? DecoratedBox(
                 decoration: BoxDecoration(

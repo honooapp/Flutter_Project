@@ -146,7 +146,7 @@ class _HinooViewerState extends State<HinooViewer> {
                       border: Border.all(color: HonooColor.secondary, width: 6),
                       borderRadius: BorderRadius.circular(12),
                     )
-                  : (widget.draft.isFromMoonSaved && !isOwn)
+                  : widget.draft.isFromMoonSaved && !widget.isReply
                   ? BoxDecoration(
                       border: Border.all(color: Colors.white, width: 6),
                       borderRadius: BorderRadius.circular(12),
