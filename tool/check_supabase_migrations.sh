@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# GitHub's hosted runners do not guarantee that ripgrep is installed. Keep the
+# checks fast when it is available, but fall back to portable extended grep so
+# this release gate cannot fail only because of the runner image.
+if ! command -v rg >/dev/null 2>&1; then
+  rg() {
+    grep -E "$@"
+  }
+fi
+
 root_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 migrations_dir="$root_dir/supabase/migrations"
 
