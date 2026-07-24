@@ -19,8 +19,9 @@ void main() {
     harness.disableOverrides();
   });
 
-  testWidgets('il separatore dell honoo Luna usa il bianco dello sfondo',
-      (tester) async {
+  testWidgets('il separatore dell honoo Luna usa il bianco dello sfondo', (
+    tester,
+  ) async {
     final honoo = Honoo(
       1,
       'Ciao Luna',
@@ -45,7 +46,9 @@ void main() {
       ),
     );
 
-    final gap = tester.widget<ColoredBox>(find.byType(ColoredBox));
+    final gap = tester.widget<ColoredBox>(
+      find.byKey(const Key('honoo-card-gap')),
+    );
     expect(gap.color, HonooColor.tertiary);
   });
 }

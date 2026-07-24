@@ -64,7 +64,7 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
                 isCollapsed: true,
                 hintText: widget.hintText,
                 hintStyle: effectiveStyle.copyWith(
-                  color: widget.textColor.withOpacity(0.5),
+                  color: widget.textColor.withValues(alpha: 0.5),
                 ),
               ),
               keyboardType: TextInputType.multiline,

@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=tool/load_live_env.sh
+source "$script_dir/load_live_env.sh"
+
 # Usa FVM per rispettare la versione dichiarata in `.fvmrc`.
 FLUTTER_BIN="${FLUTTER_BIN:-fvm flutter}"
 
@@ -33,4 +37,4 @@ for device in $DEVICES; do
     --dart-define=HONOO_TEST_USER_B_EMAIL="${HONOO_TEST_USER_B_EMAIL:-}" \
     --dart-define=HONOO_TEST_USER_B_PASSWORD="${HONOO_TEST_USER_B_PASSWORD:-}"
   echo ""
- done
+done

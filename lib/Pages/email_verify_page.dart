@@ -133,7 +133,7 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
       hintText: 'Codice di verifica',
       hintStyle: GoogleFonts.lora(color: Colors.white70),
       filled: true,
-      fillColor: Colors.white.withOpacity(0.08),
+      fillColor: Colors.white.withValues(alpha: 0.08),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: Colors.white24),
@@ -192,7 +192,7 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
                 'Controlla la posta in arrivo all’indirizzo ${widget.email}. '
                 'Inserisci qui il codice a sei cifre per completare l’accesso.',
                 style: GoogleFonts.arvo(
-                  color: HonooColor.onBackground.withOpacity(0.8),
+                  color: HonooColor.onBackground.withValues(alpha: 0.8),
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                 ),
@@ -224,7 +224,7 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
                   'Email sbagliata? Modificala',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.lora(
-                    color: HonooColor.onBackground.withOpacity(0.8),
+                    color: HonooColor.onBackground.withValues(alpha: 0.8),
                     fontSize: 14,
                     decoration: TextDecoration.underline,
                   ),

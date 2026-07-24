@@ -380,7 +380,7 @@ class _NewHinooPageState extends State<NewHinooPage>
         final bgUrl = p['bgUrl'] as String?;
         final txt = ((p['text'] as String?) ?? '').trim();
         final textColorVal = (p['textColor'] as int?) ?? 0xFFFFFFFF;
-        final isTextWhite = textColorVal == const Color(0xFFFFFFFF).value;
+        final isTextWhite = textColorVal == const Color(0xFFFFFFFF).toARGB32();
 
         double scale = 1.0;
         double offX = 0.0;
@@ -527,7 +527,7 @@ class _NewHinooPageState extends State<NewHinooPage>
       height: pillHeight,
       padding: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.55),
+        color: Colors.black.withValues(alpha: 0.55),
         borderRadius: BorderRadius.circular(pillHeight / 2),
       ),
       child: Row(

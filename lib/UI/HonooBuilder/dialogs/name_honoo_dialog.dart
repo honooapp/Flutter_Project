@@ -58,7 +58,7 @@ class _NameHonooDialogState extends State<NameHonooDialog> {
                 hintStyle:
                     GoogleFonts.lora(color: Colors.white38, fontSize: 16),
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.08),
+                fillColor: Colors.white.withValues(alpha: 0.08),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: const BorderSide(color: Colors.white24),

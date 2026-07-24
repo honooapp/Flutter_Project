@@ -17,7 +17,7 @@ jobs:
     name: Migration structure
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install ripgrep
         run: sudo apt-get update && sudo apt-get install --yes ripgrep
       - name: Verify migration ordering and safety markers
@@ -27,17 +27,11 @@ jobs:
     name: Read-only (analyze + supabase tests)
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.6'
-      - name: Install FVM
-        run: |
-          dart pub global activate fvm 3.2.1
-          echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
-      - name: Prepare Flutter SDK in FVM
-        run: fvm install 3.19.6
+          flutter-version: '3.44.6'
       - name: Flutter pub get
         run: flutter pub get
       - name: Analyze
@@ -57,17 +51,11 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.run_crud == 'true' }}
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup Flutter 3.19.6
+      - uses: actions/checkout@v6
+      - name: Setup Flutter 3.44.6
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.6'
-      - name: Install FVM
-        run: |
-          dart pub global activate fvm 3.2.1
-          echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
-      - name: Prepare Flutter SDK in FVM
-        run: fvm install 3.19.6
+          flutter-version: '3.44.6'
       - name: Flutter pub get
         run: flutter pub get
       - name: Run CRUD tests (ENABLE_WRITE_TESTS=1)
@@ -84,11 +72,11 @@ jobs:
     name: Web build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup Flutter 3.19.6
+      - uses: actions/checkout@v6
+      - name: Setup Flutter 3.44.6
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.6'
+          flutter-version: '3.44.6'
       - name: Flutter pub get
         run: flutter pub get
       - name: Verify web-safe env access

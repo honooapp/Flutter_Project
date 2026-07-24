@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Entities/conversation_entry.dart';
-import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Services/conversation_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
@@ -37,7 +36,7 @@ class UnifiedThreadView extends StatefulWidget {
   final VoidCallback? onDownloadTap;
   final int refreshToken;
   final Future<List<ConversationEntry>> Function(String conversationId)?
-      conversationLoader;
+  conversationLoader;
   final String? currentUserId;
 
   @override
@@ -60,26 +59,36 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   void initState() {
     super.initState();
     _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 900));
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
     _liftAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(begin: 0.0, end: -1.0)
-            .chain(CurveTween(curve: Curves.easeOutCubic)),
+        tween: Tween(
+          begin: 0.0,
+          end: -1.0,
+        ).chain(CurveTween(curve: Curves.easeOutCubic)),
         weight: 40,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: -1.0, end: -0.84)
-            .chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(
+          begin: -1.0,
+          end: -0.84,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 12,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: -0.84, end: -1.0)
-            .chain(CurveTween(curve: Curves.easeIn)),
+        tween: Tween(
+          begin: -0.84,
+          end: -1.0,
+        ).chain(CurveTween(curve: Curves.easeIn)),
         weight: 12,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: -1.0, end: 0.0)
-            .chain(CurveTween(curve: Curves.easeInOutCubic)),
+        tween: Tween(
+          begin: -1.0,
+          end: 0.0,
+        ).chain(CurveTween(curve: Curves.easeInOutCubic)),
         weight: 36,
       ),
     ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
@@ -207,17 +216,13 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   }
 
   bool _shouldReveal(ConversationEntry e) {
-    final String? myId =
-        widget.currentUserId ?? SupabaseProvider.client.auth.currentUser?.id;
     // Moon-saved: non rivelare
-    final bool isMoon = e.isFromMoonSaved == true ||
+    final bool isMoon =
+        e.isFromMoonSaved == true ||
         (e.honoo != null && (e.honoo!.isFromMoonSaved == true));
     if (isMoon) return false;
 
-    // Creato da me: non rivelare
-    if (e.ownerId != null && myId != null && e.ownerId == myId) return false;
-
-    // Reply?
+    // Il bounce accompagna sia le risposte ricevute sia quelle inviate.
     final bool isReply = e.honoo != null
         ? (e.honoo!.type == HonooType.answer)
         : (e.hinoo != null && e.hinoo!.type == HinooType.answer);
@@ -343,10 +348,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
                       if (answeredPage != null) answeredPage,
                       Transform.translate(
                         key: const Key('reply_reveal_foreground'),
-                        offset: Offset(
-                          0,
-                          _liftAnimation.value * revealHeight,
-                        ),
+                        offset: Offset(0, _liftAnimation.value * revealHeight),
                         child: childWidget,
                       ),
                     ],

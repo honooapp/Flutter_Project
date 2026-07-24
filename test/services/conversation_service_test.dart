@@ -39,11 +39,7 @@ void main() {
       {
         'id': 'hinoo-1',
         'pages': <Map<String, dynamic>>[
-          {
-            'text': 'seconda',
-            'backgroundImage': 'bg.png',
-            'isTextWhite': true,
-          },
+          {'text': 'seconda', 'backgroundImage': 'bg.png', 'isTextWhite': true},
         ],
         'type': 'answer',
         'created_at': '2026-01-01T11:00:00Z',
@@ -52,8 +48,9 @@ void main() {
       },
     ]);
 
-    final result =
-        await ConversationService.fetchConversation('conversation-1');
+    final result = await ConversationService.fetchConversation(
+      'conversation-1',
+    );
 
     expect(result.map((entry) => entry.kind), [
       ConversationEntryKind.honoo,
@@ -88,9 +85,121 @@ void main() {
       },
     ]);
 
-    final result =
-        await ConversationService.fetchConversation('conversation-1');
+    final result = await ConversationService.fetchConversation(
+      'conversation-1',
+    );
 
     expect(result.single.hinoo!.type.name, 'answer');
   });
+
+  test(
+    'preferisce una sola copia Honoo salvata dalla Luna alla radice',
+    () async {
+      final honoo = harness.stubTable('honoo');
+      final hinoo = harness.stubTable('hinoo');
+      honoo.queueResponse(<Map<String, dynamic>>[
+        {
+          'id': 'moon-root',
+          'text': 'stesso contenuto',
+          'image_url': 'image.png',
+          'destination': 'moon',
+          'created_at': '2026-01-01T09:00:00Z',
+          'updated_at': '2026-01-01T09:00:00Z',
+          'user_id': 'author',
+          'conversation_id': 'conversation-1',
+          'is_from_moon_saved': false,
+        },
+        {
+          'id': 'saved-root',
+          'text': 'stesso contenuto',
+          'image_url': 'image.png',
+          'destination': 'chest',
+          'created_at': '2026-01-01T10:00:00Z',
+          'updated_at': '2026-01-01T10:00:00Z',
+          'user_id': 'test_user',
+          'conversation_id': 'conversation-1',
+          'is_from_moon_saved': true,
+        },
+        {
+          'id': 'reply',
+          'text': 'risposta',
+          'image_url': '',
+          'destination': 'reply',
+          'reply_to': 'moon-root',
+          'created_at': '2026-01-01T11:00:00Z',
+          'updated_at': '2026-01-01T11:00:00Z',
+          'user_id': 'test_user',
+          'conversation_id': 'conversation-1',
+          'is_from_moon_saved': false,
+        },
+      ]);
+      hinoo.queueResponse(<Map<String, dynamic>>[]);
+
+      final result = await ConversationService.fetchConversation(
+        'conversation-1',
+      );
+
+      expect(result.map((entry) => entry.id), ['saved-root', 'reply']);
+      expect(result.first.isFromMoonSaved, isTrue);
+    },
+  );
+
+  test(
+    'preferisce una sola copia Hinoo salvata dalla Luna alla radice',
+    () async {
+      final honoo = harness.stubTable('honoo');
+      final hinoo = harness.stubTable('hinoo');
+      honoo.queueResponse(<Map<String, dynamic>>[]);
+      final pages = <Map<String, dynamic>>[
+        {
+          'text': 'stesso contenuto',
+          'backgroundImage': 'bg.png',
+          'isTextWhite': true,
+        },
+      ];
+      hinoo.queueResponse(<Map<String, dynamic>>[
+        {
+          'id': 'moon-root',
+          'pages': pages,
+          'type': 'moon',
+          'created_at': '2026-01-01T09:00:00Z',
+          'user_id': 'author',
+          'conversation_id': 'conversation-1',
+          'is_from_moon_saved': false,
+        },
+        {
+          'id': 'saved-root',
+          'pages': pages,
+          'type': 'personal',
+          'created_at': '2026-01-01T10:00:00Z',
+          'user_id': 'test_user',
+          'conversation_id': 'conversation-1',
+          'is_from_moon_saved': true,
+        },
+        {
+          'id': 'reply',
+          'pages': <Map<String, dynamic>>[
+            {
+              'text': 'risposta',
+              'backgroundImage': 'reply.png',
+              'isTextWhite': true,
+            },
+          ],
+          'type': 'answer',
+          'reply_to': 'moon-root',
+          'created_at': '2026-01-01T11:00:00Z',
+          'user_id': 'test_user',
+          'conversation_id': 'conversation-1',
+          'is_from_moon_saved': false,
+        },
+      ]);
+
+      final result = await ConversationService.fetchConversation(
+        'conversation-1',
+      );
+
+      expect(result.map((entry) => entry.id), ['saved-root', 'reply']);
+      expect(result.first.isFromMoonSaved, isTrue);
+    },
+  );
 }

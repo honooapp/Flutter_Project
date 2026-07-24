@@ -12,11 +12,7 @@ class HonooCard extends StatelessWidget {
   final Honoo honoo;
   final VoidCallback? onDownloadTap;
 
-  const HonooCard({
-    super.key,
-    required this.honoo,
-    this.onDownloadTap,
-  });
+  const HonooCard({super.key, required this.honoo, this.onDownloadTap});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +27,6 @@ class HonooCard extends StatelessWidget {
         cardBg = HonooColor.secondary;
         break;
       case HonooType.personal:
-      default:
         cardBg = HonooColor.background;
         break;
     }
@@ -45,8 +40,10 @@ class HonooCard extends StatelessWidget {
             : media.size.width;
         final double availH = constraints.maxHeight.isFinite
             ? constraints.maxHeight
-            : (media.size.height - media.padding.vertical)
-                .clamp(0.0, double.infinity);
+            : (media.size.height - media.padding.vertical).clamp(
+                0.0,
+                double.infinity,
+              );
 
         if (availW <= 0 || availH <= 0) {
           return const SizedBox.shrink();
@@ -65,8 +62,9 @@ class HonooCard extends StatelessWidget {
 
         const double cornerRadius = 5;
 
-        final Color gapColor =
-            honoo.type == HonooType.moon ? HonooColor.tertiary : cardBg;
+        final Color gapColor = honoo.type == HonooType.moon
+            ? HonooColor.tertiary
+            : cardBg;
 
         final Widget content = Card(
           color: cardBg,
@@ -94,7 +92,7 @@ class HonooCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(cornerRadius),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 4,
                           offset: const Offset(0, 2),
                         ),
@@ -132,7 +130,10 @@ class HonooCard extends StatelessWidget {
                 SizedBox(
                   width: imageSize,
                   height: gap,
-                  child: ColoredBox(color: gapColor),
+                  child: ColoredBox(
+                    key: const Key('honoo-card-gap'),
+                    color: gapColor,
+                  ),
                 ),
                 SizedBox(
                   width: imageSize,
@@ -143,7 +144,7 @@ class HonooCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(cornerRadius),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 4,
                           offset: const Offset(0, 2),
                         ),
@@ -192,15 +193,15 @@ class HonooCard extends StatelessWidget {
         // La cornice rossa segnala soltanto una risposta ricevuta.
         // I propri messaggi mantengono il rendering normale.
         final bool showReplyBorder = isReply && !isOwn;
-        final bool showMoonSavedBorder =
-            !showReplyBorder && honoo.isFromMoonSaved && !isOwn;
+        final bool showMoonSavedBorder = !isReply && honoo.isFromMoonSaved;
         final Widget wrapped = (showReplyBorder || showMoonSavedBorder)
             ? DecoratedBox(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color:
-                        showReplyBorder ? HonooColor.secondary : Colors.white,
+                    color: showReplyBorder
+                        ? HonooColor.secondary
+                        : Colors.white,
                     width: 6,
                   ),
                 ),

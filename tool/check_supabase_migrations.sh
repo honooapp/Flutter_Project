@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# GitHub's hosted runners do not guarantee that ripgrep is installed. Keep the
+# checks fast when it is available, but fall back to portable extended grep so
+# this release gate cannot fail only because of the runner image.
+if ! command -v rg >/dev/null 2>&1; then
+  rg() {
+    case "${1:-}" in
+      *F*) grep "$@" ;;
+      *) grep -E "$@" ;;
+    esac
+  }
+fi
+
 root_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 migrations_dir="$root_dir/supabase/migrations"
 
@@ -104,5 +116,31 @@ for required_fragment in \
     exit 1
   fi
 done
+
+fingerprint_hardening="$migrations_dir/20260722100000_strengthen_content_fingerprints.sql"
+for required_fragment in \
+  'create extension if not exists pgcrypto with schema extensions' \
+  'honoo_user_destination_fingerprint_sha256_key' \
+  'hinoo_user_type_fingerprint_sha256_key' \
+  "digest(fingerprint, 'sha256')" \
+  'and indisvalid' \
+  'and indisunique'; do
+  if ! rg -Fq "$required_fragment" "$fingerprint_hardening"; then
+    echo "Fingerprint hardening is missing: $required_fragment" >&2
+    exit 1
+  fi
+done
+if rg -qi '^\s*(update|delete)\b' "$fingerprint_hardening"; then
+  echo "Fingerprint hardening must not rewrite user content" >&2
+  exit 1
+fi
+honoo_create_line="$(rg -n -m 1 'create unique index if not exists honoo_user_destination_fingerprint_sha256_key' "$fingerprint_hardening" | cut -d: -f1)"
+hinoo_create_line="$(rg -n -m 1 'create unique index if not exists hinoo_user_type_fingerprint_sha256_key' "$fingerprint_hardening" | cut -d: -f1)"
+honoo_drop_line="$(rg -n -m 1 'drop index if exists public.honoo_user_destination_fingerprint_key' "$fingerprint_hardening" | cut -d: -f1)"
+hinoo_drop_line="$(rg -n -m 1 'drop index if exists public.hinoo_user_type_fingerprint_key' "$fingerprint_hardening" | cut -d: -f1)"
+if (( honoo_create_line >= honoo_drop_line || hinoo_create_line >= hinoo_drop_line )); then
+  echo "SHA-256 fingerprint guards must be created before legacy indexes are removed" >&2
+  exit 1
+fi
 
 echo "Supabase migration structure checks passed (${#migrations[@]} files)."

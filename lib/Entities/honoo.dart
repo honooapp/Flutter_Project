@@ -30,11 +30,11 @@ class Honoo {
     this.type, [
     this.replyTo,
     this.recipientTag,
-  ])  : dbId = null,
-        isFromMoonSaved = false,
-        isOnMoon = false,
-        hasReplies = false,
-        conversationId = null;
+  ]) : dbId = null,
+       isFromMoonSaved = false,
+       isOnMoon = false,
+       hasReplies = false,
+       conversationId = null;
 
   // Comodità
   String? get idAsString => dbId;
@@ -162,7 +162,6 @@ class Honoo {
       case HonooType.answer:
         return 'reply';
       case HonooType.personal:
-      default:
         return 'chest';
     }
   }

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../Entities/hinoo.dart';
@@ -57,7 +56,6 @@ class HinooService {
       'created_at': DateTime.now().toIso8601String(),
     };
 
-    debugPrint('[HinooService] publishHinoo data=$data');
     final res = await _insertPublished(data);
     if (res == null) throw 'publishHinoo: insert fallita';
   }
@@ -79,7 +77,6 @@ class HinooService {
       'created_at': DateTime.now().toIso8601String(),
     };
 
-    debugPrint('[HinooService] publishHinoo data=$data');
     final res = await _insertPublished(data);
     if (res == null) throw 'publishHinoo: insert fallita';
     final id = res['id']?.toString() ?? '';
@@ -121,7 +118,6 @@ class HinooService {
       'created_at': DateTime.now().toIso8601String(),
     };
 
-    debugPrint('[HinooService] duplicateToMoon data=$data');
     return _insertDuplicate(data);
   }
 

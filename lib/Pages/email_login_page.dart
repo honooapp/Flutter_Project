@@ -94,7 +94,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
         fontSize: 16,
       ),
       filled: true,
-      fillColor: Colors.white.withOpacity(0.08),
+      fillColor: Colors.white.withValues(alpha: 0.08),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: Colors.white24),
@@ -157,7 +157,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
                   'Inserisci la tua email\ne premi “Invia codice”.',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.lora(
-                    color: HonooColor.onBackground.withOpacity(0.8),
+                    color: HonooColor.onBackground.withValues(alpha: 0.8),
                     fontSize: 16,
                   ),
                 ),
@@ -186,7 +186,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
                 Text(
                   'o',
                   style: GoogleFonts.lora(
-                    color: HonooColor.onBackground.withOpacity(0.8),
+                    color: HonooColor.onBackground.withValues(alpha: 0.8),
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
                   ),
@@ -201,7 +201,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
                     'torna indietro',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lora(
-                      color: HonooColor.onBackground.withOpacity(0.8),
+                      color: HonooColor.onBackground.withValues(alpha: 0.8),
                       decoration: TextDecoration.underline,
                     ),
                   ),

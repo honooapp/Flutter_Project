@@ -47,8 +47,8 @@ class CasaSection extends StatelessWidget {
       final double tx = casa.bgOffsetX * scaleX;
       final double ty = casa.bgOffsetY * scaleY;
       return Matrix4.identity()
-        ..translate(tx, ty)
-        ..scale(casa.bgScale);
+        ..translateByDouble(tx, ty, 0, 1)
+        ..scaleByDouble(casa.bgScale, casa.bgScale, casa.bgScale, 1);
     }
 
     final Matrix4 transform = buildTransform();
@@ -64,10 +64,7 @@ class CasaSection extends StatelessWidget {
               child: Transform(
                 transform: transform,
                 alignment: Alignment.center,
-                child: Image(
-                  image: casa.backgroundImage,
-                  fit: BoxFit.cover,
-                ),
+                child: Image(image: casa.backgroundImage, fit: BoxFit.cover),
               ),
             )
           else

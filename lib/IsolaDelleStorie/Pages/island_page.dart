@@ -49,7 +49,7 @@ class _IslandPageState extends State<IslandPage> {
                   width: 80.w,
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
-                    color: HonooColor.wave1.withOpacity(0.6),
+                    color: HonooColor.wave1.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                   child: SingleChildScrollView(
@@ -874,7 +874,7 @@ class IslandMapWithPins extends StatelessWidget {
           left: x,
           top: 0,
           bottom: 0,
-          child: Container(width: 1, color: Colors.white.withOpacity(0.25)),
+          child: Container(width: 1, color: Colors.white.withValues(alpha: 0.25)),
         ),
       );
     }
@@ -885,7 +885,7 @@ class IslandMapWithPins extends StatelessWidget {
           top: y,
           left: 0,
           right: 0,
-          child: Container(height: 1, color: Colors.white.withOpacity(0.25)),
+          child: Container(height: 1, color: Colors.white.withValues(alpha: 0.25)),
         ),
       );
     }

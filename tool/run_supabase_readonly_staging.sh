@@ -9,7 +9,11 @@ set -euo pipefail
 : "${TEST_IMAGE_URL:=}"
 
 echo "Running STAGING read-only Supabase tests (no writes)…"
-fvm flutter test \
+flutter_runner=(fvm flutter)
+if [[ "${CI:-}" == "true" ]]; then
+  flutter_runner=(flutter)
+fi
+"${flutter_runner[@]}" test \
   --concurrency=1 \
   --reporter expanded \
   test/supabase/

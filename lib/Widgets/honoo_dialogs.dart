@@ -55,7 +55,7 @@ class HonooDialogShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.black.withOpacity(opacity),
+      backgroundColor: Colors.black.withValues(alpha: opacity),
       insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: ConstrainedBox(

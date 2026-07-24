@@ -31,7 +31,8 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
   List<String> _conversationIds = const [];
   bool _isLoadingRoots = true;
   int _currentRootIndex = 0;
-  final cs.CarouselController _rootCarousel = cs.CarouselController();
+  final cs.CarouselSliderController _rootCarousel =
+      cs.CarouselSliderController();
   final ContentFeedService _contentFeedService = const ContentFeedService();
 
   @override
@@ -43,8 +44,9 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
   Future<void> _loadConversations() async {
     setState(() => _isLoadingRoots = true);
     try {
-      final rows = await _contentFeedService
-          .fetchSharedConversationRoots(widget.ownerId);
+      final rows = await _contentFeedService.fetchSharedConversationRoots(
+        widget.ownerId,
+      );
       final list = rows
           .map((row) => row['conversation_id']?.toString() ?? '')
           .where((id) => id.isNotEmpty)
@@ -52,15 +54,18 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
       if (!mounted) return;
       setState(() {
         _conversationIds = list;
-        _currentRootIndex =
-            list.isEmpty ? 0 : _currentRootIndex.clamp(0, list.length - 1);
+        _currentRootIndex = list.isEmpty
+            ? 0
+            : _currentRootIndex.clamp(0, list.length - 1);
         _isLoadingRoots = false;
       });
     } catch (error, stackTrace) {
-      AppLogger.warning('Caricamento conversazioni condivise non riuscito',
-          scope: 'SharedConversationsPage',
-          error: error,
-          stackTrace: stackTrace);
+      AppLogger.warning(
+        'Caricamento conversazioni condivise non riuscito',
+        scope: 'SharedConversationsPage',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (!mounted) return;
       setState(() => _isLoadingRoots = false);
     }
@@ -89,54 +94,53 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
         final Widget threads = _isLoadingRoots
             ? const Center(child: LoadingSpinner())
             : (_conversationIds.isEmpty
-                ? Center(
-                    child: Text(
-                      'Nessuna conversazione condivisa',
-                      style: GoogleFonts.libreFranklin(
-                        color: HonooColor.onBackground,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
+                  ? Center(
+                      child: Text(
+                        'Nessuna conversazione condivisa',
+                        style: GoogleFonts.libreFranklin(
+                          color: HonooColor.onBackground,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
-                    ),
-                  )
-                : cs.CarouselSlider(
-                    carouselController: _rootCarousel,
-                    options: cs.CarouselOptions(
-                      scrollDirection: Axis.horizontal,
-                      height: availableH,
-                      viewportFraction: 1.0,
-                      enlargeCenterPage: false,
-                      enableInfiniteScroll: false,
-                      disableCenter: true,
-                      scrollPhysics: const PageScrollPhysics(),
-                      onPageChanged: (index, reason) {
-                        setState(() => _currentRootIndex = index);
-                      },
-                    ),
-                    items: _conversationIds
-                        .map(
-                          (conversationId) => SizedBox(
-                            width: viewW,
-                            height: availableH,
-                            child: UnifiedThreadView(
-                              conversationId: conversationId,
-                              maxWidth: viewW,
-                              maxHeight: availableH,
-                              isActive: _conversationIds.indexOf(
-                                      conversationId) ==
-                                  _currentRootIndex,
+                    )
+                  : cs.CarouselSlider(
+                      carouselController: _rootCarousel,
+                      options: cs.CarouselOptions(
+                        scrollDirection: Axis.horizontal,
+                        height: availableH,
+                        viewportFraction: 1.0,
+                        enlargeCenterPage: false,
+                        enableInfiniteScroll: false,
+                        disableCenter: true,
+                        scrollPhysics: const PageScrollPhysics(),
+                        onPageChanged: (index, reason) {
+                          setState(() => _currentRootIndex = index);
+                        },
+                      ),
+                      items: _conversationIds
+                          .map(
+                            (conversationId) => SizedBox(
+                              width: viewW,
+                              height: availableH,
+                              child: UnifiedThreadView(
+                                conversationId: conversationId,
+                                maxWidth: viewW,
+                                maxHeight: availableH,
+                                isActive:
+                                    _conversationIds.indexOf(conversationId) ==
+                                    _currentRootIndex,
+                              ),
                             ),
-                          ),
-                        )
-                        .toList(),
-                  ));
+                          )
+                          .toList(),
+                    ));
 
-        final bool isDesktop = layoutMode == ResponsiveLayoutMode.desktop ||
+        final bool isDesktop =
+            layoutMode == ResponsiveLayoutMode.desktop ||
             layoutMode == ResponsiveLayoutMode.wideDesktop ||
             layoutMode == ResponsiveLayoutMode.largeDesktop;
-        if (!isDesktop ||
-            _conversationIds.length <= 1 ||
-            _isLoadingRoots) {
+        if (!isDesktop || _conversationIds.length <= 1 || _isLoadingRoots) {
           return threads;
         }
         return DesktopCarouselArrows(
@@ -156,30 +160,37 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
           child: threads,
         );
       },
-      footerBuilder: (context, mode, footerIconSize, footerGap,
-          footerTopSpacing, footerBottomSpacing) {
-        return ResponsiveFooterBar(
-          useSafeArea: false,
-          bottomPadding: footerBottomSpacing,
-          desiredGap: footerGap,
-          minGap: 16,
-          height: footerIconSize,
-          actions: [
-            ResponsiveFooterAction(
-              asset: "assets/icons/home.svg",
-              semanticsLabel: 'Home',
-              colorFilter: const ColorFilter.mode(
-                HonooColor.onBackground,
-                BlendMode.srcIn,
-              ),
-              size: footerIconSize,
-              splashRadius: 25,
-              tooltip: 'Home',
-              onPressed: _goHome,
-            ),
-          ],
-        );
-      },
+      footerBuilder:
+          (
+            context,
+            mode,
+            footerIconSize,
+            footerGap,
+            footerTopSpacing,
+            footerBottomSpacing,
+          ) {
+            return ResponsiveFooterBar(
+              useSafeArea: false,
+              bottomPadding: footerBottomSpacing,
+              desiredGap: footerGap,
+              minGap: 16,
+              height: footerIconSize,
+              actions: [
+                ResponsiveFooterAction(
+                  asset: "assets/icons/home.svg",
+                  semanticsLabel: 'Home',
+                  colorFilter: const ColorFilter.mode(
+                    HonooColor.onBackground,
+                    BlendMode.srcIn,
+                  ),
+                  size: footerIconSize,
+                  splashRadius: 25,
+                  tooltip: 'Home',
+                  onPressed: _goHome,
+                ),
+              ],
+            );
+          },
     );
   }
 }

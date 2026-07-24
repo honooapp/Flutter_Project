@@ -1,0 +1,80 @@
+name: Live Supabase E2E
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+    inputs:
+      run_ui:
+        description: 'Esegui anche il flusso UI live su Chrome'
+        required: true
+        type: boolean
+        default: false
+
+concurrency:
+  group: live-supabase-e2e
+  cancel-in-progress: false
+
+jobs:
+  conversation:
+    name: Conversation CRUD, RLS and Realtime
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: staging
+    permissions:
+      contents: read
+    env:
+      HONOO_LIVE_RUN: 'true'
+      HONOO_LIVE_CLEANUP: 'true'
+      HONOO_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+      HONOO_SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+      HONOO_TEST_IMAGE_URL: ${{ secrets.STAGING_TEST_IMAGE_URL }}
+      HONOO_TEST_USER_A_EMAIL: ${{ secrets.STAGING_TEST_USER_A_EMAIL }}
+      HONOO_TEST_USER_A_PASSWORD: ${{ secrets.STAGING_TEST_USER_A_PASSWORD }}
+      HONOO_TEST_USER_B_EMAIL: ${{ secrets.STAGING_TEST_USER_B_EMAIL }}
+      HONOO_TEST_USER_B_PASSWORD: ${{ secrets.STAGING_TEST_USER_B_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.6'
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Run live conversation checks
+        run: bash tool/run_live_conversation_test.sh
+
+  ui:
+    name: Live UI flow
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_ui }}
+    runs-on: macos-latest
+    timeout-minutes: 20
+    environment: staging
+    permissions:
+      contents: read
+    env:
+      HONOO_LIVE_RUN: 'true'
+      SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+      HONOO_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+      HONOO_SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+      HONOO_LIVE_EMAIL: ${{ secrets.STAGING_TEST_EMAIL }}
+      HONOO_LIVE_PASSWORD: ${{ secrets.STAGING_TEST_PASSWORD }}
+      HONOO_TEST_IMAGE_URL: ${{ secrets.STAGING_TEST_IMAGE_URL }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.6'
+      - name: Install FVM and ChromeDriver
+        run: |
+          dart pub global activate fvm 3.2.1
+          echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+          brew install chromedriver
+      - name: Prepare Flutter SDK in FVM
+        run: fvm install 3.44.6
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Start ChromeDriver
+        run: chromedriver --port=4444 &
+      - name: Run live UI checks
+        run: bash tool/run_integration_tests.sh integration_test/live_honoo_creation_test.dart

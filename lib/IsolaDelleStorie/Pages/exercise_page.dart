@@ -222,7 +222,7 @@ class _ExercisePageState extends State<ExercisePage> {
       width: 80.w,
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: HonooColor.wave1.withOpacity(0.6),
+        color: HonooColor.wave1.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(8.0),
       ),
       alignment: Alignment.center,

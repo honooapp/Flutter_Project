@@ -1,8 +1,8 @@
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html;
 import 'dart:async';
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:js_util' as js_util;
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
+
+import 'package:web/web.dart' as web;
 
 import 'download_saver_base.dart';
 
@@ -24,34 +24,38 @@ class _DownloadSaverWeb implements DownloadSaver {
       // Alcuni browser mobile (iOS Safari) ignorano download programmatici.
       // Usiamo un fallback aprendolo in una nuova scheda.
       final String mime = iosBrowser ? 'application/octet-stream' : 'image/png';
-      final html.Blob blob = html.Blob(<dynamic>[img.bytes], mime);
-      final String url = html.Url.createObjectUrlFromBlob(blob);
+      final web.Blob blob = web.Blob(
+        <JSAny>[img.bytes.toJS].toJS,
+        web.BlobPropertyBag(type: mime),
+      );
+      final String url = web.URL.createObjectURL(blob);
 
       try {
         if (iosBrowser) {
           // Fallback: apri in una nuova scheda; l’utente può salvare dall’UI
-          final dynamic opened = html.window.open(url, '_blank');
+          final web.Window? opened = web.window.open(url, '_blank');
           if (opened == null) {
-            html.window.location.assign(url);
+            web.window.location.assign(url);
           } else {
             _revokeLater(url);
           }
         } else {
-          final html.AnchorElement anchor = html.AnchorElement(href: url)
+          final web.HTMLAnchorElement anchor = web.HTMLAnchorElement()
+            ..href = url
             ..download = sanitizeDownloadFilename(img.filename)
             ..rel = 'noopener'
             ..target = '_self'
             ..style.display = 'none';
-          html.document.body?.append(anchor);
+          web.document.body?.append(anchor);
           anchor.click();
           anchor.remove();
-          html.Url.revokeObjectUrl(url);
+          web.URL.revokeObjectURL(url);
         }
       } catch (_) {
         // Ultimo fallback generico: prova ad aprire in nuova scheda
-        final dynamic opened = html.window.open(url, '_blank');
+        final web.Window? opened = web.window.open(url, '_blank');
         if (opened == null) {
-          html.window.location.assign(url);
+          web.window.location.assign(url);
         } else {
           _revokeLater(url);
         }
@@ -67,14 +71,14 @@ class _DownloadSaverWeb implements DownloadSaver {
 DownloadSaver getDownloadSaverImpl() => _DownloadSaverWeb();
 
 bool _isIosBrowser() {
-  final ua = html.window.navigator.userAgent.toLowerCase();
+  final ua = web.window.navigator.userAgent.toLowerCase();
   return ua.contains('iphone') || ua.contains('ipad') || ua.contains('ipod');
 }
 
 bool _isMobileOrTabletBrowser() {
   return isMobileOrTabletBrowser(
-    html.window.navigator.userAgent,
-    maxTouchPoints: html.window.navigator.maxTouchPoints ?? 0,
+    web.window.navigator.userAgent,
+    maxTouchPoints: web.window.navigator.maxTouchPoints,
   );
 }
 
@@ -82,29 +86,27 @@ Future<bool> _shareWithSystem(
   List<DownloadImage> images,
   String? message,
 ) async {
-  final html.Navigator navigator = html.window.navigator;
-  if (!js_util.hasProperty(navigator, 'share')) return false;
+  final web.Navigator navigator = web.window.navigator;
+  if (!navigator.hasProperty('share'.toJS).toDart) return false;
 
-  final List<html.File> files = images
+  final List<web.File> files = images
       .map(
-        (DownloadImage image) => html.File(
-          <Object>[image.bytes],
+        (DownloadImage image) => web.File(
+          <JSAny>[image.bytes.toJS].toJS,
           sanitizeDownloadFilename(image.filename),
-          <String, dynamic>{'type': 'image/png'},
+          web.FilePropertyBag(type: 'image/png'),
         ),
       )
       .toList(growable: false);
-  final Object shareData = js_util.newObject();
-  js_util.setProperty(shareData, 'files', files);
-  js_util.setProperty(shareData, 'title', 'Honoo');
-  if (message != null && message.trim().isNotEmpty) {
-    js_util.setProperty(shareData, 'text', message.trim());
-  }
+  final web.ShareData shareData = web.ShareData(
+    files: files.toJS,
+    title: 'Honoo',
+    text: message?.trim() ?? '',
+  );
 
-  if (js_util.hasProperty(navigator, 'canShare')) {
+  if (navigator.hasProperty('canShare'.toJS).toDart) {
     try {
-      final bool canShare =
-          js_util.callMethod<bool>(navigator, 'canShare', <Object>[shareData]);
+      final bool canShare = navigator.canShare(shareData);
       if (!canShare) return false;
     } catch (_) {
       return false;
@@ -112,14 +114,13 @@ Future<bool> _shareWithSystem(
   }
 
   try {
-    final Object promise =
-        js_util.callMethod<Object>(navigator, 'share', <Object>[shareData]);
-    await js_util.promiseToFuture<dynamic>(promise);
+    await navigator.share(shareData).toDart;
     return true;
   } catch (error) {
     // Un annullamento volontario non deve avviare un download inatteso.
     try {
-      if (js_util.getProperty<String>(error, 'name') == 'AbortError') {
+      final JSString? name = (error as JSObject).getProperty('name'.toJS);
+      if (name?.toDart == 'AbortError') {
         return true;
       }
     } catch (_) {}
@@ -128,5 +129,5 @@ Future<bool> _shareWithSystem(
 }
 
 void _revokeLater(String url) {
-  Timer(const Duration(seconds: 30), () => html.Url.revokeObjectUrl(url));
+  Timer(const Duration(seconds: 30), () => web.URL.revokeObjectURL(url));
 }

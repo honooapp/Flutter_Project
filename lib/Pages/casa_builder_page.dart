@@ -74,7 +74,9 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
   }
 
   void _updateImageScale(double scale) {
-    final double clamped = scale.clamp(_imageMinScale, _imageMaxScale).toDouble();
+    final double clamped = scale
+        .clamp(_imageMinScale, _imageMaxScale)
+        .toDouble();
     final Matrix4 current = _imageController.value.clone();
     final Float64List values = current.storage;
     final double currentScale = _extractScaleFromMatrix(current);
@@ -84,8 +86,8 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
     final double adjustedTx = tx * (safeScale / clamped);
     final double adjustedTy = ty * (safeScale / clamped);
     _imageController.value = Matrix4.identity()
-      ..translate(adjustedTx, adjustedTy)
-      ..scale(clamped);
+      ..translateByDouble(adjustedTx, adjustedTy, 0, 1)
+      ..scaleByDouble(clamped, clamped, clamped, 1);
   }
 
   void _nudgeImageScale(double delta) {
@@ -100,8 +102,9 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
   Future<void> _pickImage() async {
     try {
       final picker = ImagePicker();
-      final XFile? selected =
-          await picker.pickImage(source: ImageSource.gallery);
+      final XFile? selected = await picker.pickImage(
+        source: ImageSource.gallery,
+      );
       if (selected == null) return;
 
       final Uint8List bytes = await selected.readAsBytes();
@@ -125,15 +128,17 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
       final double deviceRatio = MediaQuery.of(context).devicePixelRatio;
       final Size logical = boundary.size;
       const double maxOut = 2560.0;
-      final double longEdge =
-          logical.width > logical.height ? logical.width : logical.height;
+      final double longEdge = logical.width > logical.height
+          ? logical.width
+          : logical.height;
       double pixelRatio = deviceRatio;
       if (longEdge * deviceRatio > maxOut && longEdge > 0) {
         pixelRatio = (maxOut / longEdge).clamp(1.0, deviceRatio);
       }
       final ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
-      final ByteData? byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
+      final ByteData? byteData = await image.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
       return byteData?.buffer.asUint8List();
     } catch (e) {
       return null;
@@ -210,7 +215,7 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -225,11 +230,7 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
                 style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
               ),
               const SizedBox(height: 22),
-              const Icon(
-                Icons.photo,
-                size: 48,
-                color: Colors.white,
-              ),
+              const Icon(Icons.photo, size: 48, color: Colors.white),
             ],
           ),
         ),
@@ -245,17 +246,19 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
         builder: (context, constraints) {
           final double maxWidth = constraints.maxWidth;
           final double maxHeight = constraints.maxHeight;
-          final ResponsiveLayoutMode layoutMode =
-              ResponsiveLayout.modeForWidth(maxWidth);
+          final ResponsiveLayoutMode layoutMode = ResponsiveLayout.modeForWidth(
+            maxWidth,
+          );
           final bool isMobile = layoutMode == ResponsiveLayoutMode.mobile;
           final double targetMaxWidth = isMobile
               ? maxWidth
               : ResponsiveLayout.contentMaxWidth(maxWidth);
-          final double footerIconSize =
-              ResponsiveLayout.footerIconSizeForMode(layoutMode);
+          final double footerIconSize = ResponsiveLayout.footerIconSizeForMode(
+            layoutMode,
+          );
           final double footerBottomPadding =
               ResponsiveLayout.footerBottomPaddingForMode(layoutMode) +
-                  (isMobile ? 0 : 12);
+              (isMobile ? 0 : 12);
           final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
           final double footerSpacing = footerBottomPadding + safeBottom;
           final double footerTopSpacing = footerSpacing / 2;
@@ -265,8 +268,7 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
               : footerIconSize + footerTopSpacing + footerBottomSpacing;
           final double availableHeight = isMobile
               ? maxHeight
-              : (maxHeight - footerReserved)
-                  .clamp(0.0, double.infinity);
+              : (maxHeight - footerReserved).clamp(0.0, double.infinity);
           final Size canvasSize = isMobile
               ? Size(maxWidth, availableHeight)
               : ResponsiveLayout.fitAspectRatio(
@@ -403,7 +405,7 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
                       vertical: 12,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
+                      color: Colors.black.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(

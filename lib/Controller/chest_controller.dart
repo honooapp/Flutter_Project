@@ -42,42 +42,105 @@ class ChestState {
 
 class ChestController extends ValueNotifier<ChestState> {
   ChestController({
-    required ChestRepository repository,
+    required this._repository,
     ChestRealtimeGateway? realtimeGateway,
     ReliabilityPolicy reliabilityPolicy = const ReliabilityPolicy(),
+    this._realtimeReconnectBaseDelay = const Duration(seconds: 1),
+    this._realtimeReconnectMaxDelay = const Duration(seconds: 30),
   })  : _realtimeGateway = realtimeGateway ?? SupabaseChestRealtimeGateway(),
-        _repository = repository,
         _reliability = reliabilityPolicy,
         super(ChestState());
 
   final ChestRepository _repository;
   final ChestRealtimeGateway _realtimeGateway;
   final ReliabilityPolicy _reliability;
+  final Duration _realtimeReconnectBaseDelay;
+  final Duration _realtimeReconnectMaxDelay;
   ChestRealtimeSubscription? _realtimeSubscription;
   Timer? _periodicRefreshTimer;
   Timer? _realtimeDebounce;
+  Timer? _realtimeReconnectTimer;
   String? _activeUserId;
+  Future<void> Function()? _onPeriodicReconcile;
+  int _realtimeReconnectAttempt = 0;
+  int _realtimeGeneration = 0;
   bool _isRefreshingReplies = false;
   bool _refreshPending = false;
 
   void startRealtime(
     String userId, {
     Duration refreshInterval = const Duration(seconds: 60),
+    Future<void> Function()? onPeriodicReconcile,
   }) {
     stopRealtime();
     _activeUserId = userId;
+    _onPeriodicReconcile = onPeriodicReconcile;
+    _connectRealtime(userId);
+    _periodicRefreshTimer = Timer.periodic(
+      refreshInterval,
+      (_) => _runPeriodicReconcile(userId),
+    );
+  }
+
+  void _connectRealtime(String userId) {
+    if (_activeUserId != userId) return;
+    _realtimeReconnectTimer?.cancel();
+    _realtimeReconnectTimer = null;
+    final previous = _realtimeSubscription;
+    _realtimeSubscription = null;
+    if (previous != null) unawaited(previous.close());
+
+    final generation = ++_realtimeGeneration;
     try {
       _realtimeSubscription = _realtimeGateway.subscribe(
         userId: userId,
         onChange: _scheduleRealtimeRefresh,
+        onStatus: (status, error) =>
+            _handleRealtimeStatus(userId, generation, status),
       );
     } catch (_) {
-      _realtimeSubscription = null;
+      _scheduleRealtimeReconnect(userId, generation);
     }
-    _periodicRefreshTimer = Timer.periodic(
-      refreshInterval,
-      (_) => refreshReplies(userId),
+  }
+
+  void _handleRealtimeStatus(
+    String userId,
+    int generation,
+    ChestRealtimeConnectionStatus status,
+  ) {
+    if (_activeUserId != userId || generation != _realtimeGeneration) return;
+    if (status == ChestRealtimeConnectionStatus.subscribed) {
+      _realtimeReconnectAttempt = 0;
+      _realtimeReconnectTimer?.cancel();
+      _realtimeReconnectTimer = null;
+      _scheduleRealtimeRefresh();
+      return;
+    }
+    _scheduleRealtimeReconnect(userId, generation);
+  }
+
+  void _scheduleRealtimeReconnect(String userId, int generation) {
+    if (_activeUserId != userId || generation != _realtimeGeneration) return;
+    if (_realtimeReconnectTimer?.isActive ?? false) return;
+    final multiplier = 1 << _realtimeReconnectAttempt.clamp(0, 10);
+    final requestedMs = _realtimeReconnectBaseDelay.inMilliseconds * multiplier;
+    final delay = Duration(
+      milliseconds: requestedMs.clamp(
+        _realtimeReconnectBaseDelay.inMilliseconds,
+        _realtimeReconnectMaxDelay.inMilliseconds,
+      ),
     );
+    _realtimeReconnectAttempt++;
+    _realtimeReconnectTimer = Timer(delay, () => _connectRealtime(userId));
+  }
+
+  Future<void> _runPeriodicReconcile(String userId) async {
+    final reconcile = _onPeriodicReconcile;
+    if (reconcile != null) {
+      await reconcile();
+      return;
+    }
+    await refreshReplies(userId);
   }
 
   void _scheduleRealtimeRefresh() {
@@ -105,13 +168,19 @@ class ChestController extends ValueNotifier<ChestState> {
   }
 
   void stopRealtime() {
+    _activeUserId = null;
+    _onPeriodicReconcile = null;
+    _realtimeGeneration++;
+    _realtimeReconnectAttempt = 0;
     _periodicRefreshTimer?.cancel();
     _periodicRefreshTimer = null;
     _realtimeDebounce?.cancel();
     _realtimeDebounce = null;
-    _realtimeSubscription?.close();
+    _realtimeReconnectTimer?.cancel();
+    _realtimeReconnectTimer = null;
+    final subscription = _realtimeSubscription;
     _realtimeSubscription = null;
-    _activeUserId = null;
+    if (subscription != null) unawaited(subscription.close());
   }
 
   @override

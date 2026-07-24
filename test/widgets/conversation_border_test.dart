@@ -23,20 +23,20 @@ void main() {
   });
 
   Finder borderWithColor(Color color) => find.byWidgetPredicate((widget) {
-        final Decoration? decoration = switch (widget) {
-          Container(:final decoration) => decoration,
-          DecoratedBox(:final decoration) => decoration,
-          _ => null,
-        };
-        if (decoration is! BoxDecoration) return false;
-        final border = decoration.border;
-        return border is Border &&
-            border.top.color == color &&
-            border.right.color == color &&
-            border.bottom.color == color &&
-            border.left.color == color &&
-            border.top.width == 6;
-      });
+    final Decoration? decoration = switch (widget) {
+      Container(:final decoration) => decoration,
+      DecoratedBox(:final decoration) => decoration,
+      _ => null,
+    };
+    if (decoration is! BoxDecoration) return false;
+    final border = decoration.border;
+    return border is Border &&
+        border.top.color == color &&
+        border.right.color == color &&
+        border.bottom.color == color &&
+        border.left.color == color &&
+        border.top.width == 6;
+  });
 
   Honoo honoo({
     required HonooType type,
@@ -55,16 +55,16 @@ void main() {
   }
 
   HinooDraft hinoo({bool fromMoon = false}) => HinooDraft(
-        pages: const [
-          HinooSlide(
-            backgroundImage: null,
-            text: 'Test conversazione',
-            isTextWhite: true,
-          ),
-        ],
-        type: HinooType.personal,
-        isFromMoonSaved: fromMoon,
-      );
+    pages: const [
+      HinooSlide(
+        backgroundImage: null,
+        text: 'Test conversazione',
+        isTextWhite: true,
+      ),
+    ],
+    type: HinooType.personal,
+    isFromMoonSaved: fromMoon,
+  );
 
   Future<void> pumpHonoo(WidgetTester tester, Honoo value) async {
     tester.view.devicePixelRatio = 1;
@@ -112,30 +112,25 @@ void main() {
   }
 
   testWidgets('Honoo di risposta proprio non ha cornice', (tester) async {
-    await pumpHonoo(
-      tester,
-      honoo(type: HonooType.answer, owner: 'test_user'),
-    );
+    await pumpHonoo(tester, honoo(type: HonooType.answer, owner: 'test_user'));
 
     expect(borderWithColor(HonooColor.secondary), findsNothing);
     expect(borderWithColor(Colors.white), findsNothing);
   });
 
   testWidgets('Honoo ricevuto in risposta ha cornice rossa', (tester) async {
-    await pumpHonoo(
-      tester,
-      honoo(type: HonooType.answer),
-    );
+    await pumpHonoo(tester, honoo(type: HonooType.answer));
 
     expect(borderWithColor(HonooColor.secondary), findsWidgets);
     expect(borderWithColor(Colors.white), findsNothing);
   });
 
-  testWidgets('Honoo salvato dalla Luna ha solo cornice bianca',
-      (tester) async {
+  testWidgets('Honoo salvato dalla Luna ha solo cornice bianca', (
+    tester,
+  ) async {
     await pumpHonoo(
       tester,
-      honoo(type: HonooType.personal, fromMoon: true),
+      honoo(type: HonooType.personal, owner: 'test_user', fromMoon: true),
     );
 
     expect(borderWithColor(Colors.white), findsWidgets);
@@ -166,13 +161,14 @@ void main() {
     expect(borderWithColor(Colors.white), findsNothing);
   });
 
-  testWidgets('Hinoo salvato dalla Luna ha solo cornice bianca',
-      (tester) async {
+  testWidgets('Hinoo salvato dalla Luna ha solo cornice bianca', (
+    tester,
+  ) async {
     await pumpHinoo(
       tester,
       draft: hinoo(fromMoon: true),
       isReply: false,
-      authorId: 'other_user',
+      authorId: 'test_user',
     );
 
     expect(borderWithColor(Colors.white), findsWidgets);

@@ -87,8 +87,10 @@ class _HinooViewerState extends State<HinooViewer> {
         widget.maxHeight.isFinite &&
         widget.maxHeight > 0) {
       scale = (widget.maxWidth / baselineW).clamp(0.0, double.infinity);
-      final double scaleH =
-          (widget.maxHeight / baselineH).clamp(0.0, double.infinity);
+      final double scaleH = (widget.maxHeight / baselineH).clamp(
+        0.0,
+        double.infinity,
+      );
       scale = scale < scaleH ? scale : scaleH;
     } else if (widget.maxWidth.isFinite && widget.maxWidth > 0) {
       scale = widget.maxWidth / baselineW;
@@ -144,12 +146,12 @@ class _HinooViewerState extends State<HinooViewer> {
                       border: Border.all(color: HonooColor.secondary, width: 6),
                       borderRadius: BorderRadius.circular(12),
                     )
-                  : (widget.draft.isFromMoonSaved && !isOwn)
-                      ? BoxDecoration(
-                          border: Border.all(color: Colors.white, width: 6),
-                          borderRadius: BorderRadius.circular(12),
-                        )
-                      : null,
+                  : widget.draft.isFromMoonSaved && !widget.isReply
+                  ? BoxDecoration(
+                      border: Border.all(color: Colors.white, width: 6),
+                      borderRadius: BorderRadius.circular(12),
+                    )
+                  : null,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
@@ -170,8 +172,9 @@ class _HinooViewerState extends State<HinooViewer> {
                           }
                           final double target =
                               (position.pixels + event.scrollDelta.dy).clamp(
-                                  position.minScrollExtent,
-                                  position.maxScrollExtent);
+                                position.minScrollExtent,
+                                position.maxScrollExtent,
+                              );
                           if ((target - position.pixels).abs() > 0.5) {
                             _vController.jumpTo(target);
                             _scheduleSnap();
@@ -269,9 +272,9 @@ class HinooSlideView extends StatelessWidget {
     final Color textColor = slide.isTextWhite ? Colors.white : Colors.black;
     final ImageProvider bg =
         (slide.backgroundImage != null && slide.backgroundImage!.isNotEmpty)
-            ? NetworkImage(slide.backgroundImage!)
-            : const AssetImage('assets/images/hinoo_default_1080x1920.png')
-                as ImageProvider;
+        ? NetworkImage(slide.backgroundImage!)
+        : const AssetImage('assets/images/hinoo_default_1080x1920.png')
+              as ImageProvider;
 
     const double designWidth = 1080;
     const double designHeight = 1920;
@@ -289,8 +292,8 @@ class HinooSlideView extends StatelessWidget {
       final double tx = slide.bgOffsetX * scaleX;
       final double ty = slide.bgOffsetY * scaleY;
       return Matrix4.identity()
-        ..translate(tx, ty)
-        ..scale(slide.bgScale);
+        ..translateByDouble(tx, ty, 0, 1)
+        ..scaleByDouble(slide.bgScale, slide.bgScale, slide.bgScale, 1);
     }
 
     final Matrix4 transform = buildTransform();
@@ -304,10 +307,7 @@ class HinooSlideView extends StatelessWidget {
     const double actionInset = 8;
     final Widget? downloadOverlay = onDownloadTap == null
         ? null
-        : TextBoxDownloadButton(
-            onPressed: onDownloadTap!,
-            tooltip: 'download',
-          );
+        : TextBoxDownloadButton(onPressed: onDownloadTap!, tooltip: 'download');
 
     return SizedBox(
       width: width,
@@ -357,9 +357,7 @@ class HinooSlideView extends StatelessWidget {
               right: 0,
               height: halfGap,
               child: IgnorePointer(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(color: gapColor),
-                ),
+                child: DecoratedBox(decoration: BoxDecoration(color: gapColor)),
               ),
             ),
           if (halfGap > 0.05)
@@ -369,9 +367,7 @@ class HinooSlideView extends StatelessWidget {
               right: 0,
               height: halfGap,
               child: IgnorePointer(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(color: gapColor),
-                ),
+                child: DecoratedBox(decoration: BoxDecoration(color: gapColor)),
               ),
             ),
         ],
