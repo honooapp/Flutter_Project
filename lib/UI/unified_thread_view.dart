@@ -10,6 +10,7 @@ import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Utility/download_capture.dart';
 import 'package:honoo/Utility/network_image_prefetch.dart';
+import 'package:honoo/Utility/honoo_colors.dart';
 // rendering a lista con separatori; rimosso carousel verticale
 
 class UnifiedThreadView extends StatefulWidget {
@@ -46,6 +47,7 @@ class UnifiedThreadView extends StatefulWidget {
 class _UnifiedThreadViewState extends State<UnifiedThreadView>
     with SingleTickerProviderStateMixin {
   bool _loading = true;
+  Object? _loadError;
   List<ConversationEntry> _entries = const [];
   RealtimeChannel? _chan;
   bool _didHighlight = false;
@@ -107,6 +109,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
       setState(() => _loading = true);
     }
     try {
+      _loadError = null;
       final loader =
           widget.conversationLoader ?? ConversationService.fetchConversation;
       final entries = await loader(widget.conversationId);
@@ -115,6 +118,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
       setState(() {
         _entries = entries;
         _loading = false;
+        _loadError = null;
       });
       _prefetchEntriesFrom(_pageToShowFirst);
       _showLatestReceivedAndReveal();
@@ -122,9 +126,12 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
         _didHighlight = true;
         widget.onSelect?.call(_entryToShowFirst);
       }
-    } catch (_) {
+    } catch (error) {
       if (!mounted) return;
-      setState(() => _loading = false);
+      setState(() {
+        _loading = false;
+        _loadError = error;
+      });
     }
   }
 
@@ -265,6 +272,39 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   @override
   Widget build(BuildContext context) {
     if (_loading) return const Center(child: LoadingSpinner());
+    if (_entries.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                _loadError == null
+                    ? 'Conversazione vuota'
+                    : 'Non riesco a caricare la conversazione.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: HonooColor.onBackground,
+                  fontSize: 17,
+                ),
+              ),
+              if (_loadError != null) ...[
+                const SizedBox(height: 8),
+                TextButton.icon(
+                  onPressed: _load,
+                  icon: const Icon(Icons.refresh, color: Colors.white),
+                  label: const Text(
+                    'Riprova',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
+    }
     return SizedBox(
       width: widget.maxWidth,
       height: widget.maxHeight,
@@ -272,7 +312,9 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
         controller: _pageController,
         scrollDirection: Axis.vertical,
         pageSnapping: true,
-        physics: const PageScrollPhysics(),
+        physics: const PageScrollPhysics(
+          parent: ClampingScrollPhysics(),
+        ),
         onPageChanged: _prefetchEntriesFrom,
         itemCount: _entries.length,
         itemBuilder: (context, index) {

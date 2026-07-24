@@ -770,6 +770,10 @@ class _ChestPageState extends State<ChestPage> {
             },
           ),
           overlayBuilder: (ctx, mode) => const LunaFissa(),
+          bodyTopInsetBuilder: (ctx, mode) =>
+              (LunaFissa.reserveTopPadding(ctx) -
+                      ThreadLayoutScaffold.headerHeight)
+                  .clamp(0.0, double.infinity),
           bodyBuilder: (ctx, viewW, availableH, layoutMode) {
             final HonooBuilderMetrics honooMetrics =
                 ResponsiveLayout.honooBuilderMetrics(
@@ -798,7 +802,9 @@ class _ChestPageState extends State<ChestPage> {
               );
             }
             // Use PageScrollPhysics to avoid gesture conflicts with nested vertical carousels
-            const horizPhysics = PageScrollPhysics();
+            const horizPhysics = PageScrollPhysics(
+              parent: ClampingScrollPhysics(),
+            );
             final slider = cs.CarouselSlider.builder(
               carouselController: _carouselController,
               itemCount: items.length,

@@ -17,6 +17,7 @@ class ThreadLayoutScaffold extends StatelessWidget {
     required this.bodyBuilder,
     required this.footerBuilder,
     this.overlayBuilder,
+    this.bodyTopInsetBuilder,
   });
 
   final Color backgroundColor;
@@ -47,6 +48,15 @@ class ThreadLayoutScaffold extends StatelessWidget {
   final Widget Function(BuildContext context, ResponsiveLayoutMode mode)?
       overlayBuilder;
 
+  /// Spazio da sottrarre alla parte alta del corpo per overlay persistenti.
+  /// Il valore viene applicato prima di comunicare [availableH] al body.
+  final double Function(
+    BuildContext context,
+    ResponsiveLayoutMode mode,
+  )? bodyTopInsetBuilder;
+
+  static const double headerHeight = 52;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,20 +77,28 @@ class ThreadLayoutScaffold extends StatelessWidget {
           final double footerSpacing = footerBottomPadding + safeBottom;
           final double footerTopSpacing = footerSpacing / 2;
           final double footerBottomSpacing = footerSpacing - footerTopSpacing;
-          const double headerH = 52;
+          const double headerH = headerHeight;
           final double footerReserved =
               footerIconSize + footerTopSpacing + footerBottomSpacing;
-          final double availableH =
+          final double bodySlotH =
               (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
+          final double requestedTopInset =
+              bodyTopInsetBuilder?.call(context, mode) ?? 0;
+          final double bodyTopInset = requestedTopInset.clamp(0.0, bodySlotH);
+          final double availableH =
+              (bodySlotH - bodyTopInset).clamp(0.0, double.infinity);
 
           final column = Column(
             children: [
               SizedBox(height: headerH, child: Center(child: header)),
               Expanded(
-                child: SizedBox(
-                  width: viewW,
-                  height: availableH,
-                  child: bodyBuilder(context, viewW, availableH, mode),
+                child: Padding(
+                  padding: EdgeInsets.only(top: bodyTopInset),
+                  child: SizedBox(
+                    width: viewW,
+                    height: availableH,
+                    child: bodyBuilder(context, viewW, availableH, mode),
+                  ),
                 ),
               ),
               SizedBox(height: footerTopSpacing),

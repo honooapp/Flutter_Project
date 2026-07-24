@@ -112,11 +112,13 @@ class _HinooThreadViewState extends State<HinooThreadView>
         offset: Offset(0, -dy + hint),
         child: Transform.scale(
           scale: scale.clamp(0.97, 1.0),
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            physics: const BouncingScrollPhysics(),
+          child: PageView.builder(
+            scrollDirection: Axis.vertical,
+            pageSnapping: true,
+            physics: const PageScrollPhysics(
+              parent: ClampingScrollPhysics(),
+            ),
             itemCount: items.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 14),
             itemBuilder: (context, index) {
               final entry = items[index];
               return HinooViewer(

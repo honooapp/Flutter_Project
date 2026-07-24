@@ -9,7 +9,6 @@ import '../Controller/honoo_thread_loader.dart';
 import '../Entities/honoo.dart';
 import '../UI/honoo_card.dart';
 import '../Utility/honoo_colors.dart';
- 
 
 /// Una pagina del carosello orizzontale della ChestPage.
 /// Se il root honoo ha risposte, mostra un CarouselSlider verticale senza peek,
@@ -62,12 +61,14 @@ class _HonooThreadViewState extends State<HonooThreadView>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    _introCurve = CurvedAnimation(parent: _introController, curve: Curves.easeOutBack);
+    _introCurve =
+        CurvedAnimation(parent: _introController, curve: Curves.easeOutBack);
     _bounceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 220),
     );
-    _bounceCurve = CurvedAnimation(parent: _bounceController, curve: Curves.easeOutBack);
+    _bounceCurve =
+        CurvedAnimation(parent: _bounceController, curve: Curves.easeOutBack);
     _hintController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 360),
@@ -167,12 +168,19 @@ class _HonooThreadViewState extends State<HonooThreadView>
             final List<Honoo> ordered = [root, ...replies];
             child = LayoutBuilder(
               builder: (ctx, c) {
-                final double h = c.maxHeight.isFinite ? c.maxHeight : MediaQuery.of(ctx).size.height;
-                final double w = c.maxWidth.isFinite ? c.maxWidth : MediaQuery.of(ctx).size.width;
-                final double dy = (1.0 - _introCurve.value) * 12.0 - (_bounceCurve.value * 6.0);
+                final double h = c.maxHeight.isFinite
+                    ? c.maxHeight
+                    : MediaQuery.of(ctx).size.height;
+                final double w = c.maxWidth.isFinite
+                    ? c.maxWidth
+                    : MediaQuery.of(ctx).size.width;
+                final double dy = (1.0 - _introCurve.value) * 12.0 -
+                    (_bounceCurve.value * 6.0);
                 // Rimbalzo: sali fino a metà schermo (negativo) e ritorna alla posizione iniziale
                 final double hint = -_hintCurve.value * (h * 0.5);
-                final double scale = 1.0 - (1.0 - _introCurve.value) * 0.01 - (_bounceCurve.value * 0.005);
+                final double scale = 1.0 -
+                    (1.0 - _introCurve.value) * 0.01 -
+                    (_bounceCurve.value * 0.005);
                 return Transform.translate(
                   offset: Offset(0, -dy + hint),
                   child: Transform.scale(
@@ -180,16 +188,20 @@ class _HonooThreadViewState extends State<HonooThreadView>
                     child: SizedBox(
                       width: w,
                       height: h,
-                      child: ListView.separated(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        physics: const BouncingScrollPhysics(),
+                      child: PageView.builder(
+                        scrollDirection: Axis.vertical,
+                        pageSnapping: true,
+                        physics: const PageScrollPhysics(
+                          parent: ClampingScrollPhysics(),
+                        ),
                         itemCount: ordered.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 14),
                         itemBuilder: (context, index) {
                           final honoo = ordered[index];
-                          return HonooCard(
-                            honoo: honoo,
-                            onDownloadTap: widget.onDownloadTap,
+                          return Center(
+                            child: HonooCard(
+                              honoo: honoo,
+                              onDownloadTap: widget.onDownloadTap,
+                            ),
                           );
                         },
                       ),
@@ -235,7 +247,6 @@ class _HonooThreadViewState extends State<HonooThreadView>
       },
     );
   }
-
 }
 
 // No cover wrapper: we show HonooCard at its natural metrics like normal honoo

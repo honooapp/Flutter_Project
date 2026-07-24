@@ -82,4 +82,74 @@ void main() {
     expect(foreground.transform.getTranslation().y, lessThan(0));
     expect(foreground.transform.getTranslation().y, greaterThanOrEqualTo(-336));
   });
+
+  testWidgets('una conversazione senza messaggi non crea una pagina vuota',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: UnifiedThreadView(
+            conversationId: 'empty-conversation',
+            maxWidth: 390,
+            maxHeight: 700,
+            conversationLoader: (_) async => const [],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Conversazione vuota'), findsOneWidget);
+    expect(find.byType(PageView), findsNothing);
+  });
+
+  testWidgets('un errore di conversazione mostra Riprova', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: UnifiedThreadView(
+            conversationId: 'failed-conversation',
+            maxWidth: 390,
+            maxHeight: 700,
+            conversationLoader: (_) async => throw Exception('offline'),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Non riesco a caricare la conversazione.'),
+      findsOneWidget,
+    );
+    expect(find.text('Riprova'), findsOneWidget);
+    expect(find.byType(PageView), findsNothing);
+  });
+
+  testWidgets('le conversazioni usano pagine senza overscroll elastico',
+      (tester) async {
+    final entry = ConversationEntry.honoo(honoo(
+      id: 'root-physics',
+      text: 'Messaggio',
+      owner: 'me',
+      createdAt: '2026-07-20T10:00:00Z',
+    ));
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: UnifiedThreadView(
+            conversationId: 'conversation-physics',
+            maxWidth: 390,
+            maxHeight: 700,
+            conversationLoader: (_) async => [entry],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final pageView = tester.widget<PageView>(find.byType(PageView));
+    expect(pageView.physics, isA<PageScrollPhysics>());
+    expect(pageView.physics?.parent, isA<ClampingScrollPhysics>());
+  });
 }

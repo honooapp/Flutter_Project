@@ -34,7 +34,8 @@ class LunaFissa extends StatefulWidget {
     final vw = MediaQuery.of(context).size.width;
     final safeTop = MediaQuery.of(context).viewPadding.top;
     final icon = iconSizeForWidth(vw);
-    return safeTop + icon + (_margin * 2);
+    final margin = vw >= 1200 ? _largeDesktopMargin : _margin;
+    return safeTop + icon + (margin * 2);
   }
 
   @override
