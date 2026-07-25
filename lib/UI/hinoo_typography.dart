@@ -12,7 +12,7 @@ class HinooTypography {
   static const int maxCharsPerLine = 33;
 
   /// Fixed font size in dp/points (does not scale)
-  static const double fontSize = 17.0;
+  static const double fontSize = 18.0;
 
   /// Fixed line height multiplier (approximately 1.35-1.4 from image analysis)
   static const double lineHeight = 1.375;
