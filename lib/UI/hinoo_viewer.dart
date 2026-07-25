@@ -303,7 +303,9 @@ class HinooSlideView extends StatelessWidget {
     final Matrix4 transform = buildTransform();
 
     const double horizontalPadding = HinooTypography.horizontalPadding;
-    final double verticalPadding = HinooTypography.verticalPadding(width);
+    final double textTopPadding = HinooTypography.editorTextTopPadding(width);
+    const double textBottomPadding = HinooTypography.editorTextBottomPadding;
+    final double actionVerticalPadding = HinooTypography.verticalPadding(width);
     final TextStyle effectiveStyle = HinooTypography.displayTextStyle(
       color: textColor,
     );
@@ -320,6 +322,7 @@ class HinooSlideView extends StatelessWidget {
     );
 
     return SizedBox(
+      key: const ValueKey('hinoo-slide-canvas'),
       width: width,
       height: height,
       child: Stack(
@@ -327,6 +330,7 @@ class HinooSlideView extends StatelessWidget {
         children: [
           ClipRect(
             child: Transform(
+              key: const ValueKey('hinoo-saved-background-transform'),
               transform: transform,
               alignment: Alignment.center,
               child: SmoothImage(
@@ -340,11 +344,14 @@ class HinooSlideView extends StatelessWidget {
             top: gap / 2,
             bottom: gap / 2,
             child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: horizontalPadding,
-                vertical: verticalPadding,
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding,
+                textTopPadding,
+                horizontalPadding,
+                textBottomPadding,
               ),
               child: Center(
+                key: const ValueKey('hinoo-saved-text-position'),
                 child: scaleLegacyTextToFit
                     ? FittedBox(
                         key: const ValueKey('hinoo-legacy-fitted-text'),
@@ -357,7 +364,7 @@ class HinooSlideView extends StatelessWidget {
           ),
           if (downloadOverlay != null)
             Positioned(
-              top: halfGap + verticalPadding + actionInset,
+              top: halfGap + actionVerticalPadding + actionInset,
               right: horizontalPadding + actionInset,
               child: downloadOverlay,
             ),
