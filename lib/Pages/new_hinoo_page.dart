@@ -378,7 +378,9 @@ class _NewHinooPageState extends State<NewHinooPage>
     for (final p in rawPages) {
       if (p is Map) {
         final bgUrl = p['bgUrl'] as String?;
-        final txt = ((p['text'] as String?) ?? '').trim();
+        // Preserve the editor string verbatim: leading/trailing manual line
+        // breaks are part of the text's visual position on the canvas.
+        final txt = (p['text'] as String?) ?? '';
         final textColorVal = (p['textColor'] as int?) ?? 0xFFFFFFFF;
         final isTextWhite = textColorVal == const Color(0xFFFFFFFF).toARGB32();
 

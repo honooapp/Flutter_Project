@@ -83,4 +83,43 @@ void main() {
     expect(find.byKey(const ValueKey('hinoo-legacy-fitted-text')),
         findsNothing);
   });
+
+  testWidgets('Luna e Scrigno riapplicano il ritaglio salvato dello sfondo',
+      (tester) async {
+    const transform = <double>[
+      1.4, 0, 0, 0,
+      0, 1.4, 0, 0,
+      0, 0, 1.4, 0,
+      120, -90, 0, 1,
+    ];
+    const slide = HinooSlide(
+      backgroundImage: null,
+      text: 'Inquadratura invariata',
+      isTextWhite: true,
+      bgTransform: transform,
+    );
+    final roundTrip = HinooSlide.fromJson(slide.toJson());
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HinooSlideView(
+          slide: roundTrip,
+          width: 360,
+          height: 640,
+          gap: 0,
+          gapColor: Colors.black,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(roundTrip.bgTransform, transform);
+    final backgroundTransform = tester.widget<Transform>(
+      find.byKey(const ValueKey('hinoo-saved-background-transform')),
+    );
+    expect(backgroundTransform.transform.storage[0], closeTo(1.4, 0.001));
+    expect(backgroundTransform.transform.storage[5], closeTo(1.4, 0.001));
+    expect(backgroundTransform.transform.storage[12], closeTo(40, 0.001));
+    expect(backgroundTransform.transform.storage[13], closeTo(-30, 0.001));
+  });
 }

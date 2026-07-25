@@ -157,7 +157,10 @@ class HonooCard extends StatelessWidget {
                     clipBehavior: Clip.antiAlias,
                     child: hasImage
                         ? SmoothImage(
+                            key: const ValueKey('honoo-saved-image'),
                             image: NetworkImage(imageUrl),
+                            fit: BoxFit.cover,
+                            alignment: Alignment.center,
                             placeholderColor: HonooColor.tertiary,
                           )
                         : Column(
