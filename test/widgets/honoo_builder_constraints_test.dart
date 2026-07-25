@@ -35,6 +35,29 @@ void main() {
     expect(find.text('144/144'), findsOneWidget);
   });
 
+  testWidgets('applica le sostituzioni tipografiche nell editor Honoo', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 500,
+            height: 760,
+            child: HonooBuilder(showDownloadButton: false),
+          ),
+        ),
+      ),
+    );
+
+    final field = find.byType(EditableText);
+    await tester.enterText(field, '-- ... << >>\n');
+    await tester.pump();
+
+    final editable = tester.widget<EditableText>(field);
+    expect(editable.controller.text, '— … « »\n');
+  });
+
   test('OK immagine mantiene la stessa dimensione visiva del footer', () {
     for (final mode in ResponsiveLayoutMode.values) {
       final footerSize = ResponsiveLayout.footerIconSizeForMode(mode);

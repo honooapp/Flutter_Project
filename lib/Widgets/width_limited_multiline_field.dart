@@ -15,6 +15,7 @@ class WidthLimitedMultilineField extends StatefulWidget {
     this.minLines,
     this.decoration,
     this.onChanged,
+    this.preInputFormatters,
     this.additionalInputFormatters,
     this.keyboardType = TextInputType.multiline,
     this.textInputAction = TextInputAction.newline,
@@ -46,6 +47,7 @@ class WidthLimitedMultilineField extends StatefulWidget {
   final int? minLines;
   final InputDecoration? decoration;
   final VoidCallback? onChanged;
+  final List<TextInputFormatter>? preInputFormatters;
   final List<TextInputFormatter>? additionalInputFormatters;
   final TextInputType keyboardType;
   final TextInputAction textInputAction;
@@ -294,6 +296,7 @@ class _WidthLimitedMultilineFieldState
         final int? effectiveMinLines = expands ? null : widget.minLines;
 
         final List<TextInputFormatter> allFormatters = [
+          ...?widget.preInputFormatters,
           _createWidthLimitFormatter(usableWidth),
           ...?widget.additionalInputFormatters,
         ];
