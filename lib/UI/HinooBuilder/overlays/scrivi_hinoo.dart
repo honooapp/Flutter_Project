@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:honoo/Widgets/width_limited_multiline_field.dart';
 import 'package:honoo/UI/hinoo_typography.dart';
+import 'package:honoo/Utility/typographic_substitutions_formatter.dart';
 
 class ScriviHinooOverlay extends StatefulWidget {
   const ScriviHinooOverlay({
@@ -32,8 +33,9 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
 
           const double horizontalPad = HinooTypography.horizontalPadding;
 
-          final double baseVerticalPad =
-              HinooTypography.verticalPadding(canvasWidth);
+          final double baseVerticalPad = HinooTypography.verticalPadding(
+            canvasWidth,
+          );
 
           final double topPad = baseVerticalPad * 0.45;
           const double bottomPad = 6.0;
@@ -55,6 +57,7 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
               style: effectiveStyle,
               maxLines: HinooTypography.maxLines,
               maxCharsPerLine: HinooTypography.maxCharsPerLine,
+              preInputFormatters: const [TypographicSubstitutionsFormatter()],
               horizontalPadding: EdgeInsets.zero,
               scrollPadding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom + 24,

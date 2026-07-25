@@ -4,8 +4,9 @@ import 'package:honoo/UI/honoo_builder.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
 
 void main() {
-  testWidgets('contatore e input Honoo si fermano a 144 caratteri',
-      (tester) async {
+  testWidgets('contatore e input Honoo si fermano a 144 caratteri', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(

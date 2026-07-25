@@ -1,9 +1,9 @@
 import 'package:flutter/services.dart';
 
-/// Applies Honoo's typographic substitutions once a sequence is completed
+/// Applies the editors' typographic substitutions once a sequence is completed
 /// with a space or a newline.
-class HonooTypographicSubstitutionsFormatter extends TextInputFormatter {
-  const HonooTypographicSubstitutionsFormatter();
+class TypographicSubstitutionsFormatter extends TextInputFormatter {
+  const TypographicSubstitutionsFormatter();
 
   static const Map<String, String> _substitutions = {
     '...': '…',

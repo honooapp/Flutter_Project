@@ -1,9 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:honoo/Utility/honoo_typographic_substitutions_formatter.dart';
+import 'package:honoo/Utility/typographic_substitutions_formatter.dart';
 
 void main() {
-  const formatter = HonooTypographicSubstitutionsFormatter();
+  const formatter = TypographicSubstitutionsFormatter();
 
   TextEditingValue format(String oldText, String newText) {
     return formatter.formatEditUpdate(

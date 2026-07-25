@@ -24,8 +24,9 @@ void main() {
     when(() => honoo.neq(any(), any())).thenAnswer((_) => honoo);
     when(() => hinoo.neq(any(), any())).thenAnswer((_) => hinoo);
     final visit = MockQueryChain();
-    when(() => harness.client.rpc('increment_site_visit'))
-        .thenAnswer((_) => visit);
+    when(
+      () => harness.client.rpc('increment_site_visit'),
+    ).thenAnswer((_) => visit);
   });
 
   tearDown(() {
@@ -33,55 +34,57 @@ void main() {
   });
 
   testWidgets(
-      'ReplyHonooPage: dopo la conferma della risposta torna alla Home',
-      (tester) async {
-    final original = Honoo(
-      1,
-      '“Testo origine”',
-      '',
-      '2024-01-01T00:00:00Z',
-      '2024-01-01T00:00:00Z',
-      'user_1',
-      HonooType.personal,
-    );
+    'ReplyHonooPage: dopo la conferma della risposta torna alla Home',
+    (tester) async {
+      final original = Honoo(
+        1,
+        '“Testo origine”',
+        '',
+        '2024-01-01T00:00:00Z',
+        '2024-01-01T00:00:00Z',
+        'user_1',
+        HonooType.personal,
+      );
 
-    await tester.pumpWidget(
-      Sizer(
-        builder: (context, orientation, deviceType) {
-          return MaterialApp(
-            home: ReplyHonooPage(
-              originalHonoo: original,
-            ),
-          );
-        },
-      ),
-    );
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(
+        Sizer(
+          builder: (context, orientation, deviceType) {
+            return MaterialApp(home: ReplyHonooPage(originalHonoo: original));
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    final tf = find.byType(TextField).first;
-    expect(tf, findsOneWidget);
+      final tf = find.byType(TextField).first;
+      expect(tf, findsOneWidget);
 
-    await tester.enterText(tf, '“risposta di prova”');
-    await tester.pump();
+      await tester.enterText(tf, '-- risposta ... << prova >>\n');
+      await tester.pump();
 
-    final sendButton = find.bySemanticsLabel('Invia risposta');
-    expect(sendButton, findsOneWidget);
+      expect(
+        tester.widget<TextField>(tf).controller?.text,
+        '— risposta … « prova »\n',
+      );
 
-    await tester.tap(sendButton);
-    await tester.pump();
-    await tester.pump();
+      final sendButton = find.bySemanticsLabel('Invia risposta');
+      expect(sendButton, findsOneWidget);
 
-    expect(find.byType(HonooMessageDialog), findsOneWidget);
-    Navigator.of(
-      tester.element(find.byType(HonooMessageDialog)),
-      rootNavigator: true,
-    ).pop();
-    await tester.pumpAndSettle();
+      await tester.tap(sendButton);
+      await tester.pump();
+      await tester.pump();
 
-    expect(find.byType(HomePage), findsOneWidget);
-    expect(find.byType(ReplyHonooPage), findsNothing);
+      expect(find.byType(HonooMessageDialog), findsOneWidget);
+      Navigator.of(
+        tester.element(find.byType(HonooMessageDialog)),
+        rootNavigator: true,
+      ).pop();
+      await tester.pumpAndSettle();
 
-    await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump(const Duration(seconds: 25));
-  });
+      expect(find.byType(HomePage), findsOneWidget);
+      expect(find.byType(ReplyHonooPage), findsNothing);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump(const Duration(seconds: 25));
+    },
+  );
 }

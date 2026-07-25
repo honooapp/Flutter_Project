@@ -13,7 +13,7 @@ import 'package:honoo/Utility/heic_converter.dart' as heic;
 
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
-import 'package:honoo/Utility/honoo_typographic_substitutions_formatter.dart';
+import 'package:honoo/Utility/typographic_substitutions_formatter.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
 import 'package:honoo/Widgets/width_limited_multiline_field.dart';
@@ -594,7 +594,7 @@ class HonooBuilderState extends State<HonooBuilder> {
                   maxCharsPerLine: 32,
                   onChanged: () => setState(() {}),
                   preInputFormatters: const [
-                    HonooTypographicSubstitutionsFormatter(),
+                    TypographicSubstitutionsFormatter(),
                   ],
                   additionalInputFormatters: [
                     LengthLimitingTextInputFormatter(
