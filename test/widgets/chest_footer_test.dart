@@ -8,7 +8,11 @@ import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Widgets/chest_footer.dart';
 
 void main() {
-  ChestItem honooItem(HonooType type, {bool isOnMoon = false}) {
+  ChestItem honooItem(
+    HonooType type, {
+    bool isOnMoon = false,
+    bool hasReplies = false,
+  }) {
     final honoo = Honoo(
       1,
       'Test',
@@ -17,7 +21,9 @@ void main() {
       '2026-01-01T00:00:00Z',
       type == HonooType.answer ? 'another-user' : 'current-user',
       type,
-    )..isOnMoon = isOnMoon;
+    )
+      ..isOnMoon = isOnMoon
+      ..hasReplies = hasReplies;
     return ChestItem.honoo(honoo, DateTime.utc(2026));
   }
 
@@ -73,7 +79,7 @@ void main() {
     );
   }
 
-  testWidgets('footer vuoto mostra Home e Info con Home senza filtro colore',
+  testWidgets('footer vuoto mostra subito Home e Info bianche',
       (tester) async {
     await pumpFooter(tester, item: null);
 
@@ -82,8 +88,34 @@ void main() {
     expect(find.byType(IconButton), findsNWidgets(2));
     final icons =
         tester.widgetList<SvgPicture>(find.byType(SvgPicture)).toList();
-    expect(icons.first.colorFilter, isNull);
+    expect(icons.first.colorFilter, isNotNull);
     expect(icons.last.colorFilter, isNotNull);
+  });
+
+  testWidgets('solo Luna conserva il colore originale nel footer',
+      (tester) async {
+    await pumpFooter(tester, item: honooItem(HonooType.personal));
+
+    final icons =
+        tester.widgetList<SvgPicture>(find.byType(SvgPicture)).toList();
+    expect(icons, hasLength(4));
+    expect(icons[0].colorFilter, isNotNull); // Home
+    expect(icons[1].colorFilter, isNotNull); // Info
+    expect(icons[2].colorFilter, isNull); // Luna
+    expect(icons[3].colorFilter, isNotNull); // Cancella
+  });
+
+  testWidgets('anche Vedi risposte resta bianca', (tester) async {
+    await pumpFooter(
+      tester,
+      item: honooItem(HonooType.personal, hasReplies: true),
+    );
+
+    final icons =
+        tester.widgetList<SvgPicture>(find.byType(SvgPicture)).toList();
+    expect(find.byTooltip('Vedi risposte'), findsOneWidget);
+    expect(icons, hasLength(4));
+    expect(icons.every((icon) => icon.colorFilter != null), isTrue);
   });
 
   testWidgets('Honoo personale mostra Luna e Cancella e inoltra le azioni',
