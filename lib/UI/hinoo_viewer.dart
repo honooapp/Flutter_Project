@@ -335,11 +335,15 @@ class HinooSlideView extends StatelessWidget {
                 vertical: verticalPadding,
               ),
               child: Center(
-                child: Text(
-                  slide.text,
-                  textAlign: TextAlign.center,
-                  style: effectiveStyle,
-                  softWrap: true,
+                child: FittedBox(
+                  key: const ValueKey('hinoo-fitted-text'),
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    slide.text,
+                    textAlign: TextAlign.center,
+                    style: effectiveStyle,
+                    softWrap: false,
+                  ),
                 ),
               ),
             ),
