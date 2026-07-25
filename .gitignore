@@ -51,3 +51,6 @@ pubspec.lock
 
 # Local live-test credentials
 live.env
+
+# Supabase CLI internal state
+supabase/.temp/
