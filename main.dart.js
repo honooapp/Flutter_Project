@@ -30832,7 +30832,7 @@ Uy:function Uy(){},
 bsm(){$.ea=new A.ai8($.ea)
 var s=$.bs()
 s.x2=new A.ai9(s.x2)},
-b9E(a,b,c){var s=A.kw(J.a0(b).a,null),r=A.bfq("8b90300977d9f3e783627e420c59e1c43a5a91a7")
+b9E(a,b,c){var s=A.kw(J.a0(b).a,null),r=A.bfq("da13db63572f7dd5eb06637598b8d60a13096598")
 new A.bw(Date.now(),0,!1).aWi()
 $.b9D.push(new A.XM(s,r))
 if($.b9D.length>40)B.c.i8($.b9D,0)
@@ -37555,7 +37555,7 @@ bzk(){var s=$.aL().b
 s===$&&A.a()
 return s},
 bHd(){return new A.Qe()},
-bgP(a,b){return A.b2().$4$color$fontSize$fontWeight$height(a,17,b==null?B.q:b,1.375)},
+bgP(a,b){return A.b2().$4$color$fontSize$fontWeight$height(a,18,b==null?B.q:b,1.375)},
 bax(a){return 40*B.d.a1(a/360,0.8,1)},
 AE(a,b,c,d){J.a0(b)},
 bf5(a,b,c,d){if(b!=null)J.a0(b)},
@@ -117266,7 +117266,7 @@ n=A.Cx(10,10)
 r=B.dM.cL(0.6)
 q=A.bb(8)
 p=t.p
-return A.bq(new A.e8(new A.ad(0,m,0,s),A.ct(B.L,A.b([A.id(A.AJ(A.c7(o,A.ju(A.bA(A.b([A.ah("Questo \xe8 il tuo Scrigno.\n\nQui sono custoditi\ngli honoo e gli hinoo\nche hai scritto,\n\nquelli che hai salvato dalla Luna,\n\ne quelli che hai ricevuto.\n\nBlu\nsono i tuoi.\n\nBianco\nquelli della Luna.\n\nRosso\nquelli che ti sono stati inviati.\n\nScorri verso destra\nper rivedere ci\xf2 che hai scritto\ne ci\xf2 che hai salvato.\n\nScorri dall\u2019alto verso il basso\nper seguire\nle conversazioni.\n\nIn alto\nl\u2019honoo della Luna.\n\nSotto\nla tua risposta.\n\nE, sotto ancora,\nse arriva,\nla risposta\nalla tua risposta.\n",o,o,o,o,o,A.b2().$2$color$fontSize(B.f,14),B.p,o),B.aS,A.ah("v1.1.0+2 \xb7 "+A.bfq("8b90300977d9f3e783627e420c59e1c43a5a91a7"),o,o,o,o,o,B.adz,B.p,o)],p),B.r,B.t,B.D),o,o,B.df),B.n,o,o,new A.cT(r,o,o,q,o,o,B.a3),o,s,o,o,B.Qr,o,o,m),n),B.v,o),A.c6(o,A.dN(o,o,B.o_,40,o,new A.ako(a),o,o,o,"Chiudi",o),o,o,o,0,0,o)],p),B.v,B.a8),o),o,o,o)},
+return A.bq(new A.e8(new A.ad(0,m,0,s),A.ct(B.L,A.b([A.id(A.AJ(A.c7(o,A.ju(A.bA(A.b([A.ah("Questo \xe8 il tuo Scrigno.\n\nQui sono custoditi\ngli honoo e gli hinoo\nche hai scritto,\n\nquelli che hai salvato dalla Luna,\n\ne quelli che hai ricevuto.\n\nBlu\nsono i tuoi.\n\nBianco\nquelli della Luna.\n\nRosso\nquelli che ti sono stati inviati.\n\nScorri verso destra\nper rivedere ci\xf2 che hai scritto\ne ci\xf2 che hai salvato.\n\nScorri dall\u2019alto verso il basso\nper seguire\nle conversazioni.\n\nIn alto\nl\u2019honoo della Luna.\n\nSotto\nla tua risposta.\n\nE, sotto ancora,\nse arriva,\nla risposta\nalla tua risposta.\n",o,o,o,o,o,A.b2().$2$color$fontSize(B.f,14),B.p,o),B.aS,A.ah("v1.1.0+2 \xb7 "+A.bfq("da13db63572f7dd5eb06637598b8d60a13096598"),o,o,o,o,o,B.adz,B.p,o)],p),B.r,B.t,B.D),o,o,B.df),B.n,o,o,new A.cT(r,o,o,q,o,o,B.a3),o,s,o,o,B.Qr,o,o,m),n),B.v,o),A.c6(o,A.dN(o,o,B.o_,40,o,new A.ako(a),o,o,o,"Chiudi",o),o,o,o,0,0,o)],p),B.v,B.a8),o),o,o,o)},
 $S:138}
 A.ako.prototype={
 $0(){return A.a1(this.a,!1).d_()},
