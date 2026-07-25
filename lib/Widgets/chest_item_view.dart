@@ -7,7 +7,7 @@ import '../Entities/honoo.dart';
 import '../UI/hinoo_thread_view.dart';
 import '../UI/hinoo_typography.dart';
 import '../UI/hinoo_viewer.dart';
-import '../UI/honoo_thread_view.dart';
+import '../UI/honoo_card.dart';
 import '../UI/unified_thread_view.dart';
 import '../Utility/responsive_layout.dart';
 
@@ -66,11 +66,21 @@ class ChestItemView extends StatelessWidget {
       honoo: (honoo) => _buildHonoo(honoo),
       hinoo: (hinoo) => _buildHinoo(hinoo, cardWidth, cardHeight),
     );
-    final isThread = item.when(
-      honoo: (_) => true,
-      hinoo: (hinoo) => hinooRepliesByRoot[hinoo.id]?.isNotEmpty ?? false,
+    final isConversation = item.when(
+      honoo: (honoo) =>
+          isNormalMode &&
+          honoo.conversationId != null &&
+          honoo.conversationId!.isNotEmpty,
+      hinoo: (hinoo) {
+        final conversationId =
+            hinoo.conversationId ?? hinoo.draft.conversationId;
+        return (isNormalMode &&
+                conversationId != null &&
+                conversationId.isNotEmpty) ||
+            (hinooRepliesByRoot[hinoo.id]?.isNotEmpty ?? false);
+      },
     );
-    final card = isThread
+    final card = isConversation
         ? RepaintBoundary(key: repaintKey, child: content)
         : ClipRRect(
             borderRadius: BorderRadius.circular(12),
@@ -79,16 +89,14 @@ class ChestItemView extends StatelessWidget {
               child: RepaintBoundary(key: repaintKey, child: content),
             ),
           );
+    final keyedCard = KeyedSubtree(
+      key: ValueKey(identity),
+      child: SizedBox(width: maxWidth, height: availableHeight, child: card),
+    );
+    if (!isConversation) return keyedCard;
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 250),
-      child: KeyedSubtree(
-        key: ValueKey(identity),
-        child: SizedBox(
-          width: maxWidth,
-          height: availableHeight,
-          child: card,
-        ),
-      ),
+      child: keyedCard,
     );
   }
 
@@ -97,15 +105,10 @@ class ChestItemView extends StatelessWidget {
     if (isNormalMode && conversationId != null && conversationId.isNotEmpty) {
       return _unifiedThread(conversationId);
     }
-    final effectiveRoot = honoo.type == HonooType.answer &&
-            honoo.replyTo != null &&
-            honoo.replyTo!.isNotEmpty
-        ? honoo.copyWith(dbId: honoo.replyTo)
-        : honoo;
     return SizedBox(
       width: maxWidth,
       height: availableHeight,
-      child: HonooThreadView(root: effectiveRoot, onDownloadTap: onDownload),
+      child: HonooCard(honoo: honoo, onDownloadTap: onDownload),
     );
   }
 
@@ -139,14 +142,13 @@ class ChestItemView extends StatelessWidget {
   }
 
   Widget _unifiedThread(String conversationId) => UnifiedThreadView(
-        conversationId: conversationId,
-        maxWidth: maxWidth,
-        maxHeight: availableHeight,
-        isActive: isActive,
-        onSelect: onSelectConversationEntry,
-        highlightLatest:
-            highlightLatest && focusConversationId == conversationId,
-        onDownloadTap: onDownload,
-        refreshToken: conversationRefreshToken,
-      );
+    conversationId: conversationId,
+    maxWidth: maxWidth,
+    maxHeight: availableHeight,
+    isActive: isActive,
+    onSelect: onSelectConversationEntry,
+    highlightLatest: highlightLatest && focusConversationId == conversationId,
+    onDownloadTap: onDownload,
+    refreshToken: conversationRefreshToken,
+  );
 }
