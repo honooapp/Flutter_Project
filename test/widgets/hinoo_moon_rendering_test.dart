@@ -50,5 +50,37 @@ void main() {
     expect(moon.height, saved.height);
     expect(moon.gap, saved.gap);
     expect(moon.gapColor, saved.gapColor);
+    expect(moon.scaleLegacyTextToFit, saved.scaleLegacyTextToFit);
+  });
+
+  testWidgets(
+      'un Hinoo appena salvato mantiene il layout editor senza restringimento',
+      (tester) async {
+    const slide = HinooSlide(
+      backgroundImage: null,
+      text: 'Prima riga\nSeconda riga',
+      isTextWhite: true,
+    );
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: HinooViewer(
+          draft: HinooDraft(
+            pages: [slide],
+            baseCanvasHeight: 640,
+          ),
+          maxHeight: 640,
+          maxWidth: 360,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final renderedSlide =
+        tester.widget<HinooSlideView>(find.byType(HinooSlideView));
+
+    expect(renderedSlide.scaleLegacyTextToFit, isFalse);
+    expect(find.byKey(const ValueKey('hinoo-legacy-fitted-text')),
+        findsNothing);
   });
 }

@@ -205,6 +205,8 @@ class _HinooViewerState extends State<HinooViewer> {
                               height: baselineH,
                               gap: 0,
                               gapColor: widget.gapColor,
+                              scaleLegacyTextToFit:
+                                  widget.draft.baseCanvasHeight == null,
                               onDownloadTap: widget.onDownloadTap,
                             );
                           },
@@ -256,6 +258,7 @@ class HinooSlideView extends StatelessWidget {
   final double height;
   final double gap;
   final Color gapColor;
+  final bool scaleLegacyTextToFit;
   final VoidCallback? onDownloadTap;
   const HinooSlideView({
     super.key,
@@ -264,6 +267,7 @@ class HinooSlideView extends StatelessWidget {
     required this.height,
     required this.gap,
     required this.gapColor,
+    this.scaleLegacyTextToFit = false,
     this.onDownloadTap,
   });
 
@@ -308,6 +312,12 @@ class HinooSlideView extends StatelessWidget {
     final Widget? downloadOverlay = onDownloadTap == null
         ? null
         : TextBoxDownloadButton(onPressed: onDownloadTap!, tooltip: 'download');
+    final Widget text = Text(
+      slide.text,
+      textAlign: TextAlign.center,
+      style: effectiveStyle,
+      softWrap: false,
+    );
 
     return SizedBox(
       width: width,
@@ -335,16 +345,13 @@ class HinooSlideView extends StatelessWidget {
                 vertical: verticalPadding,
               ),
               child: Center(
-                child: FittedBox(
-                  key: const ValueKey('hinoo-fitted-text'),
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    slide.text,
-                    textAlign: TextAlign.center,
-                    style: effectiveStyle,
-                    softWrap: false,
-                  ),
-                ),
+                child: scaleLegacyTextToFit
+                    ? FittedBox(
+                        key: const ValueKey('hinoo-legacy-fitted-text'),
+                        fit: BoxFit.scaleDown,
+                        child: text,
+                      )
+                    : text,
               ),
             ),
           ),
