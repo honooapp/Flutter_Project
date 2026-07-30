@@ -88,7 +88,6 @@ class _HinooBuilderState extends State<HinooBuilder> {
   double _bgMinInteractiveScale = _bgMinScale;
   final TransformationController _bgController = TransformationController();
   Matrix4? _bgLockedMatrix;
-  Matrix4? _bgInitialMatrix;
   double _bgScale = _bgMinScale;
 
   // Export/anteprima
@@ -176,15 +175,6 @@ class _HinooBuilderState extends State<HinooBuilder> {
     _updateBgScale(_bgScale + delta);
   }
 
-  void _resetBgTransform() {
-    final Matrix4 reset = _bgInitialMatrix?.clone() ?? Matrix4.identity();
-    _bgController.value = reset;
-    setState(() {
-      _bgScale = _extractScaleFromMatrix(reset);
-      _bgLockedMatrix = null;
-    });
-  }
-
   void _applySlideState(dynamic slide) {
     final String text = _extractTextFromSlide(slide);
     if (_textController.text != text) {
@@ -224,7 +214,6 @@ class _HinooBuilderState extends State<HinooBuilder> {
     _bgPublicUrl = null;
     _bgLockedMatrix = null;
     _bgController.value = Matrix4.identity();
-    _bgInitialMatrix = null;
     _bgScale = _bgMinScale;
     _bgChosen = false;
     _step = _WizardStep.changeBg;
@@ -597,7 +586,6 @@ class _HinooBuilderState extends State<HinooBuilder> {
             onZoomOut: _bgChosen && _bgScale > _bgMinScale
                 ? () => _nudgeBgScale(-0.1)
                 : null,
-            onResetTransform: _bgChosen ? _resetBgTransform : null,
           ),
           if (_bgChosen && !_isUploadingBg)
             Positioned(
@@ -611,7 +599,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
                   width: 44,
                   height: 44,
                 ),
-                tooltip: 'Conferma sfondo',
+                tooltip: 'Conferma immagine',
               ),
             ),
         ] else if (_step == _WizardStep.pickColor)
@@ -854,7 +842,6 @@ class _HinooBuilderState extends State<HinooBuilder> {
         _localBgPreviewBytes = bytes;
         _bgChosen = true; // abilita OK per procedere
         _bgLockedMatrix = null;
-        _bgInitialMatrix = initialMatrix.clone();
         _bgScale = initialScale;
         _bgMinInteractiveScale = initialScale;
         _isUploadingBg = true;

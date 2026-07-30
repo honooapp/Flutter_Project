@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Widgets/composer_onboarding.dart';
 
 // Pagine per la navigazione (come in HomePage)
 import 'package:honoo/IsolaDelleStorie/Pages/island_page.dart';
-import 'package:honoo/Pages/new_honoo_page.dart';
 import 'package:honoo/Pages/chest_page.dart';
 import 'package:honoo/Utility/replies_seen_tracker.dart';
 
@@ -40,12 +40,15 @@ class SeaFooterBar extends StatelessWidget {
           final double bottleTargetX = (w / 2) + 104;
 
           // Clamp per evitare tagli laterali
-          final double islandX =
-              islandTargetX.clamp(0.0, (w - islandSize)).toDouble();
-          final double bottleX =
-              bottleTargetX.clamp(0.0, (w - bottleSize)).toDouble();
-          final double chestX =
-              chestCenterX.clamp(0.0, (w - chestSize)).toDouble();
+          final double islandX = islandTargetX
+              .clamp(0.0, (w - islandSize))
+              .toDouble();
+          final double bottleX = bottleTargetX
+              .clamp(0.0, (w - bottleSize))
+              .toDouble();
+          final double chestX = chestCenterX
+              .clamp(0.0, (w - chestSize))
+              .toDouble();
 
           return Stack(
             clipBehavior: Clip.none,
@@ -96,13 +99,7 @@ class SeaFooterBar extends StatelessWidget {
                     iconSize: bottleSize,
                     splashRadius: 40,
                     tooltip: 'Scrivi',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const NewHonooPage()),
-                    );
-                  },
+                    onPressed: () => ComposerLauncher.open(context),
                   ),
                 ),
               ),
@@ -119,7 +116,6 @@ class SeaFooterBar extends StatelessWidget {
                 ),
               ),
 
-
               // Isola (sx)
               Positioned(
                 bottom: safeBottom,
@@ -134,8 +130,9 @@ class SeaFooterBar extends StatelessWidget {
                     padding: EdgeInsets.zero,
                     icon: SvgPicture.asset(
                       "assets/icons/isoladellestorie/island.svg",
-                      theme:
-                          const SvgTheme(currentColor: HonooColor.onBackground),
+                      theme: const SvgTheme(
+                        currentColor: HonooColor.onBackground,
+                      ),
                       colorFilter: const ColorFilter.mode(
                         HonooColor.onBackground,
                         BlendMode.srcIn,
@@ -151,7 +148,8 @@ class SeaFooterBar extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const IslandPage()),
+                          builder: (context) => const IslandPage(),
+                        ),
                       );
                     },
                   ),
@@ -182,20 +180,20 @@ class SeaFooterBar extends StatelessWidget {
                         iconSize: chestSize,
                         splashRadius: 40,
                         tooltip: 'Apri il tuo Cuore',
-                      onPressed: () {
-                        if (replyCount > 0) {
-                          RepliesSeenTracker.markNow();
-                        }
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ChestPage(
-                              focusReplies: replyCount > 0,
-                              highlightLatest: replyCount > 0,
+                        onPressed: () {
+                          if (replyCount > 0) {
+                            RepliesSeenTracker.markNow();
+                          }
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChestPage(
+                                focusReplies: replyCount > 0,
+                                highlightLatest: replyCount > 0,
+                              ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
                       ),
                       if (replyCount > 0)
                         Positioned(
