@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:honoo/Controller/device_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -67,9 +68,19 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
 
   Future<String> _selectNextMobileBackground() async {
     final preferences = await SharedPreferences.getInstance();
-    final showSirena =
-        preferences.getString(_mobileBackgroundPreferenceKey) ==
-        _palombaroMobileBackground;
+    final currentBackground = preferences.getString(
+      _mobileBackgroundPreferenceKey,
+    );
+
+    // Sul web il bootstrap HTML sceglie e precarica già lo sfondo mobile.
+    // Riutilizzarlo evita un secondo cambio d'immagine prima del primo frame.
+    if (kIsWeb &&
+        (currentBackground == _palombaroMobileBackground ||
+            currentBackground == _sirenaMobileBackground)) {
+      return currentBackground!;
+    }
+
+    final showSirena = currentBackground == _palombaroMobileBackground;
     final selectedBackground = showSirena
         ? _sirenaMobileBackground
         : _palombaroMobileBackground;
@@ -558,7 +569,11 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     );
 
     if (!isPhone) {
-      return Background(child: pageBody);
+      return Background(
+        placeholderColor: Colors.transparent,
+        fadeDuration: Duration.zero,
+        child: pageBody,
+      );
     }
 
     return FutureBuilder<String>(
@@ -566,9 +581,14 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
       builder: (context, snapshot) {
         final imagePath = snapshot.data;
         if (imagePath == null) {
-          return ColoredBox(color: HonooColor.background, child: pageBody);
+          return pageBody;
         }
-        return Background(imagePath: imagePath, child: pageBody);
+        return Background(
+          imagePath: imagePath,
+          placeholderColor: Colors.transparent,
+          fadeDuration: Duration.zero,
+          child: pageBody,
+        );
       },
     );
   }
