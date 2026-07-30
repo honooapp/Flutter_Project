@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Widgets/composer_onboarding.dart';
 
 // Pagine per la navigazione (come in HomePage)
 import 'package:honoo/IsolaDelleStorie/Pages/island_page.dart';
-import 'package:honoo/Pages/new_honoo_page.dart';
 import 'package:honoo/Pages/chest_page.dart';
 import 'package:honoo/Utility/replies_seen_tracker.dart';
 
@@ -96,13 +96,7 @@ class SeaFooterBar extends StatelessWidget {
                     iconSize: bottleSize,
                     splashRadius: 40,
                     tooltip: 'Scrivi',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const NewHonooPage()),
-                    );
-                  },
+                  onPressed: () => ComposerLauncher.open(context),
                   ),
                 ),
               ),

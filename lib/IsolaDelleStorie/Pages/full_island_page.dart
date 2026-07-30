@@ -9,13 +9,13 @@ import 'package:honoo/IsolaDelleStorie/Utility/isola_delle_storie_content_manage
 import 'package:honoo/Pages/chest_page.dart';
 import 'package:honoo/Utility/formatted_text.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Widgets/composer_onboarding.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../Controller/device_controller.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../Pages/moon_page.dart';
-import '../../Pages/new_honoo_page.dart';
 import '../../Pages/home_page.dart';
 import '../../Pages/placeholder_page.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
@@ -364,13 +364,8 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                 iconSize: bottleSize,
                                 splashRadius: 40,
                                 tooltip: 'Scrivi',
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const NewHonooPage()));
-                                },
+                                onPressed: () =>
+                                    ComposerLauncher.open(context),
                               ),
                             ),
                             Positioned(
