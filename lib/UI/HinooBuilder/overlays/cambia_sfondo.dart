@@ -52,11 +52,7 @@ class CambiaSfondoOverlay extends StatelessWidget {
                   style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
                 ),
                 const SizedBox(height: 22),
-                const Icon(
-                  Icons.photo,
-                  size: 48,
-                  color: Colors.white,
-                ),
+                const Icon(Icons.photo, size: 48, color: Colors.white),
               ],
             ),
           ),
@@ -64,11 +60,13 @@ class CambiaSfondoOverlay extends StatelessWidget {
       );
     }
 
-    final double clampedScale =
-        currentScale.clamp(minScale, maxScale).toDouble();
+    final double clampedScale = currentScale
+        .clamp(minScale, maxScale)
+        .toDouble();
     final int computedDivisions = ((maxScale - minScale) * 10).round();
-    final int? sliderDivisions =
-        computedDivisions > 0 ? computedDivisions : null;
+    final int? sliderDivisions = computedDivisions > 0
+        ? computedDivisions
+        : null;
 
     return Align(
       alignment: Alignment.bottomCenter,
@@ -77,6 +75,7 @@ class CambiaSfondoOverlay extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
           child: Container(
+            key: const Key('hinoo-image-editing-controls'),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
               color: Colors.black.withValues(alpha: 0.55),
@@ -86,7 +85,8 @@ class CambiaSfondoOverlay extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Trascina per spostare lo sfondo.\nUsa il pizzico o i controlli per zoomare.',
+                  'Trascina per spostare l’immagine.\n'
+                  'Usa il pizzico o i controlli per zoomare.',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.lora(color: Colors.white, fontSize: 14),
                 ),
@@ -127,12 +127,15 @@ class CambiaSfondoOverlay extends StatelessWidget {
                             color: Colors.white,
                             tooltip: 'Aumenta zoom',
                           ),
-                          IconButton(
-                            onPressed: onResetTransform,
-                            icon: const Icon(Icons.center_focus_strong_outlined),
-                            color: Colors.white,
-                            tooltip: 'Reimposta posizione',
-                          ),
+                          if (onResetTransform != null)
+                            IconButton(
+                              onPressed: onResetTransform,
+                              icon: const Icon(
+                                Icons.center_focus_strong_outlined,
+                              ),
+                              color: Colors.white,
+                              tooltip: 'Reimposta posizione',
+                            ),
                         ],
                       ),
                     ),
@@ -158,23 +161,29 @@ class CambiaSfondoOverlay extends StatelessWidget {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        'Caricamento sfondo…',
-                        style:
-                            GoogleFonts.lora(color: Colors.white70, fontSize: 12),
+                        'Caricamento immagine…',
+                        style: GoogleFonts.lora(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
                 ],
                 const SizedBox(height: 12),
-                TextButton.icon(
-                  onPressed: onTapChange,
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                Center(
+                  child: TextButton.icon(
+                    onPressed: onTapChange,
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                    ),
+                    icon: const Icon(Icons.photo_library_outlined),
+                    label: const Text('Sostituisci immagine'),
                   ),
-                  icon: const Icon(Icons.photo_library_outlined),
-                  label: const Text('Sostituisci sfondo'),
                 ),
               ],
             ),

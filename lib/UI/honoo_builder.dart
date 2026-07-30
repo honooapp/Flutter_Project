@@ -181,11 +181,6 @@ class HonooBuilderState extends State<HonooBuilder> {
 
   void _nudgeImageScale(double delta) => _updateImageScale(_imageScale + delta);
 
-  void _resetImageTransform() {
-    _imageController.value = Matrix4.identity();
-    setState(() => _imageScale = _imageMinScale);
-  }
-
   Future<void> _pickImage() async {
     try {
       final picker = ImagePicker();
@@ -711,7 +706,8 @@ class HonooBuilderState extends State<HonooBuilder> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Trascina l’immagine e regola lo zoom',
+                'Trascina per spostare l’immagine.\n'
+                'Usa il pizzico o i controlli per zoomare.',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.arvo(
                   color: HonooColor.background,
@@ -761,58 +757,58 @@ class HonooBuilderState extends State<HonooBuilder> {
                     disabledColor: HonooColor.background.withValues(alpha: 0.3),
                     tooltip: 'Aumenta zoom',
                   ),
-                  IconButton(
-                    onPressed: _resetImageTransform,
-                    icon: const Icon(Icons.center_focus_strong_outlined),
-                    color: HonooColor.background,
-                    tooltip: 'Reimposta posizione',
-                  ),
                 ],
               ),
-              Row(
-                children: [
-                  TextButton.icon(
-                    onPressed: _pickImage,
-                    style: TextButton.styleFrom(
-                      foregroundColor: HonooColor.background,
+              SizedBox(
+                width: double.infinity,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    TextButton.icon(
+                      key: const Key('honoo-replace-editing-image'),
+                      onPressed: _pickImage,
+                      style: TextButton.styleFrom(
+                        foregroundColor: HonooColor.background,
+                      ),
+                      icon: const Icon(Icons.photo_library_outlined),
+                      label: const Text('Sostituisci immagine'),
                     ),
-                    icon: const Icon(Icons.photo_library_outlined),
-                    label: const Text('Sostituisci immagine'),
-                  ),
-                  const Spacer(),
-                  if (_isUploadingFinal)
-                    SizedBox(
-                      width: confirmIconSize,
-                      height: confirmIconSize,
-                      child: const Padding(
-                        padding: EdgeInsets.all(8),
-                        child: CircularProgressIndicator(
-                          strokeWidth: 3,
-                          color: HonooColor.background,
-                        ),
-                      ),
-                    )
-                  else
-                    IconButton(
-                      constraints: BoxConstraints.tightFor(
-                        width: confirmIconSize,
-                        height: confirmIconSize,
-                      ),
-                      padding: EdgeInsets.zero,
-                      iconSize: confirmIconSize,
-                      onPressed: _confirmImage,
-                      tooltip: 'Conferma immagine',
-                      icon: SvgPicture.asset(
-                        'assets/icons/ok.svg',
-                        width: confirmIconSize,
-                        height: confirmIconSize,
-                        colorFilter: const ColorFilter.mode(
-                          HonooColor.background,
-                          BlendMode.srcIn,
-                        ),
-                      ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: _isUploadingFinal
+                          ? SizedBox(
+                              width: confirmIconSize,
+                              height: confirmIconSize,
+                              child: const Padding(
+                                padding: EdgeInsets.all(8),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                  color: HonooColor.background,
+                                ),
+                              ),
+                            )
+                          : IconButton(
+                              constraints: BoxConstraints.tightFor(
+                                width: confirmIconSize,
+                                height: confirmIconSize,
+                              ),
+                              padding: EdgeInsets.zero,
+                              iconSize: confirmIconSize,
+                              onPressed: _confirmImage,
+                              tooltip: 'Conferma immagine',
+                              icon: SvgPicture.asset(
+                                'assets/icons/ok.svg',
+                                width: confirmIconSize,
+                                height: confirmIconSize,
+                                colorFilter: const ColorFilter.mode(
+                                  HonooColor.background,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                            ),
                     ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
@@ -885,31 +881,34 @@ class HonooBuilderState extends State<HonooBuilder> {
                       ),
                     if (_imageConfirmed && !_hideEditorActionsForCapture)
                       Positioned(
-                        left: 12,
+                        left: 0,
+                        right: 0,
                         bottom: 12,
-                        child: TextButton.icon(
-                          key: const Key('honoo-replace-confirmed-image'),
-                          onPressed: _pickImage,
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.black.withValues(
-                              alpha: 0.55,
+                        child: Center(
+                          child: TextButton.icon(
+                            key: const Key('honoo-replace-confirmed-image'),
+                            onPressed: _pickImage,
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.black.withValues(
+                                alpha: 0.55,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
+                            icon: const Icon(
+                              Icons.photo_library_outlined,
+                              size: 20,
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                            label: Text(
+                              'Sostituisci immagine',
+                              style: GoogleFonts.arvo(fontSize: 13),
                             ),
-                          ),
-                          icon: const Icon(
-                            Icons.photo_library_outlined,
-                            size: 20,
-                          ),
-                          label: Text(
-                            'Sostituisci sfondo',
-                            style: GoogleFonts.arvo(fontSize: 13),
                           ),
                         ),
                       ),
