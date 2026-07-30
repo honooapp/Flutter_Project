@@ -37,6 +37,7 @@ class ResponsiveFooterBar extends StatelessWidget {
     this.useSafeArea = true,
     this.mainAxisAlignment = MainAxisAlignment.center,
     this.alignment = Alignment.center,
+    this.expandToAvailableWidth = false,
   });
 
   final List<ResponsiveFooterAction> actions;
@@ -48,6 +49,7 @@ class ResponsiveFooterBar extends StatelessWidget {
   final bool useSafeArea;
   final MainAxisAlignment mainAxisAlignment;
   final AlignmentGeometry alignment;
+  final bool expandToAvailableWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -69,8 +71,7 @@ class ResponsiveFooterBar extends StatelessWidget {
           double gap = effectiveDesiredGap;
 
           if (availableWidth.isFinite && gapCount > 0) {
-            final double maxGap =
-                (availableWidth - totalIconWidth) / gapCount;
+            final double maxGap = (availableWidth - totalIconWidth) / gapCount;
             if (lockGapWhenPossible && maxGap >= effectiveDesiredGap) {
               gap = effectiveDesiredGap;
             } else if (maxGap <= effectiveMinGap) {
@@ -89,11 +90,14 @@ class ResponsiveFooterBar extends StatelessWidget {
               alignment: alignment,
               child: Row(
                 mainAxisAlignment: mainAxisAlignment,
-                mainAxisSize: MainAxisSize.min,
+                mainAxisSize: expandToAvailableWidth
+                    ? MainAxisSize.max
+                    : MainAxisSize.min,
                 children: [
                   for (int index = 0; index < actions.length; index++) ...[
                     _FooterIconButton(action: actions[index]),
-                    if (index < actions.length - 1) SizedBox(width: gap),
+                    if (!expandToAvailableWidth && index < actions.length - 1)
+                      SizedBox(width: gap),
                   ],
                 ],
               ),
@@ -118,7 +122,8 @@ class _FooterIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget iconWidget = action.icon ??
+    final Widget iconWidget =
+        action.icon ??
         SvgPicture.asset(
           action.asset,
           semanticsLabel: action.semanticsLabel,
