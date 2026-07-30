@@ -3,6 +3,7 @@ import 'package:honoo/Controller/device_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Utility/honoo_colors.dart';
 import '../Utility/utility.dart';
@@ -27,6 +28,14 @@ class PlaceholderPage extends StatefulWidget {
 }
 
 class _PlaceholderPageState extends State<PlaceholderPage> {
+  static const String _mobileBackgroundPreferenceKey =
+      'public_landing_mobile_background';
+  static const String _palombaroMobileBackground =
+      'assets/background palombaro.webp';
+  static const String _sirenaMobileBackground = 'assets/background sirena.webp';
+
+  late final Future<String> _mobileBackgroundPath;
+
   // Regola qui gli spazi sopra/sotto le icone (valori in pixel).
   static const double _performanceTopSpacing = 5;
   static const double _performanceBottomSpacing = 30;
@@ -49,6 +58,28 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   static const double _libriTopSpacing = 5;
   static const double _libriBottomSpacing = 30;
   static const Color _linkIconColor = Color.fromRGBO(183, 183, 206, 1);
+
+  @override
+  void initState() {
+    super.initState();
+    _mobileBackgroundPath = _selectNextMobileBackground();
+  }
+
+  Future<String> _selectNextMobileBackground() async {
+    final preferences = await SharedPreferences.getInstance();
+    final showSirena =
+        preferences.getString(_mobileBackgroundPreferenceKey) ==
+        _palombaroMobileBackground;
+    final selectedBackground = showSirena
+        ? _sirenaMobileBackground
+        : _palombaroMobileBackground;
+
+    await preferences.setString(
+      _mobileBackgroundPreferenceKey,
+      selectedBackground,
+    );
+    return selectedBackground;
+  }
 
   List<Widget> _iconBlockWithSpacing(
     String asset,
@@ -108,16 +139,14 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           decorationThickness: 3.0,
         );
     return InkWell(
-      onTap: onTap ?? () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Sezione in arrivo')),
-        );
-      },
-      child: Text(
-        text,
-        style: linkStyle,
-        textAlign: TextAlign.center,
-      ),
+      onTap:
+          onTap ??
+          () {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Sezione in arrivo')));
+          },
+      child: Text(text, style: linkStyle, textAlign: TextAlign.center),
     );
   }
 
@@ -129,9 +158,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   }) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const VenceslaoPage()),
-        );
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const VenceslaoPage()));
       },
       child: Text(
         text,
@@ -147,17 +176,16 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   }
 
   String _trimInlineText(String text) {
-    return text
-        .replaceAll(RegExp(r'^\n+'), '')
-        .replaceAll(RegExp(r'\n+$'), '');
+    return text.replaceAll(RegExp(r'^\n+'), '').replaceAll(RegExp(r'\n+$'), '');
   }
 
   @override
   Widget build(BuildContext context) {
     final isPhone = DeviceController().isPhone();
     final screenWidth = MediaQuery.of(context).size.width;
-    final ResponsiveLayoutMode layoutMode =
-        ResponsiveLayout.modeForWidth(screenWidth);
+    final ResponsiveLayoutMode layoutMode = ResponsiveLayout.modeForWidth(
+      screenWidth,
+    );
     const String performanceLine = 'performance';
     const String laboratoriLine = 'laboratori teatrali';
     const String esplorazioniLine = 'esplorazioni lunari';
@@ -173,15 +201,20 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     String textBeforePerformanceMarker = text1Fourth;
     String textAfterPerformanceMarker = '';
     if (performanceMarkerIndex != -1) {
-      textBeforePerformanceMarker =
-          text1Fourth.substring(0, performanceMarkerIndex + performanceMarker.length);
-      textAfterPerformanceMarker =
-          text1Fourth.substring(performanceMarkerIndex + performanceMarker.length);
+      textBeforePerformanceMarker = text1Fourth.substring(
+        0,
+        performanceMarkerIndex + performanceMarker.length,
+      );
+      textAfterPerformanceMarker = text1Fourth.substring(
+        performanceMarkerIndex + performanceMarker.length,
+      );
     }
-    final String textBeforePerformanceMarkerDisplay =
-        _trimInlineText(textBeforePerformanceMarker);
-    final String textAfterPerformanceMarkerDisplay =
-        _trimInlineText(textAfterPerformanceMarker);
+    final String textBeforePerformanceMarkerDisplay = _trimInlineText(
+      textBeforePerformanceMarker,
+    );
+    final String textAfterPerformanceMarkerDisplay = _trimInlineText(
+      textAfterPerformanceMarker,
+    );
     final String text1Fifth = Utility().text1Fifth;
     final int venceslaoIndex = text1Fifth.indexOf(venceslaoLine);
     String textBeforeVenceslao = text1Fifth;
@@ -192,10 +225,15 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         venceslaoIndex + venceslaoLine.length,
       );
     }
-    final String textBeforeVenceslaoDisplay = _trimInlineText(textBeforeVenceslao);
-    final String textAfterVenceslaoDisplay = _trimInlineText(textAfterVenceslao);
-    final double footerIconSize =
-        ResponsiveLayout.footerIconSizeForMode(layoutMode);
+    final String textBeforeVenceslaoDisplay = _trimInlineText(
+      textBeforeVenceslao,
+    );
+    final String textAfterVenceslaoDisplay = _trimInlineText(
+      textAfterVenceslao,
+    );
+    final double footerIconSize = ResponsiveLayout.footerIconSizeForMode(
+      layoutMode,
+    );
     final double footerBottomPadding =
         ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
     final double footerGap = ResponsiveLayout.footerGapForMode(layoutMode);
@@ -236,7 +274,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
       contentWidth = screenWidth;
     } else {
       const double minDesktopWidth = 420.0;
-      final double target = screenWidth * 0.4; // 20% più stretto rispetto al 50%
+      final double target =
+          screenWidth * 0.4; // 20% più stretto rispetto al 50%
       contentWidth = target < minDesktopWidth ? minDesktopWidth : target;
     }
 
@@ -262,9 +301,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         performanceLine,
         baseTextStyle,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const PerformancePage()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const PerformancePage()));
         },
       ),
       ..._iconBlockWithSpacing(
@@ -273,9 +312,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         topSpacing: _performanceTopSpacing,
         bottomSpacing: _performanceBottomSpacing,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const PerformancePage()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const PerformancePage()));
         },
       ),
       _linkTextBlock(
@@ -283,9 +322,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         laboratoriLine,
         baseTextStyle,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const LaboratoriSiaePage()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const LaboratoriSiaePage()));
         },
       ),
       ..._iconBlockWithSpacing(
@@ -294,9 +333,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         topSpacing: _laboratoriTopSpacing,
         bottomSpacing: _laboratoriBottomSpacing,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const LaboratoriSiaePage()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const LaboratoriSiaePage()));
         },
       ),
       _linkTextBlock(
@@ -305,9 +344,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         baseTextStyle,
         height: 0.9,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const LunaPage()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const LunaPage()));
         },
       ),
       ..._iconBlockWithSpacing(
@@ -316,9 +355,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         topSpacing: _lunaTopSpacing,
         bottomSpacing: _lunaBottomSpacing,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const LunaPage()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const LunaPage()));
         },
       ),
       _linkTextBlock(
@@ -326,9 +365,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         festeLine,
         baseTextStyle,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const FestePage()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const FestePage()));
         },
       ),
       ..._iconBlockWithSpacing(
@@ -337,9 +376,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         topSpacing: _festeTopSpacing,
         bottomSpacing: _festeBottomSpacing,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const FestePage()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const FestePage()));
         },
       ),
       _linkTextBlock(
@@ -348,9 +387,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         baseTextStyle,
         height: 0.9,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const ViaggiIsolaPage()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const ViaggiIsolaPage()));
         },
       ),
       ..._iconBlockWithSpacing(
@@ -359,9 +398,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         topSpacing: _isolaTopSpacing,
         bottomSpacing: _isolaBottomSpacing,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const ViaggiIsolaPage()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const ViaggiIsolaPage()));
         },
       ),
       _linkTextBlock(
@@ -369,9 +408,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         podcastLine,
         baseTextStyle,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const PodcastDirettePage()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const PodcastDirettePage()));
         },
       ),
       ..._materialIconBlockWithSpacing(
@@ -381,9 +420,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         bottomSpacing: _podcastBottomSpacing,
         color: _linkIconColor,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const PodcastDirettePage()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const PodcastDirettePage()));
         },
       ),
       _textBlock('e', baseTextStyle),
@@ -392,9 +431,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         libriLine,
         baseTextStyle,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const LibriPage()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const LibriPage()));
         },
       ),
       ..._materialIconBlockWithSpacing(
@@ -404,9 +443,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         bottomSpacing: _libriBottomSpacing,
         color: _linkIconColor,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const LibriPage()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const LibriPage()));
         },
       ),
       _textBlock(textBeforePerformanceMarkerDisplay, baseTextStyle),
@@ -417,9 +456,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           topSpacing: _performanceSecondTopSpacing,
           bottomSpacing: _performanceSecondBottomSpacing,
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const PerformancePage()),
-            );
+            Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const PerformancePage()));
           },
         ),
       _textBlock(textAfterPerformanceMarkerDisplay, baseTextStyle),
@@ -431,9 +470,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         topSpacing: _venceslaoTopSpacing,
         bottomSpacing: _venceslaoBottomSpacing,
         onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const VenceslaoPage()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const VenceslaoPage()));
         },
       ),
       _textBlock(textAfterVenceslaoDisplay, baseTextStyle),
@@ -455,12 +494,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          const SizedBox(
-            height: 52,
-            child: Center(
-              child: HonooAppTitle(),
-            ),
-          ),
+          const SizedBox(height: 52, child: Center(child: HonooAppTitle())),
           Expanded(
             child: SingleChildScrollView(
               child: SizedBox(
@@ -513,10 +547,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           Align(
             alignment: Alignment.center,
             child: Container(
-              color: HonooColor.background.withValues(alpha: isPhone ? 1 : 0.7),
-              constraints: BoxConstraints(
-                maxWidth: contentWidth,
-              ),
+              color: HonooColor.background.withValues(alpha: 0.7),
+              constraints: BoxConstraints(maxWidth: contentWidth),
               child: content,
             ),
           ),
@@ -525,7 +557,19 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
       ),
     );
 
-    // Ritorna il widget con o senza Background
-    return isPhone ? pageBody : Background(child: pageBody);
+    if (!isPhone) {
+      return Background(child: pageBody);
+    }
+
+    return FutureBuilder<String>(
+      future: _mobileBackgroundPath,
+      builder: (context, snapshot) {
+        final imagePath = snapshot.data;
+        if (imagePath == null) {
+          return ColoredBox(color: HonooColor.background, child: pageBody);
+        }
+        return Background(imagePath: imagePath, child: pageBody);
+      },
+    );
   }
 }
