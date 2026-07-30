@@ -22,7 +22,6 @@ import 'package:honoo/web/heic_converter.dart' as heicweb;
 
 import '../Pages/email_login_page.dart';
 import '../Services/honoo_image_uploader.dart';
-import '../UI/HinooBuilder/overlays/cambia_sfondo.dart';
 
 class HonooBuilder extends StatefulWidget {
   static const int maxTextCharacters = 144;
@@ -45,6 +44,7 @@ class HonooBuilder extends StatefulWidget {
   final String? imageHint;
   final VoidCallback? onDownloadTap;
   final bool showDownloadButton;
+  final bool showCharacterCounter;
   final double? imageConfirmIconDisplaySize;
 
   const HonooBuilder({
@@ -56,6 +56,7 @@ class HonooBuilder extends StatefulWidget {
     this.imageHint,
     this.onDownloadTap,
     this.showDownloadButton = true,
+    this.showCharacterCounter = true,
     this.imageConfirmIconDisplaySize,
   });
 
@@ -83,8 +84,10 @@ class HonooBuilderState extends State<HonooBuilder> {
 
   bool _imageConfirmed = false;
   bool _isUploadingFinal = false;
+  bool _hideEditorActionsForCapture = false;
 
   bool get hasImage => _imageBytes != null;
+  bool get _isEditingImage => hasImage && !_imageConfirmed;
 
   // url pubblico su supabase della PNG zoommata
   String _publicImageUrl = '';
@@ -238,6 +241,7 @@ class HonooBuilderState extends State<HonooBuilder> {
       }
 
       _imageController.value = Matrix4.identity();
+      _textFocus.unfocus();
 
       setState(() {
         _imageBytes = bytes;
@@ -438,9 +442,18 @@ class HonooBuilderState extends State<HonooBuilder> {
       return;
     }
 
-    final Uint8List? bytes = await TextBoxDownloadButton.hideWhileCapturing(
-      _captureHonooAsPng,
-    );
+    setState(() => _hideEditorActionsForCapture = true);
+    Uint8List? bytes;
+    try {
+      await WidgetsBinding.instance.endOfFrame;
+      bytes = await TextBoxDownloadButton.hideWhileCapturing(
+        _captureHonooAsPng,
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _hideEditorActionsForCapture = false);
+      }
+    }
     if (bytes == null || bytes.isEmpty) {
       if (!context.mounted) return;
       showHonooToast(context, message: 'Impossibile generare il file PNG.');
@@ -527,13 +540,16 @@ class HonooBuilderState extends State<HonooBuilder> {
                   width: HonooBuilder.baselineImageSize,
                   height: baselineTotalHeight,
                   child: Column(
+                    key: const Key('honoo-composed-content'),
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // ===== TEXT AREA =====
+                      // ===== TEXT AREA / IMAGE CONTROLS =====
                       SizedBox(
                         height: baselineTextHeight,
                         width: HonooBuilder.baselineImageSize,
-                        child: _buildTextArea(HonooBuilder.baselineImageSize),
+                        child: _isEditingImage
+                            ? _buildImageEditingControls(scale)
+                            : _buildTextArea(HonooBuilder.baselineImageSize),
                       ),
 
                       const SizedBox(height: HonooBuilder.baselineGap),
@@ -545,7 +561,7 @@ class HonooBuilderState extends State<HonooBuilder> {
                           width: HonooBuilder.baselineImageSize,
                           height: HonooBuilder.baselineImageSize,
                           color: Colors.white, // cornice neutra come “foglio”
-                          child: _buildImageArea(scale),
+                          child: _buildImageArea(),
                         ),
                       ),
                     ],
@@ -611,7 +627,7 @@ class HonooBuilderState extends State<HonooBuilder> {
                   ),
                   keyboardType: TextInputType.multiline,
                   textInputAction: TextInputAction.newline,
-                  autofocus: true,
+                  autofocus: !_imageConfirmed && _imageBytes == null,
                   expands: true,
                   scrollPhysics: const ClampingScrollPhysics(),
                   cursorColor: Colors.black,
@@ -619,33 +635,35 @@ class HonooBuilderState extends State<HonooBuilder> {
                   cursorRadius: const Radius.circular(0),
                 ),
               ),
-              // Contacaratteri in alto a sinistra (Arvo) – 0/144
-              Positioned(
-                top: 8,
-                left: 8,
-                child: IgnorePointer(
-                  child: Builder(
-                    builder: (_) {
-                      final int used = _textCtrl.text.characters.length;
-                      final Color color = used >= HonooBuilder.maxTextCharacters
-                          ? HonooColor.secondary
-                          : (used >= 120
-                                ? Colors.orangeAccent
-                                : HonooColor.onTertiary.withValues(
-                                    alpha: 0.75,
-                                  ));
-                      return Text(
-                        '$used/${HonooBuilder.maxTextCharacters}',
-                        style: GoogleFonts.arvo(
-                          color: color,
-                          fontSize: 12,
-                          height: 1.0,
-                        ),
-                      );
-                    },
+              if (widget.showCharacterCounter)
+                // Contacaratteri in alto a sinistra (Arvo) – 0/144
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: IgnorePointer(
+                    child: Builder(
+                      builder: (_) {
+                        final int used = _textCtrl.text.characters.length;
+                        final Color color =
+                            used >= HonooBuilder.maxTextCharacters
+                            ? HonooColor.secondary
+                            : (used >= 120
+                                  ? Colors.orangeAccent
+                                  : HonooColor.onTertiary.withValues(
+                                      alpha: 0.75,
+                                    ));
+                        return Text(
+                          '$used/${HonooBuilder.maxTextCharacters}',
+                          style: GoogleFonts.arvo(
+                            color: color,
+                            fontSize: 12,
+                            height: 1.0,
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
-              ),
               if (widget.onDownloadTap != null && widget.showDownloadButton)
                 Positioned(
                   top: 8,
@@ -662,15 +680,150 @@ class HonooBuilderState extends State<HonooBuilder> {
     );
   }
 
-  Widget _buildImageArea(double canvasScale) {
+  Widget _buildImageEditingControls(double canvasScale) {
     final double confirmIconSize = widget.imageConfirmIconDisplaySize == null
         ? 44
         : HonooBuilder.baselineIconSizeForDisplay(
             widget.imageConfirmIconDisplaySize!,
             canvasScale,
           );
+
+    return Container(
+      key: const Key('honoo-image-editing-controls'),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: HonooColor.tertiary,
+        border: Border.all(color: Colors.black12),
+        borderRadius: BorderRadius.circular(5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: IgnorePointer(
+        ignoring: _isUploadingFinal,
+        child: Opacity(
+          opacity: _isUploadingFinal ? 0.65 : 1,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Trascina l’immagine e regola lo zoom',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.arvo(
+                  color: HonooColor.background,
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: _imageScale > _imageMinScale
+                        ? () => _nudgeImageScale(-0.1)
+                        : null,
+                    icon: const Icon(Icons.remove),
+                    color: HonooColor.background,
+                    disabledColor: HonooColor.background.withValues(alpha: 0.3),
+                    tooltip: 'Riduci zoom',
+                  ),
+                  Expanded(
+                    child: SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        trackHeight: 2,
+                        activeTrackColor: HonooColor.background,
+                        inactiveTrackColor: HonooColor.background.withValues(
+                          alpha: 0.2,
+                        ),
+                        thumbColor: HonooColor.background,
+                        overlayColor: HonooColor.background.withValues(
+                          alpha: 0.12,
+                        ),
+                      ),
+                      child: Slider(
+                        value: _imageScale,
+                        min: _imageMinScale,
+                        max: _imageMaxScale,
+                        divisions: 40,
+                        onChanged: _updateImageScale,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _imageScale < _imageMaxScale
+                        ? () => _nudgeImageScale(0.1)
+                        : null,
+                    icon: const Icon(Icons.add),
+                    color: HonooColor.background,
+                    disabledColor: HonooColor.background.withValues(alpha: 0.3),
+                    tooltip: 'Aumenta zoom',
+                  ),
+                  IconButton(
+                    onPressed: _resetImageTransform,
+                    icon: const Icon(Icons.center_focus_strong_outlined),
+                    color: HonooColor.background,
+                    tooltip: 'Reimposta posizione',
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  TextButton.icon(
+                    onPressed: _pickImage,
+                    style: TextButton.styleFrom(
+                      foregroundColor: HonooColor.background,
+                    ),
+                    icon: const Icon(Icons.photo_library_outlined),
+                    label: const Text('Sostituisci immagine'),
+                  ),
+                  const Spacer(),
+                  if (_isUploadingFinal)
+                    SizedBox(
+                      width: confirmIconSize,
+                      height: confirmIconSize,
+                      child: const Padding(
+                        padding: EdgeInsets.all(8),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 3,
+                          color: HonooColor.background,
+                        ),
+                      ),
+                    )
+                  else
+                    IconButton(
+                      constraints: BoxConstraints.tightFor(
+                        width: confirmIconSize,
+                        height: confirmIconSize,
+                      ),
+                      padding: EdgeInsets.zero,
+                      iconSize: confirmIconSize,
+                      onPressed: _confirmImage,
+                      tooltip: 'Conferma immagine',
+                      icon: SvgPicture.asset(
+                        'assets/icons/ok.svg',
+                        width: confirmIconSize,
+                        height: confirmIconSize,
+                        colorFilter: const ColorFilter.mode(
+                          HonooColor.background,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageArea() {
     return GestureDetector(
-      onTap: _imageConfirmed ? null : _pickImage,
+      onTap: _imageBytes == null ? _pickImage : null,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(5),
         child: Container(
@@ -730,53 +883,36 @@ class HonooBuilderState extends State<HonooBuilder> {
                           ),
                         ),
                       ),
-
-                    // Overlay controlli finché non confermi
-                    if (!_imageConfirmed) ...[
-                      CambiaSfondoOverlay(
-                        onTapChange: _pickImage,
-                        showControls: true,
-                        currentScale: _imageScale,
-                        minScale: _imageMinScale,
-                        maxScale: _imageMaxScale,
-                        onScaleChanged: _updateImageScale,
-                        onZoomIn: _imageScale < _imageMaxScale
-                            ? () => _nudgeImageScale(0.1)
-                            : null,
-                        onZoomOut: _imageScale > _imageMinScale
-                            ? () => _nudgeImageScale(-0.1)
-                            : null,
-                        onResetTransform: _resetImageTransform,
-                      ),
+                    if (_imageConfirmed && !_hideEditorActionsForCapture)
                       Positioned(
+                        left: 12,
                         bottom: 12,
-                        right: 12,
-                        child: _isUploadingFinal
-                            ? const SizedBox(
-                                width: 44,
-                                height: 44,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 3,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : IconButton(
-                                constraints: BoxConstraints.tightFor(
-                                  width: confirmIconSize,
-                                  height: confirmIconSize,
-                                ),
-                                padding: EdgeInsets.zero,
-                                iconSize: confirmIconSize,
-                                onPressed: _confirmImage,
-                                tooltip: 'Conferma immagine',
-                                icon: SvgPicture.asset(
-                                  'assets/icons/ok.svg',
-                                  width: confirmIconSize,
-                                  height: confirmIconSize,
-                                ),
-                              ),
+                        child: TextButton.icon(
+                          key: const Key('honoo-replace-confirmed-image'),
+                          onPressed: _pickImage,
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.black.withValues(
+                              alpha: 0.55,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          icon: const Icon(
+                            Icons.photo_library_outlined,
+                            size: 20,
+                          ),
+                          label: Text(
+                            'Sostituisci sfondo',
+                            style: GoogleFonts.arvo(fontSize: 13),
+                          ),
+                        ),
                       ),
-                    ],
                   ],
                 ),
         ),

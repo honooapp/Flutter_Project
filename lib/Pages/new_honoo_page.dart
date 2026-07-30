@@ -1,6 +1,8 @@
+import 'dart:math' as math;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:ui' show ImageFilter;
+import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 
@@ -61,14 +63,9 @@ class _NewHonooPageState extends State<NewHonooPage> {
   String _lastSavedRawImage = '';
   bool _hasMinTextForDownload = false;
 
-  bool get _hasImageForDownload => _imageUrl.trim().isNotEmpty;
-  bool get _shouldShowCanvasControls =>
-      _hasMinTextForDownload || _hasImageForDownload;
-
   Widget _buildCanvasControls() {
     const double iconSize = 22;
     const double buttonBox = 34;
-    const double pillHeight = 40;
 
     Widget iconBtn({
       required IconData icon,
@@ -90,35 +87,46 @@ class _NewHonooPageState extends State<NewHonooPage> {
       );
     }
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(pillHeight / 2),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-        child: Container(
-          height: pillHeight,
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.55),
-            borderRadius: BorderRadius.circular(pillHeight / 2),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              iconBtn(
-                tooltip: 'Salva sul dispositivo',
-                icon: Icons.download_outlined,
-                onPressed: _handleDownloadTap,
-              ),
-              const SizedBox(width: 6),
-              iconBtn(
-                tooltip: 'Cancella honoo',
-                icon: Icons.delete_outline,
-                onPressed: _handleDeleteTap,
-              ),
-            ],
-          ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        iconBtn(
+          tooltip: 'Salva sul dispositivo',
+          icon: Icons.download_outlined,
+          onPressed: _handleDownloadTap,
         ),
+        const SizedBox(width: 6),
+        iconBtn(
+          tooltip: 'Cancella honoo',
+          icon: Icons.delete_outline,
+          onPressed: _handleDeleteTap,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEditorControls() {
+    final int used = _text.characters.length;
+
+    return SizedBox(
+      key: const Key('honoo-editor-controls'),
+      height: 40,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            '$used/${HonooBuilder.maxTextCharacters}',
+            key: const Key('honoo-editor-character-counter'),
+            style: GoogleFonts.arvo(
+              color: Colors.white,
+              fontSize: 12,
+              height: 1,
+            ),
+          ),
+          const Spacer(),
+          _buildCanvasControls(),
+        ],
       ),
     );
   }
@@ -228,7 +236,8 @@ class _NewHonooPageState extends State<NewHonooPage> {
       widget.recipientTag,
     )..conversationId = conversationId;
 
-    final bool shouldOfferNotifications = type == HonooType.personal &&
+    final bool shouldOfferNotifications =
+        type == HonooType.personal &&
         await ConversationNotificationPrompt.shouldOfferForFirstConversation(
           user.id,
         );
@@ -325,10 +334,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
     } catch (e, st) {
       debugPrint('duplicateToMoon failed: $e\n$st');
       if (mounted) {
-        showHonooToast(
-          context,
-          message: 'Errore: $e',
-        );
+        showHonooToast(context, message: 'Errore: $e');
       }
       return false;
     }
@@ -346,18 +352,12 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
     final state = _builderKey.currentState;
     if (state == null) {
-      showHonooToast(
-        context,
-        message: 'Impossibile avviare il download.',
-      );
+      showHonooToast(context, message: 'Impossibile avviare il download.');
       return;
     }
 
     if (!state.hasImage) {
-      showHonooToast(
-        context,
-        message: "Inserisci prima un'immagine",
-      );
+      showHonooToast(context, message: "Inserisci prima un'immagine");
       return;
     }
 
@@ -375,7 +375,9 @@ class _NewHonooPageState extends State<NewHonooPage> {
       );
       if (goLogin == true && mounted) {
         Navigator.push(
-            context, MaterialPageRoute(builder: (_) => const EmailLoginPage()));
+          context,
+          MaterialPageRoute(builder: (_) => const EmailLoginPage()),
+        );
       }
       return;
     }
@@ -471,12 +473,15 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
             final ResponsiveLayoutMode layoutMode =
                 ResponsiveLayout.modeForWidth(viewW);
-            final double targetMaxW =
-                ResponsiveLayout.contentMaxWidthForMode(layoutMode, viewW);
+            final double targetMaxW = ResponsiveLayout.contentMaxWidthForMode(
+              layoutMode,
+              viewW,
+            );
             final double footerIconSize =
                 ResponsiveLayout.footerIconSizeForMode(layoutMode);
-            final double footerGap =
-                ResponsiveLayout.footerGapForMode(layoutMode);
+            final double footerGap = ResponsiveLayout.footerGapForMode(
+              layoutMode,
+            );
             final double footerBottomPadding =
                 ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
             final double footerContentH = footerIconSize;
@@ -490,17 +495,35 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
             // Altezza disponibile per il box honoo
             final double availableH =
-                (viewH - headerH - contentTopPadding - footerReserved)
-                    .clamp(0.0, double.infinity);
+                (viewH - headerH - contentTopPadding - footerReserved).clamp(
+                  0.0,
+                  double.infinity,
+                );
+            const double editorControlsHeight = 40;
+            const double editorControlsGap = 4;
+            final double builderAvailableH =
+                (availableH - editorControlsHeight - editorControlsGap).clamp(
+                  0.0,
+                  double.infinity,
+                );
 
             final HonooBuilderMetrics metrics =
                 ResponsiveLayout.honooBuilderMetrics(
-              availableHeight: availableH,
-              maxWidth: targetMaxW,
-              mode: layoutMode,
-            );
+                  availableHeight: builderAvailableH,
+                  maxWidth: targetMaxW,
+                  mode: layoutMode,
+                  enforceDesktopBaseline: false,
+                );
             final double builderWidth = metrics.width;
             final double builderHeight = metrics.height;
+            final double editorGroupHeight =
+                editorControlsHeight + editorControlsGap + builderHeight;
+            final double editorGroupTop =
+                headerH +
+                contentTopPadding +
+                math.max(0, (availableH - editorGroupHeight) / 2);
+            final double footerTop =
+                editorGroupTop + editorGroupHeight + footerTopSpacing;
 
             return Stack(
               clipBehavior: Clip.none,
@@ -515,7 +538,8 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           onTap: () {
                             Navigator.of(context).pushAndRemoveUntil(
                               MaterialPageRoute(
-                                  builder: (_) => const PlaceholderPage()),
+                                builder: (_) => const PlaceholderPage(),
+                              ),
                               (route) => false,
                             );
                           },
@@ -532,23 +556,25 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           constraints: BoxConstraints(maxWidth: targetMaxW),
                           child: SizedBox(
                             width: builderWidth,
-                            height: builderHeight,
-                            child: Stack(
+                            height: editorGroupHeight,
+                            child: Column(
                               children: [
-                                ClipRect(
-                                  child: HonooBuilder(
-                                    key: _builderKey,
-                                    onHonooChanged: _onHonooChanged,
-                                    onFocusChanged: _onBuilderFocusChanged,
-                                    imageConfirmIconDisplaySize: footerIconSize,
+                                _buildEditorControls(),
+                                const SizedBox(height: editorControlsGap),
+                                SizedBox(
+                                  width: builderWidth,
+                                  height: builderHeight,
+                                  child: ClipRect(
+                                    child: HonooBuilder(
+                                      key: _builderKey,
+                                      onHonooChanged: _onHonooChanged,
+                                      onFocusChanged: _onBuilderFocusChanged,
+                                      showCharacterCounter: false,
+                                      imageConfirmIconDisplaySize:
+                                          footerIconSize,
+                                    ),
                                   ),
                                 ),
-                                if (_shouldShowCanvasControls)
-                                  Positioned(
-                                    top: 8,
-                                    right: 8,
-                                    child: _buildCanvasControls(),
-                                  ),
                               ],
                             ),
                           ),
@@ -560,75 +586,88 @@ class _NewHonooPageState extends State<NewHonooPage> {
 
                 // ===== FOOTER: Home – Chest – (OK|Luna) =====
                 Positioned(
-                  bottom: 0,
+                  top: footerTop,
                   left: 0,
                   right: 0,
-                  child: ResponsiveFooterBar(
-                    bottomPadding: footerBottomSpacing,
-                    desiredGap: footerGap,
-                    minGap: 16,
-                    height: footerContentH,
-                    lockGapWhenPossible: true,
-                    actions: [
-                      ResponsiveFooterAction(
-                        asset: "assets/icons/home.svg",
-                        semanticsLabel: 'Home',
-                        colorFilter: const ColorFilter.mode(
-                          HonooColor.onBackground,
-                          BlendMode.srcIn,
-                        ),
-                        size: footerIconSize,
-                        splashRadius: 25,
-                        tooltip: 'Home',
-                        onPressed: () {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(builder: (_) => const HomePage()),
-                            (route) => false,
-                          );
-                        },
+                  child: Center(
+                    child: SizedBox(
+                      key: const Key('honoo-editor-footer'),
+                      width: builderWidth,
+                      child: ResponsiveFooterBar(
+                        bottomPadding: 0,
+                        desiredGap: footerGap,
+                        minGap: 16,
+                        height: footerContentH,
+                        useSafeArea: false,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        expandToAvailableWidth: true,
+                        actions: [
+                          ResponsiveFooterAction(
+                            asset: "assets/icons/home.svg",
+                            semanticsLabel: 'Home',
+                            colorFilter: const ColorFilter.mode(
+                              HonooColor.onBackground,
+                              BlendMode.srcIn,
+                            ),
+                            size: footerIconSize,
+                            splashRadius: 25,
+                            tooltip: 'Home',
+                            onPressed: () {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                  builder: (_) => const HomePage(),
+                                ),
+                                (route) => false,
+                              );
+                            },
+                          ),
+                          ResponsiveFooterAction(
+                            asset: "assets/icons/chest.svg",
+                            semanticsLabel: 'Chest',
+                            size: footerIconSize,
+                            splashRadius: 40,
+                            tooltip: 'Apri il tuo Cuore',
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ChestPage(),
+                                ),
+                              );
+                            },
+                          ),
+                          ResponsiveFooterAction(
+                            asset: "assets/icons/ok.svg",
+                            semanticsLabel:
+                                (widget.forcedType == HonooType.answer)
+                                ? 'Invia'
+                                : 'OK',
+                            size: footerIconSize,
+                            splashRadius: 25,
+                            tooltip: (widget.forcedType == HonooType.answer)
+                                ? 'Invia'
+                                : 'Salva honoo',
+                            onPressed: _submitHonoo,
+                          ),
+                          if (widget.forcedType != HonooType.answer)
+                            ResponsiveFooterAction(
+                              asset: "assets/icons/piuma.svg",
+                              semanticsLabel: 'Piuma',
+                              size: footerIconSize,
+                              splashRadius: 25,
+                              tooltip: 'Scrivi hinoo',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const NewHinooPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                        ],
                       ),
-                      ResponsiveFooterAction(
-                        asset: "assets/icons/chest.svg",
-                        semanticsLabel: 'Chest',
-                        size: footerIconSize,
-                        splashRadius: 40,
-                        tooltip: 'Apri il tuo Cuore',
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const ChestPage()),
-                          );
-                        },
-                      ),
-                      ResponsiveFooterAction(
-                        asset: "assets/icons/ok.svg",
-                        semanticsLabel: (widget.forcedType == HonooType.answer)
-                            ? 'Invia'
-                            : 'OK',
-                        size: footerIconSize,
-                        splashRadius: 25,
-                        tooltip: (widget.forcedType == HonooType.answer)
-                            ? 'Invia'
-                            : 'Salva honoo',
-                        onPressed: _submitHonoo,
-                      ),
-                      if (widget.forcedType != HonooType.answer)
-                        ResponsiveFooterAction(
-                          asset: "assets/icons/piuma.svg",
-                          semanticsLabel: 'Piuma',
-                          size: footerIconSize,
-                          splashRadius: 25,
-                          tooltip: 'Scrivi hinoo',
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const NewHinooPage()),
-                            );
-                          },
-                        ),
-                    ],
+                    ),
                   ),
                 ),
               ],

@@ -3,13 +3,7 @@ import 'dart:ui';
 
 import 'package:honoo/UI/honoo_builder.dart';
 
-enum ResponsiveLayoutMode {
-  mobile,
-  tablet,
-  desktop,
-  wideDesktop,
-  largeDesktop,
-}
+enum ResponsiveLayoutMode { mobile, tablet, desktop, wideDesktop, largeDesktop }
 
 class ResponsiveLayout {
   const ResponsiveLayout._();
@@ -104,21 +98,22 @@ class ResponsiveLayout {
     required double availableHeight,
     required double maxWidth,
     required ResponsiveLayoutMode mode,
+    bool enforceDesktopBaseline = true,
   }) {
     const double builderRatio = 1.5;
     const double gap = HonooBuilder.baselineGap;
     final double maxImageByWidth = maxWidth;
-    final double maxImageByHeight =
-        ((availableHeight - gap) / builderRatio).clamp(0.0, double.infinity);
+    final double maxImageByHeight = ((availableHeight - gap) / builderRatio)
+        .clamp(0.0, double.infinity);
 
     double imageSize = math.min(maxImageByWidth, maxImageByHeight);
-    if (mode != ResponsiveLayoutMode.mobile) {
+    if (enforceDesktopBaseline && mode != ResponsiveLayoutMode.mobile) {
       imageSize = math.max(imageSize, HonooBuilder.baselineImageSize);
     }
 
     if (!imageSize.isFinite || imageSize <= 0) {
       imageSize = maxWidth;
-      if (mode != ResponsiveLayoutMode.mobile) {
+      if (enforceDesktopBaseline && mode != ResponsiveLayoutMode.mobile) {
         imageSize = math.max(imageSize, HonooBuilder.baselineImageSize);
       }
     }
