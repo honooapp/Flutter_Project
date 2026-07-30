@@ -181,7 +181,7 @@ class ComposerOnboardingPage extends StatelessWidget {
                   ),
                   Positioned(
                     top: 4,
-                    left: 4,
+                    right: 4,
                     child: Semantics(
                       button: true,
                       label: 'Chiudi e non mostrare più',
