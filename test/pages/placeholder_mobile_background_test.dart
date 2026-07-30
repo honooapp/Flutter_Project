@@ -1,61 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Pages/placeholder_page.dart';
+import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/smooth_image.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-
-  setUp(() {
-    SharedPreferences.setMockInitialValues({});
-  });
 
   tearDown(() {
     final binding = TestWidgetsFlutterBinding.instance;
     binding.platformDispatcher.clearAllTestValues();
   });
 
-  Future<String> pumpLandingAndReadBackground(
-    WidgetTester tester, {
-    required Size size,
-  }) async {
+  Future<void> pumpLanding(WidgetTester tester, {required Size size}) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = size;
 
     await tester.pumpWidget(const MaterialApp(home: PlaceholderPage()));
     await tester.pumpAndSettle();
-
-    final smoothImage = tester.widget<SmoothImage>(find.byType(SmoothImage));
-    return (smoothImage.image as AssetImage).assetName;
   }
 
-  testWidgets('alterna palombaro e sirena tra due caricamenti mobile', (
+  testWidgets('dopo il bootstrap la landing mobile ha sfondo blu pieno', (
     tester,
   ) async {
-    final firstBackground = await pumpLandingAndReadBackground(
-      tester,
-      size: const Size(390, 844),
-    );
-    expect(firstBackground, 'assets/background palombaro.webp');
+    await pumpLanding(tester, size: const Size(390, 844));
 
-    await tester.pumpWidget(const SizedBox.shrink());
-
-    final secondBackground = await pumpLandingAndReadBackground(
-      tester,
-      size: const Size(390, 844),
+    final scaffold = tester.widget<Scaffold>(
+      find.byKey(const Key('public_landing_screen_root')),
     );
-    expect(secondBackground, 'assets/background sirena.webp');
+
+    expect(scaffold.backgroundColor, HonooColor.background);
+    expect(find.byType(SmoothImage), findsNothing);
   });
 
   testWidgets('tablet e desktop mantengono il background attuale', (
     tester,
   ) async {
-    final background = await pumpLandingAndReadBackground(
-      tester,
-      size: const Size(1024, 768),
-    );
+    await pumpLanding(tester, size: const Size(1024, 768));
 
-    expect(background, 'assets/background.webp');
+    final smoothImage = tester.widget<SmoothImage>(find.byType(SmoothImage));
+    expect(
+      (smoothImage.image as AssetImage).assetName,
+      'assets/background.webp',
+    );
   });
 }

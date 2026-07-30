@@ -1,10 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:honoo/Controller/device_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Utility/honoo_colors.dart';
 import '../Utility/utility.dart';
@@ -29,14 +27,6 @@ class PlaceholderPage extends StatefulWidget {
 }
 
 class _PlaceholderPageState extends State<PlaceholderPage> {
-  static const String _mobileBackgroundPreferenceKey =
-      'public_landing_mobile_background';
-  static const String _palombaroMobileBackground =
-      'assets/background palombaro.webp';
-  static const String _sirenaMobileBackground = 'assets/background sirena.webp';
-
-  late final Future<String> _mobileBackgroundPath;
-
   // Regola qui gli spazi sopra/sotto le icone (valori in pixel).
   static const double _performanceTopSpacing = 5;
   static const double _performanceBottomSpacing = 30;
@@ -59,38 +49,6 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   static const double _libriTopSpacing = 5;
   static const double _libriBottomSpacing = 30;
   static const Color _linkIconColor = Color.fromRGBO(183, 183, 206, 1);
-
-  @override
-  void initState() {
-    super.initState();
-    _mobileBackgroundPath = _selectNextMobileBackground();
-  }
-
-  Future<String> _selectNextMobileBackground() async {
-    final preferences = await SharedPreferences.getInstance();
-    final currentBackground = preferences.getString(
-      _mobileBackgroundPreferenceKey,
-    );
-
-    // Sul web il bootstrap HTML sceglie e precarica già lo sfondo mobile.
-    // Riutilizzarlo evita un secondo cambio d'immagine prima del primo frame.
-    if (kIsWeb &&
-        (currentBackground == _palombaroMobileBackground ||
-            currentBackground == _sirenaMobileBackground)) {
-      return currentBackground!;
-    }
-
-    final showSirena = currentBackground == _palombaroMobileBackground;
-    final selectedBackground = showSirena
-        ? _sirenaMobileBackground
-        : _palombaroMobileBackground;
-
-    await preferences.setString(
-      _mobileBackgroundPreferenceKey,
-      selectedBackground,
-    );
-    return selectedBackground;
-  }
 
   List<Widget> _iconBlockWithSpacing(
     String asset,
@@ -551,7 +509,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     // Questo è il corpo della pagina
     final Widget pageBody = Scaffold(
       key: const Key('public_landing_screen_root'),
-      backgroundColor: Colors.transparent,
+      backgroundColor: isPhone ? HonooColor.background : Colors.transparent,
       body: Row(
         children: [
           Expanded(child: Container()),
@@ -569,27 +527,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     );
 
     if (!isPhone) {
-      return Background(
-        placeholderColor: Colors.transparent,
-        fadeDuration: Duration.zero,
-        child: pageBody,
-      );
+      return Background(child: pageBody);
     }
 
-    return FutureBuilder<String>(
-      future: _mobileBackgroundPath,
-      builder: (context, snapshot) {
-        final imagePath = snapshot.data;
-        if (imagePath == null) {
-          return pageBody;
-        }
-        return Background(
-          imagePath: imagePath,
-          placeholderColor: Colors.transparent,
-          fadeDuration: Duration.zero,
-          child: pageBody,
-        );
-      },
-    );
+    return pageBody;
   }
 }
