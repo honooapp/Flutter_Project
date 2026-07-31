@@ -701,7 +701,7 @@ class _MoonPageState extends State<MoonPage> {
         MaterialPageRoute(
           builder: (_) => ReplyHonooPage(
             originalHonoo: current.honoo!,
-            initialHintText: 'Scrivi la tua risposta...',
+            initialHintText: 'Scrivi la tua risposta',
             initialImageHint: 'Aggiungi un’immagine (opzionale)',
           ),
         ),

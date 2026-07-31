@@ -4,45 +4,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../Pages/new_hinoo_page.dart';
 import '../Pages/new_honoo_page.dart';
-import '../Services/composer_onboarding_service.dart';
 import '../Utility/honoo_colors.dart';
 
 class ComposerLauncher {
   const ComposerLauncher._();
 
-  static Future<void> open(
-    BuildContext context, {
-    ComposerOnboardingService? service,
-  }) async {
-    final onboardingService = service ?? ComposerOnboardingService();
-    final shouldShow = await onboardingService.shouldShow();
-    if (!context.mounted) return;
-
-    if (shouldShow) {
-      await Navigator.of(context).push<void>(
-        MaterialPageRoute(
-          fullscreenDialog: true,
-          builder: (_) => ComposerOnboardingPage(service: onboardingService),
-        ),
-      );
-      return;
-    }
-
-    await Navigator.of(
-      context,
-    ).push<void>(MaterialPageRoute(builder: (_) => const NewHonooPage()));
+  static Future<void> open(BuildContext context) async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => const ComposerOnboardingPage(),
+      ),
+    );
   }
 }
 
 class ComposerOnboardingPage extends StatelessWidget {
-  const ComposerOnboardingPage({required this.service, super.key});
+  const ComposerOnboardingPage({super.key});
 
-  final ComposerOnboardingService service;
+  void _dismiss(BuildContext context) => Navigator.of(context).pop();
 
-  Future<void> _dismiss(BuildContext context) async {
-    await service.dismissPermanently();
-    if (context.mounted) Navigator.of(context).pop();
+  Future<void> _openHonooComposer(BuildContext context) async {
+    await Navigator.of(
+      context,
+    ).push<void>(MaterialPageRoute(builder: (_) => const NewHonooPage()));
+  }
+
+  Future<void> _openHinooComposer(BuildContext context) async {
+    await Navigator.of(
+      context,
+    ).push<void>(MaterialPageRoute(builder: (_) => const NewHinooPage()));
   }
 
   @override
@@ -73,6 +66,7 @@ class ComposerOnboardingPage extends StatelessWidget {
                 280.0,
               );
               final iconSize = (constraints.maxWidth * 0.15).clamp(48.0, 72.0);
+              final bottleIconSize = (iconSize * 0.65).clamp(32.0, 44.0);
               final textStyle = GoogleFonts.arvo(
                 color: HonooColor.onBackground,
                 fontSize: constraints.maxWidth < 360 ? 17 : 19,
@@ -101,12 +95,22 @@ class ComposerOnboardingPage extends StatelessWidget {
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 8),
-                              SvgPicture.asset(
-                                'assets/icons/bottle.svg',
+                              IconButton(
                                 key: const Key('composer_onboarding_bottle'),
-                                width: iconSize,
-                                height: iconSize,
-                                semanticsLabel: 'Bottiglia',
+                                tooltip: 'Componi il tuo honoo',
+                                onPressed: () => _openHonooComposer(context),
+                                iconSize: bottleIconSize,
+                                padding: const EdgeInsets.all(4),
+                                constraints: const BoxConstraints(
+                                  minWidth: 48,
+                                  minHeight: 48,
+                                ),
+                                icon: SvgPicture.asset(
+                                  'assets/icons/bottle.svg',
+                                  width: bottleIconSize,
+                                  height: bottleIconSize,
+                                  semanticsLabel: 'Bottiglia',
+                                ),
                               ),
                               const SizedBox(height: 8),
                               Text(
@@ -121,19 +125,29 @@ class ComposerOnboardingPage extends StatelessWidget {
                                 height: exampleHeight,
                                 semanticsLabel: 'Esempio di honoo',
                               ),
-                              const SizedBox(height: 28),
+                              const SizedBox(height: 56),
                               Text(
                                 'Clicca qui',
                                 style: textStyle,
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 8),
-                              SvgPicture.asset(
-                                'assets/icons/piuma.svg',
+                              IconButton(
                                 key: const Key('composer_onboarding_feather'),
-                                width: iconSize,
-                                height: iconSize,
-                                semanticsLabel: 'Piuma',
+                                tooltip: 'Componi il tuo hinoo',
+                                onPressed: () => _openHinooComposer(context),
+                                iconSize: iconSize,
+                                padding: EdgeInsets.zero,
+                                constraints: BoxConstraints.tightFor(
+                                  width: iconSize,
+                                  height: iconSize,
+                                ),
+                                icon: SvgPicture.asset(
+                                  'assets/icons/piuma.svg',
+                                  width: iconSize,
+                                  height: iconSize,
+                                  semanticsLabel: 'Piuma',
+                                ),
                               ),
                               const SizedBox(height: 8),
                               Text(
@@ -149,30 +163,6 @@ class ComposerOnboardingPage extends StatelessWidget {
                                 semanticsLabel: 'Esempio di hinoo',
                               ),
                               const SizedBox(height: 32),
-                              Wrap(
-                                alignment: WrapAlignment.center,
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: [
-                                  Text('Se clicchi', style: textStyle),
-                                  SvgPicture.asset(
-                                    'assets/icons/cancella.svg',
-                                    key: const Key(
-                                      'composer_onboarding_inline_close',
-                                    ),
-                                    width: 42,
-                                    height: 42,
-                                    semanticsLabel: 'Cancella',
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'non vedrai più questa schermata.',
-                                style: textStyle,
-                                textAlign: TextAlign.center,
-                              ),
                             ],
                           ),
                         ),
@@ -184,17 +174,21 @@ class ComposerOnboardingPage extends StatelessWidget {
                     right: 4,
                     child: Semantics(
                       button: true,
-                      label: 'Chiudi e non mostrare più',
+                      label: 'Chiudi',
                       child: IconButton(
                         key: const Key('composer_onboarding_close'),
-                        tooltip: 'Chiudi e non mostrare più',
+                        tooltip: 'Chiudi',
                         onPressed: () => _dismiss(context),
-                        iconSize: 52,
-                        padding: const EdgeInsets.all(8),
+                        iconSize: 36,
+                        padding: const EdgeInsets.all(6),
+                        constraints: const BoxConstraints(
+                          minWidth: 48,
+                          minHeight: 48,
+                        ),
                         icon: SvgPicture.asset(
                           'assets/icons/cancella.svg',
-                          width: 52,
-                          height: 52,
+                          width: 36,
+                          height: 36,
                           excludeFromSemantics: true,
                         ),
                       ),
