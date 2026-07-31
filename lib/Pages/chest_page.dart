@@ -25,7 +25,6 @@ import '../Utility/network_image_prefetch.dart';
 import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/loading_spinner.dart';
 import '../Widgets/honoo_app_title.dart';
-import '../Widgets/luna_fissa.dart';
 import '../Widgets/chest_footer.dart';
 import '../Widgets/chest_item_view.dart';
 import '../Widgets/chest_info_dialog.dart';
@@ -817,11 +816,6 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
               );
             },
           ),
-          overlayBuilder: (ctx, mode) => const LunaFissa(),
-          bodyTopInsetBuilder: (ctx, mode) =>
-              (LunaFissa.reserveTopPadding(ctx) -
-                      ThreadLayoutScaffold.headerHeight)
-                  .clamp(0.0, double.infinity),
           bodyBuilder: (ctx, viewW, availableH, layoutMode) {
             final HonooBuilderMetrics honooMetrics =
                 ResponsiveLayout.honooBuilderMetrics(
