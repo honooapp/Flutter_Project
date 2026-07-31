@@ -210,7 +210,7 @@ class _ConversationPageState extends State<ConversationPage> {
                               MaterialPageRoute(
                                 builder: (context) => ReplyHonooPage(
                                   originalHonoo: honoo,
-                                  initialHintText: 'Scrivi la tua risposta...',
+                                  initialHintText: 'Scrivi la tua risposta',
                                   initialImageHint:
                                       'Aggiungi un’immagine (opzionale)',
                                 ),

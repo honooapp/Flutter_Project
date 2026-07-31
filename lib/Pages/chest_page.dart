@@ -483,7 +483,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         MaterialPageRoute(
           builder: (context) => ReplyHonooPage(
             originalHonoo: current,
-            initialHintText: 'Scrivi la tua risposta...',
+            initialHintText: 'Scrivi la tua risposta',
             initialImageHint: 'Aggiungi un’immagine (opzionale)',
             returnToPreviousOnAnswer: true,
           ),
@@ -545,7 +545,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
                   )
                   ..dbId = link.replyTo
                   ..conversationId = link.conversationId,
-            initialHintText: 'Scrivi la tua risposta...',
+            initialHintText: 'Scrivi la tua risposta',
             initialImageHint: 'Aggiungi un’immagine (opzionale)',
             returnToPreviousOnAnswer: true,
           ),

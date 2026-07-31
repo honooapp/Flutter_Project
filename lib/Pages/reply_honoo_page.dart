@@ -22,7 +22,7 @@ class ReplyHonooPage extends StatefulWidget {
   const ReplyHonooPage({
     super.key,
     required this.originalHonoo,
-    this.initialHintText = 'Scrivi la tua risposta...',
+    this.initialHintText = 'Scrivi la tua risposta',
     this.initialImageHint = 'Aggiungi un’immagine (opzionale)',
     this.returnToPreviousOnAnswer = false,
   });
@@ -71,23 +71,24 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
       recipientId: widget.originalHonoo.userId,
     );
     final newHonoo = Honoo(
-        0,
-        _text,
-        _imageUrl ?? '',
-        now,
-        now,
-        SupabaseProvider.client.auth.currentUser!.id,
-        HonooType.answer,
-        link.replyTo,
-        link.recipientId)
-      ..conversationId = link.conversationId;
+      0,
+      _text,
+      _imageUrl ?? '',
+      now,
+      now,
+      SupabaseProvider.client.auth.currentUser!.id,
+      HonooType.answer,
+      link.replyTo,
+      link.recipientId,
+    )..conversationId = link.conversationId;
 
     try {
       // Assicura che il root sia nello Scrigno se arriviamo dalla Luna
       if (widget.originalHonoo.type == HonooType.moon) {
         try {
           await HonooController().saveToChest(
-              widget.originalHonoo.copyWith(isFromMoonSaved: true));
+            widget.originalHonoo.copyWith(isFromMoonSaved: true),
+          );
         } catch (_) {}
       }
 
@@ -109,10 +110,7 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
     } catch (e) {
       debugPrint('Errore invio reply: $e');
       if (!mounted) return;
-      showHonooToast(
-        context,
-        message: 'Errore. Riprova più tardi.',
-      );
+      showHonooToast(context, message: 'Errore. Riprova più tardi.');
     } finally {
       if (mounted) {
         setState(() => _isSending = false);
@@ -127,10 +125,7 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(
-              height: 52,
-              child: Center(child: HonooAppTitle()),
-            ),
+            const SizedBox(height: 52, child: Center(child: HonooAppTitle())),
             Expanded(
               child: HonooBuilder(
                 onHonooChanged: _onHonooChanged,
