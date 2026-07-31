@@ -77,16 +77,17 @@ void main() {
               'backgroundImage': 'background.png',
               'text': 'Testo',
               'isTextWhite': true,
-            }
+            },
           ],
           'type': 'personal',
           'created_at': '2024-01-01T00:00:00Z',
           'user_id': 'user-1',
-        }
+        },
       ],
     );
-    when(() => repository.fetchHinooMoonFingerprints('user-1'))
-        .thenAnswer((_) async => const {});
+    when(
+      () => repository.fetchHinooMoonFingerprints('user-1'),
+    ).thenAnswer((_) async => const {});
 
     await controller.loadHinoo('user-1');
 
@@ -107,7 +108,7 @@ void main() {
           'backgroundImage': 'background.png',
           'text': 'Testo',
           'isTextWhite': true,
-        }
+        },
       ],
       'type': 'personal',
       'created_at': '2024-01-01T00:00:00Z',
@@ -117,10 +118,12 @@ void main() {
     final fingerprint = HinooService.fingerprint(
       draft.copyWith(type: HinooType.moon),
     );
-    when(() => repository.fetchHinooRows('user-1'))
-        .thenAnswer((_) async => [row]);
-    when(() => repository.fetchHinooMoonFingerprints('user-1'))
-        .thenAnswer((_) async => {fingerprint});
+    when(
+      () => repository.fetchHinooRows('user-1'),
+    ).thenAnswer((_) async => [row]);
+    when(
+      () => repository.fetchHinooMoonFingerprints('user-1'),
+    ).thenAnswer((_) async => {fingerprint});
 
     await controller.loadHinoo('user-1');
 
@@ -135,8 +138,9 @@ void main() {
         {'reply_to': 'root-1', 'created_at': '2024-01-01T12:00:00Z'},
       ],
     );
-    when(() => repository.fetchHinooReplyRows('user-1', const []))
-        .thenAnswer((_) async => const []);
+    when(
+      () => repository.fetchHinooReplyRows('user-1', const []),
+    ).thenAnswer((_) async => const []);
 
     await controller.loadReplies('user-1');
 
@@ -151,16 +155,37 @@ void main() {
     );
   });
 
-  test('un errore conserva i dati precedenti e termina il caricamento',
-      () async {
-    when(() => repository.fetchHinooRows('user-1'))
-        .thenThrow(Exception('offline'));
+  test(
+    'un errore conserva i dati precedenti e termina il caricamento',
+    () async {
+      when(
+        () => repository.fetchHinooRows('user-1'),
+      ).thenThrow(Exception('offline'));
 
-    await controller.loadHinoo('user-1');
+      await controller.loadHinoo('user-1');
 
-    expect(controller.value.isHinooLoading, isFalse);
-    expect(controller.value.hinoo, isEmpty);
-    expect(controller.value.error, isA<Exception>());
+      expect(controller.value.isHinooLoading, isFalse);
+      expect(controller.value.hinoo, isEmpty);
+      expect(controller.value.error, isA<Exception>());
+    },
+  );
+
+  test('loadHinoo non aggiorna lo stato dopo dispose', () async {
+    final pendingRows = Completer<List<dynamic>>();
+    final disposableController = ChestController(
+      repository: repository,
+      realtimeGateway: realtimeGateway,
+    );
+    when(
+      () => repository.fetchHinooRows('user-1'),
+    ).thenAnswer((_) => pendingRows.future);
+
+    final loading = disposableController.loadHinoo('user-1');
+    await Future<void>.delayed(Duration.zero);
+    disposableController.dispose();
+    pendingRows.complete(const []);
+
+    await expectLater(loading, completes);
   });
 
   test('start e stop gestiscono il ciclo di vita Realtime', () {
@@ -201,19 +226,21 @@ void main() {
     expect(firstSubscription.closed, isTrue);
   });
 
-  test('la riconciliazione periodica può aggiornare tutto lo Scrigno',
-      () async {
-    var reconciliations = 0;
-    controller.startRealtime(
-      'user-1',
-      refreshInterval: const Duration(milliseconds: 5),
-      onPeriodicReconcile: () async => reconciliations++,
-    );
+  test(
+    'la riconciliazione periodica può aggiornare tutto lo Scrigno',
+    () async {
+      var reconciliations = 0;
+      controller.startRealtime(
+        'user-1',
+        refreshInterval: const Duration(milliseconds: 5),
+        onPeriodicReconcile: () async => reconciliations++,
+      );
 
-    await Future<void>.delayed(const Duration(milliseconds: 18));
+      await Future<void>.delayed(const Duration(milliseconds: 18));
 
-    expect(reconciliations, greaterThanOrEqualTo(1));
-  });
+      expect(reconciliations, greaterThanOrEqualTo(1));
+    },
+  );
 
   test('un errore Realtime non impedisce l’avvio del controller', () {
     final resilientController = ChestController(
@@ -232,10 +259,12 @@ void main() {
   });
 
   test('gli eventi Realtime ravvicinati producono un solo refresh', () async {
-    when(() => repository.fetchHonooReplyRows('user-1'))
-        .thenAnswer((_) async => const []);
-    when(() => repository.fetchHinooReplyRows('user-1', const []))
-        .thenAnswer((_) async => const []);
+    when(
+      () => repository.fetchHonooReplyRows('user-1'),
+    ).thenAnswer((_) async => const []);
+    when(
+      () => repository.fetchHinooReplyRows('user-1', const []),
+    ).thenAnswer((_) async => const []);
 
     controller.startRealtime(
       'user-1',
@@ -258,8 +287,9 @@ void main() {
       callCount++;
       return callCount == 1 ? firstResponse.future : Future.value(const []);
     });
-    when(() => repository.fetchHinooReplyRows('user-1', const []))
-        .thenAnswer((_) async => const []);
+    when(
+      () => repository.fetchHinooReplyRows('user-1', const []),
+    ).thenAnswer((_) async => const []);
 
     final runningRefresh = controller.refreshReplies('user-1');
     await Future<void>.delayed(Duration.zero);
