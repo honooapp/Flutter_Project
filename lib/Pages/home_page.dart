@@ -84,6 +84,7 @@ class _HomePageState extends State<HomePage> {
           final double maxHeight = constraints.maxHeight;
           final bool isPhone = maxWidth < 600;
           final double contentWidth = isPhone ? maxWidth : maxWidth * 0.5;
+          final double introLift = (maxHeight * 0.012).clamp(6.0, 10.0);
 
           return Stack(
             fit: StackFit.expand,
@@ -129,16 +130,26 @@ class _HomePageState extends State<HomePage> {
                                               child: Column(
                                                 children: [
                                                   const SizedBox(height: 32),
-                                                  Text(
-                                                    Utility().textHome1,
-                                                    style: GoogleFonts.arvo(
-                                                      color: HonooColor
-                                                          .onBackground,
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.w700,
+                                                  Transform.translate(
+                                                    key: const Key(
+                                                      'home_intro_lift',
                                                     ),
-                                                    textAlign: TextAlign.center,
+                                                    offset: Offset(
+                                                      0,
+                                                      -introLift,
+                                                    ),
+                                                    child: Text(
+                                                      Utility().textHome1,
+                                                      style: GoogleFonts.arvo(
+                                                        color: HonooColor
+                                                            .onBackground,
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
                                                   ),
                                                   const SizedBox(height: 24),
                                                   Text(
