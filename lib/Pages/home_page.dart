@@ -144,9 +144,9 @@ class _HomeIntro extends StatelessWidget {
 
   static const double _designWidth = 360;
   static const double _moonIconSize = 22;
-  static const double _largeIconSize = 29;
-  static const double _bottleIconVerticalOffset = 6;
-  static const double _islandIconVerticalOffset = 9;
+  static const double _largeIconSize = 32;
+  static const double _bottleIconVerticalOffset = 8;
+  static const double _islandIconVerticalOffset = 10;
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +178,7 @@ class _HomeIntro extends StatelessWidget {
                     'È vero\n'
                     'Ma non per i poeti\n\n'
                     'Vuoi essere un poeta di honoo?\n\n'
-                    'Clicca su ',
+                    'Scegli',
               ),
               _inlineAction(
                 key: const Key('home_inline_bottle'),
@@ -188,7 +188,7 @@ class _HomeIntro extends StatelessWidget {
                 tooltip: 'Scrivi',
                 onPressed: () => SeaFooterBar.openComposer(context),
               ),
-              const TextSpan(text: '\n\nOppure su '),
+              const TextSpan(text: '\n\nOppure'),
               _inlineAction(
                 key: const Key('home_inline_moon'),
                 asset: 'assets/icons/moon.svg',
@@ -196,7 +196,7 @@ class _HomeIntro extends StatelessWidget {
                 tooltip: 'Vai sulla Luna',
                 onPressed: () => LunaFissa.openMoon(context),
               ),
-              const TextSpan(text: '\ne guarda le vite degli altri\n\nO su '),
+              const TextSpan(text: '\ne guarda le vite degli altri\n\nO'),
               _inlineAction(
                 key: const Key('home_inline_island'),
                 asset: 'assets/icons/isoladellestorie/island.svg',

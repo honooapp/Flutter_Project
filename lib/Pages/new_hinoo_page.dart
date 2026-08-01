@@ -445,15 +445,6 @@ class _NewHinooPageState extends State<NewHinooPage>
     return w;
   }
 
-  void _deleteCurrentFromBuilder() {
-    final dyn = _builderKey.currentState as dynamic;
-    if (dyn?.deleteCurrentPagePublic != null) {
-      dyn.deleteCurrentPagePublic();
-    } else {
-      _warnMissingApi('_deleteCurrentFromBuilder → deleteCurrentPagePublic');
-    }
-  }
-
   void _triggerDownloadFromBuilder() {
     final dyn = _builderKey.currentState as dynamic;
     if (dyn?.openDownloadDialogPublic != null) {
@@ -538,11 +529,6 @@ class _NewHinooPageState extends State<NewHinooPage>
           ),
           const SizedBox(width: 6),
         ],
-        iconBtn(
-          tooltip: 'Cancella hinoo',
-          icon: Icons.delete_outline,
-          onPressed: _deleteCurrentFromBuilder,
-        ),
       ],
     );
   }

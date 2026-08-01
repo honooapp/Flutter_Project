@@ -20,7 +20,7 @@ void main() {
     expect(find.byTooltip('Apri il tuo Cuore'), findsOneWidget);
   });
 
-  testWidgets('il cestino hinoo è sopra e fuori dal box di editing', (
+  testWidgets('il cestino hinoo non è mostrato sopra il box di editing', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -32,14 +32,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final Finder deleteButton = find.byTooltip('Cancella hinoo');
-    final Finder editor = find.byType(HinooBuilder);
-
-    expect(deleteButton, findsOneWidget);
-    expect(editor, findsOneWidget);
-    expect(
-      tester.getBottomLeft(deleteButton).dy,
-      lessThanOrEqualTo(tester.getTopLeft(editor).dy),
-    );
+    expect(find.byTooltip('Cancella hinoo'), findsNothing);
+    expect(find.byType(HinooBuilder), findsOneWidget);
   });
 }
