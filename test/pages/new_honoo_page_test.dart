@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Pages/new_honoo_page.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/UI/honoo_builder.dart';
+import 'package:honoo/Widgets/width_limited_multiline_field.dart';
 import 'package:sizer/sizer.dart';
 
 void main() {
@@ -25,19 +26,31 @@ void main() {
     await tester.enterText(tf, '“Ciao luna”');
     await tester.pump();
 
-    final controls = find.byKey(const Key('honoo-editor-controls'));
     final counter = find.byKey(const Key('honoo-editor-character-counter'));
     final builder = find.byType(HonooBuilder);
+    final textArea = find.byKey(const Key('honoo-text-area'));
 
-    expect(controls, findsOneWidget);
+    expect(find.byKey(const Key('honoo-editor-controls')), findsNothing);
     expect(counter, findsOneWidget);
     expect(
-      tester.getBottomLeft(controls).dy,
-      lessThanOrEqualTo(tester.getTopLeft(builder).dy),
+      tester.getCenter(counter).dx,
+      closeTo(tester.getCenter(builder).dx, 0.01),
     );
-    expect(tester.widget<Text>(counter).style?.color, Colors.white);
+    expect(
+      tester.getBottomLeft(counter).dy,
+      closeTo(tester.getBottomLeft(textArea).dy - 8, 1),
+    );
+    expect(
+      tester
+          .widget<WidthLimitedMultilineField>(
+            find.byType(WidthLimitedMultilineField),
+          )
+          .horizontalPadding
+          .bottom,
+      24,
+    );
     expect(find.byTooltip('Salva sul dispositivo'), findsOneWidget);
-    expect(find.byTooltip('Cancella honoo'), findsOneWidget);
+    expect(find.byTooltip('Cancella honoo'), findsNothing);
 
     final builderRect = tester.getRect(builder);
     final footerRect = tester.getRect(
@@ -49,13 +62,12 @@ void main() {
     expect(footerRect.top - builderRect.bottom, lessThan(16));
     expect(homeRect.left, greaterThanOrEqualTo(builderRect.left));
     expect(hinooRect.right, lessThanOrEqualTo(builderRect.right));
-    expect(
-      homeRect.left - builderRect.left,
-      closeTo(builderRect.right - hinooRect.right, 0.01),
-    );
 
-    // bottone di pubblicazione presente (adatta label se diverso)
-    expect(find.byTooltip('Salva honoo'), findsOneWidget);
+    expect(find.byTooltip('Salva honoo'), findsNothing);
+    expect(
+      tester.getCenter(find.byTooltip('Scrivi hinoo')).dx,
+      lessThan(tester.getCenter(find.byTooltip('Salva sul dispositivo')).dx),
+    );
   });
 
   testWidgets('il footer della risposta non mostra Scrivi hinoo', (
@@ -75,6 +87,7 @@ void main() {
     expect(find.byTooltip('Scrivi hinoo'), findsNothing);
     expect(find.byTooltip('Home'), findsOneWidget);
     expect(find.byTooltip('Apri il tuo Cuore'), findsOneWidget);
-    expect(find.byTooltip('Invia'), findsOneWidget);
+    expect(find.byTooltip('Invia'), findsNothing);
+    expect(find.byTooltip('Salva sul dispositivo'), findsOneWidget);
   });
 }

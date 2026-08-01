@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 
@@ -63,74 +62,6 @@ class _NewHonooPageState extends State<NewHonooPage> {
   String _lastSavedRawImage = '';
   bool _hasMinTextForDownload = false;
 
-  Widget _buildCanvasControls() {
-    const double iconSize = 22;
-    const double buttonBox = 34;
-
-    Widget iconBtn({
-      required IconData icon,
-      required String tooltip,
-      required VoidCallback onPressed,
-    }) {
-      return SizedBox(
-        width: buttonBox,
-        height: buttonBox,
-        child: IconButton(
-          tooltip: tooltip,
-          onPressed: onPressed,
-          icon: Icon(icon, size: iconSize, color: Colors.white),
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(),
-          splashRadius: buttonBox / 2,
-          visualDensity: VisualDensity.compact,
-        ),
-      );
-    }
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        iconBtn(
-          tooltip: 'Salva sul dispositivo',
-          icon: Icons.download_outlined,
-          onPressed: _handleDownloadTap,
-        ),
-        const SizedBox(width: 6),
-        iconBtn(
-          tooltip: 'Cancella honoo',
-          icon: Icons.delete_outline,
-          onPressed: _handleDeleteTap,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEditorControls() {
-    final int used = _text.characters.length;
-
-    return SizedBox(
-      key: const Key('honoo-editor-controls'),
-      height: 40,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            '$used/${HonooBuilder.maxTextCharacters}',
-            key: const Key('honoo-editor-character-counter'),
-            style: GoogleFonts.arvo(
-              color: Colors.white,
-              fontSize: 12,
-              height: 1,
-            ),
-          ),
-          const Spacer(),
-          _buildCanvasControls(),
-        ],
-      ),
-    );
-  }
-
   /// Aggiorna solo se cambia DAVVERO e non è identico all’ultimo SALVATO.
   void _onHonooChanged(String text, String imageUrl) {
     // se identico allo stato attuale → nessun rebuild inutile
@@ -151,12 +82,12 @@ class _NewHonooPageState extends State<NewHonooPage> {
     });
   }
 
-  Future<void> _submitHonoo() async {
+  Future<bool> _submitHonoo({bool openChestAfterSave = false}) async {
     final user = SupabaseProvider.client.auth.currentUser;
 
     // 1) Se non sei loggato: vai al login e torna qui (senza auto-salvare)
     if (user == null) {
-      if (!mounted) return;
+      if (!mounted) return false;
 
       final bool? goLogin = await showDialog<bool>(
         context: context,
@@ -168,7 +99,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
         ),
       );
 
-      if (goLogin != true || !mounted) return;
+      if (goLogin != true || !mounted) return false;
 
       // ✅ aspetta la fine del login
       final bool? ok = await Navigator.push<bool>(
@@ -181,7 +112,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
         ),
       );
 
-      if (!mounted) return;
+      if (!mounted) return false;
 
       // ✅ niente auto-save: solo feedback opzionale
       if (ok == true) {
@@ -191,20 +122,20 @@ class _NewHonooPageState extends State<NewHonooPage> {
         );
       }
 
-      return;
+      return false;
     }
 
     // 2) Validazioni minime (testo + immagine)
     if (_text.trim().isEmpty) {
-      if (!mounted) return;
+      if (!mounted) return false;
       showHonooToast(context, message: 'Scrivi qualcosa prima di salvare.');
-      return;
+      return false;
     }
 
     if (_imageUrl.trim().isEmpty) {
-      if (!mounted) return;
+      if (!mounted) return false;
       showHonooToast(context, message: 'Carica un’immagine prima di salvare.');
-      return;
+      return false;
     }
 
     // 3) Risolvi URL definitivo (usa cache se già risolto)
@@ -212,12 +143,12 @@ class _NewHonooPageState extends State<NewHonooPage> {
         _finalImageUrlCache ?? await _resolveFinalImageUrl(_imageUrl);
 
     if (finalImageUrl == null || finalImageUrl.isEmpty) {
-      if (!mounted) return;
+      if (!mounted) return false;
       showHonooToast(
         context,
         message: 'Immagine non valida. Ricaricala e riprova.',
       );
-      return;
+      return false;
     }
 
     // 4) Crea e salva
@@ -236,32 +167,41 @@ class _NewHonooPageState extends State<NewHonooPage> {
       widget.recipientTag,
     )..conversationId = conversationId;
 
-    final bool shouldOfferNotifications =
-        type == HonooType.personal &&
-        await ConversationNotificationPrompt.shouldOfferForFirstConversation(
-          user.id,
-        );
-
     try {
       if (widget.returnSavedId) {
         final id = await HonooService.publishHonooAndReturnId(newHonoo);
-        if (!mounted) return;
+        if (!mounted) return false;
         showHonooToast(context, message: 'honoo salvato.');
         Navigator.of(context).pop(id);
-        return;
+        return true;
       }
 
       await HonooService.publishHonoo(newHonoo);
 
-      if (!mounted) return;
+      if (!mounted) return false;
       setState(() {
         _finalImageUrlCache = finalImageUrl;
         _lastSavedRawImage = _imageUrl;
       });
 
+      if (openChestAfterSave) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const ChestPage()),
+          (route) => false,
+        );
+        return true;
+      }
+
+      final bool shouldOfferNotifications =
+          type == HonooType.personal &&
+          await ConversationNotificationPrompt.shouldOfferForFirstConversation(
+            user.id,
+          );
+      if (!mounted) return false;
+
       if (shouldOfferNotifications) {
         await ConversationNotificationPrompt.show(context);
-        if (!mounted) return;
+        if (!mounted) return false;
       }
 
       if (type == HonooType.answer) {
@@ -270,12 +210,12 @@ class _NewHonooPageState extends State<NewHonooPage> {
           message:
               "L'honoo adesso è nel tuo Scrigno, e, soprattutto nello Scrigno di quacun altro.",
         );
-        if (!mounted) return;
+        if (!mounted) return false;
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const HomePage()),
           (route) => false,
         );
-        return;
+        return true;
       } else {
         final bool? sendToMoon = await showDialog<bool>(
           context: context,
@@ -294,13 +234,16 @@ class _NewHonooPageState extends State<NewHonooPage> {
               MaterialPageRoute(builder: (_) => const HomePage()),
               (route) => false,
             );
+            return true;
           }
         }
+        return true;
       }
     } catch (e, st) {
       debugPrint('publishHonoo failed: $e\n$st');
-      if (!mounted) return;
+      if (!mounted) return false;
       showHonooToast(context, message: 'Errore: $e');
+      return false;
     }
   }
 
@@ -396,26 +339,6 @@ class _NewHonooPageState extends State<NewHonooPage> {
     await state.downloadHonooPublic(context, fileName: trimmed);
   }
 
-  Future<void> _handleDeleteTap() async {
-    final bool? confirmed = await showHonooDeleteDialog(
-      context,
-      target: HonooDeletionTarget.page,
-    );
-    if (!mounted) return;
-    if (confirmed != true) return;
-
-    _builderKey.currentState?.resetContent();
-
-    setState(() {
-      _text = '';
-      _imageUrl = '';
-      // no-op
-      _finalImageUrlCache = null;
-      _lastSavedRawImage = '';
-      _hasMinTextForDownload = false;
-    });
-  }
-
   void _onBuilderFocusChanged(bool hasFocus) {
     if (mounted) setState(() {});
   }
@@ -499,13 +422,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                   0.0,
                   double.infinity,
                 );
-            const double editorControlsHeight = 40;
-            const double editorControlsGap = 4;
-            final double builderAvailableH =
-                (availableH - editorControlsHeight - editorControlsGap).clamp(
-                  0.0,
-                  double.infinity,
-                );
+            final double builderAvailableH = availableH;
 
             final HonooBuilderMetrics metrics =
                 ResponsiveLayout.honooBuilderMetrics(
@@ -516,8 +433,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                 );
             final double builderWidth = metrics.width;
             final double builderHeight = metrics.height;
-            final double editorGroupHeight =
-                editorControlsHeight + editorControlsGap + builderHeight;
+            final double editorGroupHeight = builderHeight;
             final double editorGroupTop =
                 headerH +
                 contentTopPadding +
@@ -559,8 +475,6 @@ class _NewHonooPageState extends State<NewHonooPage> {
                             height: editorGroupHeight,
                             child: Column(
                               children: [
-                                _buildEditorControls(),
-                                const SizedBox(height: editorControlsGap),
                                 SizedBox(
                                   width: builderWidth,
                                   height: builderHeight,
@@ -569,9 +483,12 @@ class _NewHonooPageState extends State<NewHonooPage> {
                                       key: _builderKey,
                                       onHonooChanged: _onHonooChanged,
                                       onFocusChanged: _onBuilderFocusChanged,
-                                      showCharacterCounter: false,
+                                      showCharacterCounter: true,
                                       imageConfirmIconDisplaySize:
                                           footerIconSize,
+                                      onImageConfirmed: () => _submitHonoo(
+                                        openChestAfterSave: true,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -636,19 +553,6 @@ class _NewHonooPageState extends State<NewHonooPage> {
                               );
                             },
                           ),
-                          ResponsiveFooterAction(
-                            asset: "assets/icons/ok.svg",
-                            semanticsLabel:
-                                (widget.forcedType == HonooType.answer)
-                                ? 'Invia'
-                                : 'OK',
-                            size: footerIconSize,
-                            splashRadius: 25,
-                            tooltip: (widget.forcedType == HonooType.answer)
-                                ? 'Invia'
-                                : 'Salva honoo',
-                            onPressed: _submitHonoo,
-                          ),
                           if (widget.forcedType != HonooType.answer)
                             ResponsiveFooterAction(
                               asset: "assets/icons/piuma.svg",
@@ -665,6 +569,19 @@ class _NewHonooPageState extends State<NewHonooPage> {
                                 );
                               },
                             ),
+                          ResponsiveFooterAction(
+                            asset: "assets/icons/piuma.svg",
+                            semanticsLabel: 'Download',
+                            size: footerIconSize,
+                            splashRadius: 25,
+                            tooltip: 'Salva sul dispositivo',
+                            onPressed: _handleDownloadTap,
+                            icon: Icon(
+                              Icons.download_outlined,
+                              size: footerIconSize,
+                              color: HonooColor.onBackground,
+                            ),
+                          ),
                         ],
                       ),
                     ),

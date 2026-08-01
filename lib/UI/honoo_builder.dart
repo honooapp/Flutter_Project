@@ -17,7 +17,7 @@ import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
 import 'package:honoo/Widgets/width_limited_multiline_field.dart';
 import 'package:honoo/Widgets/text_box_download_button.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, visibleForTesting;
 import 'package:honoo/web/heic_converter.dart' as heicweb;
 
 import '../Pages/email_login_page.dart';
@@ -46,6 +46,7 @@ class HonooBuilder extends StatefulWidget {
   final bool showDownloadButton;
   final bool showCharacterCounter;
   final double? imageConfirmIconDisplaySize;
+  final Future<bool> Function()? onImageConfirmed;
 
   const HonooBuilder({
     super.key,
@@ -58,6 +59,7 @@ class HonooBuilder extends StatefulWidget {
     this.showDownloadButton = true,
     this.showCharacterCounter = true,
     this.imageConfirmIconDisplaySize,
+    this.onImageConfirmed,
   });
 
   @override
@@ -85,9 +87,24 @@ class HonooBuilderState extends State<HonooBuilder> {
   bool _imageConfirmed = false;
   bool _isUploadingFinal = false;
   bool _hideEditorActionsForCapture = false;
+  bool _isEditingText = false;
 
   bool get hasImage => _imageBytes != null;
-  bool get _isEditingImage => hasImage && !_imageConfirmed;
+  bool get _isEditingImage => hasImage && !_imageConfirmed && !_isEditingText;
+
+  @visibleForTesting
+  void setImageBytesForTesting(Uint8List bytes) {
+    setState(() {
+      _imageBytes = bytes;
+      _publicImageUrl = '';
+      _imageConfirmed = false;
+      _isUploadingFinal = false;
+      _isEditingText = false;
+      _confirmedPreviewBytes = null;
+      _imageScale = _imageMinScale;
+    });
+    _emitChange();
+  }
 
   // url pubblico su supabase della PNG zoommata
   String _publicImageUrl = '';
@@ -245,6 +262,7 @@ class HonooBuilderState extends State<HonooBuilder> {
         _publicImageUrl = '';
         _imageConfirmed = false;
         _isUploadingFinal = false;
+        _isEditingText = false;
         _confirmedPreviewBytes = null;
         _imageScale = _imageMinScale;
       });
@@ -356,14 +374,28 @@ class HonooBuilderState extends State<HonooBuilder> {
     }
 
     if (!mounted) return;
-    setState(() {
-      _publicImageUrl = publicUrl;
-      _imageConfirmed = true;
-      _isUploadingFinal = false;
-      _confirmedPreviewBytes = png;
-    });
-
+    _publicImageUrl = publicUrl;
+    _confirmedPreviewBytes = png;
     _emitChange();
+
+    final bool saved = await widget.onImageConfirmed?.call() ?? true;
+    if (!mounted) return;
+    setState(() {
+      _imageConfirmed = saved;
+      _isUploadingFinal = false;
+    });
+  }
+
+  void _editText() {
+    setState(() => _isEditingText = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _textFocus.requestFocus();
+    });
+  }
+
+  void _returnToImageEditor() {
+    _textFocus.unfocus();
+    setState(() => _isEditingText = false);
   }
 
   Future<Uint8List?> _captureHonooAsPng() async {
@@ -483,6 +515,7 @@ class HonooBuilderState extends State<HonooBuilder> {
 
       _imageConfirmed = false;
       _isUploadingFinal = false;
+      _isEditingText = false;
 
       _confirmedPreviewBytes = null;
     });
@@ -572,6 +605,7 @@ class HonooBuilderState extends State<HonooBuilder> {
 
   Widget _buildTextArea(double imageSize) {
     return Container(
+      key: const Key('honoo-text-area'),
       padding: EdgeInsets.zero,
       decoration: BoxDecoration(
         color: HonooColor.tertiary,
@@ -608,7 +642,7 @@ class HonooBuilderState extends State<HonooBuilder> {
                       HonooBuilder.maxTextCharacters,
                     ),
                   ],
-                  horizontalPadding: const EdgeInsets.symmetric(horizontal: 22),
+                  horizontalPadding: const EdgeInsets.fromLTRB(22, 0, 22, 24),
                   decoration: InputDecoration(
                     hintText: _textCtrl.text.isEmpty
                         ? (widget.textHint ?? 'Scrivi qui il tuo testo')
@@ -631,10 +665,10 @@ class HonooBuilderState extends State<HonooBuilder> {
                 ),
               ),
               if (widget.showCharacterCounter)
-                // Contacaratteri in alto a sinistra (Arvo) – 0/144
                 Positioned(
-                  top: 8,
-                  left: 8,
+                  bottom: 8,
+                  left: 0,
+                  right: 0,
                   child: IgnorePointer(
                     child: Builder(
                       builder: (_) {
@@ -649,6 +683,8 @@ class HonooBuilderState extends State<HonooBuilder> {
                                     ));
                         return Text(
                           '$used/${HonooBuilder.maxTextCharacters}',
+                          key: const Key('honoo-editor-character-counter'),
+                          textAlign: TextAlign.center,
                           style: GoogleFonts.arvo(
                             color: color,
                             fontSize: 12,
@@ -685,7 +721,7 @@ class HonooBuilderState extends State<HonooBuilder> {
 
     return Container(
       key: const Key('honoo-image-editing-controls'),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: HonooColor.tertiary,
         border: Border.all(color: Colors.black12),
@@ -707,14 +743,14 @@ class HonooBuilderState extends State<HonooBuilder> {
             children: [
               Text(
                 'Trascina per spostare l’immagine.\n'
-                'Usa il pizzico o i controlli per zoomare.',
+                'Usa il pizzico o i controlli per zoomare',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.arvo(
                   color: HonooColor.background,
                   fontSize: 14,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Row(
                 children: [
                   IconButton(
@@ -761,53 +797,87 @@ class HonooBuilderState extends State<HonooBuilder> {
               ),
               SizedBox(
                 width: double.infinity,
-                child: Stack(
-                  alignment: Alignment.center,
+                height: 34,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    TextButton.icon(
-                      key: const Key('honoo-replace-editing-image'),
-                      onPressed: _pickImage,
-                      style: TextButton.styleFrom(
-                        foregroundColor: HonooColor.background,
-                      ),
-                      icon: const Icon(Icons.photo_library_outlined),
-                      label: const Text('Sostituisci immagine'),
-                    ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: _isUploadingFinal
-                          ? SizedBox(
-                              width: confirmIconSize,
-                              height: confirmIconSize,
-                              child: const Padding(
-                                padding: EdgeInsets.all(8),
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 3,
-                                  color: HonooColor.background,
-                                ),
-                              ),
-                            )
-                          : IconButton(
-                              constraints: BoxConstraints.tightFor(
-                                width: confirmIconSize,
-                                height: confirmIconSize,
-                              ),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: TextButton.icon(
+                            key: const Key('honoo-replace-editing-image'),
+                            onPressed: _pickImage,
+                            style: TextButton.styleFrom(
+                              foregroundColor: HonooColor.background,
                               padding: EdgeInsets.zero,
-                              iconSize: confirmIconSize,
-                              onPressed: _confirmImage,
-                              tooltip: 'Conferma immagine',
-                              icon: SvgPicture.asset(
-                                'assets/icons/ok.svg',
-                                width: confirmIconSize,
-                                height: confirmIconSize,
-                                colorFilter: const ColorFilter.mode(
-                                  HonooColor.background,
-                                  BlendMode.srcIn,
-                                ),
-                              ),
+                              visualDensity: VisualDensity.compact,
                             ),
+                            icon: const Icon(
+                              Icons.photo_library_outlined,
+                              size: 18,
+                            ),
+                            label: const Text('Sostituisci immagine'),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerRight,
+                          child: TextButton.icon(
+                            key: const Key('honoo-edit-text'),
+                            onPressed: _editText,
+                            style: TextButton.styleFrom(
+                              foregroundColor: HonooColor.background,
+                              padding: EdgeInsets.zero,
+                              visualDensity: VisualDensity.compact,
+                            ),
+                            icon: const Icon(Icons.edit_outlined, size: 18),
+                            label: const Text('Modifica testo'),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
+                ),
+              ),
+              SizedBox(
+                height: 42,
+                child: Center(
+                  child: _isUploadingFinal
+                      ? const SizedBox(
+                          width: 28,
+                          height: 28,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 3,
+                            color: HonooColor.background,
+                          ),
+                        )
+                      : TextButton.icon(
+                          key: const Key('honoo-save'),
+                          onPressed: _confirmImage,
+                          style: TextButton.styleFrom(
+                            foregroundColor: HonooColor.background,
+                            padding: EdgeInsets.zero,
+                            visualDensity: VisualDensity.compact,
+                          ),
+                          icon: SvgPicture.asset(
+                            'assets/icons/ok.svg',
+                            width: math.min(confirmIconSize, 28),
+                            height: math.min(confirmIconSize, 28),
+                            colorFilter: const ColorFilter.mode(
+                              HonooColor.background,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          label: const Text('Salva honoo'),
+                        ),
                 ),
               ),
             ],
@@ -819,7 +889,10 @@ class HonooBuilderState extends State<HonooBuilder> {
 
   Widget _buildImageArea() {
     return GestureDetector(
-      onTap: _imageBytes == null ? _pickImage : null,
+      key: const Key('honoo-image-area'),
+      onTap: _imageBytes == null
+          ? _pickImage
+          : (_isEditingText && !_imageConfirmed ? _returnToImageEditor : null),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(5),
         child: Container(
@@ -881,34 +954,31 @@ class HonooBuilderState extends State<HonooBuilder> {
                       ),
                     if (_imageConfirmed && !_hideEditorActionsForCapture)
                       Positioned(
-                        left: 0,
-                        right: 0,
+                        left: 12,
                         bottom: 12,
-                        child: Center(
-                          child: TextButton.icon(
-                            key: const Key('honoo-replace-confirmed-image'),
-                            onPressed: _pickImage,
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Colors.black.withValues(
-                                alpha: 0.55,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                        child: TextButton.icon(
+                          key: const Key('honoo-replace-confirmed-image'),
+                          onPressed: _pickImage,
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.black.withValues(
+                              alpha: 0.55,
                             ),
-                            icon: const Icon(
-                              Icons.photo_library_outlined,
-                              size: 20,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
                             ),
-                            label: Text(
-                              'Sostituisci immagine',
-                              style: GoogleFonts.arvo(fontSize: 13),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
+                          ),
+                          icon: const Icon(
+                            Icons.photo_library_outlined,
+                            size: 20,
+                          ),
+                          label: Text(
+                            'Sostituisci immagine',
+                            style: GoogleFonts.arvo(fontSize: 13),
                           ),
                         ),
                       ),
