@@ -143,7 +143,8 @@ class _HomeIntro extends StatelessWidget {
   const _HomeIntro();
 
   static const double _designWidth = 360;
-  static const double _iconSize = 22;
+  static const double _moonIconSize = 22;
+  static const double _largeIconSize = 26;
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +166,7 @@ class _HomeIntro extends StatelessWidget {
             style: regularStyle,
             children: [
               TextSpan(
-                text: 'Ti regaliamo la Luna\nPer sempre\n',
+                text: 'Ti regaliamo la Luna\nPer sempre\n\n',
                 style: regularStyle.copyWith(fontWeight: FontWeight.w700),
               ),
               const TextSpan(
@@ -180,6 +181,7 @@ class _HomeIntro extends StatelessWidget {
               _inlineAction(
                 key: const Key('home_inline_bottle'),
                 asset: 'assets/icons/bottle.svg',
+                size: _largeIconSize,
                 tooltip: 'Scrivi',
                 onPressed: () => SeaFooterBar.openComposer(context),
               ),
@@ -187,6 +189,7 @@ class _HomeIntro extends StatelessWidget {
               _inlineAction(
                 key: const Key('home_inline_moon'),
                 asset: 'assets/icons/moon.svg',
+                size: _moonIconSize,
                 tooltip: 'Vai sulla Luna',
                 onPressed: () => LunaFissa.openMoon(context),
               ),
@@ -194,6 +197,7 @@ class _HomeIntro extends StatelessWidget {
               _inlineAction(
                 key: const Key('home_inline_island'),
                 asset: 'assets/icons/isoladellestorie/island.svg',
+                size: _largeIconSize,
                 tooltip: "Vai all'Isola delle Storie",
                 onPressed: () => SeaFooterBar.openIsland(context),
                 tint: HonooColor.onBackground,
@@ -213,26 +217,25 @@ class _HomeIntro extends StatelessWidget {
   static WidgetSpan _inlineAction({
     required Key key,
     required String asset,
+    required double size,
     required String tooltip,
     required VoidCallback onPressed,
     Color? tint,
   }) {
     return WidgetSpan(
-      alignment: PlaceholderAlignment.middle,
+      alignment: PlaceholderAlignment.baseline,
+      baseline: TextBaseline.alphabetic,
       child: IconButton(
         key: key,
-        constraints: const BoxConstraints.tightFor(
-          width: _iconSize,
-          height: _iconSize,
-        ),
+        constraints: BoxConstraints.tightFor(width: size, height: size),
         padding: EdgeInsets.zero,
         visualDensity: VisualDensity.compact,
         tooltip: tooltip,
         onPressed: onPressed,
         icon: SvgPicture.asset(
           asset,
-          width: _iconSize,
-          height: _iconSize,
+          width: size,
+          height: size,
           colorFilter: tint == null
               ? null
               : ColorFilter.mode(tint, BlendMode.srcIn),

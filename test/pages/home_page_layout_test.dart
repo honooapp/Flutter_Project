@@ -48,15 +48,16 @@ void main() {
     expect(find.byKey(const Key('home_inline_moon')), findsOneWidget);
     expect(find.byKey(const Key('home_inline_island')), findsOneWidget);
 
-    for (final key in const [
-      Key('home_inline_bottle'),
-      Key('home_inline_moon'),
-      Key('home_inline_island'),
+    for (final entry in const [
+      (Key('home_inline_bottle'), 26.0),
+      (Key('home_inline_moon'), 22.0),
+      (Key('home_inline_island'), 26.0),
     ]) {
+      final key = entry.$1;
       final button = tester.widget<IconButton>(find.byKey(key));
       expect(button.onPressed, isNotNull);
-      expect(button.constraints!.maxWidth, 22);
-      expect(button.constraints!.maxHeight, 22);
+      expect(button.constraints!.maxWidth, entry.$2);
+      expect(button.constraints!.maxHeight, entry.$2);
     }
 
     await pumpHomeAtSize(tester, const Size(1440, 1000));
