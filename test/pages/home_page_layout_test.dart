@@ -41,8 +41,8 @@ void main() {
 
     final intro = find.byKey(const Key('home_intro_text'));
     expect(intro, findsOneWidget);
-    expect(find.textContaining('Ti regaliamo la Luna.'), findsOneWidget);
-    expect(find.textContaining('verso le tue storie.'), findsOneWidget);
+    expect(find.textContaining('Ti regaliamo la Luna'), findsOneWidget);
+    expect(find.textContaining('verso le tue storie'), findsOneWidget);
     expect(find.byType(Scrollable), findsNothing);
     expect(find.byKey(const Key('home_inline_bottle')), findsOneWidget);
     expect(find.byKey(const Key('home_inline_moon')), findsOneWidget);
@@ -55,8 +55,8 @@ void main() {
     ]) {
       final button = tester.widget<IconButton>(find.byKey(key));
       expect(button.onPressed, isNotNull);
-      expect(button.constraints!.maxWidth, 20);
-      expect(button.constraints!.maxHeight, 20);
+      expect(button.constraints!.maxWidth, 22);
+      expect(button.constraints!.maxHeight, 22);
     }
 
     await pumpHomeAtSize(tester, const Size(1440, 1000));

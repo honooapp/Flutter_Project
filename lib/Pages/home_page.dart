@@ -143,7 +143,7 @@ class _HomeIntro extends StatelessWidget {
   const _HomeIntro();
 
   static const double _designWidth = 360;
-  static const double _iconSize = 20;
+  static const double _iconSize = 22;
 
   @override
   Widget build(BuildContext context) {
@@ -165,15 +165,15 @@ class _HomeIntro extends StatelessWidget {
             style: regularStyle,
             children: [
               TextSpan(
-                text: 'Ti regaliamo la Luna.\nPer sempre.\n',
+                text: 'Ti regaliamo la Luna\nPer sempre\n',
                 style: regularStyle.copyWith(fontWeight: FontWeight.w700),
               ),
               const TextSpan(
                 text:
-                    'Niente è per sempre.\n'
-                    'E nessuno può regalarti la Luna.\n\n'
-                    'È vero.\n'
-                    'Ma non per i poeti.\n\n'
+                    'Niente è per sempre\n'
+                    'E nessuno può regalarti la Luna\n\n'
+                    'È vero\n'
+                    'Ma non per i poeti\n\n'
                     'Vuoi essere un poeta di honoo?\n\n'
                     'Clicca su ',
               ),
@@ -183,14 +183,14 @@ class _HomeIntro extends StatelessWidget {
                 tooltip: 'Scrivi',
                 onPressed: () => SeaFooterBar.openComposer(context),
               ),
-              const TextSpan(text: '.\n\nOppure su '),
+              const TextSpan(text: '\n\nOppure su '),
               _inlineAction(
                 key: const Key('home_inline_moon'),
                 asset: 'assets/icons/moon.svg',
                 tooltip: 'Vai sulla Luna',
                 onPressed: () => LunaFissa.openMoon(context),
               ),
-              const TextSpan(text: ',\ne guarda le vite degli altri.\n\nO su '),
+              const TextSpan(text: '\ne guarda le vite degli altri\n\nO su '),
               _inlineAction(
                 key: const Key('home_inline_island'),
                 asset: 'assets/icons/isoladellestorie/island.svg',
@@ -199,7 +199,7 @@ class _HomeIntro extends StatelessWidget {
                 tint: HonooColor.onBackground,
               ),
               const TextSpan(
-                text: ',\ne inizia il viaggio\nverso le tue storie.',
+                text: '\ne inizia il viaggio\nverso le tue storie',
               ),
             ],
           ),
