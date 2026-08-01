@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Services/home_service.dart';
 import 'package:honoo/Utility/app_logger.dart';
-import '../Utility/utility.dart';
+import 'package:honoo/Utility/honoo_colors.dart';
 import '../Widgets/honoo_app_title.dart';
 import 'placeholder_page.dart';
 
@@ -56,8 +56,12 @@ class _HomePageState extends State<HomePage> {
         setState(() => _replyCount = count);
       }
     } catch (error, stackTrace) {
-      AppLogger.warning('Impossibile aggiornare il contatore risposte',
-          scope: 'HomePage', error: error, stackTrace: stackTrace);
+      AppLogger.warning(
+        'Impossibile aggiornare il contatore risposte',
+        scope: 'HomePage',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -67,8 +71,12 @@ class _HomePageState extends State<HomePage> {
     try {
       await _homeService.recordVisit();
     } catch (error, stackTrace) {
-      AppLogger.warning('Impossibile registrare la visita',
-          scope: 'HomePage', error: error, stackTrace: stackTrace);
+      AppLogger.warning(
+        'Impossibile registrare la visita',
+        scope: 'HomePage',
+        error: error,
+        stackTrace: stackTrace,
+      );
       _visitRecorded = false;
     }
   }
@@ -81,10 +89,8 @@ class _HomePageState extends State<HomePage> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final double maxWidth = constraints.maxWidth;
-          final double maxHeight = constraints.maxHeight;
           final bool isPhone = maxWidth < 600;
           final double contentWidth = isPhone ? maxWidth : maxWidth * 0.5;
-          final double introLift = (maxHeight * 0.012).clamp(6.0, 10.0);
 
           return Stack(
             fit: StackFit.expand,
@@ -99,83 +105,20 @@ class _HomePageState extends State<HomePage> {
                       onTap: () {
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                              builder: (_) => const PlaceholderPage()),
+                            builder: (_) => const PlaceholderPage(),
+                          ),
                           (route) => false,
                         );
                       },
                     ),
                   ),
                   Expanded(
-                    child: SingleChildScrollView(
-                      child: SizedBox(
-                        width: maxWidth,
-                        child: Row(
-                          children: [
-                            Expanded(child: Container()),
-                            Container(
-                              constraints:
-                                  BoxConstraints(maxWidth: contentWidth),
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    height: maxHeight * 0.8,
-                                    child: Stack(
-                                      clipBehavior: Clip.none,
-                                      children: [
-                                        Positioned.fill(
-                                          top: 0,
-                                          child: Align(
-                                            alignment: Alignment.topCenter,
-                                            child: SingleChildScrollView(
-                                              child: Column(
-                                                children: [
-                                                  const SizedBox(height: 32),
-                                                  Transform.translate(
-                                                    key: const Key(
-                                                      'home_intro_lift',
-                                                    ),
-                                                    offset: Offset(
-                                                      0,
-                                                      -introLift,
-                                                    ),
-                                                    child: Text(
-                                                      Utility().textHome1,
-                                                      style: GoogleFonts.arvo(
-                                                        color: HonooColor
-                                                            .onBackground,
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 24),
-                                                  Text(
-                                                    Utility().textHome2,
-                                                    style: GoogleFonts.arvo(
-                                                      color: HonooColor
-                                                          .onBackground,
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                    ),
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Expanded(child: Container()),
-                          ],
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: contentWidth),
+                        child: const Padding(
+                          padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+                          child: _HomeIntro(),
                         ),
                       ),
                     ),
@@ -191,6 +134,109 @@ class _HomePageState extends State<HomePage> {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _HomeIntro extends StatelessWidget {
+  const _HomeIntro();
+
+  static const double _designWidth = 360;
+  static const double _iconSize = 20;
+
+  @override
+  Widget build(BuildContext context) {
+    final regularStyle = GoogleFonts.arvo(
+      color: HonooColor.onBackground,
+      fontSize: 18,
+      height: 1.22,
+      fontWeight: FontWeight.w400,
+    );
+
+    return FittedBox(
+      key: const Key('home_intro_fitted'),
+      fit: BoxFit.scaleDown,
+      alignment: Alignment.topCenter,
+      child: SizedBox(
+        width: _designWidth,
+        child: Text.rich(
+          TextSpan(
+            style: regularStyle,
+            children: [
+              TextSpan(
+                text: 'Ti regaliamo la Luna.\nPer sempre.\n',
+                style: regularStyle.copyWith(fontWeight: FontWeight.w700),
+              ),
+              const TextSpan(
+                text:
+                    'Niente è per sempre.\n'
+                    'E nessuno può regalarti la Luna.\n\n'
+                    'È vero.\n'
+                    'Ma non per i poeti.\n\n'
+                    'Vuoi essere un poeta di honoo?\n\n'
+                    'Clicca su ',
+              ),
+              _inlineAction(
+                key: const Key('home_inline_bottle'),
+                asset: 'assets/icons/bottle.svg',
+                tooltip: 'Scrivi',
+                onPressed: () => SeaFooterBar.openComposer(context),
+              ),
+              const TextSpan(text: '.\n\nOppure su '),
+              _inlineAction(
+                key: const Key('home_inline_moon'),
+                asset: 'assets/icons/moon.svg',
+                tooltip: 'Vai sulla Luna',
+                onPressed: () => LunaFissa.openMoon(context),
+              ),
+              const TextSpan(text: ',\ne guarda le vite degli altri.\n\nO su '),
+              _inlineAction(
+                key: const Key('home_inline_island'),
+                asset: 'assets/icons/isoladellestorie/island.svg',
+                tooltip: "Vai all'Isola delle Storie",
+                onPressed: () => SeaFooterBar.openIsland(context),
+                tint: HonooColor.onBackground,
+              ),
+              const TextSpan(
+                text: ',\ne inizia il viaggio\nverso le tue storie.',
+              ),
+            ],
+          ),
+          key: const Key('home_intro_text'),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
+  static WidgetSpan _inlineAction({
+    required Key key,
+    required String asset,
+    required String tooltip,
+    required VoidCallback onPressed,
+    Color? tint,
+  }) {
+    return WidgetSpan(
+      alignment: PlaceholderAlignment.middle,
+      child: IconButton(
+        key: key,
+        constraints: const BoxConstraints.tightFor(
+          width: _iconSize,
+          height: _iconSize,
+        ),
+        padding: EdgeInsets.zero,
+        visualDensity: VisualDensity.compact,
+        tooltip: tooltip,
+        onPressed: onPressed,
+        icon: SvgPicture.asset(
+          asset,
+          width: _iconSize,
+          height: _iconSize,
+          colorFilter: tint == null
+              ? null
+              : ColorFilter.mode(tint, BlendMode.srcIn),
+        ),
       ),
     );
   }

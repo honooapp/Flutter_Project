@@ -34,18 +34,35 @@ void main() {
     await tester.pump();
   }
 
-  testWidgets('solleva solo il testo introduttivo in modo responsive', (
+  testWidgets('mostra il nuovo testo e le azioni inline senza scroll', (
     tester,
   ) async {
     await pumpHomeAtSize(tester, const Size(320, 500));
 
-    Transform intro = tester.widget(find.byKey(const Key('home_intro_lift')));
-    expect(intro.transform.getTranslation().y, -6);
+    final intro = find.byKey(const Key('home_intro_text'));
+    expect(intro, findsOneWidget);
+    expect(find.textContaining('Ti regaliamo la Luna.'), findsOneWidget);
+    expect(find.textContaining('verso le tue storie.'), findsOneWidget);
+    expect(find.byType(Scrollable), findsNothing);
+    expect(find.byKey(const Key('home_inline_bottle')), findsOneWidget);
+    expect(find.byKey(const Key('home_inline_moon')), findsOneWidget);
+    expect(find.byKey(const Key('home_inline_island')), findsOneWidget);
+
+    for (final key in const [
+      Key('home_inline_bottle'),
+      Key('home_inline_moon'),
+      Key('home_inline_island'),
+    ]) {
+      final button = tester.widget<IconButton>(find.byKey(key));
+      expect(button.onPressed, isNotNull);
+      expect(button.constraints!.maxWidth, 20);
+      expect(button.constraints!.maxHeight, 20);
+    }
 
     await pumpHomeAtSize(tester, const Size(1440, 1000));
 
-    intro = tester.widget(find.byKey(const Key('home_intro_lift')));
-    expect(intro.transform.getTranslation().y, -10);
+    expect(find.byKey(const Key('home_intro_text')), findsOneWidget);
+    expect(find.byType(Scrollable), findsNothing);
 
     await tester.pumpWidget(const SizedBox.shrink());
   });
