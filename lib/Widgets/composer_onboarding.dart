@@ -65,11 +65,13 @@ class ComposerOnboardingPage extends StatelessWidget {
                 180.0,
                 280.0,
               );
-              final iconSize = (constraints.maxWidth * 0.15).clamp(48.0, 72.0);
-              final bottleIconSize = (iconSize * 0.65).clamp(32.0, 44.0);
+              final fontSize = constraints.maxWidth < 360 ? 17.0 : 19.0;
+              final scaledFontSize = textScaler.scale(fontSize);
+              final iconSize = scaledFontSize * 2.25;
+              final bottleIconSize = iconSize * 0.72;
               final textStyle = GoogleFonts.arvo(
                 color: HonooColor.onBackground,
-                fontSize: constraints.maxWidth < 360 ? 17 : 19,
+                fontSize: fontSize,
                 height: 1.3,
               );
 
@@ -89,30 +91,18 @@ class ComposerOnboardingPage extends StatelessWidget {
                           constraints: const BoxConstraints(maxWidth: 560),
                           child: Column(
                             children: [
-                              Text(
-                                'Clicca qui',
-                                style: textStyle,
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 8),
-                              IconButton(
-                                key: const Key('composer_onboarding_bottle'),
+                              _InlineComposerAction(
+                                actionKey: const Key(
+                                  'composer_onboarding_bottle',
+                                ),
+                                textStyle: textStyle,
+                                iconAsset: 'assets/icons/bottle.svg',
+                                iconSemanticsLabel: 'Bottiglia',
                                 tooltip: 'Componi il tuo honoo',
                                 onPressed: () => _openHonooComposer(context),
                                 iconSize: bottleIconSize,
-                                padding: const EdgeInsets.all(4),
-                                constraints: const BoxConstraints(
-                                  minWidth: 48,
-                                  minHeight: 48,
-                                ),
-                                icon: SvgPicture.asset(
-                                  'assets/icons/bottle.svg',
-                                  width: bottleIconSize,
-                                  height: bottleIconSize,
-                                  semanticsLabel: 'Bottiglia',
-                                ),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 4),
                               Text(
                                 'per comporre il tuo honoo',
                                 style: textStyle,
@@ -126,30 +116,18 @@ class ComposerOnboardingPage extends StatelessWidget {
                                 semanticsLabel: 'Esempio di honoo',
                               ),
                               const SizedBox(height: 56),
-                              Text(
-                                'Clicca qui',
-                                style: textStyle,
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 8),
-                              IconButton(
-                                key: const Key('composer_onboarding_feather'),
+                              _InlineComposerAction(
+                                actionKey: const Key(
+                                  'composer_onboarding_feather',
+                                ),
+                                textStyle: textStyle,
+                                iconAsset: 'assets/icons/piuma.svg',
+                                iconSemanticsLabel: 'Piuma',
                                 tooltip: 'Componi il tuo hinoo',
                                 onPressed: () => _openHinooComposer(context),
                                 iconSize: iconSize,
-                                padding: EdgeInsets.zero,
-                                constraints: BoxConstraints.tightFor(
-                                  width: iconSize,
-                                  height: iconSize,
-                                ),
-                                icon: SvgPicture.asset(
-                                  'assets/icons/piuma.svg',
-                                  width: iconSize,
-                                  height: iconSize,
-                                  semanticsLabel: 'Piuma',
-                                ),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 4),
                               Text(
                                 'per comporre il tuo hinoo',
                                 style: textStyle,
@@ -200,6 +178,52 @@ class ComposerOnboardingPage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _InlineComposerAction extends StatelessWidget {
+  const _InlineComposerAction({
+    required this.actionKey,
+    required this.textStyle,
+    required this.iconAsset,
+    required this.iconSemanticsLabel,
+    required this.tooltip,
+    required this.onPressed,
+    required this.iconSize,
+  });
+
+  final Key actionKey;
+  final TextStyle textStyle;
+  final String iconAsset;
+  final String iconSemanticsLabel;
+  final String tooltip;
+  final VoidCallback onPressed;
+  final double iconSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text('Clicca qui', style: textStyle),
+        const SizedBox(width: 6),
+        IconButton(
+          key: actionKey,
+          tooltip: tooltip,
+          onPressed: onPressed,
+          iconSize: iconSize,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+          icon: SvgPicture.asset(
+            iconAsset,
+            width: iconSize,
+            height: iconSize,
+            semanticsLabel: iconSemanticsLabel,
+          ),
+        ),
+      ],
     );
   }
 }

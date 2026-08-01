@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Pages/new_hinoo_page.dart';
 import 'package:honoo/Pages/new_honoo_page.dart';
@@ -10,13 +11,24 @@ void main() {
 
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  Future<void> pumpOnboarding(WidgetTester tester, {required Size size}) async {
+  Future<void> pumpOnboarding(
+    WidgetTester tester, {
+    required Size size,
+    TextScaler textScaler = TextScaler.noScaling,
+  }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const MaterialApp(home: ComposerOnboardingPage()));
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MediaQuery(
+          data: MediaQueryData(size: size, textScaler: textScaler),
+          child: const ComposerOnboardingPage(),
+        ),
+      ),
+    );
     await tester.pumpAndSettle();
   }
 
@@ -51,6 +63,51 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(NewHinooPage), findsOneWidget);
+  });
+
+  testWidgets('testo e icone delle azioni restano sulla stessa riga', (
+    tester,
+  ) async {
+    await pumpOnboarding(tester, size: const Size(320, 568));
+
+    final actionText = find.text('Clicca qui');
+    expect(actionText, findsNWidgets(2));
+
+    expect(
+      tester.getCenter(actionText.at(0)).dy,
+      closeTo(
+        tester
+            .getCenter(find.byKey(const Key('composer_onboarding_bottle')))
+            .dy,
+        1,
+      ),
+    );
+    expect(
+      tester.getCenter(actionText.at(1)).dy,
+      closeTo(
+        tester
+            .getCenter(find.byKey(const Key('composer_onboarding_feather')))
+            .dy,
+        1,
+      ),
+    );
+  });
+
+  testWidgets('le icone crescono proporzionalmente al testo', (tester) async {
+    await pumpOnboarding(tester, size: const Size(390, 844));
+    final bottle = find.descendant(
+      of: find.byKey(const Key('composer_onboarding_bottle')),
+      matching: find.byType(SvgPicture),
+    );
+    final baseWidth = tester.getSize(bottle).width;
+
+    await pumpOnboarding(
+      tester,
+      size: const Size(390, 844),
+      textScaler: const TextScaler.linear(1.5),
+    );
+
+    expect(tester.getSize(bottle).width, closeTo(baseWidth * 1.5, 0.1));
   });
 
   testWidgets('la X chiude il selettore senza nasconderlo in futuro', (
