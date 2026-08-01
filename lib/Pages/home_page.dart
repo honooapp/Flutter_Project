@@ -145,7 +145,8 @@ class _HomeIntro extends StatelessWidget {
   static const double _designWidth = 360;
   static const double _moonIconSize = 22;
   static const double _largeIconSize = 29;
-  static const double _largeIconVerticalOffset = 6;
+  static const double _bottleIconVerticalOffset = 6;
+  static const double _islandIconVerticalOffset = 9;
 
   @override
   Widget build(BuildContext context) {
@@ -183,7 +184,7 @@ class _HomeIntro extends StatelessWidget {
                 key: const Key('home_inline_bottle'),
                 asset: 'assets/icons/bottle.svg',
                 size: _largeIconSize,
-                verticalOffset: _largeIconVerticalOffset,
+                verticalOffset: _bottleIconVerticalOffset,
                 tooltip: 'Scrivi',
                 onPressed: () => SeaFooterBar.openComposer(context),
               ),
@@ -200,7 +201,7 @@ class _HomeIntro extends StatelessWidget {
                 key: const Key('home_inline_island'),
                 asset: 'assets/icons/isoladellestorie/island.svg',
                 size: _largeIconSize,
-                verticalOffset: _largeIconVerticalOffset,
+                verticalOffset: _islandIconVerticalOffset,
                 tooltip: "Vai all'Isola delle Storie",
                 onPressed: () => SeaFooterBar.openIsland(context),
                 tint: HonooColor.onBackground,
