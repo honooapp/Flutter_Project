@@ -145,7 +145,7 @@ class _HomeIntro extends StatelessWidget {
   static const double _designWidth = 360;
   static const double _moonIconSize = 22;
   static const double _largeIconSize = 29;
-  static const double _largeIconVerticalOffset = 3;
+  static const double _largeIconVerticalOffset = 6;
 
   @override
   Widget build(BuildContext context) {
