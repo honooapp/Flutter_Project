@@ -19,6 +19,17 @@ class SeaFooterBar extends StatelessWidget {
   /// Altezza fissa come in HomePage
   static const double height = 105;
 
+  static void openComposer(BuildContext context) {
+    ComposerLauncher.open(context);
+  }
+
+  static void openIsland(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const IslandPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -99,7 +110,7 @@ class SeaFooterBar extends StatelessWidget {
                     iconSize: bottleSize,
                     splashRadius: 40,
                     tooltip: 'Scrivi',
-                    onPressed: () => ComposerLauncher.open(context),
+                    onPressed: () => SeaFooterBar.openComposer(context),
                   ),
                 ),
               ),
@@ -144,14 +155,7 @@ class SeaFooterBar extends StatelessWidget {
                     iconSize: islandSize,
                     splashRadius: 1,
                     tooltip: "Vai all'Isola delle Storie",
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const IslandPage(),
-                        ),
-                      );
-                    },
+                    onPressed: () => SeaFooterBar.openIsland(context),
                   ),
                 ),
               ),
