@@ -144,7 +144,8 @@ class _HomeIntro extends StatelessWidget {
 
   static const double _designWidth = 360;
   static const double _moonIconSize = 22;
-  static const double _largeIconSize = 26;
+  static const double _largeIconSize = 29;
+  static const double _largeIconVerticalOffset = 3;
 
   @override
   Widget build(BuildContext context) {
@@ -182,6 +183,7 @@ class _HomeIntro extends StatelessWidget {
                 key: const Key('home_inline_bottle'),
                 asset: 'assets/icons/bottle.svg',
                 size: _largeIconSize,
+                verticalOffset: _largeIconVerticalOffset,
                 tooltip: 'Scrivi',
                 onPressed: () => SeaFooterBar.openComposer(context),
               ),
@@ -198,6 +200,7 @@ class _HomeIntro extends StatelessWidget {
                 key: const Key('home_inline_island'),
                 asset: 'assets/icons/isoladellestorie/island.svg',
                 size: _largeIconSize,
+                verticalOffset: _largeIconVerticalOffset,
                 tooltip: "Vai all'Isola delle Storie",
                 onPressed: () => SeaFooterBar.openIsland(context),
                 tint: HonooColor.onBackground,
@@ -218,6 +221,7 @@ class _HomeIntro extends StatelessWidget {
     required Key key,
     required String asset,
     required double size,
+    double verticalOffset = 0,
     required String tooltip,
     required VoidCallback onPressed,
     Color? tint,
@@ -225,20 +229,23 @@ class _HomeIntro extends StatelessWidget {
     return WidgetSpan(
       alignment: PlaceholderAlignment.baseline,
       baseline: TextBaseline.alphabetic,
-      child: IconButton(
-        key: key,
-        constraints: BoxConstraints.tightFor(width: size, height: size),
-        padding: EdgeInsets.zero,
-        visualDensity: VisualDensity.compact,
-        tooltip: tooltip,
-        onPressed: onPressed,
-        icon: SvgPicture.asset(
-          asset,
-          width: size,
-          height: size,
-          colorFilter: tint == null
-              ? null
-              : ColorFilter.mode(tint, BlendMode.srcIn),
+      child: Transform.translate(
+        offset: Offset(0, verticalOffset),
+        child: IconButton(
+          key: key,
+          constraints: BoxConstraints.tightFor(width: size, height: size),
+          padding: EdgeInsets.zero,
+          visualDensity: VisualDensity.compact,
+          tooltip: tooltip,
+          onPressed: onPressed,
+          icon: SvgPicture.asset(
+            asset,
+            width: size,
+            height: size,
+            colorFilter: tint == null
+                ? null
+                : ColorFilter.mode(tint, BlendMode.srcIn),
+          ),
         ),
       ),
     );
