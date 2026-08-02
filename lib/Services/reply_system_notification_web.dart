@@ -36,7 +36,7 @@ class _WebReplySystemNotification extends ReplySystemNotification {
     final notification = web.Notification(
       'Nuova risposta su honoo',
       web.NotificationOptions(
-        body: 'Hai ricevuto una risposta al tuo $contentLabel.',
+        body: 'Hai ricevuto una risposta al tuo $contentLabel',
         icon: 'icons/Icon-192.png',
         tag: 'honoo-reply-$conversationId',
       ),

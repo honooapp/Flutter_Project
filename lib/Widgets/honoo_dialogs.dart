@@ -2,42 +2,36 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:honoo/Utility/interface_text.dart';
 import 'package:honoo/env/env.dart';
 
 class HonooDialogStyles {
   static TextStyle title() => GoogleFonts.lora(
-        color: Colors.white,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-      );
+    color: Colors.white,
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+  );
 
-  static TextStyle body({Color color = Colors.white70}) => GoogleFonts.lora(
-        color: color,
-        fontSize: 14,
-      );
+  static TextStyle body({Color color = Colors.white70}) =>
+      GoogleFonts.lora(color: color, fontSize: 14);
 
-  static TextStyle caption({Color color = Colors.white70}) => GoogleFonts.lora(
-        color: color,
-        fontSize: 12,
-      );
+  static TextStyle caption({Color color = Colors.white70}) =>
+      GoogleFonts.lora(color: color, fontSize: 12);
 
   static TextStyle primaryAction() => GoogleFonts.lora(
-        color: Colors.black,
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-      );
+    color: Colors.black,
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+  );
 
   static TextStyle secondaryAction() => GoogleFonts.lora(
-        color: Colors.white,
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-      );
+    color: Colors.white,
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+  );
 
   static TextStyle tertiaryAction({Color color = Colors.white54}) =>
-      GoogleFonts.lora(
-        color: color,
-        fontSize: 13,
-      );
+      GoogleFonts.lora(color: color, fontSize: 13);
 }
 
 class HonooDialogShell extends StatelessWidget {
@@ -88,12 +82,15 @@ class HonooConfirmDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(title,
-                style: HonooDialogStyles.title(), textAlign: TextAlign.center),
+            Text(
+              withoutInterfaceTrailingPeriod(title),
+              style: HonooDialogStyles.title(),
+              textAlign: TextAlign.center,
+            ),
             if (message != null && message!.trim().isNotEmpty) ...[
               const SizedBox(height: 12),
               Text(
-                message!,
+                withoutInterfaceTrailingPeriod(message!),
                 style: HonooDialogStyles.body(),
                 textAlign: TextAlign.center,
               ),
@@ -106,22 +103,29 @@ class HonooConfirmDialog extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   elevation: 0,
                 ),
-                child: Text(confirmLabel,
-                    style: HonooDialogStyles.primaryAction()),
+                child: Text(
+                  confirmLabel,
+                  style: HonooDialogStyles.primaryAction(),
+                ),
               ),
             ),
             const SizedBox(height: 12),
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
               style: TextButton.styleFrom(foregroundColor: Colors.white54),
-              child:
-                  Text(cancelLabel, style: HonooDialogStyles.tertiaryAction()),
+              child: Text(
+                cancelLabel,
+                style: HonooDialogStyles.tertiaryAction(),
+              ),
             ),
           ],
         ),
@@ -158,7 +162,8 @@ class _HonooMessageDialogState extends State<HonooMessageDialog> {
     super.initState();
 
     // Non avviare il timer in CI/test (Codex ha CI=true)
-    final bool inCi = const bool.fromEnvironment('CI', defaultValue: false) ||
+    final bool inCi =
+        const bool.fromEnvironment('CI', defaultValue: false) ||
         (readEnv('CI') == 'true');
 
     if (!inCi) {
@@ -191,14 +196,14 @@ class _HonooMessageDialogState extends State<HonooMessageDialog> {
             ],
             if (widget.title != null && widget.title!.trim().isNotEmpty) ...[
               Text(
-                widget.title!,
+                withoutInterfaceTrailingPeriod(widget.title!),
                 style: HonooDialogStyles.title(),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
             ],
             Text(
-              widget.message,
+              withoutInterfaceTrailingPeriod(widget.message),
               style: HonooDialogStyles.body(color: Colors.white),
               textAlign: TextAlign.center,
             ),

@@ -35,7 +35,7 @@ void main() {
   testWidgets('mostra solo i due blocchi di composizione', (tester) async {
     await pumpOnboarding(tester, size: const Size(390, 844));
 
-    expect(find.text('Clicca qui'), findsNWidgets(2));
+    expect(find.text('Scegli'), findsNWidgets(2));
     expect(find.text('per comporre il tuo honoo'), findsOneWidget);
     expect(find.text('per comporre il tuo hinoo'), findsOneWidget);
     expect(find.text('Se clicchi'), findsNothing);
@@ -70,7 +70,7 @@ void main() {
   ) async {
     await pumpOnboarding(tester, size: const Size(320, 568));
 
-    final actionText = find.text('Clicca qui');
+    final actionText = find.text('Scegli');
     expect(actionText, findsNWidgets(2));
 
     expect(
@@ -108,6 +108,15 @@ void main() {
     );
 
     expect(tester.getSize(bottle).width, closeTo(baseWidth * 1.5, 0.1));
+  });
+
+  testWidgets('il selettore entra nel viewport mobile senza scroll', (
+    tester,
+  ) async {
+    await pumpOnboarding(tester, size: const Size(390, 844));
+
+    final scrollable = tester.state<ScrollableState>(find.byType(Scrollable));
+    expect(scrollable.position.maxScrollExtent, 0);
   });
 
   testWidgets('la X chiude il selettore senza nasconderlo in futuro', (

@@ -398,6 +398,12 @@ class HonooBuilderState extends State<HonooBuilder> {
     setState(() => _isEditingText = false);
   }
 
+  Future<void> _saveEditedTextAndHonoo() async {
+    _textFocus.unfocus();
+    _emitChange();
+    await _confirmImage();
+  }
+
   Future<Uint8List?> _captureHonooAsPng() async {
     final boundary =
         _captureKey.currentContext?.findRenderObject()
@@ -704,6 +710,42 @@ class HonooBuilderState extends State<HonooBuilder> {
                     tooltip: 'download',
                   ),
                 ),
+              if (_isEditingText && hasImage && !_imageConfirmed)
+                Positioned(
+                  right: 6,
+                  bottom: 3,
+                  child: _isUploadingFinal
+                      ? const SizedBox(
+                          width: 30,
+                          height: 30,
+                          child: Padding(
+                            padding: EdgeInsets.all(5),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: HonooColor.background,
+                            ),
+                          ),
+                        )
+                      : IconButton(
+                          key: const Key('honoo-save-edited-text'),
+                          onPressed: _saveEditedTextAndHonoo,
+                          tooltip: 'Salva honoo',
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints.tightFor(
+                            width: 34,
+                            height: 34,
+                          ),
+                          icon: SvgPicture.asset(
+                            'assets/icons/ok.svg',
+                            width: 24,
+                            height: 24,
+                            colorFilter: const ColorFilter.mode(
+                              HonooColor.background,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ),
+                ),
             ],
           );
         },
@@ -718,6 +760,9 @@ class HonooBuilderState extends State<HonooBuilder> {
             widget.imageConfirmIconDisplaySize!,
             canvasScale,
           );
+    final double resolvedConfirmIconSize = math.min(confirmIconSize, 28);
+    final double secondaryActionIconSize = resolvedConfirmIconSize * 0.86;
+    final TextStyle actionTextStyle = GoogleFonts.arvo(fontSize: 14);
 
     return Container(
       key: const Key('honoo-image-editing-controls'),
@@ -742,7 +787,7 @@ class HonooBuilderState extends State<HonooBuilder> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Trascina per spostare l’immagine.\n'
+                'Trascina per spostare l’immagine\n'
                 'Usa il pizzico o i controlli per zoomare',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.arvo(
@@ -815,11 +860,14 @@ class HonooBuilderState extends State<HonooBuilder> {
                               padding: EdgeInsets.zero,
                               visualDensity: VisualDensity.compact,
                             ),
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.photo_library_outlined,
-                              size: 18,
+                              size: secondaryActionIconSize,
                             ),
-                            label: const Text('Sostituisci immagine'),
+                            label: Text(
+                              'Sostituisci immagine',
+                              style: actionTextStyle,
+                            ),
                           ),
                         ),
                       ),
@@ -838,8 +886,14 @@ class HonooBuilderState extends State<HonooBuilder> {
                               padding: EdgeInsets.zero,
                               visualDensity: VisualDensity.compact,
                             ),
-                            icon: const Icon(Icons.edit_outlined, size: 18),
-                            label: const Text('Modifica testo'),
+                            icon: Icon(
+                              Icons.edit_outlined,
+                              size: secondaryActionIconSize,
+                            ),
+                            label: Text(
+                              'Modifica testo',
+                              style: actionTextStyle,
+                            ),
                           ),
                         ),
                       ),
@@ -869,14 +923,14 @@ class HonooBuilderState extends State<HonooBuilder> {
                           ),
                           icon: SvgPicture.asset(
                             'assets/icons/ok.svg',
-                            width: math.min(confirmIconSize, 28),
-                            height: math.min(confirmIconSize, 28),
+                            width: resolvedConfirmIconSize,
+                            height: resolvedConfirmIconSize,
                             colorFilter: const ColorFilter.mode(
                               HonooColor.background,
                               BlendMode.srcIn,
                             ),
                           ),
-                          label: const Text('Salva honoo'),
+                          label: Text('Salva honoo', style: actionTextStyle),
                         ),
                 ),
               ),
