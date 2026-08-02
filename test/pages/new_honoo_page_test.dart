@@ -1,4 +1,6 @@
 // test/pages/new_honoo_page_smoke_test.dart
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Pages/new_honoo_page.dart';
@@ -68,6 +70,32 @@ void main() {
       tester.getCenter(find.byTooltip('Scrivi hinoo')).dx,
       lessThan(tester.getCenter(find.byTooltip('Salva sul dispositivo')).dx),
     );
+
+    tester
+        .state<HonooBuilderState>(builder)
+        .setImageBytesForTesting(
+          base64Decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+          ),
+        );
+    await tester.pumpAndSettle();
+
+    final imageRect = tester.getRect(find.byKey(const Key('honoo-image-area')));
+    final resizedFooterRect = tester.getRect(
+      find.byKey(const Key('honoo-editor-footer')),
+    );
+    expect(resizedFooterRect.left, closeTo(imageRect.left, 0.5));
+    expect(resizedFooterRect.right, closeTo(imageRect.right, 0.5));
+    for (final tooltip in [
+      'Home',
+      'Apri il tuo Cuore',
+      'Scrivi hinoo',
+      'Salva sul dispositivo',
+    ]) {
+      final actionRect = tester.getRect(find.byTooltip(tooltip));
+      expect(actionRect.left, greaterThanOrEqualTo(imageRect.left));
+      expect(actionRect.right, lessThanOrEqualTo(imageRect.right));
+    }
   });
 
   testWidgets('il footer della risposta non mostra Scrivi hinoo', (

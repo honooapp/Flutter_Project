@@ -48,6 +48,7 @@ class HonooBuilder extends StatefulWidget {
   final bool showCharacterCounter;
   final double? imageConfirmIconDisplaySize;
   final Future<bool> Function()? onImageConfirmed;
+  final ValueChanged<bool>? onImageEditorVisibilityChanged;
 
   const HonooBuilder({
     super.key,
@@ -61,6 +62,7 @@ class HonooBuilder extends StatefulWidget {
     this.showCharacterCounter = true,
     this.imageConfirmIconDisplaySize,
     this.onImageConfirmed,
+    this.onImageEditorVisibilityChanged,
   });
 
   @override
@@ -104,6 +106,7 @@ class HonooBuilderState extends State<HonooBuilder> {
       _confirmedPreviewBytes = null;
       _imageScale = _imageMinScale;
     });
+    widget.onImageEditorVisibilityChanged?.call(true);
     _emitChange();
   }
 
@@ -262,6 +265,7 @@ class HonooBuilderState extends State<HonooBuilder> {
         _confirmedPreviewBytes = null;
         _imageScale = _imageMinScale;
       });
+      widget.onImageEditorVisibilityChanged?.call(true);
 
       _emitChange();
     } catch (e) {
@@ -380,6 +384,7 @@ class HonooBuilderState extends State<HonooBuilder> {
       _imageConfirmed = saved;
       _isUploadingFinal = false;
     });
+    widget.onImageEditorVisibilityChanged?.call(!saved);
   }
 
   void _editText() {
@@ -521,6 +526,7 @@ class HonooBuilderState extends State<HonooBuilder> {
 
       _confirmedPreviewBytes = null;
     });
+    widget.onImageEditorVisibilityChanged?.call(false);
 
     _emitChange();
     widget.onFocusChanged?.call(false);
