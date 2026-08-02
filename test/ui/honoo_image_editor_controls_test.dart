@@ -35,13 +35,16 @@ void main() {
     final replace = find.byKey(const Key('honoo-replace-editing-image'));
     final editText = find.byKey(const Key('honoo-edit-text'));
     final save = find.byKey(const Key('honoo-save'));
+    final zoomSlider = find.byKey(const Key('honoo-image-zoom-slider'));
 
     final textArea = find.byKey(const Key('honoo-text-area'));
+    final imageArea = find.byKey(const Key('honoo-image-area'));
     expect(textArea, findsOneWidget);
     expect(find.text('Testo iniziale'), findsOneWidget);
     expect(replace, findsOneWidget);
     expect(editText, findsOneWidget);
     expect(save, findsOneWidget);
+    expect(zoomSlider, findsOneWidget);
     expect(
       tester.getRect(panel).bottom,
       lessThanOrEqualTo(tester.getRect(textArea).top),
@@ -63,6 +66,29 @@ void main() {
     expect(find.text('Sostituisci immagine'), findsNothing);
     expect(find.text('Modifica testo'), findsNothing);
     expect(find.text('Salva honoo'), findsNothing);
+    expect(
+      find.descendant(of: imageArea, matching: find.byIcon(Icons.remove)),
+      findsNothing,
+    );
+    expect(
+      find.descendant(of: imageArea, matching: find.byIcon(Icons.add)),
+      findsNothing,
+    );
+
+    final imageRect = tester.getRect(imageArea);
+    final sliderRect = tester.getRect(zoomSlider);
+    expect(imageRect.contains(sliderRect.topLeft), isTrue);
+    expect(imageRect.contains(sliderRect.bottomRight), isTrue);
+    expect(sliderRect.top - imageRect.top, lessThan(imageRect.height * 0.12));
+
+    final slider = tester.widget<Slider>(zoomSlider);
+    expect(slider.min, 1);
+    expect(slider.max, 5);
+    expect(slider.divisions, 40);
+    final sliderTheme = tester.widget<SliderTheme>(
+      find.ancestor(of: zoomSlider, matching: find.byType(SliderTheme)).first,
+    );
+    expect(sliderTheme.data.thumbColor, Colors.white);
 
     final replaceButton = tester.widget<IconButton>(replace);
     final editButton = tester.widget<IconButton>(editText);

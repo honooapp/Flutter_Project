@@ -174,6 +174,26 @@ class HonooBuilderState extends State<HonooBuilder> {
     return raw.clamp(_imageMinScale, _imageMaxScale).toDouble();
   }
 
+  void _updateImageScale(double scale) {
+    final double clamped = scale
+        .clamp(_imageMinScale, _imageMaxScale)
+        .toDouble();
+
+    final Matrix4 current = _imageController.value.clone();
+    final Float64List values = current.storage;
+    final double currentScale = _extractScale(current);
+    final double safeScale = currentScale <= 0 ? _imageMinScale : currentScale;
+
+    final double adjustedTx = values[12] * (safeScale / clamped);
+    final double adjustedTy = values[13] * (safeScale / clamped);
+
+    _imageController.value = Matrix4.identity()
+      ..translateByDouble(adjustedTx, adjustedTy, 0, 1)
+      ..scaleByDouble(clamped, clamped, clamped, 1);
+
+    setState(() => _imageScale = clamped);
+  }
+
   Future<void> _pickImage() async {
     try {
       final picker = ImagePicker();
@@ -858,6 +878,36 @@ class HonooBuilderState extends State<HonooBuilder> {
                                 alignment: Alignment.center,
                               ),
                             ),
+                          ),
+                        ),
+                      ),
+                    if (!_imageConfirmed && !_hideEditorActionsForCapture)
+                      Positioned(
+                        top: 10,
+                        left: 18,
+                        right: 18,
+                        child: SliderTheme(
+                          data: SliderTheme.of(context).copyWith(
+                            trackHeight: 2,
+                            activeTrackColor: HonooColor.background,
+                            inactiveTrackColor: HonooColor.background
+                                .withValues(alpha: 0.28),
+                            thumbColor: Colors.white,
+                            thumbShape: const RoundSliderThumbShape(
+                              enabledThumbRadius: 7,
+                            ),
+                            overlayColor: Colors.white.withValues(alpha: 0.18),
+                            overlayShape: const RoundSliderOverlayShape(
+                              overlayRadius: 14,
+                            ),
+                          ),
+                          child: Slider(
+                            key: const Key('honoo-image-zoom-slider'),
+                            value: _imageScale,
+                            min: _imageMinScale,
+                            max: _imageMaxScale,
+                            divisions: 40,
+                            onChanged: _updateImageScale,
                           ),
                         ),
                       ),
