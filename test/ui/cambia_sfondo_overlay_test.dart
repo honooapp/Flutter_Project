@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/UI/HinooBuilder/overlays/cambia_sfondo.dart';
 
 void main() {
-  testWidgets('i controlli hinoo usano la terminologia immagine', (
+  testWidgets('la barra zoom hinoo replica lo stile compatto honoo', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -14,53 +14,39 @@ void main() {
             showControls: true,
             isUploading: true,
             onScaleChanged: (_) {},
-            onZoomIn: () {},
-            onZoomOut: () {},
+            useCompactControls: true,
           ),
         ),
       ),
     );
 
-    expect(
-      find.text(
-        'Trascina per spostare l’immagine\n'
-        'Usa il pizzico o i controlli per zoomare',
-      ),
-      findsOneWidget,
+    final Finder sliderFinder = find.byKey(
+      const Key('hinoo-image-zoom-slider'),
     );
+    expect(sliderFinder, findsOneWidget);
     expect(find.text('Caricamento immagine…'), findsOneWidget);
-    expect(find.text('Sostituisci immagine'), findsOneWidget);
-    expect(find.textContaining('sfondo'), findsNothing);
-    expect(find.byTooltip('Reimposta posizione'), findsNothing);
+    expect(find.byIcon(Icons.remove), findsNothing);
+    expect(find.byIcon(Icons.add), findsNothing);
+
+    final SliderTheme sliderTheme = tester.widget<SliderTheme>(
+      find.ancestor(of: sliderFinder, matching: find.byType(SliderTheme)).first,
+    );
+    expect(sliderTheme.data.thumbColor, Colors.white);
+    expect(sliderTheme.data.trackHeight, 2);
   });
 
-  testWidgets('Sostituisci immagine è centrato nel pannello hinoo', (
+  testWidgets('l’indicazione iniziale hinoo è ingrandita di un punto', (
     tester,
   ) async {
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(
-          body: CambiaSfondoOverlay(
-            onTapChange: () {},
-            showControls: true,
-            onScaleChanged: (_) {},
-            onZoomIn: () {},
-            onZoomOut: () {},
-          ),
-        ),
+        home: Scaffold(body: CambiaSfondoOverlay(onTapChange: () {})),
       ),
     );
 
-    final Finder button = find.widgetWithText(
-      TextButton,
-      'Sostituisci immagine',
+    final Text prompt = tester.widget<Text>(
+      find.text('Carica prima la tua immagine,\n e poi scrivi il tuo testo'),
     );
-    final Finder panel = find.byKey(const Key('hinoo-image-editing-controls'));
-
-    expect(button, findsOneWidget);
-    expect(
-      tester.getCenter(button).dx,
-      closeTo(tester.getCenter(panel).dx, 0.5),
-    );
+    expect(prompt.style?.fontSize, 17);
   });
 }

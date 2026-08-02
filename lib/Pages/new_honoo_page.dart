@@ -61,6 +61,12 @@ class _NewHonooPageState extends State<NewHonooPage> {
   /// contenuto effettivamente SALVATO (per evitare reset dello stato da update identici)
   String _lastSavedRawImage = '';
   bool _hasMinTextForDownload = false;
+  bool _isImageEditorVisible = false;
+
+  void _onImageEditorVisibilityChanged(bool isVisible) {
+    if (_isImageEditorVisible == isVisible) return;
+    setState(() => _isImageEditorVisible = isVisible);
+  }
 
   /// Aggiorna solo se cambia DAVVERO e non è identico all’ultimo SALVATO.
   void _onHonooChanged(String text, String imageUrl) {
@@ -431,8 +437,22 @@ class _NewHonooPageState extends State<NewHonooPage> {
                   mode: layoutMode,
                   enforceDesktopBaseline: false,
                 );
-            final double builderWidth = metrics.width;
-            final double builderHeight = metrics.height;
+            final double editorScale = _isImageEditorVisible
+                ? math.min(
+                    targetMaxW / HonooBuilder.baselineImageSize,
+                    builderAvailableH /
+                        (HonooBuilder.baselineTotalHeight +
+                            HonooBuilder.baselineEditingToolbarHeight),
+                  )
+                : 0;
+            final double builderWidth = _isImageEditorVisible
+                ? HonooBuilder.baselineImageSize * editorScale
+                : metrics.width;
+            final double builderHeight = _isImageEditorVisible
+                ? (HonooBuilder.baselineTotalHeight +
+                          HonooBuilder.baselineEditingToolbarHeight) *
+                      editorScale
+                : metrics.height;
             final double editorGroupHeight = builderHeight;
             final double editorGroupTop =
                 headerH +
@@ -489,6 +509,8 @@ class _NewHonooPageState extends State<NewHonooPage> {
                                       onImageConfirmed: () => _submitHonoo(
                                         openChestAfterSave: true,
                                       ),
+                                      onImageEditorVisibilityChanged:
+                                          _onImageEditorVisibilityChanged,
                                     ),
                                   ),
                                 ),
