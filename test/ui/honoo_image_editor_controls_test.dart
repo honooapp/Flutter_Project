@@ -69,14 +69,14 @@ void main() {
     final saveIcon = tester.widget<SvgPicture>(
       find.descendant(of: save, matching: find.byType(SvgPicture)),
     );
-    expect(replaceButton.iconSize, closeTo(saveIcon.width! * 0.86, 0.01));
+    expect(replaceButton.iconSize, closeTo(saveIcon.width! * 0.82, 0.01));
     expect(editButton.iconSize, replaceButton.iconSize);
 
     expect(tester.widget<IconButton>(replace).color, isNotNull);
     expect(
       tester
           .widget<Tooltip>(
-            find.descendant(of: replace, matching: find.byType(Tooltip)),
+            find.ancestor(of: replace, matching: find.byType(Tooltip)),
           )
           .message,
       'Sostituisci immagine',
@@ -84,7 +84,7 @@ void main() {
     expect(
       tester
           .widget<Tooltip>(
-            find.descendant(of: save, matching: find.byType(Tooltip)),
+            find.ancestor(of: save, matching: find.byType(Tooltip)),
           )
           .message,
       'Salva honoo',
@@ -92,11 +92,21 @@ void main() {
     expect(
       tester
           .widget<Tooltip>(
-            find.descendant(of: editText, matching: find.byType(Tooltip)),
+            find.ancestor(of: editText, matching: find.byType(Tooltip)),
           )
           .message,
       'Modifica testo',
     );
+    for (final action in [replace, save, editText]) {
+      expect(
+        tester
+            .widget<Tooltip>(
+              find.ancestor(of: action, matching: find.byType(Tooltip)),
+            )
+            .preferBelow,
+        isFalse,
+      );
+    }
   });
 
   testWidgets('Modifica testo conserva il testo e consente il ritorno', (
@@ -135,16 +145,8 @@ void main() {
       find.byKey(const Key('honoo-image-editing-controls')),
       findsOneWidget,
     );
-    expect(find.byKey(const Key('honoo-save-edited-text')), findsOneWidget);
+    expect(find.byKey(const Key('honoo-save-edited-text')), findsNothing);
     expect(tester.widget<TextField>(find.byType(TextField)).readOnly, isFalse);
-
-    final saveEditedTextIcon = tester.widget<SvgPicture>(
-      find.descendant(
-        of: find.byKey(const Key('honoo-save-edited-text')),
-        matching: find.byType(SvgPicture),
-      ),
-    );
-    expect(saveEditedTextIcon.width, 24);
 
     await tester.enterText(find.byType(TextField), 'Testo modificato');
     await tester.tap(find.byKey(const Key('honoo-image-area')));

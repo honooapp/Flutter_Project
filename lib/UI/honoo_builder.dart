@@ -27,7 +27,7 @@ class HonooBuilder extends StatefulWidget {
   static const int maxTextCharacters = 144;
   static const double baselineImageSize = 360.0;
   static const double baselineGap = 9.0;
-  static const double baselineEditingToolbarHeight = 56.0;
+  static const double baselineEditingToolbarHeight = 48.0;
   static const double baselineTextHeight = baselineImageSize / 2;
   static const double baselineTotalHeight =
       baselineImageSize + baselineGap + baselineTextHeight;
@@ -696,42 +696,6 @@ class HonooBuilderState extends State<HonooBuilder> {
                     tooltip: 'download',
                   ),
                 ),
-              if (_isEditingText && hasImage && !_imageConfirmed)
-                Positioned(
-                  right: 6,
-                  bottom: 3,
-                  child: _isUploadingFinal
-                      ? const SizedBox(
-                          width: 30,
-                          height: 30,
-                          child: Padding(
-                            padding: EdgeInsets.all(5),
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.5,
-                              color: HonooColor.background,
-                            ),
-                          ),
-                        )
-                      : IconButton(
-                          key: const Key('honoo-save-edited-text'),
-                          onPressed: _saveEditedTextAndHonoo,
-                          tooltip: 'Salva honoo',
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints.tightFor(
-                            width: 34,
-                            height: 34,
-                          ),
-                          icon: SvgPicture.asset(
-                            'assets/icons/ok.svg',
-                            width: 24,
-                            height: 24,
-                            colorFilter: const ColorFilter.mode(
-                              HonooColor.background,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                        ),
-                ),
             ],
           );
         },
@@ -747,9 +711,9 @@ class HonooBuilderState extends State<HonooBuilder> {
             canvasScale,
           );
     final double resolvedConfirmIconSize = confirmIconSize
-        .clamp(32, 46)
+        .clamp(26, 34)
         .toDouble();
-    final double secondaryActionIconSize = resolvedConfirmIconSize * 0.86;
+    final double secondaryActionIconSize = resolvedConfirmIconSize * 0.82;
 
     return SizedBox(
       key: const Key('honoo-image-editing-controls'),
@@ -763,14 +727,17 @@ class HonooBuilderState extends State<HonooBuilder> {
               Expanded(
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    key: const Key('honoo-replace-editing-image'),
-                    onPressed: _pickImage,
-                    tooltip: 'Sostituisci immagine',
-                    padding: EdgeInsets.zero,
-                    iconSize: secondaryActionIconSize,
-                    color: HonooColor.onBackground,
-                    icon: const Icon(Icons.photo_library_outlined),
+                  child: Tooltip(
+                    message: 'Sostituisci immagine',
+                    preferBelow: false,
+                    child: IconButton(
+                      key: const Key('honoo-replace-editing-image'),
+                      onPressed: _pickImage,
+                      padding: EdgeInsets.zero,
+                      iconSize: secondaryActionIconSize,
+                      color: HonooColor.onBackground,
+                      icon: const Icon(Icons.photo_library_outlined),
+                    ),
                   ),
                 ),
               ),
@@ -785,18 +752,21 @@ class HonooBuilderState extends State<HonooBuilder> {
                             color: HonooColor.onBackground,
                           ),
                         )
-                      : IconButton(
-                          key: const Key('honoo-save'),
-                          onPressed: _saveEditedTextAndHonoo,
-                          tooltip: 'Salva honoo',
-                          padding: EdgeInsets.zero,
-                          icon: SvgPicture.asset(
-                            'assets/icons/ok.svg',
-                            width: resolvedConfirmIconSize,
-                            height: resolvedConfirmIconSize,
-                            colorFilter: const ColorFilter.mode(
-                              HonooColor.onBackground,
-                              BlendMode.srcIn,
+                      : Tooltip(
+                          message: 'Salva honoo',
+                          preferBelow: false,
+                          child: IconButton(
+                            key: const Key('honoo-save'),
+                            onPressed: _saveEditedTextAndHonoo,
+                            padding: EdgeInsets.zero,
+                            icon: SvgPicture.asset(
+                              'assets/icons/ok.svg',
+                              width: resolvedConfirmIconSize,
+                              height: resolvedConfirmIconSize,
+                              colorFilter: const ColorFilter.mode(
+                                HonooColor.onBackground,
+                                BlendMode.srcIn,
+                              ),
                             ),
                           ),
                         ),
@@ -805,14 +775,17 @@ class HonooBuilderState extends State<HonooBuilder> {
               Expanded(
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: IconButton(
-                    key: const Key('honoo-edit-text'),
-                    onPressed: _editText,
-                    tooltip: 'Modifica testo',
-                    padding: EdgeInsets.zero,
-                    iconSize: secondaryActionIconSize,
-                    color: HonooColor.onBackground,
-                    icon: const Icon(Icons.edit_outlined),
+                  child: Tooltip(
+                    message: 'Modifica testo',
+                    preferBelow: false,
+                    child: IconButton(
+                      key: const Key('honoo-edit-text'),
+                      onPressed: _editText,
+                      padding: EdgeInsets.zero,
+                      iconSize: secondaryActionIconSize,
+                      color: HonooColor.onBackground,
+                      icon: const Icon(Icons.edit_outlined),
+                    ),
                   ),
                 ),
               ),
