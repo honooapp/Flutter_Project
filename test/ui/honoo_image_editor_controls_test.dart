@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/UI/honoo_builder.dart';
 
 void main() {
@@ -37,16 +36,16 @@ void main() {
     final editText = find.byKey(const Key('honoo-edit-text'));
     final save = find.byKey(const Key('honoo-save'));
 
-    expect(
-      find.text(
-        'Trascina per spostare l’immagine\n'
-        'Usa il pizzico o i controlli per zoomare',
-      ),
-      findsOneWidget,
-    );
+    final textArea = find.byKey(const Key('honoo-text-area'));
+    expect(textArea, findsOneWidget);
+    expect(find.text('Testo iniziale'), findsOneWidget);
     expect(replace, findsOneWidget);
     expect(editText, findsOneWidget);
     expect(save, findsOneWidget);
+    expect(
+      tester.getRect(panel).bottom,
+      lessThanOrEqualTo(tester.getRect(textArea).top),
+    );
     expect(tester.getCenter(replace).dx, lessThan(tester.getCenter(panel).dx));
     expect(
       tester.getCenter(editText).dx,
@@ -59,32 +58,54 @@ void main() {
     expect(tester.getCenter(save).dx, closeTo(tester.getCenter(panel).dx, 0.5));
     expect(
       tester.getCenter(save).dy,
-      greaterThan(tester.getCenter(replace).dy),
+      closeTo(tester.getCenter(replace).dy, 0.5),
     );
-    expect(find.text('Salva honoo'), findsOneWidget);
+    expect(find.text('Sostituisci immagine'), findsNothing);
+    expect(find.text('Modifica testo'), findsNothing);
+    expect(find.text('Salva honoo'), findsNothing);
 
-    final replaceIcon = tester.widget<Icon>(
-      find.descendant(
-        of: replace,
-        matching: find.byIcon(Icons.photo_library_outlined),
-      ),
-    );
-    final editIcon = tester.widget<Icon>(
-      find.descendant(of: editText, matching: find.byIcon(Icons.edit_outlined)),
-    );
+    final replaceButton = tester.widget<IconButton>(replace);
+    final editButton = tester.widget<IconButton>(editText);
     final saveIcon = tester.widget<SvgPicture>(
       find.descendant(of: save, matching: find.byType(SvgPicture)),
     );
-    expect(replaceIcon.size, closeTo(saveIcon.width! * 0.86, 0.01));
-    expect(editIcon.size, replaceIcon.size);
+    expect(replaceButton.iconSize, closeTo(saveIcon.width! * 0.82, 0.01));
+    expect(editButton.iconSize, replaceButton.iconSize);
 
-    for (final label in [
+    expect(tester.widget<IconButton>(replace).color, isNotNull);
+    expect(
+      tester
+          .widget<Tooltip>(
+            find.ancestor(of: replace, matching: find.byType(Tooltip)),
+          )
+          .message,
       'Sostituisci immagine',
-      'Modifica testo',
+    );
+    expect(
+      tester
+          .widget<Tooltip>(
+            find.ancestor(of: save, matching: find.byType(Tooltip)),
+          )
+          .message,
       'Salva honoo',
-    ]) {
-      final text = tester.widget<Text>(find.text(label));
-      expect(text.style?.fontFamily, GoogleFonts.arvo().fontFamily);
+    );
+    expect(
+      tester
+          .widget<Tooltip>(
+            find.ancestor(of: editText, matching: find.byType(Tooltip)),
+          )
+          .message,
+      'Modifica testo',
+    );
+    for (final action in [replace, save, editText]) {
+      expect(
+        tester
+            .widget<Tooltip>(
+              find.ancestor(of: action, matching: find.byType(Tooltip)),
+            )
+            .preferBelow,
+        isFalse,
+      );
     }
   });
 
@@ -113,21 +134,19 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    expect(tester.widget<TextField>(find.byType(TextField)).readOnly, isTrue);
+
     await tester.tap(find.byKey(const Key('honoo-edit-text')));
     await tester.pump();
 
     expect(find.byType(TextField), findsOneWidget);
     expect(find.text('Testo iniziale'), findsOneWidget);
-    expect(find.byKey(const Key('honoo-image-editing-controls')), findsNothing);
-    expect(find.byKey(const Key('honoo-save-edited-text')), findsOneWidget);
-
-    final saveEditedTextIcon = tester.widget<SvgPicture>(
-      find.descendant(
-        of: find.byKey(const Key('honoo-save-edited-text')),
-        matching: find.byType(SvgPicture),
-      ),
+    expect(
+      find.byKey(const Key('honoo-image-editing-controls')),
+      findsOneWidget,
     );
-    expect(saveEditedTextIcon.width, 24);
+    expect(find.byKey(const Key('honoo-save-edited-text')), findsNothing);
+    expect(tester.widget<TextField>(find.byType(TextField)).readOnly, isFalse);
 
     await tester.enterText(find.byType(TextField), 'Testo modificato');
     await tester.tap(find.byKey(const Key('honoo-image-area')));

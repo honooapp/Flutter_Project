@@ -27,6 +27,7 @@ class HonooBuilder extends StatefulWidget {
   static const int maxTextCharacters = 144;
   static const double baselineImageSize = 360.0;
   static const double baselineGap = 9.0;
+  static const double baselineEditingToolbarHeight = 48.0;
   static const double baselineTextHeight = baselineImageSize / 2;
   static const double baselineTotalHeight =
       baselineImageSize + baselineGap + baselineTextHeight;
@@ -90,7 +91,7 @@ class HonooBuilderState extends State<HonooBuilder> {
   bool _isEditingText = false;
 
   bool get hasImage => _imageBytes != null;
-  bool get _isEditingImage => hasImage && !_imageConfirmed && !_isEditingText;
+  bool get _showImageEditingToolbar => hasImage && !_imageConfirmed;
 
   @visibleForTesting
   void setImageBytesForTesting(Uint8List bytes) {
@@ -172,31 +173,6 @@ class HonooBuilderState extends State<HonooBuilder> {
         : (sx > 0 ? sx : (sy > 0 ? sy : _imageMinScale));
     return raw.clamp(_imageMinScale, _imageMaxScale).toDouble();
   }
-
-  void _updateImageScale(double scale) {
-    final double clamped = scale
-        .clamp(_imageMinScale, _imageMaxScale)
-        .toDouble();
-
-    final Matrix4 current = _imageController.value.clone();
-    final Float64List values = current.storage;
-    final double currentScale = _extractScale(current);
-    final double safeScale = currentScale <= 0 ? _imageMinScale : currentScale;
-
-    final double tx = values[12];
-    final double ty = values[13];
-
-    final double adjustedTx = tx * (safeScale / clamped);
-    final double adjustedTy = ty * (safeScale / clamped);
-
-    _imageController.value = Matrix4.identity()
-      ..translateByDouble(adjustedTx, adjustedTy, 0, 1)
-      ..scaleByDouble(clamped, clamped, clamped, 1);
-
-    setState(() => _imageScale = clamped);
-  }
-
-  void _nudgeImageScale(double delta) => _updateImageScale(_imageScale + delta);
 
   Future<void> _pickImage() async {
     try {
@@ -551,7 +527,11 @@ class HonooBuilderState extends State<HonooBuilder> {
 
         const double eps = 0.5;
         const double baselineTextHeight = HonooBuilder.baselineTextHeight;
-        const double baselineTotalHeight = HonooBuilder.baselineTotalHeight;
+        final double editingToolbarHeight = _showImageEditingToolbar
+            ? HonooBuilder.baselineEditingToolbarHeight
+            : 0;
+        final double baselineTotalHeight =
+            HonooBuilder.baselineTotalHeight + editingToolbarHeight;
 
         final double scaleW = availW / HonooBuilder.baselineImageSize;
         final double scaleH = (availH - eps) / baselineTotalHeight;
@@ -577,13 +557,18 @@ class HonooBuilderState extends State<HonooBuilder> {
                     key: const Key('honoo-composed-content'),
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // ===== TEXT AREA / IMAGE CONTROLS =====
+                      if (_showImageEditingToolbar)
+                        SizedBox(
+                          height: editingToolbarHeight,
+                          width: HonooBuilder.baselineImageSize,
+                          child: _buildImageEditingControls(scale),
+                        ),
+
+                      // ===== TEXT AREA =====
                       SizedBox(
                         height: baselineTextHeight,
                         width: HonooBuilder.baselineImageSize,
-                        child: _isEditingImage
-                            ? _buildImageEditingControls(scale)
-                            : _buildTextArea(HonooBuilder.baselineImageSize),
+                        child: _buildTextArea(HonooBuilder.baselineImageSize),
                       ),
 
                       const SizedBox(height: HonooBuilder.baselineGap),
@@ -663,6 +648,7 @@ class HonooBuilderState extends State<HonooBuilder> {
                   keyboardType: TextInputType.multiline,
                   textInputAction: TextInputAction.newline,
                   autofocus: !_imageConfirmed && _imageBytes == null,
+                  readOnly: hasImage && !_imageConfirmed && !_isEditingText,
                   expands: true,
                   scrollPhysics: const ClampingScrollPhysics(),
                   cursorColor: Colors.black,
@@ -710,42 +696,6 @@ class HonooBuilderState extends State<HonooBuilder> {
                     tooltip: 'download',
                   ),
                 ),
-              if (_isEditingText && hasImage && !_imageConfirmed)
-                Positioned(
-                  right: 6,
-                  bottom: 3,
-                  child: _isUploadingFinal
-                      ? const SizedBox(
-                          width: 30,
-                          height: 30,
-                          child: Padding(
-                            padding: EdgeInsets.all(5),
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.5,
-                              color: HonooColor.background,
-                            ),
-                          ),
-                        )
-                      : IconButton(
-                          key: const Key('honoo-save-edited-text'),
-                          onPressed: _saveEditedTextAndHonoo,
-                          tooltip: 'Salva honoo',
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints.tightFor(
-                            width: 34,
-                            height: 34,
-                          ),
-                          icon: SvgPicture.asset(
-                            'assets/icons/ok.svg',
-                            width: 24,
-                            height: 24,
-                            colorFilter: const ColorFilter.mode(
-                              HonooColor.background,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                        ),
-                ),
             ],
           );
         },
@@ -760,178 +710,83 @@ class HonooBuilderState extends State<HonooBuilder> {
             widget.imageConfirmIconDisplaySize!,
             canvasScale,
           );
-    final double resolvedConfirmIconSize = math.min(confirmIconSize, 28);
-    final double secondaryActionIconSize = resolvedConfirmIconSize * 0.86;
-    final TextStyle actionTextStyle = GoogleFonts.arvo(fontSize: 14);
+    final double resolvedConfirmIconSize = confirmIconSize
+        .clamp(26, 34)
+        .toDouble();
+    final double secondaryActionIconSize = resolvedConfirmIconSize * 0.82;
 
-    return Container(
+    return SizedBox(
       key: const Key('honoo-image-editing-controls'),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: HonooColor.tertiary,
-        border: Border.all(color: Colors.black12),
-        borderRadius: BorderRadius.circular(5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: IgnorePointer(
         ignoring: _isUploadingFinal,
         child: Opacity(
           opacity: _isUploadingFinal ? 0.65 : 1,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Trascina per spostare l’immagine\n'
-                'Usa il pizzico o i controlli per zoomare',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.arvo(
-                  color: HonooColor.background,
-                  fontSize: 14,
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Tooltip(
+                    message: 'Sostituisci immagine',
+                    preferBelow: false,
+                    child: IconButton(
+                      key: const Key('honoo-replace-editing-image'),
+                      onPressed: _pickImage,
+                      padding: EdgeInsets.zero,
+                      iconSize: secondaryActionIconSize,
+                      color: HonooColor.onBackground,
+                      icon: const Icon(Icons.photo_library_outlined),
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(height: 2),
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: _imageScale > _imageMinScale
-                        ? () => _nudgeImageScale(-0.1)
-                        : null,
-                    icon: const Icon(Icons.remove),
-                    color: HonooColor.background,
-                    disabledColor: HonooColor.background.withValues(alpha: 0.3),
-                    tooltip: 'Riduci zoom',
-                  ),
-                  Expanded(
-                    child: SliderTheme(
-                      data: SliderTheme.of(context).copyWith(
-                        trackHeight: 2,
-                        activeTrackColor: HonooColor.background,
-                        inactiveTrackColor: HonooColor.background.withValues(
-                          alpha: 0.2,
-                        ),
-                        thumbColor: HonooColor.background,
-                        overlayColor: HonooColor.background.withValues(
-                          alpha: 0.12,
-                        ),
-                      ),
-                      child: Slider(
-                        value: _imageScale,
-                        min: _imageMinScale,
-                        max: _imageMaxScale,
-                        divisions: 40,
-                        onChanged: _updateImageScale,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: _imageScale < _imageMaxScale
-                        ? () => _nudgeImageScale(0.1)
-                        : null,
-                    icon: const Icon(Icons.add),
-                    color: HonooColor.background,
-                    disabledColor: HonooColor.background.withValues(alpha: 0.3),
-                    tooltip: 'Aumenta zoom',
-                  ),
-                ],
-              ),
-              SizedBox(
-                width: double.infinity,
-                height: 34,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: TextButton.icon(
-                            key: const Key('honoo-replace-editing-image'),
-                            onPressed: _pickImage,
-                            style: TextButton.styleFrom(
-                              foregroundColor: HonooColor.background,
-                              padding: EdgeInsets.zero,
-                              visualDensity: VisualDensity.compact,
-                            ),
-                            icon: Icon(
-                              Icons.photo_library_outlined,
-                              size: secondaryActionIconSize,
-                            ),
-                            label: Text(
-                              'Sostituisci immagine',
-                              style: actionTextStyle,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerRight,
-                          child: TextButton.icon(
-                            key: const Key('honoo-edit-text'),
-                            onPressed: _editText,
-                            style: TextButton.styleFrom(
-                              foregroundColor: HonooColor.background,
-                              padding: EdgeInsets.zero,
-                              visualDensity: VisualDensity.compact,
-                            ),
-                            icon: Icon(
-                              Icons.edit_outlined,
-                              size: secondaryActionIconSize,
-                            ),
-                            label: Text(
-                              'Modifica testo',
-                              style: actionTextStyle,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 42,
+              Expanded(
                 child: Center(
                   child: _isUploadingFinal
-                      ? const SizedBox(
-                          width: 28,
-                          height: 28,
-                          child: CircularProgressIndicator(
+                      ? SizedBox(
+                          width: resolvedConfirmIconSize * 0.72,
+                          height: resolvedConfirmIconSize * 0.72,
+                          child: const CircularProgressIndicator(
                             strokeWidth: 3,
-                            color: HonooColor.background,
+                            color: HonooColor.onBackground,
                           ),
                         )
-                      : TextButton.icon(
-                          key: const Key('honoo-save'),
-                          onPressed: _confirmImage,
-                          style: TextButton.styleFrom(
-                            foregroundColor: HonooColor.background,
+                      : Tooltip(
+                          message: 'Salva honoo',
+                          preferBelow: false,
+                          child: IconButton(
+                            key: const Key('honoo-save'),
+                            onPressed: _saveEditedTextAndHonoo,
                             padding: EdgeInsets.zero,
-                            visualDensity: VisualDensity.compact,
-                          ),
-                          icon: SvgPicture.asset(
-                            'assets/icons/ok.svg',
-                            width: resolvedConfirmIconSize,
-                            height: resolvedConfirmIconSize,
-                            colorFilter: const ColorFilter.mode(
-                              HonooColor.background,
-                              BlendMode.srcIn,
+                            icon: SvgPicture.asset(
+                              'assets/icons/ok.svg',
+                              width: resolvedConfirmIconSize,
+                              height: resolvedConfirmIconSize,
+                              colorFilter: const ColorFilter.mode(
+                                HonooColor.onBackground,
+                                BlendMode.srcIn,
+                              ),
                             ),
                           ),
-                          label: Text('Salva honoo', style: actionTextStyle),
                         ),
+                ),
+              ),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Tooltip(
+                    message: 'Modifica testo',
+                    preferBelow: false,
+                    child: IconButton(
+                      key: const Key('honoo-edit-text'),
+                      onPressed: _editText,
+                      padding: EdgeInsets.zero,
+                      iconSize: secondaryActionIconSize,
+                      color: HonooColor.onBackground,
+                      icon: const Icon(Icons.edit_outlined),
+                    ),
+                  ),
                 ),
               ),
             ],
