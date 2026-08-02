@@ -63,6 +63,7 @@ class _NewHinooPageState extends State<NewHinooPage>
   String _builderStep = 'changeBg';
   int _currentTextLength = 0;
   bool _bgUploadInProgress = false;
+  bool _hasBackground = false;
 
   bool get _isWriteStep => _builderStep == 'writeText';
   bool get _hasMinTextForDownload => _currentTextLength >= 1;
@@ -121,6 +122,18 @@ class _NewHinooPageState extends State<NewHinooPage>
     });
   }
 
+  void setEditorStateForTesting({
+    required String step,
+    required bool hasBackground,
+    int textLength = 0,
+  }) {
+    setState(() {
+      _builderStep = step;
+      _hasBackground = hasBackground;
+      _currentTextLength = textLength;
+    });
+  }
+
   void _applyDraftToLocalState(dynamic draft) {
     if (draft is! Map) return;
 
@@ -133,6 +146,7 @@ class _NewHinooPageState extends State<NewHinooPage>
     }
 
     _bgUploadInProgress = draft['isUploadingBg'] == true;
+    _hasBackground = draft['hasBg'] == true;
 
     int detectedLength = 0;
     final dynamic rawLength = draft['textLength'];
@@ -493,43 +507,69 @@ class _NewHinooPageState extends State<NewHinooPage>
     showHonooToast(context, message: 'Collega API del builder: $what');
   }
 
-  Widget _buildCanvasControls() {
-    const double iconSize = 22;
-    const double buttonBox = 34;
+  void _replaceEditorImage() {
+    final dynamic builder = _builderKey.currentState;
+    builder?.replaceBackgroundPublic?.call();
+  }
 
-    Widget iconBtn({
-      required IconData icon,
-      required String tooltip,
-      required VoidCallback onPressed,
-    }) {
-      return SizedBox(
-        width: buttonBox,
-        height: buttonBox,
-        child: IconButton(
-          tooltip: tooltip,
-          onPressed: onPressed,
-          icon: Icon(icon, size: iconSize, color: Colors.white),
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(),
-          splashRadius: buttonBox / 2,
-          visualDensity: VisualDensity.compact,
+  void _saveEditorImage() {
+    final dynamic builder = _builderKey.currentState;
+    builder?.confirmBackgroundPublic?.call();
+  }
+
+  Widget _buildImageEditingControls() {
+    const double confirmIconSize = 30;
+    const double secondaryActionIconSize = confirmIconSize * 0.82;
+
+    return IgnorePointer(
+      ignoring: _bgUploadInProgress,
+      child: Opacity(
+        opacity: _bgUploadInProgress ? 0.65 : 1,
+        child: Row(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Tooltip(
+                  message: 'Salva immagine',
+                  preferBelow: false,
+                  child: IconButton(
+                    key: const Key('hinoo-save-editing-image'),
+                    onPressed: _saveEditorImage,
+                    padding: EdgeInsets.zero,
+                    icon: SvgPicture.asset(
+                      'assets/icons/ok.svg',
+                      width: confirmIconSize,
+                      height: confirmIconSize,
+                      colorFilter: const ColorFilter.mode(
+                        HonooColor.onBackground,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: Tooltip(
+                  message: 'Sostituisci immagine',
+                  preferBelow: false,
+                  child: IconButton(
+                    key: const Key('hinoo-replace-editing-image'),
+                    onPressed: _replaceEditorImage,
+                    padding: EdgeInsets.zero,
+                    iconSize: secondaryActionIconSize,
+                    color: HonooColor.onBackground,
+                    icon: const Icon(Icons.photo_library_outlined),
+                  ),
+                ),
+              ),
+            ),
+            const Expanded(child: SizedBox.shrink()),
+          ],
         ),
-      );
-    }
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        if (_isWriteStep) ...[
-          iconBtn(
-            tooltip: 'Salva sul dispositivo',
-            icon: Icons.download_outlined,
-            onPressed: _handleDownloadTap,
-          ),
-          const SizedBox(width: 6),
-        ],
-      ],
+      ),
     );
   }
 
@@ -537,10 +577,9 @@ class _NewHinooPageState extends State<NewHinooPage>
     return SizedBox(
       key: const Key('hinoo-editor-controls'),
       height: 40,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [const Spacer(), _buildCanvasControls()],
-      ),
+      child: _builderStep == 'changeBg' && _hasBackground
+          ? _buildImageEditingControls()
+          : const SizedBox.shrink(),
     );
   }
 
@@ -757,6 +796,20 @@ class _NewHinooPageState extends State<NewHinooPage>
                                       ? 'Salva il campanello'
                                       : 'Salva hinoo'),
                             onPressed: _submitHinoo,
+                          ),
+                        if (_isWriteStep)
+                          ResponsiveFooterAction(
+                            asset: "assets/icons/piuma.svg",
+                            semanticsLabel: 'Download',
+                            size: footerIconSize,
+                            splashRadius: 25,
+                            tooltip: 'Salva sul dispositivo',
+                            onPressed: _handleDownloadTap,
+                            icon: Icon(
+                              Icons.download_outlined,
+                              size: footerIconSize,
+                              color: HonooColor.onBackground,
+                            ),
                           ),
                       ],
                     ),

@@ -15,7 +15,6 @@ import 'package:flutter/rendering.dart';
 import 'HinooBuilder/overlays/cambia_sfondo.dart';
 import 'HinooBuilder/overlays/colore_testo.dart';
 import 'HinooBuilder/overlays/scrivi_hinoo.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import '../Services/hinoo_storage_uploader.dart';
@@ -169,10 +168,6 @@ class _HinooBuilderState extends State<HinooBuilder> {
       ..translateByDouble(adjustedTx, adjustedTy, 0, 1)
       ..scaleByDouble(clamped, clamped, clamped, 1);
     _bgController.value = updated;
-  }
-
-  void _nudgeBgScale(double delta) {
-    _updateBgScale(_bgScale + delta);
   }
 
   void _applySlideState(dynamic slide) {
@@ -411,6 +406,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
   Future<void> openDownloadDialogPublic() => _openDownloadDialog();
   Future<void> downloadAllPagesPublic({String? baseName}) =>
       _downloadHinoo(baseName: baseName);
+  Future<void> replaceBackgroundPublic() => _pickAndUploadBackground();
+  void confirmBackgroundPublic() => _confirmBgAndLock();
 
   String _prepareFileBaseName(String? raw) {
     const String fallback = 'hinoo';
@@ -580,28 +577,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
             minScale: _bgMinInteractiveScale,
             maxScale: _bgMaxScale,
             onScaleChanged: _bgChosen ? _updateBgScale : null,
-            onZoomIn: _bgChosen && _bgScale < _bgMaxScale
-                ? () => _nudgeBgScale(0.1)
-                : null,
-            onZoomOut: _bgChosen && _bgScale > _bgMinScale
-                ? () => _nudgeBgScale(-0.1)
-                : null,
+            useCompactControls: true,
           ),
-          if (_bgChosen && !_isUploadingBg)
-            Positioned(
-              bottom: 12,
-              right: 12,
-              child: IconButton(
-                iconSize: 44,
-                onPressed: _confirmBgAndLock,
-                icon: SvgPicture.asset(
-                  'assets/icons/ok.svg',
-                  width: 44,
-                  height: 44,
-                ),
-                tooltip: 'Conferma immagine',
-              ),
-            ),
         ] else if (_step == _WizardStep.pickColor)
           ColoreTestoOverlay(
             onPick: (c) {

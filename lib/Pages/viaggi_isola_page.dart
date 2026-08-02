@@ -10,29 +10,29 @@ class ViaggiIsolaPage extends StatelessWidget {
   static const String _textAboveMap =
       "Apri gli occhi,\n"
       "c’è l’Isola\n"
-      "davanti a te.\n\n"
+      "davanti a te\n\n"
       "Nessuna mappa\n"
       "può sostituire\n"
       "un viaggio,\n"
       "ma guardare\n"
       "una mappa\n"
       "può essere un modo\n"
-      "di viaggiare.\n\n"
+      "di viaggiare\n\n"
       "Questa è la Mappa\n"
-      "dell’Isola.";
+      "dell’Isola";
 
   static const String _textBelowMap =
       "Nella parte orientale\n"
       "ci sono i luoghi\n"
       "di un percorso\n"
-      "di scrittura.\n\n"
+      "di scrittura\n\n"
       "E nella parte occidentale\n"
       "non ci sono\n"
       "veramente\n"
       "i leoni,\n"
       "ma questo\n"
       "lo scoprirai,\n"
-      "se ne avrai voglia.\n";
+      "se ne avrai voglia\n";
 
   @override
   Widget build(BuildContext context) {
@@ -49,13 +49,12 @@ class ViaggiIsolaPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            _textAboveMap,
-            style: bodyStyle,
-            textAlign: TextAlign.center,
-          ),
+          Text(_textAboveMap, style: bodyStyle, textAlign: TextAlign.center),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             child: Center(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
@@ -71,11 +70,7 @@ class ViaggiIsolaPage extends StatelessWidget {
               ),
             ),
           ),
-          Text(
-            _textBelowMap,
-            style: bodyStyle,
-            textAlign: TextAlign.center,
-          ),
+          Text(_textBelowMap, style: bodyStyle, textAlign: TextAlign.center),
         ],
       ),
     );

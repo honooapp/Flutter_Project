@@ -18,10 +18,10 @@ class PodcastDirettePage extends StatelessWidget {
     );
 
     final List<InlineSpan> spans = [
-      TextSpan(text: 'honoo\nsi ascolta\ne si guarda.\n\n', style: style),
-      TextSpan(text: 'È voce.\nÈ immagine.\n\n', style: style),
+      TextSpan(text: 'honoo\nsi ascolta\ne si guarda\n\n', style: style),
+      TextSpan(text: 'È voce\nÈ immagine\n\n', style: style),
       TextSpan(
-        text: 'Un canale YouTube.\n',
+        text: 'Un canale YouTube\n',
         style: style.copyWith(
           fontWeight: FontWeight.w700,
           decoration: TextDecoration.underline,
@@ -29,12 +29,18 @@ class PodcastDirettePage extends StatelessWidget {
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const ComingSoonPage(header: 'Un canale YouTube', quote: '', bibliography: '')),
+              MaterialPageRoute(
+                builder: (_) => const ComingSoonPage(
+                  header: 'Un canale YouTube',
+                  quote: '',
+                  bibliography: '',
+                ),
+              ),
             );
           },
       ),
       TextSpan(
-        text: 'Un podcast.\n',
+        text: 'Un podcast\n',
         style: style.copyWith(
           fontWeight: FontWeight.w700,
           decoration: TextDecoration.underline,
@@ -42,12 +48,18 @@ class PodcastDirettePage extends StatelessWidget {
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const ComingSoonPage(header: 'Un podcast', quote: '', bibliography: '')),
+              MaterialPageRoute(
+                builder: (_) => const ComingSoonPage(
+                  header: 'Un podcast',
+                  quote: '',
+                  bibliography: '',
+                ),
+              ),
             );
           },
       ),
       TextSpan(
-        text: 'Un account Twitch.\n\n',
+        text: 'Un account Twitch\n\n',
         style: style.copyWith(
           fontWeight: FontWeight.w700,
           decoration: TextDecoration.underline,
@@ -55,19 +67,28 @@ class PodcastDirettePage extends StatelessWidget {
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const ComingSoonPage(header: 'Un account Twitch', quote: '', bibliography: '')),
+              MaterialPageRoute(
+                builder: (_) => const ComingSoonPage(
+                  header: 'Un account Twitch',
+                  quote: '',
+                  bibliography: '',
+                ),
+              ),
             );
           },
       ),
       TextSpan(
-          text:
-              'Se vuoi,\npuoi ascoltare,\nguardare\ne partecipare.\n\n',
-          style: style),
+        text: 'Se vuoi,\npuoi ascoltare,\nguardare\ne partecipare\n\n',
+        style: style,
+      ),
     ];
 
     return HonooStandardPage(
       contentWidthFactor: 0.45,
-      child: RichText(textAlign: TextAlign.center, text: TextSpan(children: spans)),
+      child: RichText(
+        textAlign: TextAlign.center,
+        text: TextSpan(children: spans),
+      ),
     );
   }
 }

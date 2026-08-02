@@ -29,11 +29,11 @@ class LunaPage extends StatelessWidget {
       "articolato\n"
       "come viaggio\n"
       "di esplorazione\n"
-      "di un’Isola.\n\n"
+      "di un’Isola\n\n"
       "Però\n"
       "qui\n"
       "non sono\n"
-      "a lezione.\n\n"
+      "a lezione\n\n"
       "E poi ci sono\n"
       "i momenti\n"
       "in cui esagero,\n"
@@ -48,7 +48,7 @@ class LunaPage extends StatelessWidget {
       "se l’incantesimo del Mago\n"
       "li avesse fatti riapparire\n"
       "dalle nostre parti,\n"
-      "in questi giorni.\n";
+      "in questi giorni\n";
 
   @override
   Widget build(BuildContext context) {
@@ -67,11 +67,7 @@ class LunaPage extends StatelessWidget {
           (route) => false,
         );
       },
-      child: Text(
-        lunaText,
-        style: baseTextStyle,
-        textAlign: TextAlign.center,
-      ),
+      child: Text(lunaText, style: baseTextStyle, textAlign: TextAlign.center),
     );
   }
 }

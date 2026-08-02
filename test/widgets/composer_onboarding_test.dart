@@ -45,6 +45,8 @@ void main() {
       find.byKey(const Key('composer_onboarding_feather')),
       findsOneWidget,
     );
+    expect(find.byTooltip('Componi il tuo honoo'), findsNothing);
+    expect(find.byTooltip('Componi il tuo hinoo'), findsNothing);
   });
 
   testWidgets('la bottiglia apre il format honoo', (tester) async {

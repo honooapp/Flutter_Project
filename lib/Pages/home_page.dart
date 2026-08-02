@@ -143,9 +143,11 @@ class _HomeIntro extends StatelessWidget {
   const _HomeIntro();
 
   static const double _designWidth = 360;
-  static const double _moonIconSize = 22;
-  static const double _largeIconSize = 32;
-  static const double _bottleIconVerticalOffset = 8;
+  static const double _bottleIconSize = 33;
+  static const double _moonIconSize = 23;
+  static const double _islandIconSize = 34;
+  static const double _bottleIconVerticalOffset = 9;
+  static const double _moonIconVerticalOffset = 1;
   static const double _islandIconVerticalOffset = 10;
 
   @override
@@ -186,7 +188,7 @@ class _HomeIntro extends StatelessWidget {
               _inlineAction(
                 key: const Key('home_inline_bottle'),
                 asset: 'assets/icons/bottle.svg',
-                size: _largeIconSize,
+                size: _bottleIconSize,
                 verticalOffset: _bottleIconVerticalOffset,
                 tooltip: 'Scrivi',
                 onPressed: () => SeaFooterBar.openComposer(context),
@@ -199,6 +201,7 @@ class _HomeIntro extends StatelessWidget {
                 key: const Key('home_inline_moon'),
                 asset: 'assets/icons/moon.svg',
                 size: _moonIconSize,
+                verticalOffset: _moonIconVerticalOffset,
                 tooltip: 'Vai sulla Luna',
                 onPressed: () => LunaFissa.openMoon(context),
               ),
@@ -209,7 +212,7 @@ class _HomeIntro extends StatelessWidget {
               _inlineAction(
                 key: const Key('home_inline_island'),
                 asset: 'assets/icons/isoladellestorie/island.svg',
-                size: _largeIconSize,
+                size: _islandIconSize,
                 verticalOffset: _islandIconVerticalOffset,
                 tooltip: "Vai all'Isola delle Storie",
                 onPressed: () => SeaFooterBar.openIsland(context),

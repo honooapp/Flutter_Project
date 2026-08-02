@@ -120,7 +120,6 @@ class ComposerOnboardingPage extends StatelessWidget {
                                 textStyle: textStyle,
                                 iconAsset: 'assets/icons/bottle.svg',
                                 iconSemanticsLabel: 'Bottiglia',
-                                tooltip: 'Componi il tuo honoo',
                                 onPressed: () => _openHonooComposer(context),
                                 iconSize: bottleIconSize,
                               ),
@@ -145,7 +144,6 @@ class ComposerOnboardingPage extends StatelessWidget {
                                 textStyle: textStyle,
                                 iconAsset: 'assets/icons/piuma.svg',
                                 iconSemanticsLabel: 'Piuma',
-                                tooltip: 'Componi il tuo hinoo',
                                 onPressed: () => _openHinooComposer(context),
                                 iconSize: featherIconSize,
                               ),
@@ -209,7 +207,6 @@ class _InlineComposerAction extends StatelessWidget {
     required this.textStyle,
     required this.iconAsset,
     required this.iconSemanticsLabel,
-    required this.tooltip,
     required this.onPressed,
     required this.iconSize,
   });
@@ -218,7 +215,6 @@ class _InlineComposerAction extends StatelessWidget {
   final TextStyle textStyle;
   final String iconAsset;
   final String iconSemanticsLabel;
-  final String tooltip;
   final VoidCallback onPressed;
   final double iconSize;
 
@@ -232,7 +228,6 @@ class _InlineComposerAction extends StatelessWidget {
         const SizedBox(width: 9),
         IconButton(
           key: actionKey,
-          tooltip: tooltip,
           onPressed: onPressed,
           iconSize: iconSize,
           alignment: Alignment.centerLeft,
