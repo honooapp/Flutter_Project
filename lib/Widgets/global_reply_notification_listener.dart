@@ -65,10 +65,11 @@ class _GlobalReplyNotificationListenerState
       _replyEventSubscription ??= testEvents.listen(_handleEvent);
       return;
     }
-    _authSubscription ??=
-        SupabaseProvider.client.auth.onAuthStateChange.listen((state) {
-      _handleSession(state.session);
-    });
+    _authSubscription ??= SupabaseProvider.client.auth.onAuthStateChange.listen(
+      (state) {
+        _handleSession(state.session);
+      },
+    );
     _handleSession(SupabaseProvider.client.auth.currentSession);
   }
 
@@ -93,11 +94,8 @@ class _GlobalReplyNotificationListenerState
             table: 'honoo',
             filter: 'recipient_tag=eq.$userId',
           ),
-          (dynamic payload, [dynamic _]) => _handlePayload(
-            payload,
-            ReplyNotificationKind.honoo,
-            userId,
-          ),
+          (dynamic payload, [dynamic _]) =>
+              _handlePayload(payload, ReplyNotificationKind.honoo, userId),
         )
         ..subscribe();
       _hinooChannel = SupabaseProvider.client.channel('reply-hinoo-$userId')
@@ -109,11 +107,8 @@ class _GlobalReplyNotificationListenerState
             table: 'hinoo',
             filter: 'recipient_tag=eq.$userId',
           ),
-          (dynamic payload, [dynamic _]) => _handlePayload(
-            payload,
-            ReplyNotificationKind.hinoo,
-            userId,
-          ),
+          (dynamic payload, [dynamic _]) =>
+              _handlePayload(payload, ReplyNotificationKind.hinoo, userId),
         )
         ..subscribe();
     } catch (_) {
@@ -162,8 +157,9 @@ class _GlobalReplyNotificationListenerState
       ?..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content:
-              Text('Hai ricevuto una risposta al tuo ${event.contentLabel}.'),
+          content: Text(
+            'Hai ricevuto una risposta al tuo ${event.contentLabel}',
+          ),
           action: SnackBarAction(label: 'Apri', onPressed: open),
         ),
       );

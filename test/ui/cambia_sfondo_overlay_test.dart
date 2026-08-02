@@ -23,8 +23,8 @@ void main() {
 
     expect(
       find.text(
-        'Trascina per spostare l’immagine.\n'
-        'Usa il pizzico o i controlli per zoomare.',
+        'Trascina per spostare l’immagine\n'
+        'Usa il pizzico o i controlli per zoomare',
       ),
       findsOneWidget,
     );

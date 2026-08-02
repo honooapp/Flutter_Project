@@ -180,6 +180,9 @@ class _HomeIntro extends StatelessWidget {
                     'Vuoi essere un poeta di honoo?\n\n'
                     'Scegli',
               ),
+              const WidgetSpan(
+                child: SizedBox(key: Key('home_bottle_leading_gap'), width: 8),
+              ),
               _inlineAction(
                 key: const Key('home_inline_bottle'),
                 asset: 'assets/icons/bottle.svg',
@@ -189,6 +192,9 @@ class _HomeIntro extends StatelessWidget {
                 onPressed: () => SeaFooterBar.openComposer(context),
               ),
               const TextSpan(text: '\n\nOppure'),
+              const WidgetSpan(
+                child: SizedBox(key: Key('home_moon_leading_gap'), width: 8),
+              ),
               _inlineAction(
                 key: const Key('home_inline_moon'),
                 asset: 'assets/icons/moon.svg',
@@ -197,6 +203,9 @@ class _HomeIntro extends StatelessWidget {
                 onPressed: () => LunaFissa.openMoon(context),
               ),
               const TextSpan(text: '\ne guarda le vite degli altri\n\nO'),
+              const WidgetSpan(
+                child: SizedBox(key: Key('home_island_leading_gap'), width: 8),
+              ),
               _inlineAction(
                 key: const Key('home_inline_island'),
                 asset: 'assets/icons/isoladellestorie/island.svg',

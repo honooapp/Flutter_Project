@@ -72,19 +72,21 @@ void main() {
         ),
       );
 
-      events.add(const ReplyNotificationEvent(
-        kind: ReplyNotificationKind.hinoo,
-        conversationId: 'conversation-42',
-        senderId: 'other_user',
-        recipientId: 'test_user',
-      ));
+      events.add(
+        const ReplyNotificationEvent(
+          kind: ReplyNotificationKind.hinoo,
+          conversationId: 'conversation-42',
+          senderId: 'other_user',
+          recipientId: 'test_user',
+        ),
+      );
       await tester.pump();
 
       expect(notification.contentLabel, 'hinoo');
       expect(notification.conversationId, 'conversation-42');
       expect(notification.onTap, isNotNull);
       expect(
-        find.text('Hai ricevuto una risposta al tuo hinoo.'),
+        find.text('Hai ricevuto una risposta al tuo hinoo'),
         findsOneWidget,
       );
 

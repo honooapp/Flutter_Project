@@ -47,6 +47,17 @@ void main() {
     expect(find.byKey(const Key('home_inline_bottle')), findsOneWidget);
     expect(find.byKey(const Key('home_inline_moon')), findsOneWidget);
     expect(find.byKey(const Key('home_inline_island')), findsOneWidget);
+    expect(find.byKey(const Key('home_bottle_leading_gap')), findsOneWidget);
+    expect(find.byKey(const Key('home_moon_leading_gap')), findsOneWidget);
+    expect(find.byKey(const Key('home_island_leading_gap')), findsOneWidget);
+
+    for (final key in const [
+      Key('home_bottle_leading_gap'),
+      Key('home_moon_leading_gap'),
+      Key('home_island_leading_gap'),
+    ]) {
+      expect(tester.getSize(find.byKey(key)).width, 8);
+    }
 
     for (final entry in const [
       (Key('home_inline_bottle'), 32.0),

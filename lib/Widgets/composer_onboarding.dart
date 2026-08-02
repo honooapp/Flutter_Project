@@ -69,6 +69,28 @@ class ComposerOnboardingPage extends StatelessWidget {
               final scaledFontSize = textScaler.scale(fontSize);
               final iconSize = scaledFontSize * 2.25;
               final bottleIconSize = iconSize * 0.72;
+              final featherIconSize = iconSize * 1.1;
+              final topPadding = constraints.maxHeight < 700 ? 16.0 : 36.0;
+              const bottomPadding = 12.0;
+              final sectionSpacing = constraints.maxHeight < 700 ? 20.0 : 32.0;
+              final actionRowsHeight =
+                  math.max(48.0, bottleIconSize) +
+                  math.max(48.0, featherIconSize);
+              final subtitlesHeight = scaledFontSize * 1.3 * 2;
+              final fixedContentHeight =
+                  topPadding +
+                  bottomPadding +
+                  sectionSpacing +
+                  actionRowsHeight +
+                  subtitlesHeight +
+                  36;
+              final fittedExampleHeight = math.min(
+                exampleHeight,
+                math.max(
+                  120.0,
+                  (constraints.maxHeight - fixedContentHeight) / 2,
+                ),
+              );
               final textStyle = GoogleFonts.arvo(
                 color: HonooColor.onBackground,
                 fontSize: fontSize,
@@ -82,9 +104,9 @@ class ComposerOnboardingPage extends StatelessWidget {
                       key: const Key('composer_onboarding_scroll'),
                       padding: EdgeInsets.fromLTRB(
                         horizontalPadding,
-                        72,
+                        topPadding,
                         horizontalPadding,
-                        32,
+                        bottomPadding,
                       ),
                       child: Center(
                         child: ConstrainedBox(
@@ -112,10 +134,10 @@ class ComposerOnboardingPage extends StatelessWidget {
                               _ExampleImage(
                                 asset: 'assets/images/onboarding_honoo.png',
                                 width: imageWidth,
-                                height: exampleHeight,
+                                height: fittedExampleHeight,
                                 semanticsLabel: 'Esempio di honoo',
                               ),
-                              const SizedBox(height: 56),
+                              SizedBox(height: sectionSpacing),
                               _InlineComposerAction(
                                 actionKey: const Key(
                                   'composer_onboarding_feather',
@@ -125,7 +147,7 @@ class ComposerOnboardingPage extends StatelessWidget {
                                 iconSemanticsLabel: 'Piuma',
                                 tooltip: 'Componi il tuo hinoo',
                                 onPressed: () => _openHinooComposer(context),
-                                iconSize: iconSize,
+                                iconSize: featherIconSize,
                               ),
                               const SizedBox(height: 4),
                               Text(
@@ -137,10 +159,9 @@ class ComposerOnboardingPage extends StatelessWidget {
                               _ExampleImage(
                                 asset: 'assets/images/onboarding_hinoo.png',
                                 width: imageWidth,
-                                height: exampleHeight,
+                                height: fittedExampleHeight,
                                 semanticsLabel: 'Esempio di hinoo',
                               ),
-                              const SizedBox(height: 32),
                             ],
                           ),
                         ),
@@ -207,13 +228,14 @@ class _InlineComposerAction extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('Clicca qui', style: textStyle),
-        const SizedBox(width: 6),
+        Text('Scegli', style: textStyle),
+        const SizedBox(width: 9),
         IconButton(
           key: actionKey,
           tooltip: tooltip,
           onPressed: onPressed,
           iconSize: iconSize,
+          alignment: Alignment.centerLeft,
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
           icon: SvgPicture.asset(

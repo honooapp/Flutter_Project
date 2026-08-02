@@ -85,8 +85,8 @@ class CambiaSfondoOverlay extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Trascina per spostare l’immagine.\n'
-                  'Usa il pizzico o i controlli per zoomare.',
+                  'Trascina per spostare l’immagine\n'
+                  'Usa il pizzico o i controlli per zoomare',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.lora(color: Colors.white, fontSize: 14),
                 ),
