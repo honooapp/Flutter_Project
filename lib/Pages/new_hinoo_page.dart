@@ -531,6 +531,22 @@ class _NewHinooPageState extends State<NewHinooPage>
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Tooltip(
+                  message: 'Sostituisci immagine',
+                  preferBelow: false,
+                  child: IconButton(
+                    key: const Key('hinoo-replace-editing-image'),
+                    onPressed: _replaceEditorImage,
+                    padding: EdgeInsets.zero,
+                    iconSize: secondaryActionIconSize,
+                    color: HonooColor.onBackground,
+                    icon: const Icon(Icons.photo_library_outlined),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: Tooltip(
                   message: 'Salva immagine',
                   preferBelow: false,
                   child: IconButton(
@@ -550,23 +566,9 @@ class _NewHinooPageState extends State<NewHinooPage>
                 ),
               ),
             ),
-            Expanded(
-              child: Center(
-                child: Tooltip(
-                  message: 'Sostituisci immagine',
-                  preferBelow: false,
-                  child: IconButton(
-                    key: const Key('hinoo-replace-editing-image'),
-                    onPressed: _replaceEditorImage,
-                    padding: EdgeInsets.zero,
-                    iconSize: secondaryActionIconSize,
-                    color: HonooColor.onBackground,
-                    icon: const Icon(Icons.photo_library_outlined),
-                  ),
-                ),
-              ),
+            const Expanded(
+              child: SizedBox(key: Key('hinoo-editor-right-empty-slot')),
             ),
-            const Expanded(child: SizedBox.shrink()),
           ],
         ),
       ),
