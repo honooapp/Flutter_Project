@@ -24,6 +24,7 @@ class ChestItemView extends StatelessWidget {
     required this.isActive,
     required this.highlightLatest,
     required this.focusConversationId,
+    required this.revealEntryId,
     required this.onSelectConversationEntry,
     required this.onDownload,
     required this.conversationRefreshToken,
@@ -39,6 +40,7 @@ class ChestItemView extends StatelessWidget {
   final bool isActive;
   final bool highlightLatest;
   final String? focusConversationId;
+  final String? revealEntryId;
   final ValueChanged<ConversationEntry> onSelectConversationEntry;
   final VoidCallback onDownload;
   final int conversationRefreshToken;
@@ -148,6 +150,7 @@ class ChestItemView extends StatelessWidget {
     isActive: isActive,
     onSelect: onSelectConversationEntry,
     highlightLatest: highlightLatest && focusConversationId == conversationId,
+    revealEntryId: focusConversationId == conversationId ? revealEntryId : null,
     onDownloadTap: onDownload,
     refreshToken: conversationRefreshToken,
   );

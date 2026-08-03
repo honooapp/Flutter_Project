@@ -7,6 +7,7 @@ class ReplyNotificationEvent {
     required this.senderId,
     required this.recipientId,
     this.replyId,
+    this.createdAt,
   });
 
   final ReplyNotificationKind kind;
@@ -14,6 +15,7 @@ class ReplyNotificationEvent {
   final String senderId;
   final String recipientId;
   final String? replyId;
+  final DateTime? createdAt;
 
   String get contentLabel =>
       kind == ReplyNotificationKind.honoo ? 'honoo' : 'hinoo';
@@ -56,6 +58,7 @@ class ReplyNotificationEvent {
       senderId: senderId,
       recipientId: recipientId,
       replyId: record['id']?.toString(),
+      createdAt: DateTime.tryParse(record['created_at']?.toString() ?? ''),
     );
   }
 }

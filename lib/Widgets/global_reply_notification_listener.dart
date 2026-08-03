@@ -43,8 +43,7 @@ class _GlobalReplyNotificationListenerState
   int _reconnectAttempt = 0;
   int _channelGeneration = 0;
   String? _activeUserId;
-  String? _lastEventKey;
-  DateTime? _lastEventAt;
+  final Set<String> _deliveredEventKeys = <String>{};
 
   @override
   void initState() {
@@ -89,6 +88,7 @@ class _GlobalReplyNotificationListenerState
       return;
     }
     _closeRealtime(clearUser: false);
+    _deliveredEventKeys.clear();
     _activeUserId = userId;
     if (userId == null) return;
     _connectChannels(userId);
@@ -128,6 +128,7 @@ class _GlobalReplyNotificationListenerState
         if (status == 'SUBSCRIBED') {
           _reconnectAttempt = 0;
           _reconnectTimer?.cancel();
+          unawaited(_catchUpMissedReplies(userId, generation));
           return;
         }
         if (status == 'CHANNEL_ERROR' ||
@@ -172,19 +173,15 @@ class _GlobalReplyNotificationListenerState
   }
 
   void _handleEvent(ReplyNotificationEvent event) {
-    final now = DateTime.now();
     final eventKey =
-        '${event.kind.name}:${event.replyId ?? event.conversationId}';
-    if (_lastEventKey == eventKey &&
-        _lastEventAt != null &&
-        now.difference(_lastEventAt!) < const Duration(seconds: 2)) {
-      return;
+        '${event.recipientId}:${event.kind.name}:${event.replyId ?? event.conversationId}';
+    if (!_deliveredEventKeys.add(eventKey)) return;
+    if (_deliveredEventKeys.length > 256) {
+      _deliveredEventKeys.remove(_deliveredEventKeys.first);
     }
-    _lastEventKey = eventKey;
-    _lastEventAt = now;
     ReplyNotificationSignal.notifyChanged();
 
-    void open() => _openConversation(event.conversationId);
+    void open() => _openConversation(event);
     _systemNotification.show(
       contentLabel: event.contentLabel,
       conversationId: event.conversationId,
@@ -206,13 +203,71 @@ class _GlobalReplyNotificationListenerState
       );
   }
 
-  void _openConversation(String conversationId) {
-    unawaited(RepliesSeenTracker.markNow());
+  Future<void> _catchUpMissedReplies(String userId, int generation) async {
+    final lastSeen = await RepliesSeenTracker.lastSeen(userId: userId);
+    if (!mounted || generation != _channelGeneration || lastSeen == null) {
+      return;
+    }
+    try {
+      final since = lastSeen.toUtc().toIso8601String();
+      final results = await Future.wait<dynamic>([
+        SupabaseProvider.client
+            .from('honoo')
+            .select(
+              'id,destination,reply_to,recipient_tag,created_at,user_id,conversation_id',
+            )
+            .eq('destination', 'reply')
+            .eq('recipient_tag', userId)
+            .gt('created_at', since)
+            .order('created_at'),
+        SupabaseProvider.client
+            .from('hinoo')
+            .select(
+              'id,type,reply_to,recipient_tag,created_at,user_id,conversation_id',
+            )
+            .eq('type', 'answer')
+            .eq('recipient_tag', userId)
+            .gt('created_at', since)
+            .order('created_at'),
+      ]);
+      if (!mounted || generation != _channelGeneration) return;
+      final pending = <ReplyNotificationEvent>[];
+      for (var i = 0; i < results.length; i++) {
+        final kind = i == 0
+            ? ReplyNotificationKind.honoo
+            : ReplyNotificationKind.hinoo;
+        for (final row in (results[i] as List).whereType<Map>()) {
+          final event = ReplyNotificationEvent.fromRealtimePayload(
+            {'eventType': 'INSERT', 'new': row},
+            kind: kind,
+            currentUserId: userId,
+          );
+          if (event != null) pending.add(event);
+        }
+      }
+      pending.sort(
+        (a, b) => (a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0))
+            .compareTo(b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0)),
+      );
+      for (final event in pending) {
+        _handleEvent(event);
+      }
+    } catch (_) {
+      // Il canale realtime resta attivo; il prossimo reconnect ritenterà il catch-up.
+    }
+  }
+
+  void _openConversation(ReplyNotificationEvent event) {
+    final seenAt = event.createdAt;
+    if (seenAt != null) {
+      unawaited(RepliesSeenTracker.markAt(seenAt, userId: event.recipientId));
+    }
     widget.navigatorKey.currentState?.push(
       MaterialPageRoute(
         builder: (_) => ChestPage(
           focusReplies: true,
-          focusConversationId: conversationId,
+          focusConversationId: event.conversationId,
+          focusReplyId: event.replyId,
           highlightLatest: true,
         ),
       ),

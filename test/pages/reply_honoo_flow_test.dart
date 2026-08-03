@@ -20,6 +20,7 @@ void main() {
     harness = SupabaseTestHarness(withAuthenticatedUser: true);
     harness.enableOverrides();
     final honoo = harness.stubTable('honoo');
+    honoo.queueResponse(<String, dynamic>{'id': 'reply-1'});
     final hinoo = harness.stubTable('hinoo');
     when(() => honoo.neq(any(), any())).thenAnswer((_) => honoo);
     when(() => hinoo.neq(any(), any())).thenAnswer((_) => hinoo);

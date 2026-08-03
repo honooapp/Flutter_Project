@@ -15,6 +15,7 @@ class _FakeReplySystemNotification extends ReplySystemNotification {
   VoidCallback? onTap;
   String? contentLabel;
   String? conversationId;
+  int showCount = 0;
 
   @override
   ReplyNotificationPermission get permission =>
@@ -29,6 +30,7 @@ class _FakeReplySystemNotification extends ReplySystemNotification {
     required String conversationId,
     required VoidCallback onTap,
   }) {
+    showCount += 1;
     this.contentLabel = contentLabel;
     this.conversationId = conversationId;
     this.onTap = onTap;
@@ -74,16 +76,19 @@ void main() {
         ),
       );
 
-      events.add(
-        const ReplyNotificationEvent(
-          kind: ReplyNotificationKind.hinoo,
-          conversationId: 'conversation-42',
-          senderId: 'other_user',
-          recipientId: 'test_user',
-        ),
+      final event = ReplyNotificationEvent(
+        kind: ReplyNotificationKind.hinoo,
+        conversationId: 'conversation-42',
+        senderId: 'other_user',
+        recipientId: 'test_user',
+        replyId: 'reply-42',
+        createdAt: DateTime.utc(2026, 8, 3, 10),
       );
+      events.add(event);
+      events.add(event);
       await tester.pump();
 
+      expect(notification.showCount, 1);
       expect(notification.contentLabel, 'hinoo');
       expect(notification.conversationId, 'conversation-42');
       expect(notification.onTap, isNotNull);
@@ -101,6 +106,9 @@ void main() {
 
       expect(navigatorKey.currentState!.canPop(), isTrue);
       expect(find.byType(ChestPage), findsOneWidget);
+      final chestPage = tester.widget<ChestPage>(find.byType(ChestPage));
+      expect(chestPage.focusConversationId, 'conversation-42');
+      expect(chestPage.focusReplyId, 'reply-42');
 
       await tester.pumpWidget(const SizedBox.shrink());
     },
