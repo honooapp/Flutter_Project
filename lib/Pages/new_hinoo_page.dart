@@ -321,7 +321,7 @@ class _NewHinooPageState extends State<NewHinooPage>
         return;
       }
 
-      await _controller.saveToChest(hinooDraft);
+      final savedHinooId = await _controller.saveToChest(hinooDraft);
       if (!mounted) return;
       setState(() => _savedToChest = true);
       _chestBounceController.forward(from: 0);
@@ -344,6 +344,7 @@ class _NewHinooPageState extends State<NewHinooPage>
             builder: (_) => ChestPage(
               focusReplies: true,
               focusConversationId: conversationId,
+              focusReplyId: savedHinooId,
               highlightLatest: true,
             ),
           ),

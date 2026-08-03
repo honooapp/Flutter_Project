@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Entities/conversation_entry.dart';
@@ -299,4 +301,122 @@ void main() {
       expect(borderWithColor(HonooColor.secondary), findsNothing);
     },
   );
+
+  testWidgets(
+    'revealEntryId anima la risposta richiesta, non quella più recente',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(600, 900);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+
+      final root = ConversationEntry.honoo(
+        honoo(
+          id: 'root-exact',
+          text: 'Padre esatto',
+          owner: 'me',
+          createdAt: '2026-07-20T10:00:00Z',
+        ),
+      );
+      final requestedReply = ConversationEntry.honoo(
+        honoo(
+          id: 'reply-requested',
+          text: 'Risposta richiesta',
+          owner: 'other',
+          createdAt: '2026-07-20T11:00:00Z',
+          type: HonooType.answer,
+          replyTo: 'root-exact',
+        ),
+      );
+      final newerReply = ConversationEntry.honoo(
+        honoo(
+          id: 'reply-newer',
+          text: 'Risposta più recente',
+          owner: 'other',
+          createdAt: '2026-07-20T12:00:00Z',
+          type: HonooType.answer,
+          replyTo: 'reply-requested',
+        ),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: UnifiedThreadView(
+              conversationId: 'conversation-1',
+              revealEntryId: 'reply-requested',
+              maxWidth: 600,
+              maxHeight: 700,
+              isActive: true,
+              conversationLoader: (_) async => [
+                root,
+                requestedReply,
+                newerReply,
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
+
+      expect(find.text('Risposta richiesta'), findsOneWidget);
+      expect(find.text('Padre esatto'), findsOneWidget);
+      expect(find.byKey(const Key('reply_reveal_parent')), findsOneWidget);
+    },
+  );
+
+  testWidgets('un caricamento vecchio non sostituisce la nuova conversazione', (
+    tester,
+  ) async {
+    final first = Completer<List<ConversationEntry>>();
+    final second = Completer<List<ConversationEntry>>();
+    Future<List<ConversationEntry>> loader(String conversationId) =>
+        conversationId == 'conversation-old' ? first.future : second.future;
+
+    Widget app(String conversationId) => MaterialApp(
+      home: Scaffold(
+        body: UnifiedThreadView(
+          key: const Key('race-thread'),
+          conversationId: conversationId,
+          maxWidth: 390,
+          maxHeight: 700,
+          conversationLoader: loader,
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(app('conversation-old'));
+    await tester.pump();
+    await tester.pumpWidget(app('conversation-new'));
+    await tester.pump();
+
+    second.complete([
+      ConversationEntry.honoo(
+        honoo(
+          id: 'new-entry',
+          text: 'Conversazione nuova',
+          owner: 'me',
+          createdAt: '2026-07-20T12:00:00Z',
+        ),
+      ),
+    ]);
+    await tester.pumpAndSettle();
+    expect(find.text('Conversazione nuova'), findsOneWidget);
+
+    first.complete([
+      ConversationEntry.honoo(
+        honoo(
+          id: 'old-entry',
+          text: 'Conversazione vecchia',
+          owner: 'me',
+          createdAt: '2026-07-20T10:00:00Z',
+        ),
+      ),
+    ]);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Conversazione nuova'), findsOneWidget);
+    expect(find.text('Conversazione vecchia'), findsNothing);
+  });
 }

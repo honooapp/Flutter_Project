@@ -61,6 +61,15 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
 
     setState(() => _isSending = true);
 
+    final currentUser = SupabaseProvider.client.auth.currentUser;
+    if (currentUser == null) {
+      if (mounted) {
+        setState(() => _isSending = false);
+        showHonooToast(context, message: 'Accedi prima di rispondere.');
+      }
+      return;
+    }
+
     final now = DateTime.now().toIso8601String();
 
     final String replyTarget =
@@ -76,7 +85,7 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
       _imageUrl ?? '',
       now,
       now,
-      SupabaseProvider.client.auth.currentUser!.id,
+      currentUser.id,
       HonooType.answer,
       link.replyTo,
       link.recipientId,
@@ -85,14 +94,12 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
     try {
       // Assicura che il root sia nello Scrigno se arriviamo dalla Luna
       if (widget.originalHonoo.type == HonooType.moon) {
-        try {
-          await HonooController().saveToChest(
-            widget.originalHonoo.copyWith(isFromMoonSaved: true),
-          );
-        } catch (_) {}
+        await HonooController().saveToChest(
+          widget.originalHonoo.copyWith(isFromMoonSaved: true),
+        );
       }
 
-      await HonooService.publishHonoo(newHonoo);
+      final replyId = await HonooService.publishHonooAndReturnId(newHonoo);
 
       if (!mounted) return;
 
@@ -108,6 +115,7 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
           builder: (_) => ChestPage(
             focusReplies: true,
             focusConversationId: link.conversationId,
+            focusReplyId: replyId,
             highlightLatest: true,
           ),
         ),

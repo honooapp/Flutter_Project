@@ -65,8 +65,11 @@ class ChestController extends ValueNotifier<ChestState> {
   int _realtimeReconnectAttempt = 0;
   int _realtimeGeneration = 0;
   bool _isRefreshingReplies = false;
-  bool _refreshPending = false;
+  String? _pendingReplyUserId;
   bool _isDisposed = false;
+  String? _stateUserId;
+  int _hinooLoadGeneration = 0;
+  int _replyLoadGeneration = 0;
 
   void startRealtime(
     String userId, {
@@ -154,15 +157,19 @@ class ChestController extends ValueNotifier<ChestState> {
 
   Future<void> refreshReplies(String userId) async {
     if (_isRefreshingReplies) {
-      _refreshPending = true;
+      _pendingReplyUserId = userId;
       return;
     }
     _isRefreshingReplies = true;
     try {
+      var requestedUserId = userId;
       do {
-        _refreshPending = false;
-        await loadReplies(userId);
-      } while (_refreshPending);
+        _pendingReplyUserId = null;
+        await loadReplies(requestedUserId);
+        final pendingUserId = _pendingReplyUserId;
+        if (pendingUserId == null) break;
+        requestedUserId = pendingUserId;
+      } while (!_isDisposed);
     } finally {
       _isRefreshingReplies = false;
     }
@@ -193,16 +200,19 @@ class ChestController extends ValueNotifier<ChestState> {
 
   void completeWithoutUser() {
     if (_isDisposed) return;
-    value = ChestState(
-      hinoo: value.hinoo,
-      honooLatestReplies: value.honooLatestReplies,
-      hinooLatestReplies: value.hinooLatestReplies,
-      hinooRepliesByRoot: value.hinooRepliesByRoot,
-      isHinooLoading: false,
-      isReplyLoading: false,
-      hinooError: value.hinooError,
-      replyError: value.replyError,
-    );
+    _stateUserId = null;
+    _hinooLoadGeneration++;
+    _replyLoadGeneration++;
+    _pendingReplyUserId = null;
+    value = ChestState(isHinooLoading: false, isReplyLoading: false);
+  }
+
+  void _prepareUser(String userId) {
+    if (_stateUserId == userId) return;
+    _stateUserId = userId;
+    _hinooLoadGeneration++;
+    _replyLoadGeneration++;
+    value = ChestState();
   }
 
   void removeHinoo(String id) {
@@ -249,6 +259,8 @@ class ChestController extends ValueNotifier<ChestState> {
 
   Future<void> loadHinoo(String userId) async {
     if (_isDisposed) return;
+    _prepareUser(userId);
+    final generation = ++_hinooLoadGeneration;
     value = ChestState(
       hinoo: value.hinoo,
       honooLatestReplies: value.honooLatestReplies,
@@ -263,7 +275,11 @@ class ChestController extends ValueNotifier<ChestState> {
       final rows = await _reliability.read<List<dynamic>>(
         () => _repository.fetchHinooRows(userId),
       );
-      if (_isDisposed) return;
+      if (_isDisposed ||
+          generation != _hinooLoadGeneration ||
+          _stateUserId != userId) {
+        return;
+      }
       Set<String> moonFingerprints = const {};
       try {
         moonFingerprints = await _reliability.read<Set<String>>(
@@ -273,7 +289,11 @@ class ChestController extends ValueNotifier<ChestState> {
         // Il contenuto dello Scrigno resta utilizzabile anche se il controllo
         // dello stato Luna non è temporaneamente disponibile.
       }
-      if (_isDisposed) return;
+      if (_isDisposed ||
+          generation != _hinooLoadGeneration ||
+          _stateUserId != userId) {
+        return;
+      }
       final hinoo = rows
           .whereType<Map>()
           .map(ChestHinooItem.fromDatabaseRow)
@@ -304,7 +324,11 @@ class ChestController extends ValueNotifier<ChestState> {
         replyError: value.replyError,
       );
     } catch (error) {
-      if (_isDisposed) return;
+      if (_isDisposed ||
+          generation != _hinooLoadGeneration ||
+          _stateUserId != userId) {
+        return;
+      }
       value = ChestState(
         hinoo: value.hinoo,
         honooLatestReplies: value.honooLatestReplies,
@@ -320,6 +344,8 @@ class ChestController extends ValueNotifier<ChestState> {
 
   Future<void> loadReplies(String userId) async {
     if (_isDisposed) return;
+    _prepareUser(userId);
+    final generation = ++_replyLoadGeneration;
     value = ChestState(
       hinoo: value.hinoo,
       honooLatestReplies: value.honooLatestReplies,
@@ -335,7 +361,11 @@ class ChestController extends ValueNotifier<ChestState> {
       final honooRows = await _reliability.refresh<List<dynamic>>(
         () => _repository.fetchHonooReplyRows(userId),
       );
-      if (_isDisposed) return;
+      if (_isDisposed ||
+          generation != _replyLoadGeneration ||
+          _stateUserId != userId) {
+        return;
+      }
       final seenHonooKeys = <String>{};
       for (final row in honooRows.whereType<Map>()) {
         final rootId = row['reply_to']?.toString() ?? '';
@@ -356,7 +386,11 @@ class ChestController extends ValueNotifier<ChestState> {
       final rows = await _reliability.refresh<List<dynamic>>(
         () => _repository.fetchHinooReplyRows(userId, rootIds),
       );
-      if (_isDisposed) return;
+      if (_isDisposed ||
+          generation != _replyLoadGeneration ||
+          _stateUserId != userId) {
+        return;
+      }
       final seenHinooIds = <String>{};
       for (final row in rows.whereType<Map>()) {
         final id = row['id']?.toString() ?? '';
@@ -402,7 +436,11 @@ class ChestController extends ValueNotifier<ChestState> {
         hinooError: value.hinooError,
       );
     } catch (error) {
-      if (_isDisposed) return;
+      if (_isDisposed ||
+          generation != _replyLoadGeneration ||
+          _stateUserId != userId) {
+        return;
+      }
       value = ChestState(
         hinoo: value.hinoo,
         honooLatestReplies: value.honooLatestReplies,

@@ -182,7 +182,12 @@ class _NewHonooPageState extends State<NewHonooPage> {
         return true;
       }
 
-      await HonooService.publishHonoo(newHonoo);
+      final savedReplyId = type == HonooType.answer
+          ? await HonooService.publishHonooAndReturnId(newHonoo)
+          : null;
+      if (savedReplyId == null) {
+        await HonooService.publishHonoo(newHonoo);
+      }
 
       if (!mounted) return false;
       setState(() {
@@ -214,6 +219,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
             builder: (_) => ChestPage(
               focusReplies: true,
               focusConversationId: conversationId,
+              focusReplyId: savedReplyId,
               highlightLatest: true,
             ),
           ),

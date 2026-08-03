@@ -25,6 +25,7 @@ class UnifiedThreadView extends StatefulWidget {
     this.refreshToken = 0,
     this.conversationLoader,
     this.currentUserId,
+    this.revealEntryId,
   });
 
   final String conversationId;
@@ -38,6 +39,7 @@ class UnifiedThreadView extends StatefulWidget {
   final Future<List<ConversationEntry>> Function(String conversationId)?
   conversationLoader;
   final String? currentUserId;
+  final String? revealEntryId;
 
   @override
   State<UnifiedThreadView> createState() => _UnifiedThreadViewState();
@@ -49,8 +51,8 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   Object? _loadError;
   List<ConversationEntry> _entries = const [];
   RealtimeChannel? _chan;
-  bool _didHighlight = false;
   String? _revealedEntryKey;
+  int _loadGeneration = 0;
   final PageController _pageController = PageController();
   late AnimationController _controller;
   late Animation<double> _liftAnimation;
@@ -114,6 +116,8 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
 
   Future<void> _load() async {
     if (!mounted) return;
+    final generation = ++_loadGeneration;
+    final conversationId = widget.conversationId;
     if (_entries.isEmpty) {
       setState(() => _loading = true);
     }
@@ -121,9 +125,13 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
       _loadError = null;
       final loader =
           widget.conversationLoader ?? ConversationService.fetchConversation;
-      final entries = await loader(widget.conversationId);
+      final entries = await loader(conversationId);
 
-      if (!mounted) return;
+      if (!mounted ||
+          generation != _loadGeneration ||
+          conversationId != widget.conversationId) {
+        return;
+      }
       setState(() {
         _entries = entries;
         _loading = false;
@@ -131,12 +139,15 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
       });
       _prefetchEntriesFrom(_pageToShowFirst);
       _showLatestReceivedAndReveal();
-      if (widget.highlightLatest && !_didHighlight && _entries.isNotEmpty) {
-        _didHighlight = true;
+      if (widget.isActive && _entries.isNotEmpty) {
         widget.onSelect?.call(_entryToShowFirst);
       }
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted ||
+          generation != _loadGeneration ||
+          conversationId != widget.conversationId) {
+        return;
+      }
       setState(() {
         _loading = false;
         _loadError = error;
@@ -165,8 +176,11 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
     if (oldWidget.conversationId != widget.conversationId) {
       _chan?.unsubscribe();
       _chan = null;
-      _didHighlight = false;
       _revealedEntryKey = null;
+      _entries = const [];
+      _loading = true;
+      _loadError = null;
+      _controller.reset();
       _load();
     }
     if (oldWidget.refreshToken != widget.refreshToken &&
@@ -183,6 +197,9 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
         _controller.reset();
       }
     }
+    if (oldWidget.revealEntryId != widget.revealEntryId) {
+      _revealedEntryKey = null;
+    }
     if (widget.isActive) _showLatestReceivedAndReveal();
   }
 
@@ -195,6 +212,13 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
 
   int get _pageToShowFirst {
     final reversed = _entries.reversed.toList(growable: false);
+    final revealEntryId = widget.revealEntryId;
+    if (revealEntryId != null && revealEntryId.isNotEmpty) {
+      final exactIndex = reversed.indexWhere(
+        (entry) => entry.id == revealEntryId,
+      );
+      if (exactIndex >= 0) return exactIndex;
+    }
     final receivedIndex = reversed.indexWhere(_shouldReveal);
     return receivedIndex < 0 ? 0 : receivedIndex;
   }
@@ -228,6 +252,10 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
         ? (e.honoo!.type == HonooType.answer)
         : (e.hinoo != null && e.hinoo!.type == HinooType.answer);
 
+    final revealEntryId = widget.revealEntryId;
+    if (revealEntryId != null && revealEntryId.isNotEmpty) {
+      return isReply && e.id == revealEntryId;
+    }
     return isReply;
   }
 
@@ -319,7 +347,13 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
         scrollDirection: Axis.vertical,
         pageSnapping: true,
         physics: const PageScrollPhysics(parent: ClampingScrollPhysics()),
-        onPageChanged: _prefetchEntriesFrom,
+        onPageChanged: (index) {
+          _prefetchEntriesFrom(index);
+          final reversed = _entries.reversed.toList(growable: false);
+          if (index >= 0 && index < reversed.length) {
+            widget.onSelect?.call(reversed[index]);
+          }
+        },
         itemCount: _entries.length,
         itemBuilder: (context, index) {
           // Ordine inverso: ultimo (più recente) in cima

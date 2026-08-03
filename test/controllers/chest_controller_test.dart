@@ -188,6 +188,76 @@ void main() {
     await expectLater(loading, completes);
   });
 
+  test('il logout elimina immediatamente i dati dello Scrigno', () async {
+    when(() => repository.fetchHinooRows('user-1')).thenAnswer(
+      (_) async => [
+        {
+          'id': 'private-hinoo',
+          'pages': [
+            {
+              'backgroundImage': 'background.png',
+              'text': 'Privato',
+              'isTextWhite': true,
+            },
+          ],
+          'type': 'personal',
+          'created_at': '2026-08-03T10:00:00Z',
+          'user_id': 'user-1',
+        },
+      ],
+    );
+    when(
+      () => repository.fetchHinooMoonFingerprints('user-1'),
+    ).thenAnswer((_) async => const {});
+
+    await controller.loadHinoo('user-1');
+    expect(controller.value.hinoo, isNotEmpty);
+
+    controller.completeWithoutUser();
+
+    expect(controller.value.hinoo, isEmpty);
+    expect(controller.value.honooLatestReplies, isEmpty);
+    expect(controller.value.hinooRepliesByRoot, isEmpty);
+  });
+
+  test(
+    'un caricamento del vecchio utente non contamina la nuova sessione',
+    () async {
+      final oldRows = Completer<List<dynamic>>();
+      when(
+        () => repository.fetchHinooRows('user-old'),
+      ).thenAnswer((_) => oldRows.future);
+      when(() => repository.fetchHinooRows('user-new')).thenAnswer(
+        (_) async => [
+          {
+            'id': 'new-user-hinoo',
+            'pages': [
+              {
+                'backgroundImage': 'background.png',
+                'text': 'Nuovo utente',
+                'isTextWhite': true,
+              },
+            ],
+            'type': 'personal',
+            'created_at': '2026-08-03T11:00:00Z',
+            'user_id': 'user-new',
+          },
+        ],
+      );
+      when(
+        () => repository.fetchHinooMoonFingerprints('user-new'),
+      ).thenAnswer((_) async => const {});
+
+      final oldLoad = controller.loadHinoo('user-old');
+      await Future<void>.delayed(Duration.zero);
+      await controller.loadHinoo('user-new');
+      oldRows.complete(const []);
+      await oldLoad;
+
+      expect(controller.value.hinoo.single.id, 'new-user-hinoo');
+    },
+  );
+
   test('start e stop gestiscono il ciclo di vita Realtime', () {
     controller.startRealtime(
       'user-1',
