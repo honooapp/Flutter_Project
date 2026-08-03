@@ -311,11 +311,10 @@ class _NewHinooPageState extends State<NewHinooPage>
       }
 
       if (widget.isCampanello) {
-        final hinooId = await _controller.saveToChestAndReturnId(hinooDraft);
         if (!mounted) return;
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (_) => CasaBuilderPage(campanelloHinooId: hinooId),
+            builder: (_) => CasaBuilderPage(campanello: hinooDraft),
           ),
         );
         return;
@@ -433,11 +432,10 @@ class _NewHinooPageState extends State<NewHinooPage>
       }
     }
 
-    final HinooType type =
-        widget.forcedType ??
-        (widget.isCampanello
-            ? HinooType.answer
-            : (widget.isReply ? HinooType.answer : HinooType.personal));
+    final HinooType type = widget.isCampanello
+        ? HinooType.personal
+        : (widget.forcedType ??
+            (widget.isReply ? HinooType.answer : HinooType.personal));
 
     // Se è una risposta e non è stato passato esplicitamente un conversationId,
     // usa replyTo come conversationId per garantire il raggruppamento.
