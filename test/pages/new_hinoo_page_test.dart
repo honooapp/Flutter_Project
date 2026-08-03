@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:honoo/Pages/new_hinoo_page.dart';
 import 'package:honoo/UI/hinoo_builder.dart';
 import 'package:sizer/sizer.dart';
@@ -60,6 +61,13 @@ void main() {
     expect(saveImage, findsOneWidget);
     expect(replaceImage, findsOneWidget);
     expect(rightEmptySlot, findsOneWidget);
+    final replaceIcon = tester.widget<SvgPicture>(
+      find.descendant(of: replaceImage, matching: find.byType(SvgPicture)),
+    );
+    expect(
+      (replaceIcon.bytesLoader as SvgAssetLoader).assetName,
+      'assets/icons/immagine.svg',
+    );
     expect(
       tester.getCenter(replaceImage).dx,
       lessThan(tester.getCenter(saveImage).dx),
@@ -89,6 +97,16 @@ void main() {
 
     expect(find.byTooltip('Salva hinoo'), findsOneWidget);
     expect(find.byTooltip('Salva sul dispositivo'), findsOneWidget);
+    final downloadIcon = tester.widget<SvgPicture>(
+      find.descendant(
+        of: find.byTooltip('Salva sul dispositivo'),
+        matching: find.byType(SvgPicture),
+      ),
+    );
+    expect(
+      (downloadIcon.bytesLoader as SvgAssetLoader).assetName,
+      'assets/icons/download.svg',
+    );
     expect(
       tester.getCenter(find.byTooltip('Salva hinoo')).dx,
       lessThan(tester.getCenter(find.byTooltip('Salva sul dispositivo')).dx),

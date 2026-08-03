@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:honoo/UI/honoo_builder.dart';
+import 'package:honoo/Utility/honoo_colors.dart';
 
 void main() {
   testWidgets('i controlli immagine honoo hanno il nuovo posizionamento', (
@@ -22,6 +23,16 @@ void main() {
           ),
         ),
       ),
+    );
+
+    final emptyImageIcon = tester.widget<SvgPicture>(find.byType(SvgPicture));
+    expect(
+      (emptyImageIcon.bytesLoader as SvgAssetLoader).assetName,
+      'assets/icons/immagine.svg',
+    );
+    expect(
+      emptyImageIcon.colorFilter,
+      const ColorFilter.mode(HonooColor.primary, BlendMode.srcIn),
     );
 
     key.currentState!.setImageBytesForTesting(
@@ -92,11 +103,31 @@ void main() {
 
     final replaceButton = tester.widget<IconButton>(replace);
     final editButton = tester.widget<IconButton>(editText);
+    final replaceIcon = tester.widget<SvgPicture>(
+      find.descendant(of: replace, matching: find.byType(SvgPicture)),
+    );
+    final editIcon = tester.widget<SvgPicture>(
+      find.descendant(of: editText, matching: find.byType(SvgPicture)),
+    );
     final saveIcon = tester.widget<SvgPicture>(
       find.descendant(of: save, matching: find.byType(SvgPicture)),
     );
     expect(replaceButton.iconSize, closeTo(saveIcon.width! * 0.82, 0.01));
     expect(editButton.iconSize, replaceButton.iconSize);
+    expect(
+      (replaceIcon.bytesLoader as SvgAssetLoader).assetName,
+      'assets/icons/immagine.svg',
+    );
+    expect(
+      (editIcon.bytesLoader as SvgAssetLoader).assetName,
+      'assets/icons/modifica testo.svg',
+    );
+    for (final icon in [replaceIcon, editIcon]) {
+      expect(
+        icon.colorFilter,
+        const ColorFilter.mode(HonooColor.onBackground, BlendMode.srcIn),
+      );
+    }
 
     expect(tester.widget<IconButton>(replace).color, isNotNull);
     expect(

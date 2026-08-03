@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class TextBoxDownloadButton extends StatelessWidget {
   const TextBoxDownloadButton({
@@ -12,8 +13,9 @@ class TextBoxDownloadButton extends StatelessWidget {
   final String tooltip;
   final double size;
 
-  static final ValueNotifier<bool> _hiddenForCapture =
-      ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> _hiddenForCapture = ValueNotifier<bool>(
+    false,
+  );
   static int _captureDepth = 0;
 
   static Future<T> hideWhileCapturing<T>(Future<T> Function() capture) async {
@@ -59,10 +61,16 @@ class TextBoxDownloadButton extends StatelessWidget {
                   color: Colors.black.withValues(alpha: 0.55),
                   borderRadius: BorderRadius.circular(size / 2),
                 ),
-                child: Icon(
-                  Icons.download_outlined,
-                  size: size * 0.6,
-                  color: Colors.white,
+                child: Center(
+                  child: SvgPicture.asset(
+                    'assets/icons/download.svg',
+                    width: size * 0.6,
+                    height: size * 0.6,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
+                  ),
                 ),
               ),
             ),

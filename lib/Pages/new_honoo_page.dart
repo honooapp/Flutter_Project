@@ -592,16 +592,15 @@ class _NewHonooPageState extends State<NewHonooPage> {
                               },
                             ),
                           ResponsiveFooterAction(
-                            asset: "assets/icons/piuma.svg",
+                            asset: 'assets/icons/download.svg',
                             semanticsLabel: 'Download',
                             size: footerIconSize,
                             splashRadius: 25,
                             tooltip: 'Salva sul dispositivo',
                             onPressed: _handleDownloadTap,
-                            icon: Icon(
-                              Icons.download_outlined,
-                              size: footerIconSize,
-                              color: HonooColor.onBackground,
+                            colorFilter: const ColorFilter.mode(
+                              HonooColor.onBackground,
+                              BlendMode.srcIn,
                             ),
                           ),
                         ],

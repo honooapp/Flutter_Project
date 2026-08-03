@@ -539,7 +539,15 @@ class _NewHinooPageState extends State<NewHinooPage>
                     padding: EdgeInsets.zero,
                     iconSize: secondaryActionIconSize,
                     color: HonooColor.onBackground,
-                    icon: const Icon(Icons.photo_library_outlined),
+                    icon: SvgPicture.asset(
+                      'assets/icons/immagine.svg',
+                      width: secondaryActionIconSize,
+                      height: secondaryActionIconSize,
+                      colorFilter: const ColorFilter.mode(
+                        HonooColor.onBackground,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -801,16 +809,15 @@ class _NewHinooPageState extends State<NewHinooPage>
                           ),
                         if (_isWriteStep)
                           ResponsiveFooterAction(
-                            asset: "assets/icons/piuma.svg",
+                            asset: 'assets/icons/download.svg',
                             semanticsLabel: 'Download',
                             size: footerIconSize,
                             splashRadius: 25,
                             tooltip: 'Salva sul dispositivo',
                             onPressed: _handleDownloadTap,
-                            icon: Icon(
-                              Icons.download_outlined,
-                              size: footerIconSize,
-                              color: HonooColor.onBackground,
+                            colorFilter: const ColorFilter.mode(
+                              HonooColor.onBackground,
+                              BlendMode.srcIn,
                             ),
                           ),
                       ],

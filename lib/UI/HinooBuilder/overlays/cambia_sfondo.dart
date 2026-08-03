@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 
@@ -55,7 +56,15 @@ class CambiaSfondoOverlay extends StatelessWidget {
                   style: GoogleFonts.lora(color: Colors.white, fontSize: 17),
                 ),
                 const SizedBox(height: 22),
-                const Icon(Icons.photo, size: 48, color: Colors.white),
+                SvgPicture.asset(
+                  'assets/icons/immagine.svg',
+                  width: 48,
+                  height: 48,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
+                  ),
+                ),
               ],
             ),
           ),
@@ -188,7 +197,15 @@ class CambiaSfondoOverlay extends StatelessWidget {
                           vertical: 8,
                         ),
                       ),
-                      icon: const Icon(Icons.photo_library_outlined),
+                      icon: SvgPicture.asset(
+                        'assets/icons/immagine.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                       label: const Text('Sostituisci immagine'),
                     ),
                   ),

@@ -760,7 +760,15 @@ class HonooBuilderState extends State<HonooBuilder> {
                       padding: EdgeInsets.zero,
                       iconSize: secondaryActionIconSize,
                       color: HonooColor.onBackground,
-                      icon: const Icon(Icons.photo_library_outlined),
+                      icon: SvgPicture.asset(
+                        'assets/icons/immagine.svg',
+                        width: secondaryActionIconSize,
+                        height: secondaryActionIconSize,
+                        colorFilter: const ColorFilter.mode(
+                          HonooColor.onBackground,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -808,7 +816,15 @@ class HonooBuilderState extends State<HonooBuilder> {
                       padding: EdgeInsets.zero,
                       iconSize: secondaryActionIconSize,
                       color: HonooColor.onBackground,
-                      icon: const Icon(Icons.edit_outlined),
+                      icon: SvgPicture.asset(
+                        'assets/icons/modifica testo.svg',
+                        width: secondaryActionIconSize,
+                        height: secondaryActionIconSize,
+                        colorFilter: const ColorFilter.mode(
+                          HonooColor.onBackground,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -843,10 +859,14 @@ class HonooBuilderState extends State<HonooBuilder> {
                       ),
                     ),
                     const SizedBox(height: 22),
-                    const Icon(
-                      Icons.photo,
-                      size: 48,
-                      color: HonooColor.primary,
+                    SvgPicture.asset(
+                      'assets/icons/immagine.svg',
+                      width: 48,
+                      height: 48,
+                      colorFilter: const ColorFilter.mode(
+                        HonooColor.primary,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ],
                 )
@@ -923,9 +943,14 @@ class HonooBuilderState extends State<HonooBuilder> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          icon: const Icon(
-                            Icons.photo_library_outlined,
-                            size: 20,
+                          icon: SvgPicture.asset(
+                            'assets/icons/immagine.svg',
+                            width: 20,
+                            height: 20,
+                            colorFilter: const ColorFilter.mode(
+                              Colors.white,
+                              BlendMode.srcIn,
+                            ),
                           ),
                           label: Text(
                             'Sostituisci immagine',
