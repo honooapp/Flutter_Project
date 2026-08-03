@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
+import 'package:honoo/Widgets/cover_transform_image.dart';
 
 import '../test_supabase_helper.dart';
 
@@ -114,12 +115,12 @@ void main() {
     await tester.pump();
 
     expect(roundTrip.bgTransform, transform);
-    final backgroundTransform = tester.widget<Transform>(
+    final backgroundImage = tester.widget<CoverTransformImage>(
       find.byKey(const ValueKey('hinoo-saved-background-transform')),
     );
-    expect(backgroundTransform.transform.storage[0], closeTo(1.4, 0.001));
-    expect(backgroundTransform.transform.storage[5], closeTo(1.4, 0.001));
-    expect(backgroundTransform.transform.storage[12], closeTo(40, 0.001));
-    expect(backgroundTransform.transform.storage[13], closeTo(-30, 0.001));
+    expect(backgroundImage.transform!.storage[0], closeTo(1.4, 0.001));
+    expect(backgroundImage.transform!.storage[5], closeTo(1.4, 0.001));
+    expect(backgroundImage.transform!.storage[12], closeTo(40, 0.001));
+    expect(backgroundImage.transform!.storage[13], closeTo(-30, 0.001));
   });
 }
