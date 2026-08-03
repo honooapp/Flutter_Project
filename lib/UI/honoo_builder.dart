@@ -14,6 +14,7 @@ import 'package:honoo/Utility/heic_converter.dart' as heic;
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'package:honoo/Widgets/cover_transform_image.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
 import 'package:honoo/Widgets/width_limited_multiline_field.dart';
 import 'package:honoo/Widgets/text_box_download_button.dart';
@@ -184,11 +185,8 @@ class HonooBuilderState extends State<HonooBuilder> {
 
     final Matrix4 current = _imageController.value.clone();
     final Float64List values = current.storage;
-    final double currentScale = _extractScale(current);
-    final double safeScale = currentScale <= 0 ? _imageMinScale : currentScale;
-
-    final double adjustedTx = values[12] * (safeScale / clamped);
-    final double adjustedTy = values[13] * (safeScale / clamped);
+    final double adjustedTx = values[12];
+    final double adjustedTy = values[13];
 
     _imageController.value = Matrix4.identity()
       ..translateByDouble(adjustedTx, adjustedTy, 0, 1)
@@ -868,23 +866,11 @@ class HonooBuilderState extends State<HonooBuilder> {
                       //    - l’unico “fit” è sull’Image
                       RepaintBoundary(
                         key: _imageBoundaryKey,
-                        child: ClipRect(
-                          child: InteractiveViewer(
-                            transformationController: _imageController,
-                            panEnabled: true,
-                            scaleEnabled: true,
-                            minScale: _imageMinScale,
-                            maxScale: _imageMaxScale,
-                            // Evita spazi bianchi: non permettere pan oltre i bordi
-                            boundaryMargin: EdgeInsets.zero,
-                            child: SizedBox.expand(
-                              child: Image(
-                                image: MemoryImage(_imageBytes!),
-                                fit: BoxFit.cover,
-                                alignment: Alignment.center,
-                              ),
-                            ),
-                          ),
+                        child: CoverTransformImage(
+                          image: MemoryImage(_imageBytes!),
+                          transformationController: _imageController,
+                          minScale: _imageMinScale,
+                          maxScale: _imageMaxScale,
                         ),
                       ),
                     if (!_imageConfirmed && !_hideEditorActionsForCapture)

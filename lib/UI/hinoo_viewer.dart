@@ -9,6 +9,7 @@ import 'hinoo_typography.dart';
 import '../Utility/honoo_colors.dart';
 import '../Utility/network_image_prefetch.dart';
 import '../Widgets/smooth_image.dart';
+import '../Widgets/cover_transform_image.dart';
 import '../Widgets/text_box_download_button.dart';
 
 class HinooViewer extends StatefulWidget {
@@ -329,16 +330,17 @@ class HinooSlideView extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           ClipRect(
-            child: Transform(
-              key: const ValueKey('hinoo-saved-background-transform'),
-              transform: transform,
-              alignment: Alignment.center,
-              child: SmoothImage(
-                image: bg,
-                fit: BoxFit.cover,
-                placeholderColor: HonooColor.background,
-              ),
-            ),
+            child: transform.isIdentity()
+                ? SmoothImage(
+                    image: bg,
+                    fit: BoxFit.cover,
+                    placeholderColor: HonooColor.background,
+                  )
+                : CoverTransformImage.transformed(
+                    key: const ValueKey('hinoo-saved-background-transform'),
+                    image: bg,
+                    transform: transform,
+                  ),
           ),
           Positioned.fill(
             top: gap / 2,
