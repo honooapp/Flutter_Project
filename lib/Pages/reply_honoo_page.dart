@@ -11,7 +11,7 @@ import '../Entities/honoo.dart';
 import '../Entities/conversation_link.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
-import 'home_page.dart';
+import 'chest_page.dart';
 
 class ReplyHonooPage extends StatefulWidget {
   final Honoo originalHonoo;
@@ -97,14 +97,20 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
       if (!mounted) return;
 
       _sentOnce = true;
-      await showHonooMessageDialog(
-        context,
-        message:
-            "L'honoo adesso è nel tuo Scrigno,\n e,\n soprattutto,\nnello Scrigno di qualcun altro.",
-      );
+      await showReplySavedDialog(context, contentName: 'honoo');
       if (!mounted) return;
+      if (widget.returnToPreviousOnAnswer) {
+        Navigator.of(context).pop(link.conversationId);
+        return;
+      }
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const HomePage()),
+        MaterialPageRoute(
+          builder: (_) => ChestPage(
+            focusReplies: true,
+            focusConversationId: link.conversationId,
+            highlightLatest: true,
+          ),
+        ),
         (route) => false,
       );
     } catch (e) {

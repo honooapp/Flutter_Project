@@ -50,7 +50,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   List<ConversationEntry> _entries = const [];
   RealtimeChannel? _chan;
   bool _didHighlight = false;
-  bool _hasPlayedReveal = false;
+  String? _revealedEntryKey;
   final PageController _pageController = PageController();
   late AnimationController _controller;
   late Animation<double> _liftAnimation;
@@ -166,7 +166,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
       _chan?.unsubscribe();
       _chan = null;
       _didHighlight = false;
-      _hasPlayedReveal = false;
+      _revealedEntryKey = null;
       _load();
     }
     if (oldWidget.refreshToken != widget.refreshToken &&
@@ -179,7 +179,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
       if (widget.isActive && !oldWidget.isActive) {
         _load();
       } else if (!widget.isActive && oldWidget.isActive) {
-        _hasPlayedReveal = false;
+        _revealedEntryKey = null;
         _controller.reset();
       }
     }
@@ -208,8 +208,9 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
         _pageController.jumpToPage(targetPage);
       }
       final entry = _entries.reversed.elementAt(targetPage);
-      if (!_hasPlayedReveal && _shouldReveal(entry)) {
-        _hasPlayedReveal = true;
+      final entryKey = '${entry.kind.name}:${entry.id}';
+      if (_revealedEntryKey != entryKey && _shouldReveal(entry)) {
+        _revealedEntryKey = entryKey;
         _controller.forward(from: 0);
       }
     });
@@ -317,9 +318,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
         controller: _pageController,
         scrollDirection: Axis.vertical,
         pageSnapping: true,
-        physics: const PageScrollPhysics(
-          parent: ClampingScrollPhysics(),
-        ),
+        physics: const PageScrollPhysics(parent: ClampingScrollPhysics()),
         onPageChanged: _prefetchEntriesFrom,
         itemCount: _entries.length,
         itemBuilder: (context, index) {

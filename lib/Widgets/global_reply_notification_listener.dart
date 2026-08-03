@@ -8,6 +8,7 @@ import '../Pages/chest_page.dart';
 import '../Services/reply_system_notification.dart';
 import '../Services/supabase_provider.dart';
 import '../Utility/replies_seen_tracker.dart';
+import '../Utility/reply_notification_signal.dart';
 
 class GlobalReplyNotificationListener extends StatefulWidget {
   const GlobalReplyNotificationListener({
@@ -37,8 +38,10 @@ class _GlobalReplyNotificationListenerState
       widget.systemNotification ?? ReplySystemNotification.platform();
   StreamSubscription<AuthState>? _authSubscription;
   StreamSubscription<ReplyNotificationEvent>? _replyEventSubscription;
-  RealtimeChannel? _honooChannel;
-  RealtimeChannel? _hinooChannel;
+  RealtimeChannel? _replyChannel;
+  Timer? _reconnectTimer;
+  int _reconnectAttempt = 0;
+  int _channelGeneration = 0;
   String? _activeUserId;
   String? _lastEventKey;
   DateTime? _lastEventAt;
@@ -55,7 +58,7 @@ class _GlobalReplyNotificationListenerState
     if (!oldWidget.enabled && widget.enabled) {
       _start();
     } else if (oldWidget.enabled && !widget.enabled) {
-      _stopChannels();
+      _stop();
     }
   }
 
@@ -75,46 +78,82 @@ class _GlobalReplyNotificationListenerState
 
   void _handleSession(Session? session) {
     final userId = session?.user.id;
-    if (userId == _activeUserId) return;
-    _stopChannels();
-    _activeUserId = userId;
-    if (userId == null) return;
-
     final accessToken = session?.accessToken;
     if (accessToken != null) {
       SupabaseProvider.client.realtime.setAuth(accessToken);
     }
-    try {
-      _honooChannel = SupabaseProvider.client.channel('reply-honoo-$userId')
-        ..on(
-          RealtimeListenTypes.postgresChanges,
-          ChannelFilter(
-            event: 'INSERT',
-            schema: 'public',
-            table: 'honoo',
-            filter: 'recipient_tag=eq.$userId',
-          ),
-          (dynamic payload, [dynamic _]) =>
-              _handlePayload(payload, ReplyNotificationKind.honoo, userId),
-        )
-        ..subscribe();
-      _hinooChannel = SupabaseProvider.client.channel('reply-hinoo-$userId')
-        ..on(
-          RealtimeListenTypes.postgresChanges,
-          ChannelFilter(
-            event: 'INSERT',
-            schema: 'public',
-            table: 'hinoo',
-            filter: 'recipient_tag=eq.$userId',
-          ),
-          (dynamic payload, [dynamic _]) =>
-              _handlePayload(payload, ReplyNotificationKind.hinoo, userId),
-        )
-        ..subscribe();
-    } catch (_) {
-      _stopChannels();
-      _activeUserId = userId;
+    if (userId == _activeUserId) {
+      if (userId != null && _replyChannel == null) {
+        _connectChannels(userId);
+      }
+      return;
     }
+    _closeRealtime(clearUser: false);
+    _activeUserId = userId;
+    if (userId == null) return;
+    _connectChannels(userId);
+  }
+
+  void _connectChannels(String userId) {
+    _reconnectTimer?.cancel();
+    final generation = ++_channelGeneration;
+    try {
+      final channel =
+          SupabaseProvider.client.channel('reply-events-$userId-$generation')
+            ..on(
+              RealtimeListenTypes.postgresChanges,
+              ChannelFilter(
+                event: 'INSERT',
+                schema: 'public',
+                table: 'honoo',
+                filter: 'recipient_tag=eq.$userId',
+              ),
+              (dynamic payload, [dynamic _]) =>
+                  _handlePayload(payload, ReplyNotificationKind.honoo, userId),
+            )
+            ..on(
+              RealtimeListenTypes.postgresChanges,
+              ChannelFilter(
+                event: 'INSERT',
+                schema: 'public',
+                table: 'hinoo',
+                filter: 'recipient_tag=eq.$userId',
+              ),
+              (dynamic payload, [dynamic _]) =>
+                  _handlePayload(payload, ReplyNotificationKind.hinoo, userId),
+            );
+      _replyChannel = channel;
+      channel.subscribe((status, [error]) {
+        if (!mounted || generation != _channelGeneration) return;
+        if (status == 'SUBSCRIBED') {
+          _reconnectAttempt = 0;
+          _reconnectTimer?.cancel();
+          return;
+        }
+        if (status == 'CHANNEL_ERROR' ||
+            status == 'CLOSED' ||
+            status == 'TIMED_OUT') {
+          _scheduleReconnect(userId);
+        }
+      });
+    } catch (_) {
+      _replyChannel = null;
+      _scheduleReconnect(userId);
+    }
+  }
+
+  void _scheduleReconnect(String userId) {
+    if (_activeUserId != userId || _reconnectTimer?.isActive == true) return;
+    final cappedAttempt = _reconnectAttempt > 5 ? 5 : _reconnectAttempt;
+    final seconds = 1 << cappedAttempt;
+    _reconnectAttempt += 1;
+    _reconnectTimer = Timer(Duration(seconds: seconds), () {
+      if (!mounted || _activeUserId != userId) return;
+      final staleChannel = _replyChannel;
+      _replyChannel = null;
+      staleChannel?.unsubscribe();
+      _connectChannels(userId);
+    });
   }
 
   void _handlePayload(
@@ -134,7 +173,8 @@ class _GlobalReplyNotificationListenerState
 
   void _handleEvent(ReplyNotificationEvent event) {
     final now = DateTime.now();
-    final eventKey = '${event.kind.name}:${event.conversationId}';
+    final eventKey =
+        '${event.kind.name}:${event.replyId ?? event.conversationId}';
     if (_lastEventKey == eventKey &&
         _lastEventAt != null &&
         now.difference(_lastEventAt!) < const Duration(seconds: 2)) {
@@ -142,6 +182,7 @@ class _GlobalReplyNotificationListenerState
     }
     _lastEventKey = eventKey;
     _lastEventAt = now;
+    ReplyNotificationSignal.notifyChanged();
 
     void open() => _openConversation(event.conversationId);
     _systemNotification.show(
@@ -178,20 +219,27 @@ class _GlobalReplyNotificationListenerState
     );
   }
 
-  void _stopChannels() {
+  void _closeRealtime({bool clearUser = true}) {
+    _reconnectTimer?.cancel();
+    _reconnectTimer = null;
+    _channelGeneration += 1;
+    _replyChannel?.unsubscribe();
+    _replyChannel = null;
+    _reconnectAttempt = 0;
+    if (clearUser) _activeUserId = null;
+  }
+
+  void _stop() {
     _replyEventSubscription?.cancel();
     _replyEventSubscription = null;
-    _honooChannel?.unsubscribe();
-    _hinooChannel?.unsubscribe();
-    _honooChannel = null;
-    _hinooChannel = null;
-    _activeUserId = null;
+    _authSubscription?.cancel();
+    _authSubscription = null;
+    _closeRealtime();
   }
 
   @override
   void dispose() {
-    _stopChannels();
-    _authSubscription?.cancel();
+    _stop();
     super.dispose();
   }
 

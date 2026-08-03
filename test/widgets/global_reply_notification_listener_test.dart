@@ -6,6 +6,7 @@ import 'package:honoo/Entities/reply_notification_event.dart';
 import 'package:honoo/Pages/chest_page.dart';
 import 'package:honoo/Services/reply_system_notification.dart';
 import 'package:honoo/Widgets/global_reply_notification_listener.dart';
+import 'package:honoo/Utility/reply_notification_signal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../test_supabase_helper.dart';
@@ -59,6 +60,7 @@ void main() {
     (tester) async {
       final navigatorKey = GlobalKey<NavigatorState>();
       final notification = _FakeReplySystemNotification();
+      final initialRevision = ReplyNotificationSignal.revision.value;
 
       await tester.pumpWidget(
         GlobalReplyNotificationListener(
@@ -85,6 +87,10 @@ void main() {
       expect(notification.contentLabel, 'hinoo');
       expect(notification.conversationId, 'conversation-42');
       expect(notification.onTap, isNotNull);
+      expect(
+        ReplyNotificationSignal.revision.value,
+        greaterThan(initialRevision),
+      );
       expect(
         find.text('Hai ricevuto una risposta al tuo hinoo'),
         findsOneWidget,

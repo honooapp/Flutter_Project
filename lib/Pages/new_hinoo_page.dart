@@ -332,14 +332,21 @@ class _NewHinooPageState extends State<NewHinooPage>
       final bool isAnswer =
           (hinooDraft.type == HinooType.answer) || widget.isReply;
       if (isAnswer) {
-        await showHonooMessageDialog(
-          context,
-          message:
-              "L'hinoo adesso è nel tuo Scrigno,\n e,\n soprattutto,\n nello Scrigno di qualcun altro.",
-        );
+        await showReplySavedDialog(context, contentName: 'hinoo');
         if (!mounted) return;
+        final conversationId = hinooDraft.conversationId;
+        if (widget.returnToPreviousOnAnswer) {
+          Navigator.of(context).pop(conversationId);
+          return;
+        }
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const HomePage()),
+          MaterialPageRoute(
+            builder: (_) => ChestPage(
+              focusReplies: true,
+              focusConversationId: conversationId,
+              highlightLatest: true,
+            ),
+          ),
           (route) => false,
         );
         return;

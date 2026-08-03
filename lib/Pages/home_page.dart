@@ -7,6 +7,7 @@ import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Services/home_service.dart';
 import 'package:honoo/Utility/app_logger.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Utility/reply_notification_signal.dart';
 import '../Widgets/honoo_app_title.dart';
 import 'placeholder_page.dart';
 
@@ -38,11 +39,13 @@ class _HomePageState extends State<HomePage> {
       const Duration(seconds: 60),
       (_) => _loadReplyCount(),
     );
+    ReplyNotificationSignal.revision.addListener(_loadReplyCount);
   }
 
   @override
   void dispose() {
     _replyRefreshTimer?.cancel();
+    ReplyNotificationSignal.revision.removeListener(_loadReplyCount);
     super.dispose();
   }
 
