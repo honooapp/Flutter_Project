@@ -1,5 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'reply_notification_signal.dart';
+
 class RepliesSeenTracker {
   static const _key = 'last_seen_reply_at_v1';
 
@@ -13,11 +15,12 @@ class RepliesSeenTracker {
   static Future<void> markNow() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_key, DateTime.now().toIso8601String());
+    ReplyNotificationSignal.notifyChanged();
   }
 
   static Future<void> markAt(DateTime dt) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_key, dt.toIso8601String());
+    ReplyNotificationSignal.notifyChanged();
   }
 }
-

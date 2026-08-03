@@ -235,6 +235,19 @@ Future<void> showHonooMessageDialog(
   );
 }
 
+Future<void> showReplySavedDialog(
+  BuildContext context, {
+  required String contentName,
+}) {
+  return showHonooMessageDialog(
+    context,
+    message:
+        'Il tuo $contentName è nel tuo Scrigno,\n'
+        'ma soprattutto,\n'
+        'in quello di qualcun altro.',
+  );
+}
+
 void showHonooToast(
   BuildContext context, {
   required String message,

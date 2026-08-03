@@ -125,6 +125,77 @@ void main() {
     expect(find.byType(PageView), findsNothing);
   });
 
+  testWidgets('una nuova risposta riavvia il reveal dopo il refresh', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(600, 900);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final root = ConversationEntry.honoo(
+      honoo(
+        id: 'root-refresh',
+        text: 'Padre aggiornato',
+        owner: 'me',
+        createdAt: '2026-07-20T10:00:00Z',
+      ),
+    );
+    final firstReply = ConversationEntry.honoo(
+      honoo(
+        id: 'reply-refresh-1',
+        text: 'Prima risposta',
+        owner: 'other',
+        createdAt: '2026-07-20T11:00:00Z',
+        type: HonooType.answer,
+        replyTo: 'root-refresh',
+      ),
+    );
+    final secondReply = ConversationEntry.honoo(
+      honoo(
+        id: 'reply-refresh-2',
+        text: 'Seconda risposta appena salvata',
+        owner: 'me',
+        createdAt: '2026-07-20T12:00:00Z',
+        type: HonooType.answer,
+        replyTo: 'reply-refresh-1',
+      ),
+    );
+    var entries = [root, firstReply];
+
+    Widget app(int refreshToken) => MaterialApp(
+      home: Scaffold(
+        body: UnifiedThreadView(
+          key: const Key('refreshable-thread'),
+          conversationId: 'conversation-1',
+          maxWidth: 600,
+          maxHeight: 700,
+          isActive: true,
+          currentUserId: 'me',
+          refreshToken: refreshToken,
+          conversationLoader: (_) async => entries,
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(app(0));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1000));
+
+    entries = [root, firstReply, secondReply];
+    await tester.pumpWidget(app(1));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump(const Duration(milliseconds: 350));
+
+    expect(find.text('Seconda risposta appena salvata'), findsOneWidget);
+    final foreground = tester.widget<Transform>(
+      find.byKey(const Key('reply_reveal_foreground')),
+    );
+    expect(foreground.transform.getTranslation().y, lessThan(0));
+    expect(find.byKey(const Key('reply_reveal_parent')), findsOneWidget);
+  });
+
   testWidgets('un errore di conversazione mostra Riprova', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

@@ -190,14 +190,6 @@ class _NewHonooPageState extends State<NewHonooPage> {
         _lastSavedRawImage = _imageUrl;
       });
 
-      if (openChestAfterSave) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const ChestPage()),
-          (route) => false,
-        );
-        return true;
-      }
-
       final bool shouldOfferNotifications =
           type == HonooType.personal &&
           await ConversationNotificationPrompt.shouldOfferForFirstConversation(
@@ -211,14 +203,28 @@ class _NewHonooPageState extends State<NewHonooPage> {
       }
 
       if (type == HonooType.answer) {
-        await showHonooMessageDialog(
-          context,
-          message:
-              "L'honoo adesso è nel tuo Scrigno, e, soprattutto nello Scrigno di quacun altro.",
-        );
+        await showReplySavedDialog(context, contentName: 'honoo');
         if (!mounted) return false;
+        if (widget.returnToPreviousOnAnswer) {
+          Navigator.of(context).pop(conversationId);
+          return true;
+        }
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const HomePage()),
+          MaterialPageRoute(
+            builder: (_) => ChestPage(
+              focusReplies: true,
+              focusConversationId: conversationId,
+              highlightLatest: true,
+            ),
+          ),
+          (route) => false,
+        );
+        return true;
+      }
+
+      if (openChestAfterSave) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const ChestPage()),
           (route) => false,
         );
         return true;
