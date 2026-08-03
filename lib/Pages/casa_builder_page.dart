@@ -230,7 +230,15 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
                 style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
               ),
               const SizedBox(height: 22),
-              const Icon(Icons.photo, size: 48, color: Colors.white),
+              SvgPicture.asset(
+                'assets/icons/immagine.svg',
+                width: 48,
+                height: 48,
+                colorFilter: const ColorFilter.mode(
+                  Colors.white,
+                  BlendMode.srcIn,
+                ),
+              ),
             ],
           ),
         ),

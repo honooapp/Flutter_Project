@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/UI/hinoo_typography.dart';
+import 'package:honoo/Widgets/cover_transform_image.dart';
 
 class AnteprimaHinoo extends StatelessWidget {
   const AnteprimaHinoo({
@@ -232,10 +233,9 @@ class _ThumbTile extends StatelessWidget {
     Widget buildBackground() {
       final image = Image(image: bgProvider, fit: BoxFit.cover);
       if (effectiveTransform == null) return image;
-      return Transform(
+      return CoverTransformImage.transformed(
+        image: bgProvider,
         transform: effectiveTransform,
-        alignment: Alignment.center,
-        child: image,
       );
     }
 

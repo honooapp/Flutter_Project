@@ -531,6 +531,30 @@ class _NewHinooPageState extends State<NewHinooPage>
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Tooltip(
+                  message: 'Sostituisci immagine',
+                  preferBelow: false,
+                  child: IconButton(
+                    key: const Key('hinoo-replace-editing-image'),
+                    onPressed: _replaceEditorImage,
+                    padding: EdgeInsets.zero,
+                    iconSize: secondaryActionIconSize,
+                    color: HonooColor.onBackground,
+                    icon: SvgPicture.asset(
+                      'assets/icons/immagine.svg',
+                      width: secondaryActionIconSize,
+                      height: secondaryActionIconSize,
+                      colorFilter: const ColorFilter.mode(
+                        HonooColor.onBackground,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: Tooltip(
                   message: 'Salva immagine',
                   preferBelow: false,
                   child: IconButton(
@@ -550,23 +574,9 @@ class _NewHinooPageState extends State<NewHinooPage>
                 ),
               ),
             ),
-            Expanded(
-              child: Center(
-                child: Tooltip(
-                  message: 'Sostituisci immagine',
-                  preferBelow: false,
-                  child: IconButton(
-                    key: const Key('hinoo-replace-editing-image'),
-                    onPressed: _replaceEditorImage,
-                    padding: EdgeInsets.zero,
-                    iconSize: secondaryActionIconSize,
-                    color: HonooColor.onBackground,
-                    icon: const Icon(Icons.photo_library_outlined),
-                  ),
-                ),
-              ),
+            const Expanded(
+              child: SizedBox(key: Key('hinoo-editor-right-empty-slot')),
             ),
-            const Expanded(child: SizedBox.shrink()),
           ],
         ),
       ),
@@ -799,16 +809,15 @@ class _NewHinooPageState extends State<NewHinooPage>
                           ),
                         if (_isWriteStep)
                           ResponsiveFooterAction(
-                            asset: "assets/icons/piuma.svg",
+                            asset: 'assets/icons/download.svg',
                             semanticsLabel: 'Download',
                             size: footerIconSize,
                             splashRadius: 25,
                             tooltip: 'Salva sul dispositivo',
                             onPressed: _handleDownloadTap,
-                            icon: Icon(
-                              Icons.download_outlined,
-                              size: footerIconSize,
-                              color: HonooColor.onBackground,
+                            colorFilter: const ColorFilter.mode(
+                              HonooColor.onBackground,
+                              BlendMode.srcIn,
                             ),
                           ),
                       ],
