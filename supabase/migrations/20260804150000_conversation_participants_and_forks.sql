@@ -17,7 +17,7 @@ as $$
         h.user_id = auth.uid()
         or h.recipient_tag = auth.uid()::text
         or h.recipient_tag in (
-          select u.address from public.users u where u.auth_id = auth.uid()
+          select u.address from public.users u where u.auth_user_id = auth.uid()
         )
       )
     union all
@@ -28,7 +28,7 @@ as $$
         x.user_id = auth.uid()
         or x.recipient_tag = auth.uid()::text
         or x.recipient_tag in (
-          select u.address from public.users u where u.auth_id = auth.uid()
+          select u.address from public.users u where u.auth_user_id = auth.uid()
         )
       )
   );
