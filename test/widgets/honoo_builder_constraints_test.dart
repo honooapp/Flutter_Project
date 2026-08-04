@@ -4,8 +4,9 @@ import 'package:honoo/UI/honoo_builder.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
 
 void main() {
-  testWidgets('contatore e input Honoo si fermano a 144 caratteri',
-      (tester) async {
+  testWidgets('contatore e input Honoo si fermano a 144 caratteri', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
@@ -33,6 +34,29 @@ void main() {
       HonooBuilder.maxTextCharacters,
     );
     expect(find.text('144/144'), findsOneWidget);
+  });
+
+  testWidgets('applica le sostituzioni tipografiche nell editor Honoo', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 500,
+            height: 760,
+            child: HonooBuilder(showDownloadButton: false),
+          ),
+        ),
+      ),
+    );
+
+    final field = find.byType(EditableText);
+    await tester.enterText(field, '-- ... << >>\n');
+    await tester.pump();
+
+    final editable = tester.widget<EditableText>(field);
+    expect(editable.controller.text, '— … « »\n');
   });
 
   test('OK immagine mantiene la stessa dimensione visiva del footer', () {

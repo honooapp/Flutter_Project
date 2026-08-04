@@ -60,8 +60,13 @@ void main() {
       final tf = find.byType(TextField).first;
       expect(tf, findsOneWidget);
 
-      await tester.enterText(tf, '“risposta di prova”');
+      await tester.enterText(tf, '-- risposta ... << prova >>\n');
       await tester.pump();
+
+      expect(
+        tester.widget<TextField>(tf).controller?.text,
+        '— risposta … « prova »\n',
+      );
 
       final sendButton = find.bySemanticsLabel('Invia risposta');
       expect(sendButton, findsOneWidget);
@@ -87,7 +92,6 @@ void main() {
 
       expect(find.byType(ChestPage), findsOneWidget);
       expect(find.byType(ReplyHonooPage), findsNothing);
-
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump(const Duration(seconds: 25));
     },
