@@ -23,9 +23,10 @@ class ChestState {
   }) : hinoo = List.unmodifiable(hinoo),
        honooLatestReplies = Map.unmodifiable(honooLatestReplies),
        hinooLatestReplies = Map.unmodifiable(hinooLatestReplies),
-       hinooRepliesByRoot = Map.unmodifiable(
-         hinooRepliesByRoot.map(
-           (key, value) => MapEntry(key, List.unmodifiable(value)),
+       hinooRepliesByRoot = Map<String, List<HinooThreadEntry>>.unmodifiable(
+         hinooRepliesByRoot.map<String, List<HinooThreadEntry>>(
+           (key, value) =>
+               MapEntry(key, List<HinooThreadEntry>.unmodifiable(value)),
          ),
        );
 
@@ -368,15 +369,19 @@ class ChestController extends ValueNotifier<ChestState> {
       }
       final seenHonooKeys = <String>{};
       for (final row in honooRows.whereType<Map>()) {
-        final rootId = row['reply_to']?.toString() ?? '';
-        if (rootId.isEmpty) continue;
+        final conversationId = row['conversation_id']?.toString() ?? '';
+        final replyTo = row['reply_to']?.toString() ?? '';
+        final activityKey = conversationId.isNotEmpty
+            ? conversationId
+            : replyTo;
+        if (activityKey.isEmpty) continue;
         final createdRaw = (row['created_at'] ?? '').toString();
-        final key = '$rootId|$createdRaw';
+        final key = '$activityKey|$createdRaw';
         if (!seenHonooKeys.add(key)) continue;
         final created = DateTime.tryParse(createdRaw) ?? DateTime.now();
-        final existing = honooLatest[rootId];
+        final existing = honooLatest[activityKey];
         if (existing == null || created.isAfter(existing)) {
-          honooLatest[rootId] = created;
+          honooLatest[activityKey] = created;
         }
       }
 
@@ -396,6 +401,8 @@ class ChestController extends ValueNotifier<ChestState> {
         final id = row['id']?.toString() ?? '';
         if (id.isNotEmpty && !seenHinooIds.add(id)) continue;
         final rootId = row['reply_to']?.toString() ?? '';
+        final conversationId = row['conversation_id']?.toString() ?? '';
+        final activityKey = conversationId.isNotEmpty ? conversationId : rootId;
         final pages = row['pages'];
         if (rootId.isEmpty || pages is! List) continue;
         final created =
@@ -411,7 +418,7 @@ class ChestController extends ValueNotifier<ChestState> {
           replyTo: rootId,
         );
         hinooReplies
-            .putIfAbsent(rootId, () => [])
+            .putIfAbsent(rootId, () => <HinooThreadEntry>[])
             .add(
               HinooThreadEntry(
                 draft: draft,
@@ -420,9 +427,9 @@ class ChestController extends ValueNotifier<ChestState> {
                 createdAt: created,
               ),
             );
-        final existing = hinooLatest[rootId];
+        final existing = hinooLatest[activityKey];
         if (existing == null || created.isAfter(existing)) {
-          hinooLatest[rootId] = created;
+          hinooLatest[activityKey] = created;
         }
       }
 

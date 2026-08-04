@@ -12,6 +12,7 @@ import 'package:honoo/Services/hinoo_service.dart';
 import '../Entities/hinoo.dart';
 import '../Entities/honoo.dart';
 import '../Entities/conversation_link.dart';
+import '../Entities/reply_navigation_result.dart';
 import 'home_page.dart';
 import '../UI/hinoo_viewer.dart';
 import '../UI/hinoo_typography.dart';
@@ -697,7 +698,7 @@ class _MoonPageState extends State<MoonPage> {
     if (choice == null || !mounted) return;
     if (choice == _ReplyChoice.honoo && current.honoo != null) {
       if (!await _ensureMoonItemInChest(current) || !mounted) return;
-      final conversationId = await Navigator.push<String>(
+      final result = await Navigator.push<Object?>(
         context,
         MaterialPageRoute(
           builder: (_) => ReplyHonooPage(
@@ -709,7 +710,7 @@ class _MoonPageState extends State<MoonPage> {
         ),
       );
       if (!mounted) return;
-      await _openConversationAfterReply(current, conversationId);
+      await _openConversationAfterReply(current, result);
     } else if (choice == _ReplyChoice.honoo && current.hinoo != null) {
       // Risposta ad un hinoo con un honoo
       final parentId = current.hinooId;
@@ -722,7 +723,7 @@ class _MoonPageState extends State<MoonPage> {
         recipientId: recipientId,
       );
       if (!await _ensureMoonItemInChest(current) || !mounted) return;
-      final conversationId = await Navigator.push<String>(
+      final result = await Navigator.push<Object?>(
         context,
         MaterialPageRoute(
           builder: (_) => NewHonooPage(
@@ -735,7 +736,7 @@ class _MoonPageState extends State<MoonPage> {
         ),
       );
       if (!mounted) return;
-      await _openConversationAfterReply(current, conversationId);
+      await _openConversationAfterReply(current, result);
     } else if (choice == _ReplyChoice.hinoo && current.hinoo != null) {
       final String? replyTo = current.hinooId;
       if (replyTo == null || replyTo.isEmpty) return;
@@ -747,7 +748,7 @@ class _MoonPageState extends State<MoonPage> {
         recipientId: recipientId,
       );
       if (!await _ensureMoonItemInChest(current) || !mounted) return;
-      final conversationId = await Navigator.push<String>(
+      final result = await Navigator.push<Object?>(
         context,
         MaterialPageRoute(
           builder: (_) => NewHinooPage(
@@ -760,7 +761,7 @@ class _MoonPageState extends State<MoonPage> {
         ),
       );
       if (!mounted) return;
-      await _openConversationAfterReply(current, conversationId);
+      await _openConversationAfterReply(current, result);
     } else if (choice == _ReplyChoice.hinoo && current.honoo != null) {
       // Risposta ad un honoo con un hinoo
       final parentId = current.honoo!.dbId;
@@ -771,7 +772,7 @@ class _MoonPageState extends State<MoonPage> {
         recipientId: current.honoo!.userId,
       );
       if (!await _ensureMoonItemInChest(current) || !mounted) return;
-      final conversationId = await Navigator.push<String>(
+      final result = await Navigator.push<Object?>(
         context,
         MaterialPageRoute(
           builder: (_) => NewHinooPage(
@@ -784,14 +785,17 @@ class _MoonPageState extends State<MoonPage> {
         ),
       );
       if (!mounted) return;
-      await _openConversationAfterReply(current, conversationId);
+      await _openConversationAfterReply(current, result);
     }
   }
 
   Future<void> _openConversationAfterReply(
     _MoonItem current,
-    String? conversationId,
+    Object? result,
   ) async {
+    final navigation = result is ReplyNavigationResult ? result : null;
+    final conversationId =
+        navigation?.conversationId ?? (result is String ? result : null);
     if (conversationId == null || conversationId.isEmpty || !mounted) return;
     final id = current.honoo?.dbId ?? current.hinooId;
     if (id != null && id.isNotEmpty) {
@@ -803,6 +807,7 @@ class _MoonPageState extends State<MoonPage> {
         builder: (_) => ChestPage(
           focusReplies: true,
           focusConversationId: conversationId,
+          focusReplyId: navigation?.replyId,
           highlightLatest: true,
         ),
       ),

@@ -9,6 +9,7 @@ import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
 import '../Entities/honoo.dart';
 import '../Entities/conversation_link.dart';
+import '../Entities/reply_navigation_result.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
 import 'chest_page.dart';
@@ -107,7 +108,12 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
       await showReplySavedDialog(context, contentName: 'honoo');
       if (!mounted) return;
       if (widget.returnToPreviousOnAnswer) {
-        Navigator.of(context).pop(link.conversationId);
+        Navigator.of(context).pop(
+          ReplyNavigationResult(
+            conversationId: link.conversationId,
+            replyId: replyId,
+          ),
+        );
         return;
       }
       Navigator.of(context).pushAndRemoveUntil(

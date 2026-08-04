@@ -150,7 +150,12 @@ class ChestItemView extends StatelessWidget {
     isActive: isActive,
     onSelect: onSelectConversationEntry,
     highlightLatest: highlightLatest && focusConversationId == conversationId,
-    revealEntryId: focusConversationId == conversationId ? revealEntryId : null,
+    revealEntryId:
+        isActive &&
+            (focusConversationId == null ||
+                focusConversationId == conversationId)
+        ? revealEntryId
+        : null,
     onDownloadTap: onDownload,
     refreshToken: conversationRefreshToken,
   );

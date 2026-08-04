@@ -21,6 +21,7 @@ import 'email_login_page.dart';
 import 'home_page.dart';
 import 'placeholder_page.dart';
 import '../Entities/hinoo.dart';
+import '../Entities/reply_navigation_result.dart';
 import 'casa_builder_page.dart';
 import '../Widgets/conversation_notification_prompt.dart';
 
@@ -320,7 +321,11 @@ class _NewHinooPageState extends State<NewHinooPage>
         return;
       }
 
-      final savedHinooId = await _controller.saveToChest(hinooDraft);
+      final bool isAnswer =
+          (hinooDraft.type == HinooType.answer) || widget.isReply;
+      final savedHinooId = isAnswer
+          ? await _controller.saveToChestAndReturnId(hinooDraft)
+          : await _controller.saveToChest(hinooDraft);
       if (!mounted) return;
       setState(() => _savedToChest = true);
       _chestBounceController.forward(from: 0);
@@ -328,14 +333,17 @@ class _NewHinooPageState extends State<NewHinooPage>
         await ConversationNotificationPrompt.show(context);
         if (!mounted) return;
       }
-      final bool isAnswer =
-          (hinooDraft.type == HinooType.answer) || widget.isReply;
       if (isAnswer) {
         await showReplySavedDialog(context, contentName: 'hinoo');
         if (!mounted) return;
         final conversationId = hinooDraft.conversationId;
         if (widget.returnToPreviousOnAnswer) {
-          Navigator.of(context).pop(conversationId);
+          Navigator.of(context).pop(
+            ReplyNavigationResult(
+              conversationId: conversationId!,
+              replyId: savedHinooId,
+            ),
+          );
           return;
         }
         Navigator.of(context).pushAndRemoveUntil(
@@ -443,7 +451,7 @@ class _NewHinooPageState extends State<NewHinooPage>
     final HinooType type = widget.isCampanello
         ? HinooType.personal
         : (widget.forcedType ??
-            (widget.isReply ? HinooType.answer : HinooType.personal));
+              (widget.isReply ? HinooType.answer : HinooType.personal));
 
     // Se è una risposta e non è stato passato esplicitamente un conversationId,
     // usa replyTo come conversationId per garantire il raggruppamento.

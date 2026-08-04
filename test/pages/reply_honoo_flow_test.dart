@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Pages/chest_page.dart';
 import 'package:honoo/Pages/reply_honoo_page.dart';
 import 'package:honoo/Entities/honoo.dart';
+import 'package:honoo/Entities/reply_navigation_result.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sizer/sizer.dart';
@@ -95,7 +96,7 @@ void main() {
   testWidgets(
     'ReplyHonooPage: nello Scrigno restituisce la conversazione aggiornata',
     (tester) async {
-      final result = ValueNotifier<String?>(null);
+      final result = ValueNotifier<ReplyNavigationResult?>(null);
       final original = Honoo(
         1,
         '“Testo origine”',
@@ -114,14 +115,15 @@ void main() {
                 builder: (context) => Scaffold(
                   body: ElevatedButton(
                     onPressed: () async {
-                      result.value = await Navigator.of(context).push<String>(
-                        MaterialPageRoute(
-                          builder: (_) => ReplyHonooPage(
-                            originalHonoo: original,
-                            returnToPreviousOnAnswer: true,
-                          ),
-                        ),
-                      );
+                      result.value = await Navigator.of(context)
+                          .push<ReplyNavigationResult>(
+                            MaterialPageRoute(
+                              builder: (_) => ReplyHonooPage(
+                                originalHonoo: original,
+                                returnToPreviousOnAnswer: true,
+                              ),
+                            ),
+                          );
                     },
                     child: const Text('Rispondi'),
                   ),
@@ -145,7 +147,8 @@ void main() {
       ).pop();
       await tester.pumpAndSettle();
 
-      expect(result.value, '1');
+      expect(result.value?.conversationId, '1');
+      expect(result.value?.replyId, 'reply-1');
       expect(find.byType(ReplyHonooPage), findsNothing);
       expect(find.text('Rispondi'), findsOneWidget);
     },

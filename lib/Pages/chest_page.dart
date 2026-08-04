@@ -17,10 +17,12 @@ import '../Entities/honoo.dart';
 import '../Entities/hinoo.dart';
 import '../Entities/chest_item.dart';
 import '../Entities/hinoo_thread_entry.dart';
+import '../Entities/reply_navigation_result.dart';
 
 import '../Utility/honoo_colors.dart';
 import '../Utility/responsive_layout.dart';
 import '../Utility/network_image_prefetch.dart';
+import '../Utility/replies_seen_tracker.dart';
 
 import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/loading_spinner.dart';
@@ -78,6 +80,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
   int _currentIndex = 0;
   bool _didApplyInitialFocus = false;
   int _conversationRefreshToken = 0;
+  String? _pendingRevealEntryId;
   Object? _honooLoadError;
   bool _isMutating = false;
   bool _isReconciling = false;
@@ -111,9 +114,30 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
     );
   }
 
+  void _selectConversationEntry(ConversationEntry entry) {
+    setState(() => _selectedConvEntry = entry);
+    final currentUserId = SupabaseProvider.client.auth.currentUser?.id;
+    final isReply =
+        entry.honoo?.type == HonooType.answer ||
+        entry.hinoo?.type == HinooType.answer;
+    if (!isReply ||
+        currentUserId == null ||
+        entry.ownerId == currentUserId ||
+        entry.createdAt.millisecondsSinceEpoch <= 0) {
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(
+        RepliesSeenTracker.markAt(entry.createdAt, userId: currentUserId),
+      );
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _pendingRevealEntryId = widget.focusReplyId;
     WidgetsBinding.instance.addObserver(this);
     _chestController.addListener(_onChestStateChanged);
     unawaited(_initialize());
@@ -247,7 +271,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       widget.focusConversationId ?? '',
       widget.focusReplies ? '1' : '0',
       widget.highlightLatest ? '1' : '0',
-      widget.focusReplyId ?? '',
+      _pendingRevealEntryId ?? '',
       _mode.name,
       _activeConversationId ?? '',
     ].join('|');
@@ -279,8 +303,11 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       createdAtOf: (item) => item.createdAt,
       stableIdOf: _stableIdOf,
       latestReplyOf: (item) => item.when(
-        honoo: (h) => _honooLatestReplies[h.dbId ?? ''],
-        hinoo: (row) => _hinooLatestReplies[row.id],
+        honoo: (h) => _honooLatestReplies[h.conversationId ?? h.dbId ?? ''],
+        hinoo: (row) =>
+            _hinooLatestReplies[row.conversationId ??
+                row.draft.conversationId ??
+                row.id],
       ),
       conversationIdOf: _convIdOfItem,
     );
@@ -554,7 +581,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
           ),
         ),
       );
-      _refreshConversationInPlace(result is String ? result : null);
+      _refreshConversationInPlace(result);
     } else {
       final String? replyTo = current.dbId;
       if (replyTo == null || replyTo.isEmpty) return;
@@ -575,7 +602,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
           ),
         ),
       );
-      _refreshConversationInPlace(result is String ? result : null);
+      _refreshConversationInPlace(result);
     }
   }
 
@@ -616,7 +643,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
           ),
         ),
       );
-      _refreshConversationInPlace(result is String ? result : null);
+      _refreshConversationInPlace(result);
     } else {
       final String recipient =
           current.ownerId ?? current.draft.recipientTag ?? '';
@@ -639,13 +666,18 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
           ),
         ),
       );
-      _refreshConversationInPlace(result is String ? result : null);
+      _refreshConversationInPlace(result);
     }
   }
 
-  void _refreshConversationInPlace(String? conversationId) {
-    if (!mounted || conversationId == null || conversationId.isEmpty) return;
+  void _refreshConversationInPlace(Object? result) {
+    if (!mounted) return;
+    final navigation = result is ReplyNavigationResult ? result : null;
+    final conversationId =
+        navigation?.conversationId ?? (result is String ? result : null);
+    if (conversationId == null || conversationId.isEmpty) return;
     setState(() {
+      _pendingRevealEntryId = navigation?.replyId;
       _conversationRefreshToken++;
     });
   }
@@ -824,10 +856,8 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       isActive: isActive,
       highlightLatest: widget.highlightLatest,
       focusConversationId: widget.focusConversationId,
-      revealEntryId: widget.focusReplyId,
-      onSelectConversationEntry: (entry) {
-        setState(() => _selectedConvEntry = entry);
-      },
+      revealEntryId: _pendingRevealEntryId,
+      onSelectConversationEntry: _selectConversationEntry,
       onDownload: () => _handleDownloadForItem(item, repaintKey),
       conversationRefreshToken: _conversationRefreshToken,
     );

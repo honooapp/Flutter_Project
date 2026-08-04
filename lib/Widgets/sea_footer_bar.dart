@@ -7,8 +7,6 @@ import 'package:honoo/Widgets/composer_onboarding.dart';
 // Pagine per la navigazione (come in HomePage)
 import 'package:honoo/IsolaDelleStorie/Pages/island_page.dart';
 import 'package:honoo/Pages/chest_page.dart';
-import 'package:honoo/Utility/replies_seen_tracker.dart';
-import 'package:honoo/Services/supabase_provider.dart';
 
 /// Barra “mare” riutilizzabile con onde + isola (sx) + scrigno (centro) + bottiglia (dx)
 /// Posizioni, dimensioni e z-order identici alla HomePage.
@@ -186,12 +184,6 @@ class SeaFooterBar extends StatelessWidget {
                         splashRadius: 40,
                         tooltip: 'Apri il tuo Cuore',
                         onPressed: () {
-                          if (replyCount > 0) {
-                            RepliesSeenTracker.markNow(
-                              userId:
-                                  SupabaseProvider.client.auth.currentUser?.id,
-                            );
-                          }
                           Navigator.push(
                             context,
                             MaterialPageRoute(
