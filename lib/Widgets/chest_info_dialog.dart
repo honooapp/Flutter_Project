@@ -6,32 +6,32 @@ import '../Utility/honoo_colors.dart';
 import 'honoo_dialogs.dart';
 
 const chestInfoText =
-    "Questo è il tuo Scrigno.\n\n"
+    "Questo è il tuo Scrigno\n\n"
     "Qui sono custoditi\n"
     "gli honoo e gli hinoo\n"
     "che hai scritto,\n\n"
     "quelli che hai salvato dalla Luna,\n\n"
-    "e quelli che hai ricevuto.\n\n"
+    "e quelli che hai ricevuto\n\n"
     "Blu\n"
-    "sono i tuoi.\n\n"
+    "sono i tuoi\n\n"
     "Bianco\n"
-    "quelli della Luna.\n\n"
+    "quelli della Luna\n\n"
     "Rosso\n"
-    "quelli che ti sono stati inviati.\n\n"
+    "quelli che ti sono stati inviati\n\n"
     "Scorri verso destra\n"
     "per rivedere ciò che hai scritto\n"
-    "e ciò che hai salvato.\n\n"
+    "e ciò che hai salvato\n\n"
     "Scorri dall’alto verso il basso\n"
     "per seguire\n"
-    "le conversazioni.\n\n"
+    "le conversazioni\n\n"
     "In alto\n"
-    "l’honoo della Luna.\n\n"
+    "l’honoo della Luna\n\n"
     "Sotto\n"
-    "la tua risposta.\n\n"
+    "la tua risposta\n\n"
     "E, sotto ancora,\n"
     "se arriva,\n"
     "la risposta\n"
-    "alla tua risposta.\n";
+    "alla tua risposta\n";
 
 Future<void> showChestInfoDialog(BuildContext context) => showDialog<void>(
   context: context,

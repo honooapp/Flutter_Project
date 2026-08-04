@@ -21,7 +21,7 @@ void main() {
     expect(find.byTooltip('Apri il tuo Cuore'), findsOneWidget);
   });
 
-  testWidgets('il cestino hinoo non è mostrato sopra il box di editing', (
+  testWidgets('il cestino hinoo appare nella toolbar di modifica immagine', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -33,8 +33,47 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byTooltip('Cancella hinoo'), findsNothing);
+    final dynamic pageState = tester.state(find.byType(NewHinooPage));
+    pageState.setEditorStateForTesting(step: 'changeBg', hasBackground: true);
+    await tester.pump();
+
+    expect(find.byTooltip('Cancella hinoo'), findsOneWidget);
     expect(find.byType(HinooBuilder), findsOneWidget);
+  });
+
+  testWidgets('il cestino conferma e riporta l editor hinoo allo stato vuoto', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      Sizer(
+        builder: (context, orientation, deviceType) {
+          return const MaterialApp(home: NewHinooPage());
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final dynamic pageState = tester.state(find.byType(NewHinooPage));
+    pageState.setEditorStateForTesting(
+      step: 'changeBg',
+      hasBackground: true,
+      textLength: 12,
+    );
+    await tester.pump();
+
+    await tester.tap(find.byTooltip('Cancella hinoo'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Vuoi davvero eliminare questo hinoo?'), findsOneWidget);
+    expect(find.text('L’operazione non è reversibile'), findsOneWidget);
+    expect(find.text('Sì'), findsOneWidget);
+    expect(find.text('No'), findsOneWidget);
+
+    await tester.tap(find.text('Sì'));
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Cancella hinoo'), findsNothing);
+    expect(find.byTooltip('Salva immagine'), findsNothing);
   });
 
   testWidgets('controlli immagine allineati come nell editor honoo', (
@@ -55,12 +94,10 @@ void main() {
 
     final saveImage = find.byTooltip('Salva immagine');
     final replaceImage = find.byTooltip('Sostituisci immagine');
-    final rightEmptySlot = find.byKey(
-      const Key('hinoo-editor-right-empty-slot'),
-    );
+    final deleteContent = find.byTooltip('Cancella hinoo');
     expect(saveImage, findsOneWidget);
     expect(replaceImage, findsOneWidget);
-    expect(rightEmptySlot, findsOneWidget);
+    expect(deleteContent, findsOneWidget);
     final replaceIcon = tester.widget<SvgPicture>(
       find.descendant(of: replaceImage, matching: find.byType(SvgPicture)),
     );
@@ -74,11 +111,7 @@ void main() {
     );
     expect(
       tester.getCenter(saveImage).dx,
-      lessThan(tester.getCenter(rightEmptySlot).dx),
-    );
-    expect(
-      find.descendant(of: rightEmptySlot, matching: find.byType(IconButton)),
-      findsNothing,
+      lessThan(tester.getCenter(deleteContent).dx),
     );
 
     pageState.setEditorStateForTesting(step: 'writeText', hasBackground: true);

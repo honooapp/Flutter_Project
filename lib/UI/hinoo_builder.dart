@@ -400,6 +400,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
   void reorderPagesPublic(int oldIndex, int newIndex) {}
 
   void deleteCurrentPagePublic() => _deleteCurrentPage(); // già usata
+  void clearContentPublic() => _clearContent();
   Future<void> openPreviewDialogPublic() => _openPreviewDialog();
   Future<void> openDownloadDialogPublic() => _openDownloadDialog();
   Future<void> downloadAllPagesPublic({String? baseName}) =>
@@ -633,6 +634,23 @@ class _HinooBuilderState extends State<HinooBuilder> {
         _pages[0] = _createEmptySlide();
         _current = 0;
       }
+    });
+
+    _scheduleAutosave();
+    _notifyChanged();
+  }
+
+  void _clearContent() {
+    if (_pages.isEmpty) {
+      _pages.add(_createEmptySlide());
+    }
+
+    setState(() {
+      _resetToBlankState();
+      _pages
+        ..clear()
+        ..add(_createEmptySlide());
+      _current = 0;
     });
 
     _scheduleAutosave();
