@@ -10,6 +10,7 @@ import 'package:honoo/Widgets/honoo_app_title.dart';
 import '../Entities/honoo.dart';
 import '../Entities/conversation_link.dart';
 import '../Entities/reply_navigation_result.dart';
+import '../Widgets/repeated_reply_prompt.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
 import 'chest_page.dart';
@@ -26,9 +27,11 @@ class ReplyHonooPage extends StatefulWidget {
     this.initialHintText = 'Scrivi la tua risposta',
     this.initialImageHint = 'Aggiungi un’immagine (opzionale)',
     this.returnToPreviousOnAnswer = false,
+    this.targetContentName = 'honoo',
   });
 
   final bool returnToPreviousOnAnswer;
+  final String targetContentName;
 
   @override
   State<ReplyHonooPage> createState() => _ReplyHonooPageState();
@@ -75,10 +78,25 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
 
     final String replyTarget =
         widget.originalHonoo.dbId ?? widget.originalHonoo.id.toString();
-    final link = ConversationLink.fromParent(
+    final defaultLink = ConversationLink.fromParent(
       parentId: replyTarget,
       parentConversationId: widget.originalHonoo.conversationId,
       recipientId: widget.originalHonoo.userId,
+    );
+    final conversationId = await chooseReplyConversation(
+      context: context,
+      parentId: replyTarget,
+      defaultConversationId: defaultLink.conversationId,
+      contentName: widget.targetContentName,
+    );
+    if (conversationId == null || !mounted) {
+      setState(() => _isSending = false);
+      return;
+    }
+    final link = ConversationLink(
+      replyTo: defaultLink.replyTo,
+      conversationId: conversationId,
+      recipientId: defaultLink.recipientId,
     );
     final newHonoo = Honoo(
       0,

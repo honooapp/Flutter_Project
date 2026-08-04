@@ -1,7 +1,7 @@
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/honoo.dart';
 
-enum ConversationEntryKind { honoo, hinoo }
+enum ConversationEntryKind { honoo, hinoo, deleted }
 
 class ConversationEntry {
   final ConversationEntryKind kind;
@@ -25,15 +25,16 @@ class ConversationEntry {
   });
 
   factory ConversationEntry.honoo(Honoo h) => ConversationEntry._(
-        ConversationEntryKind.honoo,
-        honoo: h,
-        createdAt: DateTime.tryParse(h.createdAt) ??
-            DateTime.fromMillisecondsSinceEpoch(0),
-        ownerId: h.userId,
-        id: h.dbId,
-        replyTo: h.replyTo,
-        isFromMoonSaved: h.isFromMoonSaved,
-      );
+    ConversationEntryKind.honoo,
+    honoo: h,
+    createdAt:
+        DateTime.tryParse(h.createdAt) ??
+        DateTime.fromMillisecondsSinceEpoch(0),
+    ownerId: h.userId,
+    id: h.dbId,
+    replyTo: h.replyTo,
+    isFromMoonSaved: h.isFromMoonSaved,
+  );
 
   factory ConversationEntry.hinoo(
     HinooDraft d, {
@@ -41,14 +42,22 @@ class ConversationEntry {
     String? ownerId,
     String? id,
     bool isFromMoonSaved = false,
-  }) =>
-      ConversationEntry._(
-        ConversationEntryKind.hinoo,
-        hinoo: d,
-        createdAt: createdAt,
-        ownerId: ownerId,
-        id: id,
-        replyTo: d.replyTo,
-        isFromMoonSaved: isFromMoonSaved,
-      );
+  }) => ConversationEntry._(
+    ConversationEntryKind.hinoo,
+    hinoo: d,
+    createdAt: createdAt,
+    ownerId: ownerId,
+    id: id,
+    replyTo: d.replyTo,
+    isFromMoonSaved: isFromMoonSaved,
+  );
+
+  factory ConversationEntry.deleted({
+    required String id,
+    required DateTime createdAt,
+  }) => ConversationEntry._(
+    ConversationEntryKind.deleted,
+    id: id,
+    createdAt: createdAt,
+  );
 }

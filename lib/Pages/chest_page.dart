@@ -516,6 +516,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
 
   Future<void> _sendConversationEntryToMoon(ConversationEntry entry) async {
     if (_isMutating) return;
+    if (entry.kind == ConversationEntryKind.deleted) return;
     setState(() => _isMutating = true);
     try {
       if (entry.kind == ConversationEntryKind.honoo) {
@@ -594,6 +595,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         context,
         MaterialPageRoute(
           builder: (context) => NewHinooPage(
+            targetContentName: 'honoo',
             forcedType: HinooType.answer,
             recipientTag: link.recipientId,
             replyTo: link.replyTo,
@@ -623,6 +625,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         context,
         MaterialPageRoute(
           builder: (context) => ReplyHonooPage(
+            targetContentName: 'hinoo',
             originalHonoo:
                 Honoo(
                     0,
@@ -658,6 +661,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         context,
         MaterialPageRoute(
           builder: (context) => NewHinooPage(
+            targetContentName: 'hinoo',
             forcedType: HinooType.answer,
             recipientTag: link.recipientId,
             replyTo: link.replyTo,

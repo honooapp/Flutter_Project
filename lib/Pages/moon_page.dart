@@ -31,7 +31,6 @@ import 'reply_honoo_page.dart';
 import 'new_hinoo_page.dart';
 import 'new_honoo_page.dart';
 import '../Controller/honoo_controller.dart';
-import '../Controller/hinoo_controller.dart';
 import '../Utility/app_logger.dart';
 import '../Utility/network_image_prefetch.dart';
 
@@ -550,16 +549,24 @@ class _MoonPageState extends State<MoonPage> {
               ? 'honoo salvato nello Scrigno.'
               : 'Era già nel tuo Scrigno.',
         );
+        _openSavedMoonItemInChest(honoo.conversationId ?? honoo.dbId);
         return;
       }
       if (current.hinoo != null) {
         final draft = current.hinoo!.copyWith(
           type: HinooType.personal,
           isFromMoonSaved: true,
+          conversationId: current.hinoo!.conversationId ?? current.hinooId,
         );
-        await HinooController().saveToChest(draft);
+        final saved = await HinooService.duplicateMoonToChest(draft);
         if (!mounted) return;
-        showHonooToast(context, message: 'hinoo salvato nello Scrigno.');
+        showHonooToast(
+          context,
+          message: saved == DuplicationResult.inserted
+              ? 'hinoo salvato nello Scrigno.'
+              : 'Era già nel tuo Scrigno.',
+        );
+        _openSavedMoonItemInChest(draft.conversationId);
       }
     } catch (e) {
       if (!mounted) return;
@@ -567,15 +574,45 @@ class _MoonPageState extends State<MoonPage> {
     }
   }
 
+  void _openSavedMoonItemInChest(String? conversationId) {
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => ChestPage(focusConversationId: conversationId),
+      ),
+    );
+  }
+
   Future<void> _deleteCurrentFromMoon() async {
     if (_items.isEmpty) return;
     final _MoonItem current = _items[_currentIndex];
     final bool isHonoo = current.honoo != null;
+    final String kind = isHonoo ? 'honoo' : 'hinoo';
+    final String? id = isHonoo ? current.honoo!.dbId : current.hinooId;
+    if (id == null || id.isEmpty) return;
+
+    final bool hasConversation;
+    try {
+      hasConversation = await _contentFeedService.moonContentHasConversation(
+        kind: kind,
+        id: id,
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showHonooToast(
+        context,
+        message: 'Non riesco a verificare le conversazioni collegate: $error',
+      );
+      return;
+    }
+    if (!mounted) return;
     final bool? confirmed = await showDialog<bool>(
       context: context,
       barrierDismissible: true,
-      builder: (_) => const HonooConfirmDialog(
-        title: 'Vuoi davvero eliminarlo?',
+      builder: (_) => HonooConfirmDialog(
+        title: hasConversation
+            ? 'Questo contenuto fa parte di una conversazione, vuoi eliminarlo?'
+            : 'Vuoi davvero eliminarlo?',
         message: '',
         confirmLabel: 'Sì',
         cancelLabel: 'No',
@@ -584,15 +621,7 @@ class _MoonPageState extends State<MoonPage> {
     if (confirmed != true) return;
 
     try {
-      if (isHonoo) {
-        final id = current.honoo!.dbId;
-        if (id == null || id.isEmpty) return;
-        await HonooService.deleteHonooById(id);
-      } else {
-        final id = current.hinooId;
-        if (id == null || id.isEmpty) return;
-        await HinooService.deleteHinooById(id);
-      }
+      await _contentFeedService.deleteMoonContent(kind: kind, id: id);
       if (!mounted) return;
       // Calcola il target come l'ultimo elemento visto prima di quello cancellato
       final int desired = (_currentIndex > 0) ? _currentIndex - 1 : 0;
@@ -727,6 +756,7 @@ class _MoonPageState extends State<MoonPage> {
         context,
         MaterialPageRoute(
           builder: (_) => NewHonooPage(
+            targetContentName: 'hinoo',
             forcedType: HonooType.answer,
             recipientTag: link.recipientId,
             replyTo: link.replyTo,
@@ -752,6 +782,7 @@ class _MoonPageState extends State<MoonPage> {
         context,
         MaterialPageRoute(
           builder: (_) => NewHinooPage(
+            targetContentName: 'hinoo',
             forcedType: HinooType.answer,
             recipientTag: link.recipientId,
             replyTo: link.replyTo,
@@ -776,6 +807,7 @@ class _MoonPageState extends State<MoonPage> {
         context,
         MaterialPageRoute(
           builder: (_) => NewHinooPage(
+            targetContentName: 'honoo',
             forcedType: HinooType.answer,
             recipientTag: link.recipientId,
             replyTo: link.replyTo,
