@@ -153,8 +153,8 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Ti invieremo un codice di verifica.\n'
-                  'Inserisci la tua email\ne premi “Invia codice”.',
+                  'Ti invieremo un codice di verifica\n'
+                  'Inserisci la tua email\ne premi “Invia codice”',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.lora(
                     color: HonooColor.onBackground.withValues(alpha: 0.8),

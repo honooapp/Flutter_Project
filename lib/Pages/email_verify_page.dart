@@ -112,7 +112,7 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
       if (response.user == null && mounted) {
         showHonooToast(
           context,
-          message: 'Codice non valido.',
+          message: 'Codice non valido',
         );
       }
     } catch (e) {
@@ -189,8 +189,8 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Controlla la posta in arrivo all’indirizzo ${widget.email}. '
-                'Inserisci qui il codice a sei cifre per completare l’accesso.',
+                'Controlla la posta in arrivo all’indirizzo ${widget.email} '
+                'Inserisci qui il codice a sei cifre per completare l’accesso',
                 style: GoogleFonts.arvo(
                   color: HonooColor.onBackground.withValues(alpha: 0.8),
                   fontSize: 16,
