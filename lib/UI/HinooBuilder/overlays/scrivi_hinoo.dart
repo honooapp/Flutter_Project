@@ -33,12 +33,10 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
 
           const double horizontalPad = HinooTypography.horizontalPadding;
 
-          final double baseVerticalPad = HinooTypography.verticalPadding(
+          final double topPad = HinooTypography.editorTextTopPadding(
             canvasWidth,
           );
-
-          final double topPad = baseVerticalPad * 0.45;
-          const double bottomPad = 6.0;
+          const double bottomPad = HinooTypography.editorTextBottomPadding;
 
           final TextStyle effectiveStyle = HinooTypography.textStyle(
             color: widget.textColor,

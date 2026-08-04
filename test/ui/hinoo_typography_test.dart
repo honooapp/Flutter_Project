@@ -91,7 +91,7 @@ void main() {
 
   testWidgets('saved editor text keeps its original size and manual line breaks',
       (tester) async {
-    const editorText = 'Prima riga\nSeconda riga\nTerza riga';
+    const editorText = '\nPrima riga\nSeconda riga\nTerza riga\n';
 
     await tester.pumpWidget(
       const MaterialApp(
@@ -125,6 +125,22 @@ void main() {
     );
     expect(renderedText.softWrap, isFalse);
     expect(find.byType(FittedBox), findsNothing);
+    final savedPosition = tester.getRect(
+      find.byKey(const ValueKey('hinoo-saved-text-position')),
+    );
+    final slidePosition = tester.getRect(
+      find.byKey(const ValueKey('hinoo-slide-canvas')),
+    );
+    final expectedCenterY = (HinooTypography.editorTextTopPadding(
+                  HinooTypography.baselineCanvasWidth,
+                ) +
+                slidePosition.height -
+                HinooTypography.editorTextBottomPadding) /
+            2;
+    expect(
+      savedPosition.center.dy - slidePosition.top,
+      closeTo(expectedCenterY, 0.01),
+    );
     expect(tester.takeException(), isNull);
   });
 }

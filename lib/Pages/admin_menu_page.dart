@@ -45,7 +45,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
   RealtimeChannel? _statsChannel;
   bool _loadingPendingInvites = false;
   List<Map<String, dynamic>> _pendingInvites = const [];
-
+  final Set<String> _reviewingInviteIds = <String>{};
 
   @override
   void initState() {
@@ -60,7 +60,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
         _loadPendingInvites();
         _subscribeStats();
         _statsRefreshTimer = Timer.periodic(
-          const Duration(seconds: 30),
+          const Duration(seconds: 15),
           (_) {
             _loadVisits();
             _loadMoonCounts();
@@ -124,6 +124,30 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
       setState(() => _pendingInvites = list);
     } finally {
       if (mounted) setState(() => _loadingPendingInvites = false);
+    }
+  }
+
+  Future<void> _reviewHouseRequest(String inviteId, bool approved) async {
+    if (inviteId.isEmpty || _reviewingInviteIds.contains(inviteId)) return;
+    setState(() => _reviewingInviteIds.add(inviteId));
+    try {
+      final updated = await _adminService.reviewHouseRequest(
+        inviteId: inviteId,
+        approved: approved,
+      );
+      if (!mounted) return;
+      showHonooToast(
+        context,
+        message: updated
+            ? (approved ? 'Richiesta approvata.' : 'Richiesta rifiutata.')
+            : 'Richiesta già gestita.',
+      );
+      await _loadPendingInvites();
+    } catch (e) {
+      if (!mounted) return;
+      showHonooToast(context, message: 'Errore autorizzazione: $e');
+    } finally {
+      if (mounted) setState(() => _reviewingInviteIds.remove(inviteId));
     }
   }
 
@@ -232,13 +256,11 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
         return;
       }
       final hasCasa = await _adminService.hasCasaForUser(target.authUserId);
-      final hasCampanello =
-          await _adminService.hasCampanelloForUser(target.authUserId);
-      if (hasCasa || hasCampanello) {
+      if (hasCasa) {
         if (!mounted) return;
         showHonooToast(
           context,
-          message: 'Utente già con casa o campanello.',
+          message: 'Utente già con casa.',
         );
         return;
       }
@@ -331,17 +353,56 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                       ),
                       const SizedBox(height: 8),
                       ..._pendingInvites.map((row) {
+                        final String inviteId = (row['id']?.toString() ?? '').trim();
                         final String email = (row['email']?.toString() ?? '').trim();
                         final String userId = (row['user_id']?.toString() ?? '').trim();
                         final String label = email.isNotEmpty ? email : (userId.isNotEmpty ? userId : 'Richiesta');
                         final String when = (row['created_at']?.toString() ?? '');
+                        final bool reviewing = _reviewingInviteIds.contains(inviteId);
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Text(
-                            '• $label — $when',
-                            style: GoogleFonts.lora(
-                              color: HonooColor.onBackground.withValues(alpha: 0.9),
-                              fontSize: 14,
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.07),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text(
+                                  '$label — $when',
+                                  style: GoogleFonts.lora(
+                                    color: HonooColor.onBackground.withValues(alpha: 0.9),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    TextButton(
+                                      onPressed: reviewing
+                                          ? null
+                                          : () => _reviewHouseRequest(inviteId, false),
+                                      child: const Text('Rifiuta'),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    ElevatedButton(
+                                      onPressed: reviewing
+                                          ? null
+                                          : () => _reviewHouseRequest(inviteId, true),
+                                      child: reviewing
+                                          ? const SizedBox(
+                                              width: 18,
+                                              height: 18,
+                                              child: CircularProgressIndicator(strokeWidth: 2),
+                                            )
+                                          : const Text('Approva'),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                         );

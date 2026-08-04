@@ -6,6 +6,7 @@ import 'package:honoo/Entities/reply_notification_event.dart';
 import 'package:honoo/Pages/chest_page.dart';
 import 'package:honoo/Services/reply_system_notification.dart';
 import 'package:honoo/Widgets/global_reply_notification_listener.dart';
+import 'package:honoo/Utility/reply_notification_signal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../test_supabase_helper.dart';
@@ -14,6 +15,7 @@ class _FakeReplySystemNotification extends ReplySystemNotification {
   VoidCallback? onTap;
   String? contentLabel;
   String? conversationId;
+  int showCount = 0;
 
   @override
   ReplyNotificationPermission get permission =>
@@ -28,6 +30,7 @@ class _FakeReplySystemNotification extends ReplySystemNotification {
     required String conversationId,
     required VoidCallback onTap,
   }) {
+    showCount += 1;
     this.contentLabel = contentLabel;
     this.conversationId = conversationId;
     this.onTap = onTap;
@@ -59,6 +62,7 @@ void main() {
     (tester) async {
       final navigatorKey = GlobalKey<NavigatorState>();
       final notification = _FakeReplySystemNotification();
+      final initialRevision = ReplyNotificationSignal.revision.value;
 
       await tester.pumpWidget(
         GlobalReplyNotificationListener(
@@ -72,19 +76,28 @@ void main() {
         ),
       );
 
-      events.add(const ReplyNotificationEvent(
+      final event = ReplyNotificationEvent(
         kind: ReplyNotificationKind.hinoo,
         conversationId: 'conversation-42',
         senderId: 'other_user',
         recipientId: 'test_user',
-      ));
+        replyId: 'reply-42',
+        createdAt: DateTime.utc(2026, 8, 3, 10),
+      );
+      events.add(event);
+      events.add(event);
       await tester.pump();
 
+      expect(notification.showCount, 1);
       expect(notification.contentLabel, 'hinoo');
       expect(notification.conversationId, 'conversation-42');
       expect(notification.onTap, isNotNull);
       expect(
-        find.text('Hai ricevuto una risposta al tuo hinoo.'),
+        ReplyNotificationSignal.revision.value,
+        greaterThan(initialRevision),
+      );
+      expect(
+        find.text('Hai ricevuto una risposta al tuo hinoo'),
         findsOneWidget,
       );
 
@@ -93,6 +106,9 @@ void main() {
 
       expect(navigatorKey.currentState!.canPop(), isTrue);
       expect(find.byType(ChestPage), findsOneWidget);
+      final chestPage = tester.widget<ChestPage>(find.byType(ChestPage));
+      expect(chestPage.focusConversationId, 'conversation-42');
+      expect(chestPage.focusReplyId, 'reply-42');
 
       await tester.pumpWidget(const SizedBox.shrink());
     },

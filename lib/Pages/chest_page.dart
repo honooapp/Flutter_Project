@@ -17,15 +17,16 @@ import '../Entities/honoo.dart';
 import '../Entities/hinoo.dart';
 import '../Entities/chest_item.dart';
 import '../Entities/hinoo_thread_entry.dart';
+import '../Entities/reply_navigation_result.dart';
 
 import '../Utility/honoo_colors.dart';
 import '../Utility/responsive_layout.dart';
 import '../Utility/network_image_prefetch.dart';
+import '../Utility/replies_seen_tracker.dart';
 
 import '../Widgets/honoo_dialogs.dart';
 import '../Widgets/loading_spinner.dart';
 import '../Widgets/honoo_app_title.dart';
-import '../Widgets/luna_fissa.dart';
 import '../Widgets/chest_footer.dart';
 import '../Widgets/chest_item_view.dart';
 import '../Widgets/chest_info_dialog.dart';
@@ -45,11 +46,13 @@ class ChestPage extends StatefulWidget {
     this.focusReplies = false,
     this.focusConversationId,
     this.highlightLatest = false,
+    this.focusReplyId,
   });
 
   final bool focusReplies;
   final String? focusConversationId;
   final bool highlightLatest;
+  final String? focusReplyId;
 
   @override
   State<ChestPage> createState() => _ChestPageState();
@@ -75,7 +78,9 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
   final ChestHintService _chestHintService = ChestHintService();
 
   int _currentIndex = 0;
+  bool _didApplyInitialFocus = false;
   int _conversationRefreshToken = 0;
+  String? _pendingRevealEntryId;
   Object? _honooLoadError;
   bool _isMutating = false;
   bool _isReconciling = false;
@@ -109,9 +114,30 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
     );
   }
 
+  void _selectConversationEntry(ConversationEntry entry) {
+    setState(() => _selectedConvEntry = entry);
+    final currentUserId = SupabaseProvider.client.auth.currentUser?.id;
+    final isReply =
+        entry.honoo?.type == HonooType.answer ||
+        entry.hinoo?.type == HinooType.answer;
+    if (!isReply ||
+        currentUserId == null ||
+        entry.ownerId == currentUserId ||
+        entry.createdAt.millisecondsSinceEpoch <= 0) {
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(
+        RepliesSeenTracker.markAt(entry.createdAt, userId: currentUserId),
+      );
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _pendingRevealEntryId = widget.focusReplyId;
     WidgetsBinding.instance.addObserver(this);
     _chestController.addListener(_onChestStateChanged);
     unawaited(_initialize());
@@ -214,17 +240,38 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
     return it.when(honoo: (h) => (h.dbId ?? ''), hinoo: (row) => row.id);
   }
 
+  String _slideIdentity(ChestItem item) {
+    final conversationId = _convIdOfItem(item);
+    if (conversationId != null && conversationId.isNotEmpty) {
+      return 'conversation:$conversationId';
+    }
+    return item.when(
+      honoo: (honoo) => 'honoo:${honoo.dbId ?? honoo.id}',
+      hinoo: (hinoo) => 'hinoo:${hinoo.id}',
+    );
+  }
+
   void _rebuildItems() {
+    final previousIdentity =
+        _itemsNormal.isNotEmpty &&
+            _currentIndex >= 0 &&
+            _currentIndex < _itemsNormal.length
+        ? _slideIdentity(_itemsNormal[_currentIndex])
+        : null;
     // Build a lightweight signature of inputs that affect list construction
     final String sig = [
       ctrl.version.value.toString(),
-      _hinoo.length.toString(),
-      _honooLatestReplies.length.toString(),
-      _hinooLatestReplies.length.toString(),
-      _hinooRepliesByRoot.length.toString(),
+      ..._hinoo.map(
+        (item) =>
+            '${item.id}:${item.createdAt.toIso8601String()}:${item.conversationId ?? item.draft.conversationId ?? ''}',
+      ),
+      ..._sortedActivitySignature('honoo', _honooLatestReplies),
+      ..._sortedActivitySignature('hinoo', _hinooLatestReplies),
+      ..._sortedReplySignature(),
       widget.focusConversationId ?? '',
       widget.focusReplies ? '1' : '0',
       widget.highlightLatest ? '1' : '0',
+      _pendingRevealEntryId ?? '',
       _mode.name,
       _activeConversationId ?? '',
     ].join('|');
@@ -256,15 +303,25 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       createdAtOf: (item) => item.createdAt,
       stableIdOf: _stableIdOf,
       latestReplyOf: (item) => item.when(
-        honoo: (h) => _honooLatestReplies[h.dbId ?? ''],
-        hinoo: (row) => _hinooLatestReplies[row.id],
+        honoo: (h) => _honooLatestReplies[h.conversationId ?? h.dbId ?? ''],
+        hinoo: (row) =>
+            _hinooLatestReplies[row.conversationId ??
+                row.draft.conversationId ??
+                row.id],
       ),
       conversationIdOf: _convIdOfItem,
     );
     _itemsNormal = organization.items;
     final bool hasConversationItems = organization.conversationItemCount > 0;
 
-    if (_mode == ChestMode.normal && widget.focusConversationId != null) {
+    var desiredIndex = previousIdentity == null
+        ? -1
+        : _itemsNormal.indexWhere(
+            (item) => _slideIdentity(item) == previousIdentity,
+          );
+    if (_mode == ChestMode.normal &&
+        !_didApplyInitialFocus &&
+        widget.focusConversationId != null) {
       final idx = _itemsNormal.indexWhere((it) {
         final String? cid = it.when(
           honoo: (h) => h.conversationId,
@@ -273,21 +330,55 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         return cid == widget.focusConversationId;
       });
       if (idx >= 0) {
-        _currentIndex = idx;
+        desiredIndex = idx;
       } else if (widget.focusReplies && hasConversationItems) {
-        _currentIndex = 0;
+        desiredIndex = 0;
       }
+      if (_itemsNormal.isNotEmpty) _didApplyInitialFocus = true;
     } else if (_mode == ChestMode.normal &&
+        !_didApplyInitialFocus &&
         widget.focusReplies &&
         hasConversationItems) {
-      _currentIndex = 0;
-    } else if (_mode == ChestMode.normal &&
-        _currentIndex >= _itemsNormal.length) {
-      _currentIndex = _itemsNormal.isEmpty ? 0 : _itemsNormal.length - 1;
+      desiredIndex = 0;
+      _didApplyInitialFocus = _itemsNormal.isNotEmpty;
+    }
+    if (_mode == ChestMode.normal) {
+      if (_itemsNormal.isEmpty) {
+        desiredIndex = 0;
+      } else if (desiredIndex < 0) {
+        desiredIndex = _currentIndex.clamp(0, _itemsNormal.length - 1);
+      }
+      final indexChanged = desiredIndex != _currentIndex;
+      _currentIndex = desiredIndex;
+      if (indexChanged) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted || _itemsNormal.isEmpty) return;
+          _carouselController.jumpToPage(_currentIndex);
+        });
+      }
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _prefetchChestFrom(_currentIndex);
     });
+  }
+
+  List<String> _sortedActivitySignature(
+    String prefix,
+    Map<String, DateTime> activity,
+  ) {
+    final values = activity.entries
+        .map((entry) => '$prefix:${entry.key}:${entry.value.toIso8601String()}')
+        .toList();
+    values.sort();
+    return values;
+  }
+
+  List<String> _sortedReplySignature() {
+    final values = _hinooRepliesByRoot.entries
+        .map((entry) => '${entry.key}:${entry.value.length}')
+        .toList();
+    values.sort();
+    return values;
   }
 
   void _prefetchChestFrom(int index) {
@@ -484,13 +575,13 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         MaterialPageRoute(
           builder: (context) => ReplyHonooPage(
             originalHonoo: current,
-            initialHintText: 'Scrivi la tua risposta...',
+            initialHintText: 'Scrivi la tua risposta',
             initialImageHint: 'Aggiungi un’immagine (opzionale)',
             returnToPreviousOnAnswer: true,
           ),
         ),
       );
-      _refreshConversationInPlace(result is String ? result : null);
+      _refreshConversationInPlace(result);
     } else {
       final String? replyTo = current.dbId;
       if (replyTo == null || replyTo.isEmpty) return;
@@ -511,7 +602,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
           ),
         ),
       );
-      _refreshConversationInPlace(result is String ? result : null);
+      _refreshConversationInPlace(result);
     }
   }
 
@@ -546,13 +637,13 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
                   )
                   ..dbId = link.replyTo
                   ..conversationId = link.conversationId,
-            initialHintText: 'Scrivi la tua risposta...',
+            initialHintText: 'Scrivi la tua risposta',
             initialImageHint: 'Aggiungi un’immagine (opzionale)',
             returnToPreviousOnAnswer: true,
           ),
         ),
       );
-      _refreshConversationInPlace(result is String ? result : null);
+      _refreshConversationInPlace(result);
     } else {
       final String recipient =
           current.ownerId ?? current.draft.recipientTag ?? '';
@@ -575,13 +666,18 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
           ),
         ),
       );
-      _refreshConversationInPlace(result is String ? result : null);
+      _refreshConversationInPlace(result);
     }
   }
 
-  void _refreshConversationInPlace(String? conversationId) {
-    if (!mounted || conversationId == null || conversationId.isEmpty) return;
+  void _refreshConversationInPlace(Object? result) {
+    if (!mounted) return;
+    final navigation = result is ReplyNavigationResult ? result : null;
+    final conversationId =
+        navigation?.conversationId ?? (result is String ? result : null);
+    if (conversationId == null || conversationId.isEmpty) return;
     setState(() {
+      _pendingRevealEntryId = navigation?.replyId;
       _conversationRefreshToken++;
     });
   }
@@ -760,9 +856,8 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       isActive: isActive,
       highlightLatest: widget.highlightLatest,
       focusConversationId: widget.focusConversationId,
-      onSelectConversationEntry: (entry) {
-        setState(() => _selectedConvEntry = entry);
-      },
+      revealEntryId: _pendingRevealEntryId,
+      onSelectConversationEntry: _selectConversationEntry,
       onDownload: () => _handleDownloadForItem(item, repaintKey),
       conversationRefreshToken: _conversationRefreshToken,
     );
@@ -817,11 +912,6 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
               );
             },
           ),
-          overlayBuilder: (ctx, mode) => const LunaFissa(),
-          bodyTopInsetBuilder: (ctx, mode) =>
-              (LunaFissa.reserveTopPadding(ctx) -
-                      ThreadLayoutScaffold.headerHeight)
-                  .clamp(0.0, double.infinity),
           bodyBuilder: (ctx, viewW, availableH, layoutMode) {
             final HonooBuilderMetrics honooMetrics =
                 ResponsiveLayout.honooBuilderMetrics(
@@ -865,7 +955,10 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
                 disableCenter: true,
                 scrollPhysics: horizPhysics,
                 onPageChanged: (i, _) {
-                  setState(() => _currentIndex = i);
+                  setState(() {
+                    _currentIndex = i;
+                    _selectedConvEntry = null;
+                  });
                   _prefetchChestFrom(i);
                 },
               ),

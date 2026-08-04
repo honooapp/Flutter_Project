@@ -6,12 +6,16 @@ class ReplyNotificationEvent {
     required this.conversationId,
     required this.senderId,
     required this.recipientId,
+    this.replyId,
+    this.createdAt,
   });
 
   final ReplyNotificationKind kind;
   final String conversationId;
   final String senderId;
   final String recipientId;
+  final String? replyId;
+  final DateTime? createdAt;
 
   String get contentLabel =>
       kind == ReplyNotificationKind.honoo ? 'honoo' : 'hinoo';
@@ -22,8 +26,8 @@ class ReplyNotificationEvent {
     required String currentUserId,
   }) {
     if (payload is! Map) return null;
-    final eventType =
-        (payload['eventType'] ?? payload['event_type'])?.toString();
+    final eventType = (payload['eventType'] ?? payload['event_type'])
+        ?.toString();
     if (eventType != null && eventType.toLowerCase() != 'insert') return null;
 
     final dynamic rawRecord = payload['new'] ?? payload['record'];
@@ -53,6 +57,8 @@ class ReplyNotificationEvent {
       conversationId: conversationId,
       senderId: senderId,
       recipientId: recipientId,
+      replyId: record['id']?.toString(),
+      createdAt: DateTime.tryParse(record['created_at']?.toString() ?? ''),
     );
   }
 }

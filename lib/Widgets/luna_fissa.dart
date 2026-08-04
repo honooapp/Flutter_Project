@@ -27,6 +27,21 @@ class LunaFissa extends StatefulWidget {
     return 68;
   }
 
+  static void openMoon(BuildContext context) {
+    final user = SupabaseProvider.client.auth.currentUser;
+    if (user == null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const EmailLoginPage()),
+      );
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const MoonPage()),
+    );
+  }
+
   /// Padding verticale di riserva da applicare al contenuto
   /// per evitare qualunque sovrapposizione nel bordo alto.
   /// (top safe-area + dimensione icona + margini)
@@ -132,36 +147,17 @@ class _LunaFissaState extends State<LunaFissa> with WidgetsBindingObserver {
     final w = MediaQuery.of(context).size.width;
     final topSafe = MediaQuery.of(context).viewPadding.top;
     final iconSize = LunaFissa.iconSizeForWidth(w);
-    final double margin =
-        w >= 1200 ? LunaFissa._largeDesktopMargin : LunaFissa._margin;
+    final double margin = w >= 1200
+        ? LunaFissa._largeDesktopMargin
+        : LunaFissa._margin;
 
     final List<Widget> actions = [
       IconButton(
-        icon: SvgPicture.asset(
-          "assets/icons/moon.svg",
-          semanticsLabel: 'Moon',
-        ),
+        icon: SvgPicture.asset("assets/icons/moon.svg", semanticsLabel: 'Moon'),
         iconSize: iconSize,
         splashRadius: (iconSize / 2) + 6,
         tooltip: 'Vai sulla Luna',
-        onPressed: () {
-          final user = SupabaseProvider.client.auth.currentUser;
-          if (user == null) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const EmailLoginPage(),
-              ),
-            );
-            return;
-          }
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const MoonPage(),
-            ),
-          );
-        },
+        onPressed: () => LunaFissa.openMoon(context),
       ),
     ];
 

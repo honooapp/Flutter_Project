@@ -9,13 +9,13 @@ import 'package:honoo/IsolaDelleStorie/Utility/isola_delle_storie_content_manage
 import 'package:honoo/Pages/chest_page.dart';
 import 'package:honoo/Utility/formatted_text.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Widgets/composer_onboarding.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../Controller/device_controller.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../Pages/moon_page.dart';
-import '../../Pages/new_honoo_page.dart';
 import '../../Pages/home_page.dart';
 import '../../Pages/placeholder_page.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
@@ -101,7 +101,8 @@ class _FullIslandPageState extends State<FullIslandPage> {
                         onTap: () {
                           Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(
-                                builder: (_) => const PlaceholderPage()),
+                              builder: (_) => const PlaceholderPage(),
+                            ),
                             (route) => false,
                           );
                         },
@@ -123,39 +124,47 @@ class _FullIslandPageState extends State<FullIslandPage> {
                               const double desktopContentMaxWidth = 720;
                               final double columnMaxW = isPhone
                                   ? constraints.maxWidth
-                                  : math.min(constraints.maxWidth,
-                                      desktopContentMaxWidth);
+                                  : math.min(
+                                      constraints.maxWidth,
+                                      desktopContentMaxWidth,
+                                    );
 
                               const double mapAspectRatio = 321 / 323;
                               const double mapHorizontalPadding =
                                   24.0; // 12 + 12
-                              final double mapMaxHeight =
-                                  _maxMapHeight(context);
+                              final double mapMaxHeight = _maxMapHeight(
+                                context,
+                              );
                               final double mapMaxWidthFromHeight =
                                   mapMaxHeight * mapAspectRatio;
                               final double mapAvailableWidth = math.max(
-                                  columnMaxW - mapHorizontalPadding, 0.0);
+                                columnMaxW - mapHorizontalPadding,
+                                0.0,
+                              );
                               double targetMapWidth = mapAvailableWidth;
                               if (mapMaxWidthFromHeight > 0) {
                                 targetMapWidth = targetMapWidth == 0
                                     ? mapMaxWidthFromHeight
                                     : math.min(
-                                        targetMapWidth, mapMaxWidthFromHeight);
+                                        targetMapWidth,
+                                        mapMaxWidthFromHeight,
+                                      );
                               }
                               if (targetMapWidth <= 0) {
                                 targetMapWidth = mapMaxWidthFromHeight > 0
                                     ? mapMaxWidthFromHeight
                                     : (columnMaxW > 0
-                                        ? columnMaxW - mapHorizontalPadding
-                                        : 320.0);
+                                          ? columnMaxW - mapHorizontalPadding
+                                          : 320.0);
                               }
 
                               return Row(
                                 children: [
                                   const Expanded(child: SizedBox()),
                                   ConstrainedBox(
-                                    constraints:
-                                        BoxConstraints(maxWidth: columnMaxW),
+                                    constraints: BoxConstraints(
+                                      maxWidth: columnMaxW,
+                                    ),
                                     child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
@@ -165,11 +174,11 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                           height: 25,
                                           child: Align(
                                             alignment: Alignment.topCenter,
-                                            child: IsolaDelleStoreContentManager
-                                                .getRichText(
-                                              IsolaDelleStoreContentManager
-                                                  .fullIslandHeadDescription,
-                                            ),
+                                            child:
+                                                IsolaDelleStoreContentManager.getRichText(
+                                                  IsolaDelleStoreContentManager
+                                                      .fullIslandHeadDescription,
+                                                ),
                                           ),
                                         ),
 
@@ -177,7 +186,8 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                         // ==== IMMAGINE =====
                                         Padding(
                                           padding: const EdgeInsets.symmetric(
-                                              horizontal: 16.0),
+                                            horizontal: 16.0,
+                                          ),
                                           child: Center(
                                             child: ClipRRect(
                                               borderRadius:
@@ -198,7 +208,8 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                         // ===== TESTO SOTTO IMMAGINE =====
                                         Padding(
                                           padding: const EdgeInsets.symmetric(
-                                              horizontal: 16.0),
+                                            horizontal: 16.0,
+                                          ),
                                           child: Column(
                                             children: [
                                               const FormattedText(
@@ -227,15 +238,17 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                                       alignment:
                                                           PlaceholderAlignment
                                                               .baseline,
-                                                      baseline:
-                                                          TextBaseline.alphabetic,
+                                                      baseline: TextBaseline
+                                                          .alphabetic,
                                                       child: InkWell(
                                                         onTap: () {
-                                                          Navigator.of(context)
-                                                              .pushAndRemoveUntil(
+                                                          Navigator.of(
+                                                            context,
+                                                          ).pushAndRemoveUntil(
                                                             MaterialPageRoute(
-                                                                builder: (_) =>
-                                                                    const CampanelliPage()),
+                                                              builder: (_) =>
+                                                                  const CampanelliPage(),
+                                                            ),
                                                             (route) => false,
                                                           );
                                                         },
@@ -264,7 +277,8 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                               Text(
                                                 'o',
                                                 style: GoogleFonts.arvo(
-                                                  color: HonooColor.onBackground,
+                                                  color:
+                                                      HonooColor.onBackground,
                                                   fontSize: 18,
                                                 ),
                                               ),
@@ -279,8 +293,9 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                                   }
                                                   navigator.pushAndRemoveUntil(
                                                     MaterialPageRoute(
-                                                        builder: (_) =>
-                                                            const IslandPage()),
+                                                      builder: (_) =>
+                                                          const IslandPage(),
+                                                    ),
                                                     (route) => false,
                                                   );
                                                 },
@@ -290,8 +305,8 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                                     color:
                                                         HonooColor.onBackground,
                                                     fontSize: 18,
-                                                    decoration:
-                                                        TextDecoration.underline,
+                                                    decoration: TextDecoration
+                                                        .underline,
                                                     decorationColor:
                                                         HonooColor.onBackground,
                                                     decorationThickness: 3.0,
@@ -337,8 +352,10 @@ class _FullIslandPageState extends State<FullIslandPage> {
                         double clampX(double x, double size) =>
                             x.clamp(0.0, (w - size)).toDouble();
 
-                        final double bottleX =
-                            clampX(bottleTargetX, bottleSize);
+                        final double bottleX = clampX(
+                          bottleTargetX,
+                          bottleSize,
+                        );
                         final double chestX = clampX(chestCenterX, chestSize);
                         final double homeX = clampX(homeTargetX, homeSize);
                         final double logoX = clampX(logoTargetX, logoSize);
@@ -351,26 +368,22 @@ class _FullIslandPageState extends State<FullIslandPage> {
                               left: 0,
                               right: 0,
                               child: SizedBox(
-                                  height: 10,
-                                  child: Container(color: HonooColor.wave1)),
+                                height: 10,
+                                child: Container(color: HonooColor.wave1),
+                              ),
                             ),
                             Positioned(
                               bottom: 10,
                               left: bottleX,
                               child: IconButton(
                                 icon: SvgPicture.asset(
-                                    "assets/icons/bottle.svg",
-                                    semanticsLabel: 'Bottle'),
+                                  "assets/icons/bottle.svg",
+                                  semanticsLabel: 'Bottle',
+                                ),
                                 iconSize: bottleSize,
                                 splashRadius: 40,
                                 tooltip: 'Scrivi',
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const NewHonooPage()));
-                                },
+                                onPressed: () => ComposerLauncher.open(context),
                               ),
                             ),
                             Positioned(
@@ -378,20 +391,22 @@ class _FullIslandPageState extends State<FullIslandPage> {
                               left: 0,
                               right: 0,
                               child: IgnorePointer(
-                                  child: SizedBox(
-                                      height: 20,
-                                      child:
-                                          Container(color: HonooColor.wave2))),
+                                child: SizedBox(
+                                  height: 20,
+                                  child: Container(color: HonooColor.wave2),
+                                ),
+                              ),
                             ),
                             Positioned(
                               bottom: 0,
                               left: 0,
                               right: 0,
                               child: IgnorePointer(
-                                  child: SizedBox(
-                                      height: 30,
-                                      child:
-                                          Container(color: HonooColor.wave3))),
+                                child: SizedBox(
+                                  height: 30,
+                                  child: Container(color: HonooColor.wave3),
+                                ),
+                              ),
                             ),
                             Positioned(
                               bottom: 0,
@@ -413,7 +428,8 @@ class _FullIslandPageState extends State<FullIslandPage> {
                                 onPressed: () {
                                   Navigator.of(context).pushAndRemoveUntil(
                                     MaterialPageRoute(
-                                        builder: (_) => const HomePage()),
+                                      builder: (_) => const HomePage(),
+                                    ),
                                     (route) => false,
                                   );
                                 },
@@ -423,8 +439,10 @@ class _FullIslandPageState extends State<FullIslandPage> {
                               bottom: -20,
                               left: chestX,
                               child: IconButton(
-                                icon: SvgPicture.asset("assets/icons/chest.svg",
-                                    semanticsLabel: 'Chest'),
+                                icon: SvgPicture.asset(
+                                  "assets/icons/chest.svg",
+                                  semanticsLabel: 'Chest',
+                                ),
                                 iconSize: chestSize,
                                 splashRadius: 40,
                                 tooltip: 'Apri il tuo Cuore',
@@ -468,16 +486,20 @@ class _FullIslandPageState extends State<FullIslandPage> {
                   child: Material(
                     color: Colors.transparent,
                     child: IconButton(
-                      icon: SvgPicture.asset("assets/icons/moon.svg",
-                          semanticsLabel: 'Moon'),
+                      icon: SvgPicture.asset(
+                        "assets/icons/moon.svg",
+                        semanticsLabel: 'Moon',
+                      ),
                       iconSize: 60,
                       splashRadius: 32,
                       tooltip: 'Vai sulla Luna',
                       onPressed: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const MoonPage()));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MoonPage(),
+                          ),
+                        );
                       },
                     ),
                   ),
@@ -500,7 +522,8 @@ class _FullIslandPageState extends State<FullIslandPage> {
     const double footerHeight = 80.0;
     const double safetyGap = 24.0; // margine extra per evitare sovrapposizioni
 
-    final double reservedVertical = headerHeight +
+    final double reservedVertical =
+        headerHeight +
         introSpacing +
         introTextHeight +
         topSpacer +
@@ -523,9 +546,9 @@ class MapPinModel {
   final double x; // 0..1: ascissa nel viewBox dell'SVG
   final double y; // 0..1: ordinata nel viewBox dell'SVG
   final double
-      dx; // offset orizzontale percentuale per spostare il pin rispetto al punto logico
+  dx; // offset orizzontale percentuale per spostare il pin rispetto al punto logico
   final double
-      dy; // offset verticale percentuale per allineare il pin senza coprire il disegno
+  dy; // offset verticale percentuale per allineare il pin senza coprire il disegno
   final String assetSvg;
   final String hint;
 
@@ -569,8 +592,10 @@ class IslandMapWithPins extends StatelessWidget {
         final double safeAspectRatio = aspectRatio <= 0 ? 1 : aspectRatio;
         final double renderHeight = renderWidth / safeAspectRatio;
 
-        final double pinVisualSize =
-            (renderWidth * pinSizeFactor).clamp(24.0, 160.0);
+        final double pinVisualSize = (renderWidth * pinSizeFactor).clamp(
+          24.0,
+          160.0,
+        );
         final double hitTargetSize = math.max(pinVisualSize, 40.0);
 
         return SizedBox(
@@ -584,14 +609,17 @@ class IslandMapWithPins extends StatelessWidget {
               ),
               if (debugGrid) ..._buildDebugGrid(renderWidth, renderHeight),
               ...pins.map((pin) {
-                final double px = (pin.x * renderWidth) +
+                final double px =
+                    (pin.x * renderWidth) +
                     (pin.dx * renderWidth) -
                     (hitTargetSize / 2);
-                final double py = (pin.y * renderHeight) +
+                final double py =
+                    (pin.y * renderHeight) +
                     (pin.dy * renderHeight) -
                     (hitTargetSize / 2);
-                final VoidCallback? onPressed =
-                    onPinTap == null ? null : () => onPinTap!(pin.id);
+                final VoidCallback? onPressed = onPinTap == null
+                    ? null
+                    : () => onPinTap!(pin.id);
 
                 return Positioned(
                   left: px,
@@ -634,7 +662,10 @@ class IslandMapWithPins extends StatelessWidget {
           left: x,
           top: 0,
           bottom: 0,
-          child: Container(width: 1, color: Colors.white.withValues(alpha: 0.25)),
+          child: Container(
+            width: 1,
+            color: Colors.white.withValues(alpha: 0.25),
+          ),
         ),
       );
     }
@@ -645,7 +676,10 @@ class IslandMapWithPins extends StatelessWidget {
           top: y,
           left: 0,
           right: 0,
-          child: Container(height: 1, color: Colors.white.withValues(alpha: 0.25)),
+          child: Container(
+            height: 1,
+            color: Colors.white.withValues(alpha: 0.25),
+          ),
         ),
       );
     }

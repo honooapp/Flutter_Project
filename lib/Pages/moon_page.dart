@@ -12,6 +12,7 @@ import 'package:honoo/Services/hinoo_service.dart';
 import '../Entities/hinoo.dart';
 import '../Entities/honoo.dart';
 import '../Entities/conversation_link.dart';
+import '../Entities/reply_navigation_result.dart';
 import 'home_page.dart';
 import '../UI/hinoo_viewer.dart';
 import '../UI/hinoo_typography.dart';
@@ -696,23 +697,20 @@ class _MoonPageState extends State<MoonPage> {
 
     if (choice == null || !mounted) return;
     if (choice == _ReplyChoice.honoo && current.honoo != null) {
-      final sent = await Navigator.push<bool>(
+      if (!await _ensureMoonItemInChest(current) || !mounted) return;
+      final result = await Navigator.push<Object?>(
         context,
         MaterialPageRoute(
           builder: (_) => ReplyHonooPage(
             originalHonoo: current.honoo!,
-            initialHintText: 'Scrivi la tua risposta...',
+            initialHintText: 'Scrivi la tua risposta',
             initialImageHint: 'Aggiungi un’immagine (opzionale)',
+            returnToPreviousOnAnswer: true,
           ),
         ),
       );
       if (!mounted) return;
-      if (sent == true) {
-        final id = current.honoo?.dbId;
-        if (id != null && id.isNotEmpty) {
-          setState(() => _repliedItemIds.add(id));
-        }
-      }
+      await _openConversationAfterReply(current, result);
     } else if (choice == _ReplyChoice.honoo && current.hinoo != null) {
       // Risposta ad un hinoo con un honoo
       final parentId = current.hinooId;
@@ -724,9 +722,8 @@ class _MoonPageState extends State<MoonPage> {
         parentConversationId: current.hinoo!.conversationId,
         recipientId: recipientId,
       );
-      await _ensureMoonItemInChest(current);
-      if (!mounted) return;
-      await Navigator.push(
+      if (!await _ensureMoonItemInChest(current) || !mounted) return;
+      final result = await Navigator.push<Object?>(
         context,
         MaterialPageRoute(
           builder: (_) => NewHonooPage(
@@ -734,15 +731,12 @@ class _MoonPageState extends State<MoonPage> {
             recipientTag: link.recipientId,
             replyTo: link.replyTo,
             conversationId: link.conversationId,
-            returnSavedId: false,
+            returnToPreviousOnAnswer: true,
           ),
         ),
       );
       if (!mounted) return;
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const ChestPage(focusReplies: true)),
-      );
+      await _openConversationAfterReply(current, result);
     } else if (choice == _ReplyChoice.hinoo && current.hinoo != null) {
       final String? replyTo = current.hinooId;
       if (replyTo == null || replyTo.isEmpty) return;
@@ -753,9 +747,8 @@ class _MoonPageState extends State<MoonPage> {
         parentConversationId: current.hinoo!.conversationId,
         recipientId: recipientId,
       );
-      await _ensureMoonItemInChest(current);
-      if (!mounted) return;
-      await Navigator.push(
+      if (!await _ensureMoonItemInChest(current) || !mounted) return;
+      final result = await Navigator.push<Object?>(
         context,
         MaterialPageRoute(
           builder: (_) => NewHinooPage(
@@ -763,14 +756,12 @@ class _MoonPageState extends State<MoonPage> {
             recipientTag: link.recipientId,
             replyTo: link.replyTo,
             conversationId: link.conversationId,
+            returnToPreviousOnAnswer: true,
           ),
         ),
       );
       if (!mounted) return;
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const ChestPage(focusReplies: true)),
-      );
+      await _openConversationAfterReply(current, result);
     } else if (choice == _ReplyChoice.hinoo && current.honoo != null) {
       // Risposta ad un honoo con un hinoo
       final parentId = current.honoo!.dbId;
@@ -780,9 +771,8 @@ class _MoonPageState extends State<MoonPage> {
         parentConversationId: current.honoo!.conversationId,
         recipientId: current.honoo!.userId,
       );
-      await _ensureMoonItemInChest(current);
-      if (!mounted) return;
-      await Navigator.push(
+      if (!await _ensureMoonItemInChest(current) || !mounted) return;
+      final result = await Navigator.push<Object?>(
         context,
         MaterialPageRoute(
           builder: (_) => NewHinooPage(
@@ -790,18 +780,41 @@ class _MoonPageState extends State<MoonPage> {
             recipientTag: link.recipientId,
             replyTo: link.replyTo,
             conversationId: link.conversationId,
+            returnToPreviousOnAnswer: true,
           ),
         ),
       );
       if (!mounted) return;
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const ChestPage(focusReplies: true)),
-      );
+      await _openConversationAfterReply(current, result);
     }
   }
 
-  Future<void> _ensureMoonItemInChest(_MoonItem current) async {
+  Future<void> _openConversationAfterReply(
+    _MoonItem current,
+    Object? result,
+  ) async {
+    final navigation = result is ReplyNavigationResult ? result : null;
+    final conversationId =
+        navigation?.conversationId ?? (result is String ? result : null);
+    if (conversationId == null || conversationId.isEmpty || !mounted) return;
+    final id = current.honoo?.dbId ?? current.hinooId;
+    if (id != null && id.isNotEmpty) {
+      setState(() => _repliedItemIds.add(id));
+    }
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ChestPage(
+          focusReplies: true,
+          focusConversationId: conversationId,
+          focusReplyId: navigation?.replyId,
+          highlightLatest: true,
+        ),
+      ),
+    );
+  }
+
+  Future<bool> _ensureMoonItemInChest(_MoonItem current) async {
     try {
       if (current.honoo != null) {
         await HonooService.duplicateToChest(
@@ -810,9 +823,11 @@ class _MoonPageState extends State<MoonPage> {
       } else if (current.hinoo != null) {
         await HinooService.duplicateMoonToChest(current.hinoo!);
       }
+      return true;
     } catch (_) {
-      if (!mounted) return;
+      if (!mounted) return false;
       showHonooToast(context, message: 'Errore salvataggio nello scrigno.');
+      return false;
     }
   }
 }

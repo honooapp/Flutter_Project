@@ -15,11 +15,11 @@ import 'package:flutter/rendering.dart';
 import 'HinooBuilder/overlays/cambia_sfondo.dart';
 import 'HinooBuilder/overlays/colore_testo.dart';
 import 'HinooBuilder/overlays/scrivi_hinoo.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import '../Services/hinoo_storage_uploader.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'package:honoo/Widgets/cover_transform_image.dart';
 import 'package:honoo/Utility/heic_converter.dart' as heic;
 import 'package:honoo/Utility/image_upload_encoder.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -82,13 +82,12 @@ class _HinooBuilderState extends State<HinooBuilder> {
   _WizardStep _step = _WizardStep.changeBg;
   bool _bgChosen = false; // abilita bottone OK per procedere
   bool _isUploadingBg = false;
-  static const double _bgMinScale = 0.5;
+  static const double _bgMinScale = 1.0;
   static const double _bgMaxScale = 5.0;
   // min scale effettivo per l'interazione: almeno il fill iniziale
   double _bgMinInteractiveScale = _bgMinScale;
   final TransformationController _bgController = TransformationController();
   Matrix4? _bgLockedMatrix;
-  Matrix4? _bgInitialMatrix;
   double _bgScale = _bgMinScale;
 
   // Export/anteprima
@@ -160,29 +159,13 @@ class _HinooBuilderState extends State<HinooBuilder> {
     final double clamped = scale.clamp(_bgMinScale, _bgMaxScale).toDouble();
     final Matrix4 current = _bgController.value.clone();
     final Float64List values = current.storage;
-    final double currentScale = _extractScaleFromMatrix(current);
-    final double safeScale = currentScale <= 0 ? _bgMinScale : currentScale;
     final double tx = values[12];
     final double ty = values[13];
-    final double adjustedTx = tx * (safeScale / clamped);
-    final double adjustedTy = ty * (safeScale / clamped);
     final Matrix4 updated = Matrix4.identity()
-      ..translateByDouble(adjustedTx, adjustedTy, 0, 1)
-      ..scaleByDouble(clamped, clamped, clamped, 1);
+      ..setEntry(0, 0, clamped)
+      ..setEntry(1, 1, clamped)
+      ..setTranslationRaw(tx, ty, 0);
     _bgController.value = updated;
-  }
-
-  void _nudgeBgScale(double delta) {
-    _updateBgScale(_bgScale + delta);
-  }
-
-  void _resetBgTransform() {
-    final Matrix4 reset = _bgInitialMatrix?.clone() ?? Matrix4.identity();
-    _bgController.value = reset;
-    setState(() {
-      _bgScale = _extractScaleFromMatrix(reset);
-      _bgLockedMatrix = null;
-    });
   }
 
   void _applySlideState(dynamic slide) {
@@ -224,7 +207,6 @@ class _HinooBuilderState extends State<HinooBuilder> {
     _bgPublicUrl = null;
     _bgLockedMatrix = null;
     _bgController.value = Matrix4.identity();
-    _bgInitialMatrix = null;
     _bgScale = _bgMinScale;
     _bgChosen = false;
     _step = _WizardStep.changeBg;
@@ -422,6 +404,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
   Future<void> openDownloadDialogPublic() => _openDownloadDialog();
   Future<void> downloadAllPagesPublic({String? baseName}) =>
       _downloadHinoo(baseName: baseName);
+  Future<void> replaceBackgroundPublic() => _pickAndUploadBackground();
+  void confirmBackgroundPublic() => _confirmBgAndLock();
 
   String _prepareFileBaseName(String? raw) {
     const String fallback = 'hinoo';
@@ -544,20 +528,9 @@ class _HinooBuilderState extends State<HinooBuilder> {
         // Sfondo: usa sempre un unico percorso (asset di default oppure preview selezionata)
         Builder(
           builder: (_) {
-            final Widget fitted = SizedBox.expand(
-              child: _localBgPreviewBytes != null
-                  ? Image.memory(
-                      _localBgPreviewBytes!,
-                      fit: BoxFit.cover, // riempi sempre il canvas 9:16
-                      alignment: Alignment.center,
-                    )
-                  : const Image(
-                      image: AssetImage(
-                        'assets/images/hinoo_default_1080x1920.png',
-                      ),
-                      fit: BoxFit.cover,
-                    ),
-            );
+            final ImageProvider background = _localBgPreviewBytes != null
+                ? MemoryImage(_localBgPreviewBytes!)
+                : const AssetImage('assets/images/hinoo_default_1080x1920.png');
             final bool interactive =
                 (_step == _WizardStep.changeBg &&
                 _bgChosen &&
@@ -565,17 +538,12 @@ class _HinooBuilderState extends State<HinooBuilder> {
             if (!interactive && _bgLockedMatrix != null) {
               _bgController.value = _bgLockedMatrix!.clone();
             }
-            return ClipRect(
-              child: InteractiveViewer(
-                transformationController: _bgController,
-                panEnabled: interactive,
-                scaleEnabled: interactive,
-                minScale: _bgMinInteractiveScale,
-                maxScale: _bgMaxScale,
-                // Evita spazi bianchi: pan limitato ai bordi del canvas
-                boundaryMargin: EdgeInsets.zero,
-                child: fitted,
-              ),
+            return CoverTransformImage(
+              image: background,
+              transformationController: _bgController,
+              interactive: interactive,
+              minScale: _bgMinInteractiveScale,
+              maxScale: _bgMaxScale,
             );
           },
         ),
@@ -591,29 +559,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
             minScale: _bgMinInteractiveScale,
             maxScale: _bgMaxScale,
             onScaleChanged: _bgChosen ? _updateBgScale : null,
-            onZoomIn: _bgChosen && _bgScale < _bgMaxScale
-                ? () => _nudgeBgScale(0.1)
-                : null,
-            onZoomOut: _bgChosen && _bgScale > _bgMinScale
-                ? () => _nudgeBgScale(-0.1)
-                : null,
-            onResetTransform: _bgChosen ? _resetBgTransform : null,
+            useCompactControls: true,
           ),
-          if (_bgChosen && !_isUploadingBg)
-            Positioned(
-              bottom: 12,
-              right: 12,
-              child: IconButton(
-                iconSize: 44,
-                onPressed: _confirmBgAndLock,
-                icon: SvgPicture.asset(
-                  'assets/icons/ok.svg',
-                  width: 44,
-                  height: 44,
-                ),
-                tooltip: 'Conferma sfondo',
-              ),
-            ),
         ] else if (_step == _WizardStep.pickColor)
           ColoreTestoOverlay(
             onPick: (c) {
@@ -854,7 +801,6 @@ class _HinooBuilderState extends State<HinooBuilder> {
         _localBgPreviewBytes = bytes;
         _bgChosen = true; // abilita OK per procedere
         _bgLockedMatrix = null;
-        _bgInitialMatrix = initialMatrix.clone();
         _bgScale = initialScale;
         _bgMinInteractiveScale = initialScale;
         _isUploadingBg = true;

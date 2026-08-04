@@ -230,7 +230,7 @@ class AdminService {
         .from('house_invites')
         .select('id,status')
         .ilike('email', email)
-        .in_('status', ['pending', 'accepted']).limit(1);
+        .in_('status', ['requested', 'pending', 'accepted']).limit(1);
     if (rows is! List || rows.isEmpty) return false;
     return true;
   }
@@ -240,7 +240,7 @@ class AdminService {
     final rows = await _client
         .from('house_invites')
         .select('id,email,user_id,created_at,status')
-        .eq('status', 'pending')
+        .eq('status', 'requested')
         .order('created_at', ascending: !newestFirst);
     if (rows is! List) return const [];
     return rows.whereType<Map<String, dynamic>>().toList();
@@ -250,7 +250,7 @@ class AdminService {
     final rows = await _client
         .from('house_invites')
         .select('id')
-        .eq('status', 'pending');
+        .eq('status', 'requested');
     if (rows is! List) return 0;
     return rows.length;
   }
@@ -262,37 +262,10 @@ class AdminService {
     return rows is List && rows.isNotEmpty;
   }
 
-  Future<bool> hasCampanelloForUser(String userId) async {
-    if (userId.trim().isEmpty) return false;
-    final rows = await _client
-        .from('campanelli')
-        .select('id')
-        .eq('owner_id', userId)
-        .limit(1);
-    return rows is List && rows.isNotEmpty;
-  }
-
   Future<Set<String>> fetchExistingCaseOwners(List<String> userIds) async {
     if (userIds.isEmpty) return {};
     final rows =
         await _client.from('case').select('owner_id').in_('owner_id', userIds);
-
-    final existing = <String>{};
-    for (final row in (rows as List)) {
-      if (row is! Map) continue;
-      final String id = row['owner_id']?.toString() ?? '';
-      if (id.isNotEmpty) existing.add(id);
-    }
-    return existing;
-  }
-
-  Future<Set<String>> fetchExistingCampanelliOwners(
-      List<String> userIds) async {
-    if (userIds.isEmpty) return {};
-    final rows = await _client
-        .from('campanelli')
-        .select('owner_id')
-        .in_('owner_id', userIds);
 
     final existing = <String>{};
     for (final row in (rows as List)) {
@@ -313,12 +286,10 @@ class AdminService {
 
     final existing = await fetchExistingInvites(filtered);
     final existingCases = await fetchExistingCaseOwners(filtered);
-    final existingCampanelli = await fetchExistingCampanelliOwners(filtered);
     final toInsert = filtered
         .where((id) =>
             !existing.contains(id) &&
-            !existingCases.contains(id) &&
-            !existingCampanelli.contains(id))
+            !existingCases.contains(id))
         .toList();
     if (toInsert.isEmpty) return 0;
 
@@ -361,6 +332,20 @@ class AdminService {
       'created_at': DateTime.now().toIso8601String(),
     });
     return true;
+  }
+
+  Future<bool> reviewHouseRequest({
+    required String inviteId,
+    required bool approved,
+  }) async {
+    final result = await _client.rpc(
+      'admin_review_house_request',
+      params: {
+        'p_invite_id': inviteId,
+        'p_approved': approved,
+      },
+    );
+    return result == true;
   }
 
   Future<dynamic> _safeRpc(String fn, {Map<String, dynamic>? params}) async {

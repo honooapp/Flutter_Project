@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
+import 'package:honoo/Widgets/cover_transform_image.dart';
 
 import '../test_supabase_helper.dart';
 
@@ -82,5 +83,44 @@ void main() {
     expect(renderedSlide.scaleLegacyTextToFit, isFalse);
     expect(find.byKey(const ValueKey('hinoo-legacy-fitted-text')),
         findsNothing);
+  });
+
+  testWidgets('Luna e Scrigno riapplicano il ritaglio salvato dello sfondo',
+      (tester) async {
+    const transform = <double>[
+      1.4, 0, 0, 0,
+      0, 1.4, 0, 0,
+      0, 0, 1.4, 0,
+      120, -90, 0, 1,
+    ];
+    const slide = HinooSlide(
+      backgroundImage: null,
+      text: 'Inquadratura invariata',
+      isTextWhite: true,
+      bgTransform: transform,
+    );
+    final roundTrip = HinooSlide.fromJson(slide.toJson());
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: HinooSlideView(
+          slide: roundTrip,
+          width: 360,
+          height: 640,
+          gap: 0,
+          gapColor: Colors.black,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(roundTrip.bgTransform, transform);
+    final backgroundImage = tester.widget<CoverTransformImage>(
+      find.byKey(const ValueKey('hinoo-saved-background-transform')),
+    );
+    expect(backgroundImage.transform!.storage[0], closeTo(1.4, 0.001));
+    expect(backgroundImage.transform!.storage[5], closeTo(1.4, 0.001));
+    expect(backgroundImage.transform!.storage[12], closeTo(40, 0.001));
+    expect(backgroundImage.transform!.storage[13], closeTo(-30, 0.001));
   });
 }
