@@ -22,6 +22,7 @@ void main() {
     expect(find.byType(ChestInfoDialog), findsOneWidget);
     expect(find.byType(SingleChildScrollView), findsOneWidget);
     expect(find.textContaining('Questo è il tuo Scrigno'), findsOneWidget);
+    expect(chestInfoText, isNot(contains('.')));
     expect(find.text(BuildMetadata.displayLabel), findsNothing);
     expect(find.byTooltip('Chiudi'), findsOneWidget);
 

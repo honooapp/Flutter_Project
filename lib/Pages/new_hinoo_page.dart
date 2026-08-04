@@ -545,6 +545,23 @@ class _NewHinooPageState extends State<NewHinooPage>
     builder?.confirmBackgroundPublic?.call();
   }
 
+  Future<void> _deleteEditorContent() async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => const HonooConfirmDialog(
+        title: 'Vuoi davvero eliminare questo hinoo?',
+        message: 'L’operazione non è reversibile',
+        confirmLabel: 'Sì',
+        cancelLabel: 'No',
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final dynamic builder = _builderKey.currentState;
+    builder?.clearContentPublic?.call();
+  }
+
   Widget _buildImageEditingControls() {
     const double confirmIconSize = 30;
     const double secondaryActionIconSize = confirmIconSize * 0.82;
@@ -602,8 +619,22 @@ class _NewHinooPageState extends State<NewHinooPage>
                 ),
               ),
             ),
-            const Expanded(
-              child: SizedBox(key: Key('hinoo-editor-right-empty-slot')),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Tooltip(
+                  message: 'Cancella hinoo',
+                  preferBelow: false,
+                  child: IconButton(
+                    key: const Key('hinoo-delete-editing-content'),
+                    onPressed: _deleteEditorContent,
+                    padding: EdgeInsets.zero,
+                    iconSize: secondaryActionIconSize,
+                    color: HonooColor.onBackground,
+                    icon: const Icon(Icons.delete_outline),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
