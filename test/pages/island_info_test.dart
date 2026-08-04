@@ -5,7 +5,7 @@ import 'package:honoo/Utility/formatted_text.dart';
 import 'package:sizer/sizer.dart';
 
 void main() {
-  testWidgets('Info Isola mostra i due esempi nei punti richiesti', (
+  testWidgets('Info Isola mostra il secondo esempio hinoo in fondo', (
     tester,
   ) async {
     tester.view.devicePixelRatio = 1;
@@ -50,6 +50,22 @@ void main() {
     expect(textParts[1].trimRight(), endsWith('<b>bianco<b> o <b>nero<b>'));
     expect(textParts.last.trim(), isNotEmpty);
     expect(textParts.join(), isNot(contains('.')));
+
+    final infoColumn = tester.widget<Column>(infoContent);
+    expect(
+      infoColumn.children.last.key,
+      const Key('island_info_hinoo_example'),
+    );
+    final hinooImage = tester.widget<Image>(
+      find.descendant(
+        of: find.byKey(const Key('island_info_hinoo_example')),
+        matching: find.byType(Image),
+      ),
+    );
+    expect(
+      (hinooImage.image as AssetImage).assetName,
+      'assets/images/onboarding_hinoo.png',
+    );
   });
 
   for (final size in <Size>[

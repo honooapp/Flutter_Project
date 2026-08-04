@@ -128,16 +128,16 @@ class _IslandPageState extends State<IslandPage> {
                               color: HonooColor.onBackground,
                               fontSize: 18,
                             ),
-                            const SizedBox(height: 12),
-                            exampleImage(
-                              key: const Key('island_info_hinoo_example'),
-                              assetPath: 'assets/hinooesempio.png',
-                            ),
-                            const SizedBox(height: 20),
                             FormattedText(
                               inputText: full.substring(secondImageOffset),
                               color: HonooColor.onBackground,
                               fontSize: 18,
+                            ),
+                            const SizedBox(height: 12),
+                            exampleImage(
+                              key: const Key('island_info_hinoo_example'),
+                              assetPath:
+                                  'assets/images/onboarding_hinoo.png',
                             ),
                           ],
                         );
