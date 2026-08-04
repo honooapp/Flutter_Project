@@ -60,9 +60,9 @@ void main() {
     }
 
     for (final entry in const [
-      (Key('home_inline_bottle'), 33.0),
+      (Key('home_inline_bottle'), 35.0),
       (Key('home_inline_moon'), 23.0),
-      (Key('home_inline_island'), 34.0),
+      (Key('home_inline_island'), 36.0),
     ]) {
       final key = entry.$1;
       final button = tester.widget<IconButton>(find.byKey(key));
