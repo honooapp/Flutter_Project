@@ -595,6 +595,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         context,
         MaterialPageRoute(
           builder: (context) => NewHinooPage(
+            targetContentName: 'honoo',
             forcedType: HinooType.answer,
             recipientTag: link.recipientId,
             replyTo: link.replyTo,
@@ -624,6 +625,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         context,
         MaterialPageRoute(
           builder: (context) => ReplyHonooPage(
+            targetContentName: 'hinoo',
             originalHonoo:
                 Honoo(
                     0,
@@ -659,6 +661,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         context,
         MaterialPageRoute(
           builder: (context) => NewHinooPage(
+            targetContentName: 'hinoo',
             forcedType: HinooType.answer,
             recipientTag: link.recipientId,
             replyTo: link.replyTo,

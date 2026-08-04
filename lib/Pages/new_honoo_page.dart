@@ -23,6 +23,7 @@ import 'placeholder_page.dart';
 import '../Utility/responsive_layout.dart';
 import '../Widgets/responsive_footer_bar.dart';
 import '../Widgets/conversation_notification_prompt.dart';
+import '../Widgets/repeated_reply_prompt.dart';
 import 'package:uuid/uuid.dart';
 
 class NewHonooPage extends StatefulWidget {
@@ -34,6 +35,7 @@ class NewHonooPage extends StatefulWidget {
     this.conversationId,
     this.replyTo,
     this.returnToPreviousOnAnswer = false,
+    this.targetContentName = 'honoo',
   });
 
   final HonooType? forcedType;
@@ -42,6 +44,7 @@ class NewHonooPage extends StatefulWidget {
   final String? conversationId;
   final String? replyTo;
   final bool returnToPreviousOnAnswer;
+  final String targetContentName;
 
   @override
   State<NewHonooPage> createState() => _NewHonooPageState();
@@ -161,7 +164,18 @@ class _NewHonooPageState extends State<NewHonooPage> {
     // 4) Crea e salva
     final HonooType type = widget.forcedType ?? HonooType.personal;
     // conversation: se risposta usa quella fornita; altrimenti genera una nuova
-    final String conversationId = widget.conversationId ?? const Uuid().v4();
+    String conversationId = widget.conversationId ?? const Uuid().v4();
+    if (type == HonooType.answer && widget.replyTo?.isNotEmpty == true) {
+      if (!mounted) return false;
+      final selectedConversationId = await chooseReplyConversation(
+        context: context,
+        parentId: widget.replyTo!,
+        defaultConversationId: conversationId,
+        contentName: widget.targetContentName,
+      );
+      if (selectedConversationId == null || !mounted) return false;
+      conversationId = selectedConversationId;
+    }
     final newHonoo = Honoo(
       0,
       _text,

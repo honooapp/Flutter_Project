@@ -50,9 +50,31 @@ void main() {
         _Item(createdAt: t2, id: 'normal'),
       ]);
 
-      expect(result.items.map((item) => item.id), ['a', 'b', 'c', 'normal']);
+      expect(result.items.map((item) => item.id), ['a', 'b', 'normal', 'c']);
       expect(result.conversationItemCount, 3);
     });
+
+    test(
+      'il contenuto salvato più di recente precede conversazioni più vecchie',
+      () {
+        final old = DateTime(2024, 1, 1, 12);
+        final recent = old.add(const Duration(minutes: 5));
+        final result = _organize([
+          _Item(
+            createdAt: old,
+            id: 'conversation',
+            latestReply: old.add(const Duration(minutes: 1)),
+            conversationId: 'conversation-1',
+          ),
+          _Item(createdAt: recent, id: 'just-saved'),
+        ]);
+
+        expect(result.items.map((item) => item.id), [
+          'just-saved',
+          'conversation',
+        ]);
+      },
+    );
 
     test('mostra una sola slide per conversazione usando il più recente', () {
       final t1 = DateTime(2024, 1, 1, 12);
@@ -65,14 +87,10 @@ void main() {
           conversationId: 'conversation-1',
         ),
         _Item(createdAt: t2, id: 'outside'),
-        _Item(
-          createdAt: t2,
-          id: 'reply',
-          conversationId: 'conversation-1',
-        ),
+        _Item(createdAt: t2, id: 'reply', conversationId: 'conversation-1'),
       ]);
 
-      expect(result.items.map((item) => item.id), ['reply', 'outside']);
+      expect(result.items.map((item) => item.id), ['outside', 'reply']);
     });
 
     test('non modifica la lista ricevuta', () {

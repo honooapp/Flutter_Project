@@ -388,6 +388,7 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                         await Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (_) => NewHinooPage(
+                              targetContentName: 'hinoo',
                               forcedType: HinooType.answer,
                               recipientTag: link.recipientId,
                               replyTo: link.replyTo,
@@ -440,6 +441,7 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                         await Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (_) => NewHonooPage(
+                              targetContentName: 'hinoo',
                               forcedType: HonooType.answer,
                               recipientTag: link.recipientId,
                               replyTo: link.replyTo,

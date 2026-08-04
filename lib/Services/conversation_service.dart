@@ -106,6 +106,54 @@ class ConversationService {
         .map((entry) => entry.id)
         .whereType<String>()
         .toSet();
+    final missingParentIds = entries
+        .map((entry) => entry.honoo?.replyTo ?? entry.hinoo?.replyTo)
+        .whereType<String>()
+        .where((id) => id.isNotEmpty && !existingIds.contains(id))
+        .toSet();
+    if (missingParentIds.isNotEmpty) {
+      final parentHonooRows = await _client
+          .from('honoo')
+          .select(
+            'id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id,conversation_id,is_from_moon_saved,admin_deleted_at',
+          )
+          .in_('id', missingParentIds.toList());
+      final parentHinooRows = await _client
+          .from('hinoo')
+          .select(
+            'id,pages,type,recipient_tag,reply_to,created_at,user_id,conversation_id,is_from_moon_saved,admin_deleted_at',
+          )
+          .in_('id', missingParentIds.toList());
+      for (final row in (parentHonooRows as List)) {
+        if (row['admin_deleted_at'] != null) continue;
+        entries.add(
+          _Entry.honoo(Honoo.fromMap(Map<String, dynamic>.from(row))),
+        );
+      }
+      for (final row in (parentHinooRows as List)) {
+        if (row['admin_deleted_at'] != null || row['pages'] is! List) continue;
+        final pages = (row['pages'] as List)
+            .whereType<Map<String, dynamic>>()
+            .map(HinooSlide.fromJson)
+            .toList();
+        entries.add(
+          _Entry.hinoo(
+            HinooDraft(
+              pages: pages,
+              type: _fromDbType(row['type'] as String?),
+              recipientTag: row['recipient_tag']?.toString(),
+              replyTo: row['reply_to']?.toString(),
+              conversationId: row['conversation_id']?.toString(),
+              isFromMoonSaved: (row['is_from_moon_saved'] as bool?) ?? false,
+            ),
+            createdAt: _parseCreatedAt(row['created_at']),
+            ownerId: row['user_id']?.toString(),
+            id: row['id']?.toString(),
+            isFromMoonSaved: (row['is_from_moon_saved'] as bool?) ?? false,
+          ),
+        );
+      }
+    }
     for (final row in (tombstoneRows as List)) {
       final id = row['content_id']?.toString();
       if (id == null || id.isEmpty || !existingIds.add(id)) continue;
