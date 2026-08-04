@@ -80,6 +80,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
 
   int _currentIndex = 0;
   bool _didApplyInitialFocus = false;
+  bool _initialLoadCompleted = false;
   int _conversationRefreshToken = 0;
   String? _pendingRevealEntryId;
   Object? _honooLoadError;
@@ -192,19 +193,29 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
   }
 
   Future<void> _loadAll() async {
-    if (mounted) setState(() => _honooLoadError = null);
     try {
-      await ctrl.loadChest();
-    } catch (error) {
-      if (mounted) setState(() => _honooLoadError = error);
+      if (mounted) setState(() => _honooLoadError = null);
+      try {
+        await ctrl.loadChest();
+      } catch (error) {
+        if (mounted) setState(() => _honooLoadError = error);
+      }
+      final uid = SupabaseProvider.client.auth.currentUser?.id;
+      if (uid == null) {
+        _chestController.completeWithoutUser();
+        return;
+      }
+      await _chestController.loadHinoo(uid);
+      await _chestController.refreshReplies(uid);
+    } finally {
+      if (!_initialLoadCompleted && mounted) {
+        setState(() {
+          _initialLoadCompleted = true;
+          _lastRebuildSignature = null;
+          _rebuildItems();
+        });
+      }
     }
-    final uid = SupabaseProvider.client.auth.currentUser?.id;
-    if (uid == null) {
-      _chestController.completeWithoutUser();
-      return;
-    }
-    await _chestController.loadHinoo(uid);
-    await _chestController.refreshReplies(uid);
   }
 
   Future<void> _initialize() async {
@@ -272,6 +283,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       widget.focusConversationId ?? '',
       widget.focusReplies ? '1' : '0',
       widget.highlightLatest ? '1' : '0',
+      _initialLoadCompleted ? 'loaded' : 'loading',
       _pendingRevealEntryId ?? '',
       _mode.name,
       _activeConversationId ?? '',
@@ -313,35 +325,35 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       conversationIdOf: _convIdOfItem,
     );
     _itemsNormal = organization.items;
-    final bool hasConversationItems = organization.conversationItemCount > 0;
 
     var desiredIndex = previousIdentity == null
         ? -1
         : _itemsNormal.indexWhere(
             (item) => _slideIdentity(item) == previousIdentity,
           );
-    if (_mode == ChestMode.normal &&
-        !_didApplyInitialFocus &&
-        widget.focusConversationId != null) {
-      final idx = _itemsNormal.indexWhere((it) {
-        final String? cid = it.when(
-          honoo: (h) => h.conversationId,
-          hinoo: (row) => row.conversationId ?? row.draft.conversationId,
-        );
-        return cid == widget.focusConversationId;
-      });
-      if (idx >= 0) {
-        desiredIndex = idx;
-      } else if (widget.focusReplies && hasConversationItems) {
+    if (_mode == ChestMode.normal && !_didApplyInitialFocus) {
+      if (widget.focusConversationId != null) {
+        final idx = _itemsNormal.indexWhere((it) {
+          final String? cid = it.when(
+            honoo: (h) => h.conversationId,
+            hinoo: (row) => row.conversationId ?? row.draft.conversationId,
+          );
+          return cid == widget.focusConversationId;
+        });
+        if (idx >= 0) {
+          desiredIndex = idx;
+        } else {
+          desiredIndex = 0;
+        }
+      } else {
+        // L'ordinamento è dal più recente: durante il caricamento progressivo
+        // non conservare una selezione provvisoria che potrebbe diventare
+        // meno recente quando arrivano anche gli altri tipi di contenuto.
         desiredIndex = 0;
       }
-      if (_itemsNormal.isNotEmpty) _didApplyInitialFocus = true;
-    } else if (_mode == ChestMode.normal &&
-        !_didApplyInitialFocus &&
-        widget.focusReplies &&
-        hasConversationItems) {
-      desiredIndex = 0;
-      _didApplyInitialFocus = _itemsNormal.isNotEmpty;
+      if (_initialLoadCompleted && _itemsNormal.isNotEmpty) {
+        _didApplyInitialFocus = true;
+      }
     }
     if (_mode == ChestMode.normal) {
       if (_itemsNormal.isEmpty) {

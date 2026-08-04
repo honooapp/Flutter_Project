@@ -383,7 +383,7 @@ void main() {
   });
 
   testWidgets(
-    'il bounce mostra la risposta propria senza bordo e il padre Luna bianco',
+    'il bounce resta attivo senza bordi sulla risposta propria e sul padre Luna',
     (tester) async {
       tester.view.devicePixelRatio = 1;
       tester.view.physicalSize = const Size(600, 900);
@@ -428,7 +428,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 600));
 
       expect(find.byKey(const Key('reply_reveal_parent')), findsOneWidget);
-      expect(borderWithColor(Colors.white), findsWidgets);
+      expect(borderWithColor(Colors.white), findsNothing);
       expect(borderWithColor(HonooColor.secondary), findsNothing);
     },
   );
