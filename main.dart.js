@@ -30900,7 +30900,7 @@ UG:function UG(){},
 bsS(){$.ec=new A.aii($.ec)
 var s=$.bt()
 s.x2=new A.aij(s.x2)},
-ba3(a,b,c){var s=A.kx(J.a1(b).a,null),r=A.bt6("019af5ff6992bc578c833de09b95f9e42b8a928c")
+ba3(a,b,c){var s=A.kx(J.a1(b).a,null),r=A.bt6("833f4b7121b2546cc6e82a91f50952d4f25bdb3d")
 new A.bx(Date.now(),0,!1).VX()
 $.ba2.push(new A.XU(s,r))
 if($.ba2.length>40)B.c.iG($.ba2,0)
@@ -111477,7 +111477,7 @@ $1(a){return!1},
 $S:7}
 A.a92.prototype={
 L(a){var s=null,r=A.cN().$4$color$fontSize$fontWeight$height(B.f,18,B.q,1.22)
-return new A.lE(B.hn,B.hl,B.n,new A.Y(360,s,A.bjX(A.c3(A.b([A.c3(s,s,s,s,s,s,s,s,s,r.aLB(B.O),"Ti regaliamo la Luna\nPer sempre\n\n"),B.aab,B.ahI,A.bcP("assets/icons/bottle.svg",B.ah9,new A.aVO(a),33,s,"Scrivi",9),B.aa9,B.ahH,A.bcP("assets/icons/moon.svg",B.ahb,new A.aVP(a),23,s,"Vai sulla Luna",1),B.aaa,B.ahG,A.bcP("assets/icons/isoladellestorie/island.svg",B.aha,new A.aVQ(a),34,B.f,"Vai all'Isola delle Storie",10),B.aa6],t.VO),s,s,s,s,s,s,s,s,r,s),B.ahd,s,B.p),s),B.ahc)}}
+return new A.lE(B.hn,B.hl,B.n,new A.Y(360,s,A.bjX(A.c3(A.b([A.c3(s,s,s,s,s,s,s,s,s,r.aLB(B.O),"Ti regaliamo la Luna\nPer sempre\n\n"),B.aab,B.ahI,A.bcP("assets/icons/bottle.svg",B.ah9,new A.aVO(a),35,s,"Scrivi",9),B.aa9,B.ahH,A.bcP("assets/icons/moon.svg",B.ahb,new A.aVP(a),23,s,"Vai sulla Luna",1),B.aaa,B.ahG,A.bcP("assets/icons/isoladellestorie/island.svg",B.aha,new A.aVQ(a),36,B.f,"Vai all'Isola delle Storie",10),B.aa6],t.VO),s,s,s,s,s,s,s,s,r,s),B.ahd,s,B.p),s),B.ahc)}}
 A.aVO.prototype={
 $0(){A.Bv(this.a)
 return null},
