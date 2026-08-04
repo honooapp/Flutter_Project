@@ -299,11 +299,12 @@ class CampanelliController extends ChangeNotifier {
       if (await _adminService.isCurrentUserAdmin()) {
         return CasaRequestResult.administrator;
       }
-      await _houseInviteService.createPendingRequest(
+      final created = await _houseInviteService.createPendingRequest(
         userId: user.id,
         email: user.email ?? '',
         createdAt: DateTime.now(),
       );
+      if (!created) return CasaRequestResult.alreadyPresent;
       _publish(_state.copyWith(hasPendingOrAcceptedInvite: true));
       return CasaRequestResult.success;
     } catch (error) {
@@ -388,18 +389,20 @@ class CampanelliController extends ChangeNotifier {
     required String email,
     DateTime? createdAt,
   }) async {
-    await _houseInviteService.createPendingRequest(
+    final created = await _houseInviteService.createPendingRequest(
       userId: userId,
       email: email,
       createdAt: createdAt ?? DateTime.now(),
     );
-    _publish(_state.copyWith(hasPendingOrAcceptedInvite: true));
+    if (created) {
+      _publish(_state.copyWith(hasPendingOrAcceptedInvite: true));
+    }
   }
 
   Future<void> startPendingKnockRefresh({
     required List<String> ownedHinooIds,
     required void Function() onChanged,
-    Duration interval = const Duration(seconds: 60),
+    Duration interval = const Duration(seconds: 15),
   }) async {
     _pendingKnockRefreshTimer?.cancel();
     final ids = List<String>.unmodifiable(ownedHinooIds);
