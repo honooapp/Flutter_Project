@@ -5,7 +5,7 @@ import 'package:honoo/Utility/formatted_text.dart';
 import 'package:sizer/sizer.dart';
 
 void main() {
-  testWidgets('Info Isola mostra il secondo esempio hinoo in fondo', (
+  testWidgets('Info Isola mostra il secondo esempio dopo bianco o nero', (
     tester,
   ) async {
     tester.view.devicePixelRatio = 1;
@@ -41,7 +41,10 @@ void main() {
 
     final textParts = tester
         .widgetList<FormattedText>(
-          find.descendant(of: infoContent, matching: find.byType(FormattedText)),
+          find.descendant(
+            of: infoContent,
+            matching: find.byType(FormattedText),
+          ),
         )
         .map((widget) => widget.inputText)
         .toList();
@@ -52,10 +55,15 @@ void main() {
     expect(textParts.join(), isNot(contains('.')));
 
     final infoColumn = tester.widget<Column>(infoContent);
-    expect(
-      infoColumn.children.last.key,
-      const Key('island_info_hinoo_example'),
+    final hinooExampleIndex = infoColumn.children.indexWhere(
+      (child) => child.key == const Key('island_info_hinoo_example'),
     );
+    final formattedTextIndexes = <int>[
+      for (var index = 0; index < infoColumn.children.length; index++)
+        if (infoColumn.children[index] is FormattedText) index,
+    ];
+    expect(hinooExampleIndex, greaterThan(formattedTextIndexes[1]));
+    expect(hinooExampleIndex, lessThan(formattedTextIndexes[2]));
     final hinooImage = tester.widget<Image>(
       find.descendant(
         of: find.byKey(const Key('island_info_hinoo_example')),
@@ -92,9 +100,9 @@ void main() {
       final chest = find.byKey(const Key('island_footer_chest'));
       final info = find.byKey(const Key('island_footer_info'));
 
-      expect(tester.widget<Positioned>(bottle).bottom, 13);
-      expect(tester.widget<Positioned>(chest).bottom, -18);
-      expect(tester.widget<Positioned>(info).bottom, -13);
+      expect(tester.widget<Positioned>(bottle).bottom, 27);
+      expect(tester.widget<Positioned>(chest).bottom, -7);
+      expect(tester.widget<Positioned>(info).bottom, -5);
 
       for (final icon in <Finder>[bottle, chest, info]) {
         final rect = tester.getRect(icon);

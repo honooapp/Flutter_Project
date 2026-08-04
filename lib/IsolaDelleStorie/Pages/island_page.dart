@@ -57,8 +57,7 @@ class _IslandPageState extends State<IslandPage> {
                     child: Builder(
                       builder: (context) {
                         const String firstMarker = 'in forme più complesse';
-                        const String secondMarker =
-                            '<b>bianco<b> o <b>nero<b>';
+                        const String secondMarker = '<b>bianco<b> o <b>nero<b>';
                         final String full = IsolaDelleStoreContentManager.e00
                             .replaceAll('.', '');
                         final int firstMarkerIndex = full.indexOf(firstMarker);
@@ -128,16 +127,16 @@ class _IslandPageState extends State<IslandPage> {
                               color: HonooColor.onBackground,
                               fontSize: 18,
                             ),
+                            const SizedBox(height: 12),
+                            exampleImage(
+                              key: const Key('island_info_hinoo_example'),
+                              assetPath: 'assets/images/onboarding_hinoo.png',
+                            ),
+                            const SizedBox(height: 20),
                             FormattedText(
                               inputText: full.substring(secondImageOffset),
                               color: HonooColor.onBackground,
                               fontSize: 18,
-                            ),
-                            const SizedBox(height: 12),
-                            exampleImage(
-                              key: const Key('island_info_hinoo_example'),
-                              assetPath:
-                                  'assets/images/onboarding_hinoo.png',
                             ),
                           ],
                         );
@@ -522,7 +521,7 @@ class _IslandPageState extends State<IslandPage> {
                             ),
                             Positioned(
                               key: const Key('island_footer_bottle'),
-                              bottom: 13,
+                              bottom: 27,
                               left: bottleX,
                               child: IconButton(
                                 icon: SvgPicture.asset(
@@ -586,7 +585,7 @@ class _IslandPageState extends State<IslandPage> {
                             ),
                             Positioned(
                               key: const Key('island_footer_chest'),
-                              bottom: -18,
+                              bottom: -7,
                               left: chestX,
                               child: IconButton(
                                 icon: SvgPicture.asset(
@@ -608,7 +607,7 @@ class _IslandPageState extends State<IslandPage> {
                             ),
                             Positioned(
                               key: const Key('island_footer_info'),
-                              bottom: -13,
+                              bottom: -5,
                               left: logoX,
                               child: IconButton(
                                 icon: SvgPicture.asset(
