@@ -3,7 +3,6 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 
 import '../Utility/honoo_colors.dart';
-import '../Utility/build_metadata.dart';
 import 'honoo_dialogs.dart';
 
 const chestInfoText =
@@ -78,25 +77,12 @@ class ChestInfoDialog extends StatelessWidget {
                       ),
                       child: SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),
-                        child: Column(
-                          children: [
-                            Text(
-                              chestInfoText,
-                              style: HonooDialogStyles.body(
-                                color: HonooColor.onBackground,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              BuildMetadata.displayLabel,
-                              style: const TextStyle(
-                                color: HonooColor.onBackground,
-                                fontSize: 11,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                        child: Text(
+                          chestInfoText,
+                          style: HonooDialogStyles.body(
+                            color: HonooColor.onBackground,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),

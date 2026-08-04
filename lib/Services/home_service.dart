@@ -9,7 +9,7 @@ class HomeService {
 
   Future<int> fetchUnreadReplyCount(String userId) async {
     return policy.read(() async {
-      final lastSeen = await RepliesSeenTracker.lastSeen();
+      final lastSeen = await RepliesSeenTracker.lastSeen(userId: userId);
       final honooRows = await SupabaseProvider.client
           .from('honoo')
           .select('created_at,user_id')
@@ -25,8 +25,9 @@ class HomeService {
 
       int count = 0;
       for (final row in [...(honooRows as List), ...(hinooRows as List)]) {
-        final createdAt =
-            DateTime.tryParse((row['created_at'] ?? '').toString());
+        final createdAt = DateTime.tryParse(
+          (row['created_at'] ?? '').toString(),
+        );
         if (createdAt != null &&
             (lastSeen == null || createdAt.isAfter(lastSeen))) {
           count++;
@@ -36,7 +37,6 @@ class HomeService {
     });
   }
 
-  Future<void> recordVisit() => policy.write(
-        () => SupabaseProvider.client.rpc('increment_site_visit'),
-      );
+  Future<void> recordVisit() =>
+      policy.write(() => SupabaseProvider.client.rpc('increment_site_visit'));
 }

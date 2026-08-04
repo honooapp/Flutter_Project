@@ -18,7 +18,7 @@ class FestePage extends StatelessWidget {
       "la Stanza del Grafico,\n"
       "il Tavolo del Nim,\n"
       "la Stanza Buia\n"
-      "e l’Agorà.\n\n"
+      "e l’Agorà\n\n"
       "Ho molta voglia\n"
       "di raccontarti tutto\n"
       "nel dettaglio,\n"
@@ -27,7 +27,7 @@ class FestePage extends StatelessWidget {
       "il gusto della sorpresa,\n"
       "quando sarai invitato\n"
       "alla tua prima\n"
-      "festa di honoo.\n";
+      "festa di honoo\n";
 
   @override
   Widget build(BuildContext context) {
@@ -39,11 +39,7 @@ class FestePage extends StatelessWidget {
     );
     return HonooStandardPage(
       contentWidthFactor: 0.45,
-      child: Text(
-        festeText,
-        style: bodyStyle,
-        textAlign: TextAlign.center,
-      ),
+      child: Text(festeText, style: bodyStyle, textAlign: TextAlign.center),
     );
   }
 }

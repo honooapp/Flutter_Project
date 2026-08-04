@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../Entities/honoo.dart';
@@ -157,7 +158,10 @@ class HonooCard extends StatelessWidget {
                     clipBehavior: Clip.antiAlias,
                     child: hasImage
                         ? SmoothImage(
+                            key: const ValueKey('honoo-saved-image'),
                             image: NetworkImage(imageUrl),
+                            fit: BoxFit.cover,
+                            alignment: Alignment.center,
                             placeholderColor: HonooColor.tertiary,
                           )
                         : Column(
@@ -172,10 +176,14 @@ class HonooCard extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 22),
-                              const Icon(
-                                Icons.photo,
-                                size: 48,
-                                color: HonooColor.primary,
+                              SvgPicture.asset(
+                                'assets/icons/immagine.svg',
+                                width: 48,
+                                height: 48,
+                                colorFilter: const ColorFilter.mode(
+                                  HonooColor.primary,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                             ],
                           ),

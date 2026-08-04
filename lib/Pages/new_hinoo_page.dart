@@ -1,6 +1,5 @@
 // lib/Pages/new_hinoo_page.dart
 import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -22,6 +21,7 @@ import 'email_login_page.dart';
 import 'home_page.dart';
 import 'placeholder_page.dart';
 import '../Entities/hinoo.dart';
+import '../Entities/reply_navigation_result.dart';
 import 'casa_builder_page.dart';
 import '../Widgets/conversation_notification_prompt.dart';
 
@@ -64,9 +64,7 @@ class _NewHinooPageState extends State<NewHinooPage>
   String _builderStep = 'changeBg';
   int _currentTextLength = 0;
   bool _bgUploadInProgress = false;
-
-  // ✅ nuovo: vero se c'è uno sfondo immagine (locale o url)
-  bool _hasBgImage = false;
+  bool _hasBackground = false;
 
   bool get _isWriteStep => _builderStep == 'writeText';
   bool get _hasMinTextForDownload => _currentTextLength >= 1;
@@ -83,18 +81,24 @@ class _NewHinooPageState extends State<NewHinooPage>
     );
     _chestBounce = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.0, end: 1.18)
-            .chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween<double>(
+          begin: 1.0,
+          end: 1.18,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 45,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.18, end: 0.95)
-            .chain(CurveTween(curve: Curves.easeInOut)),
+        tween: Tween<double>(
+          begin: 1.18,
+          end: 0.95,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
         weight: 25,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: 0.95, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween<double>(
+          begin: 0.95,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 30,
       ),
     ]).animate(_chestBounceController);
@@ -119,6 +123,18 @@ class _NewHinooPageState extends State<NewHinooPage>
     });
   }
 
+  void setEditorStateForTesting({
+    required String step,
+    required bool hasBackground,
+    int textLength = 0,
+  }) {
+    setState(() {
+      _builderStep = step;
+      _hasBackground = hasBackground;
+      _currentTextLength = textLength;
+    });
+  }
+
   void _applyDraftToLocalState(dynamic draft) {
     if (draft is! Map) return;
 
@@ -131,6 +147,7 @@ class _NewHinooPageState extends State<NewHinooPage>
     }
 
     _bgUploadInProgress = draft['isUploadingBg'] == true;
+    _hasBackground = draft['hasBg'] == true;
 
     int detectedLength = 0;
     final dynamic rawLength = draft['textLength'];
@@ -141,33 +158,24 @@ class _NewHinooPageState extends State<NewHinooPage>
       if (rawText is String) detectedLength = rawText.trim().length;
     }
     _currentTextLength = detectedLength;
-
-    // ✅ Determina se c’è uno sfondo immagine
-    final bool hasBgFlag = draft['hasBg'] == true;
-    final bool hasPreviewBytes = draft['bgPreviewBytes'] != null;
-    final dynamic bgUrlRaw = draft['bgUrl'];
-    final bool hasBgUrl = bgUrlRaw is String && bgUrlRaw.trim().isNotEmpty;
-
-    _hasBgImage = hasBgFlag || hasPreviewBytes || hasBgUrl;
   }
 
   Future<void> _onPngExported(Uint8List bytes) async {
     if (!mounted) return;
-    showHonooToast(context,
-        message: 'PNG generato: pronto per salvare o condividere.');
+    showHonooToast(
+      context,
+      message: 'PNG generato: pronto per salvare o condividere.',
+    );
   }
 
   Future<void> _submitHinoo() async {
     const String writeHint = _kWriteHint;
-    final dynamic rawDraft =
-        (_builderKey.currentState as dynamic)?.exportDraft();
+    final dynamic rawDraft = (_builderKey.currentState as dynamic)
+        ?.exportDraft();
     final pages = (rawDraft is Map) ? (rawDraft['pages'] as List?) : null;
     if (rawDraft == null || pages == null || pages.isEmpty) {
       if (!mounted) return;
-      showHonooToast(
-        context,
-        message: writeHint,
-      );
+      showHonooToast(context, message: writeHint);
       return;
     }
 
@@ -193,9 +201,8 @@ class _NewHinooPageState extends State<NewHinooPage>
         final ok = await Navigator.push<bool>(
           context,
           MaterialPageRoute(
-            builder: (_) => EmailLoginPage(
-              pendingHinooDraft: hinooDraft.toJson(),
-            ),
+            builder: (_) =>
+                EmailLoginPage(pendingHinooDraft: hinooDraft.toJson()),
           ),
         );
 
@@ -211,7 +218,7 @@ class _NewHinooPageState extends State<NewHinooPage>
       return;
     }
 
-// Se il builder sta ancora caricando lo sfondo, fermati
+    // Se il builder sta ancora caricando lo sfondo, fermati
     if (rawDraft['isUploadingBg'] == true || _bgUploadInProgress) {
       if (!mounted) return;
       showHonooToast(
@@ -221,8 +228,8 @@ class _NewHinooPageState extends State<NewHinooPage>
       return;
     }
 
-// ✅ SALVATAGGIO OGGETTO: bgUrl obbligatorio (persistenza)
-// (La preview serve per download/UX, ma non basta per creare l'oggetto persistente)
+    // ✅ SALVATAGGIO OGGETTO: bgUrl obbligatorio (persistenza)
+    // (La preview serve per download/UX, ma non basta per creare l'oggetto persistente)
     final bool missingPersistedBg = hinooDraft.pages.any(
       (slide) =>
           slide.backgroundImage == null || slide.backgroundImage!.isEmpty,
@@ -274,8 +281,9 @@ class _NewHinooPageState extends State<NewHinooPage>
     if (validationErrors.isNotEmpty) {
       if (!mounted) return;
       // Se manca il testo, mostra l'hint invece del dialog/testo generico
-      final hasMissingText =
-          validationErrors.any((e) => e.toLowerCase().contains('testo'));
+      final hasMissingText = validationErrors.any(
+        (e) => e.toLowerCase().contains('testo'),
+      );
       if (hasMissingText) {
         showHonooToast(context, message: writeHint);
       } else {
@@ -287,7 +295,8 @@ class _NewHinooPageState extends State<NewHinooPage>
     }
 
     final userId = SupabaseProvider.client.auth.currentUser?.id;
-    final bool shouldOfferNotifications = userId != null &&
+    final bool shouldOfferNotifications =
+        userId != null &&
         hinooDraft.type == HinooType.personal &&
         await ConversationNotificationPrompt.shouldOfferForFirstConversation(
           userId,
@@ -303,17 +312,20 @@ class _NewHinooPageState extends State<NewHinooPage>
       }
 
       if (widget.isCampanello) {
-        final hinooId = await _controller.saveToChestAndReturnId(hinooDraft);
         if (!mounted) return;
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (_) => CasaBuilderPage(campanelloHinooId: hinooId),
+            builder: (_) => CasaBuilderPage(campanello: hinooDraft),
           ),
         );
         return;
       }
 
-      await _controller.saveToChest(hinooDraft);
+      final bool isAnswer =
+          (hinooDraft.type == HinooType.answer) || widget.isReply;
+      final savedHinooId = isAnswer
+          ? await _controller.saveToChestAndReturnId(hinooDraft)
+          : await _controller.saveToChest(hinooDraft);
       if (!mounted) return;
       setState(() => _savedToChest = true);
       _chestBounceController.forward(from: 0);
@@ -321,17 +333,28 @@ class _NewHinooPageState extends State<NewHinooPage>
         await ConversationNotificationPrompt.show(context);
         if (!mounted) return;
       }
-      final bool isAnswer =
-          (hinooDraft.type == HinooType.answer) || widget.isReply;
       if (isAnswer) {
-        await showHonooMessageDialog(
-          context,
-          message:
-              "L'hinoo adesso è nel tuo Scrigno,\n e,\n soprattutto,\n nello Scrigno di qualcun altro.",
-        );
+        await showReplySavedDialog(context, contentName: 'hinoo');
         if (!mounted) return;
+        final conversationId = hinooDraft.conversationId;
+        if (widget.returnToPreviousOnAnswer) {
+          Navigator.of(context).pop(
+            ReplyNavigationResult(
+              conversationId: conversationId!,
+              replyId: savedHinooId,
+            ),
+          );
+          return;
+        }
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const HomePage()),
+          MaterialPageRoute(
+            builder: (_) => ChestPage(
+              focusReplies: true,
+              focusConversationId: conversationId,
+              focusReplyId: savedHinooId,
+              highlightLatest: true,
+            ),
+          ),
           (route) => false,
         );
         return;
@@ -378,7 +401,9 @@ class _NewHinooPageState extends State<NewHinooPage>
     for (final p in rawPages) {
       if (p is Map) {
         final bgUrl = p['bgUrl'] as String?;
-        final txt = ((p['text'] as String?) ?? '').trim();
+        // Preserve the editor string verbatim: leading/trailing manual line
+        // breaks are part of the text's visual position on the canvas.
+        final txt = (p['text'] as String?) ?? '';
         final textColorVal = (p['textColor'] as int?) ?? 0xFFFFFFFF;
         final isTextWhite = textColorVal == const Color(0xFFFFFFFF).toARGB32();
 
@@ -394,8 +419,9 @@ class _NewHinooPageState extends State<NewHinooPage>
 
           const double designHeight = 1920;
           const double designWidth = 1080;
-          final double canvasH =
-              _lastCanvasHeight > 0 ? _lastCanvasHeight : designHeight;
+          final double canvasH = _lastCanvasHeight > 0
+              ? _lastCanvasHeight
+              : designHeight;
           final double canvasW = canvasH * (9 / 16);
           final double factorX = canvasW != 0 ? designWidth / canvasW : 1.0;
           final double factorY = canvasH != 0 ? designHeight / canvasH : 1.0;
@@ -408,22 +434,24 @@ class _NewHinooPageState extends State<NewHinooPage>
           offY = normalizedTransform[13];
         }
 
-        slides.add(HinooSlide(
-          backgroundImage: bgUrl,
-          text: txt,
-          isTextWhite: isTextWhite,
-          bgScale: scale,
-          bgOffsetX: offX,
-          bgOffsetY: offY,
-          bgTransform: normalizedTransform,
-        ));
+        slides.add(
+          HinooSlide(
+            backgroundImage: bgUrl,
+            text: txt,
+            isTextWhite: isTextWhite,
+            bgScale: scale,
+            bgOffsetX: offX,
+            bgOffsetY: offY,
+            bgTransform: normalizedTransform,
+          ),
+        );
       }
     }
 
-    final HinooType type = widget.forcedType ??
-        (widget.isCampanello
-            ? HinooType.answer
-            : (widget.isReply ? HinooType.answer : HinooType.personal));
+    final HinooType type = widget.isCampanello
+        ? HinooType.personal
+        : (widget.forcedType ??
+              (widget.isReply ? HinooType.answer : HinooType.personal));
 
     // Se è una risposta e non è stato passato esplicitamente un conversationId,
     // usa replyTo come conversationId per garantire il raggruppamento.
@@ -445,15 +473,6 @@ class _NewHinooPageState extends State<NewHinooPage>
     return w;
   }
 
-  void _deleteCurrentFromBuilder() {
-    final dyn = _builderKey.currentState as dynamic;
-    if (dyn?.deleteCurrentPagePublic != null) {
-      dyn.deleteCurrentPagePublic();
-    } else {
-      _warnMissingApi('_deleteCurrentFromBuilder → deleteCurrentPagePublic');
-    }
-  }
-
   void _triggerDownloadFromBuilder() {
     final dyn = _builderKey.currentState as dynamic;
     if (dyn?.openDownloadDialogPublic != null) {
@@ -466,8 +485,10 @@ class _NewHinooPageState extends State<NewHinooPage>
   Future<void> _handleDownloadTap() async {
     if (!_hasMinTextForDownload) {
       if (!mounted) return;
-      showHonooToast(context,
-          message: 'Scrivi almeno 1 carattere prima di scaricare');
+      showHonooToast(
+        context,
+        message: 'Scrivi almeno 1 carattere prima di scaricare',
+      );
       return;
     }
 
@@ -485,7 +506,9 @@ class _NewHinooPageState extends State<NewHinooPage>
       );
       if (goLogin == true && mounted) {
         Navigator.push(
-            context, MaterialPageRoute(builder: (_) => const EmailLoginPage()));
+          context,
+          MaterialPageRoute(builder: (_) => const EmailLoginPage()),
+        );
       }
       return;
     }
@@ -498,70 +521,90 @@ class _NewHinooPageState extends State<NewHinooPage>
     showHonooToast(context, message: 'Collega API del builder: $what');
   }
 
-  Widget _buildCanvasControls() {
-    const double iconSize = 22;
-    const double buttonBox = 34;
-    const double pillHeight = 40;
+  void _replaceEditorImage() {
+    final dynamic builder = _builderKey.currentState;
+    builder?.replaceBackgroundPublic?.call();
+  }
 
-    Widget iconBtn({
-      required IconData icon,
-      required String tooltip,
-      required VoidCallback onPressed,
-    }) {
-      return SizedBox(
-        width: buttonBox,
-        height: buttonBox,
-        child: IconButton(
-          tooltip: tooltip,
-          onPressed: onPressed,
-          icon: Icon(icon, size: iconSize, color: Colors.white),
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(),
-          splashRadius: buttonBox / 2,
-          visualDensity: VisualDensity.compact,
-        ),
-      );
-    }
+  void _saveEditorImage() {
+    final dynamic builder = _builderKey.currentState;
+    builder?.confirmBackgroundPublic?.call();
+  }
 
-    final controls = Container(
-      height: pillHeight,
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.55),
-        borderRadius: BorderRadius.circular(pillHeight / 2),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          if (_isWriteStep) ...[
-            iconBtn(
-              tooltip: 'Salva sul dispositivo',
-              icon: Icons.download_outlined,
-              onPressed: _handleDownloadTap,
+  Widget _buildImageEditingControls() {
+    const double confirmIconSize = 30;
+    const double secondaryActionIconSize = confirmIconSize * 0.82;
+
+    return IgnorePointer(
+      ignoring: _bgUploadInProgress,
+      child: Opacity(
+        opacity: _bgUploadInProgress ? 0.65 : 1,
+        child: Row(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Tooltip(
+                  message: 'Sostituisci immagine',
+                  preferBelow: false,
+                  child: IconButton(
+                    key: const Key('hinoo-replace-editing-image'),
+                    onPressed: _replaceEditorImage,
+                    padding: EdgeInsets.zero,
+                    iconSize: secondaryActionIconSize,
+                    color: HonooColor.onBackground,
+                    icon: SvgPicture.asset(
+                      'assets/icons/immagine.svg',
+                      width: secondaryActionIconSize,
+                      height: secondaryActionIconSize,
+                      colorFilter: const ColorFilter.mode(
+                        HonooColor.onBackground,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(width: 6),
+            Expanded(
+              child: Center(
+                child: Tooltip(
+                  message: 'Salva immagine',
+                  preferBelow: false,
+                  child: IconButton(
+                    key: const Key('hinoo-save-editing-image'),
+                    onPressed: _saveEditorImage,
+                    padding: EdgeInsets.zero,
+                    icon: SvgPicture.asset(
+                      'assets/icons/ok.svg',
+                      width: confirmIconSize,
+                      height: confirmIconSize,
+                      colorFilter: const ColorFilter.mode(
+                        HonooColor.onBackground,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const Expanded(
+              child: SizedBox(key: Key('hinoo-editor-right-empty-slot')),
+            ),
           ],
-          iconBtn(
-            tooltip: 'Cancella hinoo',
-            icon: Icons.delete_outline,
-            onPressed: _deleteCurrentFromBuilder,
-          ),
-        ],
+        ),
       ),
     );
+  }
 
-    if (_hasBgImage) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(pillHeight / 2),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-          child: controls,
-        ),
-      );
-    }
-
-    return controls;
+  Widget _buildEditorControls() {
+    return SizedBox(
+      key: const Key('hinoo-editor-controls'),
+      height: 40,
+      child: _builderStep == 'changeBg' && _hasBackground
+          ? _buildImageEditingControls()
+          : const SizedBox.shrink(),
+    );
   }
 
   @override
@@ -585,8 +628,9 @@ class _NewHinooPageState extends State<NewHinooPage>
                 ResponsiveLayout.modeForWidth(viewW);
             final double footerIconSize =
                 ResponsiveLayout.footerIconSizeForMode(layoutMode);
-            final double footerGap =
-                ResponsiveLayout.footerGapForMode(layoutMode);
+            final double footerGap = ResponsiveLayout.footerGapForMode(
+              layoutMode,
+            );
             final double footerBottomPadding =
                 ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
             final double footerSpacing = footerBottomPadding + safeBottom;
@@ -596,14 +640,23 @@ class _NewHinooPageState extends State<NewHinooPage>
                 footerIconSize + footerTopSpacing + footerBottomSpacing;
 
             final double availableH =
-                (viewH - _titleH - contentTopPadding - footerReserved)
-                    .clamp(0.0, double.infinity);
+                (viewH - _titleH - contentTopPadding - footerReserved).clamp(
+                  0.0,
+                  double.infinity,
+                );
+            const double editorControlsHeight = 40;
+            const double editorControlsGap = 4;
+            final double canvasAvailableH =
+                (availableH - editorControlsHeight - editorControlsGap).clamp(
+                  0.0,
+                  double.infinity,
+                );
 
             const double ar = 9 / 16;
             double canvasW = targetMaxW;
             double canvasH = canvasW / ar;
-            if (canvasH > availableH) {
-              canvasH = availableH;
+            if (canvasH > canvasAvailableH) {
+              canvasH = canvasAvailableH;
               canvasW = canvasH * ar;
             }
             _lastCanvasHeight = HinooTypography.baselineCanvasHeight;
@@ -621,7 +674,8 @@ class _NewHinooPageState extends State<NewHinooPage>
                         onTap: () {
                           Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(
-                                builder: (_) => const PlaceholderPage()),
+                              builder: (_) => const PlaceholderPage(),
+                            ),
                             (route) => false,
                           );
                         },
@@ -637,10 +691,15 @@ class _NewHinooPageState extends State<NewHinooPage>
                       constraints: BoxConstraints(maxWidth: targetMaxW),
                       child: SizedBox(
                         width: canvasW,
-                        height: canvasH,
-                        child: Stack(
+                        height:
+                            editorControlsHeight + editorControlsGap + canvasH,
+                        child: Column(
                           children: [
-                            Positioned.fill(
+                            _buildEditorControls(),
+                            const SizedBox(height: editorControlsGap),
+                            SizedBox(
+                              width: canvasW,
+                              height: canvasH,
                               child: ClipRect(
                                 child: HinooBuilder(
                                   key: _builderKey,
@@ -649,17 +708,12 @@ class _NewHinooPageState extends State<NewHinooPage>
                                   hintText: _kWriteHint,
                                   backgroundPromptText: widget.isCampanello
                                       ? 'Scrivi qui\n'
-                                          'tutto quello che vuoi\n'
-                                          'per la pagina\n'
-                                          'del tuo campanello'
+                                            'tutto quello che vuoi\n'
+                                            'per la pagina\n'
+                                            'del tuo campanello'
                                       : null,
                                 ),
                               ),
-                            ),
-                            Positioned(
-                              top: 8,
-                              right: 8,
-                              child: _buildCanvasControls(),
                             ),
                           ],
                         ),
@@ -713,7 +767,8 @@ class _NewHinooPageState extends State<NewHinooPage>
                           onPressed: () {
                             Navigator.of(context).pushAndRemoveUntil(
                               MaterialPageRoute(
-                                  builder: (_) => const HomePage()),
+                                builder: (_) => const HomePage(),
+                              ),
                               (route) => false,
                             );
                           },
@@ -740,28 +795,44 @@ class _NewHinooPageState extends State<NewHinooPage>
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (_) => const ChestPage()),
+                                builder: (_) => const ChestPage(),
+                              ),
                             );
                           },
                         ),
                         if (_isWriteStep && _currentTextLength > 0)
                           ResponsiveFooterAction(
                             asset: "assets/icons/ok.svg",
-                            semanticsLabel: ((widget.isReply ||
+                            semanticsLabel:
+                                ((widget.isReply ||
                                     widget.forcedType == HinooType.answer)
                                 ? 'Invia'
                                 : (widget.isCampanello
-                                    ? 'Salva il campanello'
-                                    : 'OK')),
+                                      ? 'Salva il campanello'
+                                      : 'OK')),
                             size: footerIconSize,
                             splashRadius: 25,
-                            tooltip: (widget.isReply ||
+                            tooltip:
+                                (widget.isReply ||
                                     widget.forcedType == HinooType.answer)
                                 ? 'Invia'
                                 : (widget.isCampanello
-                                    ? 'Salva il campanello'
-                                    : 'Salva hinoo'),
+                                      ? 'Salva il campanello'
+                                      : 'Salva hinoo'),
                             onPressed: _submitHinoo,
+                          ),
+                        if (_isWriteStep)
+                          ResponsiveFooterAction(
+                            asset: 'assets/icons/download.svg',
+                            semanticsLabel: 'Download',
+                            size: footerIconSize,
+                            splashRadius: 25,
+                            tooltip: 'Salva sul dispositivo',
+                            onPressed: _handleDownloadTap,
+                            colorFilter: const ColorFilter.mode(
+                              HonooColor.onBackground,
+                              BlendMode.srcIn,
+                            ),
                           ),
                       ],
                     ),

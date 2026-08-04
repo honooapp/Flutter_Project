@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Services/house_invite_service.dart';
 
 class _MockClient extends Mock implements SupabaseClient {}
@@ -51,7 +52,7 @@ void main() {
     when(() => chain.limit(any())).thenAnswer((_) => chain);
   });
 
-  test('hasPendingOrAcceptedInvite filtra status pending/accepted', () async {
+  test('hasPendingOrAcceptedInvite include richieste e inviti aperti', () async {
     chain.queueResponse([
       {'status': 'pending'}
     ]);
@@ -62,26 +63,84 @@ void main() {
     verify(() => client.from('house_invites')).called(1);
     verify(() => chain.select('status')).called(1);
     verify(() => chain.eq('user_id', 'user-1')).called(1);
-    verify(() => chain.in_('status', ['pending', 'accepted'])).called(1);
+    verify(() => chain.in_('status', ['requested', 'pending', 'accepted']))
+        .called(1);
     verify(() => chain.limit(1)).called(1);
   });
 
-  test('createPendingRequest mantiene il payload della richiesta', () async {
+  test('createPendingRequest usa la RPC protetta', () async {
     final createdAt = DateTime.utc(2026, 7, 18, 12);
-    when(() => chain.insert(any())).thenAnswer((_) => chain);
-    chain.queueResponse(<String, dynamic>{});
+    when(() => client.rpc(
+          'request_house_invite',
+          params: any(named: 'params'),
+        )).thenAnswer((_) => chain);
+    chain.queueResponse(true);
 
-    await service.createPendingRequest(
+    final created = await service.createPendingRequest(
       userId: 'user-1',
       email: 'user@example.com',
       createdAt: createdAt,
     );
 
-    verify(() => chain.insert({
-          'user_id': 'user-1',
-          'email': 'user@example.com',
-          'status': 'pending',
-          'created_at': '2026-07-18T12:00:00.000Z',
-        })).called(1);
+    expect(created, isTrue);
+    verify(() => client.rpc(
+          'request_house_invite',
+          params: {'p_email': 'user@example.com'},
+        )).called(1);
+  });
+
+  test('createHouseWithCampanello salva campanello e casa atomici', () async {
+    when(() => client.rpc(
+          'create_house_with_campanello',
+          params: any(named: 'params'),
+        )).thenAnswer((_) => chain);
+    chain.queueResponse('campanello-1');
+    const draft = HinooDraft(
+      pages: [
+        HinooSlide(
+          backgroundImage: 'https://example.com/background.png',
+          text: 'Suona qui',
+          isTextWhite: true,
+        ),
+      ],
+    );
+
+    final id = await service.createHouseWithCampanello(
+      campanello: draft,
+      houseImageUrl: 'https://example.com/house.png',
+      bgTransform: const [1, 0, 0, 1, 2, 3],
+    );
+
+    expect(id, 'campanello-1');
+    verify(() => client.rpc(
+          'create_house_with_campanello',
+          params: {
+            'p_pages': draft.pages.map((page) => page.toJson()).toList(),
+            'p_house_image_url': 'https://example.com/house.png',
+            'p_bg_transform': [1, 0, 0, 1, 2, 3],
+          },
+        )).called(1);
+  });
+
+  test('createHouseWithCampanello rifiuta bozze risposta', () async {
+    const draft = HinooDraft(
+      type: HinooType.answer,
+      pages: [
+        HinooSlide(
+          backgroundImage: null,
+          text: 'Risposta',
+          isTextWhite: false,
+        ),
+      ],
+    );
+
+    expect(
+      () => service.createHouseWithCampanello(
+        campanello: draft,
+        houseImageUrl: 'https://example.com/house.png',
+        bgTransform: const [1, 0, 0, 1, 0, 0],
+      ),
+      throwsArgumentError,
+    );
   });
 }

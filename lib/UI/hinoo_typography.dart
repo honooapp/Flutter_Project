@@ -29,6 +29,14 @@ class HinooTypography {
   /// Vertical padding - can be proportional or fixed
   static const double verticalPaddingBase = 40.0;
 
+  /// The editor uses an asymmetric text viewport so the keyboard/cursor do not
+  /// make the saved text jump when switching to the viewer.
+  static double editorTextTopPadding(double canvasWidth) {
+    return verticalPadding(canvasWidth) * 0.45;
+  }
+
+  static const double editorTextBottomPadding = 6.0;
+
   /// Maximum number of lines allowed
   static const int maxLines = 20;
 
@@ -49,9 +57,12 @@ class HinooTypography {
     );
   }
 
-  /// Returns the base TextStyle for display/viewer (slightly bolder)
+  /// Returns the same TextStyle used by the editor.
+  ///
+  /// Keeping identical font metrics prevents saved text from changing width
+  /// or appearing compressed after publication.
   static TextStyle displayTextStyle({required Color color}) {
-    return textStyle(color: color, fontWeight: FontWeight.w600);
+    return textStyle(color: color);
   }
 
   /// Calculate usable width after padding

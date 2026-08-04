@@ -39,21 +39,23 @@ class LaboratoriSiaePage extends StatelessWidget {
       "Filomena Reccia,\n"
       "Vincenzo  Fusco,\n"
       "Agostino  Gravante,\n"
-      "Pasqualina D’Agostino.\n\n"
+      "Pasqualina D’Agostino\n\n"
       "Sì,\n"
       "nel 2025\n"
       "honoo ha partecipato\n"
-      "a un Bando Siae.\n"
-      "E ha vinto.\n";
+      "a un Bando Siae\n"
+      "E ha vinto\n";
 
   @override
   Widget build(BuildContext context) {
     final bool isPhone = DeviceController().isPhone();
     final double screenWidth = MediaQuery.of(context).size.width;
-    final ResponsiveLayoutMode layoutMode =
-        ResponsiveLayout.modeForWidth(screenWidth);
-    final double footerIconSize =
-        ResponsiveLayout.footerIconSizeForMode(layoutMode);
+    final ResponsiveLayoutMode layoutMode = ResponsiveLayout.modeForWidth(
+      screenWidth,
+    );
+    final double footerIconSize = ResponsiveLayout.footerIconSizeForMode(
+      layoutMode,
+    );
     final double footerBottomPadding =
         ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
     final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
@@ -116,13 +118,11 @@ class LaboratoriSiaePage extends StatelessWidget {
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => const LaboratoriNoiELoroPage(),
-              ),
+              MaterialPageRoute(builder: (_) => const LaboratoriNoiELoroPage()),
             );
           },
       ),
-      TextSpan(text: '.\n\nNoi e loro', style: baseTextStyle),
+      TextSpan(text: '\n\nNoi e loro', style: baseTextStyle),
       TextSpan(text: _bodyAfterLinks, style: baseTextStyle),
     ];
 
@@ -130,12 +130,7 @@ class LaboratoriSiaePage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          const SizedBox(
-            height: 52,
-            child: Center(
-              child: HonooAppTitle(),
-            ),
-          ),
+          const SizedBox(height: 52, child: Center(child: HonooAppTitle())),
           Expanded(
             child: SingleChildScrollView(
               child: SizedBox(

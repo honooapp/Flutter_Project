@@ -9,6 +9,7 @@ import 'hinoo_typography.dart';
 import '../Utility/honoo_colors.dart';
 import '../Utility/network_image_prefetch.dart';
 import '../Widgets/smooth_image.dart';
+import '../Widgets/cover_transform_image.dart';
 import '../Widgets/text_box_download_button.dart';
 
 class HinooViewer extends StatefulWidget {
@@ -205,6 +206,8 @@ class _HinooViewerState extends State<HinooViewer> {
                               height: baselineH,
                               gap: 0,
                               gapColor: widget.gapColor,
+                              scaleLegacyTextToFit:
+                                  widget.draft.baseCanvasHeight == null,
                               onDownloadTap: widget.onDownloadTap,
                             );
                           },
@@ -256,6 +259,7 @@ class HinooSlideView extends StatelessWidget {
   final double height;
   final double gap;
   final Color gapColor;
+  final bool scaleLegacyTextToFit;
   final VoidCallback? onDownloadTap;
   const HinooSlideView({
     super.key,
@@ -264,6 +268,7 @@ class HinooSlideView extends StatelessWidget {
     required this.height,
     required this.gap,
     required this.gapColor,
+    this.scaleLegacyTextToFit = false,
     this.onDownloadTap,
   });
 
@@ -299,7 +304,9 @@ class HinooSlideView extends StatelessWidget {
     final Matrix4 transform = buildTransform();
 
     const double horizontalPadding = HinooTypography.horizontalPadding;
-    final double verticalPadding = HinooTypography.verticalPadding(width);
+    final double textTopPadding = HinooTypography.editorTextTopPadding(width);
+    const double textBottomPadding = HinooTypography.editorTextBottomPadding;
+    final double actionVerticalPadding = HinooTypography.verticalPadding(width);
     final TextStyle effectiveStyle = HinooTypography.displayTextStyle(
       color: textColor,
     );
@@ -308,45 +315,58 @@ class HinooSlideView extends StatelessWidget {
     final Widget? downloadOverlay = onDownloadTap == null
         ? null
         : TextBoxDownloadButton(onPressed: onDownloadTap!, tooltip: 'download');
+    final Widget text = Text(
+      slide.text,
+      textAlign: TextAlign.center,
+      style: effectiveStyle,
+      softWrap: false,
+    );
 
     return SizedBox(
+      key: const ValueKey('hinoo-slide-canvas'),
       width: width,
       height: height,
       child: Stack(
         fit: StackFit.expand,
         children: [
           ClipRect(
-            child: Transform(
-              transform: transform,
-              alignment: Alignment.center,
-              child: SmoothImage(
-                image: bg,
-                fit: BoxFit.cover,
-                placeholderColor: HonooColor.background,
-              ),
-            ),
+            child: transform.isIdentity()
+                ? SmoothImage(
+                    image: bg,
+                    fit: BoxFit.cover,
+                    placeholderColor: HonooColor.background,
+                  )
+                : CoverTransformImage.transformed(
+                    key: const ValueKey('hinoo-saved-background-transform'),
+                    image: bg,
+                    transform: transform,
+                  ),
           ),
           Positioned.fill(
             top: gap / 2,
             bottom: gap / 2,
             child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: horizontalPadding,
-                vertical: verticalPadding,
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding,
+                textTopPadding,
+                horizontalPadding,
+                textBottomPadding,
               ),
               child: Center(
-                child: Text(
-                  slide.text,
-                  textAlign: TextAlign.center,
-                  style: effectiveStyle,
-                  softWrap: true,
-                ),
+                key: const ValueKey('hinoo-saved-text-position'),
+                child: scaleLegacyTextToFit
+                    ? FittedBox(
+                        key: const ValueKey('hinoo-legacy-fitted-text'),
+                        fit: BoxFit.scaleDown,
+                        child: text,
+                      )
+                    : text,
               ),
             ),
           ),
           if (downloadOverlay != null)
             Positioned(
-              top: halfGap + verticalPadding + actionInset,
+              top: halfGap + actionVerticalPadding + actionInset,
               right: horizontalPadding + actionInset,
               child: downloadOverlay,
             ),

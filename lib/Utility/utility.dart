@@ -12,24 +12,30 @@ class Utility {
   final String appName = 'honoo';
   // final String text1 = """Io lo scrivo sempre così:\nsenza virgolette\ne iniziale minuscola.\nE lo pronuncio "onù",\nsenza aspirazione iniziale.\n\nhonoo\nè un progetto multimediale,\narticolato in\n\nperformance\ne laboratori teatrali\n\nesplorazioni lunari\n\ne\nviaggi sull'Isola delle Storie.\n\nNon ci sono profili utenti\nin honoo.\nE non ci sono i "mi piace".\nMa se trovi un honoo\nche ti piace,\npuoi salvarlo nel tuo cuore\ne,\nse ne hai voglia,\npuoi anche fare\nqualcosa in più.\n\nO molto di più.\n\nSe è come penso,\nl'ultima volta\nche ci siamo visti\n\navevi gli occhi chiusi\ne hai fatto la scelta giusta.\n\nMi chiamo\nVenceslao Cembalo\ne se telefoni al\n3274920811,\npuoi sentire\nun’altra volta\nla mia voce\ne continuare il viaggio.\n\n Se le cose\nstanno\ndiversamente,\nclicca sull’icona della\nhome\nin basso a sinistra.\n\nIn alto\nal centro\ndi ogni schermata\nc'è il logo\nhonoo:\nse ci clicchi sopra,\ntorni qui\na questa pagina.\n""";
   final String text1First =
-      """Io lo scrivo sempre così:\nsenza virgolette\ne iniziale minuscola.\nE lo pronuncio "onù",\nsenza aspirazione iniziale.\n\nhonoo\nè un progetto multimediale,\narticolato in""";
+      """Io lo scrivo sempre così:\nsenza virgolette\ne iniziale minuscola\nE lo pronuncio "onù",\nsenza aspirazione iniziale\n\nhonoo\nè un progetto multimediale,\narticolato in""";
   final String text1Second = """\n\nesplorazioni lunari\n""";
   final String text1Third = """\n\nviaggi sull'Isola delle Storie\n""";
   final String text1Fourth =
-      """\n\nNon ci sono profili utenti\nin honoo.\nE non ci sono i "mi piace".\nMa se trovi un honoo\nche ti piace,\npuoi salvarlo nel tuo cuore\ne,\nse ne hai voglia,\npuoi anche fare\nqualcosa di più.\n\nO molto di più.\n\nSe è come penso,\nl'ultima volta\nche ci siamo visti\n\n""";
+      """\n\nNon ci sono profili utenti\nin honoo\nE non ci sono i "mi piace"\nMa se trovi un honoo\nche ti piace,\npuoi salvarlo nel tuo cuore\ne,\nse ne hai voglia,\npuoi anche fare\nqualcosa di più\n\nO molto di più\n\nSe è come penso,\nl'ultima volta\nche ci siamo visti\n\n""";
   final String text1Fifth =
-      """\n\navevi gli occhi chiusi\ne hai fatto la scelta giusta.\n\nMi chiamo\nVenceslao Cembalo\ne se telefoni al\n3274920811,\npuoi sentire\nun’altra volta\nla mia voce\ne continuare il viaggio.\n\n Se le cose\nstanno\ndiversamente,\nclicca sull’icona della\nhome\nin basso a sinistra.\n\nIn alto\nal centro\ndi ogni schermata\nc'è il logo\n\n""";
+      """\n\navevi gli occhi chiusi\ne hai fatto la scelta giusta\n\nMi chiamo\nVenceslao Cembalo\ne se telefoni al\n3274920811,\npuoi sentire\nun’altra volta\nla mia voce\ne continuare il viaggio\n\n Se le cose\nstanno\ndiversamente,\nclicca sull’icona della\nhome\nin basso a sinistra\n\nIn alto\nal centro\ndi ogni schermata\nc'è il logo\n\n""";
   final String text1Six =
-      """\n\nse ci clicchi sopra,\ntorni qui\na questa pagina.\n\n""";
-  final String sostieniText = '\nVuoi collaborare\na questo progetto?\n\nScrivimi a\nvenceslao.cembalo@gmail.com\n\nSe fai la dichiarazione\ndei redditi,\npuoi scegliere\ndi destinare\nil 5 per mille\na honoo.\n\nNon è una donazione in più.\nNon costa nulla.\n\nÈ una parte\ndelle tue imposte\nche puoi decidere\na chi destinare.\n\nFirma\nnel riquadro\ndedicato agli Enti\ndel Terzo Settore\ne scrivi\nil codice fiscale\ndi honoo.\n\nCodice fiscale di\nhonoo - laboratorio multimediale:\n95349850636\n\nSe ti va,\nclicca qui:\n\nhttps://ko-fi.com/honoo2026\n\nper offrire\nun bicchiere di Idromele\nagli Gnometti delle Idee.\n\nOppure\nun paio di fiaschi.\n\nI risultati\nsaranno scintillanti:\ngli Gnometti delle Idee\nsono sconsideratamente generosi\ncon chi è generoso.\n\nProva\ne di me dirai\nche gli amici\nli consiglio bene.\n';
+      """\n\nse ci clicchi sopra,\ntorni qui\na questa pagina\n\n""";
+  final String sostieniText =
+      '\nVuoi collaborare\na questo progetto?\n\nScrivimi a\nvenceslao.cembalo@gmail.com\n\nSe fai la dichiarazione\ndei redditi,\npuoi scegliere\ndi destinare\nil 5 per mille\na honoo\n\nNon è una donazione in più\nNon costa nulla\n\nÈ una parte\ndelle tue imposte\nche puoi decidere\na chi destinare\n\nFirma\nnel riquadro\ndedicato agli Enti\ndel Terzo Settore\ne scrivi\nil codice fiscale\ndi honoo\n\nCodice fiscale di\nhonoo - laboratorio multimediale:\n95349850636\n\nSe ti va,\nclicca qui:\n\nhttps://ko-fi.com/honoo2026\n\nper offrire\nun bicchiere di Idromele\nagli Gnometti delle Idee\n\nOppure\nun paio di fiaschi\n\nI risultati\nsaranno scintillanti:\ngli Gnometti delle Idee\nsono sconsideratamente generosi\ncon chi è generoso\n\nProva\ne di me dirai\nche gli amici\nli consiglio bene\n';
   final String textHome1 = 'Ti regaliamo la Luna.\nPer sempre.';
   final String textHome2 =
       'Niente è per sempre,\ne nessuno può regalarti la Luna.\n\nÈ vero,\nma non per i poeti.\n\nVuoi essere un poeta di honoo?\n\nClicca sulla Bottiglia,\ne componi i tuoi honoo e hinoo.\n\nOppure sulla Luna,\ne guarda gli honoo\ne gli hinoo degli altri.\n\nO sull’Isola,\ne inizia il viaggio\nverso le tue storie.';
-  final String podcastDiretteText = 'honoo\nsi ascolta\ne si guarda.\n\nÈ voce.\nÈ immagine.\n\nUn canale YouTube.\nUn podcast.\nUn account Twitch.\n\nSe vuoi,\npuoi ascoltare,\nguardare\ne partecipare.\n\n';
-  final String libriText = 'Sto preparando\nle versioni cartacee\ndei miei libri.\n\nHo acquistato\ni codici ISBN\ne una licenza\nInDesign.\n\nÈ un lavoro lento.\nArtigianale.\n\nQui troverai la notizia,\nquando saranno pronti:\n\nIsola delle Storie\n\nIsole delle Storie\n(con illustrazioni di Joel Folda)\n\nImmacolato\n\nI limoni sono finiti\n\nAlmeno\navresti potuto\ncambiare i nomi\n\nPapà,\nma tu mi vuoi bene?\n';
-  final String campanelliText = 'In questa parte dell’Isola\nci sono case.\n\nVuoi scoprire chi ci abita?\n\nScorrendo verso destra\npuoi leggere\nciò che ogni abitante\nha scelto di raccontarti.\n\nSe vuoi,\nprova a bussare:\nmagari ti fa entrare.';
-  final String campanelloExample1Text = 'Ti piace\nascoltare musica\nin compagnia?\n\nE ballare in casa,\ncome si fa alle feste?\n\nQuesto è il campanello\ndi casa mia.\n\nPuoi bussare,\nse vuoi.\n\nMagari sono a casa.\nMagari sto ascoltando musica.\nMagari è musica che ti piace.';
-  final String campanelloExample2Text = 'Ti piace\nfare colazione in compagnia,\nin un terrazzo esposto a Sud?\n\nQuesto è il campanello di casa mia.\n\nPuoi bussare,\nse vuoi.\n\nMagari sono sul terrazzo.\nMagari c’è il sole.\nMagari sto facendo colazione.';
+  final String podcastDiretteText =
+      'honoo\nsi ascolta\ne si guarda.\n\nÈ voce.\nÈ immagine.\n\nUn canale YouTube.\nUn podcast.\nUn account Twitch.\n\nSe vuoi,\npuoi ascoltare,\nguardare\ne partecipare.\n\n';
+  final String libriText =
+      'Sto preparando\nle versioni cartacee\ndei miei libri\n\nHo acquistato\ni codici ISBN\ne una licenza\nInDesign\n\nÈ un lavoro lento\nArtigianale\n\nQui troverai la notizia,\nquando saranno pronti:\n\nIsola delle Storie\n\nIsole delle Storie\n(con illustrazioni di Joel Folda)\n\nImmacolato\n\nI limoni sono finiti\n\nAlmeno\navresti potuto\ncambiare i nomi\n\nPapà,\nma tu mi vuoi bene?\n';
+  final String campanelliText =
+      'In questa parte dell’Isola\nci sono case.\n\nVuoi scoprire chi ci abita?\n\nScorrendo verso destra\npuoi leggere\nciò che ogni abitante\nha scelto di raccontarti.\n\nSe vuoi,\nprova a bussare:\nmagari ti fa entrare.';
+  final String campanelloExample1Text =
+      'Ti piace\nascoltare musica\nin compagnia?\n\nE ballare in casa,\ncome si fa alle feste?\n\nQuesto è il campanello\ndi casa mia.\n\nPuoi bussare,\nse vuoi.\n\nMagari sono a casa.\nMagari sto ascoltando musica.\nMagari è musica che ti piace.';
+  final String campanelloExample2Text =
+      'Ti piace\nfare colazione in compagnia,\nin un terrazzo esposto a Sud?\n\nQuesto è il campanello di casa mia.\n\nPuoi bussare,\nse vuoi.\n\nMagari sono sul terrazzo.\nMagari c’è il sole.\nMagari sto facendo colazione.';
   final String chestHeader = 'Il tuo Cuore custodisce';
   final String chestSubHeader1 = 'gli honoo\nsalvati dalla luna';
   final String chestSubHeader2 = 'gli honoo\nscritti da te';
@@ -71,32 +77,36 @@ class Utility {
   final String shakespeare =
       'Quanto poveri\nsono coloro\nche non hanno pazienza!\n\nQuale ferita\nsi è mai guarita\nse non per gradi?';
   final String bibliography =
-      'William Shakespeare, Otello, 1604, \natto II, scena III, vv. 360 - 361. ';
+      'William Shakespeare, Otello, 1604, \natto II, scena III, vv. 360 - 361 ';
 
   dynamic getRandomElement(dynamic start, dynamic end) {
     if (start is int && end is int) {
       if (start > end) {
         throw ArgumentError(
-            "Invalid range: start should be less than or equal to end.");
+          "Invalid range: start should be less than or equal to end.",
+        );
       }
       return Random().nextInt(end - start + 1) + start;
     } else if (start is String && end is String) {
       if (start.length != 1 || end.length != 1) {
         throw ArgumentError(
-            "Invalid range: start and end should be single characters.");
+          "Invalid range: start and end should be single characters.",
+        );
       }
       int startCharCode = start.codeUnitAt(0);
       int endCharCode = end.codeUnitAt(0);
       if (startCharCode > endCharCode) {
         throw ArgumentError(
-            "Invalid range: start should be less than or equal to end.");
+          "Invalid range: start should be less than or equal to end.",
+        );
       }
       int randomCharCode =
           Random().nextInt(endCharCode - startCharCode + 1) + startCharCode;
       return String.fromCharCode(randomCharCode);
     } else {
       throw ArgumentError(
-          "Invalid range: start and end should be either both integers or both characters.");
+        "Invalid range: start and end should be either both integers or both characters.",
+      );
     }
   }
 }

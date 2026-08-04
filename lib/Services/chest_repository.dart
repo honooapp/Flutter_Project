@@ -8,8 +8,8 @@ class ChestRepository {
   ChestRepository({
     SupabaseClient? client,
     ReliabilityPolicy reliabilityPolicy = const ReliabilityPolicy(),
-  })  : _client = client ?? SupabaseProvider.client,
-        _reliability = reliabilityPolicy;
+  }) : _client = client ?? SupabaseProvider.client,
+       _reliability = reliabilityPolicy;
 
   final SupabaseClient _client;
   final ReliabilityPolicy _reliability;
@@ -32,10 +32,11 @@ class ChestRepository {
       final rows = await _client
           .from('hinoo')
           .select(
-              'id,pages,type,reply_to,recipient_tag,created_at,is_from_moon_saved,user_id,conversation_id')
+            'id,pages,type,reply_to,recipient_tag,created_at,is_from_moon_saved,user_id,conversation_id',
+          )
           .eq('user_id', userId)
-          .in_('type', ['personal', 'answer']).order('created_at',
-              ascending: false);
+          .in_('type', ['personal', 'answer'])
+          .order('created_at', ascending: false);
       return _asList(rows);
     } on PostgrestException catch (error) {
       final combined =
@@ -45,10 +46,11 @@ class ChestRepository {
       final rows = await _client
           .from('hinoo')
           .select(
-              'id,pages,type,reply_to,recipient_tag,created_at,user_id,conversation_id')
+            'id,pages,type,reply_to,recipient_tag,created_at,user_id,conversation_id',
+          )
           .eq('user_id', userId)
-          .in_('type', ['personal', 'answer']).order('created_at',
-              ascending: false);
+          .in_('type', ['personal', 'answer'])
+          .order('created_at', ascending: false);
       return _asList(rows);
     }
   }
@@ -56,12 +58,12 @@ class ChestRepository {
   Future<List<dynamic>> fetchHonooReplyRows(String userId) async {
     final repliesToUser = await _client
         .from('honoo')
-        .select('reply_to,created_at')
+        .select('conversation_id,reply_to,created_at')
         .eq('destination', 'reply')
         .eq('recipient_tag', userId);
     final repliesFromUser = await _client
         .from('honoo')
-        .select('reply_to,created_at')
+        .select('conversation_id,reply_to,created_at')
         .eq('destination', 'reply')
         .eq('user_id', userId);
     return [..._asList(repliesToUser), ..._asList(repliesFromUser)];
@@ -69,23 +71,23 @@ class ChestRepository {
 
   Future<List<dynamic>> fetchHinooReplyRows(
     String userId,
-    List<String> rootIds,
+    List<String> _,
   ) async {
-    if (rootIds.isEmpty) return const [];
-
     final repliesToUser = await _client
         .from('hinoo')
-        .select('id,reply_to,pages,type,recipient_tag,created_at,user_id')
+        .select(
+          'id,conversation_id,reply_to,pages,type,recipient_tag,created_at,user_id',
+        )
         .eq('type', 'answer')
         .eq('recipient_tag', userId)
-        .in_('reply_to', rootIds)
         .order('created_at', ascending: true);
     final repliesFromUser = await _client
         .from('hinoo')
-        .select('id,reply_to,pages,type,recipient_tag,created_at,user_id')
+        .select(
+          'id,conversation_id,reply_to,pages,type,recipient_tag,created_at,user_id',
+        )
         .eq('type', 'answer')
         .eq('user_id', userId)
-        .in_('reply_to', rootIds)
         .order('created_at', ascending: true);
     return [..._asList(repliesToUser), ..._asList(repliesFromUser)];
   }
