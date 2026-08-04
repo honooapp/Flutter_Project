@@ -51,7 +51,6 @@ class ChestFooter extends StatelessWidget {
         label: 'Home',
         tooltip: 'Home',
         onPressed: onHome,
-        applyColorFilter: item != null,
       ),
       _action(
         asset: 'assets/icons/info.svg',
@@ -91,7 +90,6 @@ class ChestFooter extends StatelessWidget {
           label: 'Reply',
           tooltip: 'Vedi risposte',
           onPressed: () {},
-          applyColorFilter: false,
         ),
       );
     } else if (isFromMoonSaved) {
@@ -137,6 +135,7 @@ class ChestFooter extends StatelessWidget {
     label: 'Luna',
     tooltip: 'Spedisci sulla Luna',
     onPressed: onPressed,
+    applyColorFilter: false,
   );
 
   ResponsiveFooterAction _replyAction(VoidCallback onPressed) => _action(
