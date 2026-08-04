@@ -609,8 +609,12 @@ class _NewHonooPageState extends State<NewHonooPage> {
                           ),
                           if (widget.forcedType != HonooType.answer)
                             ResponsiveFooterAction(
-                              asset: "assets/icons/piuma.svg",
+                              asset: "assets/icons/testo.svg",
                               semanticsLabel: 'Piuma',
+                              colorFilter: const ColorFilter.mode(
+                                HonooColor.onBackground,
+                                BlendMode.srcIn,
+                              ),
                               size: footerIconSize,
                               splashRadius: 25,
                               tooltip: 'Scrivi hinoo',

@@ -4,47 +4,65 @@ import 'package:honoo/env/env.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'download_saver_base.dart';
 
 class _DownloadSaverIo implements DownloadSaver {
   @override
-  Future<String> save(List<DownloadImage> images, {String? message}) async {
+  Future<DownloadSaveResult> save(
+    List<DownloadImage> images, {
+    String? message,
+  }) async {
     if (images.isEmpty) {
-      return 'Nessuna immagine da scaricare.';
+      return const DownloadSaveResult(
+        message: 'Nessuna immagine da scaricare.',
+      );
     }
 
     if (Platform.isAndroid || Platform.isIOS) {
       // Prova a salvare direttamente in Galleria/Foto
       int ok = 0;
+      final List<String> savedItemUris = <String>[];
       for (final img in images) {
         final String filename = sanitizeDownloadFilename(img.filename);
-        bool success = await _saveToGallery(img, filename);
-        if (!success && Platform.isAndroid) {
+        String? savedItemUri = await _saveToGallery(img, filename);
+        if (savedItemUri == null && Platform.isAndroid) {
           final PermissionStatus status = await Permission.storage.request();
           if (status.isGranted) {
-            success = await _saveToGallery(img, filename);
+            savedItemUri = await _saveToGallery(img, filename);
           }
         }
-        if (success) ok++;
+        if (savedItemUri != null) {
+          ok++;
+          savedItemUris.add(savedItemUri);
+        }
       }
 
       if (ok == images.length && ok > 0) {
-        return images.length == 1
-            ? 'Immagine salvata nella galleria.'
-            : 'Immagini salvate nella galleria.';
+        return DownloadSaveResult(
+          message: images.length == 1
+              ? 'Immagine salvata nella galleria.'
+              : 'Immagini salvate nella galleria.',
+          savedToGallery: true,
+          savedItemUri: images.length == 1 ? savedItemUris.single : null,
+        );
       }
 
       // Fallback: apri il foglio di condivisione
       final List<XFile> files = images
-          .map((img) => XFile.fromData(
-                img.bytes,
-                name: sanitizeDownloadFilename(img.filename),
-                mimeType: 'image/png',
-              ))
+          .map(
+            (img) => XFile.fromData(
+              img.bytes,
+              name: sanitizeDownloadFilename(img.filename),
+              mimeType: 'image/png',
+            ),
+          )
           .toList(growable: false);
       await Share.shareXFiles(files, text: message ?? '');
-      return 'Condividi o salva le immagini dalle opzioni di sistema.';
+      return const DownloadSaveResult(
+        message: 'Condividi o salva le immagini dalle opzioni di sistema.',
+      );
     }
 
     final Directory targetDir = await _resolveDownloadDirectory();
@@ -56,23 +74,36 @@ class _DownloadSaverIo implements DownloadSaver {
       await file.writeAsBytes(img.bytes, flush: true);
       savedPaths.add(file.path);
     }
-    return 'Immagini salvate in ${targetDir.path}';
+    return DownloadSaveResult(message: 'Immagini salvate in ${targetDir.path}');
   }
 
-  Future<bool> _saveToGallery(
-    DownloadImage image,
-    String filename,
-  ) async {
+  @override
+  Future<bool> openSavedImage(DownloadSaveResult result) async {
+    final String? rawUri = result.savedItemUri;
+    if (rawUri == null || rawUri.isEmpty) return false;
+    final Uri? uri = Uri.tryParse(rawUri);
+    if (uri == null) return false;
+    try {
+      return await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<String?> _saveToGallery(DownloadImage image, String filename) async {
     try {
       final dynamic result = await ImageGallerySaver.saveImage(
         image.bytes,
         quality: 100,
-        name:
-            filename.replaceFirst(RegExp(r'\.png$', caseSensitive: false), ''),
+        name: filename.replaceFirst(
+          RegExp(r'\.png$', caseSensitive: false),
+          '',
+        ),
+        isReturnImagePathOfIOS: true,
       );
-      return _extractSuccess(result);
+      return _extractSavedItemUri(result);
     } catch (_) {
-      return false;
+      return null;
     }
   }
 
@@ -88,8 +119,9 @@ class _DownloadSaverIo implements DownloadSaver {
     } else if (Platform.isWindows) {
       final String userProfile = readEnv('USERPROFILE');
       if (userProfile.isNotEmpty) {
-        final Directory downloads =
-            Directory(_joinPaths(userProfile, 'Downloads'));
+        final Directory downloads = Directory(
+          _joinPaths(userProfile, 'Downloads'),
+        );
         if (downloads.existsSync()) base = downloads;
       }
     }
@@ -112,12 +144,13 @@ class _DownloadSaverIo implements DownloadSaver {
 
 DownloadSaver getDownloadSaverImpl() => _DownloadSaverIo();
 
-bool _extractSuccess(dynamic result) {
+String? _extractSavedItemUri(dynamic result) {
   try {
     if (result is Map) {
       final success = result['isSuccess'] == true || result['success'] == true;
-      return success;
+      final dynamic rawPath = result['filePath'];
+      if (success && rawPath is String && rawPath.isNotEmpty) return rawPath;
     }
   } catch (_) {}
-  return false;
+  return null;
 }

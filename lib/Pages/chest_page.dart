@@ -25,6 +25,7 @@ import '../Utility/network_image_prefetch.dart';
 import '../Utility/replies_seen_tracker.dart';
 
 import '../Widgets/honoo_dialogs.dart';
+import '../Widgets/gallery_save_dialog.dart';
 import '../Widgets/loading_spinner.dart';
 import '../Widgets/honoo_app_title.dart';
 import '../Widgets/chest_footer.dart';
@@ -809,16 +810,31 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
     }
 
     try {
-      final message = await _downloadCaptureService.captureAndSave(
+      final contentName = item.when(
+        honoo: (_) => 'honoo',
+        hinoo: (_) => 'hinoo',
+      );
+      final result = await _downloadCaptureService.captureAndSave(
         repaintKey: repaintKey,
-        baseName: item.when(honoo: (_) => 'honoo', hinoo: (_) => 'hinoo'),
+        baseName: contentName,
         message: 'creato con honoo',
       );
       if (!mounted) return;
-      showHonooToast(
-        context,
-        message: message.isNotEmpty ? message : 'Download avviato.',
-      );
+      if (result.savedToGallery) {
+        await showDownloadSaveResult(
+          context: context,
+          contentName: contentName,
+          openSavedImage: _downloadCaptureService.openSavedImage,
+          result: result,
+        );
+      } else {
+        showHonooToast(
+          context,
+          message: result.message.isNotEmpty
+              ? result.message
+              : 'Download avviato.',
+        );
+      }
     } catch (e) {
       if (!mounted) return;
       showHonooToast(context, message: 'Errore download: $e');

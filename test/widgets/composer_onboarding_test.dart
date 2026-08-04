@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Pages/new_hinoo_page.dart';
 import 'package:honoo/Pages/new_honoo_page.dart';
+import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/composer_onboarding.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -61,7 +62,20 @@ void main() {
   testWidgets('la piuma apre il format hinoo', (tester) async {
     await pumpOnboarding(tester, size: const Size(390, 844));
 
-    await tester.tap(find.byKey(const Key('composer_onboarding_feather')));
+    final feather = find.byKey(const Key('composer_onboarding_feather'));
+    final icon = tester.widget<SvgPicture>(
+      find.descendant(of: feather, matching: find.byType(SvgPicture)),
+    );
+    expect(
+      (icon.bytesLoader as SvgAssetLoader).assetName,
+      'assets/icons/testo.svg',
+    );
+    expect(
+      icon.colorFilter,
+      const ColorFilter.mode(HonooColor.onBackground, BlendMode.srcIn),
+    );
+
+    await tester.tap(feather);
     await tester.pumpAndSettle();
 
     expect(find.byType(NewHinooPage), findsOneWidget);

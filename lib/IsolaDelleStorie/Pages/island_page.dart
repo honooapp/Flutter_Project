@@ -56,23 +56,25 @@ class _IslandPageState extends State<IslandPage> {
                     physics: const BouncingScrollPhysics(),
                     child: Builder(
                       builder: (context) {
-                        // Marker: trattino lungo (em dash) come da testo e00
-                        const String marker1 =
-                            "— Hai il presente. Non ti basta?\\n";
-                        const String marker2 =
-                            "Il <b>colore<b> del testo\n"
-                            "può essere\n"
-                            "<b>bianco<b> o <b>nero<b>.\n";
-
-                        const String full = IsolaDelleStoreContentManager.e00;
-                        final int idx1 = full.indexOf(marker1);
-                        final int idx2Start = full.indexOf(
-                          marker2,
-                          idx1 >= 0 ? idx1 + marker1.length : 0,
+                        const String firstMarker = 'in forme più complesse';
+                        const String secondMarker =
+                            '<b>bianco<b> o <b>nero<b>';
+                        final String full = IsolaDelleStoreContentManager.e00
+                            .replaceAll('.', '');
+                        final int firstMarkerIndex = full.indexOf(firstMarker);
+                        final int secondMarkerIndex = full.indexOf(
+                          secondMarker,
+                          firstMarkerIndex < 0
+                              ? 0
+                              : firstMarkerIndex + firstMarker.length,
                         );
 
                         // Helper for responsive example images
-                        Widget exampleImage(String assetPath) => LayoutBuilder(
+                        Widget exampleImage({
+                          required Key key,
+                          required String assetPath,
+                        }) => LayoutBuilder(
+                          key: key,
                           builder: (ctx, constraints) {
                             final double maxW = constraints.maxWidth.isFinite
                                 ? constraints.maxWidth
@@ -90,132 +92,55 @@ class _IslandPageState extends State<IslandPage> {
                           },
                         );
 
-                        // Fallback: if first marker is not found
-                        if (idx1 < 0) {
-                          if (idx2Start >= 0) {
-                            final int idx2EndWithBreaks =
-                                idx2Start + marker2.length;
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                FormattedText(
-                                  inputText: full.substring(
-                                    0,
-                                    idx2EndWithBreaks,
-                                  ),
-                                  color: HonooColor.onBackground,
-                                  fontSize: 18,
-                                ),
-                                const SizedBox(height: 12),
-                                exampleImage('assets/hinooesempio.png'),
-                                const SizedBox(height: 20),
-                                FormattedText(
-                                  inputText: full.substring(idx2EndWithBreaks),
-                                  color: HonooColor.onBackground,
-                                  fontSize: 18,
-                                ),
-                                const SizedBox(height: 16),
-                                exampleImage('assets/hinooesempio.png'),
-                                const SizedBox(height: 8),
-                              ],
-                            );
-                          } else {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const FormattedText(
-                                  inputText: IsolaDelleStoreContentManager.e00,
-                                  color: HonooColor.onBackground,
-                                  fontSize: 18,
-                                ),
-                                const SizedBox(height: 16),
-                                exampleImage('assets/honooesempio.png'),
-                                const SizedBox(height: 16),
-                                exampleImage('assets/honooesempio.png'),
-                                const SizedBox(height: 8),
-                              ],
-                            );
-                          }
-                        }
-
-                        final String beforeFirstImage = full.substring(
-                          0,
-                          idx1 + marker1.length,
-                        );
-                        final String afterFirstImage = full.substring(
-                          idx1 + marker1.length,
-                        );
-
-                        // Normal case: split and inject both images at the requested positions
-
-                        if (idx2Start >= 0) {
-                          final int idx2EndWithBreaks =
-                              idx2Start + marker2.length;
-
-                          final String betweenImages = full.substring(
-                            idx1 + marker1.length,
-                            idx2EndWithBreaks,
-                          );
-                          final String afterSecondImage = full.substring(
-                            idx2EndWithBreaks,
-                          );
-
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              // Up to first marker
-                              FormattedText(
-                                inputText: beforeFirstImage,
-                                color: HonooColor.onBackground,
-                                fontSize: 18,
-                              ),
-                              const SizedBox(height: 12),
-                              exampleImage('assets/honooesempio.png'),
-                              const SizedBox(height: 20),
-
-                              // Between marker1 and the phrase
-                              FormattedText(
-                                inputText: betweenImages,
-                                color: HonooColor.onBackground,
-                                fontSize: 18,
-                              ),
-                              const SizedBox(height: 12),
-                              exampleImage('assets/hinooesempio.png'),
-                              const SizedBox(height: 20),
-
-                              // Remaining content
-                              if (afterSecondImage.trim().isNotEmpty)
-                                FormattedText(
-                                  inputText: afterSecondImage,
-                                  color: HonooColor.onBackground,
-                                  fontSize: 18,
-                                ),
-                            ],
-                          );
-                        } else {
-                          // No phrase found: inject first image at marker1 and append second at end
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              FormattedText(
-                                inputText: beforeFirstImage,
-                                color: HonooColor.onBackground,
-                                fontSize: 18,
-                              ),
-                              const SizedBox(height: 12),
-                              exampleImage('assets/honooesempio.png'),
-                              const SizedBox(height: 24),
-                              FormattedText(
-                                inputText: afterFirstImage,
-                                color: HonooColor.onBackground,
-                                fontSize: 18,
-                              ),
-                              const SizedBox(height: 12),
-                              exampleImage('assets/hinooesempio.png'),
-                              const SizedBox(height: 12),
-                            ],
+                        if (firstMarkerIndex < 0 || secondMarkerIndex < 0) {
+                          return FormattedText(
+                            inputText: full,
+                            color: HonooColor.onBackground,
+                            fontSize: 18,
                           );
                         }
+
+                        final int firstImageOffset =
+                            firstMarkerIndex + firstMarker.length;
+                        final int secondImageOffset =
+                            secondMarkerIndex + secondMarker.length;
+
+                        return Column(
+                          key: const Key('island_info_content'),
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            FormattedText(
+                              inputText: full.substring(0, firstImageOffset),
+                              color: HonooColor.onBackground,
+                              fontSize: 18,
+                            ),
+                            const SizedBox(height: 12),
+                            exampleImage(
+                              key: const Key('island_info_honoo_example'),
+                              assetPath: 'assets/honooesempio.png',
+                            ),
+                            const SizedBox(height: 20),
+                            FormattedText(
+                              inputText: full.substring(
+                                firstImageOffset,
+                                secondImageOffset,
+                              ),
+                              color: HonooColor.onBackground,
+                              fontSize: 18,
+                            ),
+                            const SizedBox(height: 12),
+                            exampleImage(
+                              key: const Key('island_info_hinoo_example'),
+                              assetPath: 'assets/hinooesempio.png',
+                            ),
+                            const SizedBox(height: 20),
+                            FormattedText(
+                              inputText: full.substring(secondImageOffset),
+                              color: HonooColor.onBackground,
+                              fontSize: 18,
+                            ),
+                          ],
+                        );
                       },
                     ),
                   ),

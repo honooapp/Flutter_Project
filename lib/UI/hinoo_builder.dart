@@ -19,6 +19,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import '../Services/hinoo_storage_uploader.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'package:honoo/Widgets/gallery_save_dialog.dart';
 import 'package:honoo/Widgets/cover_transform_image.dart';
 import 'package:honoo/Utility/heic_converter.dart' as heic;
 import 'package:honoo/Utility/image_upload_encoder.dart';
@@ -282,13 +283,18 @@ class _HinooBuilderState extends State<HinooBuilder> {
         throw Exception('Impossibile generare le immagini.');
       }
 
-      final String message = await saver.save(
+      final DownloadSaveResult result = await saver.save(
         images,
         message: 'hinoo creati con honoo',
       );
       await dismissProgressDialogIfNeeded();
       if (!currentContext.mounted) return;
-      showHonooToast(currentContext, message: message);
+      await showDownloadSaveResult(
+        context: currentContext,
+        contentName: 'hinoo',
+        openSavedImage: saver.openSavedImage,
+        result: result,
+      );
     } catch (e) {
       if (mounted) {
         await dismissProgressDialogIfNeeded();
@@ -701,13 +707,16 @@ class _HinooBuilderState extends State<HinooBuilder> {
         _exportFilenameHint ??
         'hinoo_${DateTime.now().millisecondsSinceEpoch}.png';
     try {
-      final message = await saver.save([
+      final DownloadSaveResult result = await saver.save([
         DownloadImage(filename: filename, bytes: bytes),
       ]);
       if (!mounted) return;
-      if (message.isNotEmpty) {
-        showHonooToast(context, message: message);
-      }
+      await showDownloadSaveResult(
+        context: context,
+        contentName: 'hinoo',
+        openSavedImage: saver.openSavedImage,
+        result: result,
+      );
     } catch (e) {
       debugPrint('Errore durante il salvataggio/condivisione: $e');
       if (mounted) {

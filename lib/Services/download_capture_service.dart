@@ -13,11 +13,11 @@ class DownloadCaptureService {
   DownloadCaptureService({
     DownloadSaverFactory? saverFactory,
     DownloadTimestampFactory? timestampFactory,
-  })  : _saverFactory = saverFactory ?? getDownloadSaver,
-        _timestampFactory =
-            timestampFactory ?? (() => DateTime.now().millisecondsSinceEpoch);
+  }) : _saver = (saverFactory ?? getDownloadSaver)(),
+       _timestampFactory =
+           timestampFactory ?? (() => DateTime.now().millisecondsSinceEpoch);
 
-  final DownloadSaverFactory _saverFactory;
+  final DownloadSaver _saver;
   final DownloadTimestampFactory _timestampFactory;
 
   static double pixelRatioForHeight(
@@ -30,7 +30,7 @@ class DownloadCaptureService {
     return ratio.isFinite && ratio > 0 ? ratio : fallback;
   }
 
-  Future<String> captureAndSave({
+  Future<DownloadSaveResult> captureAndSave({
     required GlobalKey repaintKey,
     required String baseName,
     String? message,
@@ -58,9 +58,11 @@ class DownloadCaptureService {
     });
 
     final filename = '${baseName}_${_timestampFactory()}.png';
-    return _saverFactory().save(
-      [DownloadImage(filename: filename, bytes: bytes)],
-      message: message,
-    );
+    return _saver.save([
+      DownloadImage(filename: filename, bytes: bytes),
+    ], message: message);
   }
+
+  Future<bool> openSavedImage(DownloadSaveResult result) =>
+      _saver.openSavedImage(result);
 }
