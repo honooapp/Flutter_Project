@@ -106,6 +106,78 @@ void main() {
     expect(foreground.transform.getTranslation().y, greaterThanOrEqualTo(-336));
   });
 
+  testWidgets('il bounce mostra il segnaposto del contenuto eliminato', (
+    tester,
+  ) async {
+    final deleted = ConversationEntry.deleted(
+      id: 'root-1',
+      createdAt: DateTime.parse('2026-07-20T10:00:00Z'),
+    );
+    final reply = ConversationEntry.honoo(
+      honoo(
+        id: 'reply-1',
+        text: 'Risposta conservata',
+        owner: 'other',
+        createdAt: '2026-07-20T11:00:00Z',
+        type: HonooType.answer,
+        replyTo: 'root-1',
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: UnifiedThreadView(
+            conversationId: 'conversation-1',
+            maxWidth: 390,
+            maxHeight: 700,
+            isActive: true,
+            conversationLoader: (_) async => [deleted, reply],
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text('Risposta conservata'), findsOneWidget);
+    expect(find.text('contenuto eliminato'), findsOneWidget);
+    expect(find.byKey(const Key('reply_reveal_parent')), findsOneWidget);
+  });
+
+  testWidgets('una risposta orfana non avvia un rialzamento vuoto', (
+    tester,
+  ) async {
+    final reply = ConversationEntry.honoo(
+      honoo(
+        id: 'reply-1',
+        text: 'Risposta senza padre',
+        owner: 'other',
+        createdAt: '2026-07-20T11:00:00Z',
+        type: HonooType.answer,
+        replyTo: 'missing-root',
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: UnifiedThreadView(
+            conversationId: 'conversation-1',
+            maxWidth: 390,
+            maxHeight: 700,
+            isActive: true,
+            conversationLoader: (_) async => [reply],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Risposta senza padre'), findsOneWidget);
+    expect(find.byKey(const Key('reply_reveal_foreground')), findsNothing);
+  });
+
   testWidgets('una conversazione senza messaggi non crea una pagina vuota', (
     tester,
   ) async {

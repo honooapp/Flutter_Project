@@ -408,6 +408,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                         await Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (_) => NewHinooPage(
+                              targetContentName: 'honoo',
                               forcedType: HinooType.answer,
                               recipientTag: link.recipientId,
                               replyTo: link.replyTo,

@@ -21,7 +21,7 @@ class ConversationService {
     final honooRows = await _client
         .from('honoo')
         .select(
-          'id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id,conversation_id,is_from_moon_saved',
+          'id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id,conversation_id,is_from_moon_saved,admin_deleted_at',
         )
         .eq('conversation_id', conversationId)
         .order('created_at', ascending: true);
@@ -29,17 +29,41 @@ class ConversationService {
     final hinooRows = await _client
         .from('hinoo')
         .select(
-          'id,pages,type,recipient_tag,reply_to,created_at,user_id,conversation_id,is_from_moon_saved',
+          'id,pages,type,recipient_tag,reply_to,created_at,user_id,conversation_id,is_from_moon_saved,admin_deleted_at',
         )
         .eq('conversation_id', conversationId)
         .order('created_at', ascending: true);
 
+    final tombstoneRows = await _client
+        .from('conversation_tombstones')
+        .select('content_id,conversation_id,original_created_at')
+        .eq('conversation_id', conversationId)
+        .order('original_created_at', ascending: true);
+
     final entries = <_Entry>[];
     for (final r in (honooRows as List)) {
+      if (r['admin_deleted_at'] != null) {
+        entries.add(
+          _Entry.deleted(
+            id: r['id']?.toString(),
+            createdAt: _parseCreatedAt(r['created_at']),
+          ),
+        );
+        continue;
+      }
       final h = Honoo.fromMap(Map<String, dynamic>.from(r));
       entries.add(_Entry.honoo(h));
     }
     for (final r in (hinooRows as List)) {
+      if (r['admin_deleted_at'] != null) {
+        entries.add(
+          _Entry.deleted(
+            id: r['id']?.toString(),
+            createdAt: _parseCreatedAt(r['created_at']),
+          ),
+        );
+        continue;
+      }
       final pages = r['pages'];
       if (pages is! List) continue;
       final replyTo = r['reply_to']?.toString();
@@ -78,6 +102,68 @@ class ConversationService {
         ),
       );
     }
+    final existingIds = entries
+        .map((entry) => entry.id)
+        .whereType<String>()
+        .toSet();
+    final missingParentIds = entries
+        .map((entry) => entry.honoo?.replyTo ?? entry.hinoo?.replyTo)
+        .whereType<String>()
+        .where((id) => id.isNotEmpty && !existingIds.contains(id))
+        .toSet();
+    if (missingParentIds.isNotEmpty) {
+      final parentHonooRows = await _client
+          .from('honoo')
+          .select(
+            'id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id,conversation_id,is_from_moon_saved,admin_deleted_at',
+          )
+          .in_('id', missingParentIds.toList());
+      final parentHinooRows = await _client
+          .from('hinoo')
+          .select(
+            'id,pages,type,recipient_tag,reply_to,created_at,user_id,conversation_id,is_from_moon_saved,admin_deleted_at',
+          )
+          .in_('id', missingParentIds.toList());
+      for (final row in (parentHonooRows as List)) {
+        if (row['admin_deleted_at'] != null) continue;
+        entries.add(
+          _Entry.honoo(Honoo.fromMap(Map<String, dynamic>.from(row))),
+        );
+      }
+      for (final row in (parentHinooRows as List)) {
+        if (row['admin_deleted_at'] != null || row['pages'] is! List) continue;
+        final pages = (row['pages'] as List)
+            .whereType<Map<String, dynamic>>()
+            .map(HinooSlide.fromJson)
+            .toList();
+        entries.add(
+          _Entry.hinoo(
+            HinooDraft(
+              pages: pages,
+              type: _fromDbType(row['type'] as String?),
+              recipientTag: row['recipient_tag']?.toString(),
+              replyTo: row['reply_to']?.toString(),
+              conversationId: row['conversation_id']?.toString(),
+              isFromMoonSaved: (row['is_from_moon_saved'] as bool?) ?? false,
+            ),
+            createdAt: _parseCreatedAt(row['created_at']),
+            ownerId: row['user_id']?.toString(),
+            id: row['id']?.toString(),
+            isFromMoonSaved: (row['is_from_moon_saved'] as bool?) ?? false,
+          ),
+        );
+      }
+    }
+    for (final row in (tombstoneRows as List)) {
+      final id = row['content_id']?.toString();
+      if (id == null || id.isEmpty || !existingIds.add(id)) continue;
+      entries.add(
+        _Entry.deleted(
+          id: id,
+          createdAt: _parseCreatedAt(row['original_created_at']),
+        ),
+      );
+    }
     final deduplicatedEntries = _deduplicateMoonRoots(entries)
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
     return deduplicatedEntries
@@ -91,10 +177,18 @@ class ConversationService {
               id: e.id,
               isFromMoonSaved: e.isFromMoonSaved,
             ),
+            deleted: () => ConversationEntry.deleted(
+              id: e.id ?? '',
+              createdAt: e.createdAt,
+            ),
           ),
         )
         .toList();
   }
+
+  static DateTime _parseCreatedAt(dynamic value) =>
+      DateTime.tryParse(value?.toString() ?? '') ??
+      DateTime.fromMillisecondsSinceEpoch(0);
 
   static List<_Entry> _deduplicateMoonRoots(List<_Entry> entries) {
     final moonSavedRootKeys = entries
@@ -160,6 +254,7 @@ class _Entry {
   final String? ownerId;
   final String? id;
   final bool isFromMoonSaved;
+  final bool isDeleted;
 
   _Entry._(
     this.honoo,
@@ -168,6 +263,7 @@ class _Entry {
     this.ownerId,
     this.id,
     this.isFromMoonSaved = false,
+    this.isDeleted = false,
   });
   factory _Entry.honoo(Honoo h) => _Entry._(
     h,
@@ -192,11 +288,17 @@ class _Entry {
     isFromMoonSaved: isFromMoonSaved,
   );
 
-  bool get isReply => honoo != null
+  factory _Entry.deleted({required String? id, required DateTime createdAt}) =>
+      _Entry._(null, null, createdAt, id: id, isDeleted: true);
+
+  bool get isReply => isDeleted
+      ? false
+      : honoo != null
       ? honoo!.type == HonooType.answer
       : hinoo!.type == HinooType.answer;
 
   String get contentKey {
+    if (isDeleted) return 'deleted\u001f${id ?? ''}';
     if (honoo != null) {
       return 'honoo\u001f${honoo!.text}\u001f${honoo!.image}';
     }
@@ -207,7 +309,9 @@ class _Entry {
   T when<T>({
     required T Function(Honoo) honoo,
     required T Function(HinooDraft) hinoo,
+    required T Function() deleted,
   }) {
+    if (isDeleted) return deleted();
     if (this.honoo != null) return honoo(this.honoo!);
     return hinoo(this.hinoo!);
   }

@@ -13,6 +13,7 @@ void main() {
   setUp(() {
     harness = SupabaseTestHarness(withAuthenticatedUser: true)
       ..enableOverrides();
+    harness.stubTable('conversation_tombstones');
   });
 
   tearDown(() {
@@ -202,4 +203,96 @@ void main() {
       expect(result.first.isFromMoonSaved, isTrue);
     },
   );
+
+  test('ricostruisce il segnaposto per una conversazione orfana', () async {
+    final honoo = harness.stubTable('honoo');
+    final hinoo = harness.stubTable('hinoo');
+    final tombstones = harness.stubTable('conversation_tombstones');
+    honoo.queueResponse(<Map<String, dynamic>>[
+      {
+        'id': 'reply-1',
+        'text': 'risposta',
+        'image_url': '',
+        'destination': 'reply',
+        'reply_to': 'deleted-root',
+        'created_at': '2026-01-01T11:00:00Z',
+        'updated_at': '2026-01-01T11:00:00Z',
+        'user_id': 'test_user',
+        'conversation_id': 'conversation-1',
+      },
+    ]);
+    hinoo.queueResponse(<Map<String, dynamic>>[]);
+    tombstones.queueResponse(<Map<String, dynamic>>[
+      {
+        'content_id': 'deleted-root',
+        'conversation_id': 'conversation-1',
+        'original_created_at': '2026-01-01T10:59:59Z',
+      },
+    ]);
+
+    final result = await ConversationService.fetchConversation(
+      'conversation-1',
+    );
+
+    expect(result.map((entry) => entry.id), ['deleted-root', 'reply-1']);
+    expect(result.first.kind, ConversationEntryKind.deleted);
+  });
+
+  test('trasforma un contenuto soft-deleted in segnaposto', () async {
+    final honoo = harness.stubTable('honoo');
+    final hinoo = harness.stubTable('hinoo');
+    honoo.queueResponse(<Map<String, dynamic>>[
+      {
+        'id': 'deleted-root',
+        'created_at': '2026-01-01T10:00:00Z',
+        'conversation_id': 'conversation-1',
+        'admin_deleted_at': '2026-01-02T10:00:00Z',
+      },
+    ]);
+    hinoo.queueResponse(<Map<String, dynamic>>[]);
+
+    final result = await ConversationService.fetchConversation(
+      'conversation-1',
+    );
+
+    expect(result.single.kind, ConversationEntryKind.deleted);
+    expect(result.single.id, 'deleted-root');
+  });
+
+  test('include la radice quando una risposta avvia un nuovo filo', () async {
+    final honoo = harness.stubTable('honoo');
+    final hinoo = harness.stubTable('hinoo');
+    honoo.queueResponse(<Map<String, dynamic>>[
+      {
+        'id': 'reply-1',
+        'text': 'nuova conversazione',
+        'image_url': '',
+        'destination': 'reply',
+        'reply_to': 'moon-root',
+        'created_at': '2026-01-01T11:00:00Z',
+        'updated_at': '2026-01-01T11:00:00Z',
+        'user_id': 'test_user',
+        'conversation_id': 'forked-conversation',
+      },
+    ]);
+    hinoo.queueResponse(<Map<String, dynamic>>[]);
+    honoo.queueResponse(<Map<String, dynamic>>[
+      {
+        'id': 'moon-root',
+        'text': 'radice',
+        'image_url': 'root.png',
+        'destination': 'moon',
+        'created_at': '2026-01-01T10:00:00Z',
+        'updated_at': '2026-01-01T10:00:00Z',
+        'user_id': 'author',
+        'conversation_id': 'original-conversation',
+      },
+    ]);
+
+    final result = await ConversationService.fetchConversation(
+      'forked-conversation',
+    );
+
+    expect(result.map((entry) => entry.id), ['moon-root', 'reply-1']);
+  });
 }

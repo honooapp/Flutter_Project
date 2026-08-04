@@ -24,6 +24,7 @@ import '../Entities/hinoo.dart';
 import '../Entities/reply_navigation_result.dart';
 import 'casa_builder_page.dart';
 import '../Widgets/conversation_notification_prompt.dart';
+import '../Widgets/repeated_reply_prompt.dart';
 
 class NewHinooPage extends StatefulWidget {
   const NewHinooPage({
@@ -36,6 +37,7 @@ class NewHinooPage extends StatefulWidget {
     this.replyTo,
     this.conversationId,
     this.returnToPreviousOnAnswer = false,
+    this.targetContentName = 'hinoo',
   });
 
   final bool isReply;
@@ -46,6 +48,7 @@ class NewHinooPage extends StatefulWidget {
   final String? replyTo;
   final String? conversationId;
   final bool returnToPreviousOnAnswer;
+  final String targetContentName;
 
   @override
   State<NewHinooPage> createState() => _NewHinooPageState();
@@ -179,7 +182,7 @@ class _NewHinooPageState extends State<NewHinooPage>
       return;
     }
 
-    final HinooDraft hinooDraft = _convertRawBuilderDraft(rawDraft);
+    var hinooDraft = _convertRawBuilderDraft(rawDraft);
 
     final user = SupabaseProvider.client.auth.currentUser;
     if (user == null) {
@@ -295,6 +298,17 @@ class _NewHinooPageState extends State<NewHinooPage>
     }
 
     final userId = SupabaseProvider.client.auth.currentUser?.id;
+    if (hinooDraft.type == HinooType.answer &&
+        widget.replyTo?.isNotEmpty == true) {
+      final selectedConversationId = await chooseReplyConversation(
+        context: context,
+        parentId: widget.replyTo!,
+        defaultConversationId: hinooDraft.conversationId ?? widget.replyTo!,
+        contentName: widget.targetContentName,
+      );
+      if (selectedConversationId == null || !mounted) return;
+      hinooDraft = hinooDraft.copyWith(conversationId: selectedConversationId);
+    }
     final bool shouldOfferNotifications =
         userId != null &&
         hinooDraft.type == HinooType.personal &&

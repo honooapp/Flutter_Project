@@ -105,16 +105,16 @@ class ChestFooter extends StatelessWidget {
     if (entry == null || conversationId == null || conversationId.isEmpty) {
       return;
     }
-    final isMine = entry.ownerId != null &&
+    if (entry.kind == ConversationEntryKind.deleted) return;
+    final isMine =
+        entry.ownerId != null &&
         currentUserId != null &&
         entry.ownerId == currentUserId;
     final isPersonalEntry = entry.kind == ConversationEntryKind.honoo
         ? entry.honoo!.type == HonooType.personal
         : entry.hinoo!.type == HinooType.personal;
     if (isMine && isPersonalEntry) {
-      actions.add(
-        _moonAction(() => onSendConversationEntryToMoon(entry)),
-      );
+      actions.add(_moonAction(() => onSendConversationEntryToMoon(entry)));
     }
   }
 
@@ -133,25 +133,25 @@ class ChestFooter extends StatelessWidget {
   }
 
   ResponsiveFooterAction _moonAction(VoidCallback onPressed) => _action(
-        asset: 'assets/icons/moon.svg',
-        label: 'Luna',
-        tooltip: 'Spedisci sulla Luna',
-        onPressed: onPressed,
-      );
+    asset: 'assets/icons/moon.svg',
+    label: 'Luna',
+    tooltip: 'Spedisci sulla Luna',
+    onPressed: onPressed,
+  );
 
   ResponsiveFooterAction _replyAction(VoidCallback onPressed) => _action(
-        asset: 'assets/icons/reply.svg',
-        label: 'Rispondi',
-        tooltip: 'Rispondi',
-        onPressed: onPressed,
-      );
+    asset: 'assets/icons/reply.svg',
+    label: 'Rispondi',
+    tooltip: 'Rispondi',
+    onPressed: onPressed,
+  );
 
   ResponsiveFooterAction _deleteAction(VoidCallback onPressed) => _action(
-        asset: 'assets/icons/cancella.svg',
-        label: 'Cancella',
-        tooltip: 'Cancella',
-        onPressed: onPressed,
-      );
+    asset: 'assets/icons/cancella.svg',
+    label: 'Cancella',
+    tooltip: 'Cancella',
+    onPressed: onPressed,
+  );
 
   ResponsiveFooterAction _action({
     required String asset,
@@ -159,19 +159,15 @@ class ChestFooter extends StatelessWidget {
     required String tooltip,
     required VoidCallback onPressed,
     bool applyColorFilter = true,
-  }) =>
-      ResponsiveFooterAction(
-        asset: asset,
-        semanticsLabel: label,
-        colorFilter: applyColorFilter
-            ? const ColorFilter.mode(
-                HonooColor.onBackground,
-                BlendMode.srcIn,
-              )
-            : null,
-        size: iconSize,
-        splashRadius: 25,
-        tooltip: tooltip,
-        onPressed: onPressed,
-      );
+  }) => ResponsiveFooterAction(
+    asset: asset,
+    semanticsLabel: label,
+    colorFilter: applyColorFilter
+        ? const ColorFilter.mode(HonooColor.onBackground, BlendMode.srcIn)
+        : null,
+    size: iconSize,
+    splashRadius: 25,
+    tooltip: tooltip,
+    onPressed: onPressed,
+  );
 }
