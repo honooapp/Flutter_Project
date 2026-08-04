@@ -12,6 +12,7 @@ void main() {
     HonooType type, {
     bool isOnMoon = false,
     bool hasReplies = false,
+    String? conversationId,
   }) {
     final honoo = Honoo(
       1,
@@ -23,7 +24,8 @@ void main() {
       type,
     )
       ..isOnMoon = isOnMoon
-      ..hasReplies = hasReplies;
+      ..hasReplies = hasReplies
+      ..conversationId = conversationId;
     return ChestItem.honoo(honoo, DateTime.utc(2026));
   }
 
@@ -53,13 +55,15 @@ void main() {
     ValueChanged<Honoo>? onDeleteHonoo,
     ValueChanged<ChestHinooItem>? onSendHinooToMoon,
     ValueChanged<ChestHinooItem>? onDeleteHinoo,
+    ConversationEntry? selectedConversationEntry,
+    ValueChanged<ConversationEntry>? onSendConversationEntryToMoon,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
           body: ChestFooter(
             item: item,
-            selectedConversationEntry: null,
+            selectedConversationEntry: selectedConversationEntry,
             currentUserId: 'current-user',
             iconSize: 40,
             gap: 24,
@@ -72,7 +76,8 @@ void main() {
             onSendHinooToMoon: onSendHinooToMoon ?? (_) {},
             onReplyToHinoo: (_) {},
             onDeleteHinoo: onDeleteHinoo ?? (_) {},
-            onSendConversationEntryToMoon: (ConversationEntry _) {},
+            onSendConversationEntryToMoon:
+                onSendConversationEntryToMoon ?? (ConversationEntry _) {},
           ),
         ),
       ),
@@ -166,6 +171,29 @@ void main() {
     expect(find.byTooltip('Spedisci sulla Luna'), findsNothing);
     expect(find.byTooltip('Cancella'), findsOneWidget);
   });
+
+  testWidgets(
+    'la selezione del padre della conversazione mostra una sola azione Luna',
+    (tester) async {
+      final item = honooItem(
+        HonooType.personal,
+        conversationId: 'conversation-1',
+      );
+      final selectedEntry = ConversationEntry.honoo(item.honoo!);
+      ConversationEntry? publishedEntry;
+
+      await pumpFooter(
+        tester,
+        item: item,
+        selectedConversationEntry: selectedEntry,
+        onSendConversationEntryToMoon: (entry) => publishedEntry = entry,
+      );
+
+      expect(find.byTooltip('Spedisci sulla Luna'), findsOneWidget);
+      await tester.tap(find.byTooltip('Spedisci sulla Luna'));
+      expect(publishedEntry, same(selectedEntry));
+    },
+  );
 
   testWidgets('Hinoo già sulla Luna non mostra una seconda azione Luna',
       (tester) async {
