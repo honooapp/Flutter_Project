@@ -146,9 +146,9 @@ class _HomeIntro extends StatelessWidget {
   const _HomeIntro();
 
   static const double _designWidth = 360;
-  static const double _bottleIconSize = 37;
-  static const double _moonIconSize = 23;
-  static const double _islandIconSize = 38;
+  static const double _bottleIconSize = 39;
+  static const double _moonIconSize = 25;
+  static const double _islandIconSize = 40;
   static const double _bottleIconVerticalOffset = 9;
   static const double _moonIconVerticalOffset = 1;
   static const double _islandIconVerticalOffset = 10;

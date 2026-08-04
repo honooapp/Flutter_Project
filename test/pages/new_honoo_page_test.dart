@@ -2,10 +2,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Pages/new_honoo_page.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/UI/honoo_builder.dart';
+import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/width_limited_multiline_field.dart';
 import 'package:sizer/sizer.dart';
 
@@ -60,6 +62,20 @@ void main() {
     );
     final homeRect = tester.getRect(find.byTooltip('Home'));
     final hinooRect = tester.getRect(find.byTooltip('Scrivi hinoo'));
+    final hinooIcon = tester.widget<SvgPicture>(
+      find.descendant(
+        of: find.byTooltip('Scrivi hinoo'),
+        matching: find.byType(SvgPicture),
+      ),
+    );
+    expect(
+      (hinooIcon.bytesLoader as SvgAssetLoader).assetName,
+      'assets/icons/testo.svg',
+    );
+    expect(
+      hinooIcon.colorFilter,
+      const ColorFilter.mode(HonooColor.onBackground, BlendMode.srcIn),
+    );
     expect(footerRect.top, greaterThanOrEqualTo(builderRect.bottom));
     expect(footerRect.top - builderRect.bottom, lessThan(16));
     expect(homeRect.left, greaterThanOrEqualTo(builderRect.left));
