@@ -198,20 +198,14 @@ class HonooCard extends StatelessWidget {
             SupabaseProvider.client.auth.currentUser?.id;
         final bool isOwn =
             currentUserId != null && currentUserId == honoo.userId;
-        // La cornice rossa segnala soltanto una risposta ricevuta.
-        // I propri messaggi mantengono il rendering normale.
+        // L'unica cornice esterna è quella rossa delle risposte ricevute.
+        // Gli honoo propri e quelli salvati dalla Luna restano senza cornice.
         final bool showReplyBorder = isReply && !isOwn;
-        final bool showMoonSavedBorder = !isReply && honoo.isFromMoonSaved;
-        final Widget wrapped = (showReplyBorder || showMoonSavedBorder)
+        final Widget wrapped = showReplyBorder
             ? DecoratedBox(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: showReplyBorder
-                        ? HonooColor.secondary
-                        : Colors.white,
-                    width: 6,
-                  ),
+                  border: Border.all(color: HonooColor.secondary, width: 6),
                 ),
                 child: content,
               )

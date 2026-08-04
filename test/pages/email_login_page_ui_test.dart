@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Pages/email_login_page.dart'; // adatta se il path è diverso
+import 'package:honoo/Pages/email_verify_page.dart';
 import '../test_supabase_helper.dart';
 
 void main() {
@@ -17,6 +18,34 @@ void main() {
 
   tearDown(() {
     harness.disableOverrides();
+  });
+
+  testWidgets('i testi del login non terminano con punti', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: EmailLoginPage()));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'Ti invieremo un codice di verifica\n'
+        'Inserisci la tua email\ne premi “Invia codice”',
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('il testo di verifica non contiene punti finali', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(home: EmailVerifyPage(email: 'utente@example.com')),
+    );
+    await tester.pump();
+
+    expect(
+      find.text(
+        'Controlla la posta in arrivo all’indirizzo utente@example.com '
+        'Inserisci qui il codice a sei cifre per completare l’accesso',
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('EmailLoginPage: render, input email e azione presente',

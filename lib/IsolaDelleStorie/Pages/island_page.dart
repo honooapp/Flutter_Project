@@ -128,16 +128,16 @@ class _IslandPageState extends State<IslandPage> {
                               color: HonooColor.onBackground,
                               fontSize: 18,
                             ),
-                            const SizedBox(height: 12),
-                            exampleImage(
-                              key: const Key('island_info_hinoo_example'),
-                              assetPath: 'assets/hinooesempio.png',
-                            ),
-                            const SizedBox(height: 20),
                             FormattedText(
                               inputText: full.substring(secondImageOffset),
                               color: HonooColor.onBackground,
                               fontSize: 18,
+                            ),
+                            const SizedBox(height: 12),
+                            exampleImage(
+                              key: const Key('island_info_hinoo_example'),
+                              assetPath:
+                                  'assets/images/onboarding_hinoo.png',
                             ),
                           ],
                         );
@@ -481,6 +481,7 @@ class _IslandPageState extends State<IslandPage> {
                         const double chestSize = 70;
                         const double homeSize = 40;
                         const double logoSize = 70;
+                        const double iconButtonPadding = 16;
 
                         final double bottleTargetX = (w / 2) + 60;
                         final double chestCenterX = (w / 2) - (chestSize / 2);
@@ -492,11 +493,20 @@ class _IslandPageState extends State<IslandPage> {
 
                         final double bottleX = clampX(
                           bottleTargetX,
-                          bottleSize,
+                          bottleSize + iconButtonPadding,
                         );
-                        final double chestX = clampX(chestCenterX, chestSize);
-                        final double homeX = clampX(homeTargetX, homeSize);
-                        final double logoX = clampX(logoTargetX, logoSize);
+                        final double chestX = clampX(
+                          chestCenterX,
+                          chestSize + iconButtonPadding,
+                        );
+                        final double homeX = clampX(
+                          homeTargetX,
+                          homeSize + iconButtonPadding,
+                        );
+                        final double logoX = clampX(
+                          logoTargetX,
+                          logoSize + iconButtonPadding,
+                        );
 
                         return Stack(
                           clipBehavior: Clip.none,
@@ -511,7 +521,8 @@ class _IslandPageState extends State<IslandPage> {
                               ),
                             ),
                             Positioned(
-                              bottom: 10,
+                              key: const Key('island_footer_bottle'),
+                              bottom: 13,
                               left: bottleX,
                               child: IconButton(
                                 icon: SvgPicture.asset(
@@ -574,7 +585,8 @@ class _IslandPageState extends State<IslandPage> {
                               ),
                             ),
                             Positioned(
-                              bottom: -20,
+                              key: const Key('island_footer_chest'),
+                              bottom: -18,
                               left: chestX,
                               child: IconButton(
                                 icon: SvgPicture.asset(
@@ -595,7 +607,8 @@ class _IslandPageState extends State<IslandPage> {
                               ),
                             ),
                             Positioned(
-                              bottom: -15,
+                              key: const Key('island_footer_info'),
+                              bottom: -13,
                               left: logoX,
                               child: IconButton(
                                 icon: SvgPicture.asset(

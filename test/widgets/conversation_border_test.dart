@@ -112,7 +112,10 @@ void main() {
   }
 
   testWidgets('Honoo di risposta proprio non ha cornice', (tester) async {
-    await pumpHonoo(tester, honoo(type: HonooType.answer, owner: 'test_user'));
+    await pumpHonoo(
+      tester,
+      honoo(type: HonooType.answer, owner: 'test_user', fromMoon: true),
+    );
 
     expect(borderWithColor(HonooColor.secondary), findsNothing);
     expect(borderWithColor(Colors.white), findsNothing);
@@ -125,15 +128,13 @@ void main() {
     expect(borderWithColor(Colors.white), findsNothing);
   });
 
-  testWidgets('Honoo salvato dalla Luna ha solo cornice bianca', (
-    tester,
-  ) async {
+  testWidgets('Honoo salvato dalla Luna non ha cornice', (tester) async {
     await pumpHonoo(
       tester,
       honoo(type: HonooType.personal, owner: 'test_user', fromMoon: true),
     );
 
-    expect(borderWithColor(Colors.white), findsWidgets);
+    expect(borderWithColor(Colors.white), findsNothing);
     expect(borderWithColor(HonooColor.secondary), findsNothing);
   });
 
