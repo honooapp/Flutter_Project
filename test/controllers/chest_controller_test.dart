@@ -133,20 +133,52 @@ void main() {
   test('loadReplies deduplica e conserva la risposta più recente', () async {
     when(() => repository.fetchHonooReplyRows('user-1')).thenAnswer(
       (_) async => [
-        {'reply_to': 'root-1', 'created_at': '2024-01-01T10:00:00Z'},
-        {'reply_to': 'root-1', 'created_at': '2024-01-01T12:00:00Z'},
-        {'reply_to': 'root-1', 'created_at': '2024-01-01T12:00:00Z'},
+        {
+          'conversation_id': 'conversation-1',
+          'reply_to': 'root-1',
+          'created_at': '2024-01-01T10:00:00Z',
+        },
+        {
+          'conversation_id': 'conversation-1',
+          'reply_to': 'reply-1',
+          'created_at': '2024-01-01T12:00:00Z',
+        },
+        {
+          'conversation_id': 'conversation-1',
+          'reply_to': 'reply-1',
+          'created_at': '2024-01-01T12:00:00Z',
+        },
       ],
     );
-    when(
-      () => repository.fetchHinooReplyRows('user-1', const []),
-    ).thenAnswer((_) async => const []);
+    when(() => repository.fetchHinooReplyRows('user-1', const [])).thenAnswer(
+      (_) async => [
+        {
+          'id': 'hinoo-reply-2',
+          'conversation_id': 'hinoo-conversation-1',
+          'reply_to': 'hinoo-reply-1',
+          'created_at': '2024-01-01T13:00:00Z',
+          'user_id': 'user-2',
+          'pages': [
+            <String, dynamic>{
+              'backgroundImage': 'background.png',
+              'text': 'Risposta concatenata',
+              'isTextWhite': true,
+            },
+          ],
+        },
+      ],
+    );
 
     await controller.loadReplies('user-1');
 
+    expect(controller.value.replyError, isNull);
     expect(
-      controller.value.honooLatestReplies['root-1'],
+      controller.value.honooLatestReplies['conversation-1'],
       DateTime.parse('2024-01-01T12:00:00Z'),
+    );
+    expect(
+      controller.value.hinooLatestReplies['hinoo-conversation-1'],
+      DateTime.parse('2024-01-01T13:00:00Z'),
     );
     expect(controller.value.isReplyLoading, isFalse);
     expect(

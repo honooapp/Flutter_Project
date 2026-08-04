@@ -6,6 +6,7 @@ import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 
 import '../Entities/honoo.dart';
+import '../Entities/reply_navigation_result.dart';
 import '../Services/honoo_image_uploader.dart';
 import '../UI/honoo_builder.dart';
 import 'package:honoo/Services/honoo_service.dart';
@@ -211,7 +212,12 @@ class _NewHonooPageState extends State<NewHonooPage> {
         await showReplySavedDialog(context, contentName: 'honoo');
         if (!mounted) return false;
         if (widget.returnToPreviousOnAnswer) {
-          Navigator.of(context).pop(conversationId);
+          Navigator.of(context).pop(
+            ReplyNavigationResult(
+              conversationId: conversationId,
+              replyId: savedReplyId!,
+            ),
+          );
           return true;
         }
         Navigator.of(context).pushAndRemoveUntil(

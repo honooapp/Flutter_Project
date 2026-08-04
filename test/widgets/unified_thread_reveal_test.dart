@@ -198,6 +198,65 @@ void main() {
     expect(find.byKey(const Key('reply_reveal_parent')), findsOneWidget);
   });
 
+  testWidgets('lo swipe resta sulla pagina scelta dopo il rebuild del padre', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(600, 900);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final root = ConversationEntry.honoo(
+      honoo(
+        id: 'root-scroll',
+        text: 'Contenuto a cui si è risposto',
+        owner: 'me',
+        createdAt: '2026-07-20T10:00:00Z',
+      ),
+    );
+    final reply = ConversationEntry.honoo(
+      honoo(
+        id: 'reply-scroll',
+        text: 'Risposta inizialmente visibile',
+        owner: 'other',
+        createdAt: '2026-07-20T11:00:00Z',
+        type: HonooType.answer,
+        replyTo: 'root-scroll',
+      ),
+    );
+    String? selectedId;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: StatefulBuilder(
+          builder: (context, setState) => Scaffold(
+            body: UnifiedThreadView(
+              conversationId: 'conversation-1',
+              maxWidth: 600,
+              maxHeight: 700,
+              isActive: true,
+              currentUserId: 'me',
+              conversationLoader: (_) async => [root, reply],
+              onSelect: (entry) {
+                selectedId = entry.id;
+                setState(() {});
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1000));
+    expect(selectedId, 'reply-scroll');
+
+    await tester.drag(find.byType(PageView), const Offset(0, -650));
+    await tester.pumpAndSettle();
+
+    expect(selectedId, 'root-scroll');
+    expect(find.text('Contenuto a cui si è risposto'), findsOneWidget);
+  });
+
   testWidgets('un errore di conversazione mostra Riprova', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

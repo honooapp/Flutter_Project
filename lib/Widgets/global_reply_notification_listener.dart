@@ -7,8 +7,8 @@ import '../Entities/reply_notification_event.dart';
 import '../Pages/chest_page.dart';
 import '../Services/reply_system_notification.dart';
 import '../Services/supabase_provider.dart';
-import '../Utility/replies_seen_tracker.dart';
 import '../Utility/reply_notification_signal.dart';
+import '../Utility/replies_seen_tracker.dart';
 
 class GlobalReplyNotificationListener extends StatefulWidget {
   const GlobalReplyNotificationListener({
@@ -258,10 +258,6 @@ class _GlobalReplyNotificationListenerState
   }
 
   void _openConversation(ReplyNotificationEvent event) {
-    final seenAt = event.createdAt;
-    if (seenAt != null) {
-      unawaited(RepliesSeenTracker.markAt(seenAt, userId: event.recipientId));
-    }
     widget.navigatorKey.currentState?.push(
       MaterialPageRoute(
         builder: (_) => ChestPage(
