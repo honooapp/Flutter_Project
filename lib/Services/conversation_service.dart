@@ -124,12 +124,22 @@ class ConversationService {
     chan
         .on(
           RealtimeListenTypes.postgresChanges,
-          ChannelFilter(event: '*', schema: 'public', table: 'honoo'),
+          ChannelFilter(
+            event: '*',
+            schema: 'public',
+            table: 'honoo',
+            filter: 'conversation_id=eq.$conversationId',
+          ),
           refresh,
         )
         .on(
           RealtimeListenTypes.postgresChanges,
-          ChannelFilter(event: '*', schema: 'public', table: 'hinoo'),
+          ChannelFilter(
+            event: '*',
+            schema: 'public',
+            table: 'hinoo',
+            filter: 'conversation_id=eq.$conversationId',
+          ),
           refresh,
         )
         .subscribe();

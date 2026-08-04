@@ -6,7 +6,6 @@ import 'package:honoo/Utility/honoo_colors.dart';
 class PerformancePage extends StatelessWidget {
   const PerformancePage({super.key});
 
-
   static const String performanceText =
       "Venceslao Cembalo,\n"
       "Antonio Della Guardia\n"
@@ -16,7 +15,7 @@ class PerformancePage extends StatelessWidget {
       "Isola delle Storie\n"
       "a Roma,\n"
       "nella Galleria\n"
-      "Spazio Taverna.\n\n"
+      "Spazio Taverna\n\n"
       "Da Roma\n"
       "Isola delle Storie\n"
       "è arrivata\n"
@@ -24,10 +23,10 @@ class PerformancePage extends StatelessWidget {
       "dalle 18.00 alle 21.00,\n"
       "alla Triennale di Milano,\n"
       "a Casa Lana,\n"
-      "progettata da Ettore Sottsass.\n\n"
+      "progettata da Ettore Sottsass\n\n"
       "Sì,\n"
       "honoo è stato invitato\n"
-      "alla Triennale.\n";
+      "alla Triennale\n";
 
   @override
   Widget build(BuildContext context) {

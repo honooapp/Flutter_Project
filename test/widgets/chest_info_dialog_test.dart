@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:honoo/Utility/build_metadata.dart';
 import 'package:honoo/Widgets/chest_info_dialog.dart';
 
 void main() {
@@ -21,6 +22,7 @@ void main() {
     expect(find.byType(ChestInfoDialog), findsOneWidget);
     expect(find.byType(SingleChildScrollView), findsOneWidget);
     expect(find.textContaining('Questo è il tuo Scrigno'), findsOneWidget);
+    expect(find.text(BuildMetadata.displayLabel), findsNothing);
     expect(find.byTooltip('Chiudi'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Chiudi'));

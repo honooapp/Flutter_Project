@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Services/hinoo_storage_uploader.dart';
 import 'package:honoo/Services/house_invite_service.dart';
 import 'package:honoo/Services/supabase_provider.dart';
@@ -20,9 +21,9 @@ import 'package:image_picker/image_picker.dart';
 import 'home_page.dart';
 
 class CasaBuilderPage extends StatefulWidget {
-  const CasaBuilderPage({super.key, required this.campanelloHinooId});
+  const CasaBuilderPage({super.key, required this.campanello});
 
-  final String campanelloHinooId;
+  final HinooDraft campanello;
 
   @override
   State<CasaBuilderPage> createState() => _CasaBuilderPageState();
@@ -176,17 +177,11 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
       );
       setState(() => _isUploadingImage = false);
 
-      await SupabaseProvider.client.from('case').upsert({
-        'owner_id': user.id,
-        'campanello_hinoo_id': widget.campanelloHinooId,
-        'house_image_url': imageUrl,
-        'bg_transform': _imageController.value.storage.toList(),
-        'created_at': DateTime.now().toIso8601String(),
-      }, onConflict: 'owner_id');
-
-      try {
-        await _inviteService.markInvitesAccepted(user.id);
-      } catch (_) {}
+      await _inviteService.createHouseWithCampanello(
+        campanello: widget.campanello,
+        houseImageUrl: imageUrl,
+        bgTransform: _imageController.value.storage.toList(),
+      );
 
       if (!mounted) return;
       showHonooToast(context, message: 'Casa creata.');
@@ -230,7 +225,15 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
                 style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
               ),
               const SizedBox(height: 22),
-              const Icon(Icons.photo, size: 48, color: Colors.white),
+              SvgPicture.asset(
+                'assets/icons/immagine.svg',
+                width: 48,
+                height: 48,
+                colorFilter: const ColorFilter.mode(
+                  Colors.white,
+                  BlendMode.srcIn,
+                ),
+              ),
             ],
           ),
         ),

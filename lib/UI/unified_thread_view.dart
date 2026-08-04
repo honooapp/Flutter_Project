@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/honoo.dart';
@@ -25,6 +26,7 @@ class UnifiedThreadView extends StatefulWidget {
     this.refreshToken = 0,
     this.conversationLoader,
     this.currentUserId,
+    this.revealEntryId,
   });
 
   final String conversationId;
@@ -38,6 +40,7 @@ class UnifiedThreadView extends StatefulWidget {
   final Future<List<ConversationEntry>> Function(String conversationId)?
   conversationLoader;
   final String? currentUserId;
+  final String? revealEntryId;
 
   @override
   State<UnifiedThreadView> createState() => _UnifiedThreadViewState();
@@ -49,8 +52,10 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   Object? _loadError;
   List<ConversationEntry> _entries = const [];
   RealtimeChannel? _chan;
-  bool _didHighlight = false;
-  bool _hasPlayedReveal = false;
+  String? _revealedEntryKey;
+  String? _appliedFocusKey;
+  int _currentPageIndex = 0;
+  int _loadGeneration = 0;
   final PageController _pageController = PageController();
   late AnimationController _controller;
   late Animation<double> _liftAnimation;
@@ -114,6 +119,9 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
 
   Future<void> _load() async {
     if (!mounted) return;
+    final generation = ++_loadGeneration;
+    final conversationId = widget.conversationId;
+    final pageBeforeLoad = _currentPageIndex;
     if (_entries.isEmpty) {
       setState(() => _loading = true);
     }
@@ -121,22 +129,34 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
       _loadError = null;
       final loader =
           widget.conversationLoader ?? ConversationService.fetchConversation;
-      final entries = await loader(widget.conversationId);
+      final entries = await loader(conversationId);
 
-      if (!mounted) return;
+      if (!mounted ||
+          generation != _loadGeneration ||
+          conversationId != widget.conversationId) {
+        return;
+      }
+      final wasEmpty = _entries.isEmpty;
       setState(() {
         _entries = entries;
         _loading = false;
         _loadError = null;
       });
       _prefetchEntriesFrom(_pageToShowFirst);
-      _showLatestReceivedAndReveal();
-      if (widget.highlightLatest && !_didHighlight && _entries.isNotEmpty) {
-        _didHighlight = true;
-        widget.onSelect?.call(_entryToShowFirst);
+      _showLatestReceivedAndReveal(forceFocus: wasEmpty);
+      if (widget.isActive && _entries.isNotEmpty) {
+        final hasExplicitReveal = (widget.revealEntryId ?? '').isNotEmpty;
+        final selectedPage = (wasEmpty || hasExplicitReveal)
+            ? _pageToShowFirst
+            : pageBeforeLoad.clamp(0, _entries.length - 1);
+        widget.onSelect?.call(_entries.reversed.elementAt(selectedPage));
       }
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted ||
+          generation != _loadGeneration ||
+          conversationId != widget.conversationId) {
+        return;
+      }
       setState(() {
         _loading = false;
         _loadError = error;
@@ -165,8 +185,13 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
     if (oldWidget.conversationId != widget.conversationId) {
       _chan?.unsubscribe();
       _chan = null;
-      _didHighlight = false;
-      _hasPlayedReveal = false;
+      _revealedEntryKey = null;
+      _appliedFocusKey = null;
+      _currentPageIndex = 0;
+      _entries = const [];
+      _loading = true;
+      _loadError = null;
+      _controller.reset();
       _load();
     }
     if (oldWidget.refreshToken != widget.refreshToken &&
@@ -179,37 +204,49 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
       if (widget.isActive && !oldWidget.isActive) {
         _load();
       } else if (!widget.isActive && oldWidget.isActive) {
-        _hasPlayedReveal = false;
+        _revealedEntryKey = null;
         _controller.reset();
       }
     }
-    if (widget.isActive) _showLatestReceivedAndReveal();
-  }
-
-  ConversationEntry get _entryToShowFirst {
-    for (final entry in _entries.reversed) {
-      if (_shouldReveal(entry)) return entry;
+    if (oldWidget.revealEntryId != widget.revealEntryId) {
+      _revealedEntryKey = null;
+      _appliedFocusKey = null;
+      _showLatestReceivedAndReveal(forceFocus: true);
     }
-    return _entries.last;
   }
 
   int get _pageToShowFirst {
     final reversed = _entries.reversed.toList(growable: false);
+    final revealEntryId = widget.revealEntryId;
+    if (revealEntryId != null && revealEntryId.isNotEmpty) {
+      final exactIndex = reversed.indexWhere(
+        (entry) => entry.id == revealEntryId,
+      );
+      if (exactIndex >= 0) return exactIndex;
+    }
     final receivedIndex = reversed.indexWhere(_shouldReveal);
     return receivedIndex < 0 ? 0 : receivedIndex;
   }
 
-  void _showLatestReceivedAndReveal() {
+  void _showLatestReceivedAndReveal({bool forceFocus = false}) {
     if (!widget.isActive || _entries.isEmpty || !mounted) return;
+    final targetPage = _pageToShowFirst;
+    final entry = _entries.reversed.elementAt(targetPage);
+    final focusKey = '${widget.conversationId}:${entry.kind.name}:${entry.id}';
+    if (_appliedFocusKey == focusKey) return;
+    if (!forceFocus && widget.revealEntryId == null && _currentPageIndex != 0) {
+      return;
+    }
+    _appliedFocusKey = focusKey;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !widget.isActive || _entries.isEmpty) return;
-      final targetPage = _pageToShowFirst;
       if (_pageController.hasClients) {
         _pageController.jumpToPage(targetPage);
+        _currentPageIndex = targetPage;
       }
-      final entry = _entries.reversed.elementAt(targetPage);
-      if (!_hasPlayedReveal && _shouldReveal(entry)) {
-        _hasPlayedReveal = true;
+      final entryKey = '${entry.kind.name}:${entry.id}';
+      if (_revealedEntryKey != entryKey && _shouldReveal(entry)) {
+        _revealedEntryKey = entryKey;
         _controller.forward(from: 0);
       }
     });
@@ -227,6 +264,10 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
         ? (e.honoo!.type == HonooType.answer)
         : (e.hinoo != null && e.hinoo!.type == HinooType.answer);
 
+    final revealEntryId = widget.revealEntryId;
+    if (revealEntryId != null && revealEntryId.isNotEmpty) {
+      return isReply && e.id == revealEntryId;
+    }
     return isReply;
   }
 
@@ -313,53 +354,71 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
     return SizedBox(
       width: widget.maxWidth,
       height: widget.maxHeight,
-      child: PageView.builder(
-        controller: _pageController,
-        scrollDirection: Axis.vertical,
-        pageSnapping: true,
-        physics: const PageScrollPhysics(
-          parent: ClampingScrollPhysics(),
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(
+          dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
+            PointerDeviceKind.stylus,
+            PointerDeviceKind.trackpad,
+          },
         ),
-        onPageChanged: _prefetchEntriesFrom,
-        itemCount: _entries.length,
-        itemBuilder: (context, index) {
-          // Ordine inverso: ultimo (più recente) in cima
-          final revIndex = _entries.length - 1 - index;
-          final e = _entries[revIndex];
-          final Widget page = _entryCard(e);
-          if (index == _pageToShowFirst && _shouldReveal(e)) {
-            final answeredEntry = _answeredEntryFor(e);
-            final answeredPage = answeredEntry == null
-                ? null
-                : Transform.translate(
-                    offset: Offset(0, widget.maxHeight * 0.52),
-                    child: _entryCard(
-                      answeredEntry,
-                      keyName: 'reply_reveal_parent',
+        child: PageView.builder(
+          controller: _pageController,
+          scrollDirection: Axis.vertical,
+          pageSnapping: true,
+          physics: const PageScrollPhysics(parent: ClampingScrollPhysics()),
+          onPageChanged: (index) {
+            _currentPageIndex = index;
+            _prefetchEntriesFrom(index);
+            final reversed = _entries.reversed.toList(growable: false);
+            if (index >= 0 && index < reversed.length) {
+              widget.onSelect?.call(reversed[index]);
+            }
+          },
+          itemCount: _entries.length,
+          itemBuilder: (context, index) {
+            // Ordine inverso: ultimo (più recente) in cima
+            final revIndex = _entries.length - 1 - index;
+            final e = _entries[revIndex];
+            final Widget page = _entryCard(e);
+            if (index == _pageToShowFirst && _shouldReveal(e)) {
+              final answeredEntry = _answeredEntryFor(e);
+              final answeredPage = answeredEntry == null
+                  ? null
+                  : Transform.translate(
+                      offset: Offset(0, widget.maxHeight * 0.52),
+                      child: _entryCard(
+                        answeredEntry,
+                        keyName: 'reply_reveal_parent',
+                      ),
+                    );
+              return AnimatedBuilder(
+                animation: _liftAnimation,
+                builder: (context, childWidget) {
+                  final double revealHeight = widget.maxHeight * 0.48;
+                  return ClipRect(
+                    child: Stack(
+                      children: [
+                        if (answeredPage != null) answeredPage,
+                        Transform.translate(
+                          key: const Key('reply_reveal_foreground'),
+                          offset: Offset(
+                            0,
+                            _liftAnimation.value * revealHeight,
+                          ),
+                          child: childWidget,
+                        ),
+                      ],
                     ),
                   );
-            return AnimatedBuilder(
-              animation: _liftAnimation,
-              builder: (context, childWidget) {
-                final double revealHeight = widget.maxHeight * 0.48;
-                return ClipRect(
-                  child: Stack(
-                    children: [
-                      if (answeredPage != null) answeredPage,
-                      Transform.translate(
-                        key: const Key('reply_reveal_foreground'),
-                        offset: Offset(0, _liftAnimation.value * revealHeight),
-                        child: childWidget,
-                      ),
-                    ],
-                  ),
-                );
-              },
-              child: page,
-            );
-          }
-          return page;
-        },
+                },
+                child: page,
+              );
+            }
+            return page;
+          },
+        ),
       ),
     );
   }

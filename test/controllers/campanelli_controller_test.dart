@@ -362,7 +362,7 @@ void main() {
           userId: 'user-1',
           email: 'user@example.com',
           createdAt: createdAt,
-        )).thenAnswer((_) async {});
+        )).thenAnswer((_) async => true);
 
     await controller.createPendingHouseRequest(
       userId: 'user-1',
@@ -407,7 +407,7 @@ void main() {
             userId: 'user-1',
             email: 'user@example.com',
             createdAt: any(named: 'createdAt'),
-          )).thenAnswer((_) async {});
+          )).thenAnswer((_) async => true);
 
       expect(
         await controller.requestHouseInvite(),

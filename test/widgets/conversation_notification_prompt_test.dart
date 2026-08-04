@@ -82,6 +82,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(notification.requests, 1);
-    expect(find.text('Notifiche attivate.'), findsOneWidget);
+    expect(find.text('Notifiche attivate'), findsOneWidget);
   });
 }

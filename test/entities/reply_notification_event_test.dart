@@ -7,6 +7,7 @@ void main() {
       {
         'eventType': 'INSERT',
         'new': {
+          'id': 'reply-42',
           'destination': 'reply',
           'reply_to': 'root-1',
           'conversation_id': 'conversation-1',
@@ -21,6 +22,7 @@ void main() {
     expect(event, isNotNull);
     expect(event!.conversationId, 'conversation-1');
     expect(event.contentLabel, 'honoo');
+    expect(event.replyId, 'reply-42');
   });
 
   test('riconosce una nuova risposta Hinoo', () {
@@ -48,17 +50,16 @@ void main() {
       String event = 'INSERT',
       String recipient = 'me',
       String sender = 'other',
-    }) =>
-        {
-          'eventType': event,
-          'new': {
-            'destination': 'reply',
-            'reply_to': 'root-1',
-            'conversation_id': 'conversation-1',
-            'recipient_tag': recipient,
-            'user_id': sender,
-          },
-        };
+    }) => {
+      'eventType': event,
+      'new': {
+        'destination': 'reply',
+        'reply_to': 'root-1',
+        'conversation_id': 'conversation-1',
+        'recipient_tag': recipient,
+        'user_id': sender,
+      },
+    };
 
     ReplyNotificationEvent? parse(Map<String, dynamic> value) =>
         ReplyNotificationEvent.fromRealtimePayload(

@@ -29,6 +29,7 @@ class _GlobalInviteListenerState extends State<GlobalInviteListener> {
   Timer? _inviteRefreshTimer;
   bool _checkingInviteFlow = false;
   bool _dialogOpen = false;
+  bool _inviteDeferred = false;
   bool _started = false;
   RealtimeChannel? _inviteChannel;
   String? _inviteChannelUserId;
@@ -70,6 +71,7 @@ class _GlobalInviteListenerState extends State<GlobalInviteListener> {
     _inviteChannelUserId = null;
     _inviteChannelEmail = null;
     _dialogOpen = false;
+    _inviteDeferred = false;
     if (session == null) return;
 
     _inviteService ??= HouseInviteService();
@@ -80,7 +82,7 @@ class _GlobalInviteListenerState extends State<GlobalInviteListener> {
       _subscribeInviteEmailChannel(email);
     }
     _inviteRefreshTimer = Timer.periodic(
-      const Duration(seconds: 60),
+      const Duration(seconds: 15),
       (_) => _checkInviteFlow(),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkInviteFlow());
@@ -143,7 +145,6 @@ class _GlobalInviteListenerState extends State<GlobalInviteListener> {
   }
 
   void _handleInviteChange(dynamic payload, [dynamic _]) {
-    _checkInviteFlow();
     final eventType = payload is Map
         ? (payload['eventType'] ?? payload['event_type'])
         : null;
@@ -151,6 +152,15 @@ class _GlobalInviteListenerState extends State<GlobalInviteListener> {
     if (event != null && event != 'insert' && event != 'update') {
       return;
     }
+    final record = payload is Map
+        ? (payload['new'] ?? payload['newRecord'] ?? payload['record'])
+        : null;
+    final status = record is Map ? record['status']?.toString() : null;
+    if (status != null && status != 'pending' && status != 'accepted') {
+      return;
+    }
+    if (status == 'pending') _inviteDeferred = false;
+    _checkInviteFlow();
     final now = DateTime.now();
     if (_lastInviteToastAt != null &&
         now.difference(_lastInviteToastAt!) < const Duration(seconds: 3)) {
@@ -167,7 +177,7 @@ class _GlobalInviteListenerState extends State<GlobalInviteListener> {
   }
 
   Future<void> _checkInviteFlow() async {
-    if (_checkingInviteFlow || _dialogOpen) return;
+    if (_checkingInviteFlow || _dialogOpen || _inviteDeferred) return;
     _checkingInviteFlow = true;
 
     final user = SupabaseProvider.client.auth.currentUser;
@@ -191,24 +201,25 @@ class _GlobalInviteListenerState extends State<GlobalInviteListener> {
         return;
       }
 
-      var hasInvite = await inviteService.hasPendingOrAcceptedInvite(user.id);
+      var hasInvite = await inviteService.hasAuthorizedInvite(user.id);
       if (!hasInvite && email != null && email.isNotEmpty) {
         try {
           await inviteService.syncInvitesForEmail(email);
         } catch (_) {}
-        hasInvite = await inviteService.hasPendingOrAcceptedInvite(user.id);
+        hasInvite = await inviteService.hasAuthorizedInvite(user.id);
       }
       if (!hasInvite) {
         return;
       }
 
-      await inviteService.markInvitesAccepted(user.id);
-
       final bool? accepted = await _showCasaInviteDialog();
       if (accepted != true) {
-        await inviteService.markInvitesDeclined(user.id);
+        _inviteDeferred = true;
         return;
       }
+
+      await inviteService.markInvitesAccepted(user.id);
+      _inviteDeferred = true;
 
       final navigator = widget.navigatorKey.currentState;
       if (navigator == null) return;

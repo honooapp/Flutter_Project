@@ -55,6 +55,7 @@ void main() {
             isActive: true,
             highlightLatest: false,
             focusConversationId: null,
+            revealEntryId: null,
             onSelectConversationEntry: (ConversationEntry _) {},
             onDownload: () {},
             conversationRefreshToken: 0,

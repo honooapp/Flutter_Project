@@ -350,7 +350,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
                           MaterialPageRoute(
                             builder: (_) => ReplyHonooPage(
                               originalHonoo: current,
-                              initialHintText: 'Scrivi la tua risposta...',
+                              initialHintText: 'Scrivi la tua risposta',
                               initialImageHint:
                                   'Aggiungi un’immagine (opzionale)',
                             ),
