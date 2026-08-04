@@ -5,6 +5,27 @@ import 'supabase_provider.dart';
 class ContentFeedService {
   const ContentFeedService();
 
+  Future<bool> moonContentHasConversation({
+    required String kind,
+    required String id,
+  }) async {
+    final result = await SupabaseProvider.client.rpc(
+      'admin_moon_content_has_replies',
+      params: {'p_kind': kind, 'p_id': id},
+    );
+    return result == true;
+  }
+
+  Future<void> deleteMoonContent({
+    required String kind,
+    required String id,
+  }) async {
+    await SupabaseProvider.client.rpc(
+      'admin_soft_delete_moon_content',
+      params: {'p_kind': kind, 'p_id': id},
+    );
+  }
+
   /// Indica se l'utente ha già creato almeno una radice di conversazione.
   /// Le risposte non contano: il prompt notifiche deve seguire il primo
   /// contenuto personale salvato nello Scrigno.
@@ -30,7 +51,8 @@ class ContentFeedService {
     final rows = await SupabaseProvider.client
         .from('moon_public')
         .select(
-            'id,user_id,kind,pages,text,image_url,recipient_tag,created_at,conversation_id')
+          'id,user_id,kind,pages,text,image_url,recipient_tag,created_at,conversation_id',
+        )
         .order('created_at', ascending: false);
     return (rows as List)
         .whereType<Map>()
@@ -39,11 +61,13 @@ class ContentFeedService {
   }
 
   Future<List<Map<String, dynamic>>> fetchSharedHinooRows(
-      String ownerId) async {
+    String ownerId,
+  ) async {
     final rows = await SupabaseProvider.client
         .from('hinoo')
         .select(
-            'id,pages,type,recipient_tag,created_at,conversation_id,reply_to')
+          'id,pages,type,recipient_tag,created_at,conversation_id,reply_to',
+        )
         .eq('user_id', ownerId)
         .eq('type', 'personal')
         .order('created_at', ascending: false);
@@ -56,7 +80,8 @@ class ContentFeedService {
   /// Radici delle conversazioni condivise, Honoo e Hinoo, ordinate per data.
   /// Restituisce un solo elemento per conversation_id senza imporre modelli UI.
   Future<List<Map<String, dynamic>>> fetchSharedConversationRoots(
-      String ownerId) async {
+    String ownerId,
+  ) async {
     final honooRows = await SupabaseProvider.client
         .from('honoo')
         .select('id,conversation_id,created_at')
@@ -70,30 +95,36 @@ class ContentFeedService {
         .eq('type', 'personal')
         .order('created_at', ascending: false);
 
-    final combined = <Map<String, dynamic>>[
-      ...(honooRows as List)
-          .whereType<Map>()
-          .map((row) => row.cast<String, dynamic>()),
-      ...(hinooRows as List)
-          .whereType<Map>()
-          .map((row) => row.cast<String, dynamic>()),
-    ]..sort((a, b) {
-        final aDate = DateTime.tryParse(a['created_at']?.toString() ?? '') ??
-            DateTime.fromMillisecondsSinceEpoch(0);
-        final bDate = DateTime.tryParse(b['created_at']?.toString() ?? '') ??
-            DateTime.fromMillisecondsSinceEpoch(0);
-        return bDate.compareTo(aDate);
-      });
+    final combined =
+        <Map<String, dynamic>>[
+          ...(honooRows as List).whereType<Map>().map(
+            (row) => row.cast<String, dynamic>(),
+          ),
+          ...(hinooRows as List).whereType<Map>().map(
+            (row) => row.cast<String, dynamic>(),
+          ),
+        ]..sort((a, b) {
+          final aDate =
+              DateTime.tryParse(a['created_at']?.toString() ?? '') ??
+              DateTime.fromMillisecondsSinceEpoch(0);
+          final bDate =
+              DateTime.tryParse(b['created_at']?.toString() ?? '') ??
+              DateTime.fromMillisecondsSinceEpoch(0);
+          return bDate.compareTo(aDate);
+        });
 
     final seen = <String>{};
-    return combined.where((row) {
-      final id = row['id']?.toString() ?? '';
-      final conversationId = row['conversation_id']?.toString();
-      final effectiveId =
-          conversationId?.isNotEmpty == true ? conversationId! : id;
-      if (effectiveId.isEmpty || !seen.add(effectiveId)) return false;
-      row['conversation_id'] = effectiveId;
-      return true;
-    }).toList(growable: false);
+    return combined
+        .where((row) {
+          final id = row['id']?.toString() ?? '';
+          final conversationId = row['conversation_id']?.toString();
+          final effectiveId = conversationId?.isNotEmpty == true
+              ? conversationId!
+              : id;
+          if (effectiveId.isEmpty || !seen.add(effectiveId)) return false;
+          row['conversation_id'] = effectiveId;
+          return true;
+        })
+        .toList(growable: false);
   }
 }

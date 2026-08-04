@@ -516,6 +516,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
 
   Future<void> _sendConversationEntryToMoon(ConversationEntry entry) async {
     if (_isMutating) return;
+    if (entry.kind == ConversationEntryKind.deleted) return;
     setState(() => _isMutating = true);
     try {
       if (entry.kind == ConversationEntryKind.honoo) {

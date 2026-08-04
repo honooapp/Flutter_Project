@@ -253,6 +253,8 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   }
 
   bool _shouldReveal(ConversationEntry e) {
+    if (e.kind == ConversationEntryKind.deleted) return false;
+
     // Moon-saved: non rivelare
     final bool isMoon =
         e.isFromMoonSaved == true ||
@@ -277,6 +279,12 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
       for (final entry in _entries.reversed) {
         if (entry.id == replyTo) return entry;
       }
+      final replyIndex = _entries.indexOf(reply);
+      if (replyIndex > 0) {
+        final fallback = _entries[replyIndex - 1];
+        if (fallback.isFromMoonSaved) return fallback;
+      }
+      return null;
     }
     final replyIndex = _entries.indexOf(reply);
     return replyIndex > 0 ? _entries[replyIndex - 1] : null;
@@ -284,31 +292,49 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
 
   Widget _entryCard(ConversationEntry entry, {String? keyName}) {
     final GlobalKey repaintKey = GlobalKey();
-    final card = entry.kind == ConversationEntryKind.honoo
-        ? RepaintBoundary(
-            key: repaintKey,
-            child: HonooCard(
-              honoo: entry.honoo!,
-              onDownloadTap: () => _downloadFromBoundary(
-                repaintKey: repaintKey,
-                baseName: 'honoo',
-              ),
+    final Widget card;
+    switch (entry.kind) {
+      case ConversationEntryKind.honoo:
+        card = RepaintBoundary(
+          key: repaintKey,
+          child: HonooCard(
+            honoo: entry.honoo!,
+            onDownloadTap: () => _downloadFromBoundary(
+              repaintKey: repaintKey,
+              baseName: 'honoo',
             ),
-          )
-        : RepaintBoundary(
-            key: repaintKey,
-            child: HinooViewer(
-              draft: entry.hinoo!,
-              maxHeight: widget.maxHeight,
-              maxWidth: widget.maxWidth,
-              isReply: entry.hinoo!.type == HinooType.answer,
-              authorId: entry.ownerId,
-              onDownloadTap: () => _downloadFromBoundary(
-                repaintKey: repaintKey,
-                baseName: 'hinoo',
-              ),
+          ),
+        );
+        break;
+      case ConversationEntryKind.hinoo:
+        card = RepaintBoundary(
+          key: repaintKey,
+          child: HinooViewer(
+            draft: entry.hinoo!,
+            maxHeight: widget.maxHeight,
+            maxWidth: widget.maxWidth,
+            isReply: entry.hinoo!.type == HinooType.answer,
+            authorId: entry.ownerId,
+            onDownloadTap: () => _downloadFromBoundary(
+              repaintKey: repaintKey,
+              baseName: 'hinoo',
             ),
-          );
+          ),
+        );
+        break;
+      case ConversationEntryKind.deleted:
+        card = const ColoredBox(
+          color: HonooColor.background,
+          child: Center(
+            child: Text(
+              'contenuto eliminato',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: HonooColor.onBackground, fontSize: 18),
+            ),
+          ),
+        );
+        break;
+    }
     return SizedBox.expand(
       key: keyName == null ? null : Key(keyName),
       child: card,
@@ -384,15 +410,14 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
             final Widget page = _entryCard(e);
             if (index == _pageToShowFirst && _shouldReveal(e)) {
               final answeredEntry = _answeredEntryFor(e);
-              final answeredPage = answeredEntry == null
-                  ? null
-                  : Transform.translate(
-                      offset: Offset(0, widget.maxHeight * 0.52),
-                      child: _entryCard(
-                        answeredEntry,
-                        keyName: 'reply_reveal_parent',
-                      ),
-                    );
+              if (answeredEntry == null) return page;
+              final answeredPage = Transform.translate(
+                offset: Offset(0, widget.maxHeight * 0.52),
+                child: _entryCard(
+                  answeredEntry,
+                  keyName: 'reply_reveal_parent',
+                ),
+              );
               return AnimatedBuilder(
                 animation: _liftAnimation,
                 builder: (context, childWidget) {
@@ -400,7 +425,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
                   return ClipRect(
                     child: Stack(
                       children: [
-                        if (answeredPage != null) answeredPage,
+                        answeredPage,
                         Transform.translate(
                           key: const Key('reply_reveal_foreground'),
                           offset: Offset(

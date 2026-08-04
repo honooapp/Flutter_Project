@@ -571,11 +571,32 @@ class _MoonPageState extends State<MoonPage> {
     if (_items.isEmpty) return;
     final _MoonItem current = _items[_currentIndex];
     final bool isHonoo = current.honoo != null;
+    final String kind = isHonoo ? 'honoo' : 'hinoo';
+    final String? id = isHonoo ? current.honoo!.dbId : current.hinooId;
+    if (id == null || id.isEmpty) return;
+
+    final bool hasConversation;
+    try {
+      hasConversation = await _contentFeedService.moonContentHasConversation(
+        kind: kind,
+        id: id,
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showHonooToast(
+        context,
+        message: 'Non riesco a verificare le conversazioni collegate: $error',
+      );
+      return;
+    }
+    if (!mounted) return;
     final bool? confirmed = await showDialog<bool>(
       context: context,
       barrierDismissible: true,
-      builder: (_) => const HonooConfirmDialog(
-        title: 'Vuoi davvero eliminarlo?',
+      builder: (_) => HonooConfirmDialog(
+        title: hasConversation
+            ? 'Questo contenuto fa parte di una conversazione, vuoi eliminarlo?'
+            : 'Vuoi davvero eliminarlo?',
         message: '',
         confirmLabel: 'Sì',
         cancelLabel: 'No',
@@ -584,15 +605,7 @@ class _MoonPageState extends State<MoonPage> {
     if (confirmed != true) return;
 
     try {
-      if (isHonoo) {
-        final id = current.honoo!.dbId;
-        if (id == null || id.isEmpty) return;
-        await HonooService.deleteHonooById(id);
-      } else {
-        final id = current.hinooId;
-        if (id == null || id.isEmpty) return;
-        await HinooService.deleteHinooById(id);
-      }
+      await _contentFeedService.deleteMoonContent(kind: kind, id: id);
       if (!mounted) return;
       // Calcola il target come l'ultimo elemento visto prima di quello cancellato
       final int desired = (_currentIndex > 0) ? _currentIndex - 1 : 0;
