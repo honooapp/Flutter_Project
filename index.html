@@ -22,7 +22,13 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+        opacity: 0;
+        transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1);
         pointer-events: none;
+      }
+
+      #landing-background.is-loaded {
+        opacity: 1;
       }
     </style>
 
@@ -100,7 +106,8 @@
       alt=""
       aria-hidden="true"
       decoding="sync"
-      fetchpriority="high">
+      fetchpriority="high"
+      onload="this.classList.add('is-loaded')">
     <script>
       document.getElementById('landing-background').src =
         window.honooLandingBackground;
