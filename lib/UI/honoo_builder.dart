@@ -15,6 +15,7 @@ import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/typographic_substitutions_formatter.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'package:honoo/Widgets/gallery_save_dialog.dart';
 import 'package:honoo/Widgets/cover_transform_image.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
 import 'package:honoo/Widgets/width_limited_multiline_field.dart';
@@ -502,12 +503,17 @@ class HonooBuilderState extends State<HonooBuilder> {
         : fallbackName;
 
     // ✅ NON uso saveBytes (così non tocchi download_saver.dart)
-    final String message = await saver.save([
+    final DownloadSaveResult result = await saver.save([
       DownloadImage(filename: '$rawName.png', bytes: bytes),
     ]);
 
     if (!context.mounted) return;
-    showHonooToast(context, message: message);
+    await showDownloadSaveResult(
+      context: context,
+      contentName: 'honoo',
+      openSavedImage: saver.openSavedImage,
+      result: result,
+    );
   }
 
   void resetContent() {

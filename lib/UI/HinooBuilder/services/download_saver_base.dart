@@ -1,14 +1,28 @@
 import 'dart:typed_data';
 
 abstract class DownloadSaver {
-  Future<String> save(List<DownloadImage> images, {String? message});
+  Future<DownloadSaveResult> save(
+    List<DownloadImage> images, {
+    String? message,
+  });
+
+  Future<bool> openSavedImage(DownloadSaveResult result);
+}
+
+class DownloadSaveResult {
+  const DownloadSaveResult({
+    required this.message,
+    this.savedToGallery = false,
+    this.savedItemUri,
+  });
+
+  final String message;
+  final bool savedToGallery;
+  final String? savedItemUri;
 }
 
 class DownloadImage {
-  DownloadImage({
-    required this.filename,
-    required this.bytes,
-  });
+  DownloadImage({required this.filename, required this.bytes});
 
   final String filename;
   final Uint8List bytes;
@@ -31,10 +45,7 @@ String sanitizeDownloadFilename(String filename) {
   return '$stem$extension';
 }
 
-bool isMobileOrTabletBrowser(
-  String userAgent, {
-  int maxTouchPoints = 0,
-}) {
+bool isMobileOrTabletBrowser(String userAgent, {int maxTouchPoints = 0}) {
   final String normalized = userAgent.toLowerCase();
   return normalized.contains('android') ||
       normalized.contains('iphone') ||

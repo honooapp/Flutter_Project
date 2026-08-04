@@ -8,15 +8,22 @@ import 'download_saver_base.dart';
 
 class _DownloadSaverWeb implements DownloadSaver {
   @override
-  Future<String> save(List<DownloadImage> images, {String? message}) async {
+  Future<DownloadSaveResult> save(
+    List<DownloadImage> images, {
+    String? message,
+  }) async {
     if (images.isEmpty) {
-      return 'Nessuna immagine da scaricare.';
+      return const DownloadSaveResult(
+        message: 'Nessuna immagine da scaricare.',
+      );
     }
 
     if (_isMobileOrTabletBrowser() && await _shareWithSystem(images, message)) {
-      return images.length == 1
-          ? 'Scegli “Salva immagine” per aggiungerla alla galleria.'
-          : 'Scegli “Salva immagini” per aggiungerle alla galleria.';
+      return DownloadSaveResult(
+        message: images.length == 1
+            ? 'Scegli “Salva immagine” per aggiungerla alla galleria.'
+            : 'Scegli “Salva immagini” per aggiungerle alla galleria.',
+      );
     }
 
     final bool iosBrowser = _isIosBrowser();
@@ -62,10 +69,15 @@ class _DownloadSaverWeb implements DownloadSaver {
       }
     }
 
-    return images.length == 1
-        ? 'Download avviato.'
-        : 'Download multipli avviati.';
+    return DownloadSaveResult(
+      message: images.length == 1
+          ? 'Download avviato.'
+          : 'Download multipli avviati.',
+    );
   }
+
+  @override
+  Future<bool> openSavedImage(DownloadSaveResult result) async => false;
 }
 
 DownloadSaver getDownloadSaverImpl() => _DownloadSaverWeb();
