@@ -130,4 +130,22 @@ void main() {
     expect(captured['recipient_tag'], 'recipient-1');
     expect(captured['image_url'], isNull);
   });
+
+  test('duplicateToMoon rifiuta un honoo salvato dalla Luna', () async {
+    final honoo = Honoo(
+      1,
+      'testo',
+      '',
+      '2024-01-01T00:00:00Z',
+      '2024-01-01T00:00:00Z',
+      'user-1',
+      HonooType.personal,
+    )..isFromMoonSaved = true;
+
+    await expectLater(
+      HonooService.duplicateToMoon(honoo),
+      throwsArgumentError,
+    );
+    verifyNever(() => client.from('honoo'));
+  });
 }

@@ -134,6 +134,11 @@ class HonooService {
   /// Duplica un honoo dello scrigno pubblicandolo sulla Luna (nuova INSERT).
   /// Non tocca l'originale in 'chest'.
   static Future<DuplicationResult> duplicateToMoon(Honoo h) async {
+    if (h.isFromMoonSaved) {
+      throw ArgumentError(
+        'Un honoo salvato dalla Luna non può essere ripubblicato.',
+      );
+    }
     final session = _client.auth.currentSession;
     if (session == null) {
       throw Exception('Nessuna sessione attiva');

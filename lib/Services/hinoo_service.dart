@@ -101,6 +101,11 @@ class HinooService {
 
   /// Inserisce un record type='moon' se non già presente (dedup su fingerprint)
   static Future<DuplicationResult> duplicateToMoon(HinooDraft draft) async {
+    if (draft.isFromMoonSaved) {
+      throw ArgumentError(
+        'Un hinoo salvato dalla Luna non può essere ripubblicato.',
+      );
+    }
     final userId = _client.auth.currentUser?.id;
     if (userId == null) throw 'Utente non autenticato';
 

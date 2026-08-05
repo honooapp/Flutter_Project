@@ -12,6 +12,7 @@ void main() {
   ChestItem honooItem(
     HonooType type, {
     bool isOnMoon = false,
+    bool isFromMoonSaved = false,
     bool hasReplies = false,
     String? conversationId,
   }) {
@@ -26,12 +27,16 @@ void main() {
             type,
           )
           ..isOnMoon = isOnMoon
+          ..isFromMoonSaved = isFromMoonSaved
           ..hasReplies = hasReplies
           ..conversationId = conversationId;
     return ChestItem.honoo(honoo, DateTime.utc(2026));
   }
 
-  ChestItem hinooItem({bool isOnMoon = false}) => ChestItem.hinoo(
+  ChestItem hinooItem({
+    bool isOnMoon = false,
+    bool isFromMoonSaved = false,
+  }) => ChestItem.hinoo(
     ChestHinooItem(
       id: 'hinoo-1',
       draft: const HinooDraft(
@@ -40,7 +45,7 @@ void main() {
         ],
       ),
       createdAt: DateTime.utc(2026),
-      isFromMoonSaved: false,
+      isFromMoonSaved: isFromMoonSaved,
       ownerId: 'current-user',
       isOnMoon: isOnMoon,
     ),
@@ -183,6 +188,18 @@ void main() {
     expect(find.byTooltip('Cancella'), findsOneWidget);
   });
 
+  testWidgets('Honoo salvato dalla Luna non mostra l’azione Luna', (
+    tester,
+  ) async {
+    await pumpFooter(
+      tester,
+      item: honooItem(HonooType.personal, isFromMoonSaved: true),
+    );
+
+    expect(find.byTooltip('Spedisci sulla Luna'), findsNothing);
+    expect(find.byTooltip('Rispondi'), findsOneWidget);
+  });
+
   testWidgets(
     'la selezione del padre della conversazione mostra una sola azione Luna',
     (tester) async {
@@ -206,6 +223,27 @@ void main() {
     },
   );
 
+  testWidgets(
+    'la selezione di un contenuto salvato dalla Luna non mostra Luna',
+    (tester) async {
+      final item = honooItem(
+        HonooType.personal,
+        isFromMoonSaved: true,
+        conversationId: 'conversation-1',
+      );
+      final selectedEntry = ConversationEntry.honoo(item.honoo!);
+
+      await pumpFooter(
+        tester,
+        item: item,
+        selectedConversationEntry: selectedEntry,
+      );
+
+      expect(find.byTooltip('Spedisci sulla Luna'), findsNothing);
+      expect(find.byTooltip('Rispondi'), findsOneWidget);
+    },
+  );
+
   testWidgets('Hinoo già sulla Luna non mostra una seconda azione Luna', (
     tester,
   ) async {
@@ -213,6 +251,18 @@ void main() {
 
     expect(find.byTooltip('Spedisci sulla Luna'), findsNothing);
     expect(find.byTooltip('Cancella'), findsOneWidget);
+  });
+
+  testWidgets('Hinoo salvato dalla Luna non mostra l’azione Luna', (
+    tester,
+  ) async {
+    await pumpFooter(
+      tester,
+      item: hinooItem(isFromMoonSaved: true),
+    );
+
+    expect(find.byTooltip('Spedisci sulla Luna'), findsNothing);
+    expect(find.byTooltip('Rispondi'), findsOneWidget);
   });
 
   testWidgets('contenuto ricevuto mostra solo Home, Info e Cancella', (
