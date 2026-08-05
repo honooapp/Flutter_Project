@@ -15,6 +15,8 @@ class ChestState {
     List<ChestHinooItem> hinoo = const [],
     Map<String, DateTime> honooLatestReplies = const {},
     Map<String, DateTime> hinooLatestReplies = const {},
+    Map<String, DateTime> honooLatestReceivedReplies = const {},
+    Map<String, DateTime> hinooLatestReceivedReplies = const {},
     Map<String, List<HinooThreadEntry>> hinooRepliesByRoot = const {},
     this.isHinooLoading = true,
     this.isReplyLoading = false,
@@ -23,6 +25,12 @@ class ChestState {
   }) : hinoo = List.unmodifiable(hinoo),
        honooLatestReplies = Map.unmodifiable(honooLatestReplies),
        hinooLatestReplies = Map.unmodifiable(hinooLatestReplies),
+       honooLatestReceivedReplies = Map.unmodifiable(
+         honooLatestReceivedReplies,
+       ),
+       hinooLatestReceivedReplies = Map.unmodifiable(
+         hinooLatestReceivedReplies,
+       ),
        hinooRepliesByRoot = Map<String, List<HinooThreadEntry>>.unmodifiable(
          hinooRepliesByRoot.map<String, List<HinooThreadEntry>>(
            (key, value) =>
@@ -33,6 +41,8 @@ class ChestState {
   final List<ChestHinooItem> hinoo;
   final Map<String, DateTime> honooLatestReplies;
   final Map<String, DateTime> hinooLatestReplies;
+  final Map<String, DateTime> honooLatestReceivedReplies;
+  final Map<String, DateTime> hinooLatestReceivedReplies;
   final Map<String, List<HinooThreadEntry>> hinooRepliesByRoot;
   final bool isHinooLoading;
   final bool isReplyLoading;
@@ -222,6 +232,8 @@ class ChestController extends ValueNotifier<ChestState> {
       hinoo: value.hinoo.where((item) => item.id != id).toList(),
       honooLatestReplies: value.honooLatestReplies,
       hinooLatestReplies: value.hinooLatestReplies,
+      honooLatestReceivedReplies: value.honooLatestReceivedReplies,
+      hinooLatestReceivedReplies: value.hinooLatestReceivedReplies,
       hinooRepliesByRoot: value.hinooRepliesByRoot,
       isHinooLoading: value.isHinooLoading,
       isReplyLoading: value.isReplyLoading,
@@ -250,6 +262,8 @@ class ChestController extends ValueNotifier<ChestState> {
           .toList(),
       honooLatestReplies: value.honooLatestReplies,
       hinooLatestReplies: value.hinooLatestReplies,
+      honooLatestReceivedReplies: value.honooLatestReceivedReplies,
+      hinooLatestReceivedReplies: value.hinooLatestReceivedReplies,
       hinooRepliesByRoot: value.hinooRepliesByRoot,
       isHinooLoading: value.isHinooLoading,
       isReplyLoading: value.isReplyLoading,
@@ -266,6 +280,8 @@ class ChestController extends ValueNotifier<ChestState> {
       hinoo: value.hinoo,
       honooLatestReplies: value.honooLatestReplies,
       hinooLatestReplies: value.hinooLatestReplies,
+      honooLatestReceivedReplies: value.honooLatestReceivedReplies,
+      hinooLatestReceivedReplies: value.hinooLatestReceivedReplies,
       hinooRepliesByRoot: value.hinooRepliesByRoot,
       isHinooLoading: true,
       isReplyLoading: value.isReplyLoading,
@@ -319,6 +335,8 @@ class ChestController extends ValueNotifier<ChestState> {
         hinoo: List.unmodifiable(hinoo),
         honooLatestReplies: value.honooLatestReplies,
         hinooLatestReplies: value.hinooLatestReplies,
+        honooLatestReceivedReplies: value.honooLatestReceivedReplies,
+        hinooLatestReceivedReplies: value.hinooLatestReceivedReplies,
         hinooRepliesByRoot: value.hinooRepliesByRoot,
         isHinooLoading: false,
         isReplyLoading: value.isReplyLoading,
@@ -334,6 +352,8 @@ class ChestController extends ValueNotifier<ChestState> {
         hinoo: value.hinoo,
         honooLatestReplies: value.honooLatestReplies,
         hinooLatestReplies: value.hinooLatestReplies,
+        honooLatestReceivedReplies: value.honooLatestReceivedReplies,
+        hinooLatestReceivedReplies: value.hinooLatestReceivedReplies,
         hinooRepliesByRoot: value.hinooRepliesByRoot,
         isHinooLoading: false,
         isReplyLoading: value.isReplyLoading,
@@ -351,6 +371,8 @@ class ChestController extends ValueNotifier<ChestState> {
       hinoo: value.hinoo,
       honooLatestReplies: value.honooLatestReplies,
       hinooLatestReplies: value.hinooLatestReplies,
+      honooLatestReceivedReplies: value.honooLatestReceivedReplies,
+      hinooLatestReceivedReplies: value.hinooLatestReceivedReplies,
       hinooRepliesByRoot: value.hinooRepliesByRoot,
       isHinooLoading: value.isHinooLoading,
       isReplyLoading: true,
@@ -359,6 +381,7 @@ class ChestController extends ValueNotifier<ChestState> {
 
     try {
       final honooLatest = <String, DateTime>{};
+      final honooLatestReceived = <String, DateTime>{};
       final honooRows = await _reliability.refresh<List<dynamic>>(
         () => _repository.fetchHonooReplyRows(userId),
       );
@@ -383,9 +406,16 @@ class ChestController extends ValueNotifier<ChestState> {
         if (existing == null || created.isAfter(existing)) {
           honooLatest[activityKey] = created;
         }
+        if (row['user_id']?.toString() != userId) {
+          final existingReceived = honooLatestReceived[activityKey];
+          if (existingReceived == null || created.isAfter(existingReceived)) {
+            honooLatestReceived[activityKey] = created;
+          }
+        }
       }
 
       final hinooLatest = <String, DateTime>{};
+      final hinooLatestReceived = <String, DateTime>{};
       final hinooReplies = <String, List<HinooThreadEntry>>{};
       final rootIds = value.hinoo.map((item) => item.id).toList();
       final rows = await _reliability.refresh<List<dynamic>>(
@@ -431,12 +461,20 @@ class ChestController extends ValueNotifier<ChestState> {
         if (existing == null || created.isAfter(existing)) {
           hinooLatest[activityKey] = created;
         }
+        if (row['user_id']?.toString() != userId) {
+          final existingReceived = hinooLatestReceived[activityKey];
+          if (existingReceived == null || created.isAfter(existingReceived)) {
+            hinooLatestReceived[activityKey] = created;
+          }
+        }
       }
 
       value = ChestState(
         hinoo: value.hinoo,
         honooLatestReplies: honooLatest,
         hinooLatestReplies: hinooLatest,
+        honooLatestReceivedReplies: honooLatestReceived,
+        hinooLatestReceivedReplies: hinooLatestReceived,
         hinooRepliesByRoot: hinooReplies,
         isHinooLoading: value.isHinooLoading,
         isReplyLoading: false,
@@ -452,6 +490,8 @@ class ChestController extends ValueNotifier<ChestState> {
         hinoo: value.hinoo,
         honooLatestReplies: value.honooLatestReplies,
         hinooLatestReplies: value.hinooLatestReplies,
+        honooLatestReceivedReplies: value.honooLatestReceivedReplies,
+        hinooLatestReceivedReplies: value.hinooLatestReceivedReplies,
         hinooRepliesByRoot: value.hinooRepliesByRoot,
         isHinooLoading: value.isHinooLoading,
         isReplyLoading: false,

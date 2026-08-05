@@ -1,5 +1,6 @@
 import 'reply_system_notification_stub.dart'
-    if (dart.library.html) 'reply_system_notification_web.dart' as platform;
+    if (dart.library.html) 'reply_system_notification_web.dart'
+    as platform;
 
 enum ReplyNotificationPermission { unsupported, prompt, granted, denied }
 
@@ -11,6 +12,8 @@ abstract class ReplySystemNotification {
   ReplyNotificationPermission get permission;
 
   Future<ReplyNotificationPermission> requestPermission();
+
+  void closeConversation(String conversationId) {}
 
   void show({
     required String contentLabel,

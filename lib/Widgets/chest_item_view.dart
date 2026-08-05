@@ -149,7 +149,10 @@ class ChestItemView extends StatelessWidget {
     maxHeight: availableHeight,
     isActive: isActive,
     onSelect: onSelectConversationEntry,
-    highlightLatest: highlightLatest && focusConversationId == conversationId,
+    highlightLatest:
+        highlightLatest &&
+        (focusConversationId == null || focusConversationId == conversationId),
+    preferLatestReceived: highlightLatest && focusConversationId == null,
     revealEntryId:
         isActive &&
             (focusConversationId == null ||

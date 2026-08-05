@@ -8,6 +8,7 @@ import 'package:honoo/Services/chest_repository.dart';
 import 'package:honoo/Services/download_capture_service.dart';
 import 'package:honoo/Services/chest_hint_service.dart';
 import 'package:honoo/Services/duplication_result.dart';
+import 'package:honoo/Services/reply_system_notification.dart';
 
 import '../Controller/honoo_controller.dart';
 import '../Controller/hinoo_controller.dart';
@@ -77,6 +78,8 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
   final DownloadCaptureService _downloadCaptureService =
       DownloadCaptureService();
   final ChestHintService _chestHintService = ChestHintService();
+  final ReplySystemNotification _replySystemNotification =
+      ReplySystemNotification.platform();
 
   int _currentIndex = 0;
   bool _didApplyInitialFocus = false;
@@ -94,6 +97,10 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       _chestController.value.honooLatestReplies;
   Map<String, DateTime> get _hinooLatestReplies =>
       _chestController.value.hinooLatestReplies;
+  Map<String, DateTime> get _honooLatestReceivedReplies =>
+      _chestController.value.honooLatestReceivedReplies;
+  Map<String, DateTime> get _hinooLatestReceivedReplies =>
+      _chestController.value.hinooLatestReceivedReplies;
   Map<String, List<HinooThreadEntry>> get _hinooRepliesByRoot =>
       _chestController.value.hinooRepliesByRoot;
   ConversationEntry? _selectedConvEntry;
@@ -116,7 +123,10 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
     );
   }
 
-  void _selectConversationEntry(ConversationEntry entry) {
+  void _selectConversationEntry(
+    String? conversationId,
+    ConversationEntry entry,
+  ) {
     setState(() => _selectedConvEntry = entry);
     final currentUserId = SupabaseProvider.client.auth.currentUser?.id;
     final isReply =
@@ -127,6 +137,9 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         entry.ownerId == currentUserId ||
         entry.createdAt.millisecondsSinceEpoch <= 0) {
       return;
+    }
+    if (conversationId != null && conversationId.isNotEmpty) {
+      _replySystemNotification.closeConversation(conversationId);
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -279,6 +292,14 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       ),
       ..._sortedActivitySignature('honoo', _honooLatestReplies),
       ..._sortedActivitySignature('hinoo', _hinooLatestReplies),
+      ..._sortedActivitySignature(
+        'honoo-received',
+        _honooLatestReceivedReplies,
+      ),
+      ..._sortedActivitySignature(
+        'hinoo-received',
+        _hinooLatestReceivedReplies,
+      ),
       ..._sortedReplySignature(),
       widget.focusConversationId ?? '',
       widget.focusReplies ? '1' : '0',
@@ -322,6 +343,14 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
                 row.draft.conversationId ??
                 row.id],
       ),
+      latestNotificationOf: (item) => item.when(
+        honoo: (h) =>
+            _honooLatestReceivedReplies[h.conversationId ?? h.dbId ?? ''],
+        hinoo: (row) =>
+            _hinooLatestReceivedReplies[row.conversationId ??
+                row.draft.conversationId ??
+                row.id],
+      ),
       conversationIdOf: _convIdOfItem,
     );
     _itemsNormal = organization.items;
@@ -345,6 +374,9 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         } else {
           desiredIndex = 0;
         }
+      } else if (widget.focusReplies &&
+          organization.latestNotificationItemIndex >= 0) {
+        desiredIndex = organization.latestNotificationItemIndex;
       } else {
         // L'ordinamento è dal più recente: durante il caricamento progressivo
         // non conservare una selezione provvisoria che potrebbe diventare
@@ -889,7 +921,8 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       highlightLatest: widget.highlightLatest,
       focusConversationId: widget.focusConversationId,
       revealEntryId: _pendingRevealEntryId,
-      onSelectConversationEntry: _selectConversationEntry,
+      onSelectConversationEntry: (entry) =>
+          _selectConversationEntry(_convIdOfItem(item), entry),
       onDownload: () => _handleDownloadForItem(item, repaintKey),
       conversationRefreshToken: _conversationRefreshToken,
     );

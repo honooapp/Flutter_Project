@@ -6,12 +6,14 @@ class _Item {
     required this.id,
     required this.createdAt,
     this.latestReply,
+    this.latestNotification,
     this.conversationId,
   });
 
   final String id;
   final DateTime createdAt;
   final DateTime? latestReply;
+  final DateTime? latestNotification;
   final String? conversationId;
 }
 
@@ -21,6 +23,7 @@ ChestOrganization<_Item> _organize(List<_Item> items) {
     createdAtOf: (item) => item.createdAt,
     stableIdOf: (item) => item.id,
     latestReplyOf: (item) => item.latestReply,
+    latestNotificationOf: (item) => item.latestNotification,
     conversationIdOf: (item) => item.conversationId,
   );
 }
@@ -38,6 +41,7 @@ void main() {
 
       expect(result.items.map((item) => item.id), ['z', 'a', 'b', 'm']);
       expect(result.conversationItemCount, 0);
+      expect(result.latestNotificationItemIndex, -1);
     });
 
     test('mette prima le conversazioni ordinate per ultima risposta', () {
@@ -64,6 +68,7 @@ void main() {
             createdAt: old,
             id: 'conversation',
             latestReply: old.add(const Duration(minutes: 1)),
+            latestNotification: old.add(const Duration(minutes: 1)),
             conversationId: 'conversation-1',
           ),
           _Item(createdAt: recent, id: 'just-saved'),
@@ -73,8 +78,34 @@ void main() {
           'just-saved',
           'conversation',
         ]);
+        expect(result.latestNotificationItemIndex, 1);
       },
     );
+
+    test('seleziona la conversazione dell’ultima notifica ricevuta', () {
+      final base = DateTime(2024, 1, 1, 12);
+      final result = _organize([
+        _Item(
+          createdAt: base,
+          id: 'own-activity',
+          latestReply: base.add(const Duration(minutes: 10)),
+          conversationId: 'conversation-own',
+        ),
+        _Item(
+          createdAt: base,
+          id: 'received-notification',
+          latestReply: base.add(const Duration(minutes: 5)),
+          latestNotification: base.add(const Duration(minutes: 5)),
+          conversationId: 'conversation-received',
+        ),
+      ]);
+
+      expect(result.items.map((item) => item.id), [
+        'own-activity',
+        'received-notification',
+      ]);
+      expect(result.latestNotificationItemIndex, 1);
+    });
 
     test('mostra una sola slide per conversazione usando il più recente', () {
       final t1 = DateTime(2024, 1, 1, 12);

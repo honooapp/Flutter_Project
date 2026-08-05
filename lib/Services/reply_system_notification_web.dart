@@ -11,6 +11,8 @@ ReplySystemNotification createNotification() =>
 class _WebReplySystemNotification extends ReplySystemNotification {
   const _WebReplySystemNotification();
 
+  static final Map<String, web.Notification> _activeNotifications = {};
+
   @override
   ReplyNotificationPermission get permission {
     if (!_isSupported) {
@@ -27,6 +29,11 @@ class _WebReplySystemNotification extends ReplySystemNotification {
   }
 
   @override
+  void closeConversation(String conversationId) {
+    _activeNotifications.remove(conversationId)?.close();
+  }
+
+  @override
   void show({
     required String contentLabel,
     required String conversationId,
@@ -34,9 +41,10 @@ class _WebReplySystemNotification extends ReplySystemNotification {
     int replyCount = 1,
   }) {
     if (permission != ReplyNotificationPermission.granted) return;
-    final body = replyCount == 1
-        ? 'Hai ricevuto una risposta al tuo $contentLabel'
-        : 'Hai ricevuto $replyCount nuove risposte';
+    closeConversation(conversationId);
+    final body = replyCount > 1
+        ? 'Hai ricevuto $replyCount nuove risposte'
+        : 'Hai ricevuto una risposta al tuo $contentLabel';
     final notification = web.Notification(
       'Nuova risposta su honoo',
       web.NotificationOptions(
@@ -45,7 +53,11 @@ class _WebReplySystemNotification extends ReplySystemNotification {
         tag: 'honoo-reply-$conversationId',
       ),
     );
+    _activeNotifications[conversationId] = notification;
     notification.onclick = ((web.Event _) {
+      if (identical(_activeNotifications[conversationId], notification)) {
+        _activeNotifications.remove(conversationId);
+      }
       notification.close();
       onTap();
     }).toJS;
