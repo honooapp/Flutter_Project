@@ -51,8 +51,11 @@ void main() {
     when(() => chain.insert(any())).thenAnswer((_) => chain);
     when(() => chain.delete()).thenAnswer((_) => chain);
     when(() => chain.eq(any(), any())).thenAnswer((_) => chain);
-    when(() => chain.order(any(), ascending: any(named: 'ascending')))
-        .thenAnswer((_) => chain);
+    when(() => chain.in_(any(), any())).thenAnswer((_) => chain);
+    when(() => chain.or(any())).thenAnswer((_) => chain);
+    when(
+      () => chain.order(any(), ascending: any(named: 'ascending')),
+    ).thenAnswer((_) => chain);
   });
 
   tearDown(() {
@@ -60,41 +63,43 @@ void main() {
     resetMocktailState();
   });
 
-  test('fetchPublicHonoo: filtra destination=moon e ordina per created_at desc',
-      () async {
-    final rows = [
-      {
-        'id': 2,
-        'text': '“b”',
-        'image_url': '',
-        'created_at': '2024-01-02T00:00:00Z',
-        'updated_at': '2024-01-02T00:00:00Z',
-        'user_id': 'u2',
-        'type': 'personal',
-      },
-      {
-        'id': 1,
-        'text': '“a”',
-        'image_url': '',
-        'created_at': '2024-01-01T00:00:00Z',
-        'updated_at': '2024-01-01T00:00:00Z',
-        'user_id': 'u1',
-        'type': 'personal',
-      },
-    ];
-    chain.queueResponse(rows);
+  test(
+    'fetchPublicHonoo: filtra destination=moon e ordina per created_at desc',
+    () async {
+      final rows = [
+        {
+          'id': 2,
+          'text': '“b”',
+          'image_url': '',
+          'created_at': '2024-01-02T00:00:00Z',
+          'updated_at': '2024-01-02T00:00:00Z',
+          'user_id': 'u2',
+          'type': 'personal',
+        },
+        {
+          'id': 1,
+          'text': '“a”',
+          'image_url': '',
+          'created_at': '2024-01-01T00:00:00Z',
+          'updated_at': '2024-01-01T00:00:00Z',
+          'user_id': 'u1',
+          'type': 'personal',
+        },
+      ];
+      chain.queueResponse(rows);
 
-    final list = await HonooService.fetchPublicHonoo();
+      final list = await HonooService.fetchPublicHonoo();
 
-    expect(list, isA<List<Honoo>>());
-    expect(list.length, 2);
-    expect(list.first.dbId, '2');
+      expect(list, isA<List<Honoo>>());
+      expect(list.length, 2);
+      expect(list.first.dbId, '2');
 
-    verify(() => client.from('honoo')).called(1);
-    verify(() => chain.select('*')).called(1);
-    verify(() => chain.eq('destination', 'moon')).called(1);
-    verify(() => chain.order('created_at', ascending: false)).called(1);
-  });
+      verify(() => client.from('honoo')).called(1);
+      verify(() => chain.select('*')).called(1);
+      verify(() => chain.eq('destination', 'moon')).called(1);
+      verify(() => chain.order('created_at', ascending: false)).called(1);
+    },
+  );
 
   test('deleteHonooById: chiama delete().eq("id", id) e completa', () async {
     chain.queueResponse(<String, dynamic>{});
@@ -105,6 +110,23 @@ void main() {
     verify(() => chain.delete()).called(1);
     verify(() => chain.eq('id', '123')).called(1);
   });
+
+  test(
+    'fetchUserChestHonoo include risposte ricevute oltre ai contenuti propri',
+    () async {
+      chain.queueResponse(<Map<String, dynamic>>[]);
+
+      await HonooService.fetchUserChestHonoo('user-1');
+
+      verify(() => chain.in_('destination', ['chest', 'reply'])).called(1);
+      verify(
+        () => chain.or(
+          'user_id.eq.user-1,and(destination.eq.reply,recipient_tag.eq.user-1)',
+        ),
+      ).called(1);
+      verify(() => chain.order('created_at', ascending: false)).called(1);
+    },
+  );
 
   test('publishHonoo: reply inserisce reply_to e recipient_tag', () async {
     chain.queueResponse(<String, dynamic>{});
@@ -123,8 +145,9 @@ void main() {
 
     await HonooService.publishHonoo(honoo);
 
-    final captured = verify(() => chain.insert(captureAny())).captured.single
-        as Map<String, dynamic>;
+    final captured =
+        verify(() => chain.insert(captureAny())).captured.single
+            as Map<String, dynamic>;
     expect(captured['destination'], 'reply');
     expect(captured['reply_to'], 'root-1');
     expect(captured['recipient_tag'], 'recipient-1');
@@ -142,10 +165,7 @@ void main() {
       HonooType.personal,
     )..isFromMoonSaved = true;
 
-    await expectLater(
-      HonooService.duplicateToMoon(honoo),
-      throwsArgumentError,
-    );
+    await expectLater(HonooService.duplicateToMoon(honoo), throwsArgumentError);
     verifyNever(() => client.from('honoo'));
   });
 }

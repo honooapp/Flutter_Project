@@ -67,11 +67,18 @@ class ResponsiveFooterBar extends StatelessWidget {
             0,
             (sum, action) => sum + action.size,
           );
+          final double iconScale =
+              availableWidth.isFinite &&
+                  totalIconWidth > availableWidth &&
+                  totalIconWidth > 0
+              ? availableWidth / totalIconWidth
+              : 1;
+          final double fittedIconWidth = totalIconWidth * iconScale;
           final int gapCount = math.max(0, actions.length - 1);
           double gap = effectiveDesiredGap;
 
           if (availableWidth.isFinite && gapCount > 0) {
-            final double maxGap = (availableWidth - totalIconWidth) / gapCount;
+            final double maxGap = (availableWidth - fittedIconWidth) / gapCount;
             if (lockGapWhenPossible && maxGap >= effectiveDesiredGap) {
               gap = effectiveDesiredGap;
             } else if (maxGap <= effectiveMinGap) {
@@ -95,7 +102,10 @@ class ResponsiveFooterBar extends StatelessWidget {
                     : MainAxisSize.min,
                 children: [
                   for (int index = 0; index < actions.length; index++) ...[
-                    _FooterIconButton(action: actions[index]),
+                    _FooterIconButton(
+                      action: actions[index],
+                      size: actions[index].size * iconScale,
+                    ),
                     if (!expandToAvailableWidth && index < actions.length - 1)
                       SizedBox(width: gap),
                   ],
@@ -116,31 +126,33 @@ class ResponsiveFooterBar extends StatelessWidget {
 }
 
 class _FooterIconButton extends StatelessWidget {
-  const _FooterIconButton({required this.action});
+  const _FooterIconButton({required this.action, required this.size});
 
   final ResponsiveFooterAction action;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
-    final Widget iconWidget =
-        action.icon ??
-        SvgPicture.asset(
-          action.asset,
-          semanticsLabel: action.semanticsLabel,
-          colorFilter: action.colorFilter,
-          width: action.size,
-          height: action.size,
-        );
+    final Widget iconWidget = action.icon == null
+        ? SvgPicture.asset(
+            action.asset,
+            semanticsLabel: action.semanticsLabel,
+            colorFilter: action.colorFilter,
+            width: size,
+            height: size,
+          )
+        : SizedBox.square(
+            dimension: size,
+            child: FittedBox(child: action.icon),
+          );
 
     return IconButton(
-      constraints: BoxConstraints.tightFor(
-        width: action.size,
-        height: action.size,
-      ),
+      visualDensity: VisualDensity.compact,
+      constraints: BoxConstraints.tightFor(width: size, height: size),
       padding: EdgeInsets.zero,
       icon: iconWidget,
-      iconSize: action.size,
-      splashRadius: action.splashRadius ?? action.size * 0.5,
+      iconSize: size,
+      splashRadius: math.min(action.splashRadius ?? size * 0.5, size * 0.5),
       tooltip: action.tooltip,
       onPressed: action.onPressed,
     );

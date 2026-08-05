@@ -21,46 +21,58 @@ class HonooService {
 
   /// Honoo pubblici (Luna)
   static Future<List<Honoo>> fetchPublicHonoo() async {
-    final response = await _reliability.read(() async => await _client
-        .from('honoo')
-        .select('*')
-        .eq('destination', 'moon')
-        .order('created_at', ascending: false));
+    final response = await _reliability.read(
+      () async => await _client
+          .from('honoo')
+          .select('*')
+          .eq('destination', 'moon')
+          .order('created_at', ascending: false),
+    );
     return (response as List).map((e) => Honoo.fromMap(e)).toList();
   }
 
   /// Honoo dell’utente per una certa destination (es. 'chest')
   static Future<List<Honoo>> fetchUserHonoo(
-      String userId, String destination) async {
-    final response = await _reliability.read(() async => await _client
-        .from('honoo')
-        .select('*')
-        .eq('destination', destination)
-        .eq('user_id', userId)
-        .order('created_at', ascending: false));
+    String userId,
+    String destination,
+  ) async {
+    final response = await _reliability.read(
+      () async => await _client
+          .from('honoo')
+          .select('*')
+          .eq('destination', destination)
+          .eq('user_id', userId)
+          .order('created_at', ascending: false),
+    );
     return (response as List).map((e) => Honoo.fromMap(e)).toList();
   }
 
-  /// Radici personali e risposte scritte dall'utente che devono comparire
-  /// come un solo accesso alla relativa conversazione nello Scrigno.
+  /// Radici personali e risposte inviate o ricevute che devono comparire
+  /// come un solo accesso persistente alla conversazione nello Scrigno.
   static Future<List<Honoo>> fetchUserChestHonoo(String userId) async {
-    final response = await _reliability.read(() async => await _client
-        .from('honoo')
-        .select('*')
-        .eq('user_id', userId)
-        .in_('destination', ['chest', 'reply']).order('created_at',
-            ascending: false));
+    final response = await _reliability.read(
+      () async => await _client
+          .from('honoo')
+          .select('*')
+          .in_('destination', ['chest', 'reply'])
+          .or(
+            'user_id.eq.$userId,and(destination.eq.reply,recipient_tag.eq.$userId)',
+          )
+          .order('created_at', ascending: false),
+    );
     return (response as List).map((e) => Honoo.fromMap(e)).toList();
   }
 
   /// Tutte le reply indirizzate a recipientTag (se usi i tag poetici)
   static Future<List<Honoo>> fetchRepliesForUser(String recipientTag) async {
-    final response = await _reliability.read(() async => await _client
-        .from('honoo')
-        .select('*')
-        .eq('destination', 'reply')
-        .eq('recipient_tag', recipientTag)
-        .order('created_at', ascending: false));
+    final response = await _reliability.read(
+      () async => await _client
+          .from('honoo')
+          .select('*')
+          .eq('destination', 'reply')
+          .eq('recipient_tag', recipientTag)
+          .order('created_at', ascending: false),
+    );
     return (response as List).map((e) => Honoo.fromMap(e)).toList();
   }
 
@@ -75,11 +87,13 @@ class HonooService {
   static Future<String> publishHonooAndReturnId(Honoo honoo) async {
     _validateConversationLink(honoo);
     Map<String, dynamic>? row;
-    row = await _reliability.write(() async => await _client
-        .from('honoo')
-        .insert(honoo.toInsertMap())
-        .select('id')
-        .maybeSingle());
+    row = await _reliability.write(
+      () async => await _client
+          .from('honoo')
+          .insert(honoo.toInsertMap())
+          .select('id')
+          .maybeSingle(),
+    );
     final id = row?['id']?.toString() ?? '';
     if (id.isEmpty) {
       throw Exception('publishHonoo: id mancante');
@@ -103,9 +117,12 @@ class HonooService {
     required String id,
     required String destination,
   }) async {
-    await _reliability.write(() async => await _client.from('honoo').update({
-          'destination': destination,
-        }).eq('id', id));
+    await _reliability.write(
+      () async => await _client
+          .from('honoo')
+          .update({'destination': destination})
+          .eq('id', id),
+    );
   }
 
   /// Duplica un honoo salvandolo nello scrigno dell'utente corrente.

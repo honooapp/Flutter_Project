@@ -63,29 +63,38 @@ void main() {
     ConversationEntry? selectedConversationEntry,
     ValueChanged<ConversationEntry>? onReplyToConversationEntry,
     ValueChanged<ConversationEntry>? onSendConversationEntryToMoon,
+    Color foregroundColor = HonooColor.onBackground,
+    double width = 800,
+    double iconSize = 40,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: ChestFooter(
-            item: item,
-            selectedConversationEntry: selectedConversationEntry,
-            currentUserId: 'current-user',
-            iconSize: 40,
-            gap: 24,
-            bottomPadding: 10,
-            onHome: () {},
-            onInfo: () {},
-            onSendHonooToMoon: onSendHonooToMoon ?? (_) {},
-            onReplyToHonoo: (_) {},
-            onDeleteHonoo: onDeleteHonoo ?? (_) {},
-            onSendHinooToMoon: onSendHinooToMoon ?? (_) {},
-            onReplyToHinoo: (_) {},
-            onDeleteHinoo: onDeleteHinoo ?? (_) {},
-            onReplyToConversationEntry:
-                onReplyToConversationEntry ?? (ConversationEntry _) {},
-            onSendConversationEntryToMoon:
-                onSendConversationEntryToMoon ?? (ConversationEntry _) {},
+          body: Align(
+            child: SizedBox(
+              width: width,
+              child: ChestFooter(
+                item: item,
+                selectedConversationEntry: selectedConversationEntry,
+                currentUserId: 'current-user',
+                iconSize: iconSize,
+                gap: 24,
+                bottomPadding: 10,
+                foregroundColor: foregroundColor,
+                onHome: () {},
+                onInfo: () {},
+                onSendHonooToMoon: onSendHonooToMoon ?? (_) {},
+                onReplyToHonoo: (_) {},
+                onDeleteHonoo: onDeleteHonoo ?? (_) {},
+                onSendHinooToMoon: onSendHinooToMoon ?? (_) {},
+                onReplyToHinoo: (_) {},
+                onDeleteHinoo: onDeleteHinoo ?? (_) {},
+                onReplyToConversationEntry:
+                    onReplyToConversationEntry ?? (ConversationEntry _) {},
+                onSendConversationEntryToMoon:
+                    onSendConversationEntryToMoon ?? (ConversationEntry _) {},
+              ),
+            ),
           ),
         ),
       ),
@@ -130,18 +139,17 @@ void main() {
     );
   });
 
-  testWidgets('anche Vedi risposte resta bianca', (tester) async {
+  testWidgets('non aggiunge una finta seconda azione per vedere le risposte', (
+    tester,
+  ) async {
     await pumpFooter(
       tester,
       item: honooItem(HonooType.personal, hasReplies: true),
     );
 
-    final icons = tester
-        .widgetList<SvgPicture>(find.byType(SvgPicture))
-        .toList();
-    expect(find.byTooltip('Vedi risposte'), findsOneWidget);
-    expect(icons, hasLength(4));
-    expect(icons.every((icon) => icon.colorFilter != null), isTrue);
+    expect(find.byTooltip('Vedi risposte'), findsNothing);
+    expect(find.byTooltip('Rispondi'), findsNothing);
+    expect(find.byType(IconButton), findsNWidgets(3));
   });
 
   testWidgets('Honoo personale mostra Luna e Cancella e inoltra le azioni', (
@@ -287,6 +295,71 @@ void main() {
       expect(find.byTooltip('Rispondi'), findsOneWidget);
     },
   );
+
+  testWidgets('non duplica Rispondi tra contenuto e selezione', (tester) async {
+    final item = honooItem(
+      HonooType.personal,
+      isFromMoonSaved: true,
+      conversationId: 'conversation-1',
+    );
+    item.honoo!.dbId = 'root-1';
+
+    await pumpFooter(
+      tester,
+      item: item,
+      selectedConversationEntry: ConversationEntry.honoo(item.honoo!),
+    );
+
+    expect(find.byTooltip('Rispondi'), findsOneWidget);
+  });
+
+  testWidgets('Rispondi usa il contrasto corrente anche sullo sfondo bianco', (
+    tester,
+  ) async {
+    final item = honooItem(
+      HonooType.personal,
+      isFromMoonSaved: true,
+      conversationId: 'conversation-1',
+    );
+
+    await pumpFooter(
+      tester,
+      item: item,
+      foregroundColor: HonooColor.onTertiary,
+    );
+
+    final replyIcon = tester.widget<SvgPicture>(
+      find.descendant(
+        of: find.byTooltip('Rispondi'),
+        matching: find.byType(SvgPicture),
+      ),
+    );
+    expect(
+      replyIcon.colorFilter,
+      const ColorFilter.mode(HonooColor.onTertiary, BlendMode.srcIn),
+    );
+  });
+
+  testWidgets('tutte le azioni restano visibili su una toolbar stretta', (
+    tester,
+  ) async {
+    final item = honooItem(
+      HonooType.personal,
+      conversationId: 'conversation-1',
+    );
+    item.honoo!.dbId = 'root-1';
+
+    await pumpFooter(
+      tester,
+      item: item,
+      selectedConversationEntry: ConversationEntry.honoo(item.honoo!),
+      width: 200,
+      iconSize: 60,
+    );
+
+    expect(find.byType(IconButton), findsNWidgets(5));
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('Hinoo già sulla Luna non mostra una seconda azione Luna', (
     tester,
