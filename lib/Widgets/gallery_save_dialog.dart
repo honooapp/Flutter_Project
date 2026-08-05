@@ -19,7 +19,9 @@ Future<void> showDownloadSaveResult({
     context: context,
     barrierDismissible: true,
     builder: (_) => HonooConfirmDialog(
-      title: "L'$contentName è stato salvato nella tua galleria delle foto",
+      title:
+          'L’$contentName è stato salvato\n'
+          'nella tua Galleria delle Foto',
       confirmLabel: 'Apri galleria',
       cancelLabel: 'Ignora',
     ),
