@@ -48,12 +48,28 @@ void main() {
     );
     expect(find.byTooltip('Componi il tuo honoo'), findsNothing);
     expect(find.byTooltip('Componi il tuo hinoo'), findsNothing);
+    final closeIcon = tester.widget<SvgPicture>(
+      find.descendant(
+        of: find.byKey(const Key('composer_onboarding_close')),
+        matching: find.byType(SvgPicture),
+      ),
+    );
+    expect(
+      closeIcon.colorFilter,
+      const ColorFilter.mode(HonooColor.onBackground, BlendMode.srcIn),
+    );
   });
 
   testWidgets('la bottiglia apre il format honoo', (tester) async {
     await pumpOnboarding(tester, size: const Size(390, 844));
 
-    await tester.tap(find.byKey(const Key('composer_onboarding_bottle')));
+    final bottle = find.byKey(const Key('composer_onboarding_bottle'));
+    final icon = tester.widget<SvgPicture>(
+      find.descendant(of: bottle, matching: find.byType(SvgPicture)),
+    );
+    expect(icon.colorFilter, isNull);
+
+    await tester.tap(bottle);
     await tester.pumpAndSettle();
 
     expect(find.byType(NewHonooPage), findsOneWidget);

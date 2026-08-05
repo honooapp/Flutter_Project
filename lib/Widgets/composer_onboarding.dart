@@ -146,6 +146,10 @@ class ComposerOnboardingPage extends StatelessWidget {
                                 iconSemanticsLabel: 'Piuma',
                                 onPressed: () => _openHinooComposer(context),
                                 iconSize: featherIconSize,
+                                colorFilter: const ColorFilter.mode(
+                                  HonooColor.onBackground,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                               const SizedBox(height: 4),
                               Text(
@@ -187,6 +191,10 @@ class ComposerOnboardingPage extends StatelessWidget {
                           width: 36,
                           height: 36,
                           excludeFromSemantics: true,
+                          colorFilter: const ColorFilter.mode(
+                            HonooColor.onBackground,
+                            BlendMode.srcIn,
+                          ),
                         ),
                       ),
                     ),
@@ -209,6 +217,7 @@ class _InlineComposerAction extends StatelessWidget {
     required this.iconSemanticsLabel,
     required this.onPressed,
     required this.iconSize,
+    this.colorFilter,
   });
 
   final Key actionKey;
@@ -217,6 +226,7 @@ class _InlineComposerAction extends StatelessWidget {
   final String iconSemanticsLabel;
   final VoidCallback onPressed;
   final double iconSize;
+  final ColorFilter? colorFilter;
 
   @override
   Widget build(BuildContext context) {
@@ -238,10 +248,7 @@ class _InlineComposerAction extends StatelessWidget {
             width: iconSize,
             height: iconSize,
             semanticsLabel: iconSemanticsLabel,
-            colorFilter: const ColorFilter.mode(
-              HonooColor.onBackground,
-              BlendMode.srcIn,
-            ),
+            colorFilter: colorFilter,
           ),
         ),
       ],

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/honoo.dart';
@@ -72,7 +73,8 @@ class _AdminMoonSearchPageState extends State<AdminMoonSearchPage> {
         rows = await client
             .from('moon_public')
             .select(
-                'id,user_id,kind,pages,text,image_url,recipient_tag,created_at')
+              'id,user_id,kind,pages,text,image_url,recipient_tag,created_at',
+            )
             .or('text.ilike.%$q%,pages.ilike.%$q%')
             .order('created_at', ascending: false)
             .limit(250);
@@ -81,7 +83,8 @@ class _AdminMoonSearchPageState extends State<AdminMoonSearchPage> {
         final raw = await client
             .from('moon_public')
             .select(
-                'id,user_id,kind,pages,text,image_url,recipient_tag,created_at')
+              'id,user_id,kind,pages,text,image_url,recipient_tag,created_at',
+            )
             .order('created_at', ascending: false)
             .limit(250);
         rows = (raw as List)
@@ -95,7 +98,7 @@ class _AdminMoonSearchPageState extends State<AdminMoonSearchPage> {
         final String kind = row['kind']?.toString() ?? '';
         final created =
             DateTime.tryParse((row['created_at'] ?? '').toString()) ??
-                DateTime.fromMillisecondsSinceEpoch(0);
+            DateTime.fromMillisecondsSinceEpoch(0);
         if (kind == 'honoo') {
           final honoo = Honoo.fromMap(row.cast<String, dynamic>());
           items.add(_MoonSearchItem.honoo(honoo, created));
@@ -112,8 +115,14 @@ class _AdminMoonSearchPageState extends State<AdminMoonSearchPage> {
             );
             final String? id = row['id']?.toString();
             final String? ownerId = row['user_id']?.toString();
-            items.add(_MoonSearchItem.hinoo(draft, created,
-                hinooId: id, ownerId: ownerId));
+            items.add(
+              _MoonSearchItem.hinoo(
+                draft,
+                created,
+                hinooId: id,
+                ownerId: ownerId,
+              ),
+            );
           }
         }
       }
@@ -141,7 +150,8 @@ class _AdminMoonSearchPageState extends State<AdminMoonSearchPage> {
       final pages = row['pages'];
       if (pages is List) {
         for (final p in pages) {
-          if (p is Map && (p['text']?.toString().toLowerCase() ?? '').contains(qq)) {
+          if (p is Map &&
+              (p['text']?.toString().toLowerCase() ?? '').contains(qq)) {
             return true;
           }
         }
@@ -222,21 +232,27 @@ class _AdminMoonSearchPageState extends State<AdminMoonSearchPage> {
                             ),
                           )
                         : (_query.isEmpty
-                            ? null
-                            : IconButton(
-                                tooltip: 'Pulisci',
-                                onPressed: () {
-                                  _controller.clear();
-                                  _onQueryChanged('');
-                                },
-                                icon: const Icon(Icons.close, color: Colors.white70),
-                              )),
+                              ? null
+                              : IconButton(
+                                  tooltip: 'Pulisci',
+                                  onPressed: () {
+                                    _controller.clear();
+                                    _onQueryChanged('');
+                                  },
+                                  icon: SvgPicture.asset(
+                                    'assets/icons/cancella.svg',
+                                    width: 24,
+                                    height: 24,
+                                    colorFilter: const ColorFilter.mode(
+                                      HonooColor.onBackground,
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
+                                )),
                   ),
                 ),
                 const SizedBox(height: 16),
-                Expanded(
-                  child: _buildResultsList(),
-                ),
+                Expanded(child: _buildResultsList()),
               ],
             ),
           ),
@@ -275,47 +291,54 @@ class _AdminMoonSearchPageState extends State<AdminMoonSearchPage> {
         ),
       );
     }
-    return LayoutBuilder(builder: (context, c) {
-      final w = c.maxWidth;
-      final isNarrow = w < 700;
-      final double maxTileW =
-          isNarrow ? w : (w / 3).clamp(300.0, 420.0).toDouble();
-      return GridView.builder(
-        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: maxTileW,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          childAspectRatio: 0.9,
-        ),
-        itemCount: _results.length,
-        itemBuilder: (context, index) {
-          final item = _results[index];
-          return _buildTile(item);
-        },
-      );
-    });
+    return LayoutBuilder(
+      builder: (context, c) {
+        final w = c.maxWidth;
+        final isNarrow = w < 700;
+        final double maxTileW = isNarrow
+            ? w
+            : (w / 3).clamp(300.0, 420.0).toDouble();
+        return GridView.builder(
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: maxTileW,
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+            childAspectRatio: 0.9,
+          ),
+          itemCount: _results.length,
+          itemBuilder: (context, index) {
+            final item = _results[index];
+            return _buildTile(item);
+          },
+        );
+      },
+    );
   }
 
   Widget _buildTile(_MoonSearchItem item) {
     final Widget inner = item.when(
-      honoo: (h) => Center(
-        child: HonooCard(honoo: h),
-      ),
+      honoo: (h) => Center(child: HonooCard(honoo: h)),
       hinoo: (draft) {
-        return LayoutBuilder(builder: (ctx, c) {
-          final size = _fitAspect(c.maxWidth, c.maxHeight, HinooTypography.aspectRatio);
-          return Center(
-            child: SizedBox(
-              width: size.width,
-              height: size.height,
-              child: HinooViewer(
-                draft: draft,
-                maxHeight: size.height,
-                maxWidth: size.width,
+        return LayoutBuilder(
+          builder: (ctx, c) {
+            final size = _fitAspect(
+              c.maxWidth,
+              c.maxHeight,
+              HinooTypography.aspectRatio,
+            );
+            return Center(
+              child: SizedBox(
+                width: size.width,
+                height: size.height,
+                child: HinooViewer(
+                  draft: draft,
+                  maxHeight: size.height,
+                  maxWidth: size.width,
+                ),
               ),
-            ),
-          );
-        });
+            );
+          },
+        );
       },
     );
     return Material(
@@ -338,10 +361,7 @@ class _AdminMoonSearchPageState extends State<AdminMoonSearchPage> {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.white24),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: inner,
-          ),
+          child: Padding(padding: const EdgeInsets.all(8.0), child: inner),
         ),
       ),
     );
@@ -366,16 +386,27 @@ class _MoonSearchItem {
   final DateTime createdAt;
 
   const _MoonSearchItem._(
-      this.honoo, this.hinoo, this.createdAt, this.hinooId, this.ownerId);
+    this.honoo,
+    this.hinoo,
+    this.createdAt,
+    this.hinooId,
+    this.ownerId,
+  );
 
   factory _MoonSearchItem.honoo(Honoo h, DateTime createdAt) =>
       _MoonSearchItem._(h, null, createdAt, null, null);
 
-  factory _MoonSearchItem.hinoo(HinooDraft d, DateTime createdAt,
-          {String? hinooId, String? ownerId}) =>
-      _MoonSearchItem._(null, d, createdAt, hinooId, ownerId);
+  factory _MoonSearchItem.hinoo(
+    HinooDraft d,
+    DateTime createdAt, {
+    String? hinooId,
+    String? ownerId,
+  }) => _MoonSearchItem._(null, d, createdAt, hinooId, ownerId);
 
-  T when<T>({required T Function(Honoo h) honoo, required T Function(HinooDraft d) hinoo}) {
+  T when<T>({
+    required T Function(Honoo h) honoo,
+    required T Function(HinooDraft d) hinoo,
+  }) {
     if (this.honoo != null) return honoo(this.honoo!);
     return hinoo(this.hinoo!);
   }

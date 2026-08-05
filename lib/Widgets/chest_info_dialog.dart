@@ -1,6 +1,7 @@
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../Utility/honoo_colors.dart';
 import 'honoo_dialogs.dart';
@@ -92,9 +93,14 @@ class ChestInfoDialog extends StatelessWidget {
                   top: 0,
                   right: 0,
                   child: IconButton(
-                    icon: const Icon(
-                      Icons.close,
-                      color: HonooColor.onBackground,
+                    icon: SvgPicture.asset(
+                      'assets/icons/cancella.svg',
+                      width: 40,
+                      height: 40,
+                      colorFilter: const ColorFilter.mode(
+                        HonooColor.onBackground,
+                        BlendMode.srcIn,
+                      ),
                     ),
                     iconSize: 40,
                     tooltip: 'Chiudi',

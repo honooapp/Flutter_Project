@@ -302,7 +302,7 @@ class _MoonPageState extends State<MoonPage> {
                 }(),
                 if (_isAdmin)
                   ResponsiveFooterAction(
-                    asset: 'assets/icons/cancella.svg',
+                    asset: 'assets/Cestino.svg',
                     semanticsLabel: 'Elimina',
                     size: footerIconSize,
                     colorFilter: const ColorFilter.mode(

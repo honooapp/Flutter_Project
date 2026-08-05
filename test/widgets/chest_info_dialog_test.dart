@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:honoo/Utility/build_metadata.dart';
+import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/chest_info_dialog.dart';
 
 void main() {
@@ -25,6 +27,20 @@ void main() {
     expect(chestInfoText, isNot(contains('.')));
     expect(find.text(BuildMetadata.displayLabel), findsNothing);
     expect(find.byTooltip('Chiudi'), findsOneWidget);
+    final closeIcon = tester.widget<SvgPicture>(
+      find.descendant(
+        of: find.byTooltip('Chiudi'),
+        matching: find.byType(SvgPicture),
+      ),
+    );
+    expect(
+      (closeIcon.bytesLoader as SvgAssetLoader).assetName,
+      'assets/icons/cancella.svg',
+    );
+    expect(
+      closeIcon.colorFilter,
+      const ColorFilter.mode(HonooColor.onBackground, BlendMode.srcIn),
+    );
 
     await tester.tap(find.byTooltip('Chiudi'));
     await tester.pumpAndSettle();

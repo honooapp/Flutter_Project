@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:honoo/Pages/new_hinoo_page.dart';
 import 'package:honoo/UI/hinoo_builder.dart';
+import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:sizer/sizer.dart';
 
 void main() {
@@ -39,6 +40,20 @@ void main() {
 
     expect(find.byTooltip('Cancella hinoo'), findsOneWidget);
     expect(find.byType(HinooBuilder), findsOneWidget);
+    final deleteIcon = tester.widget<SvgPicture>(
+      find.descendant(
+        of: find.byTooltip('Cancella hinoo'),
+        matching: find.byType(SvgPicture),
+      ),
+    );
+    expect(
+      (deleteIcon.bytesLoader as SvgAssetLoader).assetName,
+      'assets/Cestino.svg',
+    );
+    expect(
+      deleteIcon.colorFilter,
+      const ColorFilter.mode(HonooColor.onBackground, BlendMode.srcIn),
+    );
   });
 
   testWidgets('il cestino conferma e riporta l editor hinoo allo stato vuoto', (

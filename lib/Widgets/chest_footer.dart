@@ -161,7 +161,7 @@ class ChestFooter extends StatelessWidget {
   );
 
   ResponsiveFooterAction _deleteAction(VoidCallback onPressed) => _action(
-    asset: 'assets/icons/cancella.svg',
+    asset: 'assets/Cestino.svg',
     label: 'Cancella',
     tooltip: 'Cancella',
     onPressed: onPressed,
