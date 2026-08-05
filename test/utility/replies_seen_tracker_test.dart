@@ -25,4 +25,42 @@ void main() {
 
     expect(await RepliesSeenTracker.lastSeen(userId: 'user-1'), newest);
   });
+
+  test('mantiene lo stato letto separato per ogni conversazione', () async {
+    final baseline = DateTime.parse('2026-08-03T09:00:00Z');
+    final openedAt = DateTime.parse('2026-08-03T12:00:00Z');
+    await RepliesSeenTracker.markAt(baseline, userId: 'user-1');
+
+    await RepliesSeenTracker.markAt(
+      openedAt,
+      userId: 'user-1',
+      conversationId: 'conversation-new',
+    );
+
+    final state = await RepliesSeenTracker.load(userId: 'user-1');
+    expect(
+      state.isSeen(
+        conversationId: 'conversation-new',
+        createdAt: DateTime.parse('2026-08-03T11:00:00Z'),
+      ),
+      isTrue,
+    );
+    expect(
+      state.isSeen(
+        conversationId: 'conversation-unopened',
+        createdAt: DateTime.parse('2026-08-03T11:00:00Z'),
+      ),
+      isFalse,
+    );
+  });
+
+  test('ignora una preferenza per conversazione non valida', () async {
+    SharedPreferences.setMockInitialValues({
+      'last_seen_reply_by_conversation_v1_user-1': '{not-json',
+    });
+
+    final state = await RepliesSeenTracker.load(userId: 'user-1');
+
+    expect(state.byConversation, isEmpty);
+  });
 }

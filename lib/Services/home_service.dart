@@ -9,16 +9,16 @@ class HomeService {
 
   Future<int> fetchUnreadReplyCount(String userId) async {
     return policy.read(() async {
-      final lastSeen = await RepliesSeenTracker.lastSeen(userId: userId);
+      final seenState = await RepliesSeenTracker.load(userId: userId);
       final honooRows = await SupabaseProvider.client
           .from('honoo')
-          .select('created_at,user_id')
+          .select('created_at,user_id,conversation_id')
           .eq('destination', 'reply')
           .eq('recipient_tag', userId)
           .neq('user_id', userId);
       final hinooRows = await SupabaseProvider.client
           .from('hinoo')
-          .select('created_at,user_id')
+          .select('created_at,user_id,conversation_id')
           .eq('type', 'answer')
           .eq('recipient_tag', userId)
           .neq('user_id', userId);
@@ -28,8 +28,12 @@ class HomeService {
         final createdAt = DateTime.tryParse(
           (row['created_at'] ?? '').toString(),
         );
+        final conversationId = (row['conversation_id'] ?? '').toString();
         if (createdAt != null &&
-            (lastSeen == null || createdAt.isAfter(lastSeen))) {
+            !seenState.isSeen(
+              conversationId: conversationId,
+              createdAt: createdAt,
+            )) {
           count++;
         }
       }

@@ -44,7 +44,7 @@ class _WebReplySystemNotification extends ReplySystemNotification {
     closeConversation(conversationId);
     final body = replyCount > 1
         ? 'Hai ricevuto $replyCount nuove risposte'
-        : 'Hai ricevuto una risposta al tuo $contentLabel';
+        : 'Hai ricevuto una nuova risposta';
     final notification = web.Notification(
       'Nuova risposta su honoo',
       web.NotificationOptions(

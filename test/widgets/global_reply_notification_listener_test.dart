@@ -100,10 +100,7 @@ void main() {
         ReplyNotificationSignal.revision.value,
         greaterThan(initialRevision),
       );
-      expect(
-        find.text('Hai ricevuto una risposta al tuo hinoo'),
-        findsOneWidget,
-      );
+      expect(find.text('Hai ricevuto una nuova risposta'), findsOneWidget);
 
       notification.onTap!();
       await tester.pumpAndSettle();
@@ -160,15 +157,15 @@ void main() {
 
       expect(notification.showCount, 1);
       expect(notification.replyCount, 1000);
-      expect(notification.conversationId, 'conversation-999');
+      expect(notification.conversationId, 'multiple-conversations');
       expect(ReplyNotificationSignal.revision.value, initialRevision + 1);
       expect(find.text('Hai ricevuto 1000 nuove risposte'), findsOneWidget);
 
       notification.onTap!();
       await tester.pumpAndSettle();
       final chestPage = tester.widget<ChestPage>(find.byType(ChestPage));
-      expect(chestPage.focusConversationId, 'conversation-999');
-      expect(chestPage.focusReplyId, 'reply-999');
+      expect(chestPage.focusConversationId, isNull);
+      expect(chestPage.focusReplyId, isNull);
 
       await tester.pumpWidget(const SizedBox.shrink());
     },

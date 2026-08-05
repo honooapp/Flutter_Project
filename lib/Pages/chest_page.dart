@@ -144,7 +144,11 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       unawaited(
-        RepliesSeenTracker.markAt(entry.createdAt, userId: currentUserId),
+        RepliesSeenTracker.markAt(
+          entry.createdAt,
+          userId: currentUserId,
+          conversationId: conversationId,
+        ),
       );
     });
   }

@@ -203,10 +203,37 @@ void main() {
           .select('id,created_at,conversation_id')
           .eq('conversation_id', hinooConversationId)
           .order('created_at');
-      expect((secondHonooThread as List).length, 1);
-      expect((secondHinooThread as List).length, 2);
+        expect((secondHonooThread as List).length, 1);
+        expect((secondHinooThread as List).length, 2);
 
-      a.realtime.setAuth(a.auth.currentSession!.accessToken);
+        // Anche il mittente B deve vedere gli stessi thread completi, non solo
+        // le righe create dal proprio account.
+        final senderFirstHonooThread = await b
+            .from('honoo')
+            .select('id,created_at,conversation_id')
+            .eq('conversation_id', honooConversationId)
+            .order('created_at');
+        final senderFirstHinooThread = await b
+            .from('hinoo')
+            .select('id,created_at,conversation_id')
+            .eq('conversation_id', honooConversationId)
+            .order('created_at');
+        final senderSecondHonooThread = await b
+            .from('honoo')
+            .select('id,created_at,conversation_id')
+            .eq('conversation_id', hinooConversationId)
+            .order('created_at');
+        final senderSecondHinooThread = await b
+            .from('hinoo')
+            .select('id,created_at,conversation_id')
+            .eq('conversation_id', hinooConversationId)
+            .order('created_at');
+        expect((senderFirstHonooThread as List).length, 2);
+        expect((senderFirstHinooThread as List).length, 1);
+        expect((senderSecondHonooThread as List).length, 1);
+        expect((senderSecondHinooThread as List).length, 2);
+
+        a.realtime.setAuth(a.auth.currentSession!.accessToken);
       var realtimeInsert = Completer<void>();
       final realtimeDelete = Completer<void>();
       var subscribed = Completer<void>();
