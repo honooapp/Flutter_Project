@@ -320,7 +320,7 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const HonooScaffold(
-            body: Center(child: LoadingSpinner()),
+            body: Center(child: LoadingSpinner(color: Colors.white)),
           );
         }
 
@@ -393,10 +393,9 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                                           ? null
                                           : () => _reviewHouseRequest(inviteId, true),
                                       child: reviewing
-                                          ? const SizedBox(
-                                              width: 18,
-                                              height: 18,
-                                              child: CircularProgressIndicator(strokeWidth: 2),
+                                          ? const LoadingSpinner(
+                                              size: 18,
+                                              color: Colors.black,
                                             )
                                           : const Text('Approva'),
                                     ),
@@ -523,13 +522,9 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                             suffixIcon: _loadingEmails
                                 ? const Padding(
                                     padding: EdgeInsets.all(12),
-                                    child: SizedBox(
-                                      width: 16,
-                                      height: 16,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
+                                    child: LoadingSpinner(
+                                      size: 16,
+                                      color: Colors.white,
                                     ),
                                   )
                                 : null,
@@ -605,7 +600,9 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                     ),
                     const SizedBox(height: 12),
                     _loadingVisits
-                        ? const Center(child: LoadingSpinner())
+                        ? const Center(
+                            child: LoadingSpinner(color: Colors.white),
+                          )
                         : _VisitsSummary(visits: _visits),
                     const SizedBox(height: 24),
                     Text(
@@ -619,7 +616,9 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                     ),
                     const SizedBox(height: 12),
                     _loadingMoonCounts
-                        ? const Center(child: LoadingSpinner())
+                        ? const Center(
+                            child: LoadingSpinner(color: Colors.white),
+                          )
                         : _MoonCountsSummary(counts: _moonCounts),
                     const SizedBox(height: 24),
                     Text(
@@ -633,7 +632,9 @@ class _AdminMenuPageState extends State<AdminMenuPage> {
                     ),
                     const SizedBox(height: 12),
                     _loadingDailyCounts
-                        ? const Center(child: LoadingSpinner())
+                        ? const Center(
+                            child: LoadingSpinner(color: Colors.white),
+                          )
                         : _DailyCountsSummary(counts: _dailyCounts),
                   ],
                 ),

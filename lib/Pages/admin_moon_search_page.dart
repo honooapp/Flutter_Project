@@ -186,7 +186,9 @@ class _AdminMoonSearchPageState extends State<AdminMoonSearchPage> {
       future: _adminCheck,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return const HonooScaffold(body: Center(child: LoadingSpinner()));
+          return const HonooScaffold(
+            body: Center(child: LoadingSpinner(color: Colors.white)),
+          );
         }
         final isAdmin = snapshot.data == true;
         if (!isAdmin) {
@@ -222,13 +224,9 @@ class _AdminMoonSearchPageState extends State<AdminMoonSearchPage> {
                     suffixIcon: _loading
                         ? const Padding(
                             padding: EdgeInsets.all(12),
-                            child: SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
+                            child: LoadingSpinner(
+                              size: 16,
+                              color: Colors.white,
                             ),
                           )
                         : (_query.isEmpty
@@ -276,7 +274,7 @@ class _AdminMoonSearchPageState extends State<AdminMoonSearchPage> {
       );
     }
     if (_loading) {
-      return const Center(child: LoadingSpinner());
+      return const Center(child: LoadingSpinner(color: Colors.white));
     }
     if (_results.isEmpty) {
       return Center(

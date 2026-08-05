@@ -110,7 +110,7 @@ class _SharedHonooPageState extends State<SharedHonooPage> {
           mode: layoutMode,
         );
         final Widget content = _isLoading
-            ? const Center(child: LoadingSpinner())
+            ? const Center(child: LoadingSpinner(color: Colors.white))
             : (_items.isEmpty
                   ? Center(
                       child: Text(

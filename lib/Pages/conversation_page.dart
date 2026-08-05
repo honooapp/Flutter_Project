@@ -98,7 +98,7 @@ class _ConversationPageState extends State<ConversationPage> {
             );
 
         final Widget carousel = _isLoading
-            ? const Center(child: LoadingSpinner())
+            ? const Center(child: LoadingSpinner(color: Colors.white))
             : (_thread.isEmpty
                   ? Center(
                       child: Text(

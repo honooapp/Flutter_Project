@@ -420,7 +420,9 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const Center(child: LoadingSpinner());
+    if (_loading) {
+      return const Center(child: LoadingSpinner(color: Colors.white));
+    }
     if (_entries.isEmpty) {
       return Center(
         child: Padding(

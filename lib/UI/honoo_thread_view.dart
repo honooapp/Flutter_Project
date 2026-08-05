@@ -119,7 +119,7 @@ class _HonooThreadViewState extends State<HonooThreadView>
         if (state.isLoading) {
           child = const Center(
             key: ValueKey('thread_loading'),
-            child: LoadingSpinner(),
+            child: LoadingSpinner(color: Colors.white),
           );
         } else if (state.error != null) {
           child = Center(

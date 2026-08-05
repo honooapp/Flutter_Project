@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Widgets/loading_spinner.dart';
 
 class CambiaSfondoOverlay extends StatelessWidget {
   const CambiaSfondoOverlay({
@@ -167,14 +168,7 @@ class CambiaSfondoOverlay extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        ),
+                        const LoadingSpinner(size: 18, color: Colors.white),
                         const SizedBox(width: 10),
                         Text(
                           'Caricamento immagine…',
@@ -267,14 +261,7 @@ class CambiaSfondoOverlay extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  ),
+                  const LoadingSpinner(size: 18, color: Colors.white),
                   const SizedBox(width: 10),
                   Text(
                     'Caricamento immagine…',

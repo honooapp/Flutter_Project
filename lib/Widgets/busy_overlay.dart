@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'package:honoo/Widgets/loading_spinner.dart';
 
 class BusyOverlay extends StatelessWidget {
   const BusyOverlay({super.key, this.message = 'Attendi...'});
@@ -15,14 +16,7 @@ class BusyOverlay extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 8),
-            const SizedBox(
-              width: 28,
-              height: 28,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.5,
-                valueColor: AlwaysStoppedAnimation(Colors.white),
-              ),
-            ),
+            const LoadingSpinner(size: 28, color: Colors.white),
             const SizedBox(height: 16),
             Text(
               message,
