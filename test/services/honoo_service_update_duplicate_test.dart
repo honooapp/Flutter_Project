@@ -121,5 +121,15 @@ void main() {
       verify(() => chain.insert(any())).called(1);
       verifyNever(() => chain.select(any()));
     });
+
+    test('rifiuta un hinoo salvato dalla Luna', () async {
+      await expectLater(
+        HinooService.duplicateToMoon(
+          sampleDraft().copyWith(isFromMoonSaved: true),
+        ),
+        throwsArgumentError,
+      );
+      verifyNever(() => client.from('hinoo'));
+    });
   });
 }

@@ -128,7 +128,7 @@ class ChestFooter extends StatelessWidget {
     final isPersonalEntry = entry.kind == ConversationEntryKind.honoo
         ? entry.honoo!.type == HonooType.personal
         : entry.hinoo!.type == HinooType.personal;
-    return isMine && isPersonalEntry ? entry : null;
+    return isMine && isPersonalEntry && !entry.isFromMoonSaved ? entry : null;
   }
 
   void _addHinooActions(
