@@ -31,7 +31,7 @@ void main() {
     );
     expect(aiIcon, findsOneWidget);
     final svg = tester.widget<SvgPicture>(aiIcon);
-    expect(svg.height, 57);
+    expect(svg.height, 52);
     expect(
       svg.colorFilter,
       const ColorFilter.mode(Color.fromRGBO(183, 183, 206, 1), BlendMode.srcIn),
@@ -40,13 +40,11 @@ void main() {
       tester
           .getSize(find.byKey(const Key('regia_agenti_icon_top_spacing')))
           .height,
-      5,
+      closeTo(23.4, 0.001),
     );
     expect(
-      tester
-          .getSize(find.byKey(const Key('regia_agenti_icon_bottom_spacing')))
-          .height,
-      30,
+      find.byKey(const Key('regia_agenti_icon_bottom_spacing')),
+      findsNothing,
     );
 
     final visibleTexts = tester
@@ -56,7 +54,7 @@ void main() {
         .toList();
     final viaggiIndex = visibleTexts.indexOf("viaggi sull'Isola delle Storie");
     final regiaIndex = visibleTexts.indexOf('Regia degli Agenti');
-    final podcastIndex = visibleTexts.indexOf('podcast e dirette');
+    final podcastIndex = visibleTexts.indexOf('Podcast e dirette');
     expect(regiaIndex, viaggiIndex + 1);
     expect(regiaIndex, lessThan(podcastIndex));
 

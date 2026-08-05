@@ -50,9 +50,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   static const double _honooBottomSpacing = 15;
   static const double _libriTopSpacing = 5;
   static const double _libriBottomSpacing = 30;
-  static const double _regiaAgentiTopSpacing = _podcastTopSpacing;
-  static const double _regiaAgentiBottomSpacing = _podcastBottomSpacing;
-  static const double _regiaAgentiIconSizeReduction = 3;
+  static const double _regiaAgentiTopSpacing = 18 * 1.3;
+  static const double _regiaAgentiBottomSpacing = 0;
+  static const double _regiaAgentiIconSizeReduction = 8;
   static const Color _linkIconColor = Color.fromRGBO(183, 183, 206, 1);
 
   List<Widget> _iconBlockWithSpacing(
@@ -195,7 +195,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     const String esplorazioniLine = 'esplorazioni lunari';
     const String festeLine = 'feste';
     const String viaggiLine = "viaggi sull'Isola delle Storie";
-    const String podcastLine = 'podcast e dirette';
+    const String podcastLine = 'Podcast e dirette';
     const String libriLine = 'libri';
     const String regiaAgentiLine = 'Regia degli Agenti';
     const String venceslaoLine = 'Venceslao Cembalo';
