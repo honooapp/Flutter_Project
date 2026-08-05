@@ -70,12 +70,10 @@ class ChestFooter extends StatelessWidget {
     );
 
     final selectedEntry = selectedConversationEntry;
-    if (_canReplyTo(selectedEntry)) {
+    if (_canReplyTo(selectedEntry) &&
+        !actions.any((action) => action.tooltip == 'Rispondi')) {
       actions.add(
-        _replyAction(
-          () => onReplyToConversationEntry(selectedEntry!),
-          color: Colors.white,
-        ),
+        _replyAction(() => onReplyToConversationEntry(selectedEntry!)),
       );
     }
 
@@ -102,17 +100,6 @@ class ChestFooter extends StatelessWidget {
         !isOnMoon &&
         selectedEntryToPublish == null) {
       actions.add(_moonAction(() => onSendHonooToMoon(honoo)));
-    } else if (hasReplies &&
-        !isFromMoonSaved &&
-        selectedConversationEntry == null) {
-      actions.add(
-        _action(
-          asset: 'assets/icons/reply.svg',
-          label: 'Reply',
-          tooltip: 'Vedi risposte',
-          onPressed: () {},
-        ),
-      );
     } else if (isFromMoonSaved) {
       actions.add(_replyAction(() => onReplyToHonoo(honoo)));
     }

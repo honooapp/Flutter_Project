@@ -34,8 +34,8 @@ class ChestRepository {
           .select(
             'id,pages,type,reply_to,recipient_tag,created_at,is_from_moon_saved,user_id,conversation_id',
           )
-          .eq('user_id', userId)
           .in_('type', ['personal', 'answer'])
+          .or('user_id.eq.$userId,and(type.eq.answer,recipient_tag.eq.$userId)')
           .order('created_at', ascending: false);
       return _asList(rows);
     } on PostgrestException catch (error) {
@@ -48,8 +48,8 @@ class ChestRepository {
           .select(
             'id,pages,type,reply_to,recipient_tag,created_at,user_id,conversation_id',
           )
-          .eq('user_id', userId)
           .in_('type', ['personal', 'answer'])
+          .or('user_id.eq.$userId,and(type.eq.answer,recipient_tag.eq.$userId)')
           .order('created_at', ascending: false);
       return _asList(rows);
     }
