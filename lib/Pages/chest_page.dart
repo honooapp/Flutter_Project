@@ -35,6 +35,7 @@ import '../Widgets/chest_item_view.dart';
 import '../Widgets/chest_info_dialog.dart';
 import '../Widgets/desktop_carousel_arrows.dart';
 import '../UI/thread_layout_scaffold.dart';
+import '../UI/unified_thread_view.dart';
 
 import 'reply_honoo_page.dart';
 import 'new_hinoo_page.dart';
@@ -975,7 +976,18 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       builder: (context, _) {
         _rebuildItems();
         final items = _itemsNormal;
-        final currentItem = items.isEmpty
+        final focusedConversationId = widget.focusConversationId;
+        final focusedItemIndex = focusedConversationId == null
+            ? -1
+            : items.indexWhere(
+                (item) => _convIdOfItem(item) == focusedConversationId,
+              );
+        final showDetachedFocusedConversation =
+            _initialLoadCompleted &&
+            focusedConversationId != null &&
+            focusedConversationId.isNotEmpty &&
+            focusedItemIndex < 0;
+        final currentItem = showDetachedFocusedConversation || items.isEmpty
             ? null
             : items[_currentIndex.clamp(0, items.length - 1)];
         final currentUserId = SupabaseProvider.client.auth.currentUser?.id;
@@ -1011,6 +1023,20 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
             final loadError = _loadError;
             if ((ctrl.isLoading.value || _isHinooLoading) && items.isEmpty) {
               return const Center(child: LoadingSpinner(color: Colors.white));
+            }
+            if (showDetachedFocusedConversation) {
+              return UnifiedThreadView(
+                conversationId: focusedConversationId,
+                maxWidth: viewW,
+                maxHeight: availableH,
+                isActive: true,
+                highlightLatest: widget.highlightLatest,
+                currentUserId: currentUserId,
+                revealEntryId: _pendingRevealEntryId,
+                refreshToken: _conversationRefreshToken,
+                onSelect: (entry) =>
+                    _selectConversationEntry(focusedConversationId, entry),
+              );
             }
             if (items.isEmpty) {
               if (loadError != null) {
@@ -1111,7 +1137,8 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
                 footerBottomSpacing,
               ) {
                 final items = _itemsNormal;
-                final ChestItem? current = items.isEmpty
+                final ChestItem? current =
+                    showDetachedFocusedConversation || items.isEmpty
                     ? null
                     : items[_currentIndex];
                 return _footerForItem(

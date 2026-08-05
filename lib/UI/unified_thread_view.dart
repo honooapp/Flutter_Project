@@ -249,6 +249,12 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
         (entry) => entry.id == revealEntryId,
       );
       if (exactIndex >= 0) return exactIndex;
+
+      // Se la riga indicata dalla notifica non è ancora disponibile, non
+      // ricadere sulla radice della conversazione (che può essere un contenuto
+      // salvato dalla Luna): mostra comunque l'ultima risposta ricevuta.
+      final latestReceivedIndex = reversed.indexWhere(_isReceivedReply);
+      if (latestReceivedIndex >= 0) return latestReceivedIndex;
     }
     final receivedIndex = reversed.indexWhere(_shouldReveal);
     return receivedIndex < 0 ? 0 : receivedIndex;
@@ -301,6 +307,22 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
       if (currentUserId != null && e.ownerId == currentUserId) return false;
     }
     return isReply;
+  }
+
+  bool _isReceivedReply(ConversationEntry entry) {
+    if (!_isDisplayableReply(entry)) return false;
+    final currentUserId =
+        widget.currentUserId ?? Supabase.instance.client.auth.currentUser?.id;
+    return currentUserId == null || entry.ownerId != currentUserId;
+  }
+
+  bool _isDisplayableReply(ConversationEntry entry) {
+    if (entry.kind == ConversationEntryKind.deleted || entry.isFromMoonSaved) {
+      return false;
+    }
+    if (entry.honoo?.isFromMoonSaved == true) return false;
+    return entry.honoo?.type == HonooType.answer ||
+        entry.hinoo?.type == HinooType.answer;
   }
 
   ConversationEntry? _answeredEntryFor(ConversationEntry reply) {

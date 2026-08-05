@@ -7,6 +7,7 @@ import 'package:honoo/Pages/chest_page.dart';
 import 'package:honoo/Services/reply_system_notification.dart';
 import 'package:honoo/Widgets/global_reply_notification_listener.dart';
 import 'package:honoo/Utility/reply_notification_signal.dart';
+import 'package:honoo/Utility/replies_seen_tracker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../test_supabase_helper.dart';
@@ -52,6 +53,7 @@ void main() {
       ..enableOverrides();
     harness.stubTable('honoo');
     harness.stubTable('hinoo');
+    harness.stubTable('conversation_tombstones');
     events = StreamController<ReplyNotificationEvent>();
   });
 
@@ -102,7 +104,10 @@ void main() {
       );
       expect(find.text('Hai ricevuto una nuova risposta'), findsOneWidget);
 
-      notification.onTap!();
+      expect(find.text('Apri'), findsOneWidget);
+      expect(find.text('Ignora'), findsOneWidget);
+
+      await tester.tap(find.text('Apri'));
       await tester.pumpAndSettle();
 
       expect(navigatorKey.currentState!.canPop(), isTrue);
@@ -114,6 +119,54 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );
+
+  testWidgets('Ignora chiude il popup senza aprire né consumare la risposta', (
+    tester,
+  ) async {
+    final navigatorKey = GlobalKey<NavigatorState>();
+    final notification = _FakeReplySystemNotification();
+
+    await tester.pumpWidget(
+      GlobalReplyNotificationListener(
+        navigatorKey: navigatorKey,
+        systemNotification: notification,
+        replyEventStream: events.stream,
+        child: MaterialApp(
+          navigatorKey: navigatorKey,
+          home: const Scaffold(body: Text('Luna')),
+        ),
+      ),
+    );
+
+    events.add(
+      ReplyNotificationEvent(
+        kind: ReplyNotificationKind.honoo,
+        conversationId: 'conversation-pending',
+        senderId: 'other_user',
+        recipientId: 'test_user',
+        replyId: 'reply-pending',
+        createdAt: DateTime.utc(2026, 8, 3, 10),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 200));
+
+    expect(find.text('Ignora'), findsOneWidget);
+    await tester.tap(find.text('Ignora'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ChestPage), findsNothing);
+    expect(find.text('Luna'), findsOneWidget);
+    expect(notification.showCount, 1);
+    expect(notification.onTap, isNotNull);
+    final seenState = await RepliesSeenTracker.load(userId: 'test_user');
+    expect(
+      seenState.isSeen(
+        conversationId: 'conversation-pending',
+        createdAt: DateTime.utc(2026, 8, 3, 10),
+      ),
+      isFalse,
+    );
+  });
 
   testWidgets(
     'un grande burst produce una sola notifica e un solo aggiornamento UI',
@@ -161,6 +214,8 @@ void main() {
       expect(ReplyNotificationSignal.revision.value, initialRevision + 1);
       expect(find.text('Hai ricevuto 1000 nuove risposte'), findsOneWidget);
 
+      await tester.tap(find.text('Ignora'));
+      await tester.pumpAndSettle();
       notification.onTap!();
       await tester.pumpAndSettle();
       final chestPage = tester.widget<ChestPage>(find.byType(ChestPage));
