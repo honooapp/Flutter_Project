@@ -94,6 +94,8 @@ class SupabaseTestHarness {
     when(() => chain.select(any())).thenAnswer((_) => chain);
     when(() => chain.insert(any())).thenAnswer((_) => chain);
     when(() => chain.eq(any(), any())).thenAnswer((_) => chain);
+    when(() => chain.neq(any(), any())).thenAnswer((_) => chain);
+    when(() => chain.gt(any(), any())).thenAnswer((_) => chain);
     when(() => chain.order(any(), ascending: any(named: 'ascending')))
         .thenAnswer((_) => chain);
     when(() => chain.limit(any())).thenAnswer((_) => chain);

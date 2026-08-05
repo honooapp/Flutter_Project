@@ -407,7 +407,7 @@ void main() {
   });
 
   testWidgets(
-    'il bounce resta attivo senza bordi sulla risposta propria e sul padre Luna',
+    'il bounce conserva la cornice bianca sul padre Luna e nessuna rossa sulla risposta propria',
     (tester) async {
       tester.view.devicePixelRatio = 1;
       tester.view.physicalSize = const Size(600, 900);
@@ -452,7 +452,13 @@ void main() {
       await tester.pump(const Duration(milliseconds: 600));
 
       expect(find.byKey(const Key('reply_reveal_parent')), findsOneWidget);
-      expect(borderWithColor(Colors.white), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('reply_reveal_parent')),
+          matching: borderWithColor(Colors.white),
+        ),
+        findsOneWidget,
+      );
       expect(borderWithColor(HonooColor.secondary), findsNothing);
     },
   );

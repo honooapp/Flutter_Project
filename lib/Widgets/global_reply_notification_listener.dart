@@ -199,12 +199,18 @@ class _GlobalReplyNotificationListenerState
     _pendingEvents.clear();
     final event = events.last;
     final replyCount = events.length;
+    final conversationIds = events.map((item) => item.conversationId).toSet();
+    final hasMultipleConversations = conversationIds.length > 1;
     ReplyNotificationSignal.notifyChanged();
 
-    void open() => _openConversation(event);
+    void open() => hasMultipleConversations
+        ? _openRepliesInbox()
+        : _openConversation(event);
     _systemNotification.show(
       contentLabel: event.contentLabel,
-      conversationId: event.conversationId,
+      conversationId: hasMultipleConversations
+          ? 'multiple-conversations'
+          : event.conversationId,
       onTap: open,
       replyCount: replyCount,
     );
@@ -218,7 +224,7 @@ class _GlobalReplyNotificationListenerState
         SnackBar(
           content: Text(
             replyCount == 1
-                ? 'Hai ricevuto una risposta al tuo ${event.contentLabel}'
+                ? 'Hai ricevuto una nuova risposta'
                 : 'Hai ricevuto $replyCount nuove risposte',
           ),
           action: SnackBarAction(label: 'Apri', onPressed: open),
@@ -227,31 +233,33 @@ class _GlobalReplyNotificationListenerState
   }
 
   Future<void> _catchUpMissedReplies(String userId, int generation) async {
-    final lastSeen = await RepliesSeenTracker.lastSeen(userId: userId);
-    if (!mounted || generation != _channelGeneration || lastSeen == null) {
+    final seenState = await RepliesSeenTracker.load(userId: userId);
+    if (!mounted || generation != _channelGeneration) {
       return;
     }
     try {
-      final since = lastSeen.toUtc().toIso8601String();
+      final since = seenState.baseline?.toUtc().toIso8601String();
+      dynamic honooQuery = SupabaseProvider.client
+          .from('honoo')
+          .select(
+            'id,destination,reply_to,recipient_tag,created_at,user_id,conversation_id',
+          )
+          .eq('destination', 'reply')
+          .eq('recipient_tag', userId);
+      dynamic hinooQuery = SupabaseProvider.client
+          .from('hinoo')
+          .select(
+            'id,type,reply_to,recipient_tag,created_at,user_id,conversation_id',
+          )
+          .eq('type', 'answer')
+          .eq('recipient_tag', userId);
+      if (since != null) {
+        honooQuery = honooQuery.gt('created_at', since);
+        hinooQuery = hinooQuery.gt('created_at', since);
+      }
       final results = await Future.wait<dynamic>([
-        SupabaseProvider.client
-            .from('honoo')
-            .select(
-              'id,destination,reply_to,recipient_tag,created_at,user_id,conversation_id',
-            )
-            .eq('destination', 'reply')
-            .eq('recipient_tag', userId)
-            .gt('created_at', since)
-            .order('created_at'),
-        SupabaseProvider.client
-            .from('hinoo')
-            .select(
-              'id,type,reply_to,recipient_tag,created_at,user_id,conversation_id',
-            )
-            .eq('type', 'answer')
-            .eq('recipient_tag', userId)
-            .gt('created_at', since)
-            .order('created_at'),
+        honooQuery.order('created_at', ascending: false).limit(100),
+        hinooQuery.order('created_at', ascending: false).limit(100),
       ]);
       if (!mounted || generation != _channelGeneration) return;
       final pending = <ReplyNotificationEvent>[];
@@ -265,7 +273,15 @@ class _GlobalReplyNotificationListenerState
             kind: kind,
             currentUserId: userId,
           );
-          if (event != null) pending.add(event);
+          final createdAt = event?.createdAt;
+          if (event != null &&
+              createdAt != null &&
+              !seenState.isSeen(
+                conversationId: event.conversationId,
+                createdAt: createdAt,
+              )) {
+            pending.add(event);
+          }
         }
       }
       pending.sort(
@@ -289,6 +305,15 @@ class _GlobalReplyNotificationListenerState
           focusReplyId: event.replyId,
           highlightLatest: true,
         ),
+      ),
+    );
+  }
+
+  void _openRepliesInbox() {
+    widget.navigatorKey.currentState?.push(
+      MaterialPageRoute(
+        builder: (_) =>
+            const ChestPage(focusReplies: true, highlightLatest: true),
       ),
     );
   }
