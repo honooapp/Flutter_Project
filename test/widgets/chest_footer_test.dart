@@ -217,7 +217,7 @@ void main() {
   });
 
   testWidgets(
-    'la selezione del padre della conversazione mostra una sola azione Luna',
+    'la selezione di un proprio Honoo non mostra Rispondi',
     (tester) async {
       final item = honooItem(
         HonooType.personal,
@@ -235,7 +235,7 @@ void main() {
       );
 
       expect(find.byTooltip('Spedisci sulla Luna'), findsOneWidget);
-      expect(find.byTooltip('Rispondi'), findsOneWidget);
+      expect(find.byTooltip('Rispondi'), findsNothing);
       await tester.tap(find.byTooltip('Spedisci sulla Luna'));
       expect(publishedEntry, same(selectedEntry));
     },
@@ -357,7 +357,8 @@ void main() {
       iconSize: 60,
     );
 
-    expect(find.byType(IconButton), findsNWidgets(5));
+    expect(find.byType(IconButton), findsNWidgets(4));
+    expect(find.byTooltip('Rispondi'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
