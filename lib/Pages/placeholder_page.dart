@@ -95,21 +95,27 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     double topSpacing = 0,
     double bottomSpacing = 0,
     VoidCallback? onTap,
+    Color? color,
+    Key? iconKey,
+    Key? topSpacingKey,
+    Key? bottomSpacingKey,
   }) {
     return [
-      if (topSpacing > 0) SizedBox(height: topSpacing),
+      if (topSpacing > 0) SizedBox(key: topSpacingKey, height: topSpacing),
       GestureDetector(
         onTap: onTap,
         child: SvgPicture.asset(
+          key: iconKey,
           asset,
           height: size,
-          colorFilter: const ColorFilter.mode(
-            HonooColor.onBackground,
+          colorFilter: ColorFilter.mode(
+            color ?? HonooColor.onBackground,
             BlendMode.srcIn,
           ),
         ),
       ),
-      if (bottomSpacing > 0) SizedBox(height: bottomSpacing),
+      if (bottomSpacing > 0)
+        SizedBox(key: bottomSpacingKey, height: bottomSpacing),
     ];
   }
 
@@ -414,9 +420,13 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
       ),
       ..._svgIconBlockWithSpacing(
         'assets/icons/ai.svg',
-        inlineIconHeight,
+        inlineIconHeight - 3,
         topSpacing: _regiaAgentiTopSpacing,
         bottomSpacing: _regiaAgentiBottomSpacing,
+        color: _linkIconColor,
+        iconKey: const Key('regia_agenti_icon'),
+        topSpacingKey: const Key('regia_agenti_icon_top_spacing'),
+        bottomSpacingKey: const Key('regia_agenti_icon_bottom_spacing'),
         onTap: () {
           Navigator.of(
             context,

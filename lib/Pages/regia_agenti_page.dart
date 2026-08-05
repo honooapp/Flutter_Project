@@ -1,16 +1,23 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/honoo_standard_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RegiaAgentiPage extends StatelessWidget {
   const RegiaAgentiPage({super.key});
 
-  static const String regiaAgentiText =
+  static const String alessandroMolinaUrl =
+      'https://www.linkedin.com/authwall?trk=gf&trkInfo=AQEKiDvNCY9k5wAAAZ_TKfSQOVjSt8GjBHYntEjt-HPxCMb7xQr32j-xeaqLUkZnvfqrUpn83qHvXKKKYHIKY1acgmDf7htNSAFpkUS9bOm7DEa8a16eUbCCpTlD4T-EdrqpifM=&original_referer=&sessionRedirect=https%3A%2F%2Fwww.linkedin.com%2Fin%2Falessandro-molina1%3Futm_source%3Dshare_via%26utm_content%3Dprofile%26utm_medium%3Dmember_ios';
+
+  static const String _textBeforeAlessandro =
       '“Regia degli Agenti”\n'
       'non è una mia espressione,\n'
-      'ma del mio amico\n'
-      'Alessandro Molina,\n'
+      'ma del mio amico\n';
+
+  static const String _textAfterAlessandro =
+      ',\n'
       'che è Capo Consigliere\n'
       'di honoo\n'
       'per tutto quello che riguarda\n'
@@ -41,6 +48,9 @@ class RegiaAgentiPage extends StatelessWidget {
       'di scrivere\n'
       'prodotti digitali\n';
 
+  static const String regiaAgentiText =
+      '${_textBeforeAlessandro}Alessandro Molina$_textAfterAlessandro';
+
   @override
   Widget build(BuildContext context) {
     final TextStyle bodyStyle = GoogleFonts.arvo(
@@ -52,10 +62,29 @@ class RegiaAgentiPage extends StatelessWidget {
 
     return HonooStandardPage(
       contentWidthFactor: 0.45,
-      child: Text(
-        regiaAgentiText,
+      child: Text.rich(
+        TextSpan(
+          style: bodyStyle,
+          children: [
+            const TextSpan(text: _textBeforeAlessandro),
+            TextSpan(
+              text: 'Alessandro Molina',
+              style: bodyStyle.copyWith(
+                decoration: TextDecoration.underline,
+                decorationColor: bodyStyle.color,
+              ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () async {
+                  await launchUrl(
+                    Uri.parse(alessandroMolinaUrl),
+                    mode: LaunchMode.externalApplication,
+                  );
+                },
+            ),
+            const TextSpan(text: _textAfterAlessandro),
+          ],
+        ),
         key: const Key('regia_agenti_text'),
-        style: bodyStyle,
         textAlign: TextAlign.center,
       ),
     );
