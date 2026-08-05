@@ -28,7 +28,11 @@ void main() {
     savedItemUri: 'content://gallery/honoo.png',
   );
 
-  Future<void> pumpDialog(WidgetTester tester, _FakeDownloadSaver saver) async {
+  Future<void> pumpDialog(
+    WidgetTester tester,
+    _FakeDownloadSaver saver, {
+    String contentName = 'honoo',
+  }) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Builder(
@@ -36,7 +40,7 @@ void main() {
             body: TextButton(
               onPressed: () => showDownloadSaveResult(
                 context: context,
-                contentName: 'honoo',
+                contentName: contentName,
                 openSavedImage: saver.openSavedImage,
                 result: result,
               ),
@@ -57,7 +61,10 @@ void main() {
     await pumpDialog(tester, saver);
 
     expect(
-      find.text("L'honoo è stato salvato nella tua galleria delle foto"),
+      find.text(
+        'L’honoo è stato salvato\n'
+        'nella tua Galleria delle Foto',
+      ),
       findsOneWidget,
     );
 
@@ -77,5 +84,18 @@ void main() {
 
     expect(saver.openCalled, isTrue);
     expect(find.text('Salva'), findsOneWidget);
+  });
+
+  testWidgets('il messaggio usa correttamente il nome hinoo', (tester) async {
+    final saver = _FakeDownloadSaver();
+    await pumpDialog(tester, saver, contentName: 'hinoo');
+
+    expect(
+      find.text(
+        'L’hinoo è stato salvato\n'
+        'nella tua Galleria delle Foto',
+      ),
+      findsOneWidget,
+    );
   });
 }
