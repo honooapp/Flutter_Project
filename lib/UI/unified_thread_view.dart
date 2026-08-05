@@ -342,8 +342,26 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
     return replyIndex > 0 ? _entries[replyIndex - 1] : null;
   }
 
-  Widget _entryCard(ConversationEntry entry, {String? keyName}) {
+  bool _isOwnedByCurrentUser(ConversationEntry entry) {
+    final currentUserId =
+        widget.currentUserId ?? SupabaseProvider.client.auth.currentUser?.id;
+    return currentUserId != null && entry.ownerId == currentUserId;
+  }
+
+  Widget _entryCard(
+    ConversationEntry entry, {
+    String? keyName,
+    bool showAsOwnedContent = false,
+  }) {
     final GlobalKey repaintKey = GlobalKey();
+    final style = showAsOwnedContent
+        ? ChestContentStyle.own
+        : ChestContentStyle.forEntry(
+            entry,
+            viewerUserId:
+                widget.currentUserId ??
+                SupabaseProvider.client.auth.currentUser?.id,
+          );
     final Widget card;
     switch (entry.kind) {
       case ConversationEntryKind.honoo:
@@ -352,6 +370,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
           child: HonooCard(
             honoo: entry.honoo!,
             viewerUserId: widget.currentUserId,
+            contentStyleOverride: showAsOwnedContent ? style : null,
             onDownloadTap: () => _downloadFromBoundary(
               repaintKey: repaintKey,
               baseName: 'honoo',
@@ -369,6 +388,9 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
             isReply: entry.hinoo!.type == HinooType.answer,
             authorId: entry.ownerId,
             viewerUserId: widget.currentUserId,
+            gapColor: showAsOwnedContent
+                ? ChestContentStyle.own.backgroundColor
+                : HonooColor.background,
             onDownloadTap: () => _downloadFromBoundary(
               repaintKey: repaintKey,
               baseName: 'hinoo',
@@ -389,11 +411,6 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
         );
         break;
     }
-    final style = ChestContentStyle.forEntry(
-      entry,
-      viewerUserId:
-          widget.currentUserId ?? SupabaseProvider.client.auth.currentUser?.id,
-    );
     return ColoredBox(
       key: keyName == null ? null : Key(keyName),
       color: style.backgroundColor,
@@ -476,6 +493,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
                 child: _entryCard(
                   answeredEntry,
                   keyName: 'reply_reveal_parent',
+                  showAsOwnedContent: _isOwnedByCurrentUser(answeredEntry),
                 ),
               );
               return AnimatedBuilder(
