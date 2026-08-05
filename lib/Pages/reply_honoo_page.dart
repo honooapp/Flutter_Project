@@ -205,7 +205,7 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
             if (_isSending)
               const Padding(
                 padding: EdgeInsets.only(bottom: 16),
-                child: LoadingSpinner(),
+                child: LoadingSpinner(color: Colors.white),
               ),
           ],
         ),

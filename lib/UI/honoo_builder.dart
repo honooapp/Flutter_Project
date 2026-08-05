@@ -15,6 +15,7 @@ import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/typographic_substitutions_formatter.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
+import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/gallery_save_dialog.dart';
 import 'package:honoo/Widgets/cover_transform_image.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
@@ -786,13 +787,9 @@ class HonooBuilderState extends State<HonooBuilder> {
               Expanded(
                 child: Center(
                   child: _isUploadingFinal
-                      ? SizedBox(
-                          width: resolvedConfirmIconSize * 0.72,
-                          height: resolvedConfirmIconSize * 0.72,
-                          child: const CircularProgressIndicator(
-                            strokeWidth: 3,
-                            color: HonooColor.onBackground,
-                          ),
+                      ? LoadingSpinner(
+                          size: resolvedConfirmIconSize * 0.72,
+                          color: HonooColor.onBackground,
                         )
                       : Tooltip(
                           message: 'Salva honoo',

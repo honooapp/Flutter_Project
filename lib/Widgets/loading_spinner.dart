@@ -7,13 +7,15 @@ class LoadingSpinner extends StatefulWidget {
   const LoadingSpinner({
     super.key,
     this.size = 50.0,
-    this.color,
+    this.color = Colors.black,
     this.semanticsLabel,
     this.rotationDuration = const Duration(milliseconds: 900),
   });
 
   final double size;
-  final Color? color;
+
+  /// Nero sulle superfici chiare; passare bianco sui fondi scuri.
+  final Color color;
   final String? semanticsLabel;
   final Duration rotationDuration;
 
@@ -59,9 +61,7 @@ class _LoadingSpinnerState extends State<LoadingSpinner>
       width: widget.size,
       height: widget.size,
       semanticsLabel: semantics,
-      colorFilter: widget.color != null
-          ? ColorFilter.mode(widget.color!, BlendMode.srcIn)
-          : null,
+      colorFilter: ColorFilter.mode(widget.color, BlendMode.srcIn),
     );
 
     return SizedBox(

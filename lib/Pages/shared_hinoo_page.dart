@@ -125,7 +125,7 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
       ),
       bodyBuilder: (context, viewW, availableH, layoutMode) {
         final Widget content = _isLoading
-            ? const Center(child: LoadingSpinner())
+            ? const Center(child: LoadingSpinner(color: Colors.white))
             : (_items.isEmpty
                   ? Center(
                       child: Text(
@@ -416,16 +416,7 @@ class _SharedHinooPageState extends State<SharedHinooPage> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   SizedBox(height: 8),
-                                  SizedBox(
-                                    width: 28,
-                                    height: 28,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      valueColor: AlwaysStoppedAnimation(
-                                        Colors.white,
-                                      ),
-                                    ),
-                                  ),
+                                  LoadingSpinner(size: 28, color: Colors.white),
                                   SizedBox(height: 16),
                                   Text(
                                     'Apro la conversazione...',

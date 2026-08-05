@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../Entities/casa_share_mode.dart';
 import 'honoo_dialogs.dart';
+import 'loading_spinner.dart';
 
 class CasaMultiShareDialog extends StatefulWidget {
   const CasaMultiShareDialog({super.key, required this.onConfirm});
@@ -91,15 +92,7 @@ class _CasaMultiShareDialogState extends State<CasaMultiShareDialog> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation(Colors.black),
-                          backgroundColor: Colors.white,
-                        ),
-                      ),
+                      const LoadingSpinner(size: 16, color: Colors.black),
                       const SizedBox(width: 10),
                       Text(
                         'Salvo...',

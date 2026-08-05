@@ -92,7 +92,7 @@ class _SharedConversationsPageState extends State<SharedConversationsPage> {
       ),
       bodyBuilder: (context, viewW, availableH, layoutMode) {
         final Widget threads = _isLoadingRoots
-            ? const Center(child: LoadingSpinner())
+            ? const Center(child: LoadingSpinner(color: Colors.white))
             : (_conversationIds.isEmpty
                   ? Center(
                       child: Text(
