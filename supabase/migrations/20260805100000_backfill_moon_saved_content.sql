@@ -19,6 +19,6 @@ from public.hinoo as original
 where saved.type = 'personal'
   and coalesce(saved.is_from_moon_saved, false) = false
   and saved.conversation_id = original.id::text
-  and original.type in ('moon', 'public')
+  and original.type = 'moon'
   and saved.user_id <> original.user_id
   and saved.pages = original.pages;
