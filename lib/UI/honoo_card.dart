@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../Entities/honoo.dart';
 import 'package:honoo/Services/supabase_provider.dart';
+import '../Utility/chest_content_style.dart';
 import '../Utility/honoo_colors.dart';
 import '../Widgets/smooth_image.dart';
 import '../Widgets/text_box_download_button.dart';
@@ -24,19 +25,23 @@ class HonooCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
-
-    Color cardBg;
-    switch (honoo.type) {
-      case HonooType.moon:
-        cardBg = HonooColor.tertiary;
-        break;
-      case HonooType.answer:
-        cardBg = HonooColor.secondary;
-        break;
-      case HonooType.personal:
-        cardBg = HonooColor.background;
-        break;
-    }
+    final String? currentUserId =
+        viewerUserId ?? SupabaseProvider.client.auth.currentUser?.id;
+    final contentStyle = ChestContentStyle.forHonoo(
+      honoo,
+      viewerUserId: currentUserId,
+    );
+    final Color cardBg = contentStyle.backgroundColor;
+    final bool isReceivedReply = identical(
+      contentStyle,
+      ChestContentStyle.receivedReply,
+    );
+    final Color textPanelColor = isReceivedReply
+        ? HonooColor.secondary
+        : HonooColor.tertiary;
+    final Color textColor = isReceivedReply
+        ? Colors.white
+        : HonooColor.onTertiary;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -67,9 +72,7 @@ class HonooCard extends StatelessWidget {
 
         const double cornerRadius = 5;
 
-        final Color gapColor = honoo.type == HonooType.moon
-            ? HonooColor.tertiary
-            : cardBg;
+        final Color gapColor = cardBg;
 
         final Widget content = Card(
           color: cardBg,
@@ -92,16 +95,20 @@ class HonooCard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: HonooColor.tertiary,
-                      border: Border.all(color: Colors.black12),
+                      color: textPanelColor,
+                      border: isReceivedReply
+                          ? null
+                          : Border.all(color: Colors.black12),
                       borderRadius: BorderRadius.circular(cornerRadius),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                      boxShadow: isReceivedReply
+                          ? null
+                          : [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                     ),
                     child: Stack(
                       children: [
@@ -110,7 +117,7 @@ class HonooCard extends StatelessWidget {
                             honoo.text,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.arvo(
-                              color: HonooColor.onTertiary,
+                              color: textColor,
                               fontSize: 18,
                               height: 1.4,
                               fontWeight: FontWeight.w400,
@@ -199,8 +206,6 @@ class HonooCard extends StatelessWidget {
         );
 
         final bool isReply = honoo.type == HonooType.answer;
-        final String? currentUserId =
-            viewerUserId ?? SupabaseProvider.client.auth.currentUser?.id;
         final bool isOwn =
             currentUserId != null && currentUserId == honoo.userId;
         return Center(

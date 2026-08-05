@@ -39,6 +39,14 @@ void main() {
         border.top.width == 6;
   });
 
+  Finder decoratedPanelWithColor(Color color) =>
+      find.byWidgetPredicate((widget) {
+        if (widget is! Container || widget.decoration is! BoxDecoration) {
+          return false;
+        }
+        return (widget.decoration! as BoxDecoration).color == color;
+      });
+
   Honoo honoo({
     required HonooType type,
     String owner = 'other_user',
@@ -126,6 +134,10 @@ void main() {
       ChestContentStyle.forHonoo(value, viewerUserId: 'test_user'),
       same(ChestContentStyle.own),
     );
+    final ownGap = tester.widget<ColoredBox>(
+      find.byKey(const Key('honoo-card-gap')),
+    );
+    expect(ownGap.color, HonooColor.background);
     expect(borderWithColor(HonooColor.secondary), findsNothing);
     expect(borderWithColor(Colors.white), findsNothing);
   });
@@ -140,6 +152,9 @@ void main() {
       ChestContentStyle.forHonoo(value, viewerUserId: 'test_user'),
       same(ChestContentStyle.receivedReply),
     );
+    expect(decoratedPanelWithColor(HonooColor.secondary), findsOneWidget);
+    final replyText = tester.widget<Text>(find.text('Test conversazione'));
+    expect(replyText.style?.color, Colors.white);
     expect(borderWithColor(HonooColor.secondary), findsNothing);
     expect(borderWithColor(Colors.white), findsNothing);
   });
