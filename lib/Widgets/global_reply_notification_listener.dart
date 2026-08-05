@@ -9,6 +9,7 @@ import '../Services/reply_system_notification.dart';
 import '../Services/supabase_provider.dart';
 import '../Utility/reply_notification_signal.dart';
 import '../Utility/replies_seen_tracker.dart';
+import 'honoo_dialogs.dart';
 
 class GlobalReplyNotificationListener extends StatefulWidget {
   const GlobalReplyNotificationListener({
@@ -216,20 +217,32 @@ class _GlobalReplyNotificationListenerState
     );
 
     final context = widget.navigatorKey.currentContext;
-    if (context == null) return;
-    final messenger = ScaffoldMessenger.maybeOf(context);
-    messenger
-      ?..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            replyCount == 1
-                ? 'Hai ricevuto una nuova risposta'
-                : 'Hai ricevuto $replyCount nuove risposte',
-          ),
-          action: SnackBarAction(label: 'Apri', onPressed: open),
-        ),
+    if (context != null) {
+      unawaited(
+        _showReplyDialog(context, replyCount: replyCount, onOpen: open),
       );
+    }
+  }
+
+  Future<void> _showReplyDialog(
+    BuildContext context, {
+    required int replyCount,
+    required VoidCallback onOpen,
+  }) async {
+    final shouldOpen = await showDialog<bool>(
+      context: context,
+      useRootNavigator: true,
+      barrierDismissible: true,
+      builder: (_) => HonooConfirmDialog(
+        title: replyCount == 1
+            ? 'Hai ricevuto una nuova risposta'
+            : 'Hai ricevuto $replyCount nuove risposte',
+        confirmLabel: 'Apri',
+        cancelLabel: 'Ignora',
+      ),
+    );
+    if (!mounted || shouldOpen != true) return;
+    onOpen();
   }
 
   Future<void> _catchUpMissedReplies(String userId, int generation) async {

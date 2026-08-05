@@ -61,6 +61,7 @@ class HinooStorageUploader {
     required String filenameExt, // es: "jpg" | "png" | "webp" | "jpeg"
     required String userId,
     String folder = 'backgrounds', // default sicuro
+    Duration? writeTimeout,
   }) async {
     _assertUserId(userId);
     final safeExt = _normalizeExt(filenameExt);
@@ -69,8 +70,13 @@ class HinooStorageUploader {
     final id = _uuid.v4();
     final path = '$userId/$safeFolder/$id.$safeExt';
 
-    await _reliability.write(
-      () => _client.storage.from(bucket).uploadBinary(
+    final reliability = writeTimeout == null
+        ? _reliability
+        : ReliabilityPolicy(writeTimeout: writeTimeout);
+    await reliability.write(
+      () => _client.storage
+          .from(bucket)
+          .uploadBinary(
             path,
             bytes,
             fileOptions: FileOptions(
@@ -91,12 +97,14 @@ class HinooStorageUploader {
     required Uint8List bytes,
     required String ext,
     required String userId,
+    Duration? writeTimeout,
   }) {
     return uploadBytes(
       bytes: bytes,
       filenameExt: ext,
       userId: userId,
       folder: 'backgrounds',
+      writeTimeout: writeTimeout,
     );
   }
 

@@ -136,4 +136,51 @@ void main() {
       expect(() => result.items.add(input.first), throwsUnsupportedError);
     });
   });
+
+  group('latestNotificationTarget', () {
+    test('mantiene la conversazione dedicata anche senza una slide radice', () {
+      final items = [
+        _Item(
+          id: 'root',
+          conversationId: 'original-conversation',
+          createdAt: DateTime.parse('2026-08-05T10:00:00Z'),
+        ),
+      ];
+
+      final target = ChestOrganizer.latestNotificationTarget(
+        items: items,
+        conversationIdOf: (item) => item.conversationId,
+        notifications: [
+          {
+            'original-conversation': DateTime.parse('2026-08-05T11:00:00Z'),
+            'dedicated-conversation': DateTime.parse('2026-08-05T12:00:00Z'),
+          },
+        ],
+      );
+
+      expect(target?.conversationId, 'dedicated-conversation');
+      expect(target?.isDetached, isTrue);
+    });
+
+    test('seleziona la slide quando la conversazione è già nello Scrigno', () {
+      final items = [
+        _Item(
+          id: 'root',
+          conversationId: 'conversation-1',
+          createdAt: DateTime.parse('2026-08-05T10:00:00Z'),
+        ),
+      ];
+
+      final target = ChestOrganizer.latestNotificationTarget(
+        items: items,
+        conversationIdOf: (item) => item.conversationId,
+        notifications: [
+          {'conversation-1': DateTime.parse('2026-08-05T11:00:00Z')},
+        ],
+      );
+
+      expect(target?.itemIndex, 0);
+      expect(target?.isDetached, isFalse);
+    });
+  });
 }

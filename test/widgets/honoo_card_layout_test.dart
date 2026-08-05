@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Entities/honoo.dart';
+import 'package:honoo/Pages/moon_page.dart';
 import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/smooth_image.dart';
@@ -23,15 +24,16 @@ void main() {
   testWidgets('il separatore dell honoo Luna usa il bianco dello sfondo', (
     tester,
   ) async {
-    final honoo = Honoo(
-      1,
-      'Ciao Luna',
-      '',
-      '2026-01-01T00:00:00Z',
-      '2026-01-01T00:00:00Z',
-      'user-id',
-      HonooType.moon,
-    );
+    final honoo = MoonPage.honooFromMoonRow({
+      'id': 'moon-honoo-id',
+      'text': 'Ciao Luna',
+      'image_url': '',
+      'created_at': '2026-01-01T00:00:00Z',
+      'user_id': 'user-id',
+      // moon_public non espone il campo destination.
+    });
+
+    expect(honoo.type, HonooType.moon);
 
     await tester.pumpWidget(
       MaterialApp(

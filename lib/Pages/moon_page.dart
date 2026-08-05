@@ -39,6 +39,11 @@ class MoonPage extends StatefulWidget {
 
   final String? initialItemId;
 
+  @visibleForTesting
+  static Honoo honooFromMoonRow(Map<String, dynamic> row) {
+    return Honoo.fromMap(row)..type = HonooType.moon;
+  }
+
   @override
   State<MoonPage> createState() => _MoonPageState();
 }
@@ -92,7 +97,7 @@ class _MoonPageState extends State<MoonPage> {
             DateTime.tryParse((row['created_at'] ?? '').toString()) ??
             DateTime.fromMillisecondsSinceEpoch(0);
         if (kind == 'honoo') {
-          final honoo = Honoo.fromMap(row.cast<String, dynamic>());
+          final honoo = MoonPage.honooFromMoonRow(row.cast<String, dynamic>());
           final String? ownerId = row['user_id']?.toString();
           if ((honoo.recipientTag ?? '').isEmpty && ownerId != null) {
             honoo.recipientTag = ownerId;
