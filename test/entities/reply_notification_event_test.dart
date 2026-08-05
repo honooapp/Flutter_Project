@@ -72,4 +72,38 @@ void main() {
     expect(parse(payload(recipient: 'someone-else')), isNull);
     expect(parse(payload(event: 'UPDATE')), isNull);
   });
+
+  test('filtra correttamente un flusso misto fra 250 utenti', () {
+    var accepted = 0;
+    for (var i = 0; i < 5000; i++) {
+      final isHonoo = i.isEven;
+      final recipient = i % 250 == 0 ? 'me' : 'user-${i % 250}';
+      final sender = i % 1000 == 0 ? 'me' : 'sender-${i % 400}';
+      final event = ReplyNotificationEvent.fromRealtimePayload(
+        {
+          'eventType': 'INSERT',
+          'new': {
+            'id': 'reply-$i',
+            'destination': isHonoo ? 'reply' : null,
+            'type': isHonoo ? null : 'answer',
+            'reply_to': 'root-$i',
+            'conversation_id': 'conversation-$i',
+            'recipient_tag': recipient,
+            'user_id': sender,
+          },
+        },
+        kind: isHonoo
+            ? ReplyNotificationKind.honoo
+            : ReplyNotificationKind.hinoo,
+        currentUserId: 'me',
+      );
+      if (event != null) {
+        accepted++;
+        expect(event.recipientId, 'me');
+        expect(event.senderId, isNot('me'));
+      }
+    }
+
+    expect(accepted, 15);
+  });
 }

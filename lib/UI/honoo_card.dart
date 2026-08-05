@@ -12,8 +12,14 @@ import '../Widgets/text_box_download_button.dart';
 class HonooCard extends StatelessWidget {
   final Honoo honoo;
   final VoidCallback? onDownloadTap;
+  final String? viewerUserId;
 
-  const HonooCard({super.key, required this.honoo, this.onDownloadTap});
+  const HonooCard({
+    super.key,
+    required this.honoo,
+    this.onDownloadTap,
+    this.viewerUserId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -195,7 +201,7 @@ class HonooCard extends StatelessWidget {
         );
 
         final String? currentUserId =
-            SupabaseProvider.client.auth.currentUser?.id;
+            viewerUserId ?? SupabaseProvider.client.auth.currentUser?.id;
         final bool isOwn =
             currentUserId != null && currentUserId == honoo.userId;
         final bool showReplyBorder = isReply && !isOwn;
@@ -215,7 +221,17 @@ class HonooCard extends StatelessWidget {
               )
             : content;
 
-        return Center(child: wrapped);
+        return Center(
+          child: isReply
+              ? Semantics(
+                  container: true,
+                  label: showReplyBorder
+                      ? 'Risposta ricevuta'
+                      : 'Risposta inviata',
+                  child: wrapped,
+                )
+              : wrapped,
+        );
       },
     );
   }

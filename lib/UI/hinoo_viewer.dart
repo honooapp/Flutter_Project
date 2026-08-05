@@ -27,9 +27,11 @@ class HinooViewer extends StatefulWidget {
     this.onDownloadTap,
     this.isReply = false,
     this.authorId,
+    this.viewerUserId,
   });
   final bool isReply;
   final String? authorId;
+  final String? viewerUserId;
 
   @override
   State<HinooViewer> createState() => _HinooViewerState();
@@ -104,12 +106,13 @@ class _HinooViewerState extends State<HinooViewer> {
     final double displayW = baselineW * scale;
     final double displayH = baselineH * scale;
 
-    final String? currentUserId = SupabaseProvider.client.auth.currentUser?.id;
+    final String? currentUserId =
+        widget.viewerUserId ?? SupabaseProvider.client.auth.currentUser?.id;
     final bool isOwn = (widget.authorId != null && widget.authorId!.isNotEmpty)
         ? (widget.authorId == currentUserId)
         : false;
 
-    return FocusableActionDetector(
+    final viewer = FocusableActionDetector(
       autofocus: true,
       shortcuts: {
         LogicalKeySet(LogicalKeyboardKey.arrowUp): const _ArrowIntent(-1),
@@ -221,6 +224,12 @@ class _HinooViewerState extends State<HinooViewer> {
           ),
         ),
       ),
+    );
+    if (!widget.isReply) return viewer;
+    return Semantics(
+      container: true,
+      label: isOwn ? 'Risposta inviata' : 'Risposta ricevuta',
+      child: viewer,
     );
   }
 
