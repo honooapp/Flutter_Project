@@ -18,5 +18,6 @@ class _UnsupportedReplySystemNotification extends ReplySystemNotification {
     required String contentLabel,
     required String conversationId,
     required void Function() onTap,
+    int replyCount = 1,
   }) {}
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Entities/conversation_entry.dart';
+import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/UI/unified_thread_view.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
@@ -38,6 +39,25 @@ void main() {
     return value;
   }
 
+  ConversationEntry hinoo({
+    required String id,
+    required String text,
+    required String owner,
+    required String createdAt,
+    HinooType type = HinooType.personal,
+    String? replyTo,
+  }) => ConversationEntry.hinoo(
+    HinooDraft(
+      pages: [HinooSlide(backgroundImage: null, text: text, isTextWhite: true)],
+      type: type,
+      replyTo: replyTo,
+      conversationId: 'conversation-1',
+    ),
+    id: id,
+    ownerId: owner,
+    createdAt: DateTime.parse(createdAt),
+  );
+
   Finder borderWithColor(Color color) => find.byWidgetPredicate((widget) {
     final Decoration? decoration = switch (widget) {
       Container(:final decoration) => decoration,
@@ -50,6 +70,10 @@ void main() {
         border.top.color == color &&
         border.top.width == 6;
   });
+
+  Finder explicitSemanticsLabel(String label) => find.byWidgetPredicate(
+    (widget) => widget is Semantics && widget.properties.label == label,
+  );
 
   testWidgets('il bounce rivela il messaggio padre fino a metà schermo', (
     tester,
@@ -549,5 +573,193 @@ void main() {
 
     expect(find.text('Conversazione nuova'), findsOneWidget);
     expect(find.text('Conversazione vecchia'), findsNothing);
+  });
+
+  for (final combination in const [
+    ('honoo', 'honoo'),
+    ('honoo', 'hinoo'),
+    ('hinoo', 'honoo'),
+    ('hinoo', 'hinoo'),
+  ]) {
+    testWidgets(
+      '${combination.$1} → ${combination.$2} rivela il padre e identifica il destinatario',
+      (tester) async {
+        tester.view.devicePixelRatio = 1;
+        tester.view.physicalSize = const Size(600, 900);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        addTearDown(tester.view.resetPhysicalSize);
+
+        final root = combination.$1 == 'honoo'
+            ? ConversationEntry.honoo(
+                honoo(
+                  id: 'root-cross',
+                  text: 'Contenuto padre',
+                  owner: 'me',
+                  createdAt: '2026-07-20T10:00:00Z',
+                ),
+              )
+            : hinoo(
+                id: 'root-cross',
+                text: 'Contenuto padre',
+                owner: 'me',
+                createdAt: '2026-07-20T10:00:00Z',
+              );
+        final reply = combination.$2 == 'honoo'
+            ? ConversationEntry.honoo(
+                honoo(
+                  id: 'reply-cross',
+                  text: 'Risposta incrociata',
+                  owner: 'other',
+                  createdAt: '2026-07-20T11:00:00Z',
+                  type: HonooType.answer,
+                  replyTo: 'root-cross',
+                ),
+              )
+            : hinoo(
+                id: 'reply-cross',
+                text: 'Risposta incrociata',
+                owner: 'other',
+                createdAt: '2026-07-20T11:00:00Z',
+                type: HinooType.answer,
+                replyTo: 'root-cross',
+              );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: UnifiedThreadView(
+                conversationId: 'conversation-1',
+                maxWidth: 600,
+                maxHeight: 700,
+                isActive: true,
+                currentUserId: 'me',
+                conversationLoader: (_) async => [root, reply],
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 350));
+
+        expect(find.text('Risposta incrociata'), findsOneWidget);
+        expect(find.text('Contenuto padre'), findsOneWidget);
+        expect(find.byKey(const Key('reply_reveal_parent')), findsOneWidget);
+        expect(explicitSemanticsLabel('Risposta ricevuta'), findsOneWidget);
+        expect(borderWithColor(HonooColor.secondary), findsWidgets);
+      },
+    );
+  }
+
+  for (final combination in const [
+    ('honoo', 'honoo'),
+    ('honoo', 'hinoo'),
+    ('hinoo', 'honoo'),
+    ('hinoo', 'hinoo'),
+  ]) {
+    testWidgets(
+      '${combination.$1} → ${combination.$2} identifica la risposta del mittente senza bordo rosso',
+      (tester) async {
+        final root = combination.$1 == 'honoo'
+            ? ConversationEntry.honoo(
+                honoo(
+                  id: 'root-sender',
+                  text: 'Contenuto ricevuto',
+                  owner: 'other',
+                  createdAt: '2026-07-20T10:00:00Z',
+                ),
+              )
+            : hinoo(
+                id: 'root-sender',
+                text: 'Contenuto ricevuto',
+                owner: 'other',
+                createdAt: '2026-07-20T10:00:00Z',
+              );
+        final reply = combination.$2 == 'honoo'
+            ? ConversationEntry.honoo(
+                honoo(
+                  id: 'reply-sender',
+                  text: 'Risposta inviata',
+                  owner: 'me',
+                  createdAt: '2026-07-20T11:00:00Z',
+                  type: HonooType.answer,
+                  replyTo: 'root-sender',
+                ),
+              )
+            : hinoo(
+                id: 'reply-sender',
+                text: 'Risposta inviata',
+                owner: 'me',
+                createdAt: '2026-07-20T11:00:00Z',
+                type: HinooType.answer,
+                replyTo: 'root-sender',
+              );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: UnifiedThreadView(
+                conversationId: 'conversation-1',
+                maxWidth: 600,
+                maxHeight: 700,
+                isActive: true,
+                currentUserId: 'me',
+                conversationLoader: (_) async => [root, reply],
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 350));
+
+        expect(explicitSemanticsLabel('Risposta inviata'), findsOneWidget);
+        expect(borderWithColor(HonooColor.secondary), findsNothing);
+        expect(find.byKey(const Key('reply_reveal_parent')), findsOneWidget);
+      },
+    );
+  }
+
+  testWidgets('un burst Realtime viene coalesciato in un solo refresh', (
+    tester,
+  ) async {
+    final firstLoad = Completer<List<ConversationEntry>>();
+    var calls = 0;
+    final entry = ConversationEntry.honoo(
+      honoo(
+        id: 'root-burst',
+        text: 'Timeline aggiornata',
+        owner: 'me',
+        createdAt: '2026-07-20T10:00:00Z',
+      ),
+    );
+    Future<List<ConversationEntry>> loader(_) {
+      calls++;
+      return calls == 1 ? firstLoad.future : Future.value([entry]);
+    }
+
+    Widget app(int token) => MaterialApp(
+      home: Scaffold(
+        body: UnifiedThreadView(
+          key: const Key('burst-thread'),
+          conversationId: 'conversation-1',
+          maxWidth: 390,
+          maxHeight: 700,
+          refreshToken: token,
+          conversationLoader: loader,
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(app(0));
+    await tester.pump();
+    for (var token = 1; token <= 100; token++) {
+      await tester.pumpWidget(app(token));
+    }
+    expect(calls, 1);
+
+    firstLoad.complete([entry]);
+    await tester.pumpAndSettle();
+
+    expect(calls, 2);
+    expect(find.text('Timeline aggiornata'), findsOneWidget);
   });
 }

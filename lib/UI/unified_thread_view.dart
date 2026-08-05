@@ -27,6 +27,7 @@ class UnifiedThreadView extends StatefulWidget {
     this.conversationLoader,
     this.currentUserId,
     this.revealEntryId,
+    this.preferLatestReceived = false,
   });
 
   final String conversationId;
@@ -41,6 +42,7 @@ class UnifiedThreadView extends StatefulWidget {
   conversationLoader;
   final String? currentUserId;
   final String? revealEntryId;
+  final bool preferLatestReceived;
 
   @override
   State<UnifiedThreadView> createState() => _UnifiedThreadViewState();
@@ -56,6 +58,8 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   String? _appliedFocusKey;
   int _currentPageIndex = 0;
   int _loadGeneration = 0;
+  String? _loadInProgressFor;
+  bool _loadRequested = false;
   final PageController _pageController = PageController();
   late AnimationController _controller;
   late Animation<double> _liftAnimation;
@@ -118,6 +122,26 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   }
 
   Future<void> _load() async {
+    final requestedConversationId = widget.conversationId;
+    _loadRequested = true;
+    if (_loadInProgressFor == requestedConversationId) return;
+    _loadInProgressFor = requestedConversationId;
+    try {
+      while (_loadRequested &&
+          mounted &&
+          widget.conversationId == requestedConversationId) {
+        _loadRequested = false;
+        await _performLoad();
+      }
+    } finally {
+      if (_loadInProgressFor == requestedConversationId) {
+        _loadInProgressFor = null;
+        if (_loadRequested && mounted) _load();
+      }
+    }
+  }
+
+  Future<void> _performLoad() async {
     if (!mounted) return;
     final generation = ++_loadGeneration;
     final conversationId = widget.conversationId;
@@ -261,7 +285,6 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
         (e.honoo != null && (e.honoo!.isFromMoonSaved == true));
     if (isMoon) return false;
 
-    // Il bounce accompagna sia le risposte ricevute sia quelle inviate.
     final bool isReply = e.honoo != null
         ? (e.honoo!.type == HonooType.answer)
         : (e.hinoo != null && e.hinoo!.type == HinooType.answer);
@@ -269,6 +292,11 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
     final revealEntryId = widget.revealEntryId;
     if (revealEntryId != null && revealEntryId.isNotEmpty) {
       return isReply && e.id == revealEntryId;
+    }
+    if (widget.preferLatestReceived) {
+      final currentUserId =
+          widget.currentUserId ?? Supabase.instance.client.auth.currentUser?.id;
+      if (currentUserId != null && e.ownerId == currentUserId) return false;
     }
     return isReply;
   }
@@ -299,6 +327,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
           key: repaintKey,
           child: HonooCard(
             honoo: entry.honoo!,
+            viewerUserId: widget.currentUserId,
             onDownloadTap: () => _downloadFromBoundary(
               repaintKey: repaintKey,
               baseName: 'honoo',
@@ -315,6 +344,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
             maxWidth: widget.maxWidth,
             isReply: entry.hinoo!.type == HinooType.answer,
             authorId: entry.ownerId,
+            viewerUserId: widget.currentUserId,
             onDownloadTap: () => _downloadFromBoundary(
               repaintKey: repaintKey,
               baseName: 'hinoo',

@@ -58,12 +58,12 @@ class ChestRepository {
   Future<List<dynamic>> fetchHonooReplyRows(String userId) async {
     final repliesToUser = await _client
         .from('honoo')
-        .select('conversation_id,reply_to,created_at')
+        .select('conversation_id,reply_to,created_at,user_id')
         .eq('destination', 'reply')
         .eq('recipient_tag', userId);
     final repliesFromUser = await _client
         .from('honoo')
-        .select('conversation_id,reply_to,created_at')
+        .select('conversation_id,reply_to,created_at,user_id')
         .eq('destination', 'reply')
         .eq('user_id', userId);
     return [..._asList(repliesToUser), ..._asList(repliesFromUser)];

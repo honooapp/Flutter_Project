@@ -18,6 +18,7 @@ class GlobalReplyNotificationListener extends StatefulWidget {
     this.enabled = true,
     this.systemNotification,
     this.replyEventStream,
+    this.notificationBatchWindow = const Duration(milliseconds: 180),
   });
 
   final Widget child;
@@ -26,6 +27,8 @@ class GlobalReplyNotificationListener extends StatefulWidget {
   final ReplySystemNotification? systemNotification;
   @visibleForTesting
   final Stream<ReplyNotificationEvent>? replyEventStream;
+  @visibleForTesting
+  final Duration notificationBatchWindow;
 
   @override
   State<GlobalReplyNotificationListener> createState() =>
@@ -40,10 +43,13 @@ class _GlobalReplyNotificationListenerState
   StreamSubscription<ReplyNotificationEvent>? _replyEventSubscription;
   RealtimeChannel? _replyChannel;
   Timer? _reconnectTimer;
+  Timer? _notificationTimer;
   int _reconnectAttempt = 0;
   int _channelGeneration = 0;
   String? _activeUserId;
   final Set<String> _deliveredEventKeys = <String>{};
+  final Map<String, ReplyNotificationEvent> _pendingEvents =
+      <String, ReplyNotificationEvent>{};
 
   @override
   void initState() {
@@ -176,9 +182,23 @@ class _GlobalReplyNotificationListenerState
     final eventKey =
         '${event.recipientId}:${event.kind.name}:${event.replyId ?? event.conversationId}';
     if (!_deliveredEventKeys.add(eventKey)) return;
-    if (_deliveredEventKeys.length > 256) {
+    if (_deliveredEventKeys.length > 4096) {
       _deliveredEventKeys.remove(_deliveredEventKeys.first);
     }
+    _pendingEvents[eventKey] = event;
+    _notificationTimer ??= Timer(
+      widget.notificationBatchWindow,
+      _flushPendingEvents,
+    );
+  }
+
+  void _flushPendingEvents() {
+    _notificationTimer = null;
+    if (!mounted || _pendingEvents.isEmpty) return;
+    final events = _pendingEvents.values.toList(growable: false);
+    _pendingEvents.clear();
+    final event = events.last;
+    final replyCount = events.length;
     ReplyNotificationSignal.notifyChanged();
 
     void open() => _openConversation(event);
@@ -186,6 +206,7 @@ class _GlobalReplyNotificationListenerState
       contentLabel: event.contentLabel,
       conversationId: event.conversationId,
       onTap: open,
+      replyCount: replyCount,
     );
 
     final context = widget.navigatorKey.currentContext;
@@ -196,7 +217,9 @@ class _GlobalReplyNotificationListenerState
       ..showSnackBar(
         SnackBar(
           content: Text(
-            'Hai ricevuto una risposta al tuo ${event.contentLabel}',
+            replyCount == 1
+                ? 'Hai ricevuto una risposta al tuo ${event.contentLabel}'
+                : 'Hai ricevuto $replyCount nuove risposte',
           ),
           action: SnackBarAction(label: 'Apri', onPressed: open),
         ),
@@ -281,6 +304,9 @@ class _GlobalReplyNotificationListenerState
   }
 
   void _stop() {
+    _notificationTimer?.cancel();
+    _notificationTimer = null;
+    _pendingEvents.clear();
     _replyEventSubscription?.cancel();
     _replyEventSubscription = null;
     _authSubscription?.cancel();

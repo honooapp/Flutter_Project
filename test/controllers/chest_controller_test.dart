@@ -137,16 +137,19 @@ void main() {
           'conversation_id': 'conversation-1',
           'reply_to': 'root-1',
           'created_at': '2024-01-01T10:00:00Z',
+          'user_id': 'user-2',
         },
         {
           'conversation_id': 'conversation-1',
           'reply_to': 'reply-1',
           'created_at': '2024-01-01T12:00:00Z',
+          'user_id': 'user-1',
         },
         {
           'conversation_id': 'conversation-1',
           'reply_to': 'reply-1',
           'created_at': '2024-01-01T12:00:00Z',
+          'user_id': 'user-1',
         },
       ],
     );
@@ -178,6 +181,14 @@ void main() {
     );
     expect(
       controller.value.hinooLatestReplies['hinoo-conversation-1'],
+      DateTime.parse('2024-01-01T13:00:00Z'),
+    );
+    expect(
+      controller.value.honooLatestReceivedReplies['conversation-1'],
+      DateTime.parse('2024-01-01T10:00:00Z'),
+    );
+    expect(
+      controller.value.hinooLatestReceivedReplies['hinoo-conversation-1'],
       DateTime.parse('2024-01-01T13:00:00Z'),
     );
     expect(controller.value.isReplyLoading, isFalse);

@@ -16,6 +16,7 @@ class _FakeReplySystemNotification extends ReplySystemNotification {
   String? contentLabel;
   String? conversationId;
   int showCount = 0;
+  int? replyCount;
 
   @override
   ReplyNotificationPermission get permission =>
@@ -29,11 +30,13 @@ class _FakeReplySystemNotification extends ReplySystemNotification {
     required String contentLabel,
     required String conversationId,
     required VoidCallback onTap,
+    int replyCount = 1,
   }) {
     showCount += 1;
     this.contentLabel = contentLabel;
     this.conversationId = conversationId;
     this.onTap = onTap;
+    this.replyCount = replyCount;
   }
 }
 
@@ -86,11 +89,12 @@ void main() {
       );
       events.add(event);
       events.add(event);
-      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
 
       expect(notification.showCount, 1);
       expect(notification.contentLabel, 'hinoo');
       expect(notification.conversationId, 'conversation-42');
+      expect(notification.replyCount, 1);
       expect(notification.onTap, isNotNull);
       expect(
         ReplyNotificationSignal.revision.value,
@@ -109,6 +113,62 @@ void main() {
       final chestPage = tester.widget<ChestPage>(find.byType(ChestPage));
       expect(chestPage.focusConversationId, 'conversation-42');
       expect(chestPage.focusReplyId, 'reply-42');
+
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
+  testWidgets(
+    'un grande burst produce una sola notifica e un solo aggiornamento UI',
+    (tester) async {
+      final navigatorKey = GlobalKey<NavigatorState>();
+      final notification = _FakeReplySystemNotification();
+      final initialRevision = ReplyNotificationSignal.revision.value;
+
+      await tester.pumpWidget(
+        GlobalReplyNotificationListener(
+          navigatorKey: navigatorKey,
+          systemNotification: notification,
+          replyEventStream: events.stream,
+          child: MaterialApp(
+            navigatorKey: navigatorKey,
+            home: const Scaffold(body: Text('Luna')),
+          ),
+        ),
+      );
+
+      for (var i = 0; i < 1000; i++) {
+        events.add(
+          ReplyNotificationEvent(
+            kind: i.isEven
+                ? ReplyNotificationKind.honoo
+                : ReplyNotificationKind.hinoo,
+            conversationId: 'conversation-$i',
+            senderId: 'sender-${i % 200}',
+            recipientId: 'test_user',
+            replyId: 'reply-$i',
+            createdAt: DateTime.utc(
+              2026,
+              8,
+              3,
+              10,
+            ).add(Duration(milliseconds: i)),
+          ),
+        );
+      }
+      await tester.pump(const Duration(milliseconds: 200));
+
+      expect(notification.showCount, 1);
+      expect(notification.replyCount, 1000);
+      expect(notification.conversationId, 'conversation-999');
+      expect(ReplyNotificationSignal.revision.value, initialRevision + 1);
+      expect(find.text('Hai ricevuto 1000 nuove risposte'), findsOneWidget);
+
+      notification.onTap!();
+      await tester.pumpAndSettle();
+      final chestPage = tester.widget<ChestPage>(find.byType(ChestPage));
+      expect(chestPage.focusConversationId, 'conversation-999');
+      expect(chestPage.focusReplyId, 'reply-999');
 
       await tester.pumpWidget(const SizedBox.shrink());
     },

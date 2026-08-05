@@ -295,4 +295,96 @@ void main() {
 
     expect(result.map((entry) => entry.id), ['moon-root', 'reply-1']);
   });
+
+  test(
+    'ordina deterministicamente 400 conversazioni concorrenti in tutte le combinazioni',
+    () async {
+      final honoo = harness.stubTable('honoo');
+      final hinoo = harness.stubTable('hinoo');
+      final honooRows = <Map<String, dynamic>>[];
+      final hinooRows = <Map<String, dynamic>>[];
+      const combinations = [
+        ('honoo', 'honoo'),
+        ('honoo', 'hinoo'),
+        ('hinoo', 'honoo'),
+        ('hinoo', 'hinoo'),
+      ];
+
+      Map<String, dynamic> row({
+        required String kind,
+        required String id,
+        required String owner,
+        required bool reply,
+        String? replyTo,
+      }) {
+        final common = <String, dynamic>{
+          'id': id,
+          'user_id': owner,
+          'created_at': '2026-08-05T12:00:00Z',
+          'conversation_id': 'crowded-conversation',
+          'reply_to': replyTo,
+          'recipient_tag': reply ? 'owner-${id.split('-').last}' : null,
+          'is_from_moon_saved': false,
+        };
+        if (kind == 'honoo') {
+          return {
+            ...common,
+            'text': id,
+            'image_url': '',
+            'destination': reply ? 'reply' : 'chest',
+            'updated_at': '2026-08-05T12:00:00Z',
+          };
+        }
+        return {
+          ...common,
+          'type': reply ? 'answer' : 'personal',
+          'pages': <Map<String, dynamic>>[
+            {'text': id, 'backgroundImage': null, 'isTextWhite': true},
+          ],
+        };
+      }
+
+      for (var index = 0; index < 400; index++) {
+        final suffix = index.toString().padLeft(4, '0');
+        final combination = combinations[index % combinations.length];
+        final rootId = 'z-root-$suffix';
+        final replyId = 'a-reply-$suffix';
+        final root = row(
+          kind: combination.$1,
+          id: rootId,
+          owner: 'owner-$suffix',
+          reply: false,
+        );
+        final reply = row(
+          kind: combination.$2,
+          id: replyId,
+          owner: 'sender-$suffix',
+          reply: true,
+          replyTo: rootId,
+        );
+        (combination.$1 == 'honoo' ? honooRows : hinooRows).add(root);
+        (combination.$2 == 'honoo' ? honooRows : hinooRows).add(reply);
+      }
+      honoo.queueResponse(honooRows);
+      hinoo.queueResponse(hinooRows);
+
+      final result = await ConversationService.fetchConversation(
+        'crowded-conversation',
+      );
+      final positions = <String, int>{
+        for (var index = 0; index < result.length; index++)
+          result[index].id!: index,
+      };
+
+      expect(result, hasLength(800));
+      for (var index = 0; index < 400; index++) {
+        final suffix = index.toString().padLeft(4, '0');
+        expect(
+          positions['z-root-$suffix'],
+          lessThan(positions['a-reply-$suffix']!),
+          reason: 'il padre deve precedere la risposta $suffix',
+        );
+      }
+    },
+  );
 }

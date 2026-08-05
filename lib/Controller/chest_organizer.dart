@@ -2,10 +2,12 @@ class ChestOrganization<T> {
   const ChestOrganization({
     required this.items,
     required this.conversationItemCount,
+    required this.latestNotificationItemIndex,
   });
 
   final List<T> items;
   final int conversationItemCount;
+  final int latestNotificationItemIndex;
 }
 
 /// Regole pure di ordinamento e raggruppamento dello Scrigno.
@@ -17,6 +19,7 @@ class ChestOrganizer {
     required DateTime Function(T item) createdAtOf,
     required String Function(T item) stableIdOf,
     required DateTime? Function(T item) latestReplyOf,
+    required DateTime? Function(T item) latestNotificationOf,
     required String? Function(T item) conversationIdOf,
   }) {
     int compareCreatedAt(T a, T b) {
@@ -83,6 +86,27 @@ class ChestOrganizer {
       conversationItemCount: items
           .where((item) => latestReplyOf(item) != null)
           .length,
+      latestNotificationItemIndex: _latestNotificationIndex(
+        regrouped,
+        latestNotificationOf,
+      ),
     );
+  }
+
+  static int _latestNotificationIndex<T>(
+    List<T> items,
+    DateTime? Function(T item) latestNotificationOf,
+  ) {
+    var latestIndex = -1;
+    DateTime? latestDate;
+    for (var i = 0; i < items.length; i++) {
+      final candidate = latestNotificationOf(items[i]);
+      if (candidate != null &&
+          (latestDate == null || candidate.isAfter(latestDate))) {
+        latestDate = candidate;
+        latestIndex = i;
+      }
+    }
+    return latestIndex;
   }
 }

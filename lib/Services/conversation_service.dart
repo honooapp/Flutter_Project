@@ -164,8 +164,7 @@ class ConversationService {
         ),
       );
     }
-    final deduplicatedEntries = _deduplicateMoonRoots(entries)
-      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    final deduplicatedEntries = _orderEntries(_deduplicateMoonRoots(entries));
     return deduplicatedEntries
         .map(
           (e) => e.when(
@@ -189,6 +188,41 @@ class ConversationService {
   static DateTime _parseCreatedAt(dynamic value) =>
       DateTime.tryParse(value?.toString() ?? '') ??
       DateTime.fromMillisecondsSinceEpoch(0);
+
+  /// Produce una timeline stabile anche quando molti utenti scrivono nello
+  /// stesso istante. Il confronto per id rende deterministici i pareggi, poi
+  /// la visita del padre garantisce che una risposta non preceda mai il
+  /// contenuto a cui risponde.
+  static List<_Entry> _orderEntries(List<_Entry> entries) {
+    final sorted = List<_Entry>.of(entries)
+      ..sort((a, b) {
+        final byTime = a.createdAt.compareTo(b.createdAt);
+        if (byTime != 0) return byTime;
+        return (a.id ?? '').compareTo(b.id ?? '');
+      });
+    final byId = <String, _Entry>{
+      for (final entry in sorted)
+        if (entry.id?.isNotEmpty == true) entry.id!: entry,
+    };
+    final ordered = <_Entry>[];
+    final visiting = <_Entry>{};
+    final visited = <_Entry>{};
+
+    void visit(_Entry entry) {
+      if (visited.contains(entry)) return;
+      if (!visiting.add(entry)) return;
+      final parentId = entry.replyTo;
+      final parent = parentId == null ? null : byId[parentId];
+      if (parent != null) visit(parent);
+      visiting.remove(entry);
+      if (visited.add(entry)) ordered.add(entry);
+    }
+
+    for (final entry in sorted) {
+      visit(entry);
+    }
+    return ordered;
+  }
 
   static List<_Entry> _deduplicateMoonRoots(List<_Entry> entries) {
     final moonSavedRootKeys = entries
@@ -296,6 +330,8 @@ class _Entry {
       : honoo != null
       ? honoo!.type == HonooType.answer
       : hinoo!.type == HinooType.answer;
+
+  String? get replyTo => honoo?.replyTo ?? hinoo?.replyTo;
 
   String get contentKey {
     if (isDeleted) return 'deleted\u001f${id ?? ''}';
