@@ -46,6 +46,7 @@ void main() {
     required String createdAt,
     HinooType type = HinooType.personal,
     String? replyTo,
+    bool fromMoon = false,
   }) => ConversationEntry.hinoo(
     HinooDraft(
       pages: [HinooSlide(backgroundImage: null, text: text, isTextWhite: true)],
@@ -56,6 +57,7 @@ void main() {
     id: id,
     ownerId: owner,
     createdAt: DateTime.parse(createdAt),
+    isFromMoonSaved: fromMoon,
   );
 
   Finder borderWithColor(Color color) => find.byWidgetPredicate((widget) {
@@ -407,7 +409,7 @@ void main() {
   });
 
   testWidgets(
-    'il bounce mostra lo sfondo bianco del padre Luna e quello blu della risposta propria',
+    'una risposta ricevuta mostra in blu il proprio Honoo salvato dalla Luna',
     (tester) async {
       tester.view.devicePixelRatio = 1;
       tester.view.physicalSize = const Size(600, 900);
@@ -426,8 +428,8 @@ void main() {
       final reply = ConversationEntry.honoo(
         honoo(
           id: 'reply-1',
-          text: 'La mia risposta',
-          owner: 'test_user',
+          text: 'Risposta ricevuta',
+          owner: 'other_user',
           createdAt: '2026-07-20T11:00:00Z',
           type: HonooType.answer,
           replyTo: 'moon-root-1',
@@ -456,9 +458,62 @@ void main() {
         tester
             .widget<ColoredBox>(find.byKey(const Key('reply_reveal_parent')))
             .color,
-        HonooColor.tertiary,
+        HonooColor.background,
       );
       expect(borderWithColor(HonooColor.secondary), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'una risposta ricevuta mostra in blu il proprio Hinoo salvato dalla Luna',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(600, 900);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+
+      final root = hinoo(
+        id: 'saved-hinoo-root',
+        text: 'Hinoo salvato dalla Luna',
+        owner: 'test_user',
+        createdAt: '2026-07-20T10:00:00Z',
+        fromMoon: true,
+      );
+      final reply = ConversationEntry.honoo(
+        honoo(
+          id: 'reply-to-hinoo',
+          text: 'Risposta ricevuta',
+          owner: 'other_user',
+          createdAt: '2026-07-20T11:00:00Z',
+          type: HonooType.answer,
+          replyTo: 'saved-hinoo-root',
+        ),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: UnifiedThreadView(
+              conversationId: 'conversation-1',
+              maxWidth: 600,
+              maxHeight: 700,
+              isActive: true,
+              currentUserId: 'test_user',
+              conversationLoader: (_) async => [root, reply],
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
+
+      expect(find.byKey(const Key('reply_reveal_parent')), findsOneWidget);
+      expect(
+        tester
+            .widget<ColoredBox>(find.byKey(const Key('reply_reveal_parent')))
+            .color,
+        HonooColor.background,
+      );
     },
   );
 

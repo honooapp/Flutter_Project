@@ -14,12 +14,14 @@ class HonooCard extends StatelessWidget {
   final Honoo honoo;
   final VoidCallback? onDownloadTap;
   final String? viewerUserId;
+  final ChestContentStyle? contentStyleOverride;
 
   const HonooCard({
     super.key,
     required this.honoo,
     this.onDownloadTap,
     this.viewerUserId,
+    this.contentStyleOverride,
   });
 
   @override
@@ -27,10 +29,9 @@ class HonooCard extends StatelessWidget {
     final media = MediaQuery.of(context);
     final String? currentUserId =
         viewerUserId ?? SupabaseProvider.client.auth.currentUser?.id;
-    final contentStyle = ChestContentStyle.forHonoo(
-      honoo,
-      viewerUserId: currentUserId,
-    );
+    final contentStyle =
+        contentStyleOverride ??
+        ChestContentStyle.forHonoo(honoo, viewerUserId: currentUserId);
     final Color cardBg = contentStyle.backgroundColor;
     final bool isReceivedReply = identical(
       contentStyle,
