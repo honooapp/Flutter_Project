@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -29,6 +30,24 @@ void main() {
               'assets/icons/ai.svg',
     );
     expect(aiIcon, findsOneWidget);
+    final svg = tester.widget<SvgPicture>(aiIcon);
+    expect(svg.height, 57);
+    expect(
+      svg.colorFilter,
+      const ColorFilter.mode(Color.fromRGBO(183, 183, 206, 1), BlendMode.srcIn),
+    );
+    expect(
+      tester
+          .getSize(find.byKey(const Key('regia_agenti_icon_top_spacing')))
+          .height,
+      5,
+    );
+    expect(
+      tester
+          .getSize(find.byKey(const Key('regia_agenti_icon_bottom_spacing')))
+          .height,
+      30,
+    );
 
     final visibleTexts = tester
         .widgetList<Text>(find.byType(Text))
@@ -57,10 +76,17 @@ void main() {
     final text = tester.widget<Text>(
       find.byKey(const Key('regia_agenti_text')),
     );
-    expect(text.data, RegiaAgentiPage.regiaAgentiText);
+    expect(text.textSpan?.toPlainText(), RegiaAgentiPage.regiaAgentiText);
     expect(text.textAlign, TextAlign.center);
-    expect(text.data, contains('Alessandro Molina'));
-    expect(text.data, contains('Behavior Driven Design'));
-    expect(text.data, contains('Sì,\nstiamo parlando'));
+    expect(text.textSpan?.toPlainText(), contains('Alessandro Molina'));
+    expect(text.textSpan?.toPlainText(), contains('Behavior Driven Design'));
+    expect(text.textSpan?.toPlainText(), contains('Sì,\nstiamo parlando'));
+
+    final rootSpan = text.textSpan! as TextSpan;
+    final alessandroSpan = rootSpan.children!.whereType<TextSpan>().singleWhere(
+      (span) => span.text == 'Alessandro Molina',
+    );
+    expect(alessandroSpan.recognizer, isA<TapGestureRecognizer>());
+    expect(alessandroSpan.style?.decoration, TextDecoration.underline);
   });
 }
