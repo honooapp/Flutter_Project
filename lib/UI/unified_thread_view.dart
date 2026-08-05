@@ -56,6 +56,8 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   String? _appliedFocusKey;
   int _currentPageIndex = 0;
   int _loadGeneration = 0;
+  String? _loadInProgressFor;
+  bool _loadRequested = false;
   final PageController _pageController = PageController();
   late AnimationController _controller;
   late Animation<double> _liftAnimation;
@@ -118,6 +120,26 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   }
 
   Future<void> _load() async {
+    final requestedConversationId = widget.conversationId;
+    _loadRequested = true;
+    if (_loadInProgressFor == requestedConversationId) return;
+    _loadInProgressFor = requestedConversationId;
+    try {
+      while (_loadRequested &&
+          mounted &&
+          widget.conversationId == requestedConversationId) {
+        _loadRequested = false;
+        await _performLoad();
+      }
+    } finally {
+      if (_loadInProgressFor == requestedConversationId) {
+        _loadInProgressFor = null;
+        if (_loadRequested && mounted) _load();
+      }
+    }
+  }
+
+  Future<void> _performLoad() async {
     if (!mounted) return;
     final generation = ++_loadGeneration;
     final conversationId = widget.conversationId;
@@ -299,6 +321,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
           key: repaintKey,
           child: HonooCard(
             honoo: entry.honoo!,
+            viewerUserId: widget.currentUserId,
             onDownloadTap: () => _downloadFromBoundary(
               repaintKey: repaintKey,
               baseName: 'honoo',
@@ -315,6 +338,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
             maxWidth: widget.maxWidth,
             isReply: entry.hinoo!.type == HinooType.answer,
             authorId: entry.ownerId,
+            viewerUserId: widget.currentUserId,
             onDownloadTap: () => _downloadFromBoundary(
               repaintKey: repaintKey,
               baseName: 'hinoo',
