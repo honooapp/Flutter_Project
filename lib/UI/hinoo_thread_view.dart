@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/hinoo_thread_entry.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
+import 'package:honoo/Services/supabase_provider.dart';
+import 'package:honoo/Utility/chest_content_style.dart';
 
 class HinooThreadView extends StatefulWidget {
   const HinooThreadView({
@@ -44,27 +46,25 @@ class _HinooThreadViewState extends State<HinooThreadView>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    _introCurve =
-        CurvedAnimation(parent: _introController, curve: Curves.easeOutBack);
+    _introCurve = CurvedAnimation(
+      parent: _introController,
+      curve: Curves.easeOutBack,
+    );
     _bounceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 220),
     );
-    _bounceCurve =
-        CurvedAnimation(parent: _bounceController, curve: Curves.easeOutBack);
+    _bounceCurve = CurvedAnimation(
+      parent: _bounceController,
+      curve: Curves.easeOutBack,
+    );
     _hintController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 360),
     );
     _hintCurve = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: CurveTween(curve: Curves.easeOut),
-        weight: 50,
-      ),
-      TweenSequenceItem(
-        tween: CurveTween(curve: Curves.easeIn),
-        weight: 50,
-      ),
+      TweenSequenceItem(tween: CurveTween(curve: Curves.easeOut), weight: 50),
+      TweenSequenceItem(tween: CurveTween(curve: Curves.easeIn), weight: 50),
     ]).animate(_hintController);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _introController.forward();
@@ -92,48 +92,63 @@ class _HinooThreadViewState extends State<HinooThreadView>
     final List<HinooThreadEntry> items = [
       ...sortedReplies,
       HinooThreadEntry(
-          draft: widget.root, authorId: widget.rootAuthorId, isReply: false),
+        draft: widget.root,
+        authorId: widget.rootAuthorId,
+        isReply: false,
+      ),
     ];
-    final slider = LayoutBuilder(builder: (ctx, c) {
-      final double h = c.maxHeight.isFinite ? c.maxHeight : widget.maxHeight;
-      final dy = (1.0 - _introCurve.value) * 12.0 - (_bounceCurve.value * 6.0);
-      final scale =
-          1.0 - (1.0 - _introCurve.value) * 0.01 - (_bounceCurve.value * 0.005);
-      // Micro-rimbalzo: max ~12px per non spostare sensibilmente il primo messaggio
-      if (items.length > 1 && !_hinted) {
-        _hinted = true;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) _hintController.forward(from: 0);
-        });
-      }
-      // Rimbalzo: sali fino a metà schermo (negativo) e ritorna alla posizione iniziale
-      final double hint = -_hintCurve.value * (h * 0.5);
-      return Transform.translate(
-        offset: Offset(0, -dy + hint),
-        child: Transform.scale(
-          scale: scale.clamp(0.97, 1.0),
-          child: PageView.builder(
-            scrollDirection: Axis.vertical,
-            pageSnapping: true,
-            physics: const PageScrollPhysics(
-              parent: ClampingScrollPhysics(),
+    final slider = LayoutBuilder(
+      builder: (ctx, c) {
+        final double h = c.maxHeight.isFinite ? c.maxHeight : widget.maxHeight;
+        final dy =
+            (1.0 - _introCurve.value) * 12.0 - (_bounceCurve.value * 6.0);
+        final scale =
+            1.0 -
+            (1.0 - _introCurve.value) * 0.01 -
+            (_bounceCurve.value * 0.005);
+        // Micro-rimbalzo: max ~12px per non spostare sensibilmente il primo messaggio
+        if (items.length > 1 && !_hinted) {
+          _hinted = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _hintController.forward(from: 0);
+          });
+        }
+        // Rimbalzo: sali fino a metà schermo (negativo) e ritorna alla posizione iniziale
+        final double hint = -_hintCurve.value * (h * 0.5);
+        return Transform.translate(
+          offset: Offset(0, -dy + hint),
+          child: Transform.scale(
+            scale: scale.clamp(0.97, 1.0),
+            child: PageView.builder(
+              scrollDirection: Axis.vertical,
+              pageSnapping: true,
+              physics: const PageScrollPhysics(parent: ClampingScrollPhysics()),
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final entry = items[index];
+                final style = ChestContentStyle.forHinoo(
+                  entry.draft,
+                  authorId: entry.authorId,
+                  viewerUserId: SupabaseProvider.client.auth.currentUser?.id,
+                  isReply: entry.isReply,
+                );
+                return ColoredBox(
+                  color: style.backgroundColor,
+                  child: HinooViewer(
+                    draft: entry.draft,
+                    maxHeight: widget.maxHeight,
+                    maxWidth: widget.maxWidth,
+                    isReply: entry.isReply,
+                    authorId: entry.authorId,
+                    onDownloadTap: widget.onDownloadTap,
+                  ),
+                );
+              },
             ),
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              final entry = items[index];
-              return HinooViewer(
-                draft: entry.draft,
-                maxHeight: widget.maxHeight,
-                maxWidth: widget.maxWidth,
-                isReply: entry.isReply,
-                authorId: entry.authorId,
-                onDownloadTap: widget.onDownloadTap,
-              );
-            },
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
 
     final bool hasReplies = items.length > 1;
     return AnimatedSwitcher(
@@ -148,8 +163,10 @@ class _HinooThreadViewState extends State<HinooThreadView>
           ).animate(animation);
           return SlideTransition(position: offset, child: child);
         }
-        final curved =
-            CurvedAnimation(parent: animation, curve: Curves.elasticOut);
+        final curved = CurvedAnimation(
+          parent: animation,
+          curve: Curves.elasticOut,
+        );
         final offset = Tween<Offset>(
           begin: const Offset(0, 0.28),
           end: Offset.zero,

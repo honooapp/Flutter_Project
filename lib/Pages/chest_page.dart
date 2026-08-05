@@ -21,6 +21,7 @@ import '../Entities/hinoo_thread_entry.dart';
 import '../Entities/reply_navigation_result.dart';
 
 import '../Utility/honoo_colors.dart';
+import '../Utility/chest_content_style.dart';
 import '../Utility/responsive_layout.dart';
 import '../Utility/network_image_prefetch.dart';
 import '../Utility/replies_seen_tracker.dart';
@@ -469,6 +470,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
     required double iconSize,
     required double gap,
     required double bottomPadding,
+    required Color foregroundColor,
   }) {
     return AnimatedOpacity(
       duration: const Duration(milliseconds: 160),
@@ -482,6 +484,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
           iconSize: iconSize,
           gap: gap,
           bottomPadding: bottomPadding,
+          foregroundColor: foregroundColor,
           onHome: _goHome,
           onInfo: _showScrignoInfo,
           onSendHonooToMoon: _sendHonooToMoon,
@@ -971,9 +974,26 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       animation: Listenable.merge([ctrl.isLoading, ctrl.version]),
       builder: (context, _) {
         _rebuildItems();
+        final items = _itemsNormal;
+        final currentItem = items.isEmpty
+            ? null
+            : items[_currentIndex.clamp(0, items.length - 1)];
+        final currentUserId = SupabaseProvider.client.auth.currentUser?.id;
+        final pageStyle = _selectedConvEntry != null
+            ? ChestContentStyle.forEntry(
+                _selectedConvEntry!,
+                viewerUserId: currentUserId,
+              )
+            : currentItem == null
+            ? ChestContentStyle.own
+            : ChestContentStyle.forItem(
+                currentItem,
+                viewerUserId: currentUserId,
+              );
         return ThreadLayoutScaffold(
-          backgroundColor: HonooColor.background,
+          backgroundColor: pageStyle.backgroundColor,
           header: HonooAppTitle(
+            color: pageStyle.logoColor,
             onTap: () {
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (_) => const PlaceholderPage()),
@@ -988,7 +1008,6 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
                   maxWidth: viewW,
                   mode: layoutMode,
                 );
-            final items = _itemsNormal;
             final loadError = _loadError;
             if ((ctrl.isLoading.value || _isHinooLoading) && items.isEmpty) {
               return const Center(child: LoadingSpinner(color: Colors.white));
@@ -1078,7 +1097,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
                 duration: const Duration(milliseconds: 220),
                 curve: Curves.easeOutCubic,
               ),
-              arrowColor: Colors.white,
+              arrowColor: pageStyle.foregroundColor,
               child: visibleSlider,
             );
           },
@@ -1100,6 +1119,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
                   iconSize: footerIconSize,
                   gap: footerGap,
                   bottomPadding: footerBottomSpacing,
+                  foregroundColor: pageStyle.foregroundColor,
                 );
               },
         );

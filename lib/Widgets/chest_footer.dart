@@ -25,6 +25,7 @@ class ChestFooter extends StatelessWidget {
     required this.onReplyToHinoo,
     required this.onDeleteHinoo,
     required this.onSendConversationEntryToMoon,
+    this.foregroundColor = HonooColor.onBackground,
   });
 
   final ChestItem? item;
@@ -42,6 +43,7 @@ class ChestFooter extends StatelessWidget {
   final ValueChanged<ChestHinooItem> onReplyToHinoo;
   final ValueChanged<ChestHinooItem> onDeleteHinoo;
   final ValueChanged<ConversationEntry> onSendConversationEntryToMoon;
+  final Color foregroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +152,6 @@ class ChestFooter extends StatelessWidget {
     label: 'Luna',
     tooltip: 'Spedisci sulla Luna',
     onPressed: onPressed,
-    applyColorFilter: false,
   );
 
   ResponsiveFooterAction _replyAction(VoidCallback onPressed) => _action(
@@ -177,7 +178,7 @@ class ChestFooter extends StatelessWidget {
     asset: asset,
     semanticsLabel: label,
     colorFilter: applyColorFilter
-        ? const ColorFilter.mode(HonooColor.onBackground, BlendMode.srcIn)
+        ? ColorFilter.mode(foregroundColor, BlendMode.srcIn)
         : null,
     size: iconSize,
     splashRadius: 25,

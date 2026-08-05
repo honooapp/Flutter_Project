@@ -4,11 +4,13 @@ import '../Entities/chest_item.dart';
 import '../Entities/conversation_entry.dart';
 import '../Entities/hinoo_thread_entry.dart';
 import '../Entities/honoo.dart';
+import '../Services/supabase_provider.dart';
 import '../UI/hinoo_thread_view.dart';
 import '../UI/hinoo_typography.dart';
 import '../UI/hinoo_viewer.dart';
 import '../UI/honoo_card.dart';
 import '../UI/unified_thread_view.dart';
+import '../Utility/chest_content_style.dart';
 import '../Utility/responsive_layout.dart';
 
 class ChestItemView extends StatelessWidget {
@@ -64,6 +66,11 @@ class ChestItemView extends StatelessWidget {
     );
     final cardWidth = isHonoo ? honooMetrics.width : hinooSize.width;
     final cardHeight = isHonoo ? honooMetrics.height : hinooSize.height;
+    final viewerUserId = SupabaseProvider.client.auth.currentUser?.id;
+    final pageStyle = ChestContentStyle.forItem(
+      item,
+      viewerUserId: viewerUserId,
+    );
     final content = item.when(
       honoo: (honoo) => _buildHonoo(honoo),
       hinoo: (hinoo) => _buildHinoo(hinoo, cardWidth, cardHeight),
@@ -93,7 +100,10 @@ class ChestItemView extends StatelessWidget {
           );
     final keyedCard = KeyedSubtree(
       key: ValueKey(identity),
-      child: SizedBox(width: maxWidth, height: availableHeight, child: card),
+      child: ColoredBox(
+        color: pageStyle.backgroundColor,
+        child: SizedBox(width: maxWidth, height: availableHeight, child: card),
+      ),
     );
     if (!isConversation) return keyedCard;
     return AnimatedSwitcher(

@@ -32,7 +32,8 @@ class ThreadLayoutScaffold extends StatelessWidget {
     double viewW,
     double availableH,
     ResponsiveLayoutMode mode,
-  ) bodyBuilder;
+  )
+  bodyBuilder;
 
   /// Costruisce il footer responsivo con spaziature già calcolate.
   final Widget Function(
@@ -42,18 +43,17 @@ class ThreadLayoutScaffold extends StatelessWidget {
     double footerGap,
     double footerTopSpacing,
     double footerBottomSpacing,
-  ) footerBuilder;
+  )
+  footerBuilder;
 
   /// Overlay opzionale (es. LunaFissa) posizionato sopra header/body/footer
   final Widget Function(BuildContext context, ResponsiveLayoutMode mode)?
-      overlayBuilder;
+  overlayBuilder;
 
   /// Spazio da sottrarre alla parte alta del corpo per overlay persistenti.
   /// Il valore viene applicato prima di comunicare [availableH] al body.
-  final double Function(
-    BuildContext context,
-    ResponsiveLayoutMode mode,
-  )? bodyTopInsetBuilder;
+  final double Function(BuildContext context, ResponsiveLayoutMode mode)?
+  bodyTopInsetBuilder;
 
   static const double headerHeight = 52;
 
@@ -61,60 +61,81 @@ class ThreadLayoutScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final double viewW = constraints.maxWidth;
-          final double viewH = constraints.maxHeight;
-          final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
-          final ResponsiveLayoutMode mode =
-              ResponsiveLayout.modeForWidth(viewW);
+      body: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
+        color: backgroundColor,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final double viewW = constraints.maxWidth;
+            final double viewH = constraints.maxHeight;
+            final viewPadding = MediaQuery.viewPaddingOf(context);
+            final double safeTop = viewPadding.top;
+            final double safeBottom = viewPadding.bottom;
+            final ResponsiveLayoutMode mode = ResponsiveLayout.modeForWidth(
+              viewW,
+            );
 
-          final double footerIconSize =
-              ResponsiveLayout.footerIconSizeForMode(mode);
-          final double footerGap = ResponsiveLayout.footerGapForMode(mode);
-          final double footerBottomPadding =
-              ResponsiveLayout.footerBottomPaddingForMode(mode);
-          final double footerSpacing = footerBottomPadding + safeBottom;
-          final double footerTopSpacing = footerSpacing / 2;
-          final double footerBottomSpacing = footerSpacing - footerTopSpacing;
-          const double headerH = headerHeight;
-          final double footerReserved =
-              footerIconSize + footerTopSpacing + footerBottomSpacing;
-          final double bodySlotH =
-              (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
-          final double requestedTopInset =
-              bodyTopInsetBuilder?.call(context, mode) ?? 0;
-          final double bodyTopInset = requestedTopInset.clamp(0.0, bodySlotH);
-          final double availableH =
-              (bodySlotH - bodyTopInset).clamp(0.0, double.infinity);
+            final double footerIconSize =
+                ResponsiveLayout.footerIconSizeForMode(mode);
+            final double footerGap = ResponsiveLayout.footerGapForMode(mode);
+            final double footerBottomPadding =
+                ResponsiveLayout.footerBottomPaddingForMode(mode);
+            final double footerSpacing = footerBottomPadding + safeBottom;
+            final double footerTopSpacing = footerSpacing / 2;
+            final double footerBottomSpacing = footerSpacing - footerTopSpacing;
+            final double headerH = headerHeight + safeTop;
+            final double footerReserved =
+                footerIconSize + footerTopSpacing + footerBottomSpacing;
+            final double bodySlotH = (viewH - headerH - footerReserved).clamp(
+              0.0,
+              double.infinity,
+            );
+            final double requestedTopInset =
+                bodyTopInsetBuilder?.call(context, mode) ?? 0;
+            final double bodyTopInset = requestedTopInset.clamp(0.0, bodySlotH);
+            final double availableH = (bodySlotH - bodyTopInset).clamp(
+              0.0,
+              double.infinity,
+            );
 
-          final column = Column(
-            children: [
-              SizedBox(height: headerH, child: Center(child: header)),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(top: bodyTopInset),
-                  child: SizedBox(
-                    width: viewW,
-                    height: availableH,
-                    child: bodyBuilder(context, viewW, availableH, mode),
+            final column = Column(
+              children: [
+                SizedBox(
+                  height: headerH,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: safeTop),
+                    child: Center(child: header),
                   ),
                 ),
-              ),
-              SizedBox(height: footerTopSpacing),
-              footerBuilder(context, mode, footerIconSize, footerGap,
-                  footerTopSpacing, footerBottomSpacing),
-            ],
-          );
-          if (overlayBuilder == null) return column;
-          return Stack(
-            clipBehavior: Clip.none,
-            children: [
-              column,
-              overlayBuilder!(context, mode),
-            ],
-          );
-        },
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: bodyTopInset),
+                    child: SizedBox(
+                      width: viewW,
+                      height: availableH,
+                      child: bodyBuilder(context, viewW, availableH, mode),
+                    ),
+                  ),
+                ),
+                SizedBox(height: footerTopSpacing),
+                footerBuilder(
+                  context,
+                  mode,
+                  footerIconSize,
+                  footerGap,
+                  footerTopSpacing,
+                  footerBottomSpacing,
+                ),
+              ],
+            );
+            if (overlayBuilder == null) return column;
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [column, overlayBuilder!(context, mode)],
+            );
+          },
+        ),
       ),
     );
   }
