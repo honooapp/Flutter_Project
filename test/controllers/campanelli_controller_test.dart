@@ -137,6 +137,38 @@ void main() {
         )).called(1);
   });
 
+  test('compone campanello e casa appartenenti a un altro utente', () async {
+    when(repository.fetchHouseRows).thenAnswer((_) async => const [
+          {
+            'campanello_hinoo_id': 'hinoo-other',
+            'owner_id': 'user-2',
+            'house_image_url': 'other-house.png',
+          },
+        ]);
+    when(() => repository.fetchShareSettingsRows(any()))
+        .thenAnswer((_) async => const []);
+    when(() => repository.fetchHinooRows(any())).thenAnswer((_) async => const [
+          {
+            'id': 'hinoo-other',
+            'pages': [
+              {
+                'text': 'Campanello pubblico',
+                'backgroundImage': 'other-bell.png',
+                'isTextWhite': false,
+              }
+            ],
+          },
+        ]);
+
+    final state = await controller.load('user-1');
+
+    expect(state.hasOwnHouse, isFalse);
+    expect(state.entries, hasLength(1));
+    expect(state.entries.single.ownerId, 'user-2');
+    expect(state.entries.single.campanelloBackgroundUrl, 'other-bell.png');
+    expect(state.entries.single.houseImageUrl, 'other-house.png');
+  });
+
   test('pubblica uno stato di errore senza conservare dati parziali', () async {
     when(repository.fetchHouseRows).thenThrow(StateError('offline'));
 

@@ -100,6 +100,26 @@ void main() {
     verify(() => fileApi.getPublicUrl(path)).called(1);
   });
 
+  test('uploadBackground accetta un timeout esteso per la casa', () async {
+    when(() => fileApi.uploadBinary(
+          any(),
+          any<Uint8List>(),
+          fileOptions: any(named: 'fileOptions'),
+        )).thenAnswer((_) async {
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      return 'slow-house-upload';
+    });
+
+    final url = await HinooStorageUploader.uploadBackground(
+      bytes: Uint8List.fromList([1, 2, 3]),
+      ext: 'png',
+      userId: 'u-house',
+      writeTimeout: const Duration(milliseconds: 100),
+    );
+
+    expect(url, 'https://cdn.example.com/hinoo/mock-url.png');
+  });
+
   test(
       'uploadBytes: folder custom e normalizzazione estensioni non permesse → jpg',
       () async {

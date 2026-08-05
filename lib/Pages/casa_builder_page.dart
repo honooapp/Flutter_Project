@@ -174,6 +174,9 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
         bytes: pngBytes,
         ext: 'png',
         userId: user.id,
+        // Il PNG della casa comprende l'intero canvas e sui collegamenti più
+        // lenti può richiedere più dei 15 secondi usati dagli upload normali.
+        writeTimeout: const Duration(minutes: 1),
       );
       setState(() => _isUploadingImage = false);
 
