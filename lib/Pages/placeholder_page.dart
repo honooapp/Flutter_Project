@@ -50,8 +50,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   static const double _honooBottomSpacing = 15;
   static const double _libriTopSpacing = 5;
   static const double _libriBottomSpacing = 30;
-  static const double _regiaAgentiTopSpacing = 5;
-  static const double _regiaAgentiBottomSpacing = 30;
+  static const double _regiaAgentiTopSpacing = _podcastTopSpacing;
+  static const double _regiaAgentiBottomSpacing = _podcastBottomSpacing;
+  static const double _regiaAgentiIconSizeReduction = 3;
   static const Color _linkIconColor = Color.fromRGBO(183, 183, 206, 1);
 
   List<Widget> _iconBlockWithSpacing(
@@ -420,7 +421,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
       ),
       ..._svgIconBlockWithSpacing(
         'assets/icons/ai.svg',
-        inlineIconHeight - 3,
+        inlineIconHeight - _regiaAgentiIconSizeReduction,
         topSpacing: _regiaAgentiTopSpacing,
         bottomSpacing: _regiaAgentiBottomSpacing,
         color: _linkIconColor,

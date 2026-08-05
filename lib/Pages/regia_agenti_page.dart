@@ -72,6 +72,7 @@ class RegiaAgentiPage extends StatelessWidget {
               style: bodyStyle.copyWith(
                 decoration: TextDecoration.underline,
                 decorationColor: bodyStyle.color,
+                decorationThickness: 3,
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () async {

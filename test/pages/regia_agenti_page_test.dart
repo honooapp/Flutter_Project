@@ -88,5 +88,6 @@ void main() {
     );
     expect(alessandroSpan.recognizer, isA<TapGestureRecognizer>());
     expect(alessandroSpan.style?.decoration, TextDecoration.underline);
+    expect(alessandroSpan.style?.decorationThickness, 3);
   });
 }
