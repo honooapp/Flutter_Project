@@ -10,6 +10,18 @@ class ChestOrganization<T> {
   final int latestNotificationItemIndex;
 }
 
+class ChestNotificationTarget {
+  const ChestNotificationTarget({
+    required this.conversationId,
+    required this.itemIndex,
+  });
+
+  final String conversationId;
+  final int itemIndex;
+
+  bool get isDetached => itemIndex < 0;
+}
+
 /// Regole pure di ordinamento e raggruppamento dello Scrigno.
 class ChestOrganizer {
   const ChestOrganizer._();
@@ -108,5 +120,34 @@ class ChestOrganizer {
       }
     }
     return latestIndex;
+  }
+
+  /// Individua la conversazione dell'ultima risposta ricevuta anche quando
+  /// usa un conversation_id nuovo e quindi non ha ancora una slide radice
+  /// nello Scrigno.
+  static ChestNotificationTarget? latestNotificationTarget<T>({
+    required List<T> items,
+    required String? Function(T item) conversationIdOf,
+    required Iterable<Map<String, DateTime>> notifications,
+  }) {
+    String? latestConversationId;
+    DateTime? latestDate;
+    for (final notificationMap in notifications) {
+      for (final entry in notificationMap.entries) {
+        if (entry.key.isEmpty ||
+            (latestDate != null && !entry.value.isAfter(latestDate))) {
+          continue;
+        }
+        latestConversationId = entry.key;
+        latestDate = entry.value;
+      }
+    }
+    if (latestConversationId == null) return null;
+    return ChestNotificationTarget(
+      conversationId: latestConversationId,
+      itemIndex: items.indexWhere(
+        (item) => conversationIdOf(item) == latestConversationId,
+      ),
+    );
   }
 }

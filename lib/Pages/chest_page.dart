@@ -85,6 +85,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
 
   int _currentIndex = 0;
   bool _didApplyInitialFocus = false;
+  String? _detachedFocusedConversationId;
   bool _initialLoadCompleted = false;
   int _conversationRefreshToken = 0;
   String? _pendingRevealEntryId;
@@ -380,16 +381,30 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         } else {
           desiredIndex = 0;
         }
-      } else if (widget.focusReplies &&
-          organization.latestNotificationItemIndex >= 0) {
-        desiredIndex = organization.latestNotificationItemIndex;
+      } else if (widget.focusReplies) {
+        final notificationTarget = ChestOrganizer.latestNotificationTarget(
+          items: _itemsNormal,
+          conversationIdOf: _convIdOfItem,
+          notifications: [
+            _honooLatestReceivedReplies,
+            _hinooLatestReceivedReplies,
+          ],
+        );
+        if (notificationTarget != null) {
+          if (notificationTarget.isDetached) {
+            _detachedFocusedConversationId = notificationTarget.conversationId;
+          } else {
+            desiredIndex = notificationTarget.itemIndex;
+          }
+        }
       } else {
         // L'ordinamento è dal più recente: durante il caricamento progressivo
         // non conservare una selezione provvisoria che potrebbe diventare
         // meno recente quando arrivano anche gli altri tipi di contenuto.
         desiredIndex = 0;
       }
-      if (_initialLoadCompleted && _itemsNormal.isNotEmpty) {
+      if (_initialLoadCompleted &&
+          (_itemsNormal.isNotEmpty || _detachedFocusedConversationId != null)) {
         _didApplyInitialFocus = true;
       }
     }
@@ -976,7 +991,8 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       builder: (context, _) {
         _rebuildItems();
         final items = _itemsNormal;
-        final focusedConversationId = widget.focusConversationId;
+        final focusedConversationId =
+            widget.focusConversationId ?? _detachedFocusedConversationId;
         final focusedItemIndex = focusedConversationId == null
             ? -1
             : items.indexWhere(
