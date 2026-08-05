@@ -86,6 +86,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
   int _currentIndex = 0;
   bool _didApplyInitialFocus = false;
   String? _detachedFocusedConversationId;
+  bool _detachedConversationVisible = true;
   bool _initialLoadCompleted = false;
   int _conversationRefreshToken = 0;
   String? _pendingRevealEntryId;
@@ -509,6 +510,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
           onSendHinooToMoon: _sendHinooToMoon,
           onReplyToHinoo: _showReplyChoiceForHinoo,
           onDeleteHinoo: _deleteHinoo,
+          onReplyToConversationEntry: _showReplyChoiceForConversationEntry,
           onSendConversationEntryToMoon: _sendConversationEntryToMoon,
         ),
       ),
@@ -739,6 +741,32 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         ),
       );
       _refreshConversationInPlace(result);
+    }
+  }
+
+  Future<void> _showReplyChoiceForConversationEntry(
+    ConversationEntry entry,
+  ) async {
+    switch (entry.kind) {
+      case ConversationEntryKind.honoo:
+        await _showReplyChoiceForHonoo(entry.honoo!);
+        return;
+      case ConversationEntryKind.hinoo:
+        final id = entry.id;
+        if (id == null || id.isEmpty) return;
+        await _showReplyChoiceForHinoo(
+          ChestHinooItem(
+            id: id,
+            draft: entry.hinoo!,
+            createdAt: entry.createdAt,
+            isFromMoonSaved: entry.isFromMoonSaved,
+            ownerId: entry.ownerId,
+            conversationId: entry.hinoo!.conversationId,
+          ),
+        );
+        return;
+      case ConversationEntryKind.deleted:
+        return;
     }
   }
 
@@ -1003,7 +1031,9 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
             focusedConversationId != null &&
             focusedConversationId.isNotEmpty &&
             focusedItemIndex < 0;
-        final currentItem = showDetachedFocusedConversation || items.isEmpty
+        final detachedConversationVisible =
+            showDetachedFocusedConversation && _detachedConversationVisible;
+        final currentItem = detachedConversationVisible || items.isEmpty
             ? null
             : items[_currentIndex.clamp(0, items.length - 1)];
         final currentUserId = SupabaseProvider.client.auth.currentUser?.id;
@@ -1040,21 +1070,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
             if ((ctrl.isLoading.value || _isHinooLoading) && items.isEmpty) {
               return const Center(child: LoadingSpinner(color: Colors.white));
             }
-            if (showDetachedFocusedConversation) {
-              return UnifiedThreadView(
-                conversationId: focusedConversationId,
-                maxWidth: viewW,
-                maxHeight: availableH,
-                isActive: true,
-                highlightLatest: widget.highlightLatest,
-                currentUserId: currentUserId,
-                revealEntryId: _pendingRevealEntryId,
-                refreshToken: _conversationRefreshToken,
-                onSelect: (entry) =>
-                    _selectConversationEntry(focusedConversationId, entry),
-              );
-            }
-            if (items.isEmpty) {
+            if (items.isEmpty && !showDetachedFocusedConversation) {
               if (loadError != null) {
                 return Center(child: _buildLoadError(compact: false));
               }
@@ -1073,9 +1089,14 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
             const horizPhysics = PageScrollPhysics(
               parent: ClampingScrollPhysics(),
             );
+            final detachedOffset = showDetachedFocusedConversation ? 1 : 0;
+            final carouselItemCount = items.length + detachedOffset;
+            final currentCarouselIndex = detachedConversationVisible
+                ? 0
+                : _currentIndex + detachedOffset;
             final slider = cs.CarouselSlider.builder(
               carouselController: _carouselController,
-              itemCount: items.length,
+              itemCount: carouselItemCount,
               options: cs.CarouselOptions(
                 height: availableH,
                 viewportFraction: 1.0,
@@ -1085,17 +1106,41 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
                 disableCenter: true,
                 scrollPhysics: horizPhysics,
                 onPageChanged: (i, _) {
+                  final isDetachedPage =
+                      showDetachedFocusedConversation && i == 0;
                   setState(() {
-                    _currentIndex = i;
+                    _detachedConversationVisible = isDetachedPage;
+                    if (!isDetachedPage) {
+                      _currentIndex = i - detachedOffset;
+                    }
                     _selectedConvEntry = null;
                   });
-                  _prefetchChestFrom(i);
+                  if (!isDetachedPage) {
+                    _prefetchChestFrom(i - detachedOffset);
+                  }
                 },
               ),
               itemBuilder: (context, index, realIdx) {
-                final bool isActive = _currentIndex == index;
+                if (showDetachedFocusedConversation && index == 0) {
+                  return UnifiedThreadView(
+                    key: ValueKey('detached:$focusedConversationId'),
+                    conversationId: focusedConversationId,
+                    maxWidth: viewW,
+                    maxHeight: availableH,
+                    isActive: detachedConversationVisible,
+                    highlightLatest: widget.highlightLatest,
+                    currentUserId: currentUserId,
+                    revealEntryId: _pendingRevealEntryId,
+                    refreshToken: _conversationRefreshToken,
+                    onSelect: (entry) =>
+                        _selectConversationEntry(focusedConversationId, entry),
+                  );
+                }
+                final itemIndex = index - detachedOffset;
+                final bool isActive =
+                    !detachedConversationVisible && _currentIndex == itemIndex;
                 return _buildChestItem(
-                  items[index],
+                  items[itemIndex],
                   availableH,
                   viewW,
                   honooMetrics,
@@ -1123,19 +1168,19 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
                 layoutMode == ResponsiveLayoutMode.desktop ||
                 layoutMode == ResponsiveLayoutMode.wideDesktop ||
                 layoutMode == ResponsiveLayoutMode.largeDesktop;
-            if (!isDesktop || items.length <= 1) {
+            if (!isDesktop || carouselItemCount <= 1) {
               return visibleSlider;
             }
             return DesktopCarouselArrows(
-              canPrev: _currentIndex > 0,
-              canNext: _currentIndex < items.length - 1,
+              canPrev: currentCarouselIndex > 0,
+              canNext: currentCarouselIndex < carouselItemCount - 1,
               onPrev: () => _carouselController.animateToPage(
-                (_currentIndex - 1).clamp(0, items.length - 1),
+                (currentCarouselIndex - 1).clamp(0, carouselItemCount - 1),
                 duration: const Duration(milliseconds: 220),
                 curve: Curves.easeOutCubic,
               ),
               onNext: () => _carouselController.animateToPage(
-                (_currentIndex + 1).clamp(0, items.length - 1),
+                (currentCarouselIndex + 1).clamp(0, carouselItemCount - 1),
                 duration: const Duration(milliseconds: 220),
                 curve: Curves.easeOutCubic,
               ),
@@ -1154,7 +1199,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
               ) {
                 final items = _itemsNormal;
                 final ChestItem? current =
-                    showDetachedFocusedConversation || items.isEmpty
+                    detachedConversationVisible || items.isEmpty
                     ? null
                     : items[_currentIndex];
                 return _footerForItem(

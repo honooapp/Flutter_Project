@@ -37,10 +37,10 @@ class HonooCard extends StatelessWidget {
       ChestContentStyle.receivedReply,
     );
     final Color textPanelColor = isReceivedReply
-        ? HonooColor.secondary
+        ? Colors.white
         : HonooColor.tertiary;
     final Color textColor = isReceivedReply
-        ? Colors.white
+        ? Colors.black
         : HonooColor.onTertiary;
 
     return LayoutBuilder(
@@ -93,6 +93,7 @@ class HonooCard extends StatelessWidget {
                   width: imageSize,
                   height: textHeight,
                   child: Container(
+                    key: const Key('honoo-card-text-panel'),
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: textPanelColor,

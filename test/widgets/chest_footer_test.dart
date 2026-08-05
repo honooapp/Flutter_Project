@@ -61,6 +61,7 @@ void main() {
     ValueChanged<ChestHinooItem>? onSendHinooToMoon,
     ValueChanged<ChestHinooItem>? onDeleteHinoo,
     ConversationEntry? selectedConversationEntry,
+    ValueChanged<ConversationEntry>? onReplyToConversationEntry,
     ValueChanged<ConversationEntry>? onSendConversationEntryToMoon,
   }) async {
     await tester.pumpWidget(
@@ -81,6 +82,8 @@ void main() {
             onSendHinooToMoon: onSendHinooToMoon ?? (_) {},
             onReplyToHinoo: (_) {},
             onDeleteHinoo: onDeleteHinoo ?? (_) {},
+            onReplyToConversationEntry:
+                onReplyToConversationEntry ?? (ConversationEntry _) {},
             onSendConversationEntryToMoon:
                 onSendConversationEntryToMoon ?? (ConversationEntry _) {},
           ),
@@ -212,6 +215,7 @@ void main() {
         HonooType.personal,
         conversationId: 'conversation-1',
       );
+      item.honoo!.dbId = 'root-1';
       final selectedEntry = ConversationEntry.honoo(item.honoo!);
       ConversationEntry? publishedEntry;
 
@@ -223,8 +227,43 @@ void main() {
       );
 
       expect(find.byTooltip('Spedisci sulla Luna'), findsOneWidget);
+      expect(find.byTooltip('Rispondi'), findsOneWidget);
       await tester.tap(find.byTooltip('Spedisci sulla Luna'));
       expect(publishedEntry, same(selectedEntry));
+    },
+  );
+
+  testWidgets(
+    'la conversazione dedicata mostra Rispondi bianco e inoltra la selezione',
+    (tester) async {
+      final honoo = honooItem(
+        HonooType.answer,
+        conversationId: 'conversation-1',
+      ).honoo!;
+      honoo.dbId = 'reply-1';
+      final selectedEntry = ConversationEntry.honoo(honoo);
+      ConversationEntry? repliedEntry;
+
+      await pumpFooter(
+        tester,
+        item: null,
+        selectedConversationEntry: selectedEntry,
+        onReplyToConversationEntry: (entry) => repliedEntry = entry,
+      );
+
+      expect(find.byTooltip('Rispondi'), findsOneWidget);
+      final replyIcon = tester.widget<SvgPicture>(
+        find.descendant(
+          of: find.byTooltip('Rispondi'),
+          matching: find.byType(SvgPicture),
+        ),
+      );
+      expect(
+        replyIcon.colorFilter,
+        const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+      );
+      await tester.tap(find.byTooltip('Rispondi'));
+      expect(repliedEntry, same(selectedEntry));
     },
   );
 

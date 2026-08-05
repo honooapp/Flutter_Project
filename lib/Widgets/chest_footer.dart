@@ -24,6 +24,7 @@ class ChestFooter extends StatelessWidget {
     required this.onSendHinooToMoon,
     required this.onReplyToHinoo,
     required this.onDeleteHinoo,
+    required this.onReplyToConversationEntry,
     required this.onSendConversationEntryToMoon,
     this.foregroundColor = HonooColor.onBackground,
   });
@@ -42,6 +43,7 @@ class ChestFooter extends StatelessWidget {
   final ValueChanged<ChestHinooItem> onSendHinooToMoon;
   final ValueChanged<ChestHinooItem> onReplyToHinoo;
   final ValueChanged<ChestHinooItem> onDeleteHinoo;
+  final ValueChanged<ConversationEntry> onReplyToConversationEntry;
   final ValueChanged<ConversationEntry> onSendConversationEntryToMoon;
   final Color foregroundColor;
 
@@ -67,6 +69,16 @@ class ChestFooter extends StatelessWidget {
       hinoo: (hinoo) => _addHinooActions(actions, hinoo),
     );
 
+    final selectedEntry = selectedConversationEntry;
+    if (_canReplyTo(selectedEntry)) {
+      actions.add(
+        _replyAction(
+          () => onReplyToConversationEntry(selectedEntry!),
+          color: Colors.white,
+        ),
+      );
+    }
+
     return ResponsiveFooterBar(
       useSafeArea: false,
       bottomPadding: bottomPadding,
@@ -90,7 +102,9 @@ class ChestFooter extends StatelessWidget {
         !isOnMoon &&
         selectedEntryToPublish == null) {
       actions.add(_moonAction(() => onSendHonooToMoon(honoo)));
-    } else if (hasReplies && !isFromMoonSaved) {
+    } else if (hasReplies &&
+        !isFromMoonSaved &&
+        selectedConversationEntry == null) {
       actions.add(
         _action(
           asset: 'assets/icons/reply.svg',
@@ -133,6 +147,12 @@ class ChestFooter extends StatelessWidget {
     return isMine && isPersonalEntry && !entry.isFromMoonSaved ? entry : null;
   }
 
+  bool _canReplyTo(ConversationEntry? entry) =>
+      entry != null &&
+      entry.kind != ConversationEntryKind.deleted &&
+      entry.id != null &&
+      entry.id!.isNotEmpty;
+
   void _addHinooActions(
     List<ResponsiveFooterAction> actions,
     ChestHinooItem hinoo,
@@ -154,12 +174,14 @@ class ChestFooter extends StatelessWidget {
     onPressed: onPressed,
   );
 
-  ResponsiveFooterAction _replyAction(VoidCallback onPressed) => _action(
-    asset: 'assets/icons/reply.svg',
-    label: 'Rispondi',
-    tooltip: 'Rispondi',
-    onPressed: onPressed,
-  );
+  ResponsiveFooterAction _replyAction(VoidCallback onPressed, {Color? color}) =>
+      _action(
+        asset: 'assets/icons/reply.svg',
+        label: 'Rispondi',
+        tooltip: 'Rispondi',
+        onPressed: onPressed,
+        color: color,
+      );
 
   ResponsiveFooterAction _deleteAction(VoidCallback onPressed) => _action(
     asset: 'assets/Cestino.svg',
@@ -174,11 +196,12 @@ class ChestFooter extends StatelessWidget {
     required String tooltip,
     required VoidCallback onPressed,
     bool applyColorFilter = true,
+    Color? color,
   }) => ResponsiveFooterAction(
     asset: asset,
     semanticsLabel: label,
     colorFilter: applyColorFilter
-        ? ColorFilter.mode(foregroundColor, BlendMode.srcIn)
+        ? ColorFilter.mode(color ?? foregroundColor, BlendMode.srcIn)
         : null,
     size: iconSize,
     splashRadius: 25,

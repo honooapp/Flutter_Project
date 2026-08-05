@@ -39,14 +39,6 @@ void main() {
         border.top.width == 6;
   });
 
-  Finder decoratedPanelWithColor(Color color) =>
-      find.byWidgetPredicate((widget) {
-        if (widget is! Container || widget.decoration is! BoxDecoration) {
-          return false;
-        }
-        return (widget.decoration! as BoxDecoration).color == color;
-      });
-
   Honoo honoo({
     required HonooType type,
     String owner = 'other_user',
@@ -142,7 +134,7 @@ void main() {
     expect(borderWithColor(Colors.white), findsNothing);
   });
 
-  testWidgets('Honoo ricevuto in risposta usa sfondo rosso e non ha cornice', (
+  testWidgets('Honoo ricevuto usa sfondo esterno rosso e box testo bianco', (
     tester,
   ) async {
     final value = honoo(type: HonooType.answer);
@@ -152,9 +144,12 @@ void main() {
       ChestContentStyle.forHonoo(value, viewerUserId: 'test_user'),
       same(ChestContentStyle.receivedReply),
     );
-    expect(decoratedPanelWithColor(HonooColor.secondary), findsOneWidget);
+    final textPanel = tester.widget<Container>(
+      find.byKey(const Key('honoo-card-text-panel')),
+    );
+    expect((textPanel.decoration! as BoxDecoration).color, Colors.white);
     final replyText = tester.widget<Text>(find.text('Test conversazione'));
-    expect(replyText.style?.color, Colors.white);
+    expect(replyText.style?.color, Colors.black);
     expect(borderWithColor(HonooColor.secondary), findsNothing);
     expect(borderWithColor(Colors.white), findsNothing);
   });
