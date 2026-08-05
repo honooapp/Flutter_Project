@@ -71,6 +71,10 @@ void main() {
         border.top.width == 6;
   });
 
+  Finder explicitSemanticsLabel(String label) => find.byWidgetPredicate(
+    (widget) => widget is Semantics && widget.properties.label == label,
+  );
+
   testWidgets('il bounce rivela il messaggio padre fino a metà schermo', (
     tester,
   ) async {
@@ -640,8 +644,76 @@ void main() {
         expect(find.text('Risposta incrociata'), findsOneWidget);
         expect(find.text('Contenuto padre'), findsOneWidget);
         expect(find.byKey(const Key('reply_reveal_parent')), findsOneWidget);
-        expect(find.bySemanticsLabel('Risposta ricevuta'), findsOneWidget);
+        expect(explicitSemanticsLabel('Risposta ricevuta'), findsOneWidget);
         expect(borderWithColor(HonooColor.secondary), findsWidgets);
+      },
+    );
+  }
+
+  for (final combination in const [
+    ('honoo', 'honoo'),
+    ('honoo', 'hinoo'),
+    ('hinoo', 'honoo'),
+    ('hinoo', 'hinoo'),
+  ]) {
+    testWidgets(
+      '${combination.$1} → ${combination.$2} identifica la risposta del mittente senza bordo rosso',
+      (tester) async {
+        final root = combination.$1 == 'honoo'
+            ? ConversationEntry.honoo(
+                honoo(
+                  id: 'root-sender',
+                  text: 'Contenuto ricevuto',
+                  owner: 'other',
+                  createdAt: '2026-07-20T10:00:00Z',
+                ),
+              )
+            : hinoo(
+                id: 'root-sender',
+                text: 'Contenuto ricevuto',
+                owner: 'other',
+                createdAt: '2026-07-20T10:00:00Z',
+              );
+        final reply = combination.$2 == 'honoo'
+            ? ConversationEntry.honoo(
+                honoo(
+                  id: 'reply-sender',
+                  text: 'Risposta inviata',
+                  owner: 'me',
+                  createdAt: '2026-07-20T11:00:00Z',
+                  type: HonooType.answer,
+                  replyTo: 'root-sender',
+                ),
+              )
+            : hinoo(
+                id: 'reply-sender',
+                text: 'Risposta inviata',
+                owner: 'me',
+                createdAt: '2026-07-20T11:00:00Z',
+                type: HinooType.answer,
+                replyTo: 'root-sender',
+              );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: UnifiedThreadView(
+                conversationId: 'conversation-1',
+                maxWidth: 600,
+                maxHeight: 700,
+                isActive: true,
+                currentUserId: 'me',
+                conversationLoader: (_) async => [root, reply],
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 350));
+
+        expect(explicitSemanticsLabel('Risposta inviata'), findsOneWidget);
+        expect(borderWithColor(HonooColor.secondary), findsNothing);
+        expect(find.byKey(const Key('reply_reveal_parent')), findsOneWidget);
       },
     );
   }

@@ -34,6 +34,7 @@ class _FakeReplyNotification extends ReplySystemNotification {
     required String contentLabel,
     required String conversationId,
     required VoidCallback onTap,
+    int replyCount = 1,
   }) {}
 }
 

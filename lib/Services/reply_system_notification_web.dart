@@ -31,12 +31,16 @@ class _WebReplySystemNotification extends ReplySystemNotification {
     required String contentLabel,
     required String conversationId,
     required void Function() onTap,
+    int replyCount = 1,
   }) {
     if (permission != ReplyNotificationPermission.granted) return;
+    final body = replyCount == 1
+        ? 'Hai ricevuto una risposta al tuo $contentLabel'
+        : 'Hai ricevuto $replyCount nuove risposte';
     final notification = web.Notification(
       'Nuova risposta su honoo',
       web.NotificationOptions(
-        body: 'Hai ricevuto una risposta al tuo $contentLabel',
+        body: body,
         icon: 'icons/Icon-192.png',
         tag: 'honoo-reply-$conversationId',
       ),
