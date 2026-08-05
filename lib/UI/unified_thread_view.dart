@@ -4,6 +4,7 @@ import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Entities/conversation_entry.dart';
 import 'package:honoo/Services/conversation_service.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
 import 'package:honoo/UI/honoo_card.dart';
@@ -11,6 +12,7 @@ import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Utility/download_capture.dart';
 import 'package:honoo/Utility/network_image_prefetch.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Utility/chest_content_style.dart';
 // rendering a lista con separatori; rimosso carousel verticale
 
 class UnifiedThreadView extends StatefulWidget {
@@ -365,9 +367,15 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
         );
         break;
     }
-    return SizedBox.expand(
+    final style = ChestContentStyle.forEntry(
+      entry,
+      viewerUserId:
+          widget.currentUserId ?? SupabaseProvider.client.auth.currentUser?.id,
+    );
+    return ColoredBox(
       key: keyName == null ? null : Key(keyName),
-      child: card,
+      color: style.backgroundColor,
+      child: SizedBox.expand(child: card),
     );
   }
 

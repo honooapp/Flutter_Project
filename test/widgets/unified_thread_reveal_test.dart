@@ -407,7 +407,7 @@ void main() {
   });
 
   testWidgets(
-    'il bounce conserva la cornice bianca sul padre Luna e nessuna rossa sulla risposta propria',
+    'il bounce mostra lo sfondo bianco del padre Luna e quello blu della risposta propria',
     (tester) async {
       tester.view.devicePixelRatio = 1;
       tester.view.physicalSize = const Size(600, 900);
@@ -453,11 +453,10 @@ void main() {
 
       expect(find.byKey(const Key('reply_reveal_parent')), findsOneWidget);
       expect(
-        find.descendant(
-          of: find.byKey(const Key('reply_reveal_parent')),
-          matching: borderWithColor(Colors.white),
-        ),
-        findsOneWidget,
+        tester
+            .widget<ColoredBox>(find.byKey(const Key('reply_reveal_parent')))
+            .color,
+        HonooColor.tertiary,
       );
       expect(borderWithColor(HonooColor.secondary), findsNothing);
     },
@@ -651,7 +650,14 @@ void main() {
         expect(find.text('Contenuto padre'), findsOneWidget);
         expect(find.byKey(const Key('reply_reveal_parent')), findsOneWidget);
         expect(explicitSemanticsLabel('Risposta ricevuta'), findsOneWidget);
-        expect(borderWithColor(HonooColor.secondary), findsWidgets);
+        expect(borderWithColor(HonooColor.secondary), findsNothing);
+        expect(
+          find.byWidgetPredicate(
+            (widget) =>
+                widget is ColoredBox && widget.color == HonooColor.secondary,
+          ),
+          findsWidgets,
+        );
       },
     );
   }

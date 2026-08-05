@@ -69,7 +69,10 @@ void main() {
           viewport.safeBottom;
       final footerTopSpacing = footerSpacing / 2;
 
-      expect(bodyRect.top, ThreadLayoutScaffold.headerHeight);
+      expect(
+        bodyRect.top,
+        ThreadLayoutScaffold.headerHeight + viewport.safeTop,
+      );
       expect(bodyRect.bottom + footerTopSpacing, footerRect.top);
       expect(bodyRect.left, 0);
       expect(bodyRect.right, viewport.size.width);

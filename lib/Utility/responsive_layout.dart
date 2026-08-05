@@ -107,15 +107,26 @@ class ResponsiveLayout {
         .clamp(0.0, double.infinity);
 
     double imageSize = math.min(maxImageByWidth, maxImageByHeight);
-    if (enforceDesktopBaseline && mode != ResponsiveLayoutMode.mobile) {
+
+    // The desktop baseline is a preferred size, never a minimum that may
+    // overflow a short landscape viewport or a split-screen window.
+    final canFitDesktopBaseline =
+        maxImageByWidth >= HonooBuilder.baselineImageSize &&
+        maxImageByHeight >= HonooBuilder.baselineImageSize;
+    if (enforceDesktopBaseline &&
+        mode != ResponsiveLayoutMode.mobile &&
+        canFitDesktopBaseline) {
       imageSize = math.max(imageSize, HonooBuilder.baselineImageSize);
     }
 
     if (!imageSize.isFinite || imageSize <= 0) {
-      imageSize = maxWidth;
-      if (enforceDesktopBaseline && mode != ResponsiveLayoutMode.mobile) {
-        imageSize = math.max(imageSize, HonooBuilder.baselineImageSize);
-      }
+      imageSize = math
+          .min(
+            maxWidth.isFinite ? maxWidth : 0,
+            maxImageByHeight.isFinite ? maxImageByHeight : 0,
+          )
+          .clamp(0.0, double.infinity)
+          .toDouble();
     }
 
     final double builderWidth = imageSize;

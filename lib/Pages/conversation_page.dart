@@ -5,6 +5,8 @@ import 'package:honoo/Controller/honoo_controller.dart';
 import 'package:honoo/Services/duplication_result.dart';
 import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Utility/chest_content_style.dart';
+import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
@@ -67,9 +69,19 @@ class _ConversationPageState extends State<ConversationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final currentHonoo = _thread.isEmpty
+        ? null
+        : _thread[_currentIndex.clamp(0, _thread.length - 1)];
+    final pageStyle = currentHonoo == null
+        ? ChestContentStyle.own
+        : ChestContentStyle.forHonoo(
+            currentHonoo,
+            viewerUserId: SupabaseProvider.client.auth.currentUser?.id,
+          );
     return ThreadLayoutScaffold(
-      backgroundColor: HonooColor.background,
+      backgroundColor: pageStyle.backgroundColor,
       header: HonooAppTitle(
+        color: pageStyle.logoColor,
         onTap: () {
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (_) => const PlaceholderPage()),
@@ -111,10 +123,18 @@ class _ConversationPageState extends State<ConversationPage> {
                         },
                       ),
                       items: _thread.map((h) {
-                        return SizedBox(
-                          width: honooMetrics.width,
-                          height: honooMetrics.height,
-                          child: HonooCard(honoo: h),
+                        final style = ChestContentStyle.forHonoo(
+                          h,
+                          viewerUserId:
+                              SupabaseProvider.client.auth.currentUser?.id,
+                        );
+                        return ColoredBox(
+                          color: style.backgroundColor,
+                          child: SizedBox(
+                            width: honooMetrics.width,
+                            height: honooMetrics.height,
+                            child: HonooCard(honoo: h),
+                          ),
                         );
                       }).toList(),
                     ));
@@ -140,8 +160,8 @@ class _ConversationPageState extends State<ConversationPage> {
                 ResponsiveFooterAction(
                   asset: "assets/icons/home.svg",
                   semanticsLabel: 'Home',
-                  colorFilter: const ColorFilter.mode(
-                    HonooColor.onBackground,
+                  colorFilter: ColorFilter.mode(
+                    pageStyle.foregroundColor,
                     BlendMode.srcIn,
                   ),
                   size: footerIconSize,
@@ -158,6 +178,10 @@ class _ConversationPageState extends State<ConversationPage> {
                   ResponsiveFooterAction(
                     asset: "assets/icons/broken_heart.svg",
                     semanticsLabel: 'Broken heart',
+                    colorFilter: ColorFilter.mode(
+                      pageStyle.foregroundColor,
+                      BlendMode.srcIn,
+                    ),
                     size: footerIconSize,
                     splashRadius: 25,
                     tooltip: 'Cuore spezzato',
@@ -194,8 +218,8 @@ class _ConversationPageState extends State<ConversationPage> {
                   ResponsiveFooterAction(
                     asset: "assets/icons/reply.svg",
                     semanticsLabel: 'Reply',
-                    colorFilter: const ColorFilter.mode(
-                      HonooColor.onBackground,
+                    colorFilter: ColorFilter.mode(
+                      pageStyle.foregroundColor,
                       BlendMode.srcIn,
                     ),
                     size: footerIconSize,

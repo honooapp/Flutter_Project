@@ -33,23 +33,25 @@ void main() {
     return ChestItem.honoo(honoo, DateTime.utc(2026));
   }
 
-  ChestItem hinooItem({
-    bool isOnMoon = false,
-    bool isFromMoonSaved = false,
-  }) => ChestItem.hinoo(
-    ChestHinooItem(
-      id: 'hinoo-1',
-      draft: const HinooDraft(
-        pages: [
-          HinooSlide(backgroundImage: null, text: 'Test', isTextWhite: true),
-        ],
-      ),
-      createdAt: DateTime.utc(2026),
-      isFromMoonSaved: isFromMoonSaved,
-      ownerId: 'current-user',
-      isOnMoon: isOnMoon,
-    ),
-  );
+  ChestItem hinooItem({bool isOnMoon = false, bool isFromMoonSaved = false}) =>
+      ChestItem.hinoo(
+        ChestHinooItem(
+          id: 'hinoo-1',
+          draft: const HinooDraft(
+            pages: [
+              HinooSlide(
+                backgroundImage: null,
+                text: 'Test',
+                isTextWhite: true,
+              ),
+            ],
+          ),
+          createdAt: DateTime.utc(2026),
+          isFromMoonSaved: isFromMoonSaved,
+          ownerId: 'current-user',
+          isOnMoon: isOnMoon,
+        ),
+      );
 
   Future<void> pumpFooter(
     WidgetTester tester, {
@@ -100,7 +102,7 @@ void main() {
     expect(icons.last.colorFilter, isNotNull);
   });
 
-  testWidgets('solo Luna conserva il colore originale nel footer', (
+  testWidgets('tutte le azioni del footer seguono il colore di contrasto', (
     tester,
   ) async {
     await pumpFooter(tester, item: honooItem(HonooType.personal));
@@ -111,7 +113,10 @@ void main() {
     expect(icons, hasLength(4));
     expect(icons[0].colorFilter, isNotNull); // Home
     expect(icons[1].colorFilter, isNotNull); // Info
-    expect(icons[2].colorFilter, isNull); // Luna
+    expect(
+      icons[2].colorFilter,
+      const ColorFilter.mode(HonooColor.onBackground, BlendMode.srcIn),
+    ); // Luna
     expect(
       icons[3].colorFilter,
       const ColorFilter.mode(HonooColor.onBackground, BlendMode.srcIn),
@@ -256,10 +261,7 @@ void main() {
   testWidgets('Hinoo salvato dalla Luna non mostra l’azione Luna', (
     tester,
   ) async {
-    await pumpFooter(
-      tester,
-      item: hinooItem(isFromMoonSaved: true),
-    );
+    await pumpFooter(tester, item: hinooItem(isFromMoonSaved: true));
 
     expect(find.byTooltip('Spedisci sulla Luna'), findsNothing);
     expect(find.byTooltip('Rispondi'), findsOneWidget);

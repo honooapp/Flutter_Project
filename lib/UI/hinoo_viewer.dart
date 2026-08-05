@@ -142,20 +142,9 @@ class _HinooViewerState extends State<HinooViewer> {
           height: displayH,
           child: FittedBox(
             fit: BoxFit.contain,
-            child: Container(
+            child: SizedBox(
               width: baselineW,
               height: baselineH,
-              decoration: widget.isReply && !isOwn
-                  ? BoxDecoration(
-                      border: Border.all(color: HonooColor.secondary, width: 6),
-                      borderRadius: BorderRadius.circular(12),
-                    )
-                  : widget.draft.isFromMoonSaved && !widget.isReply
-                  ? BoxDecoration(
-                      border: Border.all(color: Colors.white, width: 6),
-                      borderRadius: BorderRadius.circular(12),
-                    )
-                  : null,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [

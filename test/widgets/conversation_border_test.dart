@@ -5,6 +5,7 @@ import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
 import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Utility/chest_content_style.dart';
 
 import '../test_supabase_helper.dart';
 
@@ -111,68 +112,117 @@ void main() {
     await tester.pump();
   }
 
-  testWidgets('Honoo di risposta proprio non ha cornice', (tester) async {
-    await pumpHonoo(
-      tester,
-      honoo(type: HonooType.answer, owner: 'test_user', fromMoon: true),
+  testWidgets('Honoo di risposta proprio resta blu e non ha cornice', (
+    tester,
+  ) async {
+    final value = honoo(
+      type: HonooType.answer,
+      owner: 'test_user',
+      fromMoon: true,
     );
+    await pumpHonoo(tester, value);
 
+    expect(
+      ChestContentStyle.forHonoo(value, viewerUserId: 'test_user'),
+      same(ChestContentStyle.own),
+    );
     expect(borderWithColor(HonooColor.secondary), findsNothing);
     expect(borderWithColor(Colors.white), findsNothing);
   });
 
-  testWidgets('Honoo ricevuto in risposta ha cornice rossa', (tester) async {
-    await pumpHonoo(tester, honoo(type: HonooType.answer));
+  testWidgets('Honoo ricevuto in risposta usa sfondo rosso e non ha cornice', (
+    tester,
+  ) async {
+    final value = honoo(type: HonooType.answer);
+    await pumpHonoo(tester, value);
 
-    expect(borderWithColor(HonooColor.secondary), findsWidgets);
+    expect(
+      ChestContentStyle.forHonoo(value, viewerUserId: 'test_user'),
+      same(ChestContentStyle.receivedReply),
+    );
+    expect(borderWithColor(HonooColor.secondary), findsNothing);
     expect(borderWithColor(Colors.white), findsNothing);
   });
 
-  testWidgets('Honoo salvato dalla Luna ha solo cornice bianca', (tester) async {
-    await pumpHonoo(
-      tester,
-      honoo(type: HonooType.personal, owner: 'test_user', fromMoon: true),
+  testWidgets('Honoo salvato dalla Luna usa sfondo bianco e non ha cornice', (
+    tester,
+  ) async {
+    final value = honoo(
+      type: HonooType.personal,
+      owner: 'test_user',
+      fromMoon: true,
     );
+    await pumpHonoo(tester, value);
 
-    expect(borderWithColor(Colors.white), findsWidgets);
+    expect(
+      ChestContentStyle.forHonoo(value, viewerUserId: 'test_user'),
+      same(ChestContentStyle.moon),
+    );
+    expect(borderWithColor(Colors.white), findsNothing);
     expect(borderWithColor(HonooColor.secondary), findsNothing);
   });
 
   testWidgets('Hinoo di risposta proprio non ha cornice', (tester) async {
-    await pumpHinoo(
-      tester,
-      draft: hinoo(fromMoon: true),
-      isReply: true,
-      authorId: 'test_user',
-    );
+    final draft = hinoo(fromMoon: true);
+    await pumpHinoo(tester, draft: draft, isReply: true, authorId: 'test_user');
 
+    expect(
+      ChestContentStyle.forHinoo(
+        draft,
+        authorId: 'test_user',
+        viewerUserId: 'test_user',
+        isReply: true,
+      ),
+      same(ChestContentStyle.own),
+    );
     expect(borderWithColor(HonooColor.secondary), findsNothing);
     expect(borderWithColor(Colors.white), findsNothing);
   });
 
-  testWidgets('Hinoo ricevuto in risposta ha cornice rossa', (tester) async {
+  testWidgets('Hinoo ricevuto in risposta usa sfondo rosso e non ha cornice', (
+    tester,
+  ) async {
+    final draft = hinoo();
     await pumpHinoo(
       tester,
-      draft: hinoo(),
+      draft: draft,
       isReply: true,
       authorId: 'other_user',
     );
 
-    expect(borderWithColor(HonooColor.secondary), findsWidgets);
+    expect(
+      ChestContentStyle.forHinoo(
+        draft,
+        authorId: 'other_user',
+        viewerUserId: 'test_user',
+        isReply: true,
+      ),
+      same(ChestContentStyle.receivedReply),
+    );
+    expect(borderWithColor(HonooColor.secondary), findsNothing);
     expect(borderWithColor(Colors.white), findsNothing);
   });
 
-  testWidgets('Hinoo salvato dalla Luna ha solo cornice bianca', (
+  testWidgets('Hinoo salvato dalla Luna usa sfondo bianco e non ha cornice', (
     tester,
   ) async {
+    final draft = hinoo(fromMoon: true);
     await pumpHinoo(
       tester,
-      draft: hinoo(fromMoon: true),
+      draft: draft,
       isReply: false,
       authorId: 'test_user',
     );
 
-    expect(borderWithColor(Colors.white), findsWidgets);
+    expect(
+      ChestContentStyle.forHinoo(
+        draft,
+        authorId: 'test_user',
+        viewerUserId: 'test_user',
+      ),
+      same(ChestContentStyle.moon),
+    );
+    expect(borderWithColor(Colors.white), findsNothing);
     expect(borderWithColor(HonooColor.secondary), findsNothing);
   });
 }

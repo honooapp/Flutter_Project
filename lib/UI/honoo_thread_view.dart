@@ -9,16 +9,14 @@ import '../Controller/honoo_thread_loader.dart';
 import '../Entities/honoo.dart';
 import '../UI/honoo_card.dart';
 import '../Utility/honoo_colors.dart';
+import '../Utility/chest_content_style.dart';
+import '../Services/supabase_provider.dart';
 
 /// Una pagina del carosello orizzontale della ChestPage.
 /// Se il root honoo ha risposte, mostra un CarouselSlider verticale senza peek,
 /// con gutter laterale fisso, così i box non toccano mai i bordi.
 class HonooThreadView extends StatefulWidget {
-  const HonooThreadView({
-    super.key,
-    required this.root,
-    this.onDownloadTap,
-  });
+  const HonooThreadView({super.key, required this.root, this.onDownloadTap});
 
   final Honoo root;
   final VoidCallback? onDownloadTap;
@@ -61,27 +59,25 @@ class _HonooThreadViewState extends State<HonooThreadView>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    _introCurve =
-        CurvedAnimation(parent: _introController, curve: Curves.easeOutBack);
+    _introCurve = CurvedAnimation(
+      parent: _introController,
+      curve: Curves.easeOutBack,
+    );
     _bounceController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 220),
     );
-    _bounceCurve =
-        CurvedAnimation(parent: _bounceController, curve: Curves.easeOutBack);
+    _bounceCurve = CurvedAnimation(
+      parent: _bounceController,
+      curve: Curves.easeOutBack,
+    );
     _hintController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 360),
     );
     _hintCurve = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: CurveTween(curve: Curves.easeOut),
-        weight: 50,
-      ),
-      TweenSequenceItem(
-        tween: CurveTween(curve: Curves.easeIn),
-        weight: 50,
-      ),
+      TweenSequenceItem(tween: CurveTween(curve: Curves.easeOut), weight: 50),
+      TweenSequenceItem(tween: CurveTween(curve: Curves.easeIn), weight: 50),
     ]).animate(_hintController);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _introController.forward();
@@ -174,11 +170,13 @@ class _HonooThreadViewState extends State<HonooThreadView>
                 final double w = c.maxWidth.isFinite
                     ? c.maxWidth
                     : MediaQuery.of(ctx).size.width;
-                final double dy = (1.0 - _introCurve.value) * 12.0 -
+                final double dy =
+                    (1.0 - _introCurve.value) * 12.0 -
                     (_bounceCurve.value * 6.0);
                 // Rimbalzo: sali fino a metà schermo (negativo) e ritorna alla posizione iniziale
                 final double hint = -_hintCurve.value * (h * 0.5);
-                final double scale = 1.0 -
+                final double scale =
+                    1.0 -
                     (1.0 - _introCurve.value) * 0.01 -
                     (_bounceCurve.value * 0.005);
                 return Transform.translate(
@@ -197,10 +195,18 @@ class _HonooThreadViewState extends State<HonooThreadView>
                         itemCount: ordered.length,
                         itemBuilder: (context, index) {
                           final honoo = ordered[index];
-                          return Center(
-                            child: HonooCard(
-                              honoo: honoo,
-                              onDownloadTap: widget.onDownloadTap,
+                          final style = ChestContentStyle.forHonoo(
+                            honoo,
+                            viewerUserId:
+                                SupabaseProvider.client.auth.currentUser?.id,
+                          );
+                          return ColoredBox(
+                            color: style.backgroundColor,
+                            child: Center(
+                              child: HonooCard(
+                                honoo: honoo,
+                                onDownloadTap: widget.onDownloadTap,
+                              ),
                             ),
                           );
                         },

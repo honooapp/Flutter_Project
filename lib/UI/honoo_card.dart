@@ -38,8 +38,6 @@ class HonooCard extends StatelessWidget {
         break;
     }
 
-    final bool isReply = honoo.type == HonooType.answer;
-
     return LayoutBuilder(
       builder: (context, constraints) {
         final double availW = constraints.maxWidth.isFinite
@@ -200,37 +198,19 @@ class HonooCard extends StatelessWidget {
           ),
         );
 
+        final bool isReply = honoo.type == HonooType.answer;
         final String? currentUserId =
             viewerUserId ?? SupabaseProvider.client.auth.currentUser?.id;
         final bool isOwn =
             currentUserId != null && currentUserId == honoo.userId;
-        final bool showReplyBorder = isReply && !isOwn;
-        final bool showMoonSavedBorder = honoo.isFromMoonSaved && !isReply;
-        final Widget wrapped = showReplyBorder || showMoonSavedBorder
-            ? DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: showReplyBorder
-                        ? HonooColor.secondary
-                        : Colors.white,
-                    width: 6,
-                  ),
-                ),
-                child: content,
-              )
-            : content;
-
         return Center(
           child: isReply
               ? Semantics(
                   container: true,
-                  label: showReplyBorder
-                      ? 'Risposta ricevuta'
-                      : 'Risposta inviata',
-                  child: wrapped,
+                  label: isOwn ? 'Risposta inviata' : 'Risposta ricevuta',
+                  child: content,
                 )
-              : wrapped,
+              : content,
         );
       },
     );
