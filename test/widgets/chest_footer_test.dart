@@ -5,6 +5,7 @@ import 'package:honoo/Entities/chest_item.dart';
 import 'package:honoo/Entities/conversation_entry.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/honoo.dart';
+import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/chest_footer.dart';
 
 void main() {
@@ -14,39 +15,36 @@ void main() {
     bool hasReplies = false,
     String? conversationId,
   }) {
-    final honoo = Honoo(
-      1,
-      'Test',
-      '',
-      '2026-01-01T00:00:00Z',
-      '2026-01-01T00:00:00Z',
-      type == HonooType.answer ? 'another-user' : 'current-user',
-      type,
-    )
-      ..isOnMoon = isOnMoon
-      ..hasReplies = hasReplies
-      ..conversationId = conversationId;
+    final honoo =
+        Honoo(
+            1,
+            'Test',
+            '',
+            '2026-01-01T00:00:00Z',
+            '2026-01-01T00:00:00Z',
+            type == HonooType.answer ? 'another-user' : 'current-user',
+            type,
+          )
+          ..isOnMoon = isOnMoon
+          ..hasReplies = hasReplies
+          ..conversationId = conversationId;
     return ChestItem.honoo(honoo, DateTime.utc(2026));
   }
 
   ChestItem hinooItem({bool isOnMoon = false}) => ChestItem.hinoo(
-        ChestHinooItem(
-          id: 'hinoo-1',
-          draft: const HinooDraft(
-            pages: [
-              HinooSlide(
-                backgroundImage: null,
-                text: 'Test',
-                isTextWhite: true,
-              ),
-            ],
-          ),
-          createdAt: DateTime.utc(2026),
-          isFromMoonSaved: false,
-          ownerId: 'current-user',
-          isOnMoon: isOnMoon,
-        ),
-      );
+    ChestHinooItem(
+      id: 'hinoo-1',
+      draft: const HinooDraft(
+        pages: [
+          HinooSlide(backgroundImage: null, text: 'Test', isTextWhite: true),
+        ],
+      ),
+      createdAt: DateTime.utc(2026),
+      isFromMoonSaved: false,
+      ownerId: 'current-user',
+      isOnMoon: isOnMoon,
+    ),
+  );
 
   Future<void> pumpFooter(
     WidgetTester tester, {
@@ -84,30 +82,39 @@ void main() {
     );
   }
 
-  testWidgets('footer vuoto mostra subito Home e Info bianche',
-      (tester) async {
+  testWidgets('footer vuoto mostra subito Home e Info bianche', (tester) async {
     await pumpFooter(tester, item: null);
 
     expect(find.byTooltip('Home'), findsOneWidget);
     expect(find.byTooltip('Info'), findsOneWidget);
     expect(find.byType(IconButton), findsNWidgets(2));
-    final icons =
-        tester.widgetList<SvgPicture>(find.byType(SvgPicture)).toList();
+    final icons = tester
+        .widgetList<SvgPicture>(find.byType(SvgPicture))
+        .toList();
     expect(icons.first.colorFilter, isNotNull);
     expect(icons.last.colorFilter, isNotNull);
   });
 
-  testWidgets('solo Luna conserva il colore originale nel footer',
-      (tester) async {
+  testWidgets('solo Luna conserva il colore originale nel footer', (
+    tester,
+  ) async {
     await pumpFooter(tester, item: honooItem(HonooType.personal));
 
-    final icons =
-        tester.widgetList<SvgPicture>(find.byType(SvgPicture)).toList();
+    final icons = tester
+        .widgetList<SvgPicture>(find.byType(SvgPicture))
+        .toList();
     expect(icons, hasLength(4));
     expect(icons[0].colorFilter, isNotNull); // Home
     expect(icons[1].colorFilter, isNotNull); // Info
     expect(icons[2].colorFilter, isNull); // Luna
-    expect(icons[3].colorFilter, isNotNull); // Cancella
+    expect(
+      icons[3].colorFilter,
+      const ColorFilter.mode(HonooColor.onBackground, BlendMode.srcIn),
+    ); // Cancella
+    expect(
+      (icons[3].bytesLoader as SvgAssetLoader).assetName,
+      'assets/Cestino.svg',
+    );
   });
 
   testWidgets('anche Vedi risposte resta bianca', (tester) async {
@@ -116,15 +123,17 @@ void main() {
       item: honooItem(HonooType.personal, hasReplies: true),
     );
 
-    final icons =
-        tester.widgetList<SvgPicture>(find.byType(SvgPicture)).toList();
+    final icons = tester
+        .widgetList<SvgPicture>(find.byType(SvgPicture))
+        .toList();
     expect(find.byTooltip('Vedi risposte'), findsOneWidget);
     expect(icons, hasLength(4));
     expect(icons.every((icon) => icon.colorFilter != null), isTrue);
   });
 
-  testWidgets('Honoo personale mostra Luna e Cancella e inoltra le azioni',
-      (tester) async {
+  testWidgets('Honoo personale mostra Luna e Cancella e inoltra le azioni', (
+    tester,
+  ) async {
     var sent = false;
     var deleted = false;
     await pumpFooter(
@@ -143,8 +152,9 @@ void main() {
     expect(deleted, isTrue);
   });
 
-  testWidgets('Hinoo personale mostra Luna e Cancella e inoltra le azioni',
-      (tester) async {
+  testWidgets('Hinoo personale mostra Luna e Cancella e inoltra le azioni', (
+    tester,
+  ) async {
     var sent = false;
     var deleted = false;
     await pumpFooter(
@@ -161,8 +171,9 @@ void main() {
     expect(deleted, isTrue);
   });
 
-  testWidgets('Honoo già sulla Luna non mostra una seconda azione Luna',
-      (tester) async {
+  testWidgets('Honoo già sulla Luna non mostra una seconda azione Luna', (
+    tester,
+  ) async {
     await pumpFooter(
       tester,
       item: honooItem(HonooType.personal, isOnMoon: true),
@@ -195,16 +206,18 @@ void main() {
     },
   );
 
-  testWidgets('Hinoo già sulla Luna non mostra una seconda azione Luna',
-      (tester) async {
+  testWidgets('Hinoo già sulla Luna non mostra una seconda azione Luna', (
+    tester,
+  ) async {
     await pumpFooter(tester, item: hinooItem(isOnMoon: true));
 
     expect(find.byTooltip('Spedisci sulla Luna'), findsNothing);
     expect(find.byTooltip('Cancella'), findsOneWidget);
   });
 
-  testWidgets('contenuto ricevuto mostra solo Home, Info e Cancella',
-      (tester) async {
+  testWidgets('contenuto ricevuto mostra solo Home, Info e Cancella', (
+    tester,
+  ) async {
     await pumpFooter(tester, item: honooItem(HonooType.answer));
 
     expect(find.byType(IconButton), findsNWidgets(3));

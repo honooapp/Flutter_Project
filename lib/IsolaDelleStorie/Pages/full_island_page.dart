@@ -69,7 +69,15 @@ class _FullIslandPageState extends State<FullIslandPage> {
             child: Visibility(
               visible: infoVisible,
               child: IconButton(
-                icon: const Icon(Icons.close, color: HonooColor.onBackground),
+                icon: SvgPicture.asset(
+                  'assets/icons/cancella.svg',
+                  width: 40,
+                  height: 40,
+                  colorFilter: const ColorFilter.mode(
+                    HonooColor.onBackground,
+                    BlendMode.srcIn,
+                  ),
+                ),
                 iconSize: 40,
                 tooltip: 'Chiudi',
                 onPressed: () {

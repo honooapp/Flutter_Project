@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:honoo/Controller/device_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
@@ -18,6 +19,7 @@ import 'viaggi_isola_page.dart';
 import 'laboratori_siae_page.dart';
 import 'podcast_dirette_page.dart';
 import 'libri_page.dart';
+import 'regia_agenti_page.dart';
 
 class PlaceholderPage extends StatefulWidget {
   const PlaceholderPage({super.key});
@@ -48,6 +50,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   static const double _honooBottomSpacing = 15;
   static const double _libriTopSpacing = 5;
   static const double _libriBottomSpacing = 30;
+  static const double _regiaAgentiTopSpacing = 5;
+  static const double _regiaAgentiBottomSpacing = 30;
   static const Color _linkIconColor = Color.fromRGBO(183, 183, 206, 1);
 
   List<Widget> _iconBlockWithSpacing(
@@ -80,6 +84,30 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
       GestureDetector(
         onTap: onTap,
         child: Icon(icon, size: size, color: color ?? HonooColor.onBackground),
+      ),
+      if (bottomSpacing > 0) SizedBox(height: bottomSpacing),
+    ];
+  }
+
+  List<Widget> _svgIconBlockWithSpacing(
+    String asset,
+    double size, {
+    double topSpacing = 0,
+    double bottomSpacing = 0,
+    VoidCallback? onTap,
+  }) {
+    return [
+      if (topSpacing > 0) SizedBox(height: topSpacing),
+      GestureDetector(
+        onTap: onTap,
+        child: SvgPicture.asset(
+          asset,
+          height: size,
+          colorFilter: const ColorFilter.mode(
+            HonooColor.onBackground,
+            BlendMode.srcIn,
+          ),
+        ),
       ),
       if (bottomSpacing > 0) SizedBox(height: bottomSpacing),
     ];
@@ -162,6 +190,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     const String viaggiLine = "viaggi sull'Isola delle Storie";
     const String podcastLine = 'podcast e dirette';
     const String libriLine = 'libri';
+    const String regiaAgentiLine = 'Regia degli Agenti';
     const String venceslaoLine = 'Venceslao Cembalo';
     final String text1First = Utility().text1First;
     const String performanceMarker = 'che ci siamo visti\n\n';
@@ -370,6 +399,28 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           Navigator.of(
             context,
           ).push(MaterialPageRoute(builder: (_) => const ViaggiIsolaPage()));
+        },
+      ),
+      _linkTextBlock(
+        context,
+        regiaAgentiLine,
+        baseTextStyle,
+        height: 0.9,
+        onTap: () {
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const RegiaAgentiPage()));
+        },
+      ),
+      ..._svgIconBlockWithSpacing(
+        'assets/icons/ai.svg',
+        inlineIconHeight,
+        topSpacing: _regiaAgentiTopSpacing,
+        bottomSpacing: _regiaAgentiBottomSpacing,
+        onTap: () {
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const RegiaAgentiPage()));
         },
       ),
       _linkTextBlock(

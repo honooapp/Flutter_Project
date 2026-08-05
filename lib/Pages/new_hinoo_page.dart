@@ -631,7 +631,15 @@ class _NewHinooPageState extends State<NewHinooPage>
                     padding: EdgeInsets.zero,
                     iconSize: secondaryActionIconSize,
                     color: HonooColor.onBackground,
-                    icon: const Icon(Icons.delete_outline),
+                    icon: SvgPicture.asset(
+                      'assets/Cestino.svg',
+                      width: secondaryActionIconSize,
+                      height: secondaryActionIconSize,
+                      colorFilter: const ColorFilter.mode(
+                        HonooColor.onBackground,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                   ),
                 ),
               ),

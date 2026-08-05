@@ -22,10 +22,12 @@ class PendingHinooPage extends StatelessWidget {
           final double viewH = constraints.maxHeight;
           final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
           final layoutMode = ResponsiveLayout.modeForWidth(viewW);
-          final double footerIconSize =
-              ResponsiveLayout.footerIconSizeForMode(layoutMode);
-          final double footerGap =
-              ResponsiveLayout.footerGapForMode(layoutMode);
+          final double footerIconSize = ResponsiveLayout.footerIconSizeForMode(
+            layoutMode,
+          );
+          final double footerGap = ResponsiveLayout.footerGapForMode(
+            layoutMode,
+          );
           final double footerBottomPadding =
               ResponsiveLayout.footerBottomPaddingForMode(layoutMode);
           final double footerSpacing = footerBottomPadding + safeBottom;
@@ -35,8 +37,10 @@ class PendingHinooPage extends StatelessWidget {
           final double targetMaxW = viewW;
           final double footerReserved =
               footerIconSize + footerTopSpacing + footerBottomSpacing;
-          final double availableH =
-              (viewH - headerH - footerReserved).clamp(0.0, double.infinity);
+          final double availableH = (viewH - headerH - footerReserved).clamp(
+            0.0,
+            double.infinity,
+          );
 
           return Column(
             children: [
@@ -73,6 +77,10 @@ class PendingHinooPage extends StatelessWidget {
                     asset: "assets/icons/cancella.svg",
                     semanticsLabel: 'Annulla',
                     size: footerIconSize,
+                    colorFilter: const ColorFilter.mode(
+                      HonooColor.onBackground,
+                      BlendMode.srcIn,
+                    ),
                     splashRadius: 25,
                     tooltip: 'Non ora',
                     onPressed: () => Navigator.of(context).pop(false),
