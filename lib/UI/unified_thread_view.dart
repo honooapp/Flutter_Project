@@ -354,14 +354,16 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
     bool showAsOwnedContent = false,
   }) {
     final GlobalKey repaintKey = GlobalKey();
-    final style = showAsOwnedContent
+    final conversationStyle = ChestContentStyle.forConversationEntry(
+      entry,
+      viewerUserId:
+          widget.currentUserId ?? SupabaseProvider.client.auth.currentUser?.id,
+    );
+    final style =
+        showAsOwnedContent &&
+            !identical(conversationStyle, ChestContentStyle.receivedReply)
         ? ChestContentStyle.own
-        : ChestContentStyle.forEntry(
-            entry,
-            viewerUserId:
-                widget.currentUserId ??
-                SupabaseProvider.client.auth.currentUser?.id,
-          );
+        : conversationStyle;
     final Widget card;
     switch (entry.kind) {
       case ConversationEntryKind.honoo:
@@ -370,7 +372,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
           child: HonooCard(
             honoo: entry.honoo!,
             viewerUserId: widget.currentUserId,
-            contentStyleOverride: showAsOwnedContent ? style : null,
+            contentStyleOverride: style,
             onDownloadTap: () => _downloadFromBoundary(
               repaintKey: repaintKey,
               baseName: 'honoo',
@@ -388,9 +390,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
             isReply: entry.hinoo!.type == HinooType.answer,
             authorId: entry.ownerId,
             viewerUserId: widget.currentUserId,
-            gapColor: showAsOwnedContent
-                ? ChestContentStyle.own.backgroundColor
-                : HonooColor.background,
+            gapColor: style.backgroundColor,
             onDownloadTap: () => _downloadFromBoundary(
               repaintKey: repaintKey,
               baseName: 'hinoo',

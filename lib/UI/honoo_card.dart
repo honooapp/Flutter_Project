@@ -73,7 +73,9 @@ class HonooCard extends StatelessWidget {
 
         const double cornerRadius = 5;
 
-        final Color gapColor = cardBg;
+        final Color gapColor = honoo.type == HonooType.moon
+            ? HonooColor.tertiary
+            : cardBg;
 
         final Widget content = Card(
           color: cardBg,

@@ -116,7 +116,7 @@ void main() {
     expect(editButton.iconSize, replaceButton.iconSize);
     expect(
       (replaceIcon.bytesLoader as SvgAssetLoader).assetName,
-      'assets/icons/immagine.svg',
+      'assets/icons/sostituisci immagine.svg',
     );
     expect(
       (editIcon.bytesLoader as SvgAssetLoader).assetName,
