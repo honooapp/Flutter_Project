@@ -25,6 +25,14 @@ void main() {
     expect(find.byType(SingleChildScrollView), findsOneWidget);
     expect(find.textContaining('Questo è il tuo Scrigno'), findsOneWidget);
     expect(chestInfoText, isNot(contains('.')));
+    expect(chestInfoText, contains('Bianchi\n'));
+    expect(chestInfoText, contains('Rossi\n'));
+    expect(chestInfoText, contains('Sopra\nla tua risposta'));
+    expect(chestInfoText, contains('E, sopra ancora,'));
+    expect(chestInfoText, isNot(contains('Bianco\n')));
+    expect(chestInfoText, isNot(contains('Rosso\n')));
+    expect(chestInfoText, isNot(contains('Sotto\n')));
+    expect(chestInfoText, isNot(contains('sotto ancora')));
     expect(find.text(BuildMetadata.displayLabel), findsNothing);
     expect(find.byTooltip('Chiudi'), findsOneWidget);
     final closeIcon = tester.widget<SvgPicture>(
