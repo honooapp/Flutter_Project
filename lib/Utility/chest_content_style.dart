@@ -77,8 +77,10 @@ class ChestContentStyle {
     }
   }
 
-  /// Nella conversazione un contenuto proveniente dalla Luna identifica
-  /// sempre il contenuto dell'altro autore, anche per i salvataggi storici.
+  /// Nella conversazione ogni contenuto dell'altro autore è rosso.
+  ///
+  /// Un contenuto salvato dalla Luna resta attribuito all'autore originale
+  /// anche quando la copia nello Scrigno è posseduta dall'utente corrente.
   static ChestContentStyle forConversationEntry(
     ConversationEntry entry, {
     String? viewerUserId,
@@ -95,6 +97,10 @@ class ChestContentStyle {
       ConversationEntryKind.deleted => false,
     };
     if (isFromMoon) return receivedReply;
+    final ownerId = entry.ownerId;
+    if (viewerUserId != null && ownerId != null && ownerId != viewerUserId) {
+      return receivedReply;
+    }
     return forEntry(entry, viewerUserId: viewerUserId);
   }
 

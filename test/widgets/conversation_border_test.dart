@@ -201,6 +201,30 @@ void main() {
     );
   });
 
+  test('Honoo personale altrui diventa rosso nella conversazione', () {
+    final value = honoo(type: HonooType.personal, owner: 'other_user');
+
+    expect(
+      ChestContentStyle.forConversationEntry(
+        ConversationEntry.honoo(value),
+        viewerUserId: 'test_user',
+      ),
+      same(ChestContentStyle.receivedReply),
+    );
+  });
+
+  test('Honoo personale proprio resta blu nella conversazione', () {
+    final value = honoo(type: HonooType.personal, owner: 'test_user');
+
+    expect(
+      ChestContentStyle.forConversationEntry(
+        ConversationEntry.honoo(value),
+        viewerUserId: 'test_user',
+      ),
+      same(ChestContentStyle.own),
+    );
+  });
+
   testWidgets('Hinoo di risposta proprio non ha cornice', (tester) async {
     final draft = hinoo(fromMoon: true);
     await pumpHinoo(tester, draft: draft, isReply: true, authorId: 'test_user');
