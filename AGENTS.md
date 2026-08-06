@@ -12,7 +12,7 @@ Essentials for developing and maintaining **honoo** with the current architectur
 | Targets         | Web (primary), Android/iOS/Desktop supported via Flutter scaffolding    |
 | Backend         | Supabase (PostgreSQL + Auth + Storage)                                  |
 | Design Language | Typography via Google Fonts (Lora), extensive SVG assets               |
-| Git Branches    | `main` (source), `gh-pages` (built site), feature branches as needed    |
+| Git Branches    | `main` (source), feature branches as needed                             |
 
 ---
 
@@ -122,10 +122,10 @@ Golden tests rely on `test/test_config.dart` (fixes DPI). If fonts cause 400s, p
   - Workflow: `.github/workflows/deploy-gh-pages.yml`.
   - Trigger: manual dispatch only, with `DEPLOY` confirmation and a commit reachable from `main`.
   - Optional database migration gate runs before the web build; publishing starts only after it succeeds.
-  - Steps: validate release → optional Supabase migrations → Flutter web release build → add `CNAME` (`honoo.it`) → deploy via `peaceiris/actions-gh-pages`.
-  - Environment: `production`, with required reviewers recommended.
+  - Steps: validate release → optional Supabase migrations → Flutter web release build → upload native Pages artifact → deploy via `actions/deploy-pages`.
+  - Environments: `production` for migrations and `github-pages` for the native Pages deployment; required reviewers are recommended.
   - Secrets needed for every release: `PROD_SUPABASE_URL`, `PROD_SUPABASE_ANON_KEY`. Migration releases also need `SUPABASE_ACCESS_TOKEN`, `PROD_SUPABASE_PROJECT_REF`, `PROD_SUPABASE_DB_PASSWORD`.
-* For manual builds, `build/web` mirrors what peanut produced previously. Keep the base href at `/` because `gh-pages` has a `CNAME`.
+* For manual builds, `build/web` mirrors the artifact uploaded to GitHub Pages. Keep the base href at `/` and include the `CNAME` for `honoo.it`.
 * Ensure DNS for `honoo.it` points the apex to GitHub Pages IPs.
 
 ---
@@ -137,7 +137,7 @@ Golden tests rely on `test/test_config.dart` (fixes DPI). If fonts cause 400s, p
   - Jobs: analysis + staging read-only suite, optional CRUD (manual).
 * **Deploy to Pages (`deploy-gh-pages.yml`)**
   - Manual only; validates the selected `main` commit and gates build/deploy on optional production migrations.
-  - Produces the `gh-pages` build.
+  - Publishes `build/web` through the native GitHub Pages artifact and deployment actions; it does not write a `gh-pages` branch.
 * **Live Supabase E2E (`live-supabase-e2e.yml`)**
   - Scheduled daily and manually dispatchable against staging.
   - Always checks conversation CRUD, RLS and Realtime; the browser UI flow is opt-in on manual runs.
