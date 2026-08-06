@@ -138,8 +138,7 @@ class ChestFooter extends StatelessWidget {
       entry != null &&
       entry.kind != ConversationEntryKind.deleted &&
       entry.id != null &&
-      entry.id!.isNotEmpty &&
-      (entry.ownerId != currentUserId || entry.isFromMoonSaved);
+      entry.id!.isNotEmpty;
 
   void _addHinooActions(
     List<ResponsiveFooterAction> actions,
