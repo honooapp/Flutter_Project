@@ -7,17 +7,15 @@ import 'package:honoo/IsolaDelleStorie/Controller/exercise_controller.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/exercise_page.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/full_island_page.dart';
 import 'package:honoo/IsolaDelleStorie/Utility/isola_delle_storie_content_manager.dart';
-import 'package:honoo/Pages/chest_page.dart';
 import 'package:honoo/Utility/formatted_text.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
-import 'package:honoo/Widgets/composer_onboarding.dart';
+import 'package:honoo/Widgets/island_toolbar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../Controller/device_controller.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../Pages/moon_page.dart';
-import '../../Pages/home_page.dart';
 import '../../Pages/placeholder_page.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
 
@@ -477,162 +475,8 @@ class _IslandPageState extends State<IslandPage> {
                     ),
                   ),
 
-                  // Footer (onde + icone)
-                  SizedBox(
-                    height: 80,
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final double w = constraints.maxWidth;
-
-                        const double bottleSize = 70;
-                        const double chestSize = 70;
-                        const double homeSize = 40;
-                        const double logoSize = 70;
-                        const double iconButtonPadding = 16;
-
-                        final double bottleTargetX = (w / 2) + 60;
-                        final double chestCenterX = (w / 2) - (chestSize / 2);
-                        final double homeTargetX = (w / 2) - 190;
-                        final double logoTargetX = (w / 2) + 110;
-
-                        double clampX(double x, double size) =>
-                            x.clamp(0.0, (w - size)).toDouble();
-
-                        final double bottleX = clampX(
-                          bottleTargetX,
-                          bottleSize + iconButtonPadding,
-                        );
-                        final double chestX = clampX(
-                          chestCenterX,
-                          chestSize + iconButtonPadding,
-                        );
-                        final double homeX = clampX(
-                          homeTargetX,
-                          homeSize + iconButtonPadding,
-                        );
-                        final double logoX = clampX(
-                          logoTargetX,
-                          logoSize + iconButtonPadding,
-                        );
-
-                        return Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Positioned(
-                              bottom: 50,
-                              left: 0,
-                              right: 0,
-                              child: SizedBox(
-                                height: 10,
-                                child: Container(color: HonooColor.wave1),
-                              ),
-                            ),
-                            Positioned(
-                              key: const Key('island_footer_bottle'),
-                              bottom: 27,
-                              left: bottleX,
-                              child: IconButton(
-                                icon: SvgPicture.asset(
-                                  "assets/icons/bottle.svg",
-                                  semanticsLabel: 'Bottle',
-                                ),
-                                iconSize: bottleSize,
-                                splashRadius: 40,
-                                tooltip: 'Scrivi',
-                                onPressed: () => ComposerLauncher.open(context),
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 30,
-                              left: 0,
-                              right: 0,
-                              child: IgnorePointer(
-                                child: SizedBox(
-                                  height: 20,
-                                  child: Container(color: HonooColor.wave2),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: IgnorePointer(
-                                child: SizedBox(
-                                  height: 30,
-                                  child: Container(color: HonooColor.wave3),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              left: homeX,
-                              child: IconButton(
-                                icon: SvgPicture.asset(
-                                  "assets/icons/home.svg",
-                                  colorFilter: const ColorFilter.mode(
-                                    HonooColor.onBackground,
-                                    BlendMode.srcIn,
-                                  ),
-                                  width: homeSize,
-                                  height: homeSize,
-                                  semanticsLabel: 'Home',
-                                ),
-                                iconSize: homeSize,
-                                splashRadius: 1,
-                                tooltip: 'Home',
-                                onPressed: () {
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                      builder: (_) => const HomePage(),
-                                    ),
-                                    (route) => false,
-                                  );
-                                },
-                              ),
-                            ),
-                            Positioned(
-                              key: const Key('island_footer_chest'),
-                              bottom: -7,
-                              left: chestX,
-                              child: IconButton(
-                                icon: SvgPicture.asset(
-                                  "assets/icons/chest.svg",
-                                  semanticsLabel: 'Chest',
-                                ),
-                                iconSize: chestSize,
-                                splashRadius: 40,
-                                tooltip: 'Apri il tuo Cuore',
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const ChestPage(),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            Positioned(
-                              key: const Key('island_footer_info'),
-                              bottom: -5,
-                              left: logoX,
-                              child: IconButton(
-                                icon: SvgPicture.asset(
-                                  "assets/icons/info.svg",
-                                  semanticsLabel: 'Info',
-                                ),
-                                iconSize: logoSize,
-                                splashRadius: 30,
-                                tooltip: 'Info',
-                                onPressed: () =>
-                                    setState(() => infoVisible = !infoVisible),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
+                  IslandToolbar(
+                    onInfo: () => setState(() => infoVisible = !infoVisible),
                   ),
                 ],
               ),
