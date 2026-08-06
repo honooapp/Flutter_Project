@@ -118,6 +118,60 @@
       );
     </script>
     <noscript>Per usare honoo è necessario abilitare JavaScript.</noscript>
-    <script src="flutter_bootstrap.js" async></script>
+    <script>
+      // Temporary migration cleanup for clients that still have the legacy
+      // Flutter service worker. Remove this block after old installations have
+      // had enough time to receive the cleanup release.
+      (() => {
+        const reloadGuard = 'honoo.legacy_service_worker_cleanup_reloaded.v1';
+        let flutterStarted = false;
+
+        const startFlutter = () => {
+          if (flutterStarted) return;
+          flutterStarted = true;
+
+          const script = document.createElement('script');
+          script.src = 'flutter_bootstrap.js';
+          script.async = true;
+          document.body.appendChild(script);
+        };
+
+        const cleanupLegacyFlutterWorker = async () => {
+          let shouldReload = false;
+
+          if ('serviceWorker' in navigator) {
+            const registrations =
+                await navigator.serviceWorker.getRegistrations();
+            shouldReload = registrations.length > 0 ||
+                navigator.serviceWorker.controller !== null;
+            await Promise.allSettled(
+              registrations.map((registration) => registration.unregister()),
+            );
+          }
+
+          if ('caches' in window) {
+            const cacheNames = await caches.keys();
+            shouldReload = shouldReload || cacheNames.length > 0;
+            await Promise.allSettled(
+              cacheNames.map((cacheName) => caches.delete(cacheName)),
+            );
+          }
+
+          if (shouldReload && sessionStorage.getItem(reloadGuard) !== 'true') {
+            sessionStorage.setItem(reloadGuard, 'true');
+            window.location.reload();
+            return;
+          }
+
+          sessionStorage.removeItem(reloadGuard);
+          startFlutter();
+        };
+
+        cleanupLegacyFlutterWorker().catch((error) => {
+          console.warn('Legacy service worker cleanup failed.', error);
+          startFlutter();
+        });
+      })();
+    </script>
   </body>
 </html>
