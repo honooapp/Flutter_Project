@@ -124,6 +124,7 @@ Golden tests rely on `test/test_config.dart` (fixes DPI). If fonts cause 400s, p
   - Optional database migration gate runs before the web build; publishing starts only after it succeeds.
   - Steps: validate release → optional Supabase migrations → Flutter web release build → upload native Pages artifact → deploy via `actions/deploy-pages`.
   - Environments: `production` for migrations and `github-pages` for the native Pages deployment; required reviewers are recommended.
+  - Repository setting: **Settings → Pages → Build and deployment → Source** must be set to **GitHub Actions** once after migration from branch publishing.
   - Secrets needed for every release: `PROD_SUPABASE_URL`, `PROD_SUPABASE_ANON_KEY`. Migration releases also need `SUPABASE_ACCESS_TOKEN`, `PROD_SUPABASE_PROJECT_REF`, `PROD_SUPABASE_DB_PASSWORD`.
 * For manual builds, `build/web` mirrors the artifact uploaded to GitHub Pages. Keep the base href at `/` and include the `CNAME` for `honoo.it`.
 * Ensure DNS for `honoo.it` points the apex to GitHub Pages IPs.
