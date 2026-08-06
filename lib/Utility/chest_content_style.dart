@@ -77,6 +77,27 @@ class ChestContentStyle {
     }
   }
 
+  /// Nella conversazione un contenuto proveniente dalla Luna identifica
+  /// sempre il contenuto dell'altro autore, anche per i salvataggi storici.
+  static ChestContentStyle forConversationEntry(
+    ConversationEntry entry, {
+    String? viewerUserId,
+  }) {
+    final isFromMoon = switch (entry.kind) {
+      ConversationEntryKind.honoo =>
+        entry.isFromMoonSaved ||
+            entry.honoo!.isFromMoonSaved ||
+            entry.honoo!.type == HonooType.moon,
+      ConversationEntryKind.hinoo =>
+        entry.isFromMoonSaved ||
+            entry.hinoo!.isFromMoonSaved ||
+            entry.hinoo!.type == HinooType.moon,
+      ConversationEntryKind.deleted => false,
+    };
+    if (isFromMoon) return receivedReply;
+    return forEntry(entry, viewerUserId: viewerUserId);
+  }
+
   static ChestContentStyle forItem(ChestItem item, {String? viewerUserId}) {
     return item.when(
       honoo: (honoo) => forHonoo(honoo, viewerUserId: viewerUserId),

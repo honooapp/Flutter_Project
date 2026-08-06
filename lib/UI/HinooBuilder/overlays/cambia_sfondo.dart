@@ -192,7 +192,7 @@ class CambiaSfondoOverlay extends StatelessWidget {
                         ),
                       ),
                       icon: SvgPicture.asset(
-                        'assets/icons/immagine.svg',
+                        'assets/icons/sostituisci immagine.svg',
                         width: 24,
                         height: 24,
                         colorFilter: const ColorFilter.mode(

@@ -118,7 +118,7 @@ void main() {
     );
     expect(
       (replaceIcon.bytesLoader as SvgAssetLoader).assetName,
-      'assets/icons/immagine.svg',
+      'assets/icons/sostituisci immagine.svg',
     );
     expect(
       tester.getCenter(replaceImage).dx,

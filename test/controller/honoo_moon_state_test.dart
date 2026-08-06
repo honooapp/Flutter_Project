@@ -19,6 +19,10 @@ void main() {
 
   test('loadChest marca un honoo con la stessa copia già sulla Luna',
       () async {
+    final hiddenConversations = harness.stubTable(
+      'chest_hidden_conversations',
+    );
+    hiddenConversations.queueResponse(const []);
     final honoo = harness.stubTable('honoo');
     honoo.queueResponse([
       {

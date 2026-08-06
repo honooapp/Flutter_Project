@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Entities/honoo.dart';
+import 'package:honoo/Entities/conversation_entry.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
 import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
@@ -170,6 +171,34 @@ void main() {
     );
     expect(borderWithColor(Colors.white), findsNothing);
     expect(borderWithColor(HonooColor.secondary), findsNothing);
+  });
+
+  test('Honoo salvato dalla Luna diventa rosso nella conversazione', () {
+    final value = honoo(
+      type: HonooType.personal,
+      owner: 'test_user',
+      fromMoon: true,
+    );
+
+    expect(
+      ChestContentStyle.forConversationEntry(
+        ConversationEntry.honoo(value),
+        viewerUserId: 'test_user',
+      ),
+      same(ChestContentStyle.receivedReply),
+    );
+  });
+
+  test('Honoo Luna storico diventa rosso nella conversazione', () {
+    final value = honoo(type: HonooType.moon, owner: 'other_user');
+
+    expect(
+      ChestContentStyle.forConversationEntry(
+        ConversationEntry.honoo(value),
+        viewerUserId: 'test_user',
+      ),
+      same(ChestContentStyle.receivedReply),
+    );
   });
 
   testWidgets('Hinoo di risposta proprio non ha cornice', (tester) async {

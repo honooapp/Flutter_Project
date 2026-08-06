@@ -50,6 +50,17 @@ class HonooService {
   /// Radici personali e risposte inviate o ricevute che devono comparire
   /// come un solo accesso persistente alla conversazione nello Scrigno.
   static Future<List<Honoo>> fetchUserChestHonoo(String userId) async {
+    final hiddenResponse = await _reliability.read(
+      () async => await _client
+          .from('chest_hidden_conversations')
+          .select('conversation_id')
+          .eq('user_id', userId),
+    );
+    final hiddenConversationIds = (hiddenResponse as List)
+        .map((row) => row['conversation_id']?.toString())
+        .whereType<String>()
+        .where((id) => id.isNotEmpty)
+        .toSet();
     final response = await _reliability.read(
       () async => await _client
           .from('honoo')
@@ -60,7 +71,15 @@ class HonooService {
           )
           .order('created_at', ascending: false),
     );
-    return (response as List).map((e) => Honoo.fromMap(e)).toList();
+    return (response as List)
+        .map((e) => Honoo.fromMap(e))
+        .where(
+          (honoo) =>
+              !hiddenConversationIds.contains(honoo.dbId) &&
+              !hiddenConversationIds.contains(honoo.conversationId) &&
+              !hiddenConversationIds.contains(honoo.replyTo),
+        )
+        .toList();
   }
 
   /// Tutte le reply indirizzate a recipientTag (se usi i tag poetici)

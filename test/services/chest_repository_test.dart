@@ -9,11 +9,13 @@ void main() {
 
   late SupabaseTestHarness harness;
   late MockQueryChain hinoo;
+  late MockQueryChain hiddenConversations;
   late ChestRepository repository;
 
   setUp(() {
     harness = SupabaseTestHarness(withAuthenticatedUser: true);
     hinoo = harness.stubTable('hinoo');
+    hiddenConversations = harness.stubTable('chest_hidden_conversations');
     repository = ChestRepository(client: harness.client);
   });
 
@@ -23,6 +25,7 @@ void main() {
     final rows = <Map<String, dynamic>>[
       {'id': 'h-1', 'pages': <dynamic>[]},
     ];
+    hiddenConversations.queueResponse(<Map<String, dynamic>>[]);
     hinoo.queueResponse(rows);
 
     final result = await repository.fetchHinooRows('user-1');
@@ -35,6 +38,57 @@ void main() {
       ),
     ).called(1);
     verify(() => hinoo.order('created_at', ascending: false)).called(1);
+  });
+
+  test('fetchHinooRows non ripristina conversazioni eliminate', () async {
+    hiddenConversations.queueResponse([
+      {'conversation_id': 'conversation-hidden'},
+    ]);
+    hinoo.queueResponse([
+      {'id': 'h-1', 'conversation_id': 'conversation-hidden'},
+      {'id': 'h-2', 'conversation_id': 'conversation-visible'},
+    ]);
+
+    final result = await repository.fetchHinooRows('user-1');
+
+    expect(result, [
+      {'id': 'h-2', 'conversation_id': 'conversation-visible'},
+    ]);
+  });
+
+  test(
+    'fetchHinooRows nasconde anche la radice senza conversation id',
+    () async {
+      hiddenConversations.queueResponse([
+        {'conversation_id': 'root-hidden'},
+      ]);
+      hinoo.queueResponse([
+        {'id': 'root-hidden'},
+        {'id': 'root-visible'},
+      ]);
+
+      final result = await repository.fetchHinooRows('user-1');
+
+      expect(result, [
+        {'id': 'root-visible'},
+      ]);
+    },
+  );
+
+  test('hideConversation salva una rimozione persistente per utente', () async {
+    hiddenConversations.queueResponse(<String, dynamic>{});
+
+    await repository.hideConversation(
+      userId: 'user-1',
+      conversationId: 'conversation-1',
+    );
+
+    verify(
+      () => hiddenConversations.upsert({
+        'user_id': 'user-1',
+        'conversation_id': 'conversation-1',
+      }),
+    ).called(1);
   });
 
   test(

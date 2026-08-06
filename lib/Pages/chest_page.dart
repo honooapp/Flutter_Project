@@ -468,6 +468,41 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
     hinoo: (row) => row.conversationId ?? row.draft.conversationId,
   );
 
+  String? _conversationIdForDeletion(ChestItem item) {
+    final explicitId = _convIdOfItem(item);
+    if (explicitId != null && explicitId.isNotEmpty) return explicitId;
+    return item.when(
+      honoo: (honoo) => honoo.hasReplies ? honoo.dbId : null,
+      hinoo: (hinoo) {
+        final id = hinoo.id;
+        final hasActivity =
+            _honooLatestReplies.containsKey(id) ||
+            _hinooLatestReplies.containsKey(id);
+        return hasActivity ? id : null;
+      },
+    );
+  }
+
+  Future<bool> _hideConversationIfPresent(ChestItem item) async {
+    final conversationId = _conversationIdForDeletion(item);
+    final userId = SupabaseProvider.client.auth.currentUser?.id;
+    if (conversationId == null || userId == null) return false;
+    await _chestRepository.hideConversation(
+      userId: userId,
+      conversationId: conversationId,
+    );
+    if (mounted) {
+      setState(() {
+        _activeConversationId = null;
+        _selectedConvEntry = null;
+        _detachedConversationVisible = false;
+        _lastRebuildSignature = null;
+      });
+    }
+    await _reconcileAll();
+    return true;
+  }
+
   // ignore: unused_element
   void _exitConversation() {
     setState(() {
@@ -551,6 +586,16 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
     }
     setState(() => _isMutating = true);
     try {
+      if (await _hideConversationIfPresent(
+        ChestItem.honoo(
+          honoo,
+          DateTime.tryParse(honoo.createdAt) ?? DateTime(1970),
+        ),
+      )) {
+        if (!mounted) return;
+        showHonooToast(context, message: 'Conversazione eliminata.');
+        return;
+      }
       await ctrl.deleteHonooById(id);
       if (!mounted) return;
       showHonooToast(context, message: 'honoo eliminato.');
@@ -624,6 +669,11 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
     if (_isMutating) return;
     setState(() => _isMutating = true);
     try {
+      if (await _hideConversationIfPresent(ChestItem.hinoo(current))) {
+        if (!mounted) return;
+        showHonooToast(context, message: 'Conversazione eliminata.');
+        return;
+      }
       await _chestRepository.deleteHinoo(current.id);
 
       if (!mounted) return;
@@ -1038,7 +1088,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
             : items[_currentIndex.clamp(0, items.length - 1)];
         final currentUserId = SupabaseProvider.client.auth.currentUser?.id;
         final pageStyle = _selectedConvEntry != null
-            ? ChestContentStyle.forEntry(
+            ? ChestContentStyle.forConversationEntry(
                 _selectedConvEntry!,
                 viewerUserId: currentUserId,
               )

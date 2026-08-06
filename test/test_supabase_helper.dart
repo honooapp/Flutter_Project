@@ -93,6 +93,7 @@ class SupabaseTestHarness {
     when(() => client.from(table)).thenAnswer((_) => chain);
     when(() => chain.select(any())).thenAnswer((_) => chain);
     when(() => chain.insert(any())).thenAnswer((_) => chain);
+    when(() => chain.upsert(any())).thenAnswer((_) => chain);
     when(() => chain.eq(any(), any())).thenAnswer((_) => chain);
     when(() => chain.neq(any(), any())).thenAnswer((_) => chain);
     when(() => chain.gt(any(), any())).thenAnswer((_) => chain);

@@ -35,6 +35,7 @@ class _MockSupabaseClient extends Mock implements SupabaseClient {}
 void main() {
   late _MockSupabaseClient client;
   late _MockQueryChain chain;
+  late _MockQueryChain hiddenConversations;
 
   setUpAll(() {
     registerFallbackValue(<String, dynamic>{});
@@ -43,9 +44,13 @@ void main() {
   setUp(() {
     client = _MockSupabaseClient();
     chain = _MockQueryChain();
+    hiddenConversations = _MockQueryChain();
 
     HonooService.$setTestClient(client);
     when(() => client.from('honoo')).thenAnswer((_) => chain);
+    when(
+      () => client.from('chest_hidden_conversations'),
+    ).thenAnswer((_) => hiddenConversations);
 
     when(() => chain.select(any())).thenAnswer((_) => chain);
     when(() => chain.insert(any())).thenAnswer((_) => chain);
@@ -56,6 +61,12 @@ void main() {
     when(
       () => chain.order(any(), ascending: any(named: 'ascending')),
     ).thenAnswer((_) => chain);
+    when(
+      () => hiddenConversations.select(any()),
+    ).thenAnswer((_) => hiddenConversations);
+    when(
+      () => hiddenConversations.eq(any(), any()),
+    ).thenAnswer((_) => hiddenConversations);
   });
 
   tearDown(() {
@@ -114,6 +125,7 @@ void main() {
   test(
     'fetchUserChestHonoo include risposte ricevute oltre ai contenuti propri',
     () async {
+      hiddenConversations.queueResponse(<Map<String, dynamic>>[]);
       chain.queueResponse(<Map<String, dynamic>>[]);
 
       await HonooService.fetchUserChestHonoo('user-1');
@@ -125,6 +137,71 @@ void main() {
         ),
       ).called(1);
       verify(() => chain.order('created_at', ascending: false)).called(1);
+    },
+  );
+
+  test('fetchUserChestHonoo esclude conversazioni eliminate', () async {
+    hiddenConversations.queueResponse([
+      {'conversation_id': 'conversation-hidden'},
+    ]);
+    chain.queueResponse([
+      {
+        'id': 'hidden',
+        'text': 'nascosto',
+        'image_url': '',
+        'created_at': '2026-08-06T10:00:00Z',
+        'updated_at': '2026-08-06T10:00:00Z',
+        'user_id': 'user-1',
+        'destination': 'reply',
+        'conversation_id': 'conversation-hidden',
+      },
+      {
+        'id': 'visible',
+        'text': 'visibile',
+        'image_url': '',
+        'created_at': '2026-08-06T11:00:00Z',
+        'updated_at': '2026-08-06T11:00:00Z',
+        'user_id': 'user-1',
+        'destination': 'chest',
+        'conversation_id': 'conversation-visible',
+      },
+    ]);
+
+    final result = await HonooService.fetchUserChestHonoo('user-1');
+
+    expect(result.map((honoo) => honoo.dbId), ['visible']);
+  });
+
+  test(
+    'fetchUserChestHonoo nasconde anche la radice senza conversation id',
+    () async {
+      hiddenConversations.queueResponse([
+        {'conversation_id': 'root-hidden'},
+      ]);
+      chain.queueResponse([
+        {
+          'id': 'root-hidden',
+          'text': 'nascosto',
+          'image_url': '',
+          'created_at': '2026-08-06T10:00:00Z',
+          'updated_at': '2026-08-06T10:00:00Z',
+          'user_id': 'user-1',
+          'destination': 'chest',
+        },
+        {
+          'id': 'root-visible',
+          'text': 'visibile',
+          'image_url': '',
+          'created_at': '2026-08-06T11:00:00Z',
+          'updated_at': '2026-08-06T11:00:00Z',
+          'user_id': 'user-1',
+          'destination': 'chest',
+        },
+      ]);
+
+      final result = await HonooService.fetchUserChestHonoo('user-1');
+
+      expect(result.map((honoo) => honoo.dbId), ['root-visible']);
     },
   );
 
