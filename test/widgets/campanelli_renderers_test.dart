@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Entities/campanelli_view_data.dart';
+import 'package:honoo/UI/hinoo_typography.dart';
 import 'package:honoo/Widgets/campanello_card.dart';
 import 'package:honoo/Widgets/casa_section.dart';
 
@@ -13,8 +14,9 @@ void main() {
     bgOffsetY: 0,
   );
 
-  testWidgets('campanello introduttivo conserva il collegamento clicca qui',
-      (tester) async {
+  testWidgets('campanello introduttivo conserva il collegamento clicca qui', (
+    tester,
+  ) async {
     var requested = false;
 
     await tester.pumpWidget(
@@ -60,17 +62,28 @@ void main() {
     );
 
     expect(find.text('Un campanello'), findsOneWidget);
+    final savedTextPosition = tester.widget<Align>(
+      find.byKey(const ValueKey('campanello-saved-text-position')),
+    );
+    expect(savedTextPosition.alignment, Alignment.topCenter);
+    final background = find.byWidgetPredicate(
+      (widget) => widget is Image && widget.image == campanello.backgroundImage,
+    );
+    expect(background, findsOneWidget);
     expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is Image && widget.image == campanello.backgroundImage,
-      ),
-      findsOneWidget,
+      tester
+              .getRect(
+                find.byKey(const ValueKey('campanello-saved-text-position')),
+              )
+              .top -
+          tester.getRect(background).top,
+      closeTo(HinooTypography.editorTextTopPadding(320), 0.01),
     );
   });
 
-  testWidgets('casa chiusa conserva messaggio e azione scrigno',
-      (tester) async {
+  testWidgets('casa chiusa conserva messaggio e azione scrigno', (
+    tester,
+  ) async {
     var opened = false;
 
     await tester.pumpWidget(
@@ -106,8 +119,9 @@ void main() {
     expect(opened, isTrue);
   });
 
-  testWidgets('casa aperta mostra lo sfondo senza messaggio di chiusura',
-      (tester) async {
+  testWidgets('casa aperta mostra lo sfondo senza messaggio di chiusura', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(

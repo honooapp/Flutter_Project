@@ -65,6 +65,14 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(RegiaAgentiPage), findsOneWidget);
+
+    tester.state<NavigatorState>(find.byType(Navigator)).pop();
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(aiIcon);
+    await tester.tap(aiIcon);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(RegiaAgentiPage), findsOneWidget);
   });
 
   testWidgets('la pagina mostra il testo completo nello stile informativo', (
@@ -81,6 +89,11 @@ void main() {
     expect(text.textSpan?.toPlainText(), contains('Alessandro Molina'));
     expect(text.textSpan?.toPlainText(), contains('Behavior Driven Design'));
     expect(text.textSpan?.toPlainText(), contains('Sì,\nstiamo parlando'));
+    expect(text.textSpan?.toPlainText(), contains('guidando agenti AI'));
+    expect(
+      text.textSpan?.toPlainText(),
+      endsWith('E dirigere\ngli agenti\nsignifica\nimparare\na tessere'),
+    );
 
     final rootSpan = text.textSpan! as TextSpan;
     final alessandroSpan = rootSpan.children!.whereType<TextSpan>().singleWhere(
