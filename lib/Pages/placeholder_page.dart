@@ -51,7 +51,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   static const double _libriTopSpacing = 5;
   static const double _libriBottomSpacing = 30;
   static const double _regiaAgentiTopSpacing = 18 * 1.3;
-  static const double _regiaAgentiBottomSpacing = 0;
+  static const double _regiaAgentiBottomSpacing = 20;
   static const double _regiaAgentiIconSizeReduction = 8;
   static const Color _linkIconColor = Color.fromRGBO(183, 183, 206, 1);
 

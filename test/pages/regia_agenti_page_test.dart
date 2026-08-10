@@ -43,8 +43,10 @@ void main() {
       closeTo(23.4, 0.001),
     );
     expect(
-      find.byKey(const Key('regia_agenti_icon_bottom_spacing')),
-      findsNothing,
+      tester
+          .getSize(find.byKey(const Key('regia_agenti_icon_bottom_spacing')))
+          .height,
+      20,
     );
 
     final visibleTexts = tester
