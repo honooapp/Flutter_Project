@@ -18,30 +18,33 @@ class ConversationService {
   static Future<List<ConversationEntry>> _fetchConversation(
     String conversationId,
   ) async {
-    final honooRows = await _client
-        .from('honoo')
-        .select(
-          'id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id,conversation_id,is_from_moon_saved,admin_deleted_at',
-        )
-        .eq('conversation_id', conversationId)
-        .order('created_at', ascending: true);
-
-    final hinooRows = await _client
-        .from('hinoo')
-        .select(
-          'id,pages,type,recipient_tag,reply_to,created_at,user_id,conversation_id,is_from_moon_saved,admin_deleted_at',
-        )
-        .eq('conversation_id', conversationId)
-        .order('created_at', ascending: true);
-
-    final tombstoneRows = await _client
-        .from('conversation_tombstones')
-        .select('content_id,conversation_id,original_created_at')
-        .eq('conversation_id', conversationId)
-        .order('original_created_at', ascending: true);
+    final rows = await Future.wait<dynamic>([
+      _client
+          .from('honoo')
+          .select(
+            'id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id,conversation_id,is_from_moon_saved,admin_deleted_at',
+          )
+          .eq('conversation_id', conversationId)
+          .order('created_at', ascending: true),
+      _client
+          .from('hinoo')
+          .select(
+            'id,pages,type,recipient_tag,reply_to,created_at,user_id,conversation_id,is_from_moon_saved,admin_deleted_at',
+          )
+          .eq('conversation_id', conversationId)
+          .order('created_at', ascending: true),
+      _client
+          .from('conversation_tombstones')
+          .select('content_id,conversation_id,original_created_at')
+          .eq('conversation_id', conversationId)
+          .order('original_created_at', ascending: true),
+    ]);
+    final honooRows = rows[0] as List;
+    final hinooRows = rows[1] as List;
+    final tombstoneRows = rows[2] as List;
 
     final entries = <_Entry>[];
-    for (final r in (honooRows as List)) {
+    for (final r in honooRows) {
       if (r['admin_deleted_at'] != null) {
         entries.add(
           _Entry.deleted(
@@ -54,7 +57,7 @@ class ConversationService {
       final h = Honoo.fromMap(Map<String, dynamic>.from(r));
       entries.add(_Entry.honoo(h));
     }
-    for (final r in (hinooRows as List)) {
+    for (final r in hinooRows) {
       if (r['admin_deleted_at'] != null) {
         entries.add(
           _Entry.deleted(
@@ -112,25 +115,29 @@ class ConversationService {
         .where((id) => id.isNotEmpty && !existingIds.contains(id))
         .toSet();
     if (missingParentIds.isNotEmpty) {
-      final parentHonooRows = await _client
-          .from('honoo')
-          .select(
-            'id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id,conversation_id,is_from_moon_saved,admin_deleted_at',
-          )
-          .in_('id', missingParentIds.toList());
-      final parentHinooRows = await _client
-          .from('hinoo')
-          .select(
-            'id,pages,type,recipient_tag,reply_to,created_at,user_id,conversation_id,is_from_moon_saved,admin_deleted_at',
-          )
-          .in_('id', missingParentIds.toList());
-      for (final row in (parentHonooRows as List)) {
+      final parentRows = await Future.wait<dynamic>([
+        _client
+            .from('honoo')
+            .select(
+              'id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id,conversation_id,is_from_moon_saved,admin_deleted_at',
+            )
+            .in_('id', missingParentIds.toList()),
+        _client
+            .from('hinoo')
+            .select(
+              'id,pages,type,recipient_tag,reply_to,created_at,user_id,conversation_id,is_from_moon_saved,admin_deleted_at',
+            )
+            .in_('id', missingParentIds.toList()),
+      ]);
+      final parentHonooRows = parentRows[0] as List;
+      final parentHinooRows = parentRows[1] as List;
+      for (final row in parentHonooRows) {
         if (row['admin_deleted_at'] != null) continue;
         entries.add(
           _Entry.honoo(Honoo.fromMap(Map<String, dynamic>.from(row))),
         );
       }
-      for (final row in (parentHinooRows as List)) {
+      for (final row in parentHinooRows) {
         if (row['admin_deleted_at'] != null || row['pages'] is! List) continue;
         final pages = (row['pages'] as List)
             .whereType<Map<String, dynamic>>()
@@ -154,7 +161,7 @@ class ConversationService {
         );
       }
     }
-    for (final row in (tombstoneRows as List)) {
+    for (final row in tombstoneRows) {
       final id = row['content_id']?.toString();
       if (id == null || id.isEmpty || !existingIds.add(id)) continue;
       entries.add(
@@ -243,8 +250,10 @@ class ConversationService {
 
   static RealtimeChannel subscribeConversation(
     String conversationId,
-    void Function() onChange,
-  ) {
+    void Function() onChange, {
+    void Function(ConversationRealtimeConnectionStatus status, Object? error)?
+    onStatus,
+  }) {
     void refresh(dynamic _, [dynamic __]) => onChange();
     final accessToken = _client.auth.currentSession?.accessToken;
     if (accessToken != null) _client.realtime.setAuth(accessToken);
@@ -270,7 +279,21 @@ class ConversationService {
           ),
           refresh,
         )
-        .subscribe();
+        .subscribe((status, [error]) {
+          if (status == 'SUBSCRIBED') {
+            onStatus?.call(
+              ConversationRealtimeConnectionStatus.subscribed,
+              null,
+            );
+          } else if (status == 'CHANNEL_ERROR' ||
+              status == 'CLOSED' ||
+              status == 'TIMED_OUT') {
+            onStatus?.call(
+              ConversationRealtimeConnectionStatus.disconnected,
+              error ?? status,
+            );
+          }
+        });
     return chan;
   }
 
@@ -280,6 +303,8 @@ class ConversationService {
     return HinooType.personal;
   }
 }
+
+enum ConversationRealtimeConnectionStatus { subscribed, disconnected }
 
 class _Entry {
   final Honoo? honoo;

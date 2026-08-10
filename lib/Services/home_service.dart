@@ -10,21 +10,25 @@ class HomeService {
   Future<int> fetchUnreadReplyCount(String userId) async {
     return policy.read(() async {
       final seenState = await RepliesSeenTracker.load(userId: userId);
-      final honooRows = await SupabaseProvider.client
-          .from('honoo')
-          .select('created_at,user_id,conversation_id')
-          .eq('destination', 'reply')
-          .eq('recipient_tag', userId)
-          .neq('user_id', userId);
-      final hinooRows = await SupabaseProvider.client
-          .from('hinoo')
-          .select('created_at,user_id,conversation_id')
-          .eq('type', 'answer')
-          .eq('recipient_tag', userId)
-          .neq('user_id', userId);
+      final rows = await Future.wait<dynamic>([
+        SupabaseProvider.client
+            .from('honoo')
+            .select('created_at,user_id,conversation_id')
+            .eq('destination', 'reply')
+            .eq('recipient_tag', userId)
+            .neq('user_id', userId),
+        SupabaseProvider.client
+            .from('hinoo')
+            .select('created_at,user_id,conversation_id')
+            .eq('type', 'answer')
+            .eq('recipient_tag', userId)
+            .neq('user_id', userId),
+      ]);
+      final honooRows = rows[0] as List;
+      final hinooRows = rows[1] as List;
 
       int count = 0;
-      for (final row in [...(honooRows as List), ...(hinooRows as List)]) {
+      for (final row in [...honooRows, ...hinooRows]) {
         final createdAt = DateTime.tryParse(
           (row['created_at'] ?? '').toString(),
         );
