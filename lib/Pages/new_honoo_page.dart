@@ -381,6 +381,14 @@ class _NewHonooPageState extends State<NewHonooPage> {
     if (mounted) setState(() {});
   }
 
+  Widget _withoutKeyboardInsets(BuildContext context, Widget child) {
+    final MediaQueryData mediaQuery = MediaQuery.of(context);
+    return MediaQuery(
+      data: mediaQuery.copyWith(viewInsets: EdgeInsets.zero),
+      child: child,
+    );
+  }
+
   Future<String?> _resolveFinalImageUrl(String raw) async {
     final s = raw.trim();
     if (s.isEmpty) return null;
@@ -425,6 +433,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
       resizeToAvoidBottomInset: false,
       backgroundColor: HonooColor.background,
       body: SafeArea(
+        maintainBottomViewPadding: true,
         child: LayoutBuilder(
           builder: (context, viewport) {
             final double viewW = viewport.maxWidth;
@@ -493,7 +502,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
             final double footerTop =
                 editorGroupTop + editorGroupHeight + footerTopSpacing;
 
-            return Stack(
+            final Widget content = Stack(
               clipBehavior: Clip.none,
               children: [
                 // ===== HEADER + HONOO (full height) =====
@@ -646,6 +655,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
                 ),
               ],
             );
+            return _withoutKeyboardInsets(context, content);
           },
         ),
       ),

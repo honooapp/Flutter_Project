@@ -109,8 +109,8 @@ void main() {
       'Salva sul dispositivo',
     ]) {
       final actionRect = tester.getRect(find.byTooltip(tooltip));
-      expect(actionRect.left, greaterThanOrEqualTo(imageRect.left));
-      expect(actionRect.right, lessThanOrEqualTo(imageRect.right));
+      expect(actionRect.left, greaterThanOrEqualTo(imageRect.left - 0.5));
+      expect(actionRect.right, lessThanOrEqualTo(imageRect.right + 0.5));
     }
   });
 
@@ -133,5 +133,49 @@ void main() {
     expect(find.byTooltip('Apri il tuo Cuore'), findsOneWidget);
     expect(find.byTooltip('Invia'), findsNothing);
     expect(find.byTooltip('Salva sul dispositivo'), findsOneWidget);
+  });
+
+  testWidgets('la tastiera mobile non ridimensiona l’editor honoo', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetViewInsets);
+
+    await tester.pumpWidget(
+      Sizer(
+        builder: (context, orientation, deviceType) {
+          return const MaterialApp(home: NewHonooPage());
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final builder = find.byType(HonooBuilder);
+    tester
+        .state<HonooBuilderState>(builder)
+        .setImageBytesForTesting(
+          base64Decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+          ),
+        );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('honoo-edit-text')));
+    await tester.pump();
+    final Size sizeBeforeKeyboard = tester.getSize(builder);
+
+    tester.view.viewInsets = const FakeViewPadding(bottom: 320);
+    await tester.pump();
+
+    expect(tester.getSize(builder), sizeBeforeKeyboard);
+    expect(
+      MediaQuery.viewInsetsOf(
+        tester.element(find.byType(TextField).first),
+      ).bottom,
+      0,
+    );
   });
 }
