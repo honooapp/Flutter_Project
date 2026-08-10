@@ -59,16 +59,13 @@ class CasaSection extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          if (isUnlocked)
-            ClipRect(
-              child: Transform(
-                transform: transform,
-                alignment: Alignment.center,
-                child: Image(image: casa.backgroundImage, fit: BoxFit.cover),
-              ),
-            )
-          else
-            Container(color: HonooColor.background),
+          ClipRect(
+            child: Transform(
+              transform: transform,
+              alignment: Alignment.center,
+              child: Image(image: casa.backgroundImage, fit: BoxFit.cover),
+            ),
+          ),
           if (!isUnlocked)
             Center(
               child: Text(
