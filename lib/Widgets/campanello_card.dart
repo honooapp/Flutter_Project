@@ -57,20 +57,15 @@ class CampanelloCard extends StatelessWidget {
       ),
     );
 
-    return Center(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: SizedBox(
-          width: width,
-          height: height,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Image(image: data.campanello!.backgroundImage, fit: BoxFit.cover),
-              savedText,
-            ],
-          ),
-        ),
+    return SizedBox(
+      width: width,
+      height: height,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image(image: data.campanello!.backgroundImage, fit: BoxFit.cover),
+          savedText,
+        ],
       ),
     );
   }

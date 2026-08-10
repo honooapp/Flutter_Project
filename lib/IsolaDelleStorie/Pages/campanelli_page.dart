@@ -16,10 +16,10 @@ import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Services/app_failure.dart';
 import 'package:honoo/Controller/hinoo_controller.dart';
 import 'package:honoo/Controller/campanelli_controller.dart';
+import 'package:honoo/UI/hinoo_typography.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
 import 'package:honoo/Utility/utility.dart';
-import 'package:honoo/UI/hinoo_typography.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Widgets/campanelli_footer.dart';
 import 'package:honoo/Widgets/campanello_card.dart';
@@ -60,6 +60,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
   static const Duration _kAnimMed = Duration(milliseconds: 240);
   static const Duration _kBounceIn = Duration(milliseconds: 180);
   static const Duration _kBounceOut = Duration(milliseconds: 200);
+  static const Duration _kCarouselHintDuration = Duration(seconds: 4);
   static const Curve _kCurve = Curves.easeOutCubic;
   int _campanelloIndex = 0;
   int _verticalPageIndex = 0;
@@ -69,6 +70,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
   List<_CampanelloEntry> _userEntries = const [];
   bool _isLoadingUserEntries = false;
   bool _isHoveringCampanelli = false;
+  bool _showCarouselArrows = true;
+  Timer? _carouselHintTimer;
   bool _isKnocking = false;
   bool get _hasOwnHouse => _campanelliController.state.hasOwnHouse;
   bool get _hasPendingOrAcceptedInvite =>
@@ -115,10 +118,25 @@ class _CampanelliPageState extends State<CampanelliPage> {
   @override
   void initState() {
     super.initState();
+    _scheduleCarouselArrowsHide();
     _realtimeEventsSubscription =
         _campanelliController.realtimeEvents.listen(_handleRealtimeEvent);
     _loadUserEntries();
     _subscribeVisitorAccessChannel();
+  }
+
+  void _scheduleCarouselArrowsHide() {
+    _carouselHintTimer?.cancel();
+    _carouselHintTimer = Timer(_kCarouselHintDuration, () {
+      if (mounted) setState(() => _showCarouselArrows = false);
+    });
+  }
+
+  void _revealCarouselArrows() {
+    if (!_showCarouselArrows && mounted) {
+      setState(() => _showCarouselArrows = true);
+    }
+    _scheduleCarouselArrowsHide();
   }
 
   bool _isCampanelloUnlocked(String id) => _unlockedCampanelli.contains(id);
@@ -929,6 +947,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
   @override
   void dispose() {
+    _carouselHintTimer?.cancel();
     _realtimeEventsSubscription.cancel();
     _pageController.dispose();
     _campanelloPageController.dispose();
@@ -946,11 +965,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
           final double maxHeight = constraints.maxHeight;
           final ResponsiveLayoutMode layoutMode =
               ResponsiveLayout.modeForWidth(maxWidth);
-          final double targetMaxWidth =
-              layoutMode == ResponsiveLayoutMode.mobile
-                  ? maxWidth
-                  : ResponsiveLayout.contentMaxWidth(maxWidth);
-
           final double footerIconSize =
               ResponsiveLayout.footerIconSizeForMode(layoutMode);
           final double footerGap =
@@ -961,25 +975,18 @@ class _CampanelliPageState extends State<CampanelliPage> {
                   (isMobile ? 0 : 12);
           final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
           final double footerSpacing = footerBottomPadding + safeBottom;
-          final double footerTopSpacing = footerSpacing / 2;
-          final double footerBottomSpacing = footerSpacing - footerTopSpacing;
-
-          final double footerReserved =
-              footerIconSize + footerTopSpacing + footerBottomSpacing;
-          final double availableHeight =
-              (maxHeight - footerReserved).clamp(0.0, double.infinity);
+          final double footerBottomSpacing = footerSpacing / 2;
           final double scrignoSize = math.min(
             footerIconSize * 4,
-            math.min(maxWidth, availableHeight),
+            math.min(maxWidth, maxHeight),
           );
-          final Size canvasSize = ResponsiveLayout.fitAspectRatio(
-            targetMaxWidth,
-            availableHeight,
-            HinooTypography.aspectRatio,
-          );
-          final double casaWidth = isMobile ? maxWidth : canvasSize.width;
-          final double casaHeight =
-              isMobile ? availableHeight : canvasSize.height;
+          final double canvasWidth = isMobile
+              ? maxWidth
+              : math.min(maxWidth, maxHeight * HinooTypography.aspectRatio);
+          final Size canvasSize = Size(canvasWidth, maxHeight);
+          final double canvasHorizontalInset = (maxWidth - canvasWidth) / 2;
+          final double casaWidth = canvasWidth;
+          final double casaHeight = maxHeight;
           final List<_CampanelloEntry> campanelli = _buildCampanelli();
           final List<CampanelloPageData> campanelloPages =
               _buildCampanelloPages(campanelli);
@@ -1031,6 +1038,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
             actions: {
               _ArrowIntent: CallbackAction<_ArrowIntent>(
                 onInvoke: (intent) {
+                  _revealCarouselArrows();
                   if (intent.axis == Axis.horizontal &&
                       _verticalPageIndex == 0) {
                     _animatePage(
@@ -1054,8 +1062,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
               clipBehavior: Clip.none,
               children: [
                 SizedBox(
-                  height: availableHeight,
+                  height: maxHeight,
                   child: Listener(
+                    onPointerDown: (_) => _revealCarouselArrows(),
                     onPointerSignal: (event) {
                       if (event is PointerScrollEvent &&
                           !_isHoveringCampanelli) {
@@ -1080,6 +1089,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
                         scrollDirection: Axis.vertical,
                         physics: pagePhysics,
                         onPageChanged: (index) {
+                          _revealCarouselArrows();
                           if (index == 1) {
                             _lastHouseCampanelloIndex =
                                 _campanelloIndex == 0 ? 1 : _campanelloIndex;
@@ -1105,8 +1115,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 90),
                               curve: Curves.easeOutCubic,
-                              constraints:
-                                  BoxConstraints(maxWidth: targetMaxWidth),
                               child: SizedBox(
                                 width: canvasSize.width,
                                 height: canvasSize.height,
@@ -1144,8 +1152,14 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                             physics: pagePhysics,
                                             itemCount: campanelloPages.length,
                                             onPageChanged: (index) {
-                                              setState(() =>
-                                                  _campanelloIndex = index);
+                                              _revealCarouselArrows();
+                                              setState(() {
+                                                _campanelloIndex = index;
+                                                if (index > 0) {
+                                                  _lastHouseCampanelloIndex =
+                                                      index;
+                                                }
+                                              });
                                             },
                                             itemBuilder: (context, pageIndex) {
                                               return CampanelloCard(
@@ -1159,41 +1173,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                             },
                                           ),
                                         );
-                                        final bool isDesktop = layoutMode ==
-                                                ResponsiveLayoutMode.desktop ||
-                                            layoutMode ==
-                                                ResponsiveLayoutMode
-                                                    .wideDesktop ||
-                                            layoutMode ==
-                                                ResponsiveLayoutMode
-                                                    .largeDesktop;
-                                        if (!isDesktop ||
-                                            campanelloPages.length <= 1) {
-                                          return pvViewport;
-                                        }
-                                        // Su desktop, allarga l'area esterna per ospitare le frecce
-                                        const double arrowGutter = 160;
-                                        return SizedBox(
-                                          width: canvasSize.width + arrowGutter,
-                                          height: canvasSize.height,
-                                          child: DesktopCarouselArrows(
-                                            canPrev: _campanelloIndex > 0,
-                                            canNext: _campanelloIndex <
-                                                campanelloPages.length - 1,
-                                            onPrev: () => _animatePage(
-                                              _campanelloPageController,
-                                              delta: -1,
-                                              maxIndex: maxCampanelloIndex,
-                                            ),
-                                            onNext: () => _animatePage(
-                                              _campanelloPageController,
-                                              delta: 1,
-                                              maxIndex: maxCampanelloIndex,
-                                            ),
-                                            arrowColor: Colors.white,
-                                            child: Center(child: pvViewport),
-                                          ),
-                                        );
+                                        return pvViewport;
                                       }(),
                                     ),
                                   ),
@@ -1268,11 +1248,51 @@ class _CampanelliPageState extends State<CampanelliPage> {
                     ),
                   ),
                 ),
+                if (campanelloPages.length > 1)
+                  Positioned(
+                    top: 0,
+                    bottom: 0,
+                    left: canvasHorizontalInset,
+                    right: canvasHorizontalInset,
+                    child: IgnorePointer(
+                      ignoring: !_showCarouselArrows,
+                      child: AnimatedOpacity(
+                        key: const ValueKey<String>(
+                          'campanelli_carousel_arrows',
+                        ),
+                        opacity: _showCarouselArrows ? 1 : 0,
+                        duration: const Duration(milliseconds: 280),
+                        child: DesktopCarouselArrows(
+                          canPrev: safeCampanelloIndex > 0,
+                          canNext:
+                              safeCampanelloIndex < campanelloPages.length - 1,
+                          onPrev: () {
+                            _revealCarouselArrows();
+                            _animatePage(
+                              _campanelloPageController,
+                              delta: -1,
+                              maxIndex: maxCampanelloIndex,
+                            );
+                          },
+                          onNext: () {
+                            _revealCarouselArrows();
+                            _animatePage(
+                              _campanelloPageController,
+                              delta: 1,
+                              maxIndex: maxCampanelloIndex,
+                            );
+                          },
+                          arrowColor: Colors.white,
+                          child: const SizedBox.expand(),
+                        ),
+                      ),
+                    ),
+                  ),
                 if (showFooter)
                   Positioned(
                     bottom: 0,
-                    left: 0,
-                    right: 0,
+                    left: canvasHorizontalInset,
+                    right: canvasHorizontalInset,
                     child: CampanelliFooter(
                       iconSize: footerIconSize,
                       bottomPadding: footerBottomSpacing,
