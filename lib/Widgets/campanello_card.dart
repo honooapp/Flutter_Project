@@ -29,7 +29,7 @@ class CampanelloCard extends StatelessWidget {
       fontWeight: FontWeight.w400,
     );
 
-    final Widget text = Padding(
+    final Widget introText = Padding(
       padding: EdgeInsets.symmetric(
         horizontal: HinooTypography.horizontalPadding,
         vertical: verticalPadding,
@@ -39,9 +39,23 @@ class CampanelloCard extends StatelessWidget {
 
     if (data.isIntro) {
       return Center(
-        child: SizedBox(width: width, height: height, child: text),
+        child: SizedBox(width: width, height: height, child: introText),
       );
     }
+
+    final Widget savedText = Padding(
+      padding: EdgeInsets.fromLTRB(
+        HinooTypography.horizontalPadding,
+        HinooTypography.editorTextTopPadding(width),
+        HinooTypography.horizontalPadding,
+        HinooTypography.editorTextBottomPadding,
+      ),
+      child: Align(
+        key: const ValueKey('campanello-saved-text-position'),
+        alignment: Alignment.topCenter,
+        child: _buildText(textStyle),
+      ),
+    );
 
     return SizedBox(
       width: width,
@@ -50,7 +64,7 @@ class CampanelloCard extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Image(image: data.campanello!.backgroundImage, fit: BoxFit.cover),
-          text,
+          savedText,
         ],
       ),
     );
