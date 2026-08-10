@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/campanelli_page.dart';
 import 'package:honoo/Widgets/campanelli_footer.dart';
 import 'package:honoo/Widgets/campanello_card.dart';
+import 'package:honoo/Widgets/casa_section.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
 
 import '../test_supabase_helper.dart';
@@ -70,6 +71,17 @@ void main() {
 
     expect(find.byType(CampanelloCard), findsOneWidget);
     expect(find.byType(CampanelliFooter), findsOneWidget);
+    final CampanelloCard card = tester.widget(find.byType(CampanelloCard));
+    expect(card.width, closeTo(506.25, 0.01));
+    expect(card.height, 900);
+    expect(tester.getSize(find.byType(CampanelliFooter)).width, 506.25);
+
+    await tester.drag(find.byType(CampanelloCard), const Offset(0, -900));
+    await tester.pumpAndSettle();
+
+    final CasaSection casa = tester.widget(find.byType(CasaSection));
+    expect(casa.width, closeTo(506.25, 0.01));
+    expect(casa.height, 900);
     expect(tester.takeException(), isNull);
   });
 }

@@ -16,6 +16,8 @@ import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Services/app_failure.dart';
 import 'package:honoo/Controller/hinoo_controller.dart';
 import 'package:honoo/Controller/campanelli_controller.dart';
+import 'package:honoo/UI/hinoo_typography.dart';
+import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
 import 'package:honoo/Utility/utility.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
@@ -956,7 +958,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: HonooColor.background,
       body: LayoutBuilder(
         builder: (context, constraints) {
           final double maxWidth = constraints.maxWidth;
@@ -978,8 +980,12 @@ class _CampanelliPageState extends State<CampanelliPage> {
             footerIconSize * 4,
             math.min(maxWidth, maxHeight),
           );
-          final Size canvasSize = Size(maxWidth, maxHeight);
-          final double casaWidth = maxWidth;
+          final double canvasWidth = isMobile
+              ? maxWidth
+              : math.min(maxWidth, maxHeight * HinooTypography.aspectRatio);
+          final Size canvasSize = Size(canvasWidth, maxHeight);
+          final double canvasHorizontalInset = (maxWidth - canvasWidth) / 2;
+          final double casaWidth = canvasWidth;
           final double casaHeight = maxHeight;
           final List<_CampanelloEntry> campanelli = _buildCampanelli();
           final List<CampanelloPageData> campanelloPages =
@@ -1243,7 +1249,11 @@ class _CampanelliPageState extends State<CampanelliPage> {
                   ),
                 ),
                 if (campanelloPages.length > 1)
-                  Positioned.fill(
+                  Positioned(
+                    top: 0,
+                    bottom: 0,
+                    left: canvasHorizontalInset,
+                    right: canvasHorizontalInset,
                     child: IgnorePointer(
                       ignoring: !_showCarouselArrows,
                       child: AnimatedOpacity(
@@ -1281,8 +1291,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
                 if (showFooter)
                   Positioned(
                     bottom: 0,
-                    left: 0,
-                    right: 0,
+                    left: canvasHorizontalInset,
+                    right: canvasHorizontalInset,
                     child: CampanelliFooter(
                       iconSize: footerIconSize,
                       bottomPadding: footerBottomSpacing,
