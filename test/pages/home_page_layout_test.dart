@@ -1,9 +1,28 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Pages/home_page.dart';
+import 'package:honoo/Services/home_service.dart';
+import 'package:honoo/Utility/reply_notification_signal.dart';
+import 'package:honoo/Widgets/sea_footer_bar.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../test_supabase_helper.dart';
+
+class _ControlledHomeService extends HomeService {
+  final List<Completer<int>> requests = [];
+
+  @override
+  Future<int> fetchUnreadReplyCount(String userId) {
+    final request = Completer<int>();
+    requests.add(request);
+    return request.future;
+  }
+
+  @override
+  Future<void> recordVisit() async {}
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -76,6 +95,32 @@ void main() {
     expect(find.byKey(const Key('home_intro_text')), findsOneWidget);
     expect(find.byType(Scrollable), findsNothing);
 
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('una risposta vecchia non ripristina il badge già azzerato', (
+    tester,
+  ) async {
+    harness.disableOverrides();
+    harness = SupabaseTestHarness(withAuthenticatedUser: true)
+      ..enableOverrides();
+    final service = _ControlledHomeService();
+
+    await tester.pumpWidget(MaterialApp(home: HomePage(homeService: service)));
+    await tester.pump();
+    expect(service.requests, hasLength(1));
+
+    ReplyNotificationSignal.notifyChanged();
+    await tester.pump();
+    expect(service.requests, hasLength(2));
+
+    service.requests[1].complete(0);
+    await tester.pump();
+    service.requests[0].complete(3);
+    await tester.pump();
+
+    final footer = tester.widget<SeaFooterBar>(find.byType(SeaFooterBar));
+    expect(footer.replyCount, 0);
     await tester.pumpWidget(const SizedBox.shrink());
   });
 }

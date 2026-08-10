@@ -7,6 +7,16 @@ import 'reply_notification_signal.dart';
 class RepliesSeenTracker {
   static const _key = 'last_seen_reply_at_v1';
   static const _conversationKey = 'last_seen_reply_by_conversation_v1';
+  static Future<void> _writeQueue = Future<void>.value();
+
+  static Future<void> _serializeWrite(Future<void> Function() operation) {
+    final next = _writeQueue.then(
+      (_) => operation(),
+      onError: (_) => operation(),
+    );
+    _writeQueue = next.then<void>((_) {}, onError: (_) {});
+    return next;
+  }
 
   static String _keyFor(String? userId) {
     final normalized = userId?.trim() ?? '';
@@ -53,20 +63,20 @@ class RepliesSeenTracker {
     return DateTime.tryParse(s);
   }
 
-  static Future<void> markNow({String? userId}) async {
+  static Future<void> markNow({String? userId}) => _serializeWrite(() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
       _keyFor(userId),
       DateTime.now().toUtc().toIso8601String(),
     );
     ReplyNotificationSignal.notifyChanged();
-  }
+  });
 
   static Future<void> markAt(
     DateTime dt, {
     String? userId,
     String? conversationId,
-  }) async {
+  }) => _serializeWrite(() async {
     final normalizedConversation = conversationId?.trim() ?? '';
     if (normalizedConversation.isNotEmpty) {
       final prefs = await SharedPreferences.getInstance();
@@ -89,7 +99,7 @@ class RepliesSeenTracker {
     if (current != null && !dt.isAfter(current)) return;
     await prefs.setString(key, dt.toUtc().toIso8601String());
     ReplyNotificationSignal.notifyChanged();
-  }
+  });
 }
 
 class ReplySeenState {

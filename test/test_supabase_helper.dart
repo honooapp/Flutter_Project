@@ -36,7 +36,14 @@ class MockQueryChain extends Mock
         invocation.positionalArguments.isNotEmpty) {
       final onValue =
           invocation.positionalArguments[0] as dynamic Function(dynamic);
-      return Future.value(onValue(_nextResponse()));
+      // Replica la semantica asincrona di Postgrest: Future.wait non supporta
+      // callback `then` invocate sincronicamente durante la registrazione.
+      final response = _nextResponse();
+      // ignore: prefer_void_to_null, il mock deve rispettare R=Null di Future.then.
+      return Future<Null>.microtask(() {
+        onValue(response);
+        return null;
+      });
     }
     return super.noSuchMethod(invocation);
   }

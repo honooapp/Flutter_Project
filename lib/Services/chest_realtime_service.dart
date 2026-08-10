@@ -8,25 +8,20 @@ abstract class ChestRealtimeSubscription {
   Future<void> close();
 }
 
-enum ChestRealtimeConnectionStatus {
-  subscribed,
-  disconnected,
-}
+enum ChestRealtimeConnectionStatus { subscribed, disconnected }
 
 abstract class ChestRealtimeGateway {
   ChestRealtimeSubscription subscribe({
     required String userId,
     required void Function() onChange,
-    required void Function(
-      ChestRealtimeConnectionStatus status,
-      Object? error,
-    ) onStatus,
+    required void Function(ChestRealtimeConnectionStatus status, Object? error)
+    onStatus,
   });
 }
 
 class SupabaseChestRealtimeGateway implements ChestRealtimeGateway {
   SupabaseChestRealtimeGateway({SupabaseClient? client})
-      : _client = client ?? SupabaseProvider.client;
+    : _client = client ?? SupabaseProvider.client;
 
   final SupabaseClient _client;
 
@@ -34,10 +29,8 @@ class SupabaseChestRealtimeGateway implements ChestRealtimeGateway {
   ChestRealtimeSubscription subscribe({
     required String userId,
     required void Function() onChange,
-    required void Function(
-      ChestRealtimeConnectionStatus status,
-      Object? error,
-    ) onStatus,
+    required void Function(ChestRealtimeConnectionStatus status, Object? error)
+    onStatus,
   }) {
     void notify(dynamic _, [dynamic __]) => onChange();
     final accessToken = _client.auth.currentSession?.accessToken;
@@ -46,12 +39,42 @@ class SupabaseChestRealtimeGateway implements ChestRealtimeGateway {
     final channel = _client.channel('chest-replies-$userId');
     channel.on(
       RealtimeListenTypes.postgresChanges,
-      ChannelFilter(event: '*', schema: 'public', table: 'honoo'),
+      ChannelFilter(
+        event: '*',
+        schema: 'public',
+        table: 'honoo',
+        filter: 'recipient_tag=eq.$userId',
+      ),
       notify,
     );
     channel.on(
       RealtimeListenTypes.postgresChanges,
-      ChannelFilter(event: '*', schema: 'public', table: 'hinoo'),
+      ChannelFilter(
+        event: '*',
+        schema: 'public',
+        table: 'honoo',
+        filter: 'user_id=eq.$userId',
+      ),
+      notify,
+    );
+    channel.on(
+      RealtimeListenTypes.postgresChanges,
+      ChannelFilter(
+        event: '*',
+        schema: 'public',
+        table: 'hinoo',
+        filter: 'recipient_tag=eq.$userId',
+      ),
+      notify,
+    );
+    channel.on(
+      RealtimeListenTypes.postgresChanges,
+      ChannelFilter(
+        event: '*',
+        schema: 'public',
+        table: 'hinoo',
+        filter: 'user_id=eq.$userId',
+      ),
       notify,
     );
     channel.subscribe((status, [error]) {

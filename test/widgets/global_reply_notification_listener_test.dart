@@ -18,6 +18,12 @@ class _FakeReplySystemNotification extends ReplySystemNotification {
   String? conversationId;
   int showCount = 0;
   int? replyCount;
+  final List<String> closedConversations = [];
+
+  @override
+  void closeConversation(String conversationId) {
+    closedConversations.add(conversationId);
+  }
 
   @override
   ReplyNotificationPermission get permission =>
@@ -115,6 +121,7 @@ void main() {
       final chestPage = tester.widget<ChestPage>(find.byType(ChestPage));
       expect(chestPage.focusConversationId, 'conversation-42');
       expect(chestPage.focusReplyId, 'reply-42');
+      expect(notification.closedConversations, contains('conversation-42'));
 
       await tester.pumpWidget(const SizedBox.shrink());
     },
@@ -221,6 +228,10 @@ void main() {
       final chestPage = tester.widget<ChestPage>(find.byType(ChestPage));
       expect(chestPage.focusConversationId, isNull);
       expect(chestPage.focusReplyId, isNull);
+      expect(
+        notification.closedConversations,
+        contains('multiple-conversations'),
+      );
 
       await tester.pumpWidget(const SizedBox.shrink());
     },

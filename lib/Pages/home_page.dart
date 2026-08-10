@@ -16,21 +16,24 @@ import '../Widgets/sea_footer_bar.dart';
 import '../Widgets/luna_fissa.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, this.homeService = const HomeService()});
+
+  final HomeService homeService;
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   int _replyCount = 0;
   Timer? _replyRefreshTimer;
   bool _visitRecorded = false;
-  final HomeService _homeService = const HomeService();
+  int _replyLoadGeneration = 0;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadReplyCount();
       _recordVisit();
@@ -44,17 +47,22 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _replyRefreshTimer?.cancel();
     ReplyNotificationSignal.revision.removeListener(_loadReplyCount);
     super.dispose();
   }
 
   Future<void> _loadReplyCount() async {
+    final generation = ++_replyLoadGeneration;
     final user = SupabaseProvider.client.auth.currentUser;
-    if (user == null) return;
+    if (user == null) {
+      if (mounted && _replyCount != 0) setState(() => _replyCount = 0);
+      return;
+    }
     try {
-      final count = await _homeService.fetchUnreadReplyCount(user.id);
-      if (!mounted) return;
+      final count = await widget.homeService.fetchUnreadReplyCount(user.id);
+      if (!mounted || generation != _replyLoadGeneration) return;
       if (count != _replyCount) {
         setState(() => _replyCount = count);
       }
@@ -68,11 +76,16 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _loadReplyCount();
+  }
+
   Future<void> _recordVisit() async {
     if (_visitRecorded) return;
     _visitRecorded = true;
     try {
-      await _homeService.recordVisit();
+      await widget.homeService.recordVisit();
     } catch (error, stackTrace) {
       AppLogger.warning(
         'Impossibile registrare la visita',

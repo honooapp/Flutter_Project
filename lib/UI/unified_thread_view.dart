@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:honoo/Entities/hinoo.dart';
@@ -30,6 +32,7 @@ class UnifiedThreadView extends StatefulWidget {
     this.currentUserId,
     this.revealEntryId,
     this.preferLatestReceived = false,
+    this.reconcileInterval = const Duration(seconds: 30),
   });
 
   final String conversationId;
@@ -45,17 +48,23 @@ class UnifiedThreadView extends StatefulWidget {
   final String? currentUserId;
   final String? revealEntryId;
   final bool preferLatestReceived;
+  @visibleForTesting
+  final Duration reconcileInterval;
 
   @override
   State<UnifiedThreadView> createState() => _UnifiedThreadViewState();
 }
 
 class _UnifiedThreadViewState extends State<UnifiedThreadView>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   bool _loading = true;
   Object? _loadError;
   List<ConversationEntry> _entries = const [];
   RealtimeChannel? _chan;
+  Timer? _reconnectTimer;
+  Timer? _reconcileTimer;
+  int _reconnectAttempt = 0;
+  int _channelGeneration = 0;
   String? _revealedEntryKey;
   String? _appliedFocusKey;
   int _currentPageIndex = 0;
@@ -69,6 +78,7 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
@@ -109,18 +119,77 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
 
   void _syncSubscription() {
     if (!widget.isActive) {
-      _chan?.unsubscribe();
-      _chan = null;
+      _closeSubscription();
       return;
     }
+    _reconcileTimer ??= Timer.periodic(
+      widget.reconcileInterval,
+      (_) => _load(),
+    );
+    _connectSubscription();
+  }
+
+  void _connectSubscription() {
+    if (!widget.isActive || _chan != null) return;
+    final generation = ++_channelGeneration;
     try {
-      _chan ??= ConversationService.subscribeConversation(
+      _chan = ConversationService.subscribeConversation(
         widget.conversationId,
         _load,
+        onStatus: (status, error) {
+          if (!mounted || generation != _channelGeneration) return;
+          if (status == ConversationRealtimeConnectionStatus.subscribed) {
+            _reconnectAttempt = 0;
+            _reconnectTimer?.cancel();
+            _load();
+          } else {
+            _scheduleReconnect(generation);
+          }
+        },
       );
     } catch (_) {
       _chan = null;
+      _scheduleReconnect(generation);
     }
+  }
+
+  void _scheduleReconnect(int generation) {
+    if (!widget.isActive ||
+        generation != _channelGeneration ||
+        _reconnectTimer?.isActive == true) {
+      return;
+    }
+    final attempt = _reconnectAttempt.clamp(0, 5);
+    _reconnectAttempt += 1;
+    _reconnectTimer = Timer(Duration(seconds: 1 << attempt), () {
+      if (!mounted || !widget.isActive || generation != _channelGeneration) {
+        return;
+      }
+      final staleChannel = _chan;
+      _chan = null;
+      unawaited(staleChannel?.unsubscribe());
+      _connectSubscription();
+    });
+  }
+
+  void _closeSubscription() {
+    _channelGeneration += 1;
+    _reconnectTimer?.cancel();
+    _reconnectTimer = null;
+    _reconcileTimer?.cancel();
+    _reconcileTimer = null;
+    final channel = _chan;
+    _chan = null;
+    unawaited(channel?.unsubscribe());
+    _reconnectAttempt = 0;
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed || !widget.isActive) return;
+    _closeSubscription();
+    _load();
+    _syncSubscription();
   }
 
   Future<void> _load() async {
@@ -208,9 +277,12 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
   @override
   void didUpdateWidget(covariant UnifiedThreadView oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.reconcileInterval != widget.reconcileInterval) {
+      _reconcileTimer?.cancel();
+      _reconcileTimer = null;
+    }
     if (oldWidget.conversationId != widget.conversationId) {
-      _chan?.unsubscribe();
-      _chan = null;
+      _closeSubscription();
       _revealedEntryKey = null;
       _appliedFocusKey = null;
       _currentPageIndex = 0;
@@ -225,7 +297,8 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
       _load();
     }
     if (oldWidget.isActive != widget.isActive ||
-        oldWidget.conversationId != widget.conversationId) {
+        oldWidget.conversationId != widget.conversationId ||
+        oldWidget.reconcileInterval != widget.reconcileInterval) {
       _syncSubscription();
       if (widget.isActive && !oldWidget.isActive) {
         _load();
@@ -532,7 +605,8 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
 
   @override
   void dispose() {
-    _chan?.unsubscribe();
+    WidgetsBinding.instance.removeObserver(this);
+    _closeSubscription();
     _pageController.dispose();
     _controller.dispose();
     super.dispose();

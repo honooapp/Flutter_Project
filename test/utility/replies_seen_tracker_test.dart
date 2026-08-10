@@ -63,4 +63,25 @@ void main() {
 
     expect(state.byConversation, isEmpty);
   });
+
+  test('non perde marcature concorrenti di conversazioni diverse', () async {
+    await Future.wait([
+      RepliesSeenTracker.markAt(
+        DateTime.parse('2026-08-03T10:00:00Z'),
+        userId: 'user-1',
+        conversationId: 'conversation-1',
+      ),
+      RepliesSeenTracker.markAt(
+        DateTime.parse('2026-08-03T11:00:00Z'),
+        userId: 'user-1',
+        conversationId: 'conversation-2',
+      ),
+    ]);
+
+    final state = await RepliesSeenTracker.load(userId: 'user-1');
+    expect(
+      state.byConversation.keys,
+      containsAll(['conversation-1', 'conversation-2']),
+    );
+  });
 }

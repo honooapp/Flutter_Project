@@ -20,6 +20,7 @@ class GlobalReplyNotificationListener extends StatefulWidget {
     this.systemNotification,
     this.replyEventStream,
     this.notificationBatchWindow = const Duration(milliseconds: 180),
+    this.catchUpInterval = const Duration(seconds: 30),
   });
 
   final Widget child;
@@ -30,6 +31,8 @@ class GlobalReplyNotificationListener extends StatefulWidget {
   final Stream<ReplyNotificationEvent>? replyEventStream;
   @visibleForTesting
   final Duration notificationBatchWindow;
+  @visibleForTesting
+  final Duration catchUpInterval;
 
   @override
   State<GlobalReplyNotificationListener> createState() =>
@@ -37,7 +40,8 @@ class GlobalReplyNotificationListener extends StatefulWidget {
 }
 
 class _GlobalReplyNotificationListenerState
-    extends State<GlobalReplyNotificationListener> {
+    extends State<GlobalReplyNotificationListener>
+    with WidgetsBindingObserver {
   late final ReplySystemNotification _systemNotification =
       widget.systemNotification ?? ReplySystemNotification.platform();
   StreamSubscription<AuthState>? _authSubscription;
@@ -45,6 +49,9 @@ class _GlobalReplyNotificationListenerState
   RealtimeChannel? _replyChannel;
   Timer? _reconnectTimer;
   Timer? _notificationTimer;
+  Timer? _catchUpTimer;
+  int? _catchUpInFlightGeneration;
+  DateTime? _lastCatchUpAt;
   int _reconnectAttempt = 0;
   int _channelGeneration = 0;
   String? _activeUserId;
@@ -55,12 +62,19 @@ class _GlobalReplyNotificationListenerState
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     if (widget.enabled) _start();
   }
 
   @override
   void didUpdateWidget(GlobalReplyNotificationListener oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.catchUpInterval != widget.catchUpInterval) {
+      _catchUpTimer?.cancel();
+      _catchUpTimer = null;
+      final userId = _activeUserId;
+      if (widget.enabled && userId != null) _startCatchUpTimer(userId);
+    }
     if (!oldWidget.enabled && widget.enabled) {
       _start();
     } else if (oldWidget.enabled && !widget.enabled) {
@@ -92,13 +106,24 @@ class _GlobalReplyNotificationListenerState
       if (userId != null && _replyChannel == null) {
         _connectChannels(userId);
       }
+      if (userId != null) _startCatchUpTimer(userId);
       return;
     }
     _closeRealtime(clearUser: false);
     _deliveredEventKeys.clear();
+    _lastCatchUpAt = null;
     _activeUserId = userId;
     if (userId == null) return;
     _connectChannels(userId);
+    _startCatchUpTimer(userId);
+  }
+
+  void _startCatchUpTimer(String userId) {
+    _catchUpTimer ??= Timer.periodic(widget.catchUpInterval, (_) {
+      if (_activeUserId == userId && _replyChannel != null) {
+        unawaited(_catchUpMissedReplies(userId, _channelGeneration));
+      }
+    });
   }
 
   void _connectChannels(String userId) {
@@ -246,12 +271,20 @@ class _GlobalReplyNotificationListenerState
   }
 
   Future<void> _catchUpMissedReplies(String userId, int generation) async {
-    final seenState = await RepliesSeenTracker.load(userId: userId);
-    if (!mounted || generation != _channelGeneration) {
-      return;
-    }
+    if (_catchUpInFlightGeneration == generation) return;
+    _catchUpInFlightGeneration = generation;
     try {
-      final since = seenState.baseline?.toUtc().toIso8601String();
+      final catchUpStartedAt = DateTime.now().toUtc();
+      final seenState = await RepliesSeenTracker.load(userId: userId);
+      if (!mounted || generation != _channelGeneration) return;
+      final baseline = seenState.baseline?.toUtc();
+      final lastCatchUp = _lastCatchUpAt;
+      final sinceDate =
+          baseline == null ||
+              (lastCatchUp != null && lastCatchUp.isAfter(baseline))
+          ? lastCatchUp
+          : baseline;
+      final since = sinceDate?.toIso8601String();
       dynamic honooQuery = SupabaseProvider.client
           .from('honoo')
           .select(
@@ -304,12 +337,18 @@ class _GlobalReplyNotificationListenerState
       for (final event in pending) {
         _handleEvent(event);
       }
+      _lastCatchUpAt = catchUpStartedAt;
     } catch (_) {
-      // Il canale realtime resta attivo; il prossimo reconnect ritenterà il catch-up.
+      // Il canale realtime resta attivo; il controllo periodico ritenterà.
+    } finally {
+      if (_catchUpInFlightGeneration == generation) {
+        _catchUpInFlightGeneration = null;
+      }
     }
   }
 
   void _openConversation(ReplyNotificationEvent event) {
+    _systemNotification.closeConversation(event.conversationId);
     widget.navigatorKey.currentState?.push(
       MaterialPageRoute(
         builder: (_) => ChestPage(
@@ -323,6 +362,7 @@ class _GlobalReplyNotificationListenerState
   }
 
   void _openRepliesInbox() {
+    _systemNotification.closeConversation('multiple-conversations');
     widget.navigatorKey.currentState?.push(
       MaterialPageRoute(
         builder: (_) =>
@@ -332,6 +372,8 @@ class _GlobalReplyNotificationListenerState
   }
 
   void _closeRealtime({bool clearUser = true}) {
+    _catchUpTimer?.cancel();
+    _catchUpTimer = null;
     _reconnectTimer?.cancel();
     _reconnectTimer = null;
     _channelGeneration += 1;
@@ -339,6 +381,19 @@ class _GlobalReplyNotificationListenerState
     _replyChannel = null;
     _reconnectAttempt = 0;
     if (clearUser) _activeUserId = null;
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    final userId = _activeUserId;
+    if (userId == null) return;
+    if (_replyChannel == null) {
+      _connectChannels(userId);
+    } else {
+      unawaited(_catchUpMissedReplies(userId, _channelGeneration));
+    }
+    _startCatchUpTimer(userId);
   }
 
   void _stop() {
@@ -350,10 +405,12 @@ class _GlobalReplyNotificationListenerState
     _authSubscription?.cancel();
     _authSubscription = null;
     _closeRealtime();
+    _lastCatchUpAt = null;
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _stop();
     super.dispose();
   }
