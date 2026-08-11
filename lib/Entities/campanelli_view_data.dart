@@ -8,6 +8,7 @@ class CampanelloData {
     required this.backgroundImage,
     required this.text,
     required this.linkedHouseId,
+    this.bgTransform,
   });
 
   final String id;
@@ -16,12 +17,14 @@ class CampanelloData {
   final ImageProvider backgroundImage;
   final String text;
   final String linkedHouseId;
+  final List<double>? bgTransform;
 
   factory CampanelloData.fromBackend({
     required Map<String, dynamic> row,
     required ImageProvider backgroundImage,
     required String text,
     required String linkedHouseId,
+    List<double>? bgTransform,
   }) {
     return CampanelloData(
       id: row['id']?.toString() ?? '',
@@ -30,6 +33,7 @@ class CampanelloData {
       backgroundImage: backgroundImage,
       text: text,
       linkedHouseId: linkedHouseId,
+      bgTransform: bgTransform,
     );
   }
 }

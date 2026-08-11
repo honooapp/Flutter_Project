@@ -19,6 +19,7 @@ import '../Entities/hinoo.dart';
 import '../Entities/chest_item.dart';
 import '../Entities/hinoo_thread_entry.dart';
 import '../Entities/reply_navigation_result.dart';
+import '../Entities/casa_share_mode.dart';
 
 import '../Utility/honoo_colors.dart';
 import '../Utility/chest_content_style.dart';
@@ -51,12 +52,14 @@ class ChestPage extends StatefulWidget {
     this.focusConversationId,
     this.highlightLatest = false,
     this.focusReplyId,
+    this.initialFilter = CasaShareMode.all,
   });
 
   final bool focusReplies;
   final String? focusConversationId;
   final bool highlightLatest;
   final String? focusReplyId;
+  final CasaShareMode initialFilter;
 
   @override
   State<ChestPage> createState() => _ChestPageState();
@@ -312,6 +315,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       widget.focusConversationId ?? '',
       widget.focusReplies ? '1' : '0',
       widget.highlightLatest ? '1' : '0',
+      widget.initialFilter.name,
       _initialLoadCompleted ? 'loaded' : 'loading',
       _pendingRevealEntryId ?? '',
       _mode.name,
@@ -339,7 +343,24 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         .map<ChestItem>((r) => ChestItem.hinoo(r))
         .toList();
 
-    final items = [...honooItems, ...hinooItems];
+    final items = [...honooItems, ...hinooItems]
+        .where((item) {
+          switch (widget.initialFilter) {
+            case CasaShareMode.all:
+              return true;
+            case CasaShareMode.home:
+              return item.when(
+                honoo: (honoo) => !honoo.isFromMoonSaved,
+                hinoo: (hinoo) => !hinoo.isFromMoonSaved,
+              );
+            case CasaShareMode.moon:
+              return item.when(
+                honoo: (honoo) => honoo.isFromMoonSaved,
+                hinoo: (hinoo) => hinoo.isFromMoonSaved,
+              );
+          }
+        })
+        .toList(growable: false);
     final organization = ChestOrganizer.organize<ChestItem>(
       items: items,
       createdAtOf: (item) => item.createdAt,
