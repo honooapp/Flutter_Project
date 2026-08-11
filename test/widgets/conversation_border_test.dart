@@ -68,7 +68,11 @@ void main() {
     isFromMoonSaved: fromMoon,
   );
 
-  Future<void> pumpHonoo(WidgetTester tester, Honoo value) async {
+  Future<void> pumpHonoo(
+    WidgetTester tester,
+    Honoo value, {
+    ChestContentStyle? contentStyleOverride,
+  }) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(800, 1000);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -79,7 +83,10 @@ void main() {
           body: SizedBox(
             width: 500,
             height: 750,
-            child: HonooCard(honoo: value),
+            child: HonooCard(
+              honoo: value,
+              contentStyleOverride: contentStyleOverride,
+            ),
           ),
         ),
       ),
@@ -201,6 +208,34 @@ void main() {
     );
   });
 
+  test('Honoo Luna proprio resta blu nella conversazione', () {
+    final value = honoo(type: HonooType.moon, owner: 'test_user');
+
+    expect(
+      ChestContentStyle.forConversationEntry(
+        ConversationEntry.honoo(value),
+        viewerUserId: 'test_user',
+      ),
+      same(ChestContentStyle.own),
+    );
+  });
+
+  testWidgets('Honoo Luna in conversazione usa il rosso anche nella fascia', (
+    tester,
+  ) async {
+    final value = honoo(type: HonooType.moon, owner: 'other_user');
+    await pumpHonoo(
+      tester,
+      value,
+      contentStyleOverride: ChestContentStyle.receivedReply,
+    );
+
+    final gap = tester.widget<ColoredBox>(
+      find.byKey(const Key('honoo-card-gap')),
+    );
+    expect(gap.color, HonooColor.secondary);
+  });
+
   test('Honoo personale altrui diventa rosso nella conversazione', () {
     final value = honoo(type: HonooType.personal, owner: 'other_user');
 
@@ -222,6 +257,38 @@ void main() {
         viewerUserId: 'test_user',
       ),
       same(ChestContentStyle.own),
+    );
+  });
+
+  test('Hinoo Luna proprio resta blu nella conversazione', () {
+    final draft = hinoo().copyWith(type: HinooType.moon);
+
+    expect(
+      ChestContentStyle.forConversationEntry(
+        ConversationEntry.hinoo(
+          draft,
+          createdAt: DateTime.parse('2026-07-18T10:00:00Z'),
+          ownerId: 'test_user',
+        ),
+        viewerUserId: 'test_user',
+      ),
+      same(ChestContentStyle.own),
+    );
+  });
+
+  test('Hinoo Luna altrui resta rosso nella conversazione', () {
+    final draft = hinoo().copyWith(type: HinooType.moon);
+
+    expect(
+      ChestContentStyle.forConversationEntry(
+        ConversationEntry.hinoo(
+          draft,
+          createdAt: DateTime.parse('2026-07-18T10:00:00Z'),
+          ownerId: 'other_user',
+        ),
+        viewerUserId: 'test_user',
+      ),
+      same(ChestContentStyle.receivedReply),
     );
   });
 
