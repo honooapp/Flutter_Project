@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:honoo/Services/supabase_provider.dart';
+import 'package:honoo/Services/house_invite_service.dart';
 
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
@@ -38,6 +39,8 @@ class NewHinooPage extends StatefulWidget {
     this.conversationId,
     this.returnToPreviousOnAnswer = false,
     this.targetContentName = 'hinoo',
+    this.initialDraft,
+    this.editingCampanelloId,
   });
 
   final bool isReply;
@@ -49,6 +52,8 @@ class NewHinooPage extends StatefulWidget {
   final String? conversationId;
   final bool returnToPreviousOnAnswer;
   final String targetContentName;
+  final HinooDraft? initialDraft;
+  final String? editingCampanelloId;
 
   @override
   State<NewHinooPage> createState() => _NewHinooPageState();
@@ -326,6 +331,17 @@ class _NewHinooPageState extends State<NewHinooPage>
       }
 
       if (widget.isCampanello) {
+        final String? editingId = widget.editingCampanelloId;
+        if (editingId != null && editingId.isNotEmpty) {
+          await HouseInviteService().updateCampanello(
+            campanelloHinooId: editingId,
+            campanello: hinooDraft,
+          );
+          if (!mounted) return;
+          showHonooToast(context, message: 'Campanello aggiornato.');
+          Navigator.of(context).pop(true);
+          return;
+        }
         if (!mounted) return;
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
@@ -765,6 +781,7 @@ class _NewHinooPageState extends State<NewHinooPage>
                                             'per la pagina\n'
                                             'del tuo campanello'
                                       : null,
+                                  initialDraft: widget.initialDraft,
                                 ),
                               ),
                             ),

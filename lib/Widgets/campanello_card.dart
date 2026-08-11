@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../Entities/campanelli_view_data.dart';
 import '../UI/hinoo_typography.dart';
 import '../Utility/honoo_colors.dart';
+import 'text_box_download_button.dart';
 
 class CampanelloCard extends StatelessWidget {
   const CampanelloCard({
@@ -12,12 +13,14 @@ class CampanelloCard extends StatelessWidget {
     required this.width,
     required this.height,
     this.onRequestTap,
+    this.onEditTap,
   });
 
   final CampanelloPageData data;
   final double width;
   final double height;
   final VoidCallback? onRequestTap;
+  final VoidCallback? onEditTap;
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +68,17 @@ class CampanelloCard extends StatelessWidget {
         children: [
           Image(image: data.campanello!.backgroundImage, fit: BoxFit.cover),
           savedText,
+          if (onEditTap != null)
+            Positioned(
+              top: 6,
+              right: 6,
+              child: TextBoxDownloadButton(
+                key: const ValueKey('edit-own-campanello'),
+                onPressed: onEditTap!,
+                tooltip: 'Modifica campanello',
+                asset: 'assets/icons/sostituisci immagine.svg',
+              ),
+            ),
         ],
       ),
     );

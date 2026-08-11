@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../Entities/campanelli_view_data.dart';
 import '../Utility/honoo_colors.dart';
+import 'text_box_download_button.dart';
 
 class CasaSection extends StatelessWidget {
   const CasaSection({
@@ -16,6 +17,7 @@ class CasaSection extends StatelessWidget {
     required this.footerBottomSpacing,
     required this.width,
     required this.height,
+    this.onEditTap,
   });
 
   final CasaData casa;
@@ -27,6 +29,7 @@ class CasaSection extends StatelessWidget {
   final double footerBottomSpacing;
   final double width;
   final double height;
+  final VoidCallback? onEditTap;
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +79,17 @@ class CasaSection extends StatelessWidget {
                   color: HonooColor.onBackground,
                   fontWeight: FontWeight.w400,
                 ),
+              ),
+            ),
+          if (onEditTap != null)
+            Positioned(
+              top: 6,
+              right: 6,
+              child: TextBoxDownloadButton(
+                key: const ValueKey('edit-own-casa'),
+                onPressed: onEditTap!,
+                tooltip: 'Modifica casa',
+                asset: 'assets/icons/sostituisci immagine.svg',
               ),
             ),
           Positioned(

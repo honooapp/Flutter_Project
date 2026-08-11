@@ -143,4 +143,53 @@ void main() {
       throwsArgumentError,
     );
   });
+
+  test('updateCampanello aggiorna le pagine del campanello esistente', () async {
+    when(() => client.from('hinoo')).thenAnswer((_) => chain);
+    when(() => chain.update(any())).thenAnswer((_) => chain);
+    chain.queueResponse(null);
+    const draft = HinooDraft(
+      pages: [
+        HinooSlide(
+          backgroundImage: 'https://example.com/bell.png',
+          text: 'Campanello modificato',
+          isTextWhite: false,
+        ),
+      ],
+    );
+
+    await service.updateCampanello(
+      campanelloHinooId: 'hinoo-1',
+      campanello: draft,
+    );
+
+    verify(() => client.from('hinoo')).called(1);
+    verify(() => chain.update(any(
+          that: containsPair(
+            'pages',
+            draft.pages.map((page) => page.toJson()).toList(),
+          ),
+        ))).called(1);
+    verify(() => chain.eq('id', 'hinoo-1')).called(1);
+  });
+
+  test('updateHouse aggiorna immagine e trasformazione della propria casa',
+      () async {
+    when(() => client.from('case')).thenAnswer((_) => chain);
+    when(() => chain.update(any())).thenAnswer((_) => chain);
+    chain.queueResponse(null);
+
+    await service.updateHouse(
+      campanelloHinooId: 'hinoo-1',
+      houseImageUrl: 'https://example.com/house.png',
+      bgTransform: const [1, 0, 0, 1],
+    );
+
+    verify(() => client.from('case')).called(1);
+    verify(() => chain.update({
+          'house_image_url': 'https://example.com/house.png',
+          'bg_transform': [1, 0, 0, 1],
+        })).called(1);
+    verify(() => chain.eq('campanello_hinoo_id', 'hinoo-1')).called(1);
+  });
 }

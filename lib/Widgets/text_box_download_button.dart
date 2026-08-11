@@ -7,11 +7,13 @@ class TextBoxDownloadButton extends StatelessWidget {
     required this.onPressed,
     this.tooltip = 'download',
     this.size = 30,
+    this.asset = 'assets/icons/download.svg',
   });
 
   final VoidCallback onPressed;
   final String tooltip;
   final double size;
+  final String asset;
 
   static final ValueNotifier<bool> _hiddenForCapture = ValueNotifier<bool>(
     false,
@@ -63,7 +65,7 @@ class TextBoxDownloadButton extends StatelessWidget {
                 ),
                 child: Center(
                   child: SvgPicture.asset(
-                    'assets/icons/download.svg',
+                    asset,
                     width: size * 0.6,
                     height: size * 0.6,
                     colorFilter: const ColorFilter.mode(

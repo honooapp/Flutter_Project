@@ -80,6 +80,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final CasaSection casa = tester.widget(find.byType(CasaSection));
+    expect(find.byType(DesktopCarouselArrows), findsNothing);
     expect(casa.width, closeTo(506.25, 0.01));
     expect(casa.height, 900);
     expect(tester.takeException(), isNull);

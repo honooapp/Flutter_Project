@@ -12,6 +12,8 @@ class CampanelliEntry {
     required this.bgScale,
     required this.bgOffsetX,
     required this.bgOffsetY,
+    required this.campanelloIsTextWhite,
+    required this.campanelloBgTransform,
   });
 
   final String hinooId;
@@ -23,4 +25,6 @@ class CampanelliEntry {
   final double bgScale;
   final double bgOffsetX;
   final double bgOffsetY;
+  final bool campanelloIsTextWhite;
+  final List<double>? campanelloBgTransform;
 }
