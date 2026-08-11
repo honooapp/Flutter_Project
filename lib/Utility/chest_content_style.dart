@@ -85,18 +85,14 @@ class ChestContentStyle {
     ConversationEntry entry, {
     String? viewerUserId,
   }) {
-    final isFromMoon = switch (entry.kind) {
+    final isFromMoonSaved = switch (entry.kind) {
       ConversationEntryKind.honoo =>
-        entry.isFromMoonSaved ||
-            entry.honoo!.isFromMoonSaved ||
-            entry.honoo!.type == HonooType.moon,
+        entry.isFromMoonSaved || entry.honoo!.isFromMoonSaved,
       ConversationEntryKind.hinoo =>
-        entry.isFromMoonSaved ||
-            entry.hinoo!.isFromMoonSaved ||
-            entry.hinoo!.type == HinooType.moon,
+        entry.isFromMoonSaved || entry.hinoo!.isFromMoonSaved,
       ConversationEntryKind.deleted => false,
     };
-    if (isFromMoon) return receivedReply;
+    if (isFromMoonSaved) return receivedReply;
     final ownerId = entry.ownerId;
     if (viewerUserId != null && ownerId != null && ownerId != viewerUserId) {
       return receivedReply;
