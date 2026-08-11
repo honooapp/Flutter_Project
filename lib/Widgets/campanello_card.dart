@@ -80,7 +80,7 @@ class CampanelloCard extends StatelessWidget {
                 key: const ValueKey('edit-own-campanello-image'),
                 onPressed: onEditImageTap ?? onEditTap!,
                 tooltip: 'Modifica immagine',
-                asset: 'assets/icons/sostituisci immagine.svg',
+                asset: 'assets/icons/immagine.svg',
               ),
             ),
           if (onEditTextTap != null || onEditTap != null)

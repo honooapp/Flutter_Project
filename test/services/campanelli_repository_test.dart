@@ -122,6 +122,45 @@ void main() {
     verify(() => houseAccess.eq('id', 'knock-1')).called(1);
   });
 
+  test('approveHouseKnock salva i filtri sulla singola bussata', () async {
+    final rpc = MockQueryChain()..queueResponse(null);
+    when(() => harness.client.rpc(
+          'approve_house_knock',
+          params: any(named: 'params'),
+        )).thenAnswer((_) => rpc);
+
+    await repository.approveHouseKnock(
+      knockId: '42',
+      shareModes: const ['home', 'moon'],
+    );
+
+    verify(() => harness.client.rpc(
+          'approve_house_knock',
+          params: {
+            'p_knock_id': 42,
+            'p_share_modes': ['home', 'moon'],
+          },
+        )).called(1);
+  });
+
+  test('fetchGrantedHouseTags restituisce solo tag validi', () async {
+    when(() => houseAccess.not('granted_at', 'is', null))
+        .thenAnswer((_) => houseAccess);
+    houseAccess.queueResponse(const [
+      {'target_house_tag': 'house-1', 'share_modes': ['home']},
+      {'target_house_tag': '', 'share_modes': ['all']},
+      {'target_house_tag': 'legacy-house', 'share_modes': []},
+      {'target_house_tag': 'house-2', 'share_modes': ['moon']},
+    ]);
+
+    expect(
+      await repository.fetchGrantedHouseTags('visitor-1'),
+      ['house-1', 'house-2'],
+    );
+    verify(() => houseAccess.eq('visitor_id', 'visitor-1')).called(1);
+    verify(() => houseAccess.not('granted_at', 'is', null)).called(1);
+  });
+
   test('saveShareModes mantiene payload e chiave di conflitto', () async {
     final updatedAt = DateTime.utc(2026, 7, 18, 10, 30);
     when(() => settings.upsert(

@@ -626,7 +626,7 @@ class _NewHinooPageState extends State<NewHinooPage>
                     iconSize: secondaryActionIconSize,
                     color: HonooColor.onBackground,
                     icon: SvgPicture.asset(
-                      'assets/icons/sostituisci immagine.svg',
+                      'assets/icons/immagine.svg',
                       width: secondaryActionIconSize,
                       height: secondaryActionIconSize,
                       colorFilter: const ColorFilter.mode(
@@ -708,7 +708,7 @@ class _NewHinooPageState extends State<NewHinooPage>
               onPressed: _beginCampanelloImageEdit,
               tooltip: 'Modifica immagine',
               size: actionSize,
-              asset: 'assets/icons/sostituisci immagine.svg',
+              asset: 'assets/icons/immagine.svg',
             ),
             if (_campanelloEditStarted)
               TextBoxDownloadButton(
