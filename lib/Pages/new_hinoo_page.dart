@@ -26,6 +26,9 @@ import '../Entities/reply_navigation_result.dart';
 import 'casa_builder_page.dart';
 import '../Widgets/conversation_notification_prompt.dart';
 import '../Widgets/repeated_reply_prompt.dart';
+import '../Widgets/text_box_download_button.dart';
+
+enum CampanelloEditMode { image, text }
 
 class NewHinooPage extends StatefulWidget {
   const NewHinooPage({
@@ -41,6 +44,7 @@ class NewHinooPage extends StatefulWidget {
     this.targetContentName = 'hinoo',
     this.initialDraft,
     this.editingCampanelloId,
+    this.campanelloEditMode,
   });
 
   final bool isReply;
@@ -54,6 +58,7 @@ class NewHinooPage extends StatefulWidget {
   final String targetContentName;
   final HinooDraft? initialDraft;
   final String? editingCampanelloId;
+  final CampanelloEditMode? campanelloEditMode;
 
   @override
   State<NewHinooPage> createState() => _NewHinooPageState();
@@ -73,6 +78,7 @@ class _NewHinooPageState extends State<NewHinooPage>
   int _currentTextLength = 0;
   bool _bgUploadInProgress = false;
   bool _hasBackground = false;
+  bool _campanelloEditStarted = false;
 
   bool get _isWriteStep => _builderStep == 'writeText';
   bool get _hasMinTextForDownload => _currentTextLength >= 1;
@@ -115,6 +121,12 @@ class _NewHinooPageState extends State<NewHinooPage>
       final draft = dyn?.exportDraft?.call();
       if (!mounted) return;
       setState(() => _applyDraftToLocalState(draft));
+      final editMode = widget.campanelloEditMode;
+      if (editMode == CampanelloEditMode.image) {
+        _beginCampanelloImageEdit();
+      } else if (editMode == CampanelloEditMode.text) {
+        _beginCampanelloTextEdit();
+      }
     });
   }
 
@@ -556,6 +568,19 @@ class _NewHinooPageState extends State<NewHinooPage>
     builder?.replaceBackgroundPublic?.call();
   }
 
+  void _beginCampanelloImageEdit() {
+    if (!mounted) return;
+    setState(() => _campanelloEditStarted = true);
+    _replaceEditorImage();
+  }
+
+  void _beginCampanelloTextEdit() {
+    if (!mounted) return;
+    setState(() => _campanelloEditStarted = true);
+    final dynamic builder = _builderKey.currentState;
+    builder?.editTextPublic?.call();
+  }
+
   void _saveEditorImage() {
     final dynamic builder = _builderKey.currentState;
     builder?.confirmBackgroundPublic?.call();
@@ -667,6 +692,45 @@ class _NewHinooPageState extends State<NewHinooPage>
   }
 
   Widget _buildEditorControls() {
+    final bool editingExistingCampanello =
+        widget.isCampanello &&
+        (widget.editingCampanelloId?.isNotEmpty ?? false);
+    if (editingExistingCampanello) {
+      const double actionSize = 30;
+      return SizedBox(
+        key: const Key('campanello-editor-controls'),
+        height: 40,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextBoxDownloadButton(
+              key: const Key('campanello-edit-image'),
+              onPressed: _beginCampanelloImageEdit,
+              tooltip: 'Modifica immagine',
+              size: actionSize,
+              asset: 'assets/icons/immagine.svg',
+            ),
+            if (_campanelloEditStarted)
+              TextBoxDownloadButton(
+                key: const Key('campanello-save-changes'),
+                onPressed: _submitHinoo,
+                tooltip: 'Conferma e salva',
+                size: actionSize,
+                asset: 'assets/icons/ok.svg',
+              )
+            else
+              const SizedBox(width: actionSize, height: actionSize),
+            TextBoxDownloadButton(
+              key: const Key('campanello-edit-text'),
+              onPressed: _beginCampanelloTextEdit,
+              tooltip: 'Modifica testo',
+              size: actionSize,
+              asset: 'assets/icons/modifica testo.svg',
+            ),
+          ],
+        ),
+      );
+    }
     return SizedBox(
       key: const Key('hinoo-editor-controls'),
       height: 40,
@@ -870,7 +934,11 @@ class _NewHinooPageState extends State<NewHinooPage>
                             );
                           },
                         ),
-                        if (_isWriteStep && _currentTextLength > 0)
+                        if (_isWriteStep &&
+                            _currentTextLength > 0 &&
+                            !(widget.isCampanello &&
+                                (widget.editingCampanelloId?.isNotEmpty ??
+                                    false)))
                           ResponsiveFooterAction(
                             asset: "assets/icons/ok.svg",
                             semanticsLabel:

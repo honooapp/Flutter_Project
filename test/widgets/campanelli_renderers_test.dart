@@ -84,7 +84,8 @@ void main() {
   testWidgets('il campanello proprietario espone il comando modifica', (
     tester,
   ) async {
-    var edited = false;
+    var editedImage = false;
+    var editedText = false;
     const campanello = CampanelloData(
       id: 'campanello-1',
       campanelloHinooId: 'hinoo-1',
@@ -101,14 +102,17 @@ void main() {
             data: CampanelloPageData.campanello(campanello),
             width: 320,
             height: 500,
-            onEditTap: () => edited = true,
+            onEditImageTap: () => editedImage = true,
+            onEditTextTap: () => editedText = true,
           ),
         ),
       ),
     );
 
-    await tester.tap(find.byKey(const ValueKey('edit-own-campanello')));
-    expect(edited, isTrue);
+    await tester.tap(find.byKey(const ValueKey('edit-own-campanello-image')));
+    await tester.tap(find.byKey(const ValueKey('edit-own-campanello-text')));
+    expect(editedImage, isTrue);
+    expect(editedText, isTrue);
   });
 
   testWidgets('casa chiusa conserva messaggio e azione scrigno', (

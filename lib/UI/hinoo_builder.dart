@@ -433,6 +433,11 @@ class _HinooBuilderState extends State<HinooBuilder> {
       _downloadHinoo(baseName: baseName);
   Future<void> replaceBackgroundPublic() => _pickAndUploadBackground();
   void confirmBackgroundPublic() => _confirmBgAndLock();
+  void editTextPublic() {
+    setState(() => _step = _WizardStep.writeText);
+    _textFocus.requestFocus();
+    _notifyChanged();
+  }
 
   String _prepareFileBaseName(String? raw) {
     const String fallback = 'hinoo';

@@ -4,9 +4,58 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:honoo/Pages/new_hinoo_page.dart';
 import 'package:honoo/UI/hinoo_builder.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Entities/hinoo.dart';
 import 'package:sizer/sizer.dart';
 
 void main() {
+  testWidgets(
+    'il campanello mostra salva al centro solo dopo aver avviato una modifica',
+    (tester) async {
+      await tester.pumpWidget(
+        Sizer(
+          builder: (context, orientation, deviceType) {
+            return const MaterialApp(
+              home: NewHinooPage(
+                isCampanello: true,
+                editingCampanelloId: 'campanello-1',
+                initialDraft: HinooDraft(
+                  pages: [
+                    HinooSlide(
+                      backgroundImage: null,
+                      text: 'Il mio campanello',
+                      isTextWhite: true,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      );
+      await tester.pump();
+
+      expect(find.byKey(const Key('campanello-edit-image')), findsOneWidget);
+      expect(find.byKey(const Key('campanello-edit-text')), findsOneWidget);
+      expect(find.byKey(const Key('campanello-save-changes')), findsNothing);
+
+      await tester.tap(find.byKey(const Key('campanello-edit-text')));
+      await tester.pump();
+
+      expect(find.byKey(const Key('campanello-save-changes')), findsOneWidget);
+      final imageX = tester
+          .getCenter(find.byKey(const Key('campanello-edit-image')))
+          .dx;
+      final saveX = tester
+          .getCenter(find.byKey(const Key('campanello-save-changes')))
+          .dx;
+      final textX = tester
+          .getCenter(find.byKey(const Key('campanello-edit-text')))
+          .dx;
+      expect(imageX, lessThan(saveX));
+      expect(saveX, lessThan(textX));
+    },
+  );
+
   testWidgets('il footer hinoo non mostra Scrivi honoo', (tester) async {
     await tester.pumpWidget(
       Sizer(
