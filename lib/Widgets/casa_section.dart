@@ -89,7 +89,7 @@ class CasaSection extends StatelessWidget {
                 key: const ValueKey('edit-own-casa'),
                 onPressed: onEditTap!,
                 tooltip: 'Modifica casa',
-                asset: 'assets/icons/sostituisci immagine.svg',
+                asset: 'assets/icons/immagine.svg',
               ),
             ),
           Positioned(

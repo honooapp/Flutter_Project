@@ -1,38 +1,38 @@
 enum CasaShareMode {
-  honoo,
-  hinoo,
-  conversations;
+  home,
+  moon,
+  all;
 
   String get label {
     switch (this) {
-      case CasaShareMode.honoo:
-        return 'I miei honoo';
-      case CasaShareMode.hinoo:
-        return 'I miei hinoo';
-      case CasaShareMode.conversations:
-        return 'Le mie conversazioni';
+      case CasaShareMode.home:
+        return 'honoo e hinoo di casa';
+      case CasaShareMode.moon:
+        return 'honoo e hinoo dalla luna';
+      case CasaShareMode.all:
+        return 'tutto';
     }
   }
 
   String get dbValue {
     switch (this) {
-      case CasaShareMode.honoo:
-        return 'honoo';
-      case CasaShareMode.hinoo:
-        return 'hinoo';
-      case CasaShareMode.conversations:
-        return 'conversations';
+      case CasaShareMode.home:
+        return 'home';
+      case CasaShareMode.moon:
+        return 'moon';
+      case CasaShareMode.all:
+        return 'all';
     }
   }
 
   static CasaShareMode? fromDb(String? value) {
     switch (value) {
-      case 'honoo':
-        return CasaShareMode.honoo;
-      case 'hinoo':
-        return CasaShareMode.hinoo;
-      case 'conversations':
-        return CasaShareMode.conversations;
+      case 'home':
+        return CasaShareMode.home;
+      case 'moon':
+        return CasaShareMode.moon;
+      case 'all':
+        return CasaShareMode.all;
       default:
         return null;
     }

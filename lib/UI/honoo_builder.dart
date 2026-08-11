@@ -772,7 +772,7 @@ class HonooBuilderState extends State<HonooBuilder> {
                       iconSize: secondaryActionIconSize,
                       color: HonooColor.onBackground,
                       icon: SvgPicture.asset(
-                        'assets/icons/sostituisci immagine.svg',
+                        'assets/icons/immagine.svg',
                         width: secondaryActionIconSize,
                         height: secondaryActionIconSize,
                         colorFilter: const ColorFilter.mode(
@@ -951,7 +951,7 @@ class HonooBuilderState extends State<HonooBuilder> {
                             ),
                           ),
                           icon: SvgPicture.asset(
-                            'assets/icons/sostituisci immagine.svg',
+                            'assets/icons/immagine.svg',
                             width: 20,
                             height: 20,
                             colorFilter: const ColorFilter.mode(

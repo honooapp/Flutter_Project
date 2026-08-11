@@ -217,23 +217,18 @@ class CampanelliController extends ChangeNotifier {
 
   Future<void> approvePendingKnock({
     required String knockId,
-    required String ownerId,
-    required String campanelloHinooId,
     required List<String> shareModes,
-    DateTime? approvedAt,
   }) async {
-    final timestamp = approvedAt ?? DateTime.now();
-    await _repository.saveShareModes(
-      ownerId: ownerId,
-      campanelloHinooId: campanelloHinooId,
-      modes: shareModes,
-      updatedAt: timestamp,
-    );
-    await _repository.grantHouseAccess(
+    await _repository.approveHouseKnock(
       knockId: knockId,
-      grantedAt: timestamp,
+      shareModes: shareModes,
     );
     removePendingKnock(knockId);
+  }
+
+  Future<Set<String>> loadGrantedHouseTags(String visitorId) async {
+    final tags = await _repository.fetchGrantedHouseTags(visitorId);
+    return Set<String>.unmodifiable(tags);
   }
 
   Future<void> sendHouseKnock({

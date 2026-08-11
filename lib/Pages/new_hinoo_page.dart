@@ -601,7 +601,7 @@ class _NewHinooPageState extends State<NewHinooPage>
                     iconSize: secondaryActionIconSize,
                     color: HonooColor.onBackground,
                     icon: SvgPicture.asset(
-                      'assets/icons/sostituisci immagine.svg',
+                      'assets/icons/immagine.svg',
                       width: secondaryActionIconSize,
                       height: secondaryActionIconSize,
                       colorFilter: const ColorFilter.mode(

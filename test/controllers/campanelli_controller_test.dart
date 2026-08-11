@@ -255,43 +255,25 @@ void main() {
   });
 
   test('approva la bussata e la rimuove dallo stato', () async {
-    final approvedAt = DateTime.utc(2026, 7, 18, 10, 30);
     controller.addPendingKnockRow(const {
       'id': 'knock-1',
       'target_house_tag': 'hinoo-1',
       'created_at': '2026-07-18T10:00:00Z',
     });
-    when(() => repository.saveShareModes(
-          ownerId: 'owner-1',
-          campanelloHinooId: 'hinoo-1',
-          modes: ['honoo', 'hinoo'],
-          updatedAt: approvedAt,
-        )).thenAnswer((_) async {});
-    when(() => repository.grantHouseAccess(
+    when(() => repository.approveHouseKnock(
           knockId: 'knock-1',
-          grantedAt: approvedAt,
+          shareModes: ['home', 'moon'],
         )).thenAnswer((_) async {});
 
     await controller.approvePendingKnock(
       knockId: 'knock-1',
-      ownerId: 'owner-1',
-      campanelloHinooId: 'hinoo-1',
-      shareModes: const ['honoo', 'hinoo'],
-      approvedAt: approvedAt,
+      shareModes: const ['home', 'moon'],
     );
 
-    verifyInOrder([
-      () => repository.saveShareModes(
-            ownerId: 'owner-1',
-            campanelloHinooId: 'hinoo-1',
-            modes: ['honoo', 'hinoo'],
-            updatedAt: approvedAt,
-          ),
-      () => repository.grantHouseAccess(
-            knockId: 'knock-1',
-            grantedAt: approvedAt,
-          ),
-    ]);
+    verify(() => repository.approveHouseKnock(
+          knockId: 'knock-1',
+          shareModes: ['home', 'moon'],
+        )).called(1);
     expect(controller.state.pendingKnocks, isEmpty);
   });
 
@@ -322,50 +304,40 @@ void main() {
     when(() => repository.saveShareModes(
           ownerId: 'owner-1',
           campanelloHinooId: 'hinoo-1',
-          modes: ['honoo', 'conversations'],
+          modes: ['home', 'all'],
           updatedAt: updatedAt,
         )).thenAnswer((_) async {});
 
     await controller.saveShareModes(
       ownerId: 'owner-1',
       campanelloHinooId: 'hinoo-1',
-      modes: const ['honoo', 'conversations'],
+      modes: const ['home', 'all'],
       updatedAt: updatedAt,
     );
 
     verify(() => repository.saveShareModes(
           ownerId: 'owner-1',
           campanelloHinooId: 'hinoo-1',
-          modes: ['honoo', 'conversations'],
+          modes: ['home', 'all'],
           updatedAt: updatedAt,
         )).called(1);
   });
 
   test('mantiene la bussata pendente se la concessione fallisce', () async {
-    final approvedAt = DateTime.utc(2026, 7, 18, 10, 30);
     controller.addPendingKnockRow(const {
       'id': 'knock-1',
       'target_house_tag': 'hinoo-1',
       'created_at': '2026-07-18T10:00:00Z',
     });
-    when(() => repository.saveShareModes(
-          ownerId: any(named: 'ownerId'),
-          campanelloHinooId: any(named: 'campanelloHinooId'),
-          modes: any(named: 'modes'),
-          updatedAt: any(named: 'updatedAt'),
-        )).thenAnswer((_) async {});
-    when(() => repository.grantHouseAccess(
+    when(() => repository.approveHouseKnock(
           knockId: any(named: 'knockId'),
-          grantedAt: any(named: 'grantedAt'),
+          shareModes: any(named: 'shareModes'),
         )).thenThrow(StateError('offline'));
 
     await expectLater(
       controller.approvePendingKnock(
         knockId: 'knock-1',
-        ownerId: 'owner-1',
-        campanelloHinooId: 'hinoo-1',
-        shareModes: const ['honoo'],
-        approvedAt: approvedAt,
+        shareModes: const ['home'],
       ),
       throwsStateError,
     );
