@@ -1,9 +1,7 @@
 import 'dart:math' as math;
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:honoo/Services/hinoo_storage_uploader.dart';
@@ -15,6 +13,7 @@ import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
+import 'package:honoo/Widgets/cover_transform_image.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -41,8 +40,9 @@ class CasaBuilderPage extends StatefulWidget {
 class _CasaBuilderPageState extends State<CasaBuilderPage> {
   final HouseInviteService _inviteService = HouseInviteService();
   final TransformationController _imageController = TransformationController();
-  final GlobalKey _captureKey = GlobalKey();
   ImageProvider? _imageProvider;
+  Uint8List? _pickedImageBytes;
+  String _pickedImageExtension = 'jpg';
   bool _isSaving = false;
   bool _isUploadingImage = false;
   bool _hasPickedImage = false;
@@ -130,6 +130,12 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
       final Uint8List bytes = await selected.readAsBytes();
       setState(() {
         _imageProvider = MemoryImage(bytes);
+        _pickedImageBytes = bytes;
+        final extension = selected.name.split('.').last.toLowerCase();
+        _pickedImageExtension =
+            {'jpg', 'jpeg', 'png', 'webp'}.contains(extension)
+            ? extension
+            : 'jpg';
         _imageScale = _imageMinScale;
         _hasPickedImage = true;
       });
@@ -137,32 +143,6 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
     } catch (e) {
       if (!mounted) return;
       showHonooToast(context, message: 'Errore immagine: $e');
-    }
-  }
-
-  Future<Uint8List?> _captureCasaImage() async {
-    try {
-      final RenderRepaintBoundary? boundary =
-          _captureKey.currentContext?.findRenderObject()
-              as RenderRepaintBoundary?;
-      if (boundary == null) return null;
-      final double deviceRatio = MediaQuery.of(context).devicePixelRatio;
-      final Size logical = boundary.size;
-      const double maxOut = 2560.0;
-      final double longEdge = logical.width > logical.height
-          ? logical.width
-          : logical.height;
-      double pixelRatio = deviceRatio;
-      if (longEdge * deviceRatio > maxOut && longEdge > 0) {
-        pixelRatio = (maxOut / longEdge).clamp(1.0, deviceRatio);
-      }
-      final ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
-      final ByteData? byteData = await image.toByteData(
-        format: ui.ImageByteFormat.png,
-      );
-      return byteData?.buffer.asUint8List();
-    } catch (e) {
-      return null;
     }
   }
 
@@ -188,15 +168,15 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
       String imageUrl = widget.initialHouseImageUrl ?? '';
       if (_hasPickedImage || imageUrl.isEmpty) {
         setState(() => _isUploadingImage = true);
-        final Uint8List? pngBytes = await _captureCasaImage();
-        if (pngBytes == null || pngBytes.isEmpty) {
-          throw Exception('Impossibile generare l\'immagine della casa.');
+        final Uint8List? imageBytes = _pickedImageBytes;
+        if (imageBytes == null || imageBytes.isEmpty) {
+          throw Exception('Impossibile leggere l\'immagine della casa.');
         }
         imageUrl = await HinooStorageUploader.uploadBackground(
-          bytes: pngBytes,
-          ext: 'png',
+          bytes: imageBytes,
+          ext: _pickedImageExtension,
           userId: user.id,
-          // Il PNG della casa comprende l'intero canvas e sui collegamenti più
+          // L'immagine originale può essere pesante e sui collegamenti più
           // lenti può richiedere più dei 15 secondi usati dagli upload normali.
           writeTimeout: const Duration(minutes: 1),
         );
@@ -342,31 +322,14 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
                       child: SizedBox(
                         width: HinooTypography.baselineCanvasWidth,
                         height: HinooTypography.baselineCanvasHeight,
-                        child: RepaintBoundary(
-                          key: _captureKey,
-                          child: ClipRect(
-                            child: InteractiveViewer(
-                              transformationController: _imageController,
-                              panEnabled: true,
-                              scaleEnabled: true,
-                              minScale: _imageMinScale,
-                              maxScale: _imageMaxScale,
-                              boundaryMargin: const EdgeInsets.all(200),
-                              child: SizedBox.expand(
-                                child: _imageProvider == null
-                                    ? Image.asset(
-                                        'assets/stanza-02_carta.jpg',
-                                        fit: BoxFit.cover,
-                                        alignment: Alignment.center,
-                                      )
-                                    : Image(
-                                        image: _imageProvider!,
-                                        fit: BoxFit.cover,
-                                        alignment: Alignment.center,
-                                      ),
-                              ),
-                            ),
-                          ),
+                        child: CoverTransformImage(
+                          image:
+                              _imageProvider ??
+                              const AssetImage('assets/stanza-02_carta.jpg'),
+                          transformationController: _imageController,
+                          interactive: _imageProvider != null,
+                          minScale: _imageMinScale,
+                          maxScale: _imageMaxScale,
                         ),
                       ),
                     ),

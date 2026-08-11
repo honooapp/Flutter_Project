@@ -71,13 +71,16 @@ class _CampanelliPageState extends State<CampanelliPage> {
   bool _showCarouselArrows = true;
   Timer? _carouselHintTimer;
   bool _isKnocking = false;
+  bool _knockOverlayVisible = false;
+  final Map<String, Completer<void>> _knockWaiters =
+      <String, Completer<void>>{};
   bool _isShowingKnockRequest = false;
   final Set<String> _shownKnockRequestIds = <String>{};
   bool get _hasOwnHouse => _campanelliController.state.hasOwnHouse;
   bool get _hasPendingOrAcceptedInvite =>
       _campanelliController.state.hasPendingOrAcceptedInvite;
   late final StreamSubscription<CampanelliRealtimeEvent>
-      _realtimeEventsSubscription;
+  _realtimeEventsSubscription;
   List<PendingKnock> get _pendingKnocks =>
       _campanelliController.state.pendingKnocks;
   Set<String> get _pendingKnockTags => _campanelliController.pendingKnockTags;
@@ -100,6 +103,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
   void _showBusyOverlay(String message) {
     if (!mounted) return;
+    _knockOverlayVisible = true;
     unawaited(
       showDialog<void>(
         context: context,
@@ -110,7 +114,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
   }
 
   void _hideBusyOverlay() {
-    if (!mounted) return;
+    if (!mounted || !_knockOverlayVisible) return;
+    _knockOverlayVisible = false;
     Navigator.of(context, rootNavigator: true).maybePop();
   }
 
@@ -200,7 +205,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
     setState(() => _isKnocking = true);
     try {
-      _showBusyOverlay('Invio la bussata...');
+      _showBusyOverlay('Sto bussando');
       try {
         final user = SupabaseProvider.client.auth.currentUser;
         final targetTag = campanello.campanelloHinooId;
@@ -211,15 +216,21 @@ class _CampanelliPageState extends State<CampanelliPage> {
           _hideBusyOverlay();
           return;
         }
+        final waiter = Completer<void>();
+        _knockWaiters[targetTag] = waiter;
         await _campanelliController.sendHouseKnock(
           targetHouseTag: targetTag,
           visitorId: user.id,
         );
+        await waiter.future.timeout(const Duration(seconds: 12));
+        _hideBusyOverlay();
+      } on TimeoutException {
         _hideBusyOverlay();
         if (mounted) {
-          showHonooToast(
+          await showHonooMessageDialog(
             context,
-            message: 'Bussata inviata. Attendi risposta.',
+            message: 'Il proprietario non è in casa\nProva più tardi',
+            duration: const Duration(seconds: 3),
           );
         }
       } catch (e) {
@@ -231,6 +242,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
             message: 'Invio non riuscito. Ritenta tra poco.',
           );
         }
+      } finally {
+        final targetTag = campanello.campanelloHinooId;
+        if (targetTag != null) _knockWaiters.remove(targetTag);
       }
     } finally {
       if (mounted) setState(() => _isKnocking = false);
@@ -282,17 +296,19 @@ class _CampanelliPageState extends State<CampanelliPage> {
     final user = SupabaseProvider.client.auth.currentUser;
     final bool isOwner = user != null && campanello.ownerId == user.id;
     if (isOwner) {
+      final filter = await Navigator.of(context).push<CasaShareMode>(
+        MaterialPageRoute(builder: (_) => const CasaChestFilterPage()),
+      );
+      if (!mounted || filter == null) return;
       await Navigator.of(context).push<void>(
-        MaterialPageRoute(builder: (_) => const ChestPage()),
+        MaterialPageRoute(builder: (_) => ChestPage(initialFilter: filter)),
       );
       return;
     }
     final ownerId = campanello.ownerId;
     if (ownerId == null || ownerId.isEmpty) return;
     await Navigator.of(context).push<void>(
-      MaterialPageRoute(
-        builder: (_) => SharedHouseChestPage(ownerId: ownerId),
-      ),
+      MaterialPageRoute(builder: (_) => SharedHouseChestPage(ownerId: ownerId)),
     );
   }
 
@@ -552,42 +568,46 @@ class _CampanelliPageState extends State<CampanelliPage> {
         return;
       }
 
-      final entries = loadState.entries.map((entry) {
-        final casaId = 'casa_${entry.hinooId}';
-        return _CampanelloEntry(
-          campanello: CampanelloData.fromBackend(
-            row: {
-              'id': 'campanello_${entry.hinooId}',
-              'campanello_hinoo_id': entry.hinooId,
-              'owner_id': entry.ownerId,
-            },
-            backgroundImage: _campanelloBackgroundProvider(
-              entry.campanelloBackgroundUrl,
-            ),
-            text: entry.text,
-            linkedHouseId: casaId,
-          ),
-          casa: CasaData.fromBackend(
-            row: {'id': casaId, 'bg_transform': entry.bgTransform},
-            backgroundImage: _houseBackgroundProvider(
-              entry.houseImageUrl,
-              entry.campanelloBackgroundUrl,
-            ),
-            bgScale: entry.bgScale,
-            bgOffsetX: entry.bgOffsetX,
-            bgOffsetY: entry.bgOffsetY,
-          ),
-          campanelloBackgroundUrl: entry.campanelloBackgroundUrl,
-          houseImageUrl: entry.houseImageUrl,
-          campanelloIsTextWhite: entry.campanelloIsTextWhite,
-          campanelloBgScale: entry.bgScale,
-          campanelloBgOffsetX: entry.bgOffsetX,
-          campanelloBgOffsetY: entry.bgOffsetY,
-          campanelloBgTransform: entry.campanelloBgTransform,
-        );
-      }).toList(growable: false);
-      final grantedHouseTags =
-          await _campanelliController.loadGrantedHouseTags(user.id);
+      final entries = loadState.entries
+          .map((entry) {
+            final casaId = 'casa_${entry.hinooId}';
+            return _CampanelloEntry(
+              campanello: CampanelloData.fromBackend(
+                row: {
+                  'id': 'campanello_${entry.hinooId}',
+                  'campanello_hinoo_id': entry.hinooId,
+                  'owner_id': entry.ownerId,
+                },
+                backgroundImage: _campanelloBackgroundProvider(
+                  entry.campanelloBackgroundUrl,
+                ),
+                text: entry.text,
+                linkedHouseId: casaId,
+                bgTransform: entry.campanelloBgTransform,
+              ),
+              casa: CasaData.fromBackend(
+                row: {'id': casaId, 'bg_transform': entry.bgTransform},
+                backgroundImage: _houseBackgroundProvider(
+                  entry.houseImageUrl,
+                  entry.campanelloBackgroundUrl,
+                ),
+                bgScale: entry.bgScale,
+                bgOffsetX: entry.bgOffsetX,
+                bgOffsetY: entry.bgOffsetY,
+              ),
+              campanelloBackgroundUrl: entry.campanelloBackgroundUrl,
+              houseImageUrl: entry.houseImageUrl,
+              campanelloIsTextWhite: entry.campanelloIsTextWhite,
+              campanelloBgScale: entry.bgScale,
+              campanelloBgOffsetX: entry.bgOffsetX,
+              campanelloBgOffsetY: entry.bgOffsetY,
+              campanelloBgTransform: entry.campanelloBgTransform,
+            );
+          })
+          .toList(growable: false);
+      final grantedHouseTags = await _campanelliController.loadGrantedHouseTags(
+        user.id,
+      );
 
       if (mounted) {
         setState(() {
@@ -595,10 +615,13 @@ class _CampanelliPageState extends State<CampanelliPage> {
           _ownedHinooIds = List<String>.from(ownedHinooIds);
           _unlockedCampanelli.addAll(
             entries
-                .where((entry) =>
-                    entry.campanello.ownerId == user.id ||
-                    grantedHouseTags
-                        .contains(entry.campanello.campanelloHinooId))
+                .where(
+                  (entry) =>
+                      entry.campanello.ownerId == user.id ||
+                      grantedHouseTags.contains(
+                        entry.campanello.campanelloHinooId,
+                      ),
+                )
                 .map((entry) => entry.campanello.id),
           );
         });
@@ -693,6 +716,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
       case CampanelliPendingKnockRemoved():
         setState(() {});
       case CampanelliAccessGranted(:final targetTag):
+        final waiter = _knockWaiters[targetTag];
+        if (waiter != null && !waiter.isCompleted) waiter.complete();
+        _hideBusyOverlay();
         showHonooToast(context, message: 'La casa è stata aperta');
         try {
           HapticFeedback.lightImpact();
@@ -948,6 +974,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
   void dispose() {
     _carouselHintTimer?.cancel();
     _realtimeEventsSubscription.cancel();
+    for (final waiter in _knockWaiters.values) {
+      if (!waiter.isCompleted) waiter.complete();
+    }
     _pageController.dispose();
     _campanelloPageController.dispose();
     _campanelliController.dispose();

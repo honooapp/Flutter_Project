@@ -32,7 +32,13 @@ class HonooCard extends StatelessWidget {
     final contentStyle =
         contentStyleOverride ??
         ChestContentStyle.forHonoo(honoo, viewerUserId: currentUserId);
-    final Color cardBg = contentStyle.backgroundColor;
+    // Sulla Luna il fondo esterno della card deve essere bianco: usando il
+    // blu dello Scrigno questo affiorava agli angoli arrotondati come piccoli
+    // rettangoli tra pannello testo e immagine.
+    final Color cardBg =
+        contentStyleOverride == null && honoo.type == HonooType.moon
+        ? HonooColor.tertiary
+        : contentStyle.backgroundColor;
     final bool isReceivedReply = identical(
       contentStyle,
       ChestContentStyle.receivedReply,

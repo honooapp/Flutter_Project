@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../Entities/campanelli_view_data.dart';
 import '../Utility/honoo_colors.dart';
 import 'text_box_download_button.dart';
+import 'cover_transform_image.dart';
 
 class CasaSection extends StatelessWidget {
   const CasaSection({
@@ -62,12 +63,9 @@ class CasaSection extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          ClipRect(
-            child: Transform(
-              transform: transform,
-              alignment: Alignment.center,
-              child: Image(image: casa.backgroundImage, fit: BoxFit.cover),
-            ),
+          CoverTransformImage.transformed(
+            image: casa.backgroundImage,
+            transform: transform,
           ),
           if (!isUnlocked)
             Center(

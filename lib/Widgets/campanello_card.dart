@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../Entities/campanelli_view_data.dart';
 import '../UI/hinoo_typography.dart';
 import '../Utility/honoo_colors.dart';
+import 'cover_transform_image.dart';
 import 'text_box_download_button.dart';
 
 class CampanelloCard extends StatelessWidget {
@@ -57,12 +58,20 @@ class CampanelloCard extends StatelessWidget {
         HinooTypography.horizontalPadding,
         HinooTypography.editorTextBottomPadding,
       ),
-      child: Align(
+      child: Center(
         key: const ValueKey('campanello-saved-text-position'),
-        alignment: Alignment.topCenter,
         child: _buildText(textStyle),
       ),
     );
+
+    final rawTransform = data.campanello!.bgTransform;
+    Matrix4? transform;
+    if (rawTransform != null && rawTransform.length == 16) {
+      final values = List<double>.from(rawTransform);
+      values[12] *= width / HinooTypography.baselineCanvasWidth;
+      values[13] *= height / HinooTypography.baselineCanvasHeight;
+      transform = Matrix4.fromList(values);
+    }
 
     return SizedBox(
       width: width,
@@ -70,7 +79,13 @@ class CampanelloCard extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Image(image: data.campanello!.backgroundImage, fit: BoxFit.cover),
+          if (transform != null)
+            CoverTransformImage.transformed(
+              image: data.campanello!.backgroundImage,
+              transform: transform,
+            )
+          else
+            Image(image: data.campanello!.backgroundImage, fit: BoxFit.cover),
           savedText,
           if (onEditTap != null || onEditImageTap != null)
             Positioned(

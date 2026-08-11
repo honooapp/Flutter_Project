@@ -53,6 +53,7 @@ void main() {
       find.byKey(const Key('honoo-card-gap')),
     );
     expect(gap.color, HonooColor.tertiary);
+    expect(tester.widget<Card>(find.byType(Card)).color, HonooColor.tertiary);
   });
 
   testWidgets(

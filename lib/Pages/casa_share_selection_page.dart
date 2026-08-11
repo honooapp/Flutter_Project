@@ -17,6 +17,71 @@ class CasaShareSelectionPage extends StatefulWidget {
   State<CasaShareSelectionPage> createState() => _CasaShareSelectionPageState();
 }
 
+/// Menu di ingresso allo Scrigno dalla propria casa. La scelta è immediata:
+/// non rappresenta un'autorizzazione e quindi non ha stato selezionato né OK.
+class CasaChestFilterPage extends StatelessWidget {
+  const CasaChestFilterPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: HonooColor.background,
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compact = constraints.maxHeight < 650;
+            final iconSize = compact ? 72.0 : 96.0;
+            final spacing = compact ? 28.0 : 46.0;
+            return Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 32,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _ShareIcon(
+                      key: const ValueKey('house-chest-home'),
+                      mode: CasaShareMode.home,
+                      asset: 'assets/icons/honoo_chest_blue.svg',
+                      selected: false,
+                      size: iconSize,
+                      addWhiteOutline: true,
+                      onTap: () =>
+                          Navigator.of(context).pop(CasaShareMode.home),
+                    ),
+                    SizedBox(height: spacing),
+                    _ShareIcon(
+                      key: const ValueKey('house-chest-moon'),
+                      mode: CasaShareMode.moon,
+                      asset: 'assets/icons/honoo_chest_white.svg',
+                      selected: false,
+                      size: iconSize,
+                      onTap: () =>
+                          Navigator.of(context).pop(CasaShareMode.moon),
+                    ),
+                    SizedBox(height: spacing),
+                    _ShareIcon(
+                      key: const ValueKey('house-chest-all'),
+                      mode: CasaShareMode.all,
+                      asset: 'assets/icons/chest_home.svg',
+                      selected: false,
+                      size: iconSize,
+                      addWhiteOutline: true,
+                      onTap: () => Navigator.of(context).pop(CasaShareMode.all),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
 class _CasaShareSelectionPageState extends State<CasaShareSelectionPage> {
   late final Set<CasaShareMode> _selected = Set<CasaShareMode>.of(
     widget.initialSelection,

@@ -62,22 +62,25 @@ void main() {
     );
 
     expect(find.text('Un campanello'), findsOneWidget);
-    final savedTextPosition = tester.widget<Align>(
+    final savedTextPosition = tester.widget<Center>(
       find.byKey(const ValueKey('campanello-saved-text-position')),
     );
-    expect(savedTextPosition.alignment, Alignment.topCenter);
+    expect(savedTextPosition.widthFactor, isNull);
     final background = find.byWidgetPredicate(
       (widget) => widget is Image && widget.image == campanello.backgroundImage,
     );
     expect(background, findsOneWidget);
+    final textPadding = tester.widget<Padding>(
+      find
+          .ancestor(
+            of: find.byKey(const ValueKey('campanello-saved-text-position')),
+            matching: find.byType(Padding),
+          )
+          .first,
+    );
     expect(
-      tester
-              .getRect(
-                find.byKey(const ValueKey('campanello-saved-text-position')),
-              )
-              .top -
-          tester.getRect(background).top,
-      closeTo(HinooTypography.editorTextTopPadding(320), 0.01),
+      (textPadding.padding as EdgeInsets).top,
+      HinooTypography.editorTextTopPadding(320),
     );
   });
 

@@ -581,9 +581,14 @@ class _NewHinooPageState extends State<NewHinooPage>
     builder?.editTextPublic?.call();
   }
 
-  void _saveEditorImage() {
+  Future<void> _saveEditorImage() async {
     final dynamic builder = _builderKey.currentState;
     builder?.confirmBackgroundPublic?.call();
+    if (widget.isCampanello &&
+        (widget.editingCampanelloId?.isNotEmpty ?? false)) {
+      await WidgetsBinding.instance.endOfFrame;
+      if (mounted) await _submitHinoo();
+    }
   }
 
   Future<void> _deleteEditorContent() async {
@@ -696,6 +701,9 @@ class _NewHinooPageState extends State<NewHinooPage>
         widget.isCampanello &&
         (widget.editingCampanelloId?.isNotEmpty ?? false);
     if (editingExistingCampanello) {
+      if (_campanelloEditStarted && _builderStep == 'changeBg') {
+        return _buildImageEditingControls();
+      }
       const double actionSize = 30;
       return SizedBox(
         key: const Key('campanello-editor-controls'),
