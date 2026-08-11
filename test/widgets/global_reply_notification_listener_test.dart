@@ -175,6 +175,91 @@ void main() {
     );
   });
 
+  testWidgets('una risposta già visualizzata non genera una nuova notifica', (
+    tester,
+  ) async {
+    final navigatorKey = GlobalKey<NavigatorState>();
+    final notification = _FakeReplySystemNotification();
+    final createdAt = DateTime.utc(2026, 8, 3, 10);
+    await RepliesSeenTracker.markAt(
+      createdAt,
+      userId: 'test_user',
+      conversationId: 'conversation-seen',
+    );
+
+    await tester.pumpWidget(
+      GlobalReplyNotificationListener(
+        navigatorKey: navigatorKey,
+        systemNotification: notification,
+        replyEventStream: events.stream,
+        child: MaterialApp(
+          navigatorKey: navigatorKey,
+          home: const Scaffold(body: Text('Luna')),
+        ),
+      ),
+    );
+
+    events.add(
+      ReplyNotificationEvent(
+        kind: ReplyNotificationKind.honoo,
+        conversationId: 'conversation-seen',
+        senderId: 'other_user',
+        recipientId: 'test_user',
+        replyId: 'reply-seen',
+        createdAt: createdAt,
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 200));
+    await tester.pump();
+
+    expect(notification.showCount, 0);
+    expect(find.text('Hai ricevuto una nuova risposta'), findsNothing);
+  });
+
+  testWidgets('visualizzare una risposta chiude la sua notifica attiva', (
+    tester,
+  ) async {
+    final navigatorKey = GlobalKey<NavigatorState>();
+    final notification = _FakeReplySystemNotification();
+    final createdAt = DateTime.utc(2026, 8, 3, 11);
+
+    await tester.pumpWidget(
+      GlobalReplyNotificationListener(
+        navigatorKey: navigatorKey,
+        systemNotification: notification,
+        replyEventStream: events.stream,
+        child: MaterialApp(
+          navigatorKey: navigatorKey,
+          home: const Scaffold(body: Text('Luna')),
+        ),
+      ),
+    );
+
+    events.add(
+      ReplyNotificationEvent(
+        kind: ReplyNotificationKind.honoo,
+        conversationId: 'conversation-now-seen',
+        senderId: 'other_user',
+        recipientId: 'test_user',
+        replyId: 'reply-now-seen',
+        createdAt: createdAt,
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(notification.showCount, 1);
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      'last_seen_reply_by_conversation_v1_test_user',
+      '{"conversation-now-seen":"${createdAt.toIso8601String()}"}',
+    );
+    ReplyNotificationSignal.notifyChanged();
+    await tester.pump();
+
+    expect(notification.closedConversations, contains('conversation-now-seen'));
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   testWidgets(
     'un grande burst produce una sola notifica e un solo aggiornamento UI',
     (tester) async {

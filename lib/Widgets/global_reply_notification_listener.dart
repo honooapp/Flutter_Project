@@ -58,11 +58,15 @@ class _GlobalReplyNotificationListenerState
   final Set<String> _deliveredEventKeys = <String>{};
   final Map<String, ReplyNotificationEvent> _pendingEvents =
       <String, ReplyNotificationEvent>{};
+  final Map<String, ReplyNotificationEvent> _shownEventsByConversation =
+      <String, ReplyNotificationEvent>{};
+  bool _multipleNotificationShown = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    ReplyNotificationSignal.revision.addListener(_reconcileSeenNotifications);
     if (widget.enabled) _start();
   }
 
@@ -218,11 +222,13 @@ class _GlobalReplyNotificationListenerState
     );
   }
 
-  void _flushPendingEvents() {
+  Future<void> _flushPendingEvents() async {
     _notificationTimer = null;
     if (!mounted || _pendingEvents.isEmpty) return;
-    final events = _pendingEvents.values.toList(growable: false);
+    final queuedEvents = _pendingEvents.values.toList(growable: false);
     _pendingEvents.clear();
+    final events = await _onlyUnseenEvents(queuedEvents);
+    if (!mounted || events.isEmpty) return;
     final event = events.last;
     final replyCount = events.length;
     final conversationIds = events.map((item) => item.conversationId).toSet();
@@ -240,13 +246,71 @@ class _GlobalReplyNotificationListenerState
       onTap: open,
       replyCount: replyCount,
     );
+    _multipleNotificationShown =
+        _multipleNotificationShown || hasMultipleConversations;
+    for (final item in events) {
+      _shownEventsByConversation[item.conversationId] = item;
+    }
 
     final context = widget.navigatorKey.currentContext;
-    if (context != null) {
+    if (context != null && context.mounted) {
       unawaited(
         _showReplyDialog(context, replyCount: replyCount, onOpen: open),
       );
     }
+  }
+
+  Future<List<ReplyNotificationEvent>> _onlyUnseenEvents(
+    List<ReplyNotificationEvent> events,
+  ) async {
+    if (events.isEmpty) return const [];
+    final result = <ReplyNotificationEvent>[];
+    final states = <String, ReplySeenState>{};
+    for (final event in events) {
+      final createdAt = event.createdAt;
+      if (createdAt == null) {
+        result.add(event);
+        continue;
+      }
+      final state = states[event.recipientId] ??= await RepliesSeenTracker.load(
+        userId: event.recipientId,
+      );
+      if (!state.isSeen(
+        conversationId: event.conversationId,
+        createdAt: createdAt,
+      )) {
+        result.add(event);
+      }
+    }
+    return result;
+  }
+
+  void _reconcileSeenNotifications() {
+    unawaited(_closeNotificationsAlreadySeen());
+  }
+
+  Future<void> _closeNotificationsAlreadySeen() async {
+    if (_shownEventsByConversation.isEmpty && _pendingEvents.isEmpty) return;
+    final events = <ReplyNotificationEvent>{
+      ..._shownEventsByConversation.values,
+      ..._pendingEvents.values,
+    }.toList(growable: false);
+    final unseen = await _onlyUnseenEvents(events);
+    if (!mounted) return;
+    final unseenConversations = unseen.map((e) => e.conversationId).toSet();
+    final shownConversations = _shownEventsByConversation.keys.toList();
+    for (final conversationId in shownConversations) {
+      if (unseenConversations.contains(conversationId)) continue;
+      _systemNotification.closeConversation(conversationId);
+      _shownEventsByConversation.remove(conversationId);
+    }
+    if (_multipleNotificationShown && _shownEventsByConversation.isEmpty) {
+      _systemNotification.closeConversation('multiple-conversations');
+      _multipleNotificationShown = false;
+    }
+    _pendingEvents.removeWhere(
+      (_, event) => !unseenConversations.contains(event.conversationId),
+    );
   }
 
   Future<void> _showReplyDialog(
@@ -400,6 +464,8 @@ class _GlobalReplyNotificationListenerState
     _notificationTimer?.cancel();
     _notificationTimer = null;
     _pendingEvents.clear();
+    _shownEventsByConversation.clear();
+    _multipleNotificationShown = false;
     _replyEventSubscription?.cancel();
     _replyEventSubscription = null;
     _authSubscription?.cancel();
@@ -411,6 +477,9 @@ class _GlobalReplyNotificationListenerState
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    ReplyNotificationSignal.revision.removeListener(
+      _reconcileSeenNotifications,
+    );
     _stop();
     super.dispose();
   }

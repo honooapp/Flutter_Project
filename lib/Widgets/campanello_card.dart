@@ -14,6 +14,8 @@ class CampanelloCard extends StatelessWidget {
     required this.height,
     this.onRequestTap,
     this.onEditTap,
+    this.onEditImageTap,
+    this.onEditTextTap,
   });
 
   final CampanelloPageData data;
@@ -21,6 +23,8 @@ class CampanelloCard extends StatelessWidget {
   final double height;
   final VoidCallback? onRequestTap;
   final VoidCallback? onEditTap;
+  final VoidCallback? onEditImageTap;
+  final VoidCallback? onEditTextTap;
 
   @override
   Widget build(BuildContext context) {
@@ -68,15 +72,26 @@ class CampanelloCard extends StatelessWidget {
         children: [
           Image(image: data.campanello!.backgroundImage, fit: BoxFit.cover),
           savedText,
-          if (onEditTap != null)
+          if (onEditTap != null || onEditImageTap != null)
+            Positioned(
+              top: 6,
+              left: 6,
+              child: TextBoxDownloadButton(
+                key: const ValueKey('edit-own-campanello-image'),
+                onPressed: onEditImageTap ?? onEditTap!,
+                tooltip: 'Modifica immagine',
+                asset: 'assets/icons/sostituisci immagine.svg',
+              ),
+            ),
+          if (onEditTextTap != null || onEditTap != null)
             Positioned(
               top: 6,
               right: 6,
               child: TextBoxDownloadButton(
-                key: const ValueKey('edit-own-campanello'),
-                onPressed: onEditTap!,
-                tooltip: 'Modifica campanello',
-                asset: 'assets/icons/sostituisci immagine.svg',
+                key: const ValueKey('edit-own-campanello-text'),
+                onPressed: onEditTextTap ?? onEditTap!,
+                tooltip: 'Modifica testo',
+                asset: 'assets/icons/modifica testo.svg',
               ),
             ),
         ],
