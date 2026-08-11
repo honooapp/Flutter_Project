@@ -304,12 +304,11 @@ class HinooSlideView extends StatelessWidget {
     const double horizontalPadding = HinooTypography.horizontalPadding;
     final double textTopPadding = HinooTypography.editorTextTopPadding(width);
     const double textBottomPadding = HinooTypography.editorTextBottomPadding;
-    final double actionVerticalPadding = HinooTypography.verticalPadding(width);
     final TextStyle effectiveStyle = HinooTypography.displayTextStyle(
       color: textColor,
     );
     final double halfGap = gap / 2;
-    const double actionInset = 8;
+    const double actionInset = 6;
     final Widget? downloadOverlay = onDownloadTap == null
         ? null
         : TextBoxDownloadButton(onPressed: onDownloadTap!, tooltip: 'download');
@@ -364,8 +363,8 @@ class HinooSlideView extends StatelessWidget {
           ),
           if (downloadOverlay != null)
             Positioned(
-              top: halfGap + actionVerticalPadding + actionInset,
-              right: horizontalPadding + actionInset,
+              top: halfGap + actionInset,
+              right: actionInset,
               child: downloadOverlay,
             ),
           if (halfGap > 0.05)

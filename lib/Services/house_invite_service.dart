@@ -92,4 +92,28 @@ class HouseInviteService {
     if (id.isEmpty) throw StateError('ID campanello mancante.');
     return id;
   }
+
+  Future<void> updateCampanello({
+    required String campanelloHinooId,
+    required HinooDraft campanello,
+  }) async {
+    await _client
+        .from('hinoo')
+        .update({
+          'pages': campanello.pages.map((page) => page.toJson()).toList(),
+          'updated_at': DateTime.now().toIso8601String(),
+        })
+        .eq('id', campanelloHinooId);
+  }
+
+  Future<void> updateHouse({
+    required String campanelloHinooId,
+    required String houseImageUrl,
+    required List<double> bgTransform,
+  }) async {
+    await _client
+        .from('case')
+        .update({'house_image_url': houseImageUrl, 'bg_transform': bgTransform})
+        .eq('campanello_hinoo_id', campanelloHinooId);
+  }
 }

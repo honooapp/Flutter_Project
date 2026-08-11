@@ -35,6 +35,7 @@ import 'package:honoo/Widgets/busy_overlay.dart';
 import 'package:honoo/Services/campanelli_repository.dart';
 
 import '../../Pages/home_page.dart';
+import '../../Pages/casa_builder_page.dart';
 import '../../Pages/shared_conversations_page.dart';
 import '../../Pages/shared_hinoo_page.dart';
 import '../../Pages/shared_honoo_page.dart';
@@ -457,10 +458,72 @@ class _CampanelliPageState extends State<CampanelliPage> {
   }
 
   List<_CampanelloEntry> _buildCampanelli() {
+    final userId = SupabaseProvider.client.auth.currentUser?.id;
+    if (!_hasOwnHouse || userId == null) {
+      return [
+        ..._buildBaseCampanelli(),
+        ..._userEntries,
+      ];
+    }
+
+    final ownEntries = _userEntries
+        .where((entry) => entry.campanello.ownerId == userId)
+        .toList(growable: false);
+    final otherEntries = _userEntries
+        .where((entry) => entry.campanello.ownerId != userId)
+        .toList(growable: false);
     return [
+      ...ownEntries,
       ..._buildBaseCampanelli(),
-      ..._userEntries,
+      ...otherEntries,
     ];
+  }
+
+  HinooDraft _campanelloDraftFor(_CampanelloEntry entry) {
+    return HinooDraft(
+      pages: [
+        HinooSlide(
+          backgroundImage: entry.campanelloBackgroundUrl,
+          text: entry.campanello.text,
+          isTextWhite: entry.campanelloIsTextWhite,
+          bgScale: entry.campanelloBgScale,
+          bgOffsetX: entry.campanelloBgOffsetX,
+          bgOffsetY: entry.campanelloBgOffsetY,
+          bgTransform: entry.campanelloBgTransform,
+        ),
+      ],
+    );
+  }
+
+  Future<void> _editCampanello(_CampanelloEntry entry) async {
+    final String? campanelloId = entry.campanello.campanelloHinooId;
+    if (campanelloId == null || campanelloId.isEmpty) return;
+    final bool? updated = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => NewHinooPage(
+          isCampanello: true,
+          initialDraft: _campanelloDraftFor(entry),
+          editingCampanelloId: campanelloId,
+        ),
+      ),
+    );
+    if (updated == true && mounted) await _loadUserEntries();
+  }
+
+  Future<void> _editCasa(_CampanelloEntry entry) async {
+    final String? campanelloId = entry.campanello.campanelloHinooId;
+    if (campanelloId == null || campanelloId.isEmpty) return;
+    final bool? updated = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => CasaBuilderPage(
+          campanello: _campanelloDraftFor(entry),
+          editingCampanelloId: campanelloId,
+          initialHouseImageUrl: entry.houseImageUrl,
+          initialTransform: entry.casa.bgTransform,
+        ),
+      ),
+    );
+    if (updated == true && mounted) await _loadUserEntries();
   }
 
   Future<void> _handleInviteRequestTap() async {
@@ -628,6 +691,13 @@ class _CampanelliPageState extends State<CampanelliPage> {
             bgOffsetX: entry.bgOffsetX,
             bgOffsetY: entry.bgOffsetY,
           ),
+          campanelloBackgroundUrl: entry.campanelloBackgroundUrl,
+          houseImageUrl: entry.houseImageUrl,
+          campanelloIsTextWhite: entry.campanelloIsTextWhite,
+          campanelloBgScale: entry.bgScale,
+          campanelloBgOffsetX: entry.bgOffsetX,
+          campanelloBgOffsetY: entry.bgOffsetY,
+          campanelloBgTransform: entry.campanelloBgTransform,
         );
       }).toList(growable: false);
 
@@ -641,6 +711,18 @@ class _CampanelliPageState extends State<CampanelliPage> {
                 .map((entry) => entry.campanello.id),
           );
         });
+        final bool hasOwnEntry =
+            entries.any((entry) => entry.campanello.ownerId == user.id);
+        if (hasOwnEntry) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted || !_campanelloPageController.hasClients) return;
+            _campanelloPageController.jumpToPage(1);
+            setState(() {
+              _campanelloIndex = 1;
+              _lastHouseCampanelloIndex = 1;
+            });
+          });
+        }
       }
       // Verifica inviti pendenti/accettati per nascondere CTA se già invitato
       try {
@@ -1162,6 +1244,18 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                               });
                                             },
                                             itemBuilder: (context, pageIndex) {
+                                              final _CampanelloEntry? entry =
+                                                  pageIndex > 0 &&
+                                                          pageIndex <=
+                                                              campanelli.length
+                                                      ? campanelli[
+                                                          pageIndex - 1]
+                                                      : null;
+                                              final bool isOwnEntry = entry !=
+                                                      null &&
+                                                  user != null &&
+                                                  entry.campanello.ownerId ==
+                                                      user.id;
                                               return CampanelloCard(
                                                 data:
                                                     campanelloPages[pageIndex],
@@ -1169,6 +1263,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                                 height: canvasSize.height,
                                                 onRequestTap:
                                                     _handleInviteRequestTap,
+                                                onEditTap: isOwnEntry
+                                                    ? () =>
+                                                        _editCampanello(entry)
+                                                    : null,
                                               );
                                             },
                                           ),
@@ -1224,6 +1322,11 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                       footerBottomSpacing: footerBottomSpacing,
                                       width: casaWidth,
                                       height: casaHeight,
+                                      onEditTap: isOwnCampanello
+                                          ? () => _editCasa(
+                                                campanelli[casaIndex],
+                                              )
+                                          : null,
                                     ),
                                   ),
                                 )
@@ -1241,6 +1344,11 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                     footerBottomSpacing: footerBottomSpacing,
                                     width: casaWidth,
                                     height: casaHeight,
+                                    onEditTap: isOwnCampanello
+                                        ? () => _editCasa(
+                                              campanelli[casaIndex],
+                                            )
+                                        : null,
                                   ),
                                 ),
                         ],
@@ -1248,7 +1356,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
                     ),
                   ),
                 ),
-                if (campanelloPages.length > 1)
+                if (_verticalPageIndex == 0 && campanelloPages.length > 1)
                   Positioned(
                     top: 0,
                     bottom: 0,
@@ -1332,9 +1440,23 @@ class _ArrowIntent extends Intent {
 class _CampanelloEntry {
   final CampanelloData campanello;
   final CasaData casa;
+  final String? campanelloBackgroundUrl;
+  final String? houseImageUrl;
+  final bool campanelloIsTextWhite;
+  final double campanelloBgScale;
+  final double campanelloBgOffsetX;
+  final double campanelloBgOffsetY;
+  final List<double>? campanelloBgTransform;
 
   const _CampanelloEntry({
     required this.campanello,
     required this.casa,
+    this.campanelloBackgroundUrl,
+    this.houseImageUrl,
+    this.campanelloIsTextWhite = true,
+    this.campanelloBgScale = 1,
+    this.campanelloBgOffsetX = 0,
+    this.campanelloBgOffsetY = 0,
+    this.campanelloBgTransform,
   });
 }

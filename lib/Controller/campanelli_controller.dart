@@ -159,6 +159,8 @@ class CampanelliController extends ChangeNotifier {
           bgScale: slide.bgScale,
           bgOffsetX: slide.bgOffsetX,
           bgOffsetY: slide.bgOffsetY,
+          campanelloIsTextWhite: slide.isTextWhite,
+          campanelloBgTransform: slide.bgTransform,
         ));
       }
       _publish(CampanelliLoadState(

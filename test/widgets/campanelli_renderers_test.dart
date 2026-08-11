@@ -81,6 +81,36 @@ void main() {
     );
   });
 
+  testWidgets('il campanello proprietario espone il comando modifica', (
+    tester,
+  ) async {
+    var edited = false;
+    const campanello = CampanelloData(
+      id: 'campanello-1',
+      campanelloHinooId: 'hinoo-1',
+      ownerId: 'owner-1',
+      backgroundImage: AssetImage('assets/campanello1.png'),
+      text: 'Un campanello',
+      linkedHouseId: 'casa-1',
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: CampanelloCard(
+            data: CampanelloPageData.campanello(campanello),
+            width: 320,
+            height: 500,
+            onEditTap: () => edited = true,
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byKey(const ValueKey('edit-own-campanello')));
+    expect(edited, isTrue);
+  });
+
   testWidgets('casa chiusa conserva messaggio e azione scrigno', (
     tester,
   ) async {
@@ -146,5 +176,31 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  testWidgets('la casa proprietaria espone il comando modifica', (
+    tester,
+  ) async {
+    var edited = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: CasaSection(
+            casa: casa,
+            isUnlocked: true,
+            scrignoAsset: 'assets/images/casa_palombaro_con_scrigno.png',
+            footerIconSize: 40,
+            scrignoSize: 80,
+            footerBottomSpacing: 10,
+            width: 320,
+            height: 500,
+            onEditTap: () => edited = true,
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byKey(const ValueKey('edit-own-casa')));
+    expect(edited, isTrue);
   });
 }

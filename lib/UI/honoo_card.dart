@@ -97,7 +97,6 @@ class HonooCard extends StatelessWidget {
                   height: textHeight,
                   child: Container(
                     key: const Key('honoo-card-text-panel'),
-                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: textPanelColor,
                       border: isReceivedReply
@@ -116,24 +115,27 @@ class HonooCard extends StatelessWidget {
                     ),
                     child: Stack(
                       children: [
-                        Center(
-                          child: Text(
-                            honoo.text,
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.arvo(
-                              color: textColor,
-                              fontSize: 18,
-                              height: 1.4,
-                              fontWeight: FontWeight.w400,
+                        Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Center(
+                            child: Text(
+                              honoo.text,
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.arvo(
+                                color: textColor,
+                                fontSize: 18,
+                                height: 1.4,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              maxLines: 5,
+                              overflow: TextOverflow.visible,
                             ),
-                            maxLines: 5,
-                            overflow: TextOverflow.visible,
                           ),
                         ),
                         if (onDownloadTap != null)
                           Positioned(
-                            top: 0,
-                            right: 0,
+                            top: 6,
+                            right: 6,
                             child: TextBoxDownloadButton(
                               onPressed: onDownloadTap!,
                               tooltip: 'download',

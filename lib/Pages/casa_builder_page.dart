@@ -21,9 +21,18 @@ import 'package:image_picker/image_picker.dart';
 import 'home_page.dart';
 
 class CasaBuilderPage extends StatefulWidget {
-  const CasaBuilderPage({super.key, required this.campanello});
+  const CasaBuilderPage({
+    super.key,
+    required this.campanello,
+    this.editingCampanelloId,
+    this.initialHouseImageUrl,
+    this.initialTransform,
+  });
 
   final HinooDraft campanello;
+  final String? editingCampanelloId;
+  final String? initialHouseImageUrl;
+  final List<double>? initialTransform;
 
   @override
   State<CasaBuilderPage> createState() => _CasaBuilderPageState();
@@ -36,6 +45,7 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
   ImageProvider? _imageProvider;
   bool _isSaving = false;
   bool _isUploadingImage = false;
+  bool _hasPickedImage = false;
   double _imageScale = 1.0;
   static const double _imageMinScale = 1.0;
   static const double _imageMaxScale = 5.0;
@@ -44,6 +54,15 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
   @override
   void initState() {
     super.initState();
+    final String? initialUrl = widget.initialHouseImageUrl;
+    if (initialUrl != null && initialUrl.isNotEmpty) {
+      _imageProvider = NetworkImage(initialUrl);
+    }
+    final List<double>? initialTransform = widget.initialTransform;
+    if (initialTransform != null && initialTransform.length == 16) {
+      _imageController.value = Matrix4.fromList(initialTransform);
+      _imageScale = _extractScaleFromMatrix(_imageController.value);
+    }
     _imageController.addListener(_handleImageTransform);
   }
 
@@ -112,6 +131,7 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
       setState(() {
         _imageProvider = MemoryImage(bytes);
         _imageScale = _imageMinScale;
+        _hasPickedImage = true;
       });
       _resetImageTransform();
     } catch (e) {
@@ -165,29 +185,48 @@ class _CasaBuilderPageState extends State<CasaBuilderPage> {
         throw Exception('Utente non autenticato.');
       }
 
-      setState(() => _isUploadingImage = true);
-      final Uint8List? pngBytes = await _captureCasaImage();
-      if (pngBytes == null || pngBytes.isEmpty) {
-        throw Exception('Impossibile generare l\'immagine della casa.');
+      String imageUrl = widget.initialHouseImageUrl ?? '';
+      if (_hasPickedImage || imageUrl.isEmpty) {
+        setState(() => _isUploadingImage = true);
+        final Uint8List? pngBytes = await _captureCasaImage();
+        if (pngBytes == null || pngBytes.isEmpty) {
+          throw Exception('Impossibile generare l\'immagine della casa.');
+        }
+        imageUrl = await HinooStorageUploader.uploadBackground(
+          bytes: pngBytes,
+          ext: 'png',
+          userId: user.id,
+          // Il PNG della casa comprende l'intero canvas e sui collegamenti più
+          // lenti può richiedere più dei 15 secondi usati dagli upload normali.
+          writeTimeout: const Duration(minutes: 1),
+        );
+        setState(() => _isUploadingImage = false);
       }
-      final imageUrl = await HinooStorageUploader.uploadBackground(
-        bytes: pngBytes,
-        ext: 'png',
-        userId: user.id,
-        // Il PNG della casa comprende l'intero canvas e sui collegamenti più
-        // lenti può richiedere più dei 15 secondi usati dagli upload normali.
-        writeTimeout: const Duration(minutes: 1),
-      );
-      setState(() => _isUploadingImage = false);
 
-      await _inviteService.createHouseWithCampanello(
-        campanello: widget.campanello,
-        houseImageUrl: imageUrl,
-        bgTransform: _imageController.value.storage.toList(),
-      );
+      final String? editingId = widget.editingCampanelloId;
+      if (editingId != null && editingId.isNotEmpty) {
+        await _inviteService.updateHouse(
+          campanelloHinooId: editingId,
+          houseImageUrl: imageUrl,
+          bgTransform: _imageController.value.storage.toList(),
+        );
+      } else {
+        await _inviteService.createHouseWithCampanello(
+          campanello: widget.campanello,
+          houseImageUrl: imageUrl,
+          bgTransform: _imageController.value.storage.toList(),
+        );
+      }
 
       if (!mounted) return;
-      showHonooToast(context, message: 'Casa creata.');
+      showHonooToast(
+        context,
+        message: editingId == null ? 'Casa creata.' : 'Casa aggiornata.',
+      );
+      if (editingId != null) {
+        Navigator.of(context).pop(true);
+        return;
+      }
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const HomePage()),
         (route) => false,

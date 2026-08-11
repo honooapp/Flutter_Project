@@ -32,6 +32,7 @@ import 'package:honoo/Widgets/text_box_download_button.dart';
 import 'package:honoo/UI/HinooBuilder/dialogs/name_hinoo_dialog.dart';
 import 'package:honoo/UI/hinoo_export_spec.dart';
 import 'package:honoo/UI/hinoo_typography.dart';
+import 'package:honoo/Entities/hinoo.dart';
 
 // Import coerenti con la struttura HinooBuilder
 
@@ -48,12 +49,14 @@ class HinooBuilder extends StatefulWidget {
     this.onPngExported, // PNG generato (anteprima)
     this.hintText,
     this.backgroundPromptText,
+    this.initialDraft,
   });
 
   final ValueChanged<dynamic>? onHinooChanged;
   final ValueChanged<Uint8List>? onPngExported;
   final String? hintText;
   final String? backgroundPromptText;
+  final HinooDraft? initialDraft;
 
   @override
   State<HinooBuilder> createState() => _HinooBuilderState();
@@ -102,7 +105,24 @@ class _HinooBuilderState extends State<HinooBuilder> {
   @override
   void initState() {
     super.initState();
-    if (_pages.isEmpty) {
+    final HinooDraft? initialDraft = widget.initialDraft;
+    if (initialDraft != null && initialDraft.pages.isNotEmpty) {
+      _pages.addAll(
+        initialDraft.pages.map(
+          (slide) => {
+            'text': slide.text,
+            'bgUrl': slide.backgroundImage,
+            'textColor': (slide.isTextWhite ? Colors.white : Colors.black)
+                .toARGB32(),
+            if (slide.bgTransform != null)
+              'bgTransform': List<double>.from(slide.bgTransform!),
+          },
+        ),
+      );
+      _applySlideState(_pages.first);
+      _step = _WizardStep.writeText;
+      _bgMinInteractiveScale = _bgScale;
+    } else if (_pages.isEmpty) {
       _pages.add(_createEmptySlide());
     }
     _textController.addListener(
@@ -537,7 +557,11 @@ class _HinooBuilderState extends State<HinooBuilder> {
           builder: (_) {
             final ImageProvider background = _localBgPreviewBytes != null
                 ? MemoryImage(_localBgPreviewBytes!)
-                : const AssetImage('assets/images/hinoo_default_1080x1920.png');
+                : (_bgPublicUrl != null && _bgPublicUrl!.isNotEmpty
+                      ? NetworkImage(_bgPublicUrl!)
+                      : const AssetImage(
+                          'assets/images/hinoo_default_1080x1920.png',
+                        ));
             final bool interactive =
                 (_step == _WizardStep.changeBg &&
                 _bgChosen &&
