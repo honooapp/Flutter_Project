@@ -54,8 +54,9 @@ class CampanelliPage extends StatefulWidget {
 class _CampanelliPageState extends State<CampanelliPage> {
   final CampanelliDataRepository _campanelliRepository =
       CampanelliDataRepository();
-  late final CampanelliController _campanelliController =
-      CampanelliController(repository: _campanelliRepository);
+  late final CampanelliController _campanelliController = CampanelliController(
+    repository: _campanelliRepository,
+  );
   // Animations: centralize durations/curves to avoid magic numbers
   static const Duration _kAnimFast = Duration(milliseconds: 220);
   static const Duration _kAnimMed = Duration(milliseconds: 240);
@@ -79,7 +80,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
       _campanelliController.state.hasPendingOrAcceptedInvite;
   DateTime? _lastKnockToastAt;
   late final StreamSubscription<CampanelliRealtimeEvent>
-      _realtimeEventsSubscription;
+  _realtimeEventsSubscription;
   List<PendingKnock> get _pendingKnocks =>
       _campanelliController.state.pendingKnocks;
   Set<String> get _pendingKnockTags => _campanelliController.pendingKnockTags;
@@ -120,8 +121,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
   void initState() {
     super.initState();
     _scheduleCarouselArrowsHide();
-    _realtimeEventsSubscription =
-        _campanelliController.realtimeEvents.listen(_handleRealtimeEvent);
+    _realtimeEventsSubscription = _campanelliController.realtimeEvents.listen(
+      _handleRealtimeEvent,
+    );
     _loadUserEntries();
     _subscribeVisitorAccessChannel();
   }
@@ -157,13 +159,15 @@ class _CampanelliPageState extends State<CampanelliPage> {
     final double delta = axis == Axis.vertical
         ? event.scrollDelta.dy
         : (event.scrollDelta.dy.abs() > 0
-            ? event.scrollDelta.dy
-            : event.scrollDelta.dx);
+              ? event.scrollDelta.dy
+              : event.scrollDelta.dx);
     if (delta.abs() < 0.5) {
       return;
     }
-    final double target = (position.pixels + delta)
-        .clamp(position.minScrollExtent, position.maxScrollExtent);
+    final double target = (position.pixels + delta).clamp(
+      position.minScrollExtent,
+      position.maxScrollExtent,
+    );
     if ((target - position.pixels).abs() > 0.5) {
       controller.jumpTo(target);
     }
@@ -189,7 +193,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
       HapticFeedback.lightImpact();
     } catch (error, stackTrace) {
       debugPrint(
-          '[Campanelli] haptic failed: ${AppFailure.from(error, stackTrace)}');
+        '[Campanelli] haptic failed: ${AppFailure.from(error, stackTrace)}',
+      );
     }
     if (_isCampanelloUnlocked(campanello.id)) {
       await _showEnterDialog(campanello.id);
@@ -250,15 +255,19 @@ class _CampanelliPageState extends State<CampanelliPage> {
         );
         _hideBusyOverlay();
         if (mounted) {
-          showHonooToast(context,
-              message: 'Bussata inviata. Attendi risposta.');
+          showHonooToast(
+            context,
+            message: 'Bussata inviata. Attendi risposta.',
+          );
         }
       } catch (e) {
         debugPrint('house_access insert error: $e');
         _hideBusyOverlay();
         if (mounted) {
-          showHonooToast(context,
-              message: 'Invio non riuscito. Ritenta tra poco.');
+          showHonooToast(
+            context,
+            message: 'Invio non riuscito. Ritenta tra poco.',
+          );
         }
       }
     } finally {
@@ -289,11 +298,16 @@ class _CampanelliPageState extends State<CampanelliPage> {
     final position = _pageController.position;
     final double bump = position.viewportDimension * 0.5;
     final double start = position.pixels;
-    final double target = (start + bump)
-        .clamp(position.minScrollExtent, position.maxScrollExtent);
+    final double target = (start + bump).clamp(
+      position.minScrollExtent,
+      position.maxScrollExtent,
+    );
 
-    await _pageController.animateTo(target,
-        duration: _kAnimFast, curve: _kCurve);
+    await _pageController.animateTo(
+      target,
+      duration: _kAnimFast,
+      curve: _kCurve,
+    );
     await _pageController.animateTo(start, duration: _kAnimMed, curve: _kCurve);
   }
 
@@ -353,9 +367,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
     return showDialog<Set<CasaShareMode>>(
       context: context,
       barrierDismissible: true,
-      builder: (_) => CasaMultiShareDialog(
-        onConfirm: (modes) async {},
-      ),
+      builder: (_) => CasaMultiShareDialog(onConfirm: (modes) async {}),
     );
   }
 
@@ -394,17 +406,13 @@ class _CampanelliPageState extends State<CampanelliPage> {
       case CasaShareMode.honoo:
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => SharedHonooPage(ownerId: ownerId),
-          ),
+          MaterialPageRoute(builder: (_) => SharedHonooPage(ownerId: ownerId)),
         );
         return;
       case CasaShareMode.hinoo:
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => SharedHinooPage(ownerId: ownerId),
-          ),
+          MaterialPageRoute(builder: (_) => SharedHinooPage(ownerId: ownerId)),
         );
         return;
       case CasaShareMode.conversations:
@@ -459,11 +467,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
   List<_CampanelloEntry> _buildCampanelli() {
     final userId = SupabaseProvider.client.auth.currentUser?.id;
-    if (!_hasOwnHouse || userId == null) {
-      return [
-        ..._buildBaseCampanelli(),
-        ..._userEntries,
-      ];
+    if (userId == null) {
+      return [..._buildBaseCampanelli(), ..._userEntries];
     }
 
     final ownEntries = _userEntries
@@ -472,11 +477,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
     final otherEntries = _userEntries
         .where((entry) => entry.campanello.ownerId != userId)
         .toList(growable: false);
-    return [
-      ...ownEntries,
-      ..._buildBaseCampanelli(),
-      ...otherEntries,
-    ];
+    return [...ownEntries, ..._buildBaseCampanelli(), ...otherEntries];
   }
 
   HinooDraft _campanelloDraftFor(_CampanelloEntry entry) {
@@ -495,7 +496,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
     );
   }
 
-  Future<void> _editCampanello(_CampanelloEntry entry) async {
+  Future<void> _editCampanello(
+    _CampanelloEntry entry,
+    CampanelloEditMode editMode,
+  ) async {
     final String? campanelloId = entry.campanello.campanelloHinooId;
     if (campanelloId == null || campanelloId.isEmpty) return;
     final bool? updated = await Navigator.of(context).push<bool>(
@@ -504,6 +508,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
           isCampanello: true,
           initialDraft: _campanelloDraftFor(entry),
           editingCampanelloId: campanelloId,
+          campanelloEditMode: editMode,
         ),
       ),
     );
@@ -562,8 +567,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
           if (invite == true && mounted) {
             final inviteResult = await _campanelliController.sendAdminInvite();
             if (mounted) {
-              showHonooToast(context,
-                  message: _adminInviteMessage(inviteResult));
+              showHonooToast(
+                context,
+                message: _adminInviteMessage(inviteResult),
+              );
             }
           }
         default:
@@ -666,40 +673,42 @@ class _CampanelliPageState extends State<CampanelliPage> {
         return;
       }
 
-      final entries = loadState.entries.map((entry) {
-        final casaId = 'casa_${entry.hinooId}';
-        return _CampanelloEntry(
-          campanello: CampanelloData.fromBackend(
-            row: {
-              'id': 'campanello_${entry.hinooId}',
-              'campanello_hinoo_id': entry.hinooId,
-              'owner_id': entry.ownerId,
-            },
-            backgroundImage: _campanelloBackgroundProvider(
-              entry.campanelloBackgroundUrl,
-            ),
-            text: entry.text,
-            linkedHouseId: casaId,
-          ),
-          casa: CasaData.fromBackend(
-            row: {'id': casaId, 'bg_transform': entry.bgTransform},
-            backgroundImage: _houseBackgroundProvider(
-              entry.houseImageUrl,
-              entry.campanelloBackgroundUrl,
-            ),
-            bgScale: entry.bgScale,
-            bgOffsetX: entry.bgOffsetX,
-            bgOffsetY: entry.bgOffsetY,
-          ),
-          campanelloBackgroundUrl: entry.campanelloBackgroundUrl,
-          houseImageUrl: entry.houseImageUrl,
-          campanelloIsTextWhite: entry.campanelloIsTextWhite,
-          campanelloBgScale: entry.bgScale,
-          campanelloBgOffsetX: entry.bgOffsetX,
-          campanelloBgOffsetY: entry.bgOffsetY,
-          campanelloBgTransform: entry.campanelloBgTransform,
-        );
-      }).toList(growable: false);
+      final entries = loadState.entries
+          .map((entry) {
+            final casaId = 'casa_${entry.hinooId}';
+            return _CampanelloEntry(
+              campanello: CampanelloData.fromBackend(
+                row: {
+                  'id': 'campanello_${entry.hinooId}',
+                  'campanello_hinoo_id': entry.hinooId,
+                  'owner_id': entry.ownerId,
+                },
+                backgroundImage: _campanelloBackgroundProvider(
+                  entry.campanelloBackgroundUrl,
+                ),
+                text: entry.text,
+                linkedHouseId: casaId,
+              ),
+              casa: CasaData.fromBackend(
+                row: {'id': casaId, 'bg_transform': entry.bgTransform},
+                backgroundImage: _houseBackgroundProvider(
+                  entry.houseImageUrl,
+                  entry.campanelloBackgroundUrl,
+                ),
+                bgScale: entry.bgScale,
+                bgOffsetX: entry.bgOffsetX,
+                bgOffsetY: entry.bgOffsetY,
+              ),
+              campanelloBackgroundUrl: entry.campanelloBackgroundUrl,
+              houseImageUrl: entry.houseImageUrl,
+              campanelloIsTextWhite: entry.campanelloIsTextWhite,
+              campanelloBgScale: entry.bgScale,
+              campanelloBgOffsetX: entry.bgOffsetX,
+              campanelloBgOffsetY: entry.bgOffsetY,
+              campanelloBgTransform: entry.campanelloBgTransform,
+            );
+          })
+          .toList(growable: false);
 
       if (mounted) {
         setState(() {
@@ -711,8 +720,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
                 .map((entry) => entry.campanello.id),
           );
         });
-        final bool hasOwnEntry =
-            entries.any((entry) => entry.campanello.ownerId == user.id);
+        final bool hasOwnEntry = entries.any(
+          (entry) => entry.campanello.ownerId == user.id,
+        );
         if (hasOwnEntry) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!mounted || !_campanelloPageController.hasClients) return;
@@ -730,7 +740,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
         if (mounted) setState(() {});
       } catch (error, stackTrace) {
         debugPrint(
-            '[Campanelli] invite state failed: ${AppFailure.from(error, stackTrace)}');
+          '[Campanelli] invite state failed: ${AppFailure.from(error, stackTrace)}',
+        );
       }
       _subscribeOwnerAccessChannel();
       await _campanelliController.startPendingKnockRefresh(
@@ -741,7 +752,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
       );
     } catch (error, stackTrace) {
       debugPrint(
-          '[Campanelli] user entries failed: ${AppFailure.from(error, stackTrace)}');
+        '[Campanelli] user entries failed: ${AppFailure.from(error, stackTrace)}',
+      );
       if (mounted) {
         setState(() {
           _userEntries = const [];
@@ -765,7 +777,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
       );
     } catch (error, stackTrace) {
       debugPrint(
-          '[Campanelli] owner realtime failed: ${AppFailure.from(error, stackTrace)}');
+        '[Campanelli] owner realtime failed: ${AppFailure.from(error, stackTrace)}',
+      );
       // In test or when Realtime not available, safely ignore
     }
   }
@@ -774,12 +787,11 @@ class _CampanelliPageState extends State<CampanelliPage> {
     try {
       final user = SupabaseProvider.client.auth.currentUser;
       if (user == null) return;
-      _campanelliController.startVisitorRealtime(
-        userId: user.id,
-      );
+      _campanelliController.startVisitorRealtime(userId: user.id);
     } catch (error, stackTrace) {
       debugPrint(
-          '[Campanelli] visitor realtime failed: ${AppFailure.from(error, stackTrace)}');
+        '[Campanelli] visitor realtime failed: ${AppFailure.from(error, stackTrace)}',
+      );
       // In test or when Realtime not available, safely ignore
     }
   }
@@ -793,10 +805,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
         if (_lastKnockToastAt == null ||
             now.difference(_lastKnockToastAt!) > const Duration(seconds: 3)) {
           _lastKnockToastAt = now;
-          showHonooToast(
-            context,
-            message: 'Qualcuno ha bussato alla tua casa',
-          );
+          showHonooToast(context, message: 'Qualcuno ha bussato alla tua casa');
         }
       case CampanelliPendingKnockRemoved():
         setState(() {});
@@ -806,7 +815,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
           HapticFeedback.lightImpact();
         } catch (error, stackTrace) {
           debugPrint(
-              '[Campanelli] haptic failed: ${AppFailure.from(error, stackTrace)}');
+            '[Campanelli] haptic failed: ${AppFailure.from(error, stackTrace)}',
+          );
         }
         await _goToCampanelloByTag(targetTag);
         await _hintCampanelloBounce();
@@ -848,16 +858,25 @@ class _CampanelliPageState extends State<CampanelliPage> {
     final position = _campanelloPageController.position;
     final double bump = (position.viewportDimension * 0.08).clamp(6.0, 60.0);
     final double start = position.pixels;
-    final double target = (start + bump)
-        .clamp(position.minScrollExtent, position.maxScrollExtent);
+    final double target = (start + bump).clamp(
+      position.minScrollExtent,
+      position.maxScrollExtent,
+    );
     try {
-      await _campanelloPageController.animateTo(target,
-          duration: _kBounceIn, curve: _kCurve);
-      await _campanelloPageController.animateTo(start,
-          duration: _kBounceOut, curve: _kCurve);
+      await _campanelloPageController.animateTo(
+        target,
+        duration: _kBounceIn,
+        curve: _kCurve,
+      );
+      await _campanelloPageController.animateTo(
+        start,
+        duration: _kBounceOut,
+        curve: _kCurve,
+      );
     } catch (error, stackTrace) {
       debugPrint(
-          '[Campanelli] bounce animation failed: ${AppFailure.from(error, stackTrace)}');
+        '[Campanelli] bounce animation failed: ${AppFailure.from(error, stackTrace)}',
+      );
     }
   }
 
@@ -921,12 +940,15 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
     if (draft != null) {
       try {
-        final HinooDraft personalDraft =
-            draft.copyWith(type: HinooType.personal, recipientTag: null);
+        final HinooDraft personalDraft = draft.copyWith(
+          type: HinooType.personal,
+          recipientTag: null,
+        );
         await HinooController().saveToChest(personalDraft);
       } catch (error, stackTrace) {
         debugPrint(
-            '[Campanelli] save hinoo failed: ${AppFailure.from(error, stackTrace)}');
+          '[Campanelli] save hinoo failed: ${AppFailure.from(error, stackTrace)}',
+        );
       }
     }
 
@@ -935,7 +957,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
         await HonooController().saveToChest(honoo);
       } catch (error, stackTrace) {
         debugPrint(
-            '[Campanelli] save honoo failed: ${AppFailure.from(error, stackTrace)}');
+          '[Campanelli] save honoo failed: ${AppFailure.from(error, stackTrace)}',
+        );
       }
     }
 
@@ -947,7 +970,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
       HapticFeedback.lightImpact();
     } catch (error, stackTrace) {
       debugPrint(
-          '[Campanelli] haptic failed: ${AppFailure.from(error, stackTrace)}');
+        '[Campanelli] haptic failed: ${AppFailure.from(error, stackTrace)}',
+      );
     }
   }
 
@@ -972,13 +996,12 @@ class _CampanelliPageState extends State<CampanelliPage> {
     }
 
     if (knock.hinooId != null && knock.hinooId!.isNotEmpty) {
-      final draft =
-          await _campanelliController.fetchPendingHinoo(knock.hinooId!);
+      final draft = await _campanelliController.fetchPendingHinoo(
+        knock.hinooId!,
+      );
       if (draft == null || !mounted) return;
       final bool? approved = await Navigator.of(context).push<bool>(
-        MaterialPageRoute(
-          builder: (_) => PendingHinooPage(draft: draft),
-        ),
+        MaterialPageRoute(builder: (_) => PendingHinooPage(draft: draft)),
       );
 
       if (approved == true && mounted) {
@@ -988,13 +1011,12 @@ class _CampanelliPageState extends State<CampanelliPage> {
     }
 
     if (knock.honooId != null && knock.honooId!.isNotEmpty) {
-      final honoo =
-          await _campanelliController.fetchPendingHonoo(knock.honooId!);
+      final honoo = await _campanelliController.fetchPendingHonoo(
+        knock.honooId!,
+      );
       if (honoo == null || !mounted) return;
       final bool? approved = await Navigator.of(context).push<bool>(
-        MaterialPageRoute(
-          builder: (_) => PendingHonooPage(honoo: honoo),
-        ),
+        MaterialPageRoute(builder: (_) => PendingHonooPage(honoo: honoo)),
       );
 
       if (approved == true && mounted) {
@@ -1045,16 +1067,19 @@ class _CampanelliPageState extends State<CampanelliPage> {
         builder: (context, constraints) {
           final double maxWidth = constraints.maxWidth;
           final double maxHeight = constraints.maxHeight;
-          final ResponsiveLayoutMode layoutMode =
-              ResponsiveLayout.modeForWidth(maxWidth);
-          final double footerIconSize =
-              ResponsiveLayout.footerIconSizeForMode(layoutMode);
-          final double footerGap =
-              ResponsiveLayout.footerGapForMode(layoutMode);
+          final ResponsiveLayoutMode layoutMode = ResponsiveLayout.modeForWidth(
+            maxWidth,
+          );
+          final double footerIconSize = ResponsiveLayout.footerIconSizeForMode(
+            layoutMode,
+          );
+          final double footerGap = ResponsiveLayout.footerGapForMode(
+            layoutMode,
+          );
           final bool isMobile = layoutMode == ResponsiveLayoutMode.mobile;
           final double footerBottomPadding =
               ResponsiveLayout.footerBottomPaddingForMode(layoutMode) +
-                  (isMobile ? 0 : 12);
+              (isMobile ? 0 : 12);
           final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
           final double footerSpacing = footerBottomPadding + safeBottom;
           final double footerBottomSpacing = footerSpacing / 2;
@@ -1072,20 +1097,27 @@ class _CampanelliPageState extends State<CampanelliPage> {
           final List<_CampanelloEntry> campanelli = _buildCampanelli();
           final List<CampanelloPageData> campanelloPages =
               _buildCampanelloPages(campanelli);
-          final int safeCampanelloIndex =
-              _campanelloIndex.clamp(0, campanelloPages.length - 1);
-          final int houseCampanelloIndex =
-              safeCampanelloIndex == 0 ? 1 : safeCampanelloIndex;
-          final int casaIndex =
-              (houseCampanelloIndex - 1).clamp(0, campanelli.length - 1);
+          final int safeCampanelloIndex = _campanelloIndex.clamp(
+            0,
+            campanelloPages.length - 1,
+          );
+          final int houseCampanelloIndex = safeCampanelloIndex == 0
+              ? 1
+              : safeCampanelloIndex;
+          final int casaIndex = (houseCampanelloIndex - 1).clamp(
+            0,
+            campanelli.length - 1,
+          );
           final bool showCampanello = safeCampanelloIndex > 0;
           final bool showFooter = _verticalPageIndex == 0;
-          final CampanelloData? activeCampanello =
-              showCampanello ? campanelli[casaIndex].campanello : null;
+          final CampanelloData? activeCampanello = showCampanello
+              ? campanelli[casaIndex].campanello
+              : null;
           final user = SupabaseProvider.client.auth.currentUser;
           final String? activeCampanelloId =
               activeCampanello?.campanelloHinooId;
-          final bool hasPendingKnock = activeCampanelloId != null &&
+          final bool hasPendingKnock =
+              activeCampanelloId != null &&
               _pendingKnockTags.contains(activeCampanelloId);
           final bool hasAnyPendingKnock = _pendingKnockTags.isNotEmpty;
           final int pendingKnockCount = _pendingKnocks.length;
@@ -1095,27 +1127,39 @@ class _CampanelliPageState extends State<CampanelliPage> {
           final VoidCallback? scrignoTap = activeCampanello == null
               ? null
               : () => _handleScrigno(activeCampanello);
-          final bool isOwnCampanello = activeCampanello != null &&
+          final bool isOwnCampanello =
+              activeCampanello != null &&
               user != null &&
               activeCampanello.ownerId == user.id;
-          final ScrollPhysics pagePhysics =
-              const PageScrollPhysics().applyTo(const BouncingScrollPhysics());
+          final ScrollPhysics pagePhysics = const PageScrollPhysics().applyTo(
+            const BouncingScrollPhysics(),
+          );
           const int verticalPages = 2;
-          final int maxCampanelloIndex =
-              math.max(0, campanelloPages.length - 1);
+          final int maxCampanelloIndex = math.max(
+            0,
+            campanelloPages.length - 1,
+          );
           const int maxVerticalIndex = verticalPages - 1;
 
           return FocusableActionDetector(
             autofocus: true,
             shortcuts: {
-              LogicalKeySet(LogicalKeyboardKey.arrowLeft):
-                  const _ArrowIntent(Axis.horizontal, -1),
-              LogicalKeySet(LogicalKeyboardKey.arrowRight):
-                  const _ArrowIntent(Axis.horizontal, 1),
-              LogicalKeySet(LogicalKeyboardKey.arrowUp):
-                  const _ArrowIntent(Axis.vertical, -1),
-              LogicalKeySet(LogicalKeyboardKey.arrowDown):
-                  const _ArrowIntent(Axis.vertical, 1),
+              LogicalKeySet(LogicalKeyboardKey.arrowLeft): const _ArrowIntent(
+                Axis.horizontal,
+                -1,
+              ),
+              LogicalKeySet(LogicalKeyboardKey.arrowRight): const _ArrowIntent(
+                Axis.horizontal,
+                1,
+              ),
+              LogicalKeySet(LogicalKeyboardKey.arrowUp): const _ArrowIntent(
+                Axis.vertical,
+                -1,
+              ),
+              LogicalKeySet(LogicalKeyboardKey.arrowDown): const _ArrowIntent(
+                Axis.vertical,
+                1,
+              ),
             },
             actions: {
               _ArrowIntent: CallbackAction<_ArrowIntent>(
@@ -1173,8 +1217,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
                         onPageChanged: (index) {
                           _revealCarouselArrows();
                           if (index == 1) {
-                            _lastHouseCampanelloIndex =
-                                _campanelloIndex == 0 ? 1 : _campanelloIndex;
+                            _lastHouseCampanelloIndex = _campanelloIndex == 0
+                                ? 1
+                                : _campanelloIndex;
                           }
                           if (index == 0) {
                             final int target = _campanelloIndex == 0
@@ -1216,13 +1261,13 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                     child: ScrollConfiguration(
                                       behavior: ScrollConfiguration.of(context)
                                           .copyWith(
-                                        dragDevices: {
-                                          PointerDeviceKind.touch,
-                                          PointerDeviceKind.mouse,
-                                          PointerDeviceKind.stylus,
-                                          PointerDeviceKind.trackpad,
-                                        },
-                                      ),
+                                            dragDevices: {
+                                              PointerDeviceKind.touch,
+                                              PointerDeviceKind.mouse,
+                                              PointerDeviceKind.stylus,
+                                              PointerDeviceKind.trackpad,
+                                            },
+                                          ),
                                       child: () {
                                         final pvViewport = SizedBox(
                                           width: canvasSize.width,
@@ -1246,13 +1291,12 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                             itemBuilder: (context, pageIndex) {
                                               final _CampanelloEntry? entry =
                                                   pageIndex > 0 &&
-                                                          pageIndex <=
-                                                              campanelli.length
-                                                      ? campanelli[
-                                                          pageIndex - 1]
-                                                      : null;
-                                              final bool isOwnEntry = entry !=
-                                                      null &&
+                                                      pageIndex <=
+                                                          campanelli.length
+                                                  ? campanelli[pageIndex - 1]
+                                                  : null;
+                                              final bool isOwnEntry =
+                                                  entry != null &&
                                                   user != null &&
                                                   entry.campanello.ownerId ==
                                                       user.id;
@@ -1263,9 +1307,18 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                                 height: canvasSize.height,
                                                 onRequestTap:
                                                     _handleInviteRequestTap,
-                                                onEditTap: isOwnEntry
-                                                    ? () =>
-                                                        _editCampanello(entry)
+                                                onEditImageTap: isOwnEntry
+                                                    ? () => _editCampanello(
+                                                        entry,
+                                                        CampanelloEditMode
+                                                            .image,
+                                                      )
+                                                    : null,
+                                                onEditTextTap: isOwnEntry
+                                                    ? () => _editCampanello(
+                                                        entry,
+                                                        CampanelloEditMode.text,
+                                                      )
                                                     : null,
                                               );
                                             },
@@ -1323,9 +1376,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                       width: casaWidth,
                                       height: casaHeight,
                                       onEditTap: isOwnCampanello
-                                          ? () => _editCasa(
-                                                campanelli[casaIndex],
-                                              )
+                                          ? () =>
+                                                _editCasa(campanelli[casaIndex])
                                           : null,
                                     ),
                                   ),
@@ -1345,9 +1397,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                     width: casaWidth,
                                     height: casaHeight,
                                     onEditTap: isOwnCampanello
-                                        ? () => _editCasa(
-                                              campanelli[casaIndex],
-                                            )
+                                        ? () => _editCasa(campanelli[casaIndex])
                                         : null,
                                   ),
                                 ),
