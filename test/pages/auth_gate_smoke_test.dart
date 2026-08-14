@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Pages/auth_gate.dart';
-import 'package:honoo/Pages/placeholder_page.dart';
+import 'package:honoo/Pages/home_page.dart';
 
 import '../test_supabase_helper.dart';
 
@@ -20,10 +20,9 @@ void main() {
     harness.disableOverrides();
   });
 
-  testWidgets('AuthGate: senza sessione mostra subito la landing',
-      (tester) async {
+  testWidgets('AuthGate: senza sessione mostra subito la home', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: AuthGate()));
 
-    expect(find.byType(PlaceholderPage), findsOneWidget);
+    expect(find.byType(HomePage), findsOneWidget);
   });
 }

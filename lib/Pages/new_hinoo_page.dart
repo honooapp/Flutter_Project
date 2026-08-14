@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Services/house_invite_service.dart';
+import 'package:honoo/Services/auth_navigation_service.dart';
 
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
@@ -18,7 +19,6 @@ import 'package:honoo/UI/hinoo_typography.dart';
 import '../UI/hinoo_builder.dart';
 
 import 'chest_page.dart';
-import 'email_login_page.dart';
 import 'home_page.dart';
 import 'placeholder_page.dart';
 import '../Entities/hinoo.dart';
@@ -204,37 +204,7 @@ class _NewHinooPageState extends State<NewHinooPage>
     final user = SupabaseProvider.client.auth.currentUser;
     if (user == null) {
       if (!mounted) return;
-
-      final bool? goLogin = await showDialog<bool>(
-        context: context,
-        barrierDismissible: true,
-        builder: (_) => const HonooConfirmDialog(
-          title: 'Devi accedere prima',
-          message:
-              'Per salvare questo hinoo,\ndevi fare prima il login.\nVuoi andare alla pagina di login?',
-          confirmLabel: 'Vai al login',
-        ),
-      );
-
-      if (goLogin == true && mounted) {
-        // ✅ aspetta il risultato, ma NON salvare in automatico
-        final ok = await Navigator.push<bool>(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>
-                EmailLoginPage(pendingHinooDraft: hinooDraft.toJson()),
-          ),
-        );
-
-        if (!mounted) return;
-
-        if (ok == true) {
-          showHonooToast(
-            context,
-            message: 'Accesso completato. Ora puoi salvare lo hinoo.',
-          );
-        }
-      }
+      await AuthNavigationService.ensureLoggedIn(context);
       return;
     }
 
@@ -537,21 +507,7 @@ class _NewHinooPageState extends State<NewHinooPage>
     final user = SupabaseProvider.client.auth.currentUser;
     if (user == null) {
       if (!mounted) return;
-      final bool? goLogin = await showDialog<bool>(
-        context: context,
-        barrierDismissible: true,
-        builder: (_) => const HonooConfirmDialog(
-          title: 'Devi prima accedere',
-          message: 'Vuoi andare alla pagina di login?',
-          confirmLabel: 'Vai al login',
-        ),
-      );
-      if (goLogin == true && mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const EmailLoginPage()),
-        );
-      }
+      await AuthNavigationService.ensureLoggedIn(context);
       return;
     }
 

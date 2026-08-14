@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Pages/home_page.dart';
+import 'package:honoo/Pages/placeholder_page.dart';
 import 'package:honoo/Services/home_service.dart';
 import 'package:honoo/Utility/reply_notification_signal.dart';
 import 'package:honoo/Widgets/sea_footer_bar.dart';
@@ -61,19 +62,31 @@ void main() {
     final intro = find.byKey(const Key('home_intro_text'));
     expect(intro, findsOneWidget);
     expect(find.textContaining('Ti regaliamo la Luna'), findsOneWidget);
-    expect(find.textContaining('verso le tue storie'), findsOneWidget);
+    expect(
+      find.textContaining('È vero. Ma non per i poeti\n\nVuoi essere'),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('home_island_followup_text')), findsOneWidget);
+    final islandFollowupTransform = tester.widget<Transform>(
+      find.byKey(const Key('home_island_followup_text_offset')),
+    );
+    expect(islandFollowupTransform.transform.getTranslation().y, -2);
+    expect(find.textContaining('e vedi tutto'), findsOneWidget);
     expect(find.byType(Scrollable), findsNothing);
     expect(find.byKey(const Key('home_inline_bottle')), findsOneWidget);
     expect(find.byKey(const Key('home_inline_moon')), findsOneWidget);
     expect(find.byKey(const Key('home_inline_island')), findsOneWidget);
+    expect(find.byKey(const Key('home_inline_honoo')), findsOneWidget);
     expect(find.byKey(const Key('home_bottle_leading_gap')), findsOneWidget);
     expect(find.byKey(const Key('home_moon_leading_gap')), findsOneWidget);
     expect(find.byKey(const Key('home_island_leading_gap')), findsOneWidget);
+    expect(find.byKey(const Key('home_honoo_leading_gap')), findsOneWidget);
 
     for (final key in const [
       Key('home_bottle_leading_gap'),
       Key('home_moon_leading_gap'),
       Key('home_island_leading_gap'),
+      Key('home_honoo_leading_gap'),
     ]) {
       expect(tester.getSize(find.byKey(key)).width, 8);
     }
@@ -81,7 +94,7 @@ void main() {
     for (final entry in const [
       (Key('home_inline_bottle'), 42.0),
       (Key('home_inline_moon'), 28.0),
-      (Key('home_inline_island'), 43.0),
+      (Key('home_inline_island'), 55.0),
     ]) {
       final key = entry.$1;
       final button = tester.widget<IconButton>(find.byKey(key));
@@ -90,12 +103,29 @@ void main() {
       expect(button.constraints!.maxHeight, entry.$2);
     }
 
+    final inlineHonooStyle = tester.widget<AnimatedDefaultTextStyle>(
+      find.descendant(
+        of: find.byKey(const Key('home_inline_honoo')),
+        matching: find.byType(AnimatedDefaultTextStyle),
+      ),
+    );
+    expect(inlineHonooStyle.style.fontSize, 23);
+
     await pumpHomeAtSize(tester, const Size(1440, 1000));
 
     expect(find.byKey(const Key('home_intro_text')), findsOneWidget);
     expect(find.byType(Scrollable), findsNothing);
 
     await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets("la scritta honoo apre la placeholder page", (tester) async {
+    await pumpHomeAtSize(tester, const Size(320, 600));
+
+    await tester.tap(find.byKey(const Key('home_inline_honoo')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(PlaceholderPage), findsOneWidget);
   });
 
   testWidgets('una risposta vecchia non ripristina il badge già azzerato', (

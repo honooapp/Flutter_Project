@@ -36,10 +36,13 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   static const double _laboratoriBottomSpacing = 30;
   static const double _lunaTopSpacing = -5;
   static const double _lunaBottomSpacing = 30;
+  static const double _lunaIconSizeIncrease = 15;
+  static const double _lunaIconVerticalOffset = -2;
   static const double _festeTopSpacing = 5;
   static const double _festeBottomSpacing = 30;
+  static const double _festeIconSizeIncrease = 6;
   static const double _isolaTopSpacing = -5;
-  static const double _isolaBottomSpacing = 20;
+  static const double _isolaBottomSpacing = 30;
   static const double _podcastTopSpacing = 5;
   static const double _podcastBottomSpacing = 30;
   static const double _performanceSecondTopSpacing = 15;
@@ -51,8 +54,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   static const double _libriTopSpacing = 5;
   static const double _libriBottomSpacing = 30;
   static const double _regiaAgentiTopSpacing = 18 * 1.3;
-  static const double _regiaAgentiBottomSpacing = 20;
-  static const double _regiaAgentiIconSizeReduction = 8;
+  static const double _regiaAgentiBottomSpacing = 30;
+  static const double _regiaAgentiIconSizeReduction = 15;
+  static const double _regiaAgentiIconVerticalOffset = -2;
   static const Color _linkIconColor = Color.fromRGBO(183, 183, 206, 1);
 
   List<Widget> _iconBlockWithSpacing(
@@ -61,14 +65,22 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     double topSpacing = 0,
     double bottomSpacing = 0,
     VoidCallback? onTap,
+    Key? bottomSpacingKey,
+    Key? transformKey,
+    double verticalOffset = 0,
   }) {
     return [
       if (topSpacing > 0) SizedBox(height: topSpacing),
       GestureDetector(
         onTap: onTap,
-        child: Image.asset(asset, height: size),
+        child: Transform.translate(
+          key: transformKey,
+          offset: Offset(0, verticalOffset),
+          child: Image.asset(asset, height: size),
+        ),
       ),
-      if (bottomSpacing > 0) SizedBox(height: bottomSpacing),
+      if (bottomSpacing > 0)
+        SizedBox(key: bottomSpacingKey, height: bottomSpacing),
     ];
   }
 
@@ -100,18 +112,24 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     Key? iconKey,
     Key? topSpacingKey,
     Key? bottomSpacingKey,
+    Key? transformKey,
+    double verticalOffset = 0,
   }) {
     return [
       if (topSpacing > 0) SizedBox(key: topSpacingKey, height: topSpacing),
       GestureDetector(
         onTap: onTap,
-        child: SvgPicture.asset(
-          key: iconKey,
-          asset,
-          height: size,
-          colorFilter: ColorFilter.mode(
-            color ?? HonooColor.onBackground,
-            BlendMode.srcIn,
+        child: Transform.translate(
+          key: transformKey,
+          offset: Offset(0, verticalOffset),
+          child: SvgPicture.asset(
+            key: iconKey,
+            asset,
+            height: size,
+            colorFilter: ColorFilter.mode(
+              color ?? HonooColor.onBackground,
+              BlendMode.srcIn,
+            ),
           ),
         ),
       ),
@@ -190,13 +208,13 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     final ResponsiveLayoutMode layoutMode = ResponsiveLayout.modeForWidth(
       screenWidth,
     );
-    const String performanceLine = 'performance';
-    const String laboratoriLine = 'laboratori teatrali';
-    const String esplorazioniLine = 'esplorazioni lunari';
-    const String festeLine = 'feste';
-    const String viaggiLine = "viaggi sull'Isola delle Storie";
+    const String performanceLine = 'Performance';
+    const String laboratoriLine = 'Laboratori teatrali';
+    const String esplorazioniLine = 'Esplorazioni lunari';
+    const String festeLine = 'Feste';
+    const String viaggiLine = "Viaggi sull'Isola delle Storie";
     const String podcastLine = 'Podcast e dirette';
-    const String libriLine = 'libri';
+    const String libriLine = 'Libri';
     const String regiaAgentiLine = 'Regia degli Agenti';
     const String venceslaoLine = 'Venceslao Cembalo';
     final String text1First = Utility().text1First;
@@ -356,9 +374,11 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
       ),
       ..._iconBlockWithSpacing(
         "assets/icons/luna.png",
-        inlineIconHeight,
+        inlineIconHeight + _lunaIconSizeIncrease,
         topSpacing: _lunaTopSpacing,
         bottomSpacing: _lunaBottomSpacing,
+        transformKey: const Key('luna_icon_transform'),
+        verticalOffset: _lunaIconVerticalOffset,
         onTap: () {
           Navigator.of(
             context,
@@ -377,7 +397,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
       ),
       ..._iconBlockWithSpacing(
         "assets/icons/feste.png",
-        inlineIconHeight,
+        inlineIconHeight + _festeIconSizeIncrease,
         topSpacing: _festeTopSpacing,
         bottomSpacing: _festeBottomSpacing,
         onTap: () {
@@ -402,6 +422,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         inlineIconHeight,
         topSpacing: _isolaTopSpacing,
         bottomSpacing: _isolaBottomSpacing,
+        bottomSpacingKey: const Key('isola_icon_bottom_spacing'),
         onTap: () {
           Navigator.of(
             context,
@@ -428,6 +449,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         iconKey: const Key('regia_agenti_icon'),
         topSpacingKey: const Key('regia_agenti_icon_top_spacing'),
         bottomSpacingKey: const Key('regia_agenti_icon_bottom_spacing'),
+        transformKey: const Key('regia_agenti_icon_transform'),
+        verticalOffset: _regiaAgentiIconVerticalOffset,
         onTap: () {
           Navigator.of(
             context,
@@ -456,7 +479,6 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           ).push(MaterialPageRoute(builder: (_) => const PodcastDirettePage()));
         },
       ),
-      _textBlock('e', baseTextStyle),
       _linkTextBlock(
         context,
         libriLine,

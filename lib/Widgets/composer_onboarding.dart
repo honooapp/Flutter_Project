@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../Pages/new_hinoo_page.dart';
 import '../Pages/new_honoo_page.dart';
+import '../Services/auth_navigation_service.dart';
 import '../Utility/honoo_colors.dart';
 
 class ComposerLauncher {
@@ -27,12 +28,20 @@ class ComposerOnboardingPage extends StatelessWidget {
   void _dismiss(BuildContext context) => Navigator.of(context).pop();
 
   Future<void> _openHonooComposer(BuildContext context) async {
+    if (!await AuthNavigationService.ensureLoggedIn(context) ||
+        !context.mounted) {
+      return;
+    }
     await Navigator.of(
       context,
     ).push<void>(MaterialPageRoute(builder: (_) => const NewHonooPage()));
   }
 
   Future<void> _openHinooComposer(BuildContext context) async {
+    if (!await AuthNavigationService.ensureLoggedIn(context) ||
+        !context.mounted) {
+      return;
+    }
     await Navigator.of(
       context,
     ).push<void>(MaterialPageRoute(builder: (_) => const NewHinooPage()));

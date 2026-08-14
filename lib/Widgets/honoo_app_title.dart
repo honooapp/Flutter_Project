@@ -4,10 +4,11 @@ import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/utility.dart';
 
 class HonooAppTitle extends StatelessWidget {
-  const HonooAppTitle({super.key, this.onTap, this.color});
+  const HonooAppTitle({super.key, this.onTap, this.color, this.fontSize = 28});
 
   final VoidCallback? onTap;
   final Color? color;
+  final double fontSize;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,7 @@ class HonooAppTitle extends StatelessWidget {
       curve: Curves.easeOutCubic,
       style: GoogleFonts.libreFranklin(
         color: color ?? HonooColor.secondary,
-        fontSize: 28,
+        fontSize: fontSize,
         fontWeight: FontWeight.w600,
       ),
       child: Text(Utility().appName, textAlign: TextAlign.center),
