@@ -39,7 +39,7 @@ class RegiaAgentiPage extends StatelessWidget {
       'e di Gherkin,\n'
       'cioè\n'
       'di imparare\n'
-      'a tessere idee\n'
+      'a tessere scenari\n'
       'che una macchina\n'
       'possa comprendere,\n'
       'realizzare\n'

@@ -161,10 +161,11 @@ class _HomeIntro extends StatelessWidget {
   static const double _designWidth = 360;
   static const double _bottleIconSize = 42;
   static const double _moonIconSize = 28;
-  static const double _islandIconSize = 43;
+  static const double _islandIconSize = 55;
   static const double _bottleIconVerticalOffset = 9;
   static const double _moonIconVerticalOffset = 1;
-  static const double _islandIconVerticalOffset = 10;
+  static const double _islandIconVerticalOffset = 17;
+  static const double _islandFollowupTextVerticalOffset = -2;
 
   @override
   Widget build(BuildContext context) {
@@ -193,8 +194,7 @@ class _HomeIntro extends StatelessWidget {
                 text:
                     'Niente è per sempre\n'
                     'E nessuno può regalarti la Luna\n\n'
-                    'È vero\n'
-                    'Ma non per i poeti\n\n'
+                    'È vero. Ma non per i poeti\n\n'
                     'Vuoi essere un poeta di honoo?\n\n'
                     'Scegli',
               ),
@@ -234,9 +234,40 @@ class _HomeIntro extends StatelessWidget {
                 onPressed: () => SeaFooterBar.openIsland(context),
                 tint: HonooColor.onBackground,
               ),
-              const TextSpan(
-                text: '\ne inizia il viaggio\nverso le tue storie',
+              const TextSpan(text: '\n'),
+              WidgetSpan(
+                alignment: PlaceholderAlignment.baseline,
+                baseline: TextBaseline.alphabetic,
+                child: Transform.translate(
+                  key: const Key('home_island_followup_text_offset'),
+                  offset: const Offset(0, _islandFollowupTextVerticalOffset),
+                  child: Text(
+                    'e viaggia nelle tue storie',
+                    key: const Key('home_island_followup_text'),
+                    style: regularStyle,
+                  ),
+                ),
               ),
+              const TextSpan(text: '\n\nO'),
+              const WidgetSpan(
+                child: SizedBox(key: Key('home_honoo_leading_gap'), width: 8),
+              ),
+              WidgetSpan(
+                alignment: PlaceholderAlignment.baseline,
+                baseline: TextBaseline.alphabetic,
+                child: HonooAppTitle(
+                  key: const Key('home_inline_honoo'),
+                  fontSize: 23,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const PlaceholderPage(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const TextSpan(text: '\ne vedi tutto'),
             ],
           ),
           key: const Key('home_intro_text'),

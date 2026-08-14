@@ -31,6 +31,29 @@ void main() {
 
     expect(scaffold.backgroundColor, HonooColor.background);
     expect(find.byType(SmoothImage), findsNothing);
+
+    final luna = tester.widget<Image>(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is Image &&
+            widget.image is AssetImage &&
+            (widget.image as AssetImage).assetName == 'assets/icons/luna.png',
+      ),
+    );
+    final feste = tester.widget<Image>(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is Image &&
+            widget.image is AssetImage &&
+            (widget.image as AssetImage).assetName == 'assets/icons/feste.png',
+      ),
+    );
+    expect(luna.height, 75);
+    final lunaTransform = tester.widget<Transform>(
+      find.byKey(const Key('luna_icon_transform')),
+    );
+    expect(lunaTransform.transform.getTranslation().y, -2);
+    expect(feste.height, 66);
   });
 
   testWidgets('tablet e desktop mantengono il background attuale', (

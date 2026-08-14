@@ -31,7 +31,11 @@ void main() {
     );
     expect(aiIcon, findsOneWidget);
     final svg = tester.widget<SvgPicture>(aiIcon);
-    expect(svg.height, 52);
+    expect(svg.height, 45);
+    final transform = tester.widget<Transform>(
+      find.byKey(const Key('regia_agenti_icon_transform')),
+    );
+    expect(transform.transform.getTranslation().y, -2);
     expect(
       svg.colorFilter,
       const ColorFilter.mode(Color.fromRGBO(183, 183, 206, 1), BlendMode.srcIn),
@@ -46,7 +50,11 @@ void main() {
       tester
           .getSize(find.byKey(const Key('regia_agenti_icon_bottom_spacing')))
           .height,
-      20,
+      30,
+    );
+    expect(
+      tester.getSize(find.byKey(const Key('isola_icon_bottom_spacing'))).height,
+      30,
     );
 
     final visibleTexts = tester
@@ -54,11 +62,26 @@ void main() {
         .map((widget) => widget.data)
         .whereType<String>()
         .toList();
-    final viaggiIndex = visibleTexts.indexOf("viaggi sull'Isola delle Storie");
+    expect(
+      visibleTexts,
+      containsAll(<String>[
+        'Performance',
+        'Laboratori teatrali',
+        'Esplorazioni lunari',
+        'Feste',
+        "Viaggi sull'Isola delle Storie",
+        'Regia degli Agenti',
+        'Podcast e dirette',
+        'Libri',
+      ]),
+    );
+    final viaggiIndex = visibleTexts.indexOf("Viaggi sull'Isola delle Storie");
     final regiaIndex = visibleTexts.indexOf('Regia degli Agenti');
     final podcastIndex = visibleTexts.indexOf('Podcast e dirette');
+    final libriIndex = visibleTexts.indexOf('Libri');
     expect(regiaIndex, viaggiIndex + 1);
     expect(regiaIndex, lessThan(podcastIndex));
+    expect(libriIndex, podcastIndex + 1);
 
     await tester.ensureVisible(link);
     await tester.tap(link);
@@ -90,6 +113,8 @@ void main() {
     expect(text.textSpan?.toPlainText(), contains('Behavior Driven Design'));
     expect(text.textSpan?.toPlainText(), contains('Sì,\nstiamo parlando'));
     expect(text.textSpan?.toPlainText(), contains('guidando agenti AI'));
+    expect(text.textSpan?.toPlainText(), contains('a tessere scenari'));
+    expect(text.textSpan?.toPlainText(), isNot(contains('a tessere idee')));
     expect(
       text.textSpan?.toPlainText(),
       endsWith('E dirigere\ngli agenti\nsignifica\nimparare\na tessere'),

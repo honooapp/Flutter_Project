@@ -22,7 +22,7 @@ class Utility {
   final String text1Six =
       """\n\nse ci clicchi sopra,\ntorni qui\na questa pagina\n\n""";
   final String sostieniText =
-      '\nVuoi collaborare\na questo progetto?\n\nScrivimi a\nvenceslao.cembalo@gmail.com\n\nSe fai la dichiarazione\ndei redditi,\npuoi scegliere\ndi destinare\nil 5 per mille\na honoo\n\nNon è una donazione in più\nNon costa nulla\n\nÈ una parte\ndelle tue imposte\nche puoi decidere\na chi destinare\n\nFirma\nnel riquadro\ndedicato agli Enti\ndel Terzo Settore\ne scrivi\nil codice fiscale\ndi honoo\n\nCodice fiscale di\nhonoo - laboratorio multimediale:\n95349850636\n\nSe ti va,\nclicca qui:\n\nhttps://ko-fi.com/honoo2026\n\nper offrire\nun bicchiere di Idromele\nagli Gnometti delle Idee\n\nOppure\nun paio di fiaschi\n\nI risultati\nsaranno scintillanti:\ngli Gnometti delle Idee\nsono sconsideratamente generosi\ncon chi è generoso\n\nProva\ne di me dirai\nche gli amici\nli consiglio bene\n';
+      '\nVuoi collaborare\na questo progetto?\n\nScrivimi a\nvenceslao.cembalo@gmail.com\n\nSe fai la dichiarazione\ndei redditi,\npuoi scegliere\ndi destinare\nil 5 per mille\na honoo\n\nNon è una donazione in più\nNon costa nulla\n\nÈ una parte\ndelle tue imposte\nche puoi decidere\na chi destinare\n\nFirma\nnel riquadro\ndedicato agli Enti\ndel Terzo Settore\ne scrivi\nil codice fiscale\ndi honoo\n\nCodice fiscale di\nhonoo - laboratorio multimediale:\n95349850636\n\nSe ti va,\nclicca qui:\n\nhttps://ko-fi.com/honoo2026\n\nper offrire\nun bicchiere di Idromele\nagli Gnometti delle Idee\n\nOppure\nun paio di fiaschi\n\nI risultati\nsaranno scintillanti:\ngli Gnometti delle Idee\nsono sconsideratamente generosi\ncon chi è generoso\n\nProva\ne di me dirai\nche gli amici\nli consiglio bene\n\n';
   final String textHome1 = 'Ti regaliamo la Luna.\nPer sempre.';
   final String textHome2 =
       'Niente è per sempre,\ne nessuno può regalarti la Luna.\n\nÈ vero,\nma non per i poeti.\n\nVuoi essere un poeta di honoo?\n\nClicca sulla Bottiglia,\ne componi i tuoi honoo e hinoo.\n\nOppure sulla Luna,\ne guarda gli honoo\ne gli hinoo degli altri.\n\nO sull’Isola,\ne inizia il viaggio\nverso le tue storie.';
@@ -31,11 +31,11 @@ class Utility {
   final String libriText =
       'Sto preparando\nle versioni cartacee\ndei miei libri\n\nHo acquistato\ni codici ISBN\ne una licenza\nInDesign\n\nÈ un lavoro lento\nArtigianale\n\nQui troverai la notizia,\nquando saranno pronti:\n\nIsola delle Storie\n\nIsole delle Storie\n(con illustrazioni di Joel Folda)\n\nImmacolato\n\nI limoni sono finiti\n\nAlmeno\navresti potuto\ncambiare i nomi\n\nPapà,\nma tu mi vuoi bene?\n';
   final String campanelliText =
-      'In questa parte dell’Isola\nci sono case.\n\nVuoi scoprire chi ci abita?\n\nScorrendo verso destra\npuoi leggere\nciò che ogni abitante\nha scelto di raccontarti.\n\nSe vuoi,\nprova a bussare:\nmagari ti fa entrare.';
+      'In questa parte dell’Isola\nci sono case\n\nVuoi scoprire chi ci abita?\n\nScorrendo verso destra\npuoi leggere\nciò che ogni abitante\nha scelto di raccontarti\n\nSe vuoi,\nprova a bussare:\nmagari ti fa entrare';
   final String campanelloExample1Text =
-      'Ti piace\nascoltare musica\nin compagnia?\n\nE ballare in casa,\ncome si fa alle feste?\n\nQuesto è il campanello\ndi casa mia.\n\nPuoi bussare,\nse vuoi.\n\nMagari sono a casa.\nMagari sto ascoltando musica.\nMagari è musica che ti piace.';
+      'Ti piace\nascoltare musica\nin compagnia?\n\nE ballare in casa,\ncome si fa alle feste?\n\nQuesto è il campanello\ndi casa mia\n\nPuoi bussare,\nse vuoi\n\nMagari sono a casa\nMagari sto ascoltando musica\nMagari è musica che ti piace';
   final String campanelloExample2Text =
-      'Ti piace\nfare colazione in compagnia,\nin un terrazzo esposto a Sud?\n\nQuesto è il campanello di casa mia.\n\nPuoi bussare,\nse vuoi.\n\nMagari sono sul terrazzo.\nMagari c’è il sole.\nMagari sto facendo colazione.';
+      'Ti piace\nfare colazione in compagnia,\nin un terrazzo esposto a Sud?\n\nQuesto è il campanello di casa mia\n\nPuoi bussare,\nse vuoi\n\nMagari sono sul terrazzo\nMagari c’è il sole\nMagari sto facendo colazione';
   final String chestHeader = 'Il tuo Cuore custodisce';
   final String chestSubHeader1 = 'gli honoo\nsalvati dalla luna';
   final String chestSubHeader2 = 'gli honoo\nscritti da te';

@@ -8,11 +8,11 @@ import 'package:honoo/Services/supabase_provider.dart';
 import '../Entities/honoo.dart';
 import '../Entities/reply_navigation_result.dart';
 import '../Services/honoo_image_uploader.dart';
+import '../Services/auth_navigation_service.dart';
 import '../UI/honoo_builder.dart';
 import 'package:honoo/Services/honoo_service.dart';
 import 'package:honoo/Services/duplication_result.dart';
 
-import 'email_login_page.dart';
 import 'chest_page.dart';
 import 'new_hinoo_page.dart';
 import 'home_page.dart';
@@ -95,43 +95,10 @@ class _NewHonooPageState extends State<NewHonooPage> {
   Future<bool> _submitHonoo({bool openChestAfterSave = false}) async {
     final user = SupabaseProvider.client.auth.currentUser;
 
-    // 1) Se non sei loggato: vai al login e torna qui (senza auto-salvare)
+    // Se la sessione scade, apri direttamente il login e conserva l'editor.
     if (user == null) {
       if (!mounted) return false;
-
-      final bool? goLogin = await showDialog<bool>(
-        context: context,
-        barrierDismissible: true,
-        builder: (_) => const HonooConfirmDialog(
-          title: 'Devi prima accedere',
-          message: '\nVuoi andare alla pagina di login?',
-          confirmLabel: 'Vai al login',
-        ),
-      );
-
-      if (goLogin != true || !mounted) return false;
-
-      // ✅ aspetta la fine del login
-      final bool? ok = await Navigator.push<bool>(
-        context,
-        MaterialPageRoute(
-          builder: (context) => EmailLoginPage(
-            pendingHonooText: _text,
-            pendingImageUrl: _imageUrl,
-          ),
-        ),
-      );
-
-      if (!mounted) return false;
-
-      // ✅ niente auto-save: solo feedback opzionale
-      if (ok == true) {
-        showHonooToast(
-          context,
-          message: 'Accesso completato. Premi di nuovo OK per salvare.',
-        );
-      }
-
+      await AuthNavigationService.ensureLoggedIn(context);
       return false;
     }
 
@@ -345,21 +312,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
     final user = SupabaseProvider.client.auth.currentUser;
     if (user == null) {
       if (!mounted) return;
-      final bool? goLogin = await showDialog<bool>(
-        context: context,
-        barrierDismissible: true,
-        builder: (_) => const HonooConfirmDialog(
-          title: 'Devi prima accedere',
-          message: '\nVuoi andare alla pagina di login?',
-          confirmLabel: 'Vai al login',
-        ),
-      );
-      if (goLogin == true && mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const EmailLoginPage()),
-        );
-      }
+      await AuthNavigationService.ensureLoggedIn(context);
       return;
     }
 

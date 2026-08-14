@@ -3,14 +3,26 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Pages/new_hinoo_page.dart';
 import 'package:honoo/Pages/new_honoo_page.dart';
+import 'package:honoo/Pages/email_login_page.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/composer_onboarding.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../test_supabase_helper.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  setUpAll(registerSupabaseFallbacks);
 
-  setUp(() => SharedPreferences.setMockInitialValues({}));
+  late SupabaseTestHarness supabase;
+
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+    supabase = SupabaseTestHarness(withAuthenticatedUser: true);
+    supabase.enableOverrides();
+  });
+
+  tearDown(() => supabase.disableOverrides());
 
   Future<void> pumpOnboarding(
     WidgetTester tester, {
@@ -95,6 +107,36 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(NewHinooPage), findsOneWidget);
+  });
+
+  testWidgets('da anonimo la bottiglia apre direttamente il login', (
+    tester,
+  ) async {
+    supabase.disableOverrides();
+    supabase = SupabaseTestHarness();
+    supabase.enableOverrides();
+    await pumpOnboarding(tester, size: const Size(390, 844));
+
+    await tester.tap(find.byKey(const Key('composer_onboarding_bottle')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(EmailLoginPage), findsOneWidget);
+    expect(find.byType(NewHonooPage), findsNothing);
+    expect(find.byType(AlertDialog), findsNothing);
+  });
+
+  testWidgets('da anonimo la piuma apre direttamente il login', (tester) async {
+    supabase.disableOverrides();
+    supabase = SupabaseTestHarness();
+    supabase.enableOverrides();
+    await pumpOnboarding(tester, size: const Size(390, 844));
+
+    await tester.tap(find.byKey(const Key('composer_onboarding_feather')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(EmailLoginPage), findsOneWidget);
+    expect(find.byType(NewHinooPage), findsNothing);
+    expect(find.byType(AlertDialog), findsNothing);
   });
 
   testWidgets('testo e icone delle azioni restano sulla stessa riga', (

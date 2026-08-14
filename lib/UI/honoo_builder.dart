@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:honoo/Utility/heic_converter.dart' as heic;
 
 import 'package:honoo/Services/supabase_provider.dart';
+import 'package:honoo/Services/auth_navigation_service.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Utility/typographic_substitutions_formatter.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
@@ -24,7 +25,6 @@ import 'package:honoo/Widgets/text_box_download_button.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, visibleForTesting;
 import 'package:honoo/web/heic_converter.dart' as heicweb;
 
-import '../Pages/email_login_page.dart';
 import '../Services/honoo_image_uploader.dart';
 
 class HonooBuilder extends StatefulWidget {
@@ -328,23 +328,7 @@ class HonooBuilderState extends State<HonooBuilder> {
     final session = client.auth.currentSession;
     if (session == null) {
       if (!mounted) return;
-      final bool? goLogin = await showDialog<bool>(
-        context: context,
-        barrierDismissible: true,
-        builder: (_) => const HonooConfirmDialog(
-          title: 'Devi accedere prima',
-          message:
-              'Per caricare un’immagine,\ndevi fare prima il login.\nVuoi andare alla pagina di login?',
-          confirmLabel: 'Vai al login',
-        ),
-      );
-
-      if (goLogin == true && mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const EmailLoginPage()),
-        );
-      }
+      await AuthNavigationService.ensureLoggedIn(context);
       return;
     }
 

@@ -9,6 +9,7 @@ import 'package:honoo/Services/download_capture_service.dart';
 import 'package:honoo/Services/chest_hint_service.dart';
 import 'package:honoo/Services/duplication_result.dart';
 import 'package:honoo/Services/reply_system_notification.dart';
+import 'package:honoo/Services/auth_navigation_service.dart';
 
 import '../Controller/honoo_controller.dart';
 import '../Controller/hinoo_controller.dart';
@@ -91,6 +92,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
   String? _detachedFocusedConversationId;
   bool _detachedConversationVisible = true;
   bool _initialLoadCompleted = false;
+  bool _authResolved = false;
   int _conversationRefreshToken = 0;
   String? _pendingRevealEntryId;
   Object? _honooLoadError;
@@ -166,6 +168,19 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
     _pendingRevealEntryId = widget.focusReplyId;
     WidgetsBinding.instance.addObserver(this);
     _chestController.addListener(_onChestStateChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_authenticateAndInitialize());
+    });
+  }
+
+  Future<void> _authenticateAndInitialize() async {
+    final bool loggedIn = await AuthNavigationService.ensureLoggedIn(context);
+    if (!mounted) return;
+    if (!loggedIn) {
+      Navigator.of(context).pop();
+      return;
+    }
+    setState(() => _authResolved = true);
     unawaited(_initialize());
     _maybeShowScrignoHint();
   }
@@ -942,16 +957,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
     final user = SupabaseProvider.client.auth.currentUser;
     if (user == null) {
       if (!mounted) return;
-      await showDialog<bool>(
-        context: context,
-        barrierDismissible: true,
-        builder: (_) => const HonooConfirmDialog(
-          title: 'Devi accedere',
-          message:
-              'Per scaricare questo contenuto, devi fare prima il log in. Vuoi andare alla pagina di login?',
-          confirmLabel: 'Vai al login',
-        ),
-      );
+      await AuthNavigationService.ensureLoggedIn(context);
       return;
     }
 
@@ -1085,6 +1091,12 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    if (!_authResolved) {
+      return const Scaffold(
+        backgroundColor: HonooColor.background,
+        body: Center(child: LoadingSpinner(color: Colors.white)),
+      );
+    }
     return AnimatedBuilder(
       animation: Listenable.merge([ctrl.isLoading, ctrl.version]),
       builder: (context, _) {
