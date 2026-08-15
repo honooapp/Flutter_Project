@@ -1014,8 +1014,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
             ResponsiveLayoutMode.wideDesktop ||
             ResponsiveLayoutMode.largeDesktop => 28,
           };
-          final double carouselArrowVerticalInset =
-              footerIconSize + footerSpacing + 12;
           final double scrignoSize = math.min(
             footerIconSize * 4,
             math.min(maxWidth, maxHeight),
@@ -1376,8 +1374,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
                           arrowColor: Colors.white,
                           arrowSize: carouselArrowSize,
                           horizontalInset: isMobile ? 4 : 10,
-                          arrowAlignment: Alignment.bottomCenter,
-                          verticalInset: carouselArrowVerticalInset,
+                          arrowAlignment: Alignment.center,
                           child: const SizedBox.expand(),
                         ),
                       ),
