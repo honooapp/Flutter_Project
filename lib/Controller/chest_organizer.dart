@@ -1,3 +1,5 @@
+import '../Entities/casa_share_mode.dart';
+
 class ChestOrganization<T> {
   const ChestOrganization({
     required this.items,
@@ -25,6 +27,23 @@ class ChestNotificationTarget {
 /// Regole pure di ordinamento e raggruppamento dello Scrigno.
 class ChestOrganizer {
   const ChestOrganizer._();
+
+  static bool matchesCasaFilter({
+    required CasaChestFilter? filter,
+    required bool isFromMoonSaved,
+    required bool hasConversation,
+  }) {
+    switch (filter) {
+      case null:
+        return true;
+      case CasaChestFilter.authored:
+        return !hasConversation && !isFromMoonSaved;
+      case CasaChestFilter.moonSaved:
+        return !hasConversation && isFromMoonSaved;
+      case CasaChestFilter.conversations:
+        return hasConversation;
+    }
+  }
 
   static ChestOrganization<T> organize<T>({
     required List<T> items,

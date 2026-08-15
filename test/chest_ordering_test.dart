@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:honoo/Entities/casa_share_mode.dart';
 import 'package:honoo/Controller/chest_organizer.dart';
 
 class _Item {
@@ -29,6 +30,49 @@ ChestOrganization<_Item> _organize(List<_Item> items) {
 }
 
 void main() {
+  test('i filtri dello Scrigno di casa sono reciprocamente esclusivi', () {
+    expect(
+      ChestOrganizer.matchesCasaFilter(
+        filter: CasaChestFilter.authored,
+        isFromMoonSaved: false,
+        hasConversation: false,
+      ),
+      isTrue,
+    );
+    expect(
+      ChestOrganizer.matchesCasaFilter(
+        filter: CasaChestFilter.moonSaved,
+        isFromMoonSaved: true,
+        hasConversation: false,
+      ),
+      isTrue,
+    );
+    expect(
+      ChestOrganizer.matchesCasaFilter(
+        filter: CasaChestFilter.conversations,
+        isFromMoonSaved: true,
+        hasConversation: true,
+      ),
+      isTrue,
+    );
+    expect(
+      ChestOrganizer.matchesCasaFilter(
+        filter: CasaChestFilter.authored,
+        isFromMoonSaved: false,
+        hasConversation: true,
+      ),
+      isFalse,
+    );
+    expect(
+      ChestOrganizer.matchesCasaFilter(
+        filter: CasaChestFilter.moonSaved,
+        isFromMoonSaved: true,
+        hasConversation: true,
+      ),
+      isFalse,
+    );
+  });
+
   group('ChestOrganizer', () {
     test('ordina gli elementi normali per data DESC e id stabile', () {
       final now = DateTime(2024, 1, 1, 12);

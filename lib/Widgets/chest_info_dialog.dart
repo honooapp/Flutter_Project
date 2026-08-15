@@ -6,19 +6,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../Utility/honoo_colors.dart';
 import 'honoo_dialogs.dart';
 
-const chestInfoText =
+const chestInfoTextBeforeIcons =
     "Questo è il tuo Scrigno\n\n"
     "Qui sono custoditi\n"
     "gli honoo e gli hinoo\n"
     "che hai scritto,\n\n"
     "quelli che hai salvato dalla Luna,\n\n"
-    "e quelli che hai ricevuto\n\n"
-    "Blu\n"
-    "sono i tuoi\n\n"
-    "Bianchi\n"
-    "quelli della Luna\n\n"
-    "Rossi\n"
-    "quelli che ti sono stati inviati\n\n"
+    "e quelli che hai ricevuto\n\n";
+
+const chestInfoTextAfterIcons =
     "Scorri verso destra\n"
     "per rivedere ciò che hai scritto\n"
     "e ciò che hai salvato\n\n"
@@ -78,10 +74,36 @@ class ChestInfoDialog extends StatelessWidget {
                       ),
                       child: SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),
-                        child: Text(
-                          chestInfoText,
-                          style: HonooDialogStyles.body(
-                            color: HonooColor.onBackground,
+                        child: Text.rich(
+                          TextSpan(
+                            style: HonooDialogStyles.body(
+                              color: HonooColor.onBackground,
+                            ),
+                            children: [
+                              const TextSpan(text: chestInfoTextBeforeIcons),
+                              _chestIconSpan(
+                                asset: 'assets/icons/honoo_chest_blue.svg',
+                                semanticsLabel: 'Blu',
+                                size: _responsiveIconSize(maxWidth),
+                              ),
+                              const TextSpan(text: '\nsono i tuoi\n\n'),
+                              _chestIconSpan(
+                                asset: 'assets/icons/honoo_chest_white.svg',
+                                semanticsLabel: 'Bianchi',
+                                size: _responsiveIconSize(maxWidth),
+                              ),
+                              const TextSpan(text: '\nquelli della Luna\n\n'),
+                              _chestIconSpan(
+                                asset: 'assets/icons/honoo_chest_red.svg',
+                                semanticsLabel: 'Rossi',
+                                size: _responsiveIconSize(maxWidth),
+                              ),
+                              const TextSpan(
+                                text:
+                                    '\nquelli che ti sono stati inviati\n\n'
+                                    '$chestInfoTextAfterIcons',
+                              ),
+                            ],
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -112,6 +134,27 @@ class ChestInfoDialog extends StatelessWidget {
           ),
         );
       },
+    ),
+  );
+
+  static double _responsiveIconSize(double availableWidth) =>
+      (availableWidth * 0.2).clamp(44.0, 72.0);
+
+  static WidgetSpan _chestIconSpan({
+    required String asset,
+    required String semanticsLabel,
+    required double size,
+  }) => WidgetSpan(
+    alignment: PlaceholderAlignment.middle,
+    child: Semantics(
+      image: true,
+      label: semanticsLabel,
+      child: SvgPicture.asset(
+        asset,
+        width: size,
+        height: size,
+        excludeFromSemantics: true,
+      ),
     ),
   );
 }

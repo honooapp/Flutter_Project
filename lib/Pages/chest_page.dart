@@ -54,6 +54,7 @@ class ChestPage extends StatefulWidget {
     this.highlightLatest = false,
     this.focusReplyId,
     this.initialFilter = CasaShareMode.all,
+    this.casaFilter,
   });
 
   final bool focusReplies;
@@ -61,6 +62,7 @@ class ChestPage extends StatefulWidget {
   final bool highlightLatest;
   final String? focusReplyId;
   final CasaShareMode initialFilter;
+  final CasaChestFilter? casaFilter;
 
   @override
   State<ChestPage> createState() => _ChestPageState();
@@ -331,6 +333,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       widget.focusReplies ? '1' : '0',
       widget.highlightLatest ? '1' : '0',
       widget.initialFilter.name,
+      widget.casaFilter?.name ?? '',
       _initialLoadCompleted ? 'loaded' : 'loading',
       _pendingRevealEntryId ?? '',
       _mode.name,
@@ -360,19 +363,33 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
 
     final items = [...honooItems, ...hinooItems]
         .where((item) {
+          final conversationId = _conversationIdForItemFilter(item);
+          final hasConversation =
+              (conversationId != null &&
+                  (_honooLatestReplies.containsKey(conversationId) ||
+                      _hinooLatestReplies.containsKey(conversationId))) ||
+              item.when(
+                honoo: (honoo) => honoo.hasReplies,
+                hinoo: (_) => false,
+              );
+          final isFromMoonSaved = item.when(
+            honoo: (honoo) => honoo.isFromMoonSaved,
+            hinoo: (hinoo) => hinoo.isFromMoonSaved,
+          );
+          if (widget.casaFilter != null) {
+            return ChestOrganizer.matchesCasaFilter(
+              filter: widget.casaFilter,
+              isFromMoonSaved: isFromMoonSaved,
+              hasConversation: hasConversation,
+            );
+          }
           switch (widget.initialFilter) {
             case CasaShareMode.all:
               return true;
             case CasaShareMode.home:
-              return item.when(
-                honoo: (honoo) => !honoo.isFromMoonSaved,
-                hinoo: (hinoo) => !hinoo.isFromMoonSaved,
-              );
+              return !isFromMoonSaved;
             case CasaShareMode.moon:
-              return item.when(
-                honoo: (honoo) => honoo.isFromMoonSaved,
-                hinoo: (hinoo) => hinoo.isFromMoonSaved,
-              );
+              return isFromMoonSaved;
           }
         })
         .toList(growable: false);
@@ -502,6 +519,12 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
   String? _convIdOfItem(ChestItem it) => it.when(
     honoo: (h) => h.conversationId,
     hinoo: (row) => row.conversationId ?? row.draft.conversationId,
+  );
+
+  String? _conversationIdForItemFilter(ChestItem item) => item.when(
+    honoo: (honoo) => honoo.conversationId ?? honoo.dbId,
+    hinoo: (hinoo) =>
+        hinoo.conversationId ?? hinoo.draft.conversationId ?? hinoo.id,
   );
 
   String? _conversationIdForDeletion(ChestItem item) {

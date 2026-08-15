@@ -296,12 +296,12 @@ class _CampanelliPageState extends State<CampanelliPage> {
     final user = SupabaseProvider.client.auth.currentUser;
     final bool isOwner = user != null && campanello.ownerId == user.id;
     if (isOwner) {
-      final filter = await Navigator.of(context).push<CasaShareMode>(
+      final filter = await Navigator.of(context).push<CasaChestFilter>(
         MaterialPageRoute(builder: (_) => const CasaChestFilterPage()),
       );
       if (!mounted || filter == null) return;
       await Navigator.of(context).push<void>(
-        MaterialPageRoute(builder: (_) => ChestPage(initialFilter: filter)),
+        MaterialPageRoute(builder: (_) => ChestPage(casaFilter: filter)),
       );
       return;
     }
