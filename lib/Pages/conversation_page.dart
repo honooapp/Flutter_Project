@@ -81,7 +81,6 @@ class _ConversationPageState extends State<ConversationPage> {
     return ThreadLayoutScaffold(
       backgroundColor: pageStyle.backgroundColor,
       header: HonooAppTitle(
-        color: pageStyle.logoColor,
         onTap: () {
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (_) => const PlaceholderPage()),

@@ -1007,6 +1007,15 @@ class _CampanelliPageState extends State<CampanelliPage> {
           final double safeBottom = MediaQuery.of(context).viewPadding.bottom;
           final double footerSpacing = footerBottomPadding + safeBottom;
           final double footerBottomSpacing = footerSpacing / 2;
+          final double carouselArrowSize = switch (layoutMode) {
+            ResponsiveLayoutMode.mobile => 24,
+            ResponsiveLayoutMode.tablet => 26,
+            ResponsiveLayoutMode.desktop ||
+            ResponsiveLayoutMode.wideDesktop ||
+            ResponsiveLayoutMode.largeDesktop => 28,
+          };
+          final double carouselArrowVerticalInset =
+              footerIconSize + footerSpacing + 12;
           final double scrignoSize = math.min(
             footerIconSize * 4,
             math.min(maxWidth, maxHeight),
@@ -1365,6 +1374,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
                             );
                           },
                           arrowColor: Colors.white,
+                          arrowSize: carouselArrowSize,
+                          horizontalInset: isMobile ? 4 : 10,
+                          arrowAlignment: Alignment.bottomCenter,
+                          verticalInset: carouselArrowVerticalInset,
                           child: const SizedBox.expand(),
                         ),
                       ),

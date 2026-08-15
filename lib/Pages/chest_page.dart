@@ -1157,7 +1157,6 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         return ThreadLayoutScaffold(
           backgroundColor: pageStyle.backgroundColor,
           header: HonooAppTitle(
-            color: pageStyle.logoColor,
             onTap: () {
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (_) => const PlaceholderPage()),

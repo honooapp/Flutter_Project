@@ -82,6 +82,44 @@ void main() {
       (textPadding.padding as EdgeInsets).top,
       HinooTypography.editorTextTopPadding(320),
     );
+    expect(
+      tester.getSize(find.byKey(const ValueKey('campanello-text-canvas'))),
+      const Size(320, 500),
+    );
+  });
+
+  testWidgets('il testo mantiene il canvas 9:16 nel formato tutto schermo', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    const campanello = CampanelloData(
+      id: 'campanello-1',
+      campanelloHinooId: null,
+      ownerId: 'owner-1',
+      backgroundImage: AssetImage('assets/campanello1.png'),
+      text: 'Un campanello',
+      linkedHouseId: 'casa-1',
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: CampanelloCard(
+            data: CampanelloPageData.campanello(campanello),
+            width: 390,
+            height: 844,
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      tester.getSize(find.byKey(const ValueKey('campanello-text-canvas'))),
+      const Size(390, 693.3333333333334),
+    );
   });
 
   testWidgets('il campanello proprietario espone il comando modifica', (

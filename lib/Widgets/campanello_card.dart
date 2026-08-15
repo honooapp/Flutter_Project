@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -30,6 +32,10 @@ class CampanelloCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double verticalPadding = HinooTypography.verticalPadding(width);
+    final double textCanvasHeight = math.min(
+      height,
+      width / HinooTypography.aspectRatio,
+    );
     final TextStyle textStyle = GoogleFonts.lora(
       fontSize: 18,
       height: HinooTypography.lineHeight,
@@ -51,16 +57,24 @@ class CampanelloCard extends StatelessWidget {
       );
     }
 
-    final Widget savedText = Padding(
-      padding: EdgeInsets.fromLTRB(
-        HinooTypography.horizontalPadding,
-        HinooTypography.editorTextTopPadding(width),
-        HinooTypography.horizontalPadding,
-        HinooTypography.editorTextBottomPadding,
-      ),
-      child: Center(
-        key: const ValueKey('campanello-saved-text-position'),
-        child: _buildText(textStyle),
+    final Widget savedText = Align(
+      alignment: Alignment.topCenter,
+      child: SizedBox(
+        key: const ValueKey('campanello-text-canvas'),
+        width: width,
+        height: textCanvasHeight,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            HinooTypography.horizontalPadding,
+            HinooTypography.editorTextTopPadding(width),
+            HinooTypography.horizontalPadding,
+            HinooTypography.editorTextBottomPadding,
+          ),
+          child: Center(
+            key: const ValueKey('campanello-saved-text-position'),
+            child: _buildText(textStyle),
+          ),
+        ),
       ),
     );
 

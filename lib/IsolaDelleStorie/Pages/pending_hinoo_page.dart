@@ -44,13 +44,9 @@ class PendingHinooPage extends StatelessWidget {
 
           return Column(
             children: [
-              SizedBox(
+              const SizedBox(
                 height: headerH,
-                child: Center(
-                  child: HonooAppTitle(
-                    onTap: () => Navigator.of(context).pop(false),
-                  ),
-                ),
+                child: Center(child: HonooAppTitle()),
               ),
               Expanded(
                 child: Center(

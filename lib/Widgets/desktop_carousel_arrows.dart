@@ -14,6 +14,8 @@ class DesktopCarouselArrows extends StatelessWidget {
     this.arrowColor = Colors.white,
     this.arrowSize = 48,
     this.horizontalInset = 16,
+    this.arrowAlignment = Alignment.center,
+    this.verticalInset = 0,
   });
 
   final Widget child;
@@ -24,6 +26,8 @@ class DesktopCarouselArrows extends StatelessWidget {
   final Color arrowColor;
   final double arrowSize;
   final double horizontalInset;
+  final AlignmentGeometry arrowAlignment;
+  final double verticalInset;
 
   @override
   Widget build(BuildContext context) {
@@ -36,23 +40,29 @@ class DesktopCarouselArrows extends StatelessWidget {
             left: horizontalInset,
             top: 0,
             bottom: 0,
-            child: Center(
-              child: Tooltip(
-                message: 'Indietro',
-                child: GestureDetector(
-                  key: const ValueKey<String>('desktop_carousel_prev'),
-                  behavior: HitTestBehavior.opaque,
-                  onTap: onPrev,
-                  child: SizedBox.square(
-                    dimension: arrowSize + 16,
-                    child: Center(
-                      child: SvgPicture.asset(
-                        'assets/icons/arrow_left.svg',
-                        width: arrowSize,
-                        height: arrowSize,
-                        colorFilter:
-                            ColorFilter.mode(arrowColor, BlendMode.srcIn),
-                        semanticsLabel: 'Indietro',
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: verticalInset),
+              child: Align(
+                alignment: arrowAlignment,
+                child: Tooltip(
+                  message: 'Indietro',
+                  child: GestureDetector(
+                    key: const ValueKey<String>('desktop_carousel_prev'),
+                    behavior: HitTestBehavior.opaque,
+                    onTap: onPrev,
+                    child: SizedBox.square(
+                      dimension: arrowSize + 16,
+                      child: Center(
+                        child: SvgPicture.asset(
+                          'assets/icons/arrow_left.svg',
+                          width: arrowSize,
+                          height: arrowSize,
+                          colorFilter: ColorFilter.mode(
+                            arrowColor,
+                            BlendMode.srcIn,
+                          ),
+                          semanticsLabel: 'Indietro',
+                        ),
                       ),
                     ),
                   ),
@@ -65,23 +75,29 @@ class DesktopCarouselArrows extends StatelessWidget {
             right: horizontalInset,
             top: 0,
             bottom: 0,
-            child: Center(
-              child: Tooltip(
-                message: 'Avanti',
-                child: GestureDetector(
-                  key: const ValueKey<String>('desktop_carousel_next'),
-                  behavior: HitTestBehavior.opaque,
-                  onTap: onNext,
-                  child: SizedBox.square(
-                    dimension: arrowSize + 16,
-                    child: Center(
-                      child: SvgPicture.asset(
-                        'assets/icons/arrow_right.svg',
-                        width: arrowSize,
-                        height: arrowSize,
-                        colorFilter:
-                            ColorFilter.mode(arrowColor, BlendMode.srcIn),
-                        semanticsLabel: 'Avanti',
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: verticalInset),
+              child: Align(
+                alignment: arrowAlignment,
+                child: Tooltip(
+                  message: 'Avanti',
+                  child: GestureDetector(
+                    key: const ValueKey<String>('desktop_carousel_next'),
+                    behavior: HitTestBehavior.opaque,
+                    onTap: onNext,
+                    child: SizedBox.square(
+                      dimension: arrowSize + 16,
+                      child: Center(
+                        child: SvgPicture.asset(
+                          'assets/icons/arrow_right.svg',
+                          width: arrowSize,
+                          height: arrowSize,
+                          colorFilter: ColorFilter.mode(
+                            arrowColor,
+                            BlendMode.srcIn,
+                          ),
+                          semanticsLabel: 'Avanti',
+                        ),
                       ),
                     ),
                   ),
