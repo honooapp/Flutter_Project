@@ -31,24 +31,12 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
         builder: (context, constraints) {
           final double canvasWidth = math.max(1, constraints.maxWidth);
 
-          const double horizontalPad = HinooTypography.horizontalPadding;
-
-          final double topPad = HinooTypography.editorTextTopPadding(
-            canvasWidth,
-          );
-          const double bottomPad = HinooTypography.editorTextBottomPadding;
-
           final TextStyle effectiveStyle = HinooTypography.textStyle(
             color: widget.textColor,
           );
 
           return Padding(
-            padding: EdgeInsets.fromLTRB(
-              horizontalPad,
-              topPad,
-              horizontalPad,
-              bottomPad,
-            ),
+            padding: HinooTypography.textViewportPadding(canvasWidth),
             child: WidthLimitedMultilineField(
               controller: widget.controller,
               focusNode: widget.focusNode,
