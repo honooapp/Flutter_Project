@@ -42,6 +42,12 @@ void main() {
     final CampanelloCard card = tester.widget(find.byType(CampanelloCard));
     expect(card.width, 390);
     expect(card.height, 844);
+    final DesktopCarouselArrows arrows = tester.widget(
+      find.byType(DesktopCarouselArrows),
+    );
+    expect(arrows.arrowSize, 24);
+    expect(arrows.arrowAlignment, Alignment.bottomCenter);
+    expect(arrows.verticalInset, greaterThan(0));
     expect(tester.takeException(), isNull);
   });
 
@@ -75,6 +81,11 @@ void main() {
     expect(card.width, closeTo(506.25, 0.01));
     expect(card.height, 900);
     expect(tester.getSize(find.byType(CampanelliFooter)).width, 506.25);
+    final DesktopCarouselArrows arrows = tester.widget(
+      find.byType(DesktopCarouselArrows),
+    );
+    expect(arrows.arrowSize, 28);
+    expect(arrows.arrowAlignment, Alignment.bottomCenter);
 
     await tester.drag(find.byType(CampanelloCard), const Offset(0, -900));
     await tester.pumpAndSettle();

@@ -62,9 +62,9 @@ class _SharedHouseChestPageState extends State<SharedHouseChestPage> {
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: HonooAppTitle(onTap: () => Navigator.of(context).pop()),
+            const Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: HonooAppTitle(),
             ),
             Expanded(child: _body()),
             if (_items.length > 1)

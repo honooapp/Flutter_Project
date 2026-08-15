@@ -7,14 +7,14 @@ void main() {
   testWidgets('il menu dello scrigno di casa sceglie subito il filtro', (
     tester,
   ) async {
-    CasaShareMode? result;
+    CasaChestFilter? result;
 
     await tester.pumpWidget(
       MaterialApp(
         home: Builder(
           builder: (context) => TextButton(
             onPressed: () async {
-              result = await Navigator.of(context).push<CasaShareMode>(
+              result = await Navigator.of(context).push<CasaChestFilter>(
                 MaterialPageRoute(builder: (_) => const CasaChestFilterPage()),
               );
             },
@@ -35,6 +35,6 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('house-chest-moon')));
     await tester.pumpAndSettle();
-    expect(result, CasaShareMode.moon);
+    expect(result, CasaChestFilter.moonSaved);
   });
 }

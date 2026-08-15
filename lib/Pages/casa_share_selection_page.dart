@@ -43,33 +43,35 @@ class CasaChestFilterPage extends StatelessWidget {
                   children: [
                     _ShareIcon(
                       key: const ValueKey('house-chest-home'),
-                      mode: CasaShareMode.home,
+                      label: CasaChestFilter.authored.label,
                       asset: 'assets/icons/honoo_chest_blue.svg',
                       selected: false,
                       size: iconSize,
                       addWhiteOutline: true,
                       onTap: () =>
-                          Navigator.of(context).pop(CasaShareMode.home),
+                          Navigator.of(context).pop(CasaChestFilter.authored),
                     ),
                     SizedBox(height: spacing),
                     _ShareIcon(
                       key: const ValueKey('house-chest-moon'),
-                      mode: CasaShareMode.moon,
+                      label: CasaChestFilter.moonSaved.label,
                       asset: 'assets/icons/honoo_chest_white.svg',
                       selected: false,
                       size: iconSize,
                       onTap: () =>
-                          Navigator.of(context).pop(CasaShareMode.moon),
+                          Navigator.of(context).pop(CasaChestFilter.moonSaved),
                     ),
                     SizedBox(height: spacing),
                     _ShareIcon(
                       key: const ValueKey('house-chest-all'),
-                      mode: CasaShareMode.all,
+                      label: CasaChestFilter.conversations.label,
                       asset: 'assets/icons/chest_home.svg',
                       selected: false,
                       size: iconSize,
                       addWhiteOutline: true,
-                      onTap: () => Navigator.of(context).pop(CasaShareMode.all),
+                      onTap: () => Navigator.of(
+                        context,
+                      ).pop(CasaChestFilter.conversations),
                     ),
                   ],
                 ),
@@ -128,7 +130,7 @@ class _CasaShareSelectionPageState extends State<CasaShareSelectionPage> {
                         SizedBox(height: compact ? 24 : 40),
                         _ShareIcon(
                           key: const ValueKey('house-share-home'),
-                          mode: CasaShareMode.home,
+                          label: CasaShareMode.home.label,
                           asset: 'assets/icons/honoo_chest_blue.svg',
                           selected: _selected.contains(CasaShareMode.home),
                           size: iconSize,
@@ -138,7 +140,7 @@ class _CasaShareSelectionPageState extends State<CasaShareSelectionPage> {
                         SizedBox(height: spacing),
                         _ShareIcon(
                           key: const ValueKey('house-share-moon'),
-                          mode: CasaShareMode.moon,
+                          label: CasaShareMode.moon.label,
                           asset: 'assets/icons/honoo_chest_white.svg',
                           selected: _selected.contains(CasaShareMode.moon),
                           size: iconSize,
@@ -147,7 +149,7 @@ class _CasaShareSelectionPageState extends State<CasaShareSelectionPage> {
                         SizedBox(height: spacing),
                         _ShareIcon(
                           key: const ValueKey('house-share-all'),
-                          mode: CasaShareMode.all,
+                          label: CasaShareMode.all.label,
                           asset: 'assets/icons/chest_home.svg',
                           selected: _selected.contains(CasaShareMode.all),
                           size: iconSize,
@@ -196,7 +198,7 @@ class _CasaShareSelectionPageState extends State<CasaShareSelectionPage> {
 class _ShareIcon extends StatelessWidget {
   const _ShareIcon({
     super.key,
-    required this.mode,
+    required this.label,
     required this.asset,
     required this.selected,
     required this.size,
@@ -204,7 +206,7 @@ class _ShareIcon extends StatelessWidget {
     this.addWhiteOutline = false,
   });
 
-  final CasaShareMode mode;
+  final String label;
   final String asset;
   final bool selected;
   final double size;
@@ -234,14 +236,14 @@ class _ShareIcon extends StatelessWidget {
     );
 
     return Tooltip(
-      message: mode.label,
+      message: label,
       preferBelow: false,
       verticalOffset: 18,
       waitDuration: const Duration(milliseconds: 250),
       child: Semantics(
         button: true,
         selected: selected,
-        label: mode.label,
+        label: label,
         child: Material(
           color: Colors.transparent,
           child: InkWell(
