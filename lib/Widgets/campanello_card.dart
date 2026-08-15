@@ -70,8 +70,9 @@ class CampanelloCard extends StatelessWidget {
             HinooTypography.horizontalPadding,
             HinooTypography.editorTextBottomPadding,
           ),
-          child: Center(
+          child: Align(
             key: const ValueKey('campanello-saved-text-position'),
+            alignment: Alignment.topCenter,
             child: _buildText(textStyle),
           ),
         ),
@@ -132,7 +133,12 @@ class CampanelloCard extends StatelessWidget {
     final String raw = data.text;
     final idx = raw.toLowerCase().lastIndexOf('clicca qui');
     if (idx < 0 || onRequestTap == null) {
-      return Text(raw, style: textStyle, textAlign: TextAlign.center);
+      return Text(
+        raw,
+        style: textStyle,
+        textAlign: TextAlign.center,
+        softWrap: false,
+      );
     }
 
     final String before = raw.substring(0, idx);

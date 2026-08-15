@@ -6,29 +6,33 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../Utility/honoo_colors.dart';
 import 'honoo_dialogs.dart';
 
-const chestInfoTextBeforeIcons =
+const chestInfoTextStart =
     "Questo è il tuo Scrigno\n\n"
     "Qui sono custoditi\n"
     "gli honoo e gli hinoo\n"
-    "che hai scritto,\n\n"
-    "quelli che hai salvato dalla Luna,\n\n"
-    "e quelli che hai ricevuto\n\n";
+    "che hai scritto\n";
 
-const chestInfoTextAfterIcons =
+const chestInfoTextAfterWritten = "\n\nquelli che hai salvato dalla Luna\n";
+
+const chestInfoTextAfterSaved = "\n\ne quelli che hai ricevuto\n";
+
+const chestInfoTextDirections =
+    "\n\n"
     "Scorri verso destra\n"
-    "per rivedere ciò che hai scritto\n"
-    "e ciò che hai salvato\n\n"
-    "Scorri dall’alto verso il basso\n"
+    "per rivedere\n"
+    "quello che hai scritto\n"
+    "e quello che hai salvato\n\n"
+    "Scorri verso il basso\n"
     "per seguire\n"
-    "le conversazioni\n\n"
-    "In alto\n"
-    "l’honoo della Luna\n\n"
-    "Sopra\n"
-    "la tua risposta\n\n"
-    "E, sopra ancora,\n"
-    "se arriva,\n"
-    "la risposta\n"
-    "alla tua risposta\n";
+    "le conversazioni fra\n\n"
+    "quello che hai salvato\n"
+    "dalla Luna\n";
+
+const chestInfoTextBeforeOwnReply = "\n\nla tua risposta,\n";
+
+const chestInfoTextBeforeReceivedReply =
+    "\n\ne, se arriva,\n"
+    "la risposta alla tua risposta\n";
 
 Future<void> showChestInfoDialog(BuildContext context) => showDialog<void>(
   context: context,
@@ -80,28 +84,43 @@ class ChestInfoDialog extends StatelessWidget {
                               color: HonooColor.onBackground,
                             ),
                             children: [
-                              const TextSpan(text: chestInfoTextBeforeIcons),
+                              const TextSpan(text: chestInfoTextStart),
                               _chestIconSpan(
                                 asset: 'assets/icons/honoo_chest_blue.svg',
                                 semanticsLabel: 'Blu',
                                 size: _responsiveIconSize(maxWidth),
                               ),
-                              const TextSpan(text: '\nsono i tuoi\n\n'),
+                              const TextSpan(text: chestInfoTextAfterWritten),
                               _chestIconSpan(
                                 asset: 'assets/icons/honoo_chest_white.svg',
                                 semanticsLabel: 'Bianchi',
                                 size: _responsiveIconSize(maxWidth),
                               ),
-                              const TextSpan(text: '\nquelli della Luna\n\n'),
+                              const TextSpan(text: chestInfoTextAfterSaved),
                               _chestIconSpan(
                                 asset: 'assets/icons/honoo_chest_red.svg',
                                 semanticsLabel: 'Rossi',
                                 size: _responsiveIconSize(maxWidth),
                               ),
+                              const TextSpan(text: chestInfoTextDirections),
+                              _chestIconSpan(
+                                asset: 'assets/icons/honoo_chest_white.svg',
+                                semanticsLabel: 'Bianchi',
+                                size: _responsiveIconSize(maxWidth),
+                              ),
+                              const TextSpan(text: chestInfoTextBeforeOwnReply),
+                              _chestIconSpan(
+                                asset: 'assets/icons/honoo_chest_blue.svg',
+                                semanticsLabel: 'Blu',
+                                size: _responsiveIconSize(maxWidth),
+                              ),
                               const TextSpan(
-                                text:
-                                    '\nquelli che ti sono stati inviati\n\n'
-                                    '$chestInfoTextAfterIcons',
+                                text: chestInfoTextBeforeReceivedReply,
+                              ),
+                              _chestIconSpan(
+                                asset: 'assets/icons/honoo_chest_red.svg',
+                                semanticsLabel: 'Rossi',
+                                size: _responsiveIconSize(maxWidth),
                               ),
                             ],
                           ),

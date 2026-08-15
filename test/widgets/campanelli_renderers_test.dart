@@ -45,7 +45,7 @@ void main() {
       campanelloHinooId: null,
       ownerId: 'owner-1',
       backgroundImage: AssetImage('assets/campanello1.png'),
-      text: 'Un campanello',
+      text: 'Un campanello\ncon un a capo manuale',
       linkedHouseId: 'casa-1',
     );
 
@@ -61,11 +61,13 @@ void main() {
       ),
     );
 
-    expect(find.text('Un campanello'), findsOneWidget);
-    final savedTextPosition = tester.widget<Center>(
+    final textFinder = find.text('Un campanello\ncon un a capo manuale');
+    expect(textFinder, findsOneWidget);
+    expect(tester.widget<Text>(textFinder).softWrap, isFalse);
+    final savedTextPosition = tester.widget<Align>(
       find.byKey(const ValueKey('campanello-saved-text-position')),
     );
-    expect(savedTextPosition.widthFactor, isNull);
+    expect(savedTextPosition.alignment, Alignment.topCenter);
     final background = find.byWidgetPredicate(
       (widget) => widget is Image && widget.image == campanello.backgroundImage,
     );
