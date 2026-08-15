@@ -70,8 +70,9 @@ class CampanelloCard extends StatelessWidget {
             HinooTypography.horizontalPadding,
             HinooTypography.editorTextBottomPadding,
           ),
-          child: Center(
+          child: Align(
             key: const ValueKey('campanello-saved-text-position'),
+            alignment: Alignment.topCenter,
             child: _buildText(textStyle),
           ),
         ),
