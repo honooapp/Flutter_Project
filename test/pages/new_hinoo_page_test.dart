@@ -42,6 +42,28 @@ void main() {
       await tester.pump();
 
       expect(find.byKey(const Key('campanello-save-changes')), findsOneWidget);
+      final textFieldFinder = find.byType(TextField);
+      final textField = tester.widget<TextField>(textFieldFinder);
+      expect((textField.decoration!.contentPadding! as EdgeInsets).top, 0);
+
+      final twentyLines = List.generate(
+        20,
+        (index) => '${index + 1}',
+      ).join('\n');
+      await tester.enterText(textFieldFinder, twentyLines);
+      await tester.pump();
+      expect(
+        tester.widget<TextField>(textFieldFinder).controller!.text,
+        twentyLines,
+      );
+
+      await tester.enterText(textFieldFinder, '$twentyLines\n21');
+      await tester.pump();
+      expect(
+        tester.widget<TextField>(textFieldFinder).controller!.text,
+        twentyLines,
+      );
+
       final imageX = tester
           .getCenter(find.byKey(const Key('campanello-edit-image')))
           .dx;

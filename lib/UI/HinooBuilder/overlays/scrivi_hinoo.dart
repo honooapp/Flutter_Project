@@ -12,12 +12,14 @@ class ScriviHinooOverlay extends StatefulWidget {
     required this.focusNode,
     required this.textColor,
     this.hintText,
+    this.centerTextVertically = true,
   });
 
   final TextEditingController controller;
   final FocusNode focusNode;
   final Color textColor;
   final String? hintText;
+  final bool centerTextVertically;
 
   @override
   State<ScriviHinooOverlay> createState() => _ScriviHinooOverlayState();
@@ -64,6 +66,7 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
               cursorColor: Colors.white,
               cursorWidth: 3,
               cursorRadius: const Radius.circular(0),
+              centerTextVertically: widget.centerTextVertically,
             ),
           );
         },

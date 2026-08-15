@@ -64,22 +64,10 @@ void main() {
     final textFinder = find.text('Un campanello\ncon un a capo manuale');
     expect(textFinder, findsOneWidget);
     expect(tester.widget<Text>(textFinder).softWrap, isFalse);
-    final savedTextPosition = tester.getRect(
+    final savedTextPosition = tester.widget<Align>(
       find.byKey(const ValueKey('campanello-saved-text-position')),
     );
-    final textCanvasPosition = tester.getRect(
-      find.byKey(const ValueKey('campanello-text-canvas')),
-    );
-    expect(
-      savedTextPosition.center.dy - textCanvasPosition.top,
-      closeTo(
-        HinooTypography.textViewportCenterY(
-          canvasWidth: 320,
-          canvasHeight: 500,
-        ),
-        0.01,
-      ),
-    );
+    expect(savedTextPosition.alignment, Alignment.topCenter);
     final background = find.byWidgetPredicate(
       (widget) => widget is Image && widget.image == campanello.backgroundImage,
     );

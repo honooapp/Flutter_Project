@@ -35,7 +35,7 @@ class Utility {
   final String campanelloExample1Text =
       'Ti piace\nascoltare musica\nin compagnia?\n\nE ballare in casa,\ncome si fa alle feste?\n\nQuesto è il campanello\ndi casa mia\n\nPuoi bussare,\nse vuoi\n\nMagari sono a casa\nMagari sto ascoltando musica\nMagari è musica che ti piace';
   final String campanelloExample2Text =
-      'Ti piace\nfare colazione in compagnia,\nin un terrazzo esposto a Sud?\n\nQuesto è il campanello di casa mia\n\nPuoi bussare,\nse vuoi\n\nMagari sono sul terrazzo\nMagari c’è il sole\nMagari sto facendo colazione';
+      '\n\nTi piace\nfare colazione in compagnia,\nin un terrazzo esposto a Sud?\n\nQuesto è il campanello\ndi casa mia\n\nPuoi bussare,\nse vuoi\n\nMagari sono sul terrazzo\nMagari c’è il sole\nMagari sto facendo colazione';
   final String chestHeader = 'Il tuo Cuore custodisce';
   final String chestSubHeader1 = 'gli honoo\nsalvati dalla luna';
   final String chestSubHeader2 = 'gli honoo\nscritti da te';
