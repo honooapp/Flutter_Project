@@ -24,15 +24,39 @@ void main() {
     expect(find.byType(ChestInfoDialog), findsOneWidget);
     expect(find.byType(SingleChildScrollView), findsOneWidget);
     expect(find.textContaining('Questo è il tuo Scrigno'), findsOneWidget);
-    const chestInfoText = chestInfoTextBeforeIcons + chestInfoTextAfterIcons;
-    expect(chestInfoText, isNot(contains('.')));
-    expect(chestInfoText, isNot(contains('Blu\n')));
-    expect(chestInfoText, isNot(contains('Bianchi\n')));
-    expect(chestInfoText, isNot(contains('Rossi\n')));
-    expect(chestInfoText, contains('Sopra\nla tua risposta'));
-    expect(chestInfoText, contains('E, sopra ancora,'));
-    expect(chestInfoText, isNot(contains('Sotto\n')));
-    expect(chestInfoText, isNot(contains('sotto ancora')));
+    final infoText = tester.widget<RichText>(
+      find.descendant(
+        of: find.byType(ChestInfoDialog),
+        matching: find.byType(RichText),
+      ),
+    );
+    expect(
+      infoText.text.toPlainText(includeSemanticsLabels: false),
+      "Questo è il tuo Scrigno\n\n"
+      "Qui sono custoditi\n"
+      "gli honoo e gli hinoo\n"
+      "che hai scritto\n"
+      "\uFFFC\n\n"
+      "quelli che hai salvato dalla Luna\n"
+      "\uFFFC\n\n"
+      "e quelli che hai ricevuto\n"
+      "\uFFFC\n\n"
+      "Scorri verso destra\n"
+      "per rivedere\n"
+      "quello che hai scritto\n"
+      "e quello che hai salvato\n\n"
+      "Scorri verso il basso\n"
+      "per seguire\n"
+      "le conversazioni fra\n\n"
+      "quello che hai salvato\n"
+      "dalla Luna\n"
+      "\uFFFC\n\n"
+      "la tua risposta,\n"
+      "\uFFFC\n\n"
+      "e, se arriva,\n"
+      "la risposta alla tua risposta\n"
+      "\uFFFC",
+    );
     for (final asset in const [
       'assets/icons/honoo_chest_blue.svg',
       'assets/icons/honoo_chest_white.svg',
@@ -45,12 +69,12 @@ void main() {
               widget.bytesLoader is SvgAssetLoader &&
               (widget.bytesLoader as SvgAssetLoader).assetName == asset,
         ),
-        findsOneWidget,
+        findsNWidgets(2),
       );
     }
-    expect(find.bySemanticsLabel('Blu'), findsOneWidget);
-    expect(find.bySemanticsLabel('Bianchi'), findsOneWidget);
-    expect(find.bySemanticsLabel('Rossi'), findsOneWidget);
+    expect(find.bySemanticsLabel('Blu'), findsNWidgets(2));
+    expect(find.bySemanticsLabel('Bianchi'), findsNWidgets(2));
+    expect(find.bySemanticsLabel('Rossi'), findsNWidgets(2));
     expect(find.text(BuildMetadata.displayLabel), findsNothing);
     expect(find.byTooltip('Chiudi'), findsOneWidget);
     final closeIcon = tester.widget<SvgPicture>(
