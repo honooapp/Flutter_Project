@@ -42,8 +42,8 @@ void main() {
   test('il secondo campanello mantiene la posizione manuale del testo', () {
     final text = Utility().campanelloExample2Text;
 
-    expect(text, startsWith('\n\nTi piace'));
+    expect(text, startsWith('Ti piace'));
     expect(text, contains('Questo è il campanello\ndi casa mia'));
-    expect(text.split('\n'), hasLength(15));
+    expect(text.split('\n'), hasLength(13));
   });
 }

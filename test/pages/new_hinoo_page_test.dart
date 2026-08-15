@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:honoo/Pages/new_hinoo_page.dart';
 import 'package:honoo/UI/hinoo_builder.dart';
+import 'package:honoo/UI/hinoo_typography.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:sizer/sizer.dart';
@@ -45,6 +46,14 @@ void main() {
       final textFieldFinder = find.byType(TextField);
       final textField = tester.widget<TextField>(textFieldFinder);
       expect((textField.decoration!.contentPadding! as EdgeInsets).top, 0);
+      final canvasWidth = tester.getSize(find.byType(HinooBuilder)).width;
+      final viewportPadding = tester.widget<Padding>(
+        find.byKey(const ValueKey('builder-text-viewport-padding')),
+      );
+      expect(
+        viewportPadding.padding,
+        HinooTypography.campanelloTextViewportPadding(canvasWidth),
+      );
 
       final twentyLines = List.generate(
         20,

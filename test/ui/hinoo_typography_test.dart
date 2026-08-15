@@ -5,6 +5,15 @@ import 'package:honoo/UI/hinoo_typography.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
 
 void main() {
+  test('campanello padding replaces two leading blank lines', () {
+    expect(
+      HinooTypography.campanelloTextViewportPadding(
+        HinooTypography.baselineCanvasWidth,
+      ),
+      const EdgeInsets.fromLTRB(32, 67.5, 32, 6),
+    );
+  });
+
   test('baseline text viewport exposes the Hinoo top spacing calculation', () {
     expect(
       HinooTypography.textViewportPadding(

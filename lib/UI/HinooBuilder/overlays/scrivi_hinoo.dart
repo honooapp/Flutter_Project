@@ -13,6 +13,7 @@ class ScriviHinooOverlay extends StatefulWidget {
     required this.textColor,
     this.hintText,
     this.centerTextVertically = true,
+    this.useCampanelloPadding = false,
   });
 
   final TextEditingController controller;
@@ -20,6 +21,7 @@ class ScriviHinooOverlay extends StatefulWidget {
   final Color textColor;
   final String? hintText;
   final bool centerTextVertically;
+  final bool useCampanelloPadding;
 
   @override
   State<ScriviHinooOverlay> createState() => _ScriviHinooOverlayState();
@@ -38,7 +40,10 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
           );
 
           return Padding(
-            padding: HinooTypography.textViewportPadding(canvasWidth),
+            key: const ValueKey('builder-text-viewport-padding'),
+            padding: widget.useCampanelloPadding
+                ? HinooTypography.campanelloTextViewportPadding(canvasWidth)
+                : HinooTypography.textViewportPadding(canvasWidth),
             child: WidthLimitedMultilineField(
               controller: widget.controller,
               focusNode: widget.focusNode,

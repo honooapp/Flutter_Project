@@ -51,6 +51,7 @@ class HinooBuilder extends StatefulWidget {
     this.backgroundPromptText,
     this.initialDraft,
     this.centerTextVertically = true,
+    this.useCampanelloPadding = false,
   });
 
   final ValueChanged<dynamic>? onHinooChanged;
@@ -59,6 +60,7 @@ class HinooBuilder extends StatefulWidget {
   final String? backgroundPromptText;
   final HinooDraft? initialDraft;
   final bool centerTextVertically;
+  final bool useCampanelloPadding;
 
   @override
   State<HinooBuilder> createState() => _HinooBuilderState();
@@ -624,6 +626,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
             textColor: _txtColor,
             hintText: widget.hintText,
             centerTextVertically: widget.centerTextVertically,
+            useCampanelloPadding: widget.useCampanelloPadding,
           ),
       ],
     );

@@ -64,7 +64,7 @@ class CampanelloCard extends StatelessWidget {
         width: width,
         height: textCanvasHeight,
         child: Padding(
-          padding: HinooTypography.textViewportPadding(width),
+          padding: HinooTypography.campanelloTextViewportPadding(width),
           child: Align(
             key: const ValueKey('campanello-saved-text-position'),
             alignment: Alignment.topCenter,
