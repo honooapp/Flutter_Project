@@ -99,7 +99,8 @@ class HinooService {
     });
   }
 
-  /// Inserisce un record type='moon' se non già presente (dedup su fingerprint)
+  /// Inserisce una nuova copia type='moon' a ogni invio. Il fingerprint resta
+  /// disponibile per mostrare nello Scrigno lo stato di pubblicazione.
   static Future<DuplicationResult> duplicateToMoon(HinooDraft draft) async {
     if (draft.isFromMoonSaved) {
       throw ArgumentError(
@@ -153,9 +154,7 @@ class HinooService {
     return _insertDuplicate(data);
   }
 
-  static Future<DuplicationResult> _insertDuplicate(
-    Map<String, dynamic> data,
-  ) {
+  static Future<DuplicationResult> _insertDuplicate(Map<String, dynamic> data) {
     return _reliability.write(() async {
       try {
         await _client.from(_table).insert(data);
@@ -180,9 +179,7 @@ class HinooService {
 
   static Future<void> deleteHinooById(String id) async {
     if (id.trim().isEmpty) return;
-    await _reliability.write(
-      () => _client.from(_table).delete().eq('id', id),
-    );
+    await _reliability.write(() => _client.from(_table).delete().eq('id', id));
   }
 
   static String fingerprint(HinooDraft d) {
@@ -239,8 +236,10 @@ class HinooService {
   }
 
   /// Carica gli Hinoo personali dell'utente (dallo scrigno)
-  static Future<List<HinooDraft>> fetchUserHinoo(String userId,
-      {HinooType type = HinooType.personal}) async {
+  static Future<List<HinooDraft>> fetchUserHinoo(
+    String userId, {
+    HinooType type = HinooType.personal,
+  }) async {
     final typeStr = _toDbType(type);
     final baseQuery = _client
         .from(_table)

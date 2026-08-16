@@ -89,16 +89,14 @@ class ChestFooter extends StatelessWidget {
 
   void _addHonooActions(List<ResponsiveFooterAction> actions, Honoo honoo) {
     final isPersonal = honoo.type == HonooType.personal;
-    final hasReplies = honoo.hasReplies == true;
     final isFromMoonSaved = honoo.isFromMoonSaved == true;
-    final isOnMoon = honoo.isOnMoon == true;
     final selectedEntryToPublish = _selectedEntryToPublish(honoo);
+    final isMine = _isMine(honoo.userId);
 
-    if (isPersonal &&
-        !hasReplies &&
-        !isFromMoonSaved &&
-        !isOnMoon &&
-        selectedEntryToPublish == null) {
+    if (selectedConversationEntry == null &&
+        isPersonal &&
+        isMine &&
+        !isFromMoonSaved) {
       actions.add(_moonAction(() => onSendHonooToMoon(honoo)));
     } else if (isFromMoonSaved) {
       actions.add(_replyAction(() => onReplyToHonoo(honoo)));
@@ -107,11 +105,15 @@ class ChestFooter extends StatelessWidget {
     actions.add(_deleteAction(() => onDeleteHonoo(honoo)));
 
     if (selectedEntryToPublish != null) {
-      actions.add(
-        _moonAction(
-          () => onSendConversationEntryToMoon(selectedEntryToPublish),
-        ),
-      );
+      if (selectedEntryToPublish.id == honoo.dbId) {
+        actions.add(_moonAction(() => onSendHonooToMoon(honoo)));
+      } else {
+        actions.add(
+          _moonAction(
+            () => onSendConversationEntryToMoon(selectedEntryToPublish),
+          ),
+        );
+      }
     }
   }
 
@@ -124,15 +126,15 @@ class ChestFooter extends StatelessWidget {
         entry.kind == ConversationEntryKind.deleted) {
       return null;
     }
-    final isMine =
-        entry.ownerId != null &&
-        currentUserId != null &&
-        entry.ownerId == currentUserId;
+    final isMine = _isMine(entry.ownerId);
     final isPersonalEntry = entry.kind == ConversationEntryKind.honoo
         ? entry.honoo!.type == HonooType.personal
         : entry.hinoo!.type == HinooType.personal;
     return isMine && isPersonalEntry && !entry.isFromMoonSaved ? entry : null;
   }
+
+  bool _isMine(String? ownerId) =>
+      ownerId != null && currentUserId != null && ownerId == currentUserId;
 
   bool _canReplyTo(ConversationEntry? entry) =>
       entry != null &&
@@ -146,12 +148,45 @@ class ChestFooter extends StatelessWidget {
   ) {
     final isPersonal = hinoo.draft.type == HinooType.personal;
     final isFromMoonSaved = hinoo.isFromMoonSaved;
-    if (isPersonal && !isFromMoonSaved && !hinoo.isOnMoon) {
+    final selectedEntryToPublish = _selectedEntryToPublishForHinoo(hinoo);
+    if (selectedConversationEntry == null &&
+        isPersonal &&
+        _isMine(hinoo.ownerId) &&
+        !isFromMoonSaved) {
       actions.add(_moonAction(() => onSendHinooToMoon(hinoo)));
     } else if (isFromMoonSaved) {
       actions.add(_replyAction(() => onReplyToHinoo(hinoo)));
     }
     actions.add(_deleteAction(() => onDeleteHinoo(hinoo)));
+
+    if (selectedEntryToPublish != null) {
+      if (selectedEntryToPublish.id == hinoo.id) {
+        actions.add(_moonAction(() => onSendHinooToMoon(hinoo)));
+      } else {
+        actions.add(
+          _moonAction(
+            () => onSendConversationEntryToMoon(selectedEntryToPublish),
+          ),
+        );
+      }
+    }
+  }
+
+  ConversationEntry? _selectedEntryToPublishForHinoo(ChestHinooItem hinoo) {
+    final entry = selectedConversationEntry;
+    final conversationId = hinoo.conversationId ?? hinoo.draft.conversationId;
+    if (entry == null ||
+        conversationId == null ||
+        conversationId.isEmpty ||
+        entry.kind == ConversationEntryKind.deleted) {
+      return null;
+    }
+    final isPersonalEntry = entry.kind == ConversationEntryKind.honoo
+        ? entry.honoo!.type == HonooType.personal
+        : entry.hinoo!.type == HinooType.personal;
+    return _isMine(entry.ownerId) && isPersonalEntry && !entry.isFromMoonSaved
+        ? entry
+        : null;
   }
 
   ResponsiveFooterAction _moonAction(VoidCallback onPressed) => _action(
