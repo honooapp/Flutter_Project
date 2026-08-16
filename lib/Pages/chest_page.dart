@@ -1073,7 +1073,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       revealEntryId: _pendingRevealEntryId,
       onSelectConversationEntry: (entry) =>
           _selectConversationEntry(_convIdOfItem(item), entry),
-      onDownload: () => _handleDownloadForItem(item, repaintKey),
+      onDownload: (captureKey) => _handleDownloadForItem(item, captureKey),
       conversationRefreshToken: _conversationRefreshToken,
     );
   }

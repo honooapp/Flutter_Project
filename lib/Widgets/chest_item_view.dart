@@ -44,7 +44,7 @@ class ChestItemView extends StatelessWidget {
   final String? focusConversationId;
   final String? revealEntryId;
   final ValueChanged<ConversationEntry> onSelectConversationEntry;
-  final VoidCallback onDownload;
+  final ValueChanged<GlobalKey> onDownload;
   final int conversationRefreshToken;
 
   @override
@@ -90,12 +90,14 @@ class ChestItemView extends StatelessWidget {
       },
     );
     final card = isConversation
-        ? RepaintBoundary(key: repaintKey, child: content)
+        ? content
         : ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: SizedBox(
               width: cardWidth,
-              child: RepaintBoundary(key: repaintKey, child: content),
+              child: isHonoo
+                  ? RepaintBoundary(key: repaintKey, child: content)
+                  : content,
             ),
           );
     final keyedCard = KeyedSubtree(
@@ -120,7 +122,10 @@ class ChestItemView extends StatelessWidget {
     return SizedBox(
       width: maxWidth,
       height: availableHeight,
-      child: HonooCard(honoo: honoo, onDownloadTap: onDownload),
+      child: HonooCard(
+        honoo: honoo,
+        onDownloadTap: () => onDownload(repaintKey),
+      ),
     );
   }
 
@@ -140,7 +145,7 @@ class ChestItemView extends StatelessWidget {
         maxHeight: availableHeight,
         maxWidth: maxWidth,
         authorId: hinoo.ownerId,
-        onDownloadTap: onDownload,
+        onDownloadCanvasTap: onDownload,
       );
     }
     return HinooThreadView(
@@ -169,7 +174,6 @@ class ChestItemView extends StatelessWidget {
                 focusConversationId == conversationId)
         ? revealEntryId
         : null,
-    onDownloadTap: onDownload,
     refreshToken: conversationRefreshToken,
   );
 }
