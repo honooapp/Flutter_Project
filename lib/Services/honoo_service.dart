@@ -196,6 +196,22 @@ class HonooService {
 
   static String fingerprint(Honoo h) => '${h.text}\u001f${h.image}';
 
+  static Future<bool> hasMoonCopy(Honoo h) async {
+    final session = _client.auth.currentSession;
+    if (session == null) throw Exception('Nessuna sessione attiva');
+    final row = await _reliability.read(
+      () async => await _client
+          .from('honoo')
+          .select('id')
+          .eq('user_id', session.user.id)
+          .eq('destination', 'moon')
+          .eq('fingerprint', fingerprint(h))
+          .limit(1)
+          .maybeSingle(),
+    );
+    return row != null;
+  }
+
   static Future<DuplicationResult> _insertDuplicate(
     Map<String, dynamic> payload,
   ) {

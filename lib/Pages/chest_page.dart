@@ -8,6 +8,8 @@ import 'package:honoo/Services/chest_repository.dart';
 import 'package:honoo/Services/download_capture_service.dart';
 import 'package:honoo/Services/chest_hint_service.dart';
 import 'package:honoo/Services/duplication_result.dart';
+import 'package:honoo/Services/hinoo_service.dart';
+import 'package:honoo/Services/honoo_service.dart';
 import 'package:honoo/Services/reply_system_notification.dart';
 import 'package:honoo/Services/auth_navigation_service.dart';
 
@@ -708,7 +710,18 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
     setState(() => _isMutating = true);
     try {
       if (entry.kind == ConversationEntryKind.honoo) {
-        final result = await HonooController().sendToMoon(entry.honoo!);
+        final honoo = entry.honoo!;
+        final alreadyOnMoon =
+            honoo.isOnMoon || await HonooService.hasMoonCopy(honoo);
+        if (!mounted) return;
+        if (alreadyOnMoon) {
+          final confirmed = await showRepeatMoonPublicationDialog(
+            context,
+            contentName: 'honoo',
+          );
+          if (!mounted || confirmed != true) return;
+        }
+        final result = await HonooController().sendToMoon(honoo);
         if (!mounted) return;
         showHonooToast(
           context,
@@ -717,7 +730,17 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
               : "L'honoo era già presente sulla Luna.",
         );
       } else {
-        final result = await _hinooController.sendToMoon(entry.hinoo!);
+        final hinoo = entry.hinoo!;
+        final alreadyOnMoon = await HinooService.hasMoonCopy(hinoo);
+        if (!mounted) return;
+        if (alreadyOnMoon) {
+          final confirmed = await showRepeatMoonPublicationDialog(
+            context,
+            contentName: 'hinoo',
+          );
+          if (!mounted || confirmed != true) return;
+        }
+        final result = await _hinooController.sendToMoon(hinoo);
         if (!mounted) return;
         final text = result == HinooMoonResult.published
             ? "L'hinoo è anche sulla Luna."

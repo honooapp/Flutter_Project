@@ -74,6 +74,8 @@ void main() {
     when(() => chain.delete()).thenAnswer((_) => chain);
     when(() => chain.eq(any(), any())).thenAnswer((_) => chain);
     when(() => chain.in_(any(), any())).thenAnswer((_) => chain);
+    when(() => chain.limit(any())).thenAnswer((_) => chain);
+    when(() => chain.maybeSingle()).thenAnswer((_) => chain);
     when(() => chain.or(any())).thenAnswer((_) => chain);
     when(
       () => chain.order(any(), ascending: any(named: 'ascending')),
@@ -282,5 +284,26 @@ void main() {
     expect(first, DuplicationResult.inserted);
     expect(second, DuplicationResult.inserted);
     verify(() => chain.insert(any())).called(2);
+  });
+
+  test('hasMoonCopy riconosce una pubblicazione Honoo precedente', () async {
+    final honoo = Honoo(
+      1,
+      'testo',
+      '',
+      '2024-01-01T00:00:00Z',
+      '2024-01-01T00:00:00Z',
+      'user-1',
+      HonooType.answer,
+    );
+    chain.queueResponse(<String, dynamic>{'id': 'moon-1'});
+
+    expect(await HonooService.hasMoonCopy(honoo), isTrue);
+
+    verify(() => chain.eq('user_id', 'user-1')).called(1);
+    verify(() => chain.eq('destination', 'moon')).called(1);
+    verify(
+      () => chain.eq('fingerprint', HonooService.fingerprint(honoo)),
+    ).called(1);
   });
 }

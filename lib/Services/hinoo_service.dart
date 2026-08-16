@@ -110,7 +110,11 @@ class HinooService {
     final userId = _client.auth.currentUser?.id;
     if (userId == null) throw 'Utente non autenticato';
 
-    final sanitized = draft.copyWith(type: HinooType.moon);
+    final sanitized = HinooDraft(
+      pages: draft.pages,
+      type: HinooType.moon,
+      baseCanvasHeight: draft.baseCanvasHeight,
+    );
     final fp = fingerprint(sanitized);
 
     final data = {
@@ -118,9 +122,9 @@ class HinooService {
       'type': _toDbType(HinooType.moon),
       'pages': sanitized.toJson()['pages'],
       'fingerprint': fp,
-      'recipient_tag': sanitized.recipientTag,
-      'reply_to': sanitized.replyTo,
-      'is_from_moon_saved': sanitized.isFromMoonSaved,
+      'recipient_tag': null,
+      'reply_to': null,
+      'is_from_moon_saved': false,
       'created_at': DateTime.now().toIso8601String(),
     };
 
@@ -194,6 +198,33 @@ class HinooService {
       if (d.recipientTag != null) 'recipient=${d.recipientTag}',
     ];
     return parts.join('||');
+  }
+
+  static Future<bool> hasMoonCopy(HinooDraft draft) async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) throw 'Utente non autenticato';
+    final sanitized = HinooDraft(
+      pages: draft.pages,
+      type: HinooType.moon,
+      baseCanvasHeight: draft.baseCanvasHeight,
+    );
+    final fingerprints = <String>{
+      fingerprint(sanitized),
+      // Compatibilità con le copie create prima che i riferimenti privati
+      // della conversazione venissero rimossi dalla pubblicazione Luna.
+      fingerprint(draft.copyWith(type: HinooType.moon)),
+    }.toList(growable: false);
+    final row = await _reliability.read(
+      () async => await _client
+          .from(_table)
+          .select('id')
+          .eq('user_id', userId)
+          .eq('type', 'moon')
+          .in_('fingerprint', fingerprints)
+          .limit(1)
+          .maybeSingle(),
+    );
+    return row != null;
   }
 
   static bool _isMissingMoonSavedColumn(PostgrestException e) {

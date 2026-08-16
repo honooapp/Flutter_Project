@@ -225,7 +225,7 @@ void main() {
     expect(find.byType(PageView), findsNothing);
   });
 
-  testWidgets('una nuova risposta riavvia il reveal dopo il refresh', (
+  testWidgets('una nuova risposta propria resta blu dopo il refresh', (
     tester,
   ) async {
     tester.view.devicePixelRatio = 1;
@@ -289,11 +289,8 @@ void main() {
     await tester.pump(const Duration(milliseconds: 350));
 
     expect(find.text('Seconda risposta appena salvata'), findsOneWidget);
-    final foreground = tester.widget<Transform>(
-      find.byKey(const Key('reply_reveal_foreground')),
-    );
-    expect(foreground.transform.getTranslation().y, lessThan(0));
-    expect(find.byKey(const Key('reply_reveal_parent')), findsOneWidget);
+    expect(find.byKey(const Key('reply_reveal_foreground')), findsNothing);
+    expect(find.byKey(const Key('reply_reveal_parent')), findsNothing);
   });
 
   testWidgets('lo swipe resta sulla pagina scelta dopo il rebuild del padre', (
@@ -780,10 +777,77 @@ void main() {
 
         expect(explicitSemanticsLabel('Risposta inviata'), findsOneWidget);
         expect(borderWithColor(HonooColor.secondary), findsNothing);
-        expect(find.byKey(const Key('reply_reveal_parent')), findsOneWidget);
+        expect(find.byKey(const Key('reply_reveal_parent')), findsNothing);
       },
     );
   }
+
+  testWidgets('l’apertura mostra il contenuto più recente anche se è proprio', (
+    tester,
+  ) async {
+    final root = ConversationEntry.honoo(
+      honoo(
+        id: 'root-latest',
+        text: 'Contenuto iniziale',
+        owner: 'other',
+        createdAt: '2026-07-20T10:00:00Z',
+      ),
+    );
+    final receivedReply = ConversationEntry.honoo(
+      honoo(
+        id: 'received-latest',
+        text: 'Risposta ricevuta precedente',
+        owner: 'other',
+        createdAt: '2026-07-20T11:00:00Z',
+        type: HonooType.answer,
+        replyTo: 'root-latest',
+      ),
+    );
+    final latestOwnReply = ConversationEntry.honoo(
+      honoo(
+        id: 'own-latest',
+        text: 'Ultima risposta inviata',
+        owner: 'me',
+        createdAt: '2026-07-20T12:00:00Z',
+        type: HonooType.answer,
+        replyTo: 'received-latest',
+      ),
+    );
+    ConversationEntry? selected;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: UnifiedThreadView(
+            conversationId: 'conversation-latest',
+            maxWidth: 600,
+            maxHeight: 700,
+            isActive: true,
+            currentUserId: 'me',
+            conversationLoader: (_) async => [
+              root,
+              receivedReply,
+              latestOwnReply,
+            ],
+            onSelect: (entry) => selected = entry,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+
+    expect(selected?.id, 'own-latest');
+    expect(find.text('Ultima risposta inviata'), findsOneWidget);
+    expect(find.byKey(const Key('reply_reveal_parent')), findsNothing);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is ColoredBox && widget.color == HonooColor.background,
+      ),
+      findsWidgets,
+    );
+  });
 
   testWidgets('un burst Realtime viene coalesciato in un solo refresh', (
     tester,
