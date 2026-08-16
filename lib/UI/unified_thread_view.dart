@@ -329,8 +329,15 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
       final latestReceivedIndex = reversed.indexWhere(_isReceivedReply);
       if (latestReceivedIndex >= 0) return latestReceivedIndex;
     }
-    final receivedIndex = reversed.indexWhere(_shouldReveal);
-    return receivedIndex < 0 ? 0 : receivedIndex;
+    if (widget.preferLatestReceived) {
+      final latestReceivedIndex = reversed.indexWhere(_isReceivedReply);
+      if (latestReceivedIndex >= 0) return latestReceivedIndex;
+    }
+    // Nell'apertura normale la pagina 0 corrisponde sempre al contenuto più
+    // recente, indipendentemente dal fatto che sia una risposta ricevuta, una
+    // risposta inviata o un nuovo contenuto. Solo una notifica esplicita può
+    // spostare il focus su un elemento precedente.
+    return 0;
   }
 
   void _showLatestReceivedAndReveal({bool forceFocus = false}) {
@@ -366,26 +373,19 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
         (e.honoo != null && (e.honoo!.isFromMoonSaved == true));
     if (isMoon) return false;
 
-    final bool isReply = e.honoo != null
-        ? (e.honoo!.type == HonooType.answer)
-        : (e.hinoo != null && e.hinoo!.type == HinooType.answer);
+    if (!_isReceivedReply(e)) return false;
 
     final revealEntryId = widget.revealEntryId;
     if (revealEntryId != null && revealEntryId.isNotEmpty) {
-      return isReply && e.id == revealEntryId;
+      return e.id == revealEntryId;
     }
-    if (widget.preferLatestReceived) {
-      final currentUserId =
-          widget.currentUserId ?? Supabase.instance.client.auth.currentUser?.id;
-      if (currentUserId != null && e.ownerId == currentUserId) return false;
-    }
-    return isReply;
+    return true;
   }
 
   bool _isReceivedReply(ConversationEntry entry) {
     if (!_isDisplayableReply(entry)) return false;
     final currentUserId =
-        widget.currentUserId ?? Supabase.instance.client.auth.currentUser?.id;
+        widget.currentUserId ?? SupabaseProvider.client.auth.currentUser?.id;
     return currentUserId == null || entry.ownerId != currentUserId;
   }
 

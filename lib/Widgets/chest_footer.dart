@@ -127,10 +127,12 @@ class ChestFooter extends StatelessWidget {
       return null;
     }
     final isMine = _isMine(entry.ownerId);
-    final isPersonalEntry = entry.kind == ConversationEntryKind.honoo
-        ? entry.honoo!.type == HonooType.personal
-        : entry.hinoo!.type == HinooType.personal;
-    return isMine && isPersonalEntry && !entry.isFromMoonSaved ? entry : null;
+    final isPublishableEntry = entry.kind == ConversationEntryKind.honoo
+        ? entry.honoo!.type != HonooType.moon
+        : entry.hinoo!.type != HinooType.moon;
+    return isMine && isPublishableEntry && !entry.isFromMoonSaved
+        ? entry
+        : null;
   }
 
   bool _isMine(String? ownerId) =>
@@ -181,10 +183,12 @@ class ChestFooter extends StatelessWidget {
         entry.kind == ConversationEntryKind.deleted) {
       return null;
     }
-    final isPersonalEntry = entry.kind == ConversationEntryKind.honoo
-        ? entry.honoo!.type == HonooType.personal
-        : entry.hinoo!.type == HinooType.personal;
-    return _isMine(entry.ownerId) && isPersonalEntry && !entry.isFromMoonSaved
+    final isPublishableEntry = entry.kind == ConversationEntryKind.honoo
+        ? entry.honoo!.type != HonooType.moon
+        : entry.hinoo!.type != HinooType.moon;
+    return _isMine(entry.ownerId) &&
+            isPublishableEntry &&
+            !entry.isFromMoonSaved
         ? entry
         : null;
   }

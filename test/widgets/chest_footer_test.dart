@@ -39,6 +39,7 @@ void main() {
     bool isOnMoon = false,
     bool isFromMoonSaved = false,
     String ownerId = 'current-user',
+    String? conversationId,
   }) => ChestItem.hinoo(
     ChestHinooItem(
       id: 'hinoo-1',
@@ -51,6 +52,7 @@ void main() {
       isFromMoonSaved: isFromMoonSaved,
       ownerId: ownerId,
       isOnMoon: isOnMoon,
+      conversationId: conversationId,
     ),
   );
 
@@ -251,6 +253,81 @@ void main() {
       expect(find.byTooltip('Rispondi'), findsOneWidget);
       await tester.tap(find.byTooltip('Spedisci sulla Luna'));
       expect(publishedHonoo, same(item.honoo));
+    },
+  );
+
+  testWidgets(
+    'una propria risposta Honoo mostra Luna e pubblica la selezione',
+    (tester) async {
+      final item = honooItem(
+        HonooType.personal,
+        conversationId: 'conversation-1',
+      );
+      item.honoo!.dbId = 'root-1';
+      final reply =
+          Honoo(
+              2,
+              'Risposta propria',
+              '',
+              '2026-01-01T01:00:00Z',
+              '2026-01-01T01:00:00Z',
+              'current-user',
+              HonooType.answer,
+            )
+            ..dbId = 'reply-1'
+            ..replyTo = 'root-1'
+            ..conversationId = 'conversation-1';
+      final selectedEntry = ConversationEntry.honoo(reply);
+      ConversationEntry? publishedEntry;
+
+      await pumpFooter(
+        tester,
+        item: item,
+        selectedConversationEntry: selectedEntry,
+        onSendConversationEntryToMoon: (entry) => publishedEntry = entry,
+      );
+
+      expect(find.byTooltip('Spedisci sulla Luna'), findsOneWidget);
+      await tester.tap(find.byTooltip('Spedisci sulla Luna'));
+      expect(publishedEntry, same(selectedEntry));
+    },
+  );
+
+  testWidgets(
+    'una propria risposta Hinoo mostra Luna e pubblica la selezione',
+    (tester) async {
+      final item = hinooItem(conversationId: 'conversation-1');
+      const replyDraft = HinooDraft(
+        pages: [
+          HinooSlide(
+            backgroundImage: null,
+            text: 'Risposta propria',
+            isTextWhite: true,
+          ),
+        ],
+        type: HinooType.answer,
+        recipientTag: 'destinatario',
+        replyTo: 'root-1',
+        conversationId: 'conversation-1',
+      );
+      final selectedEntry = ConversationEntry.hinoo(
+        replyDraft,
+        createdAt: DateTime.utc(2026, 1, 1, 1),
+        ownerId: 'current-user',
+        id: 'reply-hinoo-1',
+      );
+      ConversationEntry? publishedEntry;
+
+      await pumpFooter(
+        tester,
+        item: item,
+        selectedConversationEntry: selectedEntry,
+        onSendConversationEntryToMoon: (entry) => publishedEntry = entry,
+      );
+
+      expect(find.byTooltip('Spedisci sulla Luna'), findsOneWidget);
+      await tester.tap(find.byTooltip('Spedisci sulla Luna'));
+      expect(publishedEntry, same(selectedEntry));
     },
   );
 

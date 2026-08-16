@@ -69,6 +69,7 @@ void main() {
 
     when(() => chain.select(any())).thenAnswer((_) => chain);
     when(() => chain.eq(any(), any())).thenAnswer((_) => chain);
+    when(() => chain.in_(any(), any())).thenAnswer((_) => chain);
     when(() => chain.limit(any())).thenAnswer((_) => chain);
     when(() => chain.insert(any())).thenAnswer((_) => chain);
     when(() => chain.maybeSingle()).thenAnswer((_) => chain);
@@ -136,5 +137,59 @@ void main() {
       );
       verifyNever(() => client.from('hinoo'));
     });
+
+    test(
+      'una risposta viene pubblicata senza legami con la conversazione',
+      () async {
+        chain.queueResponse(<String, dynamic>{});
+        final reply = sampleDraft().copyWith(
+          type: HinooType.answer,
+          recipientTag: 'destinatario',
+          replyTo: 'parent-1',
+          conversationId: 'conversation-1',
+        );
+
+        final result = await HinooService.duplicateToMoon(reply);
+
+        expect(result, DuplicationResult.inserted);
+        final payload =
+            verify(() => chain.insert(captureAny())).captured.single
+                as Map<String, dynamic>;
+        expect(payload['type'], 'moon');
+        expect(payload['recipient_tag'], isNull);
+        expect(payload['reply_to'], isNull);
+        expect(payload.containsKey('conversation_id'), isFalse);
+        expect(payload['is_from_moon_saved'], isFalse);
+        expect(payload['fingerprint'], isNot(contains('destinatario')));
+      },
+    );
+
+    test(
+      'riconosce anche il fingerprint usato dalle vecchie risposte',
+      () async {
+        chain.queueResponse(<String, dynamic>{'id': 'moon-1'});
+        final reply = sampleDraft().copyWith(
+          type: HinooType.answer,
+          recipientTag: 'destinatario',
+          replyTo: 'parent-1',
+          conversationId: 'conversation-1',
+        );
+
+        expect(await HinooService.hasMoonCopy(reply), isTrue);
+
+        final fingerprints =
+            verify(() => chain.in_('fingerprint', captureAny())).captured.single
+                as List<String>;
+        expect(fingerprints, hasLength(2));
+        expect(
+          fingerprints.any((value) => value.contains('destinatario')),
+          isTrue,
+        );
+        expect(
+          fingerprints.any((value) => !value.contains('destinatario')),
+          isTrue,
+        );
+      },
+    );
   });
 }
