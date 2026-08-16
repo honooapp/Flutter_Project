@@ -57,7 +57,7 @@ void main() {
           .width;
       expect(
         viewportPadding.padding,
-        HinooTypography.textViewportPadding(viewportWidth),
+        HinooTypography.campanelloTextViewportPadding(viewportWidth),
       );
 
       final twentyLines = List.generate(
