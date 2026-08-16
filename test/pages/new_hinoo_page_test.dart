@@ -45,14 +45,19 @@ void main() {
       expect(find.byKey(const Key('campanello-save-changes')), findsOneWidget);
       final textFieldFinder = find.byType(TextField);
       final textField = tester.widget<TextField>(textFieldFinder);
-      expect((textField.decoration!.contentPadding! as EdgeInsets).top, 0);
-      final canvasWidth = tester.getSize(find.byType(HinooBuilder)).width;
+      expect(
+        (textField.decoration!.contentPadding! as EdgeInsets).top,
+        greaterThan(0),
+      );
       final viewportPadding = tester.widget<Padding>(
         find.byKey(const ValueKey('builder-text-viewport-padding')),
       );
+      final viewportWidth = tester
+          .getSize(find.byKey(const ValueKey('builder-text-viewport-padding')))
+          .width;
       expect(
         viewportPadding.padding,
-        HinooTypography.campanelloTextViewportPadding(canvasWidth),
+        HinooTypography.textViewportPadding(viewportWidth),
       );
 
       final twentyLines = List.generate(

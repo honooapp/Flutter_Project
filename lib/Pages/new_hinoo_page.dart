@@ -803,8 +803,6 @@ class _NewHinooPageState extends State<NewHinooPage>
                                   onHinooChanged: _onHinooChanged,
                                   onPngExported: _onPngExported,
                                   hintText: _kWriteHint,
-                                  centerTextVertically: !widget.isCampanello,
-                                  useCampanelloPadding: widget.isCampanello,
                                   backgroundPromptText: widget.isCampanello
                                       ? 'Scrivi qui\n'
                                             'tutto quello che vuoi\n'
