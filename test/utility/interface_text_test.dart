@@ -38,4 +38,12 @@ void main() {
   test('il testo di sostegno mantiene uno spazio finale', () {
     expect(Utility().sostieniText, endsWith('li consiglio bene\n\n'));
   });
+
+  test('il secondo campanello mantiene la posizione manuale del testo', () {
+    final text = Utility().campanelloExample2Text;
+
+    expect(text, startsWith('Ti piace'));
+    expect(text, contains('Questo è il campanello\ndi casa mia'));
+    expect(text.split('\n'), hasLength(13));
+  });
 }

@@ -301,9 +301,6 @@ class HinooSlideView extends StatelessWidget {
 
     final Matrix4 transform = buildTransform();
 
-    const double horizontalPadding = HinooTypography.horizontalPadding;
-    final double textTopPadding = HinooTypography.editorTextTopPadding(width);
-    const double textBottomPadding = HinooTypography.editorTextBottomPadding;
     final TextStyle effectiveStyle = HinooTypography.displayTextStyle(
       color: textColor,
     );
@@ -343,12 +340,7 @@ class HinooSlideView extends StatelessWidget {
             top: gap / 2,
             bottom: gap / 2,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                horizontalPadding,
-                textTopPadding,
-                horizontalPadding,
-                textBottomPadding,
-              ),
+              padding: HinooTypography.textViewportPadding(width),
               child: Center(
                 key: const ValueKey('hinoo-saved-text-position'),
                 child: scaleLegacyTextToFit

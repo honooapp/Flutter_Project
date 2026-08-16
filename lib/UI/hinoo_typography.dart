@@ -37,6 +37,45 @@ class HinooTypography {
 
   static const double editorTextBottomPadding = 6.0;
 
+  /// Campanelli use the position previously produced by two leading blank
+  /// lines as their fixed starting point.
+  static double campanelloTextTopPadding(double canvasWidth) {
+    return editorTextTopPadding(baselineCanvasWidth) +
+        (fontSize * lineHeight * 2);
+  }
+
+  /// Shared text viewport used by Hinoo and Campanello, both while editing
+  /// and after publication.
+  static EdgeInsets textViewportPadding(double canvasWidth) {
+    return EdgeInsets.fromLTRB(
+      horizontalPadding,
+      editorTextTopPadding(canvasWidth),
+      horizontalPadding,
+      editorTextBottomPadding,
+    );
+  }
+
+  static EdgeInsets campanelloTextViewportPadding(double canvasWidth) {
+    return EdgeInsets.fromLTRB(
+      horizontalPadding,
+      campanelloTextTopPadding(canvasWidth),
+      horizontalPadding,
+      editorTextBottomPadding,
+    );
+  }
+
+  /// Vertical center of the padded text viewport, measured from the top of
+  /// the canvas. The rendered text starts half its own height above this line.
+  static double textViewportCenterY({
+    required double canvasWidth,
+    required double canvasHeight,
+  }) {
+    return (editorTextTopPadding(canvasWidth) +
+            canvasHeight -
+            editorTextBottomPadding) /
+        2;
+  }
+
   /// Maximum number of lines allowed
   static const int maxLines = 20;
 

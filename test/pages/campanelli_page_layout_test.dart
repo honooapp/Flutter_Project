@@ -46,8 +46,8 @@ void main() {
       find.byType(DesktopCarouselArrows),
     );
     expect(arrows.arrowSize, 24);
-    expect(arrows.arrowAlignment, Alignment.bottomCenter);
-    expect(arrows.verticalInset, greaterThan(0));
+    expect(arrows.arrowAlignment, Alignment.center);
+    expect(arrows.verticalInset, 0);
     expect(tester.takeException(), isNull);
   });
 
@@ -85,7 +85,7 @@ void main() {
       find.byType(DesktopCarouselArrows),
     );
     expect(arrows.arrowSize, 28);
-    expect(arrows.arrowAlignment, Alignment.bottomCenter);
+    expect(arrows.arrowAlignment, Alignment.center);
 
     await tester.drag(find.byType(CampanelloCard), const Offset(0, -900));
     await tester.pumpAndSettle();

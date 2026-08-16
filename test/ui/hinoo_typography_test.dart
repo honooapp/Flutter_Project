@@ -5,6 +5,31 @@ import 'package:honoo/UI/hinoo_typography.dart';
 import 'package:honoo/UI/hinoo_viewer.dart';
 
 void main() {
+  test('campanello padding replaces two leading blank lines', () {
+    expect(
+      HinooTypography.campanelloTextViewportPadding(
+        HinooTypography.baselineCanvasWidth,
+      ),
+      const EdgeInsets.fromLTRB(32, 67.5, 32, 6),
+    );
+  });
+
+  test('baseline text viewport exposes the Hinoo top spacing calculation', () {
+    expect(
+      HinooTypography.textViewportPadding(
+        HinooTypography.baselineCanvasWidth,
+      ),
+      const EdgeInsets.fromLTRB(32, 18, 32, 6),
+    );
+    expect(
+      HinooTypography.textViewportCenterY(
+        canvasWidth: HinooTypography.baselineCanvasWidth,
+        canvasHeight: HinooTypography.baselineCanvasHeight,
+      ),
+      326,
+    );
+  });
+
   testWidgets('creation and publication use the Honoo-equivalent font size',
       (tester) async {
     final creationStyle = HinooTypography.textStyle(color: Colors.white);
@@ -131,12 +156,10 @@ void main() {
     final slidePosition = tester.getRect(
       find.byKey(const ValueKey('hinoo-slide-canvas')),
     );
-    final expectedCenterY = (HinooTypography.editorTextTopPadding(
-                  HinooTypography.baselineCanvasWidth,
-                ) +
-                slidePosition.height -
-                HinooTypography.editorTextBottomPadding) /
-            2;
+    final expectedCenterY = HinooTypography.textViewportCenterY(
+      canvasWidth: HinooTypography.baselineCanvasWidth,
+      canvasHeight: slidePosition.height,
+    );
     expect(
       savedPosition.center.dy - slidePosition.top,
       closeTo(expectedCenterY, 0.01),

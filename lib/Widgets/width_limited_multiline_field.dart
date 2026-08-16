@@ -36,6 +36,7 @@ class WidthLimitedMultilineField extends StatefulWidget {
     this.cursorRadius,
     this.scrollPadding,
     this.allowFontShrink = false,
+    this.centerTextVertically = true,
   });
 
   final TextEditingController controller;
@@ -68,6 +69,7 @@ class WidthLimitedMultilineField extends StatefulWidget {
   final Radius? cursorRadius;
   final EdgeInsets? scrollPadding;
   final bool allowFontShrink;
+  final bool centerTextVertically;
 
   @override
   State<WidthLimitedMultilineField> createState() =>
@@ -264,7 +266,9 @@ class _WidthLimitedMultilineFieldState
         }
 
         double padTop = 0;
-        if (maxHeight.isFinite && maxHeight > 0) {
+        if (widget.centerTextVertically &&
+            maxHeight.isFinite &&
+            maxHeight > 0) {
           padTop = math.max(0, (maxHeight - textHeight) / 2);
         }
 

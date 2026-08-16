@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:honoo/Pages/new_hinoo_page.dart';
 import 'package:honoo/UI/hinoo_builder.dart';
+import 'package:honoo/UI/hinoo_typography.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Entities/hinoo.dart';
 import 'package:sizer/sizer.dart';
@@ -42,6 +43,41 @@ void main() {
       await tester.pump();
 
       expect(find.byKey(const Key('campanello-save-changes')), findsOneWidget);
+      final textFieldFinder = find.byType(TextField);
+      final textField = tester.widget<TextField>(textFieldFinder);
+      expect(
+        (textField.decoration!.contentPadding! as EdgeInsets).top,
+        greaterThan(0),
+      );
+      final viewportPadding = tester.widget<Padding>(
+        find.byKey(const ValueKey('builder-text-viewport-padding')),
+      );
+      final viewportWidth = tester
+          .getSize(find.byKey(const ValueKey('builder-text-viewport-padding')))
+          .width;
+      expect(
+        viewportPadding.padding,
+        HinooTypography.campanelloTextViewportPadding(viewportWidth),
+      );
+
+      final twentyLines = List.generate(
+        20,
+        (index) => '${index + 1}',
+      ).join('\n');
+      await tester.enterText(textFieldFinder, twentyLines);
+      await tester.pump();
+      expect(
+        tester.widget<TextField>(textFieldFinder).controller!.text,
+        twentyLines,
+      );
+
+      await tester.enterText(textFieldFinder, '$twentyLines\n21');
+      await tester.pump();
+      expect(
+        tester.widget<TextField>(textFieldFinder).controller!.text,
+        twentyLines,
+      );
+
       final imageX = tester
           .getCenter(find.byKey(const Key('campanello-edit-image')))
           .dx;

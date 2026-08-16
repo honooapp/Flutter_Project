@@ -81,8 +81,8 @@ void main() {
           .first,
     );
     expect(
-      (textPadding.padding as EdgeInsets).top,
-      HinooTypography.editorTextTopPadding(320),
+      textPadding.padding,
+      HinooTypography.campanelloTextViewportPadding(320),
     );
     expect(
       tester.getSize(find.byKey(const ValueKey('campanello-text-canvas'))),

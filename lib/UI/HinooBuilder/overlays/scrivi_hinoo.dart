@@ -12,12 +12,16 @@ class ScriviHinooOverlay extends StatefulWidget {
     required this.focusNode,
     required this.textColor,
     this.hintText,
+    this.centerTextVertically = true,
+    this.useCampanelloPadding = false,
   });
 
   final TextEditingController controller;
   final FocusNode focusNode;
   final Color textColor;
   final String? hintText;
+  final bool centerTextVertically;
+  final bool useCampanelloPadding;
 
   @override
   State<ScriviHinooOverlay> createState() => _ScriviHinooOverlayState();
@@ -31,24 +35,15 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
         builder: (context, constraints) {
           final double canvasWidth = math.max(1, constraints.maxWidth);
 
-          const double horizontalPad = HinooTypography.horizontalPadding;
-
-          final double topPad = HinooTypography.editorTextTopPadding(
-            canvasWidth,
-          );
-          const double bottomPad = HinooTypography.editorTextBottomPadding;
-
           final TextStyle effectiveStyle = HinooTypography.textStyle(
             color: widget.textColor,
           );
 
           return Padding(
-            padding: EdgeInsets.fromLTRB(
-              horizontalPad,
-              topPad,
-              horizontalPad,
-              bottomPad,
-            ),
+            key: const ValueKey('builder-text-viewport-padding'),
+            padding: widget.useCampanelloPadding
+                ? HinooTypography.campanelloTextViewportPadding(canvasWidth)
+                : HinooTypography.textViewportPadding(canvasWidth),
             child: WidthLimitedMultilineField(
               controller: widget.controller,
               focusNode: widget.focusNode,
@@ -76,6 +71,7 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
               cursorColor: Colors.white,
               cursorWidth: 3,
               cursorRadius: const Radius.circular(0),
+              centerTextVertically: widget.centerTextVertically,
             ),
           );
         },
