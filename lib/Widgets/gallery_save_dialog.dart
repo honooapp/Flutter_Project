@@ -5,7 +5,6 @@ import 'package:honoo/Widgets/honoo_dialogs.dart';
 Future<void> showDownloadSaveResult({
   required BuildContext context,
   required String contentName,
-  required Future<bool> Function(DownloadSaveResult result) openSavedImage,
   required DownloadSaveResult result,
 }) async {
   if (!result.savedToGallery) {
@@ -15,21 +14,18 @@ Future<void> showDownloadSaveResult({
     return;
   }
 
-  final bool? openGallery = await showDialog<bool>(
+  final String subject = switch (contentName.toLowerCase()) {
+    'campanello' => 'Il campanello',
+    'honoo' => 'L’honoo',
+    _ => 'L’hinoo',
+  };
+  await showDialog<bool>(
     context: context,
-    barrierDismissible: true,
+    barrierDismissible: false,
     builder: (_) => HonooConfirmDialog(
-      title:
-          'L’$contentName è stato salvato\n'
-          'nella tua Galleria delle Foto',
-      confirmLabel: 'Apri galleria',
-      cancelLabel: 'Ignora',
+      title: '$subject è nella tua Galleria delle foto',
+      confirmLabel: 'OK',
+      showCancel: false,
     ),
   );
-  if (openGallery != true || !context.mounted) return;
-
-  final bool opened = await openSavedImage(result);
-  if (!opened && context.mounted) {
-    showHonooToast(context, message: 'Impossibile aprire l’immagine salvata.');
-  }
 }

@@ -28,7 +28,7 @@ const chestInfoTextDirections =
     "quello che hai salvato\n"
     "dalla Luna\n";
 
-const chestInfoTextBeforeOwnReply = "\n\nla tua risposta,\n";
+const chestInfoTextBeforeOwnReply = "\n\nla tua risposta\n";
 
 const chestInfoTextBeforeReceivedReply =
     "\n\ne, se arriva,\n"

@@ -24,6 +24,7 @@ import 'placeholder_page.dart';
 import '../Entities/hinoo.dart';
 import '../Entities/reply_navigation_result.dart';
 import 'casa_builder_page.dart';
+import '../IsolaDelleStorie/Pages/campanelli_page.dart';
 import '../Widgets/conversation_notification_prompt.dart';
 import '../Widgets/repeated_reply_prompt.dart';
 import '../Widgets/text_box_download_button.dart';
@@ -79,6 +80,7 @@ class _NewHinooPageState extends State<NewHinooPage>
   bool _bgUploadInProgress = false;
   bool _hasBackground = false;
   bool _campanelloEditStarted = false;
+  Size? _unobstructedCanvasSize;
 
   bool get _isWriteStep => _builderStep == 'writeText';
   bool get _hasMinTextForDownload => _currentTextLength >= 1;
@@ -320,7 +322,16 @@ class _NewHinooPageState extends State<NewHinooPage>
             campanello: hinooDraft,
           );
           if (!mounted) return;
-          showHonooToast(context, message: 'Campanello aggiornato.');
+          await showDialog<void>(
+            context: context,
+            barrierDismissible: false,
+            builder: (_) => const HonooConfirmDialog(
+              title: 'la modifica è stata effettuata',
+              confirmLabel: 'OK',
+              showCancel: false,
+            ),
+          );
+          if (!mounted) return;
           Navigator.of(context).pop(true);
           return;
         }
@@ -485,12 +496,14 @@ class _NewHinooPageState extends State<NewHinooPage>
     return w;
   }
 
-  void _triggerDownloadFromBuilder() {
+  Future<bool> _triggerDownloadFromBuilder() async {
     final dyn = _builderKey.currentState as dynamic;
     if (dyn?.openDownloadDialogPublic != null) {
-      dyn.openDownloadDialogPublic();
+      final dynamic saved = await dyn.openDownloadDialogPublic();
+      return saved == true;
     } else {
       _warnMissingApi('_triggerDownloadFromBuilder → openDownloadDialogPublic');
+      return false;
     }
   }
 
@@ -511,7 +524,15 @@ class _NewHinooPageState extends State<NewHinooPage>
       return;
     }
 
-    _triggerDownloadFromBuilder();
+    final bool saved = await _triggerDownloadFromBuilder();
+    if (!saved || !mounted) return;
+    final Widget destination = widget.isCampanello
+        ? const CampanelliPage()
+        : const ChestPage();
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => destination),
+      (route) => false,
+    );
   }
 
   void _warnMissingApi(String what) {
@@ -756,6 +777,12 @@ class _NewHinooPageState extends State<NewHinooPage>
               canvasH = canvasAvailableH;
               canvasW = canvasH * ar;
             }
+            if (kbOpen && _unobstructedCanvasSize != null) {
+              canvasW = _unobstructedCanvasSize!.width;
+              canvasH = _unobstructedCanvasSize!.height;
+            } else if (!kbOpen) {
+              _unobstructedCanvasSize = Size(canvasW, canvasH);
+            }
             _lastCanvasHeight = HinooTypography.baselineCanvasHeight;
 
             final Widget mainColumn = Column(
@@ -795,6 +822,7 @@ class _NewHinooPageState extends State<NewHinooPage>
                             _buildEditorControls(),
                             const SizedBox(height: editorControlsGap),
                             SizedBox(
+                              key: const Key('hinoo-editor-card'),
                               width: canvasW,
                               height: canvasH,
                               child: ClipRect(
@@ -804,6 +832,9 @@ class _NewHinooPageState extends State<NewHinooPage>
                                   onPngExported: _onPngExported,
                                   hintText: _kWriteHint,
                                   useCampanelloPadding: widget.isCampanello,
+                                  downloadContentName: widget.isCampanello
+                                      ? 'campanello'
+                                      : 'hinoo',
                                   backgroundPromptText: widget.isCampanello
                                       ? 'Scrivi qui\n'
                                             'tutto quello che vuoi\n'

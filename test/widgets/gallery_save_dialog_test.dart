@@ -41,7 +41,6 @@ void main() {
               onPressed: () => showDownloadSaveResult(
                 context: context,
                 contentName: contentName,
-                openSavedImage: saver.openSavedImage,
                 result: result,
               ),
               child: const Text('Salva'),
@@ -54,35 +53,33 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('Ignora chiude il dialogo senza aprire la galleria', (
+  testWidgets('mostra il popup honoo e torna alla schermata con OK', (
     tester,
   ) async {
     final saver = _FakeDownloadSaver();
     await pumpDialog(tester, saver);
 
     expect(
-      find.text(
-        'L’honoo è stato salvato\n'
-        'nella tua Galleria delle Foto',
-      ),
+      find.text('L’honoo è nella tua Galleria delle foto'),
       findsOneWidget,
     );
+    expect(find.text('Ignora'), findsNothing);
 
-    await tester.tap(find.text('Ignora'));
+    await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
 
     expect(saver.openCalled, isFalse);
     expect(find.text('Salva'), findsOneWidget);
   });
 
-  testWidgets('Apri galleria apre esattamente il file salvato', (tester) async {
+  testWidgets('non apre la galleria dopo la conferma', (tester) async {
     final saver = _FakeDownloadSaver();
     await pumpDialog(tester, saver);
 
-    await tester.tap(find.text('Apri galleria'));
+    await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
 
-    expect(saver.openCalled, isTrue);
+    expect(saver.openCalled, isFalse);
     expect(find.text('Salva'), findsOneWidget);
   });
 
@@ -91,10 +88,19 @@ void main() {
     await pumpDialog(tester, saver, contentName: 'hinoo');
 
     expect(
-      find.text(
-        'L’hinoo è stato salvato\n'
-        'nella tua Galleria delle Foto',
-      ),
+      find.text('L’hinoo è nella tua Galleria delle foto'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('il messaggio usa correttamente il nome campanello', (
+    tester,
+  ) async {
+    final saver = _FakeDownloadSaver();
+    await pumpDialog(tester, saver, contentName: 'campanello');
+
+    expect(
+      find.text('Il campanello è nella tua Galleria delle foto'),
       findsOneWidget,
     );
   });

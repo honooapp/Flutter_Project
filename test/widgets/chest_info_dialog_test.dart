@@ -51,7 +51,7 @@ void main() {
       "quello che hai salvato\n"
       "dalla Luna\n"
       "\uFFFC\n\n"
-      "la tua risposta,\n"
+      "la tua risposta\n"
       "\uFFFC\n\n"
       "e, se arriva,\n"
       "la risposta alla tua risposta\n"

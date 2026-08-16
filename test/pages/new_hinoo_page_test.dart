@@ -107,6 +107,46 @@ void main() {
     expect(find.byTooltip('Apri il tuo Cuore'), findsOneWidget);
   });
 
+  testWidgets('la tastiera mobile non ridimensiona la card hinoo', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetViewInsets);
+
+    await tester.pumpWidget(
+      Sizer(
+        builder: (context, orientation, deviceType) {
+          return const MaterialApp(
+            home: NewHinooPage(
+              initialDraft: HinooDraft(
+                pages: [
+                  HinooSlide(
+                    backgroundImage: null,
+                    text: 'Testo',
+                    isTextWhite: true,
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final card = find.byKey(const Key('hinoo-editor-card'));
+    final Size sizeBeforeKeyboard = tester.getSize(card);
+
+    tester.view.viewInsets = const FakeViewPadding(bottom: 320);
+    await tester.pump();
+
+    expect(tester.getSize(card), sizeBeforeKeyboard);
+    expect(find.byType(TextField), findsOneWidget);
+  });
+
   testWidgets('il cestino hinoo appare nella toolbar di modifica immagine', (
     tester,
   ) async {

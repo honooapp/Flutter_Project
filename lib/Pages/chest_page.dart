@@ -1019,7 +1019,6 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         await showDownloadSaveResult(
           context: context,
           contentName: contentName,
-          openSavedImage: _downloadCaptureService.openSavedImage,
           result: result,
         );
       } else {

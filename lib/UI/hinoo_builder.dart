@@ -52,6 +52,7 @@ class HinooBuilder extends StatefulWidget {
     this.initialDraft,
     this.centerTextVertically = true,
     this.useCampanelloPadding = false,
+    this.downloadContentName = 'hinoo',
   });
 
   final ValueChanged<dynamic>? onHinooChanged;
@@ -61,6 +62,7 @@ class HinooBuilder extends StatefulWidget {
   final HinooDraft? initialDraft;
   final bool centerTextVertically;
   final bool useCampanelloPadding;
+  final String downloadContentName;
 
   @override
   State<HinooBuilder> createState() => _HinooBuilderState();
@@ -237,15 +239,15 @@ class _HinooBuilderState extends State<HinooBuilder> {
     _step = _WizardStep.changeBg;
   }
 
-  Future<void> _openDownloadDialog() async {
-    if (!mounted || _pages.isEmpty) return;
+  Future<bool> _openDownloadDialog() async {
+    if (!mounted || _pages.isEmpty) return false;
     final bool? confirmed = await showDialog<bool>(
       context: context,
       barrierDismissible: true,
       builder: (_) => const DownloadHinooDialog(),
     );
-    if (confirmed != true) return;
-    if (!mounted) return;
+    if (confirmed != true) return false;
+    if (!mounted) return false;
     final String? chosenName = await showDialog<String>(
       context: context,
       barrierDismissible: true,
@@ -253,15 +255,15 @@ class _HinooBuilderState extends State<HinooBuilder> {
     );
     final String? trimmed = chosenName?.trim();
     if (trimmed == null || trimmed.isEmpty) {
-      return;
+      return false;
     }
-    if (!mounted) return;
+    if (!mounted) return false;
     _lastFileBaseName = trimmed;
-    await _downloadHinoo(baseName: trimmed);
+    return _downloadHinoo(baseName: trimmed);
   }
 
-  Future<void> _downloadHinoo({String? baseName}) async {
-    if (!mounted) return;
+  Future<bool> _downloadHinoo({String? baseName}) async {
+    if (!mounted) return false;
     final BuildContext currentContext = context;
     final HinooExportMode exportMode = _resolveExportMode();
     bool progressVisible = false;
@@ -312,19 +314,20 @@ class _HinooBuilderState extends State<HinooBuilder> {
         message: 'hinoo creati con honoo',
       );
       await dismissProgressDialogIfNeeded();
-      if (!currentContext.mounted) return;
+      if (!currentContext.mounted) return false;
       await showDownloadSaveResult(
         context: currentContext,
-        contentName: 'hinoo',
-        openSavedImage: saver.openSavedImage,
+        contentName: widget.downloadContentName,
         result: result,
       );
+      return result.savedToGallery;
     } catch (e) {
       if (mounted) {
         await dismissProgressDialogIfNeeded();
-        if (!currentContext.mounted) return;
+        if (!currentContext.mounted) return false;
         showHonooToast(currentContext, message: 'Errore download: $e');
       }
+      return false;
     } finally {
       if (mounted) {
         await dismissProgressDialogIfNeeded();
@@ -432,8 +435,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
   void deleteCurrentPagePublic() => _deleteCurrentPage(); // già usata
   void clearContentPublic() => _clearContent();
   Future<void> openPreviewDialogPublic() => _openPreviewDialog();
-  Future<void> openDownloadDialogPublic() => _openDownloadDialog();
-  Future<void> downloadAllPagesPublic({String? baseName}) =>
+  Future<bool> openDownloadDialogPublic() => _openDownloadDialog();
+  Future<bool> downloadAllPagesPublic({String? baseName}) =>
       _downloadHinoo(baseName: baseName);
   Future<void> replaceBackgroundPublic() => _pickAndUploadBackground();
   void confirmBackgroundPublic() => _confirmBgAndLock();
@@ -748,8 +751,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
       if (!mounted) return;
       await showDownloadSaveResult(
         context: context,
-        contentName: 'hinoo',
-        openSavedImage: saver.openSavedImage,
+        contentName: widget.downloadContentName,
         result: result,
       );
     } catch (e) {
