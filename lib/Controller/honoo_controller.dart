@@ -37,9 +37,8 @@ class HonooController {
         ..clear()
         ..addAll(
           chest.map(
-            (h) => h.copyWith(
-              isOnMoon: moonContent.contains((h.text, h.image)),
-            ),
+            (h) =>
+                h.copyWith(isOnMoon: moonContent.contains((h.text, h.image))),
           ),
         );
 
@@ -48,8 +47,10 @@ class HonooController {
       final ids = _personal.map((h) => h.dbId).whereType<String>().toList();
       if (ids.isNotEmpty) {
         final client = SupabaseProvider.client;
-        final rows =
-            await client.from('honoo').select('reply_to').in_('reply_to', ids);
+        final rows = await client
+            .from('honoo')
+            .select('reply_to')
+            .in_('reply_to', ids);
 
         // reply_to presenti → esistono risposte
         final repliedParents = <String>{};
@@ -90,7 +91,8 @@ class HonooController {
     final rows = await client
         .from('honoo')
         .select(
-            'id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id')
+          'id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id',
+        )
         .or('id.eq.$id,reply_to.eq.$id')
         .order('created_at', ascending: true);
 
@@ -116,6 +118,7 @@ class HonooController {
         _personal[index] = _personal[index].copyWith(isOnMoon: true);
         version.value++;
       }
+      h.isOnMoon = true;
       return result;
     } catch (e) {
       debugPrint('duplicateToMoon error: $e');

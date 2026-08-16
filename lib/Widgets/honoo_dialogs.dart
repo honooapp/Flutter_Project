@@ -303,3 +303,19 @@ Future<bool?> showHonooDeleteDialog(
     ),
   );
 }
+
+Future<bool?> showRepeatMoonPublicationDialog(
+  BuildContext context, {
+  required String contentName,
+}) {
+  return showDialog<bool>(
+    context: context,
+    barrierDismissible: true,
+    builder: (_) => HonooConfirmDialog(
+      title:
+          'Questo $contentName è già presente sulla Luna, vuoi inviarlo di nuovo?',
+      confirmLabel: 'Sì',
+      cancelLabel: 'No',
+    ),
+  );
+}

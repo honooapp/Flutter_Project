@@ -613,6 +613,13 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
 
   Future<void> _sendHonooToMoon(Honoo honoo) async {
     if (_isMutating) return;
+    if (honoo.isOnMoon == true) {
+      final confirmed = await showRepeatMoonPublicationDialog(
+        context,
+        contentName: 'honoo',
+      );
+      if (!mounted || confirmed != true) return;
+    }
     setState(() => _isMutating = true);
     try {
       final result = await HonooController().sendToMoon(honoo);
@@ -671,6 +678,13 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
 
   Future<void> _sendHinooToMoon(ChestHinooItem hinoo) async {
     if (_isMutating) return;
+    if (hinoo.isOnMoon) {
+      final confirmed = await showRepeatMoonPublicationDialog(
+        context,
+        contentName: 'hinoo',
+      );
+      if (!mounted || confirmed != true) return;
+    }
     setState(() => _isMutating = true);
     try {
       final result = await _hinooController.sendToMoon(hinoo.draft);

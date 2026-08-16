@@ -83,42 +83,47 @@ void main() {
 
   group('HinooService.duplicateToMoon', () {
     HinooDraft sampleDraft() => const HinooDraft(
-          pages: [
-            HinooSlide(
-              text: 'Testo',
-              backgroundImage: null,
-              isTextWhite: true,
-              bgScale: 1.0,
-              bgOffsetX: 0,
-              bgOffsetY: 0,
-            ),
-          ],
-          type: HinooType.personal,
-          recipientTag: null,
+      pages: [
+        HinooSlide(
+          text: 'Testo',
+          backgroundImage: null,
+          isTextWhite: true,
+          bgScale: 1.0,
+          bgOffsetX: 0,
+          bgOffsetY: 0,
+        ),
+      ],
+      type: HinooType.personal,
+      recipientTag: null,
+    );
+
+    test(
+      'il conflitto univoco atomico viene riconosciuto come duplicato',
+      () async {
+        chain.queueError(
+          const PostgrestException(message: 'duplicate', code: '23505'),
         );
 
-    test('il conflitto univoco atomico viene riconosciuto come duplicato',
-        () async {
-      chain.queueError(
-        const PostgrestException(message: 'duplicate', code: '23505'),
-      );
+        final res = await HinooService.duplicateToMoon(sampleDraft());
 
-      final res = await HinooService.duplicateToMoon(sampleDraft());
+        expect(res, DuplicationResult.alreadyPresent);
+        verify(() => client.from('hinoo')).called(1);
+        verify(() => chain.insert(any())).called(1);
+        verifyNever(() => chain.select(any()));
+      },
+    );
 
-      expect(res, DuplicationResult.alreadyPresent);
-      verify(() => client.from('hinoo')).called(1);
-      verify(() => chain.insert(any())).called(1);
-      verifyNever(() => chain.select(any()));
-    });
-
-    test('senza conflitto inserisce e ritorna inserted', () async {
+    test('due invii consecutivi creano due copie sulla Luna', () async {
+      chain.queueResponse(<String, dynamic>{});
       chain.queueResponse(<String, dynamic>{});
 
-      final res = await HinooService.duplicateToMoon(sampleDraft());
+      final first = await HinooService.duplicateToMoon(sampleDraft());
+      final second = await HinooService.duplicateToMoon(sampleDraft());
 
-      expect(res, DuplicationResult.inserted);
-      verify(() => client.from('hinoo')).called(1);
-      verify(() => chain.insert(any())).called(1);
+      expect(first, DuplicationResult.inserted);
+      expect(second, DuplicationResult.inserted);
+      verify(() => client.from('hinoo')).called(2);
+      verify(() => chain.insert(any())).called(2);
       verifyNever(() => chain.select(any()));
     });
 

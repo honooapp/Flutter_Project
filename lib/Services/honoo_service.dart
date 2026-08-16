@@ -167,8 +167,9 @@ class HonooService {
     return _insertDuplicate(payload);
   }
 
-  /// Duplica un honoo dello scrigno pubblicandolo sulla Luna (nuova INSERT).
-  /// Non tocca l'originale in 'chest'.
+  /// Pubblica una nuova copia dell'honoo sulla Luna a ogni invio.
+  /// Non tocca l'originale in 'chest'; il fingerprint resta disponibile per
+  /// mostrare nello Scrigno che almeno una copia è già stata pubblicata.
   static Future<DuplicationResult> duplicateToMoon(Honoo h) async {
     if (h.isFromMoonSaved) {
       throw ArgumentError(

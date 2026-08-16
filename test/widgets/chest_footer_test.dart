@@ -15,6 +15,7 @@ void main() {
     bool isFromMoonSaved = false,
     bool hasReplies = false,
     String? conversationId,
+    String? ownerId,
   }) {
     final honoo =
         Honoo(
@@ -23,7 +24,8 @@ void main() {
             '',
             '2026-01-01T00:00:00Z',
             '2026-01-01T00:00:00Z',
-            type == HonooType.answer ? 'another-user' : 'current-user',
+            ownerId ??
+                (type == HonooType.answer ? 'another-user' : 'current-user'),
             type,
           )
           ..isOnMoon = isOnMoon
@@ -33,25 +35,24 @@ void main() {
     return ChestItem.honoo(honoo, DateTime.utc(2026));
   }
 
-  ChestItem hinooItem({bool isOnMoon = false, bool isFromMoonSaved = false}) =>
-      ChestItem.hinoo(
-        ChestHinooItem(
-          id: 'hinoo-1',
-          draft: const HinooDraft(
-            pages: [
-              HinooSlide(
-                backgroundImage: null,
-                text: 'Test',
-                isTextWhite: true,
-              ),
-            ],
-          ),
-          createdAt: DateTime.utc(2026),
-          isFromMoonSaved: isFromMoonSaved,
-          ownerId: 'current-user',
-          isOnMoon: isOnMoon,
-        ),
-      );
+  ChestItem hinooItem({
+    bool isOnMoon = false,
+    bool isFromMoonSaved = false,
+    String ownerId = 'current-user',
+  }) => ChestItem.hinoo(
+    ChestHinooItem(
+      id: 'hinoo-1',
+      draft: const HinooDraft(
+        pages: [
+          HinooSlide(backgroundImage: null, text: 'Test', isTextWhite: true),
+        ],
+      ),
+      createdAt: DateTime.utc(2026),
+      isFromMoonSaved: isFromMoonSaved,
+      ownerId: ownerId,
+      isOnMoon: isOnMoon,
+    ),
+  );
 
   Future<void> pumpFooter(
     WidgetTester tester, {
@@ -139,7 +140,7 @@ void main() {
     );
   });
 
-  testWidgets('non aggiunge una finta seconda azione per vedere le risposte', (
+  testWidgets('un Honoo personale con risposte conserva l’azione Luna', (
     tester,
   ) async {
     await pumpFooter(
@@ -149,7 +150,8 @@ void main() {
 
     expect(find.byTooltip('Vedi risposte'), findsNothing);
     expect(find.byTooltip('Rispondi'), findsNothing);
-    expect(find.byType(IconButton), findsNWidgets(3));
+    expect(find.byTooltip('Spedisci sulla Luna'), findsOneWidget);
+    expect(find.byType(IconButton), findsNWidgets(4));
   });
 
   testWidgets('Honoo personale mostra Luna e Cancella e inoltra le azioni', (
@@ -192,7 +194,7 @@ void main() {
     expect(deleted, isTrue);
   });
 
-  testWidgets('Honoo già sulla Luna non mostra una seconda azione Luna', (
+  testWidgets('Honoo già sulla Luna continua a mostrare l’azione Luna', (
     tester,
   ) async {
     await pumpFooter(
@@ -200,7 +202,7 @@ void main() {
       item: honooItem(HonooType.personal, isOnMoon: true),
     );
 
-    expect(find.byTooltip('Spedisci sulla Luna'), findsNothing);
+    expect(find.byTooltip('Spedisci sulla Luna'), findsOneWidget);
     expect(find.byTooltip('Cancella'), findsOneWidget);
   });
 
@@ -216,6 +218,17 @@ void main() {
     expect(find.byTooltip('Rispondi'), findsOneWidget);
   });
 
+  testWidgets('Honoo personale di un altro utente non mostra Luna', (
+    tester,
+  ) async {
+    await pumpFooter(
+      tester,
+      item: honooItem(HonooType.personal, ownerId: 'another-user'),
+    );
+
+    expect(find.byTooltip('Spedisci sulla Luna'), findsNothing);
+  });
+
   testWidgets(
     'la selezione del padre della conversazione mostra una sola azione Luna',
     (tester) async {
@@ -225,19 +238,19 @@ void main() {
       );
       item.honoo!.dbId = 'root-1';
       final selectedEntry = ConversationEntry.honoo(item.honoo!);
-      ConversationEntry? publishedEntry;
+      Honoo? publishedHonoo;
 
       await pumpFooter(
         tester,
         item: item,
         selectedConversationEntry: selectedEntry,
-        onSendConversationEntryToMoon: (entry) => publishedEntry = entry,
+        onSendHonooToMoon: (honoo) => publishedHonoo = honoo,
       );
 
       expect(find.byTooltip('Spedisci sulla Luna'), findsOneWidget);
       expect(find.byTooltip('Rispondi'), findsOneWidget);
       await tester.tap(find.byTooltip('Spedisci sulla Luna'));
-      expect(publishedEntry, same(selectedEntry));
+      expect(publishedHonoo, same(item.honoo));
     },
   );
 
@@ -361,12 +374,12 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Hinoo già sulla Luna non mostra una seconda azione Luna', (
+  testWidgets('Hinoo già sulla Luna continua a mostrare l’azione Luna', (
     tester,
   ) async {
     await pumpFooter(tester, item: hinooItem(isOnMoon: true));
 
-    expect(find.byTooltip('Spedisci sulla Luna'), findsNothing);
+    expect(find.byTooltip('Spedisci sulla Luna'), findsOneWidget);
     expect(find.byTooltip('Cancella'), findsOneWidget);
   });
 
@@ -377,6 +390,14 @@ void main() {
 
     expect(find.byTooltip('Spedisci sulla Luna'), findsNothing);
     expect(find.byTooltip('Rispondi'), findsOneWidget);
+  });
+
+  testWidgets('Hinoo personale di un altro utente non mostra Luna', (
+    tester,
+  ) async {
+    await pumpFooter(tester, item: hinooItem(ownerId: 'another-user'));
+
+    expect(find.byTooltip('Spedisci sulla Luna'), findsNothing);
   });
 
   testWidgets('contenuto ricevuto mostra solo Home, Info e Cancella', (

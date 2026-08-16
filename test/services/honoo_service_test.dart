@@ -6,6 +6,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:honoo/Services/honoo_service.dart';
+import 'package:honoo/Services/duplication_result.dart';
 import 'package:honoo/Entities/honoo.dart';
 
 class _MockQueryChain extends Mock
@@ -32,10 +33,19 @@ class _MockQueryChain extends Mock
 
 class _MockSupabaseClient extends Mock implements SupabaseClient {}
 
+class _MockAuth extends Mock implements GoTrueClient {}
+
+class _MockSession extends Mock implements Session {}
+
+class _MockUser extends Mock implements User {}
+
 void main() {
   late _MockSupabaseClient client;
   late _MockQueryChain chain;
   late _MockQueryChain hiddenConversations;
+  late _MockAuth auth;
+  late _MockSession session;
+  late _MockUser user;
 
   setUpAll(() {
     registerFallbackValue(<String, dynamic>{});
@@ -45,8 +55,15 @@ void main() {
     client = _MockSupabaseClient();
     chain = _MockQueryChain();
     hiddenConversations = _MockQueryChain();
+    auth = _MockAuth();
+    session = _MockSession();
+    user = _MockUser();
 
     HonooService.$setTestClient(client);
+    when(() => client.auth).thenReturn(auth);
+    when(() => auth.currentSession).thenReturn(session);
+    when(() => session.user).thenReturn(user);
+    when(() => user.id).thenReturn('user-1');
     when(() => client.from('honoo')).thenAnswer((_) => chain);
     when(
       () => client.from('chest_hidden_conversations'),
@@ -244,5 +261,26 @@ void main() {
 
     await expectLater(HonooService.duplicateToMoon(honoo), throwsArgumentError);
     verifyNever(() => client.from('honoo'));
+  });
+
+  test('duplicateToMoon inserisce una nuova riga a ogni invio', () async {
+    final honoo = Honoo(
+      1,
+      'testo',
+      '',
+      '2024-01-01T00:00:00Z',
+      '2024-01-01T00:00:00Z',
+      'user-1',
+      HonooType.personal,
+    );
+    chain.queueResponse(<String, dynamic>{});
+    chain.queueResponse(<String, dynamic>{});
+
+    final first = await HonooService.duplicateToMoon(honoo);
+    final second = await HonooService.duplicateToMoon(honoo);
+
+    expect(first, DuplicationResult.inserted);
+    expect(second, DuplicationResult.inserted);
+    verify(() => chain.insert(any())).called(2);
   });
 }
