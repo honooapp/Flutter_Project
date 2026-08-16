@@ -161,6 +161,7 @@ void main() {
         expect(payload.containsKey('conversation_id'), isFalse);
         expect(payload['is_from_moon_saved'], isFalse);
         expect(payload['fingerprint'], isNot(contains('destinatario')));
+        expect(payload.containsKey('created_at'), isFalse);
       },
     );
 

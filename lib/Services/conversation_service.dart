@@ -279,6 +279,16 @@ class ConversationService {
           ),
           refresh,
         )
+        .on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(
+            event: '*',
+            schema: 'public',
+            table: 'conversation_tombstones',
+            filter: 'conversation_id=eq.$conversationId',
+          ),
+          refresh,
+        )
         .subscribe((status, [error]) {
           if (status == 'SUBSCRIBED') {
             onStatus?.call(

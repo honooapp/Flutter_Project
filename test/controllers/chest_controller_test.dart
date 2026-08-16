@@ -199,6 +199,84 @@ void main() {
   });
 
   test(
+    'loadReplies collega una risposta Hinoo legacy tramite conversation_id',
+    () async {
+      when(() => repository.fetchHinooRows('user-1')).thenAnswer(
+        (_) async => [
+          {
+            'id': 'hinoo-root',
+            'conversation_id': 'legacy-conversation',
+            'pages': [
+              <String, dynamic>{
+                'backgroundImage': 'root.png',
+                'text': 'Radice',
+                'isTextWhite': true,
+              },
+            ],
+            'type': 'personal',
+            'created_at': '2024-01-01T10:00:00Z',
+            'user_id': 'user-1',
+          },
+        ],
+      );
+      when(
+        () => repository.fetchHinooMoonFingerprints('user-1'),
+      ).thenAnswer((_) async => const {});
+      when(
+        () => repository.fetchHonooReplyRows('user-1'),
+      ).thenAnswer((_) async => const []);
+      when(
+        () => repository.fetchHinooReplyRows('user-1', ['hinoo-root']),
+      ).thenAnswer(
+        (_) async => [
+          {
+            'id': 'legacy-reply',
+            'conversation_id': 'legacy-conversation',
+            'reply_to': null,
+            'recipient_tag': 'user-1',
+            'created_at': '2024-01-01T11:00:00Z',
+            'user_id': 'user-2',
+            'pages': [
+              <String, dynamic>{
+                'backgroundImage': 'reply.png',
+                'text': 'Risposta legacy',
+                'isTextWhite': true,
+              },
+            ],
+          },
+        ],
+      );
+
+      await controller.loadHinoo('user-1');
+      await controller.loadReplies('user-1');
+
+      expect(
+        controller.value.hinooLatestReplies['legacy-conversation'],
+        DateTime.parse('2024-01-01T11:00:00Z'),
+      );
+      expect(
+        controller.value.hinooLatestReceivedReplies['legacy-conversation'],
+        DateTime.parse('2024-01-01T11:00:00Z'),
+      );
+      expect(
+        controller
+            .value
+            .hinooRepliesByRoot['hinoo-root']!
+            .single
+            .draft
+            .pages
+            .single
+            .text,
+        'Risposta legacy',
+      );
+      expect(
+        controller.value.hinooRepliesByRoot['hinoo-root']!.single.draft.replyTo,
+        'hinoo-root',
+      );
+    },
+  );
+
+  test(
     'un errore conserva i dati precedenti e termina il caricamento',
     () async {
       when(

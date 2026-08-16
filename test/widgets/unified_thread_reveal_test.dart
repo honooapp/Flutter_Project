@@ -293,7 +293,7 @@ void main() {
     expect(find.byKey(const Key('reply_reveal_parent')), findsNothing);
   });
 
-  testWidgets('lo swipe resta sulla pagina scelta dopo il rebuild del padre', (
+  testWidgets('una nuova risposta non sposta la pagina scelta con lo swipe', (
     tester,
   ) async {
     tester.view.devicePixelRatio = 1;
@@ -319,37 +319,51 @@ void main() {
         replyTo: 'root-scroll',
       ),
     );
+    final newReply = ConversationEntry.honoo(
+      honoo(
+        id: 'reply-scroll-new',
+        text: 'Nuova risposta realtime',
+        owner: 'other',
+        createdAt: '2026-07-20T12:00:00Z',
+        type: HonooType.answer,
+        replyTo: 'reply-scroll',
+      ),
+    );
+    var entries = [root, reply];
     String? selectedId;
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home: StatefulBuilder(
-          builder: (context, setState) => Scaffold(
-            body: UnifiedThreadView(
-              conversationId: 'conversation-1',
-              maxWidth: 600,
-              maxHeight: 700,
-              isActive: true,
-              currentUserId: 'me',
-              conversationLoader: (_) async => [root, reply],
-              onSelect: (entry) {
-                selectedId = entry.id;
-                setState(() {});
-              },
-            ),
-          ),
+    Widget app(int refreshToken) => MaterialApp(
+      home: Scaffold(
+        body: UnifiedThreadView(
+          key: const Key('scroll-refresh-thread'),
+          conversationId: 'conversation-1',
+          maxWidth: 600,
+          maxHeight: 700,
+          isActive: true,
+          currentUserId: 'me',
+          refreshToken: refreshToken,
+          conversationLoader: (_) async => entries,
+          onSelect: (entry) => selectedId = entry.id,
         ),
       ),
     );
+
+    await tester.pumpWidget(app(0));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 1000));
     expect(selectedId, 'reply-scroll');
 
     await tester.drag(find.byType(PageView), const Offset(0, -650));
     await tester.pumpAndSettle();
+    expect(selectedId, 'root-scroll');
+
+    entries = [root, reply, newReply];
+    await tester.pumpWidget(app(1));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
 
     expect(selectedId, 'root-scroll');
-    expect(find.text('Contenuto a cui si è risposto'), findsOneWidget);
+    expect(tester.widget<PageView>(find.byType(PageView)).controller!.page, 2);
   });
 
   testWidgets('un errore di conversazione mostra Riprova', (tester) async {

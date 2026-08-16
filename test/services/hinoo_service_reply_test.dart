@@ -90,12 +90,14 @@ void main() {
 
     await HinooService.publishHinoo(draft);
 
-    final captured = verify(() => chain.insert(captureAny())).captured.single
-        as Map<String, dynamic>;
+    final captured =
+        verify(() => chain.insert(captureAny())).captured.single
+            as Map<String, dynamic>;
     expect(captured['type'], 'answer');
     expect(captured['reply_to'], 'root-1');
     expect(captured['recipient_tag'], 'recipient-1');
     expect(captured['conversation_id'], 'conversation-1');
+    expect(captured.containsKey('created_at'), isFalse);
   });
 
   test('publishHinoo: non salva una risposta senza reply_to', () async {
