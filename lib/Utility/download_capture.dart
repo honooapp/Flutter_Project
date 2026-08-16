@@ -19,20 +19,17 @@ Future<void> captureAndSave(
     final result = await _downloadCaptureService.captureAndSave(
       repaintKey: repaintKey,
       baseName: baseName,
+      message: message ?? toastOnStart,
     );
 
     if (!rootNav.mounted) return;
-    if (result.savedToGallery) {
-      await showDownloadSaveResult(
-        context: rootNav.context,
-        contentName: baseName.toLowerCase().startsWith('hinoo')
-            ? 'hinoo'
-            : 'honoo',
-        result: result,
-      );
-    } else {
-      showHonooToast(rootNav.context, message: message ?? toastOnStart);
-    }
+    await showDownloadSaveResult(
+      context: rootNav.context,
+      contentName: baseName.toLowerCase().startsWith('hinoo')
+          ? 'hinoo'
+          : 'honoo',
+      result: result,
+    );
   } catch (e) {
     if (rootNav != null && rootNav.mounted) {
       showHonooToast(rootNav.context, message: 'Errore download: $e');

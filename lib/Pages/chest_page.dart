@@ -1015,20 +1015,11 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         message: 'creato con honoo',
       );
       if (!mounted) return;
-      if (result.savedToGallery) {
-        await showDownloadSaveResult(
-          context: context,
-          contentName: contentName,
-          result: result,
-        );
-      } else {
-        showHonooToast(
-          context,
-          message: result.message.isNotEmpty
-              ? result.message
-              : 'Download avviato.',
-        );
-      }
+      await showDownloadSaveResult(
+        context: context,
+        contentName: contentName,
+        result: result,
+      );
     } catch (e) {
       if (!mounted) return;
       showHonooToast(context, message: 'Errore download: $e');

@@ -32,6 +32,7 @@ void main() {
     WidgetTester tester,
     _FakeDownloadSaver saver, {
     String contentName = 'honoo',
+    DownloadSaveResult saveResult = result,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -41,7 +42,7 @@ void main() {
               onPressed: () => showDownloadSaveResult(
                 context: context,
                 contentName: contentName,
-                result: result,
+                result: saveResult,
               ),
               child: const Text('Salva'),
             ),
@@ -103,5 +104,24 @@ void main() {
       find.text('Il campanello è nella tua Galleria delle foto'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('mostra lo stesso popup per un download web', (tester) async {
+    final saver = _FakeDownloadSaver();
+    await pumpDialog(
+      tester,
+      saver,
+      contentName: 'campanello',
+      saveResult: const DownloadSaveResult(
+        message: 'Download avviato.',
+        savedToGallery: false,
+      ),
+    );
+
+    expect(
+      find.text('Il campanello è nella tua Galleria delle foto'),
+      findsOneWidget,
+    );
+    expect(find.text('Download avviato.'), findsNothing);
   });
 }

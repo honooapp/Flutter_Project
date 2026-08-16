@@ -320,7 +320,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
         contentName: widget.downloadContentName,
         result: result,
       );
-      return result.savedToGallery;
+      return true;
     } catch (e) {
       if (mounted) {
         await dismissProgressDialogIfNeeded();
