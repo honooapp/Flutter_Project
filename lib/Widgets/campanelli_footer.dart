@@ -42,6 +42,7 @@ class CampanelliFooter extends StatelessWidget {
       desiredGap: desiredGap,
       minGap: 16,
       height: iconSize,
+      centerFirstAction: !showCampanello,
       actions: [
         ResponsiveFooterAction(
           asset: "assets/icons/home.svg",
