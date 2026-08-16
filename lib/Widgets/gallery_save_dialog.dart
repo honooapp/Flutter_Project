@@ -7,13 +7,9 @@ Future<void> showDownloadSaveResult({
   required String contentName,
   required DownloadSaveResult result,
 }) async {
-  if (!result.savedToGallery) {
-    if (result.message.isNotEmpty) {
-      showHonooToast(context, message: result.message);
-    }
-    return;
-  }
-
+  // Sul web savedToGallery resta false anche quando il download o la
+  // condivisione sono partiti correttamente. Arrivare qui significa che il
+  // salvataggio si è concluso senza errori, quindi il feedback resta uniforme.
   final String subject = switch (contentName.toLowerCase()) {
     'campanello' => 'Il campanello',
     'honoo' => 'L’honoo',

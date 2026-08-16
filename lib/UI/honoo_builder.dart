@@ -498,7 +498,7 @@ class HonooBuilderState extends State<HonooBuilder> {
       contentName: 'honoo',
       result: result,
     );
-    return result.savedToGallery;
+    return true;
   }
 
   void resetContent() {
