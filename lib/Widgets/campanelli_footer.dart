@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../Utility/honoo_colors.dart';
@@ -58,7 +59,7 @@ class CampanelliFooter extends StatelessWidget {
         ),
         if (showCampanello && !isOwnCampanello && !isKnocking)
           ResponsiveFooterAction(
-            asset: "assets/icons/campanello_bianco.png",
+            asset: "assets/icons/campana.svg",
             semanticsLabel: 'Campanello',
             size: iconSize,
             splashRadius: 25,
@@ -67,8 +68,8 @@ class CampanelliFooter extends StatelessWidget {
             icon: Stack(
               clipBehavior: Clip.none,
               children: [
-                Image.asset(
-                  "assets/icons/campanello_bianco.png",
+                SvgPicture.asset(
+                  "assets/icons/campana.svg",
                   width: iconSize,
                   height: iconSize,
                   fit: BoxFit.contain,
@@ -84,7 +85,7 @@ class CampanelliFooter extends StatelessWidget {
           ),
         if (showCampanello && !isOwnCampanello && isKnocking)
           ResponsiveFooterAction(
-            asset: "assets/icons/campanello_bianco.png",
+            asset: "assets/icons/campana.svg",
             semanticsLabel: 'Campanello',
             size: iconSize,
             splashRadius: 25,
@@ -94,7 +95,7 @@ class CampanelliFooter extends StatelessWidget {
           ),
         if (!showCampanello && hasAnyPendingKnock)
           ResponsiveFooterAction(
-            asset: "assets/icons/campanello_bianco.png",
+            asset: "assets/icons/campana.svg",
             semanticsLabel: 'Campanelli',
             size: iconSize,
             splashRadius: 25,
@@ -103,8 +104,8 @@ class CampanelliFooter extends StatelessWidget {
             icon: Stack(
               clipBehavior: Clip.none,
               children: [
-                Image.asset(
-                  "assets/icons/campanello_bianco.png",
+                SvgPicture.asset(
+                  "assets/icons/campana.svg",
                   width: iconSize,
                   height: iconSize,
                   fit: BoxFit.contain,
@@ -119,7 +120,7 @@ class CampanelliFooter extends StatelessWidget {
           ),
         if (!showCampanello && !hasAnyPendingKnock)
           ResponsiveFooterAction(
-            asset: "assets/icons/campanello_bianco.png",
+            asset: "assets/icons/campana.svg",
             semanticsLabel: 'Campanelli',
             size: iconSize,
             splashRadius: 25,
