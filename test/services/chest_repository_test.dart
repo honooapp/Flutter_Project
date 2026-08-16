@@ -109,6 +109,28 @@ void main() {
     },
   );
 
+  test('fetchHinooReplyRows include le risposte legacy senza reply_to', () async {
+    hiddenConversations.queueResponse(<Map<String, dynamic>>[]);
+    hinoo.queueResponse([
+      {'id': 'legacy-received'},
+    ]);
+    hinoo.queueResponse([
+      {'id': 'legacy-sent'},
+    ]);
+
+    final result = await repository.fetchHinooReplyRows('user-1', const []);
+
+    expect(result, [
+      {'id': 'legacy-received'},
+      {'id': 'legacy-sent'},
+    ]);
+    verify(
+      () => hinoo.or(
+        'type.eq.answer,and(conversation_id.not.is.null,recipient_tag.not.is.null)',
+      ),
+    ).called(2);
+  });
+
   test('deleteHinoo elimina esclusivamente la riga indicata', () async {
     hinoo.queueResponse(<String, dynamic>{});
 

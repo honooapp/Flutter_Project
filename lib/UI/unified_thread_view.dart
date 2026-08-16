@@ -217,6 +217,10 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
     final generation = ++_loadGeneration;
     final conversationId = widget.conversationId;
     final pageBeforeLoad = _currentPageIndex;
+    final selectedEntryBeforeLoad =
+        pageBeforeLoad > 0 && pageBeforeLoad < _entries.length
+        ? _entries.reversed.elementAt(pageBeforeLoad)
+        : null;
     if (_entries.isEmpty) {
       setState(() => _loading = true);
     }
@@ -241,10 +245,28 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
       _showLatestReceivedAndReveal(forceFocus: wasEmpty);
       if (widget.isActive && _entries.isNotEmpty) {
         final hasExplicitReveal = (widget.revealEntryId ?? '').isNotEmpty;
-        final selectedPage = (wasEmpty || hasExplicitReveal)
+        final reversed = _entries.reversed.toList(growable: false);
+        var selectedPage = (wasEmpty || hasExplicitReveal)
             ? _pageToShowFirst
             : pageBeforeLoad.clamp(0, _entries.length - 1);
-        widget.onSelect?.call(_entries.reversed.elementAt(selectedPage));
+        if (!wasEmpty &&
+            !hasExplicitReveal &&
+            selectedEntryBeforeLoad != null) {
+          final preservedPage = reversed.indexWhere(
+            (entry) =>
+                entry.kind == selectedEntryBeforeLoad.kind &&
+                entry.id == selectedEntryBeforeLoad.id,
+          );
+          if (preservedPage >= 0) selectedPage = preservedPage;
+        }
+        if (selectedPage != pageBeforeLoad) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted || !_pageController.hasClients) return;
+            _pageController.jumpToPage(selectedPage);
+            _currentPageIndex = selectedPage;
+          });
+        }
+        widget.onSelect?.call(reversed[selectedPage]);
       }
     } catch (error) {
       if (!mounted ||

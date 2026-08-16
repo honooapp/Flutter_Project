@@ -417,6 +417,11 @@ class ChestController extends ValueNotifier<ChestState> {
       final hinooLatest = <String, DateTime>{};
       final hinooLatestReceived = <String, DateTime>{};
       final hinooReplies = <String, List<HinooThreadEntry>>{};
+      final hinooRootByConversation = <String, String>{
+        for (final item in value.hinoo)
+          if ((item.conversationId ?? '').isNotEmpty)
+            item.conversationId!: item.id,
+      };
       final rootIds = value.hinoo.map((item) => item.id).toList();
       final rows = await _reliability.refresh<List<dynamic>>(
         () => _repository.fetchHinooReplyRows(userId, rootIds),
@@ -430,11 +435,14 @@ class ChestController extends ValueNotifier<ChestState> {
       for (final row in rows.whereType<Map>()) {
         final id = row['id']?.toString() ?? '';
         if (id.isNotEmpty && !seenHinooIds.add(id)) continue;
-        final rootId = row['reply_to']?.toString() ?? '';
+        final storedRootId = row['reply_to']?.toString() ?? '';
         final conversationId = row['conversation_id']?.toString() ?? '';
+        final rootId = storedRootId.isNotEmpty
+            ? storedRootId
+            : hinooRootByConversation[conversationId] ?? '';
         final activityKey = conversationId.isNotEmpty ? conversationId : rootId;
         final pages = row['pages'];
-        if (rootId.isEmpty || pages is! List) continue;
+        if (activityKey.isEmpty || pages is! List) continue;
         final created =
             DateTime.tryParse((row['created_at'] ?? '').toString()) ??
             DateTime.fromMillisecondsSinceEpoch(0);
@@ -445,18 +453,20 @@ class ChestController extends ValueNotifier<ChestState> {
               .toList(),
           type: HinooType.answer,
           recipientTag: row['recipient_tag'] as String?,
-          replyTo: rootId,
+          replyTo: rootId.isEmpty ? null : rootId,
         );
-        hinooReplies
-            .putIfAbsent(rootId, () => <HinooThreadEntry>[])
-            .add(
-              HinooThreadEntry(
-                draft: draft,
-                authorId: row['user_id']?.toString(),
-                isReply: true,
-                createdAt: created,
-              ),
-            );
+        if (rootId.isNotEmpty) {
+          hinooReplies
+              .putIfAbsent(rootId, () => <HinooThreadEntry>[])
+              .add(
+                HinooThreadEntry(
+                  draft: draft,
+                  authorId: row['user_id']?.toString(),
+                  isReply: true,
+                  createdAt: created,
+                ),
+              );
+        }
         final existing = hinooLatest[activityKey];
         if (existing == null || created.isAfter(existing)) {
           hinooLatest[activityKey] = created;

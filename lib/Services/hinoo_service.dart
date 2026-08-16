@@ -53,7 +53,6 @@ class HinooService {
       'conversation_id': draft.conversationId,
       'is_from_moon_saved': draft.isFromMoonSaved,
       'fingerprint': (draft.type == HinooType.moon) ? fingerprint(draft) : null,
-      'created_at': DateTime.now().toIso8601String(),
     };
 
     final res = await _insertPublished(data);
@@ -74,7 +73,6 @@ class HinooService {
       'conversation_id': draft.conversationId,
       'is_from_moon_saved': draft.isFromMoonSaved,
       'fingerprint': (draft.type == HinooType.moon) ? fingerprint(draft) : null,
-      'created_at': DateTime.now().toIso8601String(),
     };
 
     final res = await _insertPublished(data);
@@ -125,7 +123,6 @@ class HinooService {
       'recipient_tag': null,
       'reply_to': null,
       'is_from_moon_saved': false,
-      'created_at': DateTime.now().toIso8601String(),
     };
 
     return _insertDuplicate(data);
@@ -152,7 +149,6 @@ class HinooService {
       'conversation_id': sanitized.conversationId,
       'is_from_moon_saved': true,
       'fingerprint': fp,
-      'created_at': DateTime.now().toIso8601String(),
     };
 
     return _insertDuplicate(data);

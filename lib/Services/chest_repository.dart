@@ -108,7 +108,9 @@ class ChestRepository {
         .select(
           'id,conversation_id,reply_to,pages,type,recipient_tag,created_at,user_id',
         )
-        .eq('type', 'answer')
+        .or(
+          'type.eq.answer,and(conversation_id.not.is.null,recipient_tag.not.is.null)',
+        )
         .eq('recipient_tag', userId)
         .order('created_at', ascending: true);
     final repliesFromUser = await _client
@@ -116,7 +118,9 @@ class ChestRepository {
         .select(
           'id,conversation_id,reply_to,pages,type,recipient_tag,created_at,user_id',
         )
-        .eq('type', 'answer')
+        .or(
+          'type.eq.answer,and(conversation_id.not.is.null,recipient_tag.not.is.null)',
+        )
         .eq('user_id', userId)
         .order('created_at', ascending: true);
     return _withoutHiddenConversations([
