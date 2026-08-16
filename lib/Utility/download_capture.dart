@@ -28,7 +28,6 @@ Future<void> captureAndSave(
         contentName: baseName.toLowerCase().startsWith('hinoo')
             ? 'hinoo'
             : 'honoo',
-        openSavedImage: _downloadCaptureService.openSavedImage,
         result: result,
       );
     } else {

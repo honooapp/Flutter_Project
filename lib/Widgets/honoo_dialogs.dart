@@ -67,12 +67,14 @@ class HonooConfirmDialog extends StatelessWidget {
     this.message,
     required this.confirmLabel,
     this.cancelLabel = 'Annulla',
+    this.showCancel = true,
   });
 
   final String title;
   final String? message;
   final String confirmLabel;
   final String cancelLabel;
+  final bool showCancel;
 
   @override
   Widget build(BuildContext context) {
@@ -118,15 +120,17 @@ class HonooConfirmDialog extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              style: TextButton.styleFrom(foregroundColor: Colors.white54),
-              child: Text(
-                cancelLabel,
-                style: HonooDialogStyles.tertiaryAction(),
+            if (showCancel) ...[
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                style: TextButton.styleFrom(foregroundColor: Colors.white54),
+                child: Text(
+                  cancelLabel,
+                  style: HonooDialogStyles.tertiaryAction(),
+                ),
               ),
-            ),
+            ],
           ],
         ),
       ),

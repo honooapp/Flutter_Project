@@ -22,7 +22,7 @@ class HinooThreadView extends StatefulWidget {
   final double maxHeight;
   final double maxWidth;
   final String? rootAuthorId;
-  final VoidCallback? onDownloadTap;
+  final ValueChanged<GlobalKey>? onDownloadTap;
 
   @override
   State<HinooThreadView> createState() => _HinooThreadViewState();
@@ -140,7 +140,7 @@ class _HinooThreadViewState extends State<HinooThreadView>
                     maxWidth: widget.maxWidth,
                     isReply: entry.isReply,
                     authorId: entry.authorId,
-                    onDownloadTap: widget.onDownloadTap,
+                    onDownloadCanvasTap: widget.onDownloadTap,
                   ),
                 );
               },

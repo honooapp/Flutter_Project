@@ -407,7 +407,28 @@ class _CampanelliPageState extends State<CampanelliPage> {
         ),
       ),
     );
-    if (updated == true && mounted) await _loadUserEntries();
+    if (updated == true && mounted) {
+      await _loadUserEntries();
+      if (mounted) await _showOwnCampanello();
+    }
+  }
+
+  Future<void> _showOwnCampanello() async {
+    final String? userId = SupabaseProvider.client.auth.currentUser?.id;
+    if (userId == null) return;
+    final int ownIndex = _buildCampanelli().indexWhere(
+      (entry) => entry.campanello.ownerId == userId,
+    );
+    if (ownIndex < 0) return;
+    final int pageIndex = ownIndex + 1;
+    setState(() {
+      _campanelloIndex = pageIndex;
+      _lastHouseCampanelloIndex = pageIndex;
+    });
+    await WidgetsBinding.instance.endOfFrame;
+    if (_campanelloPageController.hasClients) {
+      _campanelloPageController.jumpToPage(pageIndex);
+    }
   }
 
   Future<void> _editCasa(_CampanelloEntry entry) async {

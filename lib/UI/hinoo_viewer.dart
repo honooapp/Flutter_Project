@@ -18,6 +18,7 @@ class HinooViewer extends StatefulWidget {
   final double maxWidth;
   final Color gapColor;
   final VoidCallback? onDownloadTap;
+  final ValueChanged<GlobalKey>? onDownloadCanvasTap;
   const HinooViewer({
     super.key,
     required this.draft,
@@ -25,6 +26,7 @@ class HinooViewer extends StatefulWidget {
     required this.maxWidth,
     this.gapColor = HonooColor.background,
     this.onDownloadTap,
+    this.onDownloadCanvasTap,
     this.isReply = false,
     this.authorId,
     this.viewerUserId,
@@ -39,6 +41,7 @@ class HinooViewer extends StatefulWidget {
 
 class _HinooViewerState extends State<HinooViewer> {
   late final PageController _vController;
+  final GlobalKey _downloadBoundaryKey = GlobalKey();
   Timer? _snapTimer;
 
   @override
@@ -105,6 +108,9 @@ class _HinooViewerState extends State<HinooViewer> {
     }
     final double displayW = baselineW * scale;
     final double displayH = baselineH * scale;
+    final VoidCallback? onDownloadTap = widget.onDownloadCanvasTap != null
+        ? () => widget.onDownloadCanvasTap!(_downloadBoundaryKey)
+        : widget.onDownloadTap;
 
     final String? currentUserId =
         widget.viewerUserId ?? SupabaseProvider.client.auth.currentUser?.id;
@@ -142,72 +148,75 @@ class _HinooViewerState extends State<HinooViewer> {
           height: displayH,
           child: FittedBox(
             fit: BoxFit.contain,
-            child: SizedBox(
-              width: baselineW,
-              height: baselineH,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(5),
-                    child: Listener(
-                      onPointerSignal: (event) {
-                        if (event is PointerScrollEvent &&
-                            widget.draft.pages.length > 1 &&
-                            _vController.hasClients &&
-                            _vController.position.haveDimensions) {
-                          final position = _vController.position;
-                          if ((position.maxScrollExtent -
-                                      position.minScrollExtent)
-                                  .abs() <
-                              0.5) {
-                            return;
+            child: RepaintBoundary(
+              key: _downloadBoundaryKey,
+              child: SizedBox(
+                width: baselineW,
+                height: baselineH,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(5),
+                      child: Listener(
+                        onPointerSignal: (event) {
+                          if (event is PointerScrollEvent &&
+                              widget.draft.pages.length > 1 &&
+                              _vController.hasClients &&
+                              _vController.position.haveDimensions) {
+                            final position = _vController.position;
+                            if ((position.maxScrollExtent -
+                                        position.minScrollExtent)
+                                    .abs() <
+                                0.5) {
+                              return;
+                            }
+                            final double target =
+                                (position.pixels + event.scrollDelta.dy).clamp(
+                                  position.minScrollExtent,
+                                  position.maxScrollExtent,
+                                );
+                            if ((target - position.pixels).abs() > 0.5) {
+                              _vController.jumpTo(target);
+                              _scheduleSnap();
+                            }
                           }
-                          final double target =
-                              (position.pixels + event.scrollDelta.dy).clamp(
-                                position.minScrollExtent,
-                                position.maxScrollExtent,
+                        },
+                        child: ScrollConfiguration(
+                          behavior: ScrollConfiguration.of(context).copyWith(
+                            dragDevices: {
+                              PointerDeviceKind.touch,
+                              PointerDeviceKind.mouse,
+                              PointerDeviceKind.stylus,
+                              PointerDeviceKind.trackpad,
+                            },
+                          ),
+                          child: PageView.builder(
+                            scrollDirection: Axis.vertical,
+                            controller: _vController,
+                            // disabilita scroll interno in contesti di thread verticale a pagina intera
+                            physics: const NeverScrollableScrollPhysics(),
+                            allowImplicitScrolling: true,
+                            onPageChanged: _prefetchPagesFrom,
+                            itemCount: widget.draft.pages.length,
+                            itemBuilder: (context, index) {
+                              return HinooSlideView(
+                                slide: widget.draft.pages[index],
+                                width: baselineW,
+                                height: baselineH,
+                                gap: 0,
+                                gapColor: widget.gapColor,
+                                scaleLegacyTextToFit:
+                                    widget.draft.baseCanvasHeight == null,
+                                onDownloadTap: onDownloadTap,
                               );
-                          if ((target - position.pixels).abs() > 0.5) {
-                            _vController.jumpTo(target);
-                            _scheduleSnap();
-                          }
-                        }
-                      },
-                      child: ScrollConfiguration(
-                        behavior: ScrollConfiguration.of(context).copyWith(
-                          dragDevices: {
-                            PointerDeviceKind.touch,
-                            PointerDeviceKind.mouse,
-                            PointerDeviceKind.stylus,
-                            PointerDeviceKind.trackpad,
-                          },
-                        ),
-                        child: PageView.builder(
-                          scrollDirection: Axis.vertical,
-                          controller: _vController,
-                          // disabilita scroll interno in contesti di thread verticale a pagina intera
-                          physics: const NeverScrollableScrollPhysics(),
-                          allowImplicitScrolling: true,
-                          onPageChanged: _prefetchPagesFrom,
-                          itemCount: widget.draft.pages.length,
-                          itemBuilder: (context, index) {
-                            return HinooSlideView(
-                              slide: widget.draft.pages[index],
-                              width: baselineW,
-                              height: baselineH,
-                              gap: 0,
-                              gapColor: widget.gapColor,
-                              scaleLegacyTextToFit:
-                                  widget.draft.baseCanvasHeight == null,
-                              onDownloadTap: widget.onDownloadTap,
-                            );
-                          },
+                            },
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

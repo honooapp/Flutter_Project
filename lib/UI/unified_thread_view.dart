@@ -454,21 +454,16 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
         );
         break;
       case ConversationEntryKind.hinoo:
-        card = RepaintBoundary(
-          key: repaintKey,
-          child: HinooViewer(
-            draft: entry.hinoo!,
-            maxHeight: widget.maxHeight,
-            maxWidth: widget.maxWidth,
-            isReply: entry.hinoo!.type == HinooType.answer,
-            authorId: entry.ownerId,
-            viewerUserId: widget.currentUserId,
-            gapColor: style.backgroundColor,
-            onDownloadTap: () => _downloadFromBoundary(
-              repaintKey: repaintKey,
-              baseName: 'hinoo',
-            ),
-          ),
+        card = HinooViewer(
+          draft: entry.hinoo!,
+          maxHeight: widget.maxHeight,
+          maxWidth: widget.maxWidth,
+          isReply: entry.hinoo!.type == HinooType.answer,
+          authorId: entry.ownerId,
+          viewerUserId: widget.currentUserId,
+          gapColor: style.backgroundColor,
+          onDownloadCanvasTap: (canvasKey) =>
+              _downloadFromBoundary(repaintKey: canvasKey, baseName: 'hinoo'),
         );
         break;
       case ConversationEntryKind.deleted:

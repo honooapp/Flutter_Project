@@ -1019,7 +1019,6 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
         await showDownloadSaveResult(
           context: context,
           contentName: contentName,
-          openSavedImage: _downloadCaptureService.openSavedImage,
           result: result,
         );
       } else {
@@ -1074,7 +1073,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       revealEntryId: _pendingRevealEntryId,
       onSelectConversationEntry: (entry) =>
           _selectConversationEntry(_convIdOfItem(item), entry),
-      onDownload: () => _handleDownloadForItem(item, repaintKey),
+      onDownload: (captureKey) => _handleDownloadForItem(item, captureKey),
       conversationRefreshToken: _conversationRefreshToken,
     );
   }

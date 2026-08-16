@@ -57,7 +57,7 @@ void main() {
             focusConversationId: null,
             revealEntryId: null,
             onSelectConversationEntry: (ConversationEntry _) {},
-            onDownload: () {},
+            onDownload: (_) {},
             conversationRefreshToken: 0,
           ),
         ),

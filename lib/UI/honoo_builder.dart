@@ -452,13 +452,13 @@ class HonooBuilderState extends State<HonooBuilder> {
     }
   }
 
-  Future<void> downloadHonooPublic(
+  Future<bool> downloadHonooPublic(
     BuildContext context, {
     String? fileName,
   }) async {
     if (!hasImage) {
       showHonooToast(context, message: 'Devi prima caricare un’immagine.');
-      return;
+      return false;
     }
 
     setState(() => _hideEditorActionsForCapture = true);
@@ -474,9 +474,9 @@ class HonooBuilderState extends State<HonooBuilder> {
       }
     }
     if (bytes == null || bytes.isEmpty) {
-      if (!context.mounted) return;
+      if (!context.mounted) return false;
       showHonooToast(context, message: 'Impossibile generare il file PNG.');
-      return;
+      return false;
     }
 
     final saver = getDownloadSaver();
@@ -492,13 +492,13 @@ class HonooBuilderState extends State<HonooBuilder> {
       DownloadImage(filename: '$rawName.png', bytes: bytes),
     ]);
 
-    if (!context.mounted) return;
+    if (!context.mounted) return false;
     await showDownloadSaveResult(
       context: context,
       contentName: 'honoo',
-      openSavedImage: saver.openSavedImage,
       result: result,
     );
+    return result.savedToGallery;
   }
 
   void resetContent() {
