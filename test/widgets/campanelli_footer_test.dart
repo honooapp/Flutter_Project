@@ -37,8 +37,9 @@ void main() {
     );
   }
 
-  testWidgets('campanello visitatore mostra badge e inoltra le azioni',
-      (tester) async {
+  testWidgets('campanello visitatore mostra badge e inoltra le azioni', (
+    tester,
+  ) async {
     var home = false;
     var knocked = false;
     await pumpFooter(
@@ -61,8 +62,9 @@ void main() {
     expect(knocked, isTrue);
   });
 
-  testWidgets('intro con bussate mostra lista e limita il badge a 99+',
-      (tester) async {
+  testWidgets('intro con bussate mostra lista e limita il badge a 99+', (
+    tester,
+  ) async {
     var opened = false;
     await pumpFooter(
       tester,
@@ -78,13 +80,20 @@ void main() {
     expect(opened, isTrue);
   });
 
-  testWidgets('campanello proprio non mostra azioni di bussata',
-      (tester) async {
-    await pumpFooter(
-      tester,
-      showCampanello: true,
-      isOwnCampanello: true,
+  testWidgets("intro centra l'icona Home nella toolbar", (tester) async {
+    await pumpFooter(tester, showCampanello: false);
+
+    final footer = find.byType(CampanelliFooter);
+    expect(
+      tester.getCenter(find.byTooltip('Home')).dx,
+      tester.getCenter(footer).dx,
     );
+  });
+
+  testWidgets('campanello proprio non mostra azioni di bussata', (
+    tester,
+  ) async {
+    await pumpFooter(tester, showCampanello: true, isOwnCampanello: true);
 
     expect(find.byTooltip('Home'), findsOneWidget);
     expect(find.byTooltip('Campanello'), findsNothing);

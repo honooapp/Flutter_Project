@@ -38,6 +38,7 @@ class ResponsiveFooterBar extends StatelessWidget {
     this.mainAxisAlignment = MainAxisAlignment.center,
     this.alignment = Alignment.center,
     this.expandToAvailableWidth = false,
+    this.centerFirstAction = false,
   });
 
   final List<ResponsiveFooterAction> actions;
@@ -50,6 +51,7 @@ class ResponsiveFooterBar extends StatelessWidget {
   final MainAxisAlignment mainAxisAlignment;
   final AlignmentGeometry alignment;
   final bool expandToAvailableWidth;
+  final bool centerFirstAction;
 
   @override
   Widget build(BuildContext context) {
@@ -63,10 +65,11 @@ class ResponsiveFooterBar extends StatelessWidget {
           final double availableWidth = constraints.maxWidth.isFinite
               ? constraints.maxWidth
               : double.infinity;
-          final double totalIconWidth = actions.fold(
-            0,
-            (sum, action) => sum + action.size,
-          );
+          final bool balanceFirstAction =
+              centerFirstAction && actions.length == 2;
+          final double totalIconWidth =
+              actions.fold(0.0, (sum, action) => sum + action.size) +
+              (balanceFirstAction ? actions.last.size : 0);
           final double iconScale =
               availableWidth.isFinite &&
                   totalIconWidth > availableWidth &&
@@ -74,7 +77,9 @@ class ResponsiveFooterBar extends StatelessWidget {
               ? availableWidth / totalIconWidth
               : 1;
           final double fittedIconWidth = totalIconWidth * iconScale;
-          final int gapCount = math.max(0, actions.length - 1);
+          final int gapCount = balanceFirstAction
+              ? 2
+              : math.max(0, actions.length - 1);
           double gap = effectiveDesiredGap;
 
           if (availableWidth.isFinite && gapCount > 0) {
@@ -101,6 +106,10 @@ class ResponsiveFooterBar extends StatelessWidget {
                     ? MainAxisSize.max
                     : MainAxisSize.min,
                 children: [
+                  if (balanceFirstAction) ...[
+                    SizedBox(width: actions.last.size * iconScale),
+                    SizedBox(width: gap),
+                  ],
                   for (int index = 0; index < actions.length; index++) ...[
                     _FooterIconButton(
                       action: actions[index],
