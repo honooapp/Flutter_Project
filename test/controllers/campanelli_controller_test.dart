@@ -169,6 +169,57 @@ void main() {
     expect(state.entries.single.houseImageUrl, 'other-house.png');
   });
 
+  test('mette il proprio campanello in testa e gli altri per creazione',
+      () async {
+    when(repository.fetchHouseRows).thenAnswer((_) async => const [
+          {
+            'campanello_hinoo_id': 'hinoo-newer',
+            'owner_id': 'user-3',
+            'created_at': '2026-08-03T10:00:00Z',
+          },
+          {
+            'campanello_hinoo_id': 'hinoo-owned',
+            'owner_id': 'user-1',
+            'created_at': '2026-08-04T10:00:00Z',
+          },
+          {
+            'campanello_hinoo_id': 'hinoo-older',
+            'owner_id': 'user-2',
+            'created_at': '2026-08-01T10:00:00Z',
+          },
+        ]);
+    when(() => repository.fetchShareSettingsRows(any()))
+        .thenAnswer((_) async => const []);
+    when(() => repository.fetchHinooRows(any())).thenAnswer((_) async => const [
+          {
+            'id': 'hinoo-newer',
+            'pages': [
+              {'text': 'Più recente'}
+            ],
+          },
+          {
+            'id': 'hinoo-owned',
+            'pages': [
+              {'text': 'Mio'}
+            ],
+          },
+          {
+            'id': 'hinoo-older',
+            'pages': [
+              {'text': 'Più vecchio'}
+            ],
+          },
+        ]);
+
+    final state = await controller.load('user-1');
+
+    expect(state.entries.map((entry) => entry.hinooId), [
+      'hinoo-owned',
+      'hinoo-older',
+      'hinoo-newer',
+    ]);
+  });
+
   test('pubblica uno stato di errore senza conservare dati parziali', () async {
     when(repository.fetchHouseRows).thenThrow(StateError('offline'));
 

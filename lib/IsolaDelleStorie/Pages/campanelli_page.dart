@@ -32,6 +32,7 @@ import 'package:honoo/Widgets/busy_overlay.dart';
 import 'package:honoo/Services/campanelli_repository.dart';
 
 import '../../Pages/home_page.dart';
+import '../../Pages/email_login_page.dart';
 import '../../Pages/casa_builder_page.dart';
 import '../../Pages/casa_share_selection_page.dart';
 import '../../Pages/chest_page.dart';
@@ -62,7 +63,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
   static const Curve _kCurve = Curves.easeOutCubic;
   int _campanelloIndex = 0;
   int _verticalPageIndex = 0;
-  int _lastHouseCampanelloIndex = 1;
+  int _lastHouseCampanelloIndex = 0;
   final PageController _pageController = PageController();
   final PageController _campanelloPageController = PageController();
   List<_CampanelloEntry> _userEntries = const [];
@@ -85,10 +86,12 @@ class _CampanelliPageState extends State<CampanelliPage> {
       _campanelliController.state.pendingKnocks;
   Set<String> get _pendingKnockTags => _campanelliController.pendingKnockTags;
   List<String> _ownedHinooIds = const [];
-  static const String campanelloSirenaId = 'campanello_sirena';
-  static const String campanelloPalombaroId = 'campanello_palombaro';
-  static const String casaSirenaId = 'casa_sirena';
-  static const String casaPalombaroId = 'casa_palombaro';
+  static const String campanelloVenceslaoId =
+      'campanello_admin_venceslao_cembalo';
+  static const String campanelloMariAndreeaId =
+      'campanello_admin_mariandreea_lavric';
+  static const String casaVenceslaoId = 'casa_admin_venceslao_cembalo';
+  static const String casaMariAndreeaId = 'casa_admin_mariandreea_lavric';
   static const String campanelloSirenaBg = 'assets/campanello1.png';
   static const String campanelloPalombaroBg = 'assets/campanello2.png';
   static const String casaSirenaBg = 'assets/images/casa_sirena.png';
@@ -97,8 +100,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
   static const String userCampanelloBg = 'assets/campanello1.png';
   static const String scrignoOverlay = 'assets/icons/scrigno_di_carta.png';
   final Set<String> _unlockedCampanelli = {
-    campanelloSirenaId,
-    campanelloPalombaroId,
+    campanelloVenceslaoId,
+    campanelloMariAndreeaId,
   };
 
   void _showBusyOverlay(String message) {
@@ -325,15 +328,15 @@ class _CampanelliPageState extends State<CampanelliPage> {
     return [
       _CampanelloEntry(
         campanello: CampanelloData(
-          id: campanelloSirenaId,
+          id: campanelloVenceslaoId,
           campanelloHinooId: null,
           ownerId: null,
           backgroundImage: const AssetImage(campanelloSirenaBg),
           text: Utility().campanelloExample1Text,
-          linkedHouseId: casaSirenaId,
+          linkedHouseId: casaVenceslaoId,
         ),
         casa: const CasaData(
-          id: casaSirenaId,
+          id: casaVenceslaoId,
           backgroundImage: AssetImage(casaSirenaBg),
           bgScale: 1.0,
           bgOffsetX: 0.0,
@@ -342,15 +345,15 @@ class _CampanelliPageState extends State<CampanelliPage> {
       ),
       _CampanelloEntry(
         campanello: CampanelloData(
-          id: campanelloPalombaroId,
+          id: campanelloMariAndreeaId,
           campanelloHinooId: null,
           ownerId: null,
           backgroundImage: const AssetImage(campanelloPalombaroBg),
           text: Utility().campanelloExample2Text,
-          linkedHouseId: casaPalombaroId,
+          linkedHouseId: casaMariAndreeaId,
         ),
         casa: const CasaData(
-          id: casaPalombaroId,
+          id: casaMariAndreeaId,
           backgroundImage: AssetImage(casaPalombaroBg),
           bgScale: 1.0,
           bgOffsetX: 0.0,
@@ -363,7 +366,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
   List<_CampanelloEntry> _buildCampanelli() {
     final userId = SupabaseProvider.client.auth.currentUser?.id;
     if (userId == null) {
-      return [..._buildBaseCampanelli(), ..._userEntries];
+      return _buildBaseCampanelli();
     }
 
     final ownEntries = _userEntries
@@ -372,7 +375,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
     final otherEntries = _userEntries
         .where((entry) => entry.campanello.ownerId != userId)
         .toList(growable: false);
-    return [...ownEntries, ..._buildBaseCampanelli(), ...otherEntries];
+    return [...ownEntries, ...otherEntries];
   }
 
   HinooDraft _campanelloDraftFor(_CampanelloEntry entry) {
@@ -420,7 +423,7 @@ class _CampanelliPageState extends State<CampanelliPage> {
       (entry) => entry.campanello.ownerId == userId,
     );
     if (ownIndex < 0) return;
-    final int pageIndex = ownIndex + 1;
+    final int pageIndex = ownIndex;
     setState(() {
       _campanelloIndex = pageIndex;
       _lastHouseCampanelloIndex = pageIndex;
@@ -448,6 +451,14 @@ class _CampanelliPageState extends State<CampanelliPage> {
   }
 
   Future<void> _handleInviteRequestTap() async {
+    if (SupabaseProvider.client.auth.currentUser == null) {
+      final loggedIn = await Navigator.of(
+        context,
+      ).push<bool>(MaterialPageRoute(builder: (_) => const EmailLoginPage()));
+      if (!mounted || loggedIn != true) return;
+      await _loadUserEntries();
+      if (!mounted) return;
+    }
     if (!_campanelliController.beginInviteRequest()) return;
     try {
       if (_hasOwnHouse) {
@@ -531,8 +542,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
   List<CampanelloPageData> _buildCampanelloPages(
     List<_CampanelloEntry> campanelli,
   ) {
+    final isGuest = SupabaseProvider.client.auth.currentUser == null;
     final pages = <CampanelloPageData>[
-      CampanelloPageData.intro(Utility().campanelliText),
+      if (isGuest) CampanelloPageData.intro(Utility().campanelliText),
       for (final campanello in campanelli)
         CampanelloPageData.campanello(campanello.campanello),
     ];
@@ -544,6 +556,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
           'Vuoi\n anche tu\n una casa\n sull\'Isola?\n\nClicca qui',
         ),
       );
+    }
+
+    if (pages.isEmpty) {
+      pages.add(CampanelloPageData.intro('Nessun campanello disponibile'));
     }
 
     return pages;
@@ -652,10 +668,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
         if (hasOwnEntry) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!mounted || !_campanelloPageController.hasClients) return;
-            _campanelloPageController.jumpToPage(1);
+            _campanelloPageController.jumpToPage(0);
             setState(() {
-              _campanelloIndex = 1;
-              _lastHouseCampanelloIndex = 1;
+              _campanelloIndex = 0;
+              _lastHouseCampanelloIndex = 0;
             });
           });
         }
@@ -785,8 +801,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
       (e) => e.campanello.campanelloHinooId == tag,
     );
     if (idx < 0) return;
-    // Horizontal PageView uses a pages list with an intro at index 0
-    final int pageIndex = idx + 1;
+    final bool hasIntro = SupabaseProvider.client.auth.currentUser == null;
+    final int pageIndex = idx + (hasIntro ? 1 : 0);
     // Ensure we are on the campanelli layer (vertical page 0)
     if (_pageController.hasClients) {
       await _pageController.animateToPage(
@@ -1053,18 +1069,18 @@ class _CampanelliPageState extends State<CampanelliPage> {
             0,
             campanelloPages.length - 1,
           );
-          final int houseCampanelloIndex = safeCampanelloIndex == 0
-              ? 1
-              : safeCampanelloIndex;
-          final int casaIndex = (houseCampanelloIndex - 1).clamp(
-            0,
-            campanelli.length - 1,
-          );
-          final bool showCampanello = safeCampanelloIndex > 0;
+          final activePage = campanelloPages[safeCampanelloIndex];
+          final CampanelloData? activeCampanello = activePage.campanello;
+          final _CampanelloEntry? activeEntry = activeCampanello == null
+              ? null
+              : campanelli.cast<_CampanelloEntry?>().firstWhere(
+                  (entry) => entry?.campanello.id == activeCampanello.id,
+                  orElse: () => null,
+                );
+          final _CampanelloEntry? houseEntry =
+              activeEntry ?? (campanelli.isEmpty ? null : campanelli.first);
+          final bool showCampanello = activeCampanello != null;
           final bool showFooter = _verticalPageIndex == 0;
-          final CampanelloData? activeCampanello = showCampanello
-              ? campanelli[casaIndex].campanello
-              : null;
           final user = SupabaseProvider.client.auth.currentUser;
           final String? activeCampanelloId =
               activeCampanello?.campanelloHinooId;
@@ -1090,6 +1106,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
           final int maxCampanelloIndex = math.max(
             0,
             campanelloPages.length - 1,
+          );
+          final int firstCampanelloPageIndex = campanelloPages.indexWhere(
+            (page) => page.campanello != null,
           );
           const int maxVerticalIndex = verticalPages - 1;
 
@@ -1169,21 +1188,18 @@ class _CampanelliPageState extends State<CampanelliPage> {
                         onPageChanged: (index) {
                           _revealCarouselArrows();
                           if (index == 1) {
-                            _lastHouseCampanelloIndex = _campanelloIndex == 0
-                                ? 1
+                            _lastHouseCampanelloIndex = activeCampanello == null
+                                ? math.max(0, firstCampanelloPageIndex)
                                 : _campanelloIndex;
                           }
                           if (index == 0) {
-                            final int target = _campanelloIndex == 0
-                                ? _lastHouseCampanelloIndex
-                                : _campanelloIndex;
-                            if (target > 0 &&
-                                _campanelloPageController.hasClients) {
+                            final int target = _lastHouseCampanelloIndex;
+                            if (_campanelloPageController.hasClients) {
                               _campanelloPageController.jumpToPage(target);
                             }
                             setState(() {
                               _verticalPageIndex = index;
-                              if (target > 0) _campanelloIndex = target;
+                              _campanelloIndex = target;
                             });
                             return;
                           }
@@ -1234,27 +1250,41 @@ class _CampanelliPageState extends State<CampanelliPage> {
                                               _revealCarouselArrows();
                                               setState(() {
                                                 _campanelloIndex = index;
-                                                if (index > 0) {
+                                                if (campanelloPages[index]
+                                                        .campanello !=
+                                                    null) {
                                                   _lastHouseCampanelloIndex =
                                                       index;
                                                 }
                                               });
                                             },
                                             itemBuilder: (context, pageIndex) {
+                                              final page =
+                                                  campanelloPages[pageIndex];
                                               final _CampanelloEntry? entry =
-                                                  pageIndex > 0 &&
-                                                      pageIndex <=
-                                                          campanelli.length
-                                                  ? campanelli[pageIndex - 1]
-                                                  : null;
+                                                  page.campanello == null
+                                                  ? null
+                                                  : campanelli
+                                                        .cast<
+                                                          _CampanelloEntry?
+                                                        >()
+                                                        .firstWhere(
+                                                          (candidate) =>
+                                                              candidate
+                                                                  ?.campanello
+                                                                  .id ==
+                                                              page
+                                                                  .campanello!
+                                                                  .id,
+                                                          orElse: () => null,
+                                                        );
                                               final bool isOwnEntry =
                                                   entry != null &&
                                                   user != null &&
                                                   entry.campanello.ownerId ==
                                                       user.id;
                                               return CampanelloCard(
-                                                data:
-                                                    campanelloPages[pageIndex],
+                                                data: page,
                                                 width: canvasSize.width,
                                                 height: canvasSize.height,
                                                 onRequestTap:
@@ -1284,75 +1314,73 @@ class _CampanelliPageState extends State<CampanelliPage> {
                               ),
                             ),
                           ),
-                          casaUnlocked
-                              ? AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 480),
-                                  switchInCurve: Curves.easeOutCubic,
-                                  switchOutCurve: Curves.easeOutCubic,
-                                  transitionBuilder: (child, animation) {
-                                    final curved = CurvedAnimation(
-                                      parent: animation,
-                                      curve: Curves.elasticOut,
-                                    );
-                                    final offsetAnimation = Tween<Offset>(
-                                      begin: const Offset(0, 0.28),
-                                      end: Offset.zero,
-                                    ).animate(curved);
-                                    final scale = Tween<double>(
-                                      begin: 0.97,
-                                      end: 1.0,
-                                    ).animate(curved);
-                                    return SlideTransition(
-                                      position: offsetAnimation,
-                                      child: ScaleTransition(
-                                        scale: scale,
-                                        child: FadeTransition(
-                                          opacity: animation,
-                                          child: child,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Center(
-                                    child: CasaSection(
-                                      key: ValueKey(
-                                        '${campanelli[casaIndex].casa.id}_open',
-                                      ),
-                                      casa: campanelli[casaIndex].casa,
-                                      isUnlocked: casaUnlocked,
-                                      scrignoAsset: scrignoOverlay,
-                                      onScrignoTap: scrignoTap,
-                                      footerIconSize: footerIconSize,
-                                      scrignoSize: scrignoSize,
-                                      footerBottomSpacing: footerBottomSpacing,
-                                      width: casaWidth,
-                                      height: casaHeight,
-                                      onEditTap: isOwnCampanello
-                                          ? () =>
-                                                _editCasa(campanelli[casaIndex])
-                                          : null,
+                          if (houseEntry == null)
+                            const SizedBox.expand()
+                          else if (casaUnlocked)
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 480),
+                              switchInCurve: Curves.easeOutCubic,
+                              switchOutCurve: Curves.easeOutCubic,
+                              transitionBuilder: (child, animation) {
+                                final curved = CurvedAnimation(
+                                  parent: animation,
+                                  curve: Curves.elasticOut,
+                                );
+                                final offsetAnimation = Tween<Offset>(
+                                  begin: const Offset(0, 0.28),
+                                  end: Offset.zero,
+                                ).animate(curved);
+                                final scale = Tween<double>(
+                                  begin: 0.97,
+                                  end: 1.0,
+                                ).animate(curved);
+                                return SlideTransition(
+                                  position: offsetAnimation,
+                                  child: ScaleTransition(
+                                    scale: scale,
+                                    child: FadeTransition(
+                                      opacity: animation,
+                                      child: child,
                                     ),
                                   ),
-                                )
-                              : Center(
-                                  child: CasaSection(
-                                    key: ValueKey(
-                                      '${campanelli[casaIndex].casa.id}_closed',
-                                    ),
-                                    casa: campanelli[casaIndex].casa,
-                                    isUnlocked: casaUnlocked,
-                                    scrignoAsset: scrignoOverlay,
-                                    onScrignoTap: scrignoTap,
-                                    footerIconSize: footerIconSize,
-                                    scrignoSize: scrignoSize,
-                                    footerBottomSpacing: footerBottomSpacing,
-                                    width: casaWidth,
-                                    height: casaHeight,
-                                    onEditTap: isOwnCampanello
-                                        ? () => _editCasa(campanelli[casaIndex])
-                                        : null,
-                                  ),
+                                );
+                              },
+                              child: Center(
+                                child: CasaSection(
+                                  key: ValueKey('${houseEntry.casa.id}_open'),
+                                  casa: houseEntry.casa,
+                                  isUnlocked: casaUnlocked,
+                                  scrignoAsset: scrignoOverlay,
+                                  onScrignoTap: scrignoTap,
+                                  footerIconSize: footerIconSize,
+                                  scrignoSize: scrignoSize,
+                                  footerBottomSpacing: footerBottomSpacing,
+                                  width: casaWidth,
+                                  height: casaHeight,
+                                  onEditTap: isOwnCampanello
+                                      ? () => _editCasa(houseEntry)
+                                      : null,
                                 ),
+                              ),
+                            )
+                          else
+                            Center(
+                              child: CasaSection(
+                                key: ValueKey('${houseEntry.casa.id}_closed'),
+                                casa: houseEntry.casa,
+                                isUnlocked: casaUnlocked,
+                                scrignoAsset: scrignoOverlay,
+                                onScrignoTap: scrignoTap,
+                                footerIconSize: footerIconSize,
+                                scrignoSize: scrignoSize,
+                                footerBottomSpacing: footerBottomSpacing,
+                                width: casaWidth,
+                                height: casaHeight,
+                                onEditTap: isOwnCampanello
+                                    ? () => _editCasa(houseEntry)
+                                    : null,
+                              ),
+                            ),
                         ],
                       ),
                     ),

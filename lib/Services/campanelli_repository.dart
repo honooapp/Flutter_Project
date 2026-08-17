@@ -13,7 +13,9 @@ class CampanelliDataRepository {
   Future<List<dynamic>> fetchHouseRows() async {
     final rows = await _client
         .from('case')
-        .select('campanello_hinoo_id,owner_id,house_image_url,bg_transform');
+        .select(
+          'campanello_hinoo_id,owner_id,house_image_url,bg_transform,created_at',
+        );
     return _asList(rows);
   }
 
