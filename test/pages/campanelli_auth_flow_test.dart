@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/campanelli_page.dart';
 import 'package:honoo/Pages/email_login_page.dart';
-import 'package:honoo/Utility/utility.dart';
 import 'package:honoo/Widgets/campanello_card.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -24,23 +23,58 @@ void main() {
   testWidgets(
     'un ospite vede presentazione, i due admin in ordine e poi il login',
     (tester) async {
+      final rpc = MockQueryChain();
+      rpc.queueResponse(const [
+        {
+          'admin_email': 'venceslao.cembalo@gmail.com',
+          'campanello_hinoo_id': 'hinoo-venceslao',
+          'owner_id': 'admin-venceslao',
+          'house_image_url': null,
+          'pages': [
+            {
+              'backgroundImage': null,
+              'text': 'Campanello di Venceslao',
+              'isTextWhite': true,
+            },
+          ],
+        },
+        {
+          'admin_email': 'mariandreealavric@gmail.com',
+          'campanello_hinoo_id': 'hinoo-mariandreea',
+          'owner_id': 'admin-mariandreea',
+          'house_image_url': null,
+          'pages': [
+            {
+              'backgroundImage': null,
+              'text': 'Campanello di Mari Andreea',
+              'isTextWhite': false,
+            },
+          ],
+        },
+      ]);
+      when(
+        () => harness.client.rpc('get_public_admin_campanelli'),
+      ).thenAnswer((_) => rpc);
+
       await tester.pumpWidget(const MaterialApp(home: CampanelliPage()));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       CampanelloCard card = tester.widget(find.byType(CampanelloCard));
-      expect(card.data.text, Utility().campanelliText);
+      expect(card.data.isIntro, isTrue);
 
       await tester.drag(find.byType(CampanelloCard), const Offset(-500, 0));
       await tester.pumpAndSettle();
       card = tester.widget(find.byType(CampanelloCard));
-      expect(card.data.campanello?.id, 'campanello_admin_venceslao_cembalo');
-      expect(card.data.text, Utility().campanelloExample1Text);
+      expect(card.data.campanello?.campanelloHinooId, 'hinoo-venceslao');
+      expect(card.data.text, 'Campanello di Venceslao');
+      expect(card.data.text, isNot(contains('Magari sono a casa')));
 
       await tester.drag(find.byType(CampanelloCard), const Offset(-500, 0));
       await tester.pumpAndSettle();
       card = tester.widget(find.byType(CampanelloCard));
-      expect(card.data.campanello?.id, 'campanello_admin_mariandreea_lavric');
-      expect(card.data.text, Utility().campanelloExample2Text);
+      expect(card.data.campanello?.campanelloHinooId, 'hinoo-mariandreea');
+      expect(card.data.text, 'Campanello di Mari Andreea');
+      expect(card.data.text, isNot(contains('Magari sono sul terrazzo')));
 
       await tester.drag(find.byType(CampanelloCard), const Offset(-500, 0));
       await tester.pumpAndSettle();

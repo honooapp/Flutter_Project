@@ -86,23 +86,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
       _campanelliController.state.pendingKnocks;
   Set<String> get _pendingKnockTags => _campanelliController.pendingKnockTags;
   List<String> _ownedHinooIds = const [];
-  static const String campanelloVenceslaoId =
-      'campanello_admin_venceslao_cembalo';
-  static const String campanelloMariAndreeaId =
-      'campanello_admin_mariandreea_lavric';
-  static const String casaVenceslaoId = 'casa_admin_venceslao_cembalo';
-  static const String casaMariAndreeaId = 'casa_admin_mariandreea_lavric';
-  static const String campanelloSirenaBg = 'assets/campanello1.png';
-  static const String campanelloPalombaroBg = 'assets/campanello2.png';
-  static const String casaSirenaBg = 'assets/images/casa_sirena.png';
-  static const String casaPalombaroBg = 'assets/images/casa_palombaro.png';
-  static const String defaultCasaBg = 'assets/images/casa_palombaro.png';
-  static const String userCampanelloBg = 'assets/campanello1.png';
+  static const String defaultCasaBg = 'assets/background.png';
+  static const String userCampanelloBg = 'assets/background.png';
   static const String scrignoOverlay = 'assets/icons/scrigno_di_carta.png';
-  final Set<String> _unlockedCampanelli = {
-    campanelloVenceslaoId,
-    campanelloMariAndreeaId,
-  };
+  final Set<String> _unlockedCampanelli = <String>{};
 
   void _showBusyOverlay(String message) {
     if (!mounted) return;
@@ -324,49 +311,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
     );
   }
 
-  List<_CampanelloEntry> _buildBaseCampanelli() {
-    return [
-      _CampanelloEntry(
-        campanello: CampanelloData(
-          id: campanelloVenceslaoId,
-          campanelloHinooId: null,
-          ownerId: null,
-          backgroundImage: const AssetImage(campanelloSirenaBg),
-          text: Utility().campanelloExample1Text,
-          linkedHouseId: casaVenceslaoId,
-        ),
-        casa: const CasaData(
-          id: casaVenceslaoId,
-          backgroundImage: AssetImage(casaSirenaBg),
-          bgScale: 1.0,
-          bgOffsetX: 0.0,
-          bgOffsetY: 0.0,
-        ),
-      ),
-      _CampanelloEntry(
-        campanello: CampanelloData(
-          id: campanelloMariAndreeaId,
-          campanelloHinooId: null,
-          ownerId: null,
-          backgroundImage: const AssetImage(campanelloPalombaroBg),
-          text: Utility().campanelloExample2Text,
-          linkedHouseId: casaMariAndreeaId,
-        ),
-        casa: const CasaData(
-          id: casaMariAndreeaId,
-          backgroundImage: AssetImage(casaPalombaroBg),
-          bgScale: 1.0,
-          bgOffsetX: 0.0,
-          bgOffsetY: 0.0,
-        ),
-      ),
-    ];
-  }
-
   List<_CampanelloEntry> _buildCampanelli() {
     final userId = SupabaseProvider.client.auth.currentUser?.id;
     if (userId == null) {
-      return _buildBaseCampanelli();
+      return _userEntries;
     }
 
     final ownEntries = _userEntries
@@ -588,7 +536,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
   Future<void> _loadUserEntries() async {
     if (_isLoadingUserEntries) return;
     final user = SupabaseProvider.client.auth.currentUser;
-    if (user == null) return;
+    if (user == null) {
+      await _loadPublicAdminEntries();
+      return;
+    }
 
     setState(() => _isLoadingUserEntries = true);
     try {
@@ -712,6 +663,82 @@ class _CampanelliPageState extends State<CampanelliPage> {
       if (mounted) {
         setState(() => _isLoadingUserEntries = false);
       }
+    }
+  }
+
+  Future<void> _loadPublicAdminEntries() async {
+    setState(() => _isLoadingUserEntries = true);
+    try {
+      final rows = await _campanelliRepository.fetchPublicAdminCampanelli();
+      final entries = <_CampanelloEntry>[];
+      for (final rawRow in rows) {
+        if (rawRow is! Map) continue;
+        final row = Map<String, dynamic>.from(rawRow);
+        final hinooId = row['campanello_hinoo_id']?.toString() ?? '';
+        final ownerId = row['owner_id']?.toString() ?? '';
+        final pages = row['pages'];
+        if (hinooId.isEmpty ||
+            ownerId.isEmpty ||
+            pages is! List ||
+            pages.isEmpty) {
+          continue;
+        }
+        final firstPage = pages.first;
+        if (firstPage is! Map) continue;
+        final slide = HinooSlide.fromJson(Map<String, dynamic>.from(firstPage));
+        if (slide.text.trim().isEmpty) continue;
+        final casaId = 'casa_$hinooId';
+        final houseImageUrl = row['house_image_url']?.toString();
+        entries.add(
+          _CampanelloEntry(
+            campanello: CampanelloData.fromBackend(
+              row: {
+                'id': 'campanello_$hinooId',
+                'campanello_hinoo_id': hinooId,
+                'owner_id': ownerId,
+              },
+              backgroundImage: _campanelloBackgroundProvider(
+                slide.backgroundImage,
+              ),
+              text: slide.text.trim(),
+              linkedHouseId: casaId,
+              bgTransform: slide.bgTransform,
+            ),
+            casa: CasaData.fromBackend(
+              row: {'id': casaId, 'bg_transform': row['house_bg_transform']},
+              backgroundImage: _houseBackgroundProvider(
+                houseImageUrl,
+                slide.backgroundImage,
+              ),
+              bgScale: slide.bgScale,
+              bgOffsetX: slide.bgOffsetX,
+              bgOffsetY: slide.bgOffsetY,
+            ),
+            campanelloBackgroundUrl: slide.backgroundImage,
+            houseImageUrl: houseImageUrl,
+            campanelloIsTextWhite: slide.isTextWhite,
+            campanelloBgScale: slide.bgScale,
+            campanelloBgOffsetX: slide.bgOffsetX,
+            campanelloBgOffsetY: slide.bgOffsetY,
+            campanelloBgTransform: slide.bgTransform,
+          ),
+        );
+      }
+      if (mounted) {
+        setState(() {
+          _userEntries = List<_CampanelloEntry>.unmodifiable(entries);
+          _unlockedCampanelli.addAll(
+            entries.map((entry) => entry.campanello.id),
+          );
+        });
+      }
+    } catch (error, stackTrace) {
+      debugPrint(
+        '[Campanelli] public admins load failed: '
+        '${AppFailure.from(error, stackTrace)}',
+      );
+    } finally {
+      if (mounted) setState(() => _isLoadingUserEntries = false);
     }
   }
 

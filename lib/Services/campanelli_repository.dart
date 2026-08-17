@@ -10,6 +10,11 @@ class CampanelliDataRepository {
 
   final SupabaseClient _client;
 
+  Future<List<dynamic>> fetchPublicAdminCampanelli() async {
+    final rows = await _client.rpc('get_public_admin_campanelli');
+    return _asList(rows);
+  }
+
   Future<List<dynamic>> fetchHouseRows() async {
     final rows = await _client
         .from('case')
@@ -98,8 +103,11 @@ class CampanelliDataRepository {
         .not('granted_at', 'is', null);
     return _asList(rows)
         .whereType<Map>()
-        .where((row) => row['share_modes'] is List &&
-            (row['share_modes'] as List).isNotEmpty)
+        .where(
+          (row) =>
+              row['share_modes'] is List &&
+              (row['share_modes'] as List).isNotEmpty,
+        )
         .map((row) => row['target_house_tag']?.toString() ?? '')
         .where((tag) => tag.isNotEmpty)
         .toList(growable: false);
