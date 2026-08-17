@@ -152,6 +152,9 @@ class CampanelliController extends ChangeNotifier {
         entries.add(CampanelliEntry(
           hinooId: id,
           ownerId: ownerId,
+          createdAt:
+              DateTime.tryParse(houseRow['created_at']?.toString() ?? '') ??
+              DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
           text: text,
           campanelloBackgroundUrl: slide.backgroundImage,
           houseImageUrl: houseRow['house_image_url']?.toString(),
@@ -163,6 +166,13 @@ class CampanelliController extends ChangeNotifier {
           campanelloBgTransform: slide.bgTransform,
         ));
       }
+      entries.sort((a, b) {
+        final aIsOwned = a.ownerId == userId;
+        final bIsOwned = b.ownerId == userId;
+        if (aIsOwned != bIsOwned) return aIsOwned ? -1 : 1;
+        final byCreation = a.createdAt.compareTo(b.createdAt);
+        return byCreation != 0 ? byCreation : a.hinooId.compareTo(b.hinooId);
+      });
       _publish(CampanelliLoadState(
         entries: List<CampanelliEntry>.unmodifiable(entries),
         shareModesByCampanello: shareModes,

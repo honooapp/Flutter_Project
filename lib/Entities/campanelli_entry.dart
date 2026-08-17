@@ -5,6 +5,7 @@ class CampanelliEntry {
   const CampanelliEntry({
     required this.hinooId,
     required this.ownerId,
+    required this.createdAt,
     required this.text,
     required this.campanelloBackgroundUrl,
     required this.houseImageUrl,
@@ -18,6 +19,7 @@ class CampanelliEntry {
 
   final String hinooId;
   final String ownerId;
+  final DateTime createdAt;
   final String text;
   final String? campanelloBackgroundUrl;
   final String? houseImageUrl;
