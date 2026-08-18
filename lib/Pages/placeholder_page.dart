@@ -19,6 +19,7 @@ import 'viaggi_isola_page.dart';
 import 'laboratori_siae_page.dart';
 import 'podcast_dirette_page.dart';
 import 'libri_page.dart';
+import 'la_banda_page.dart';
 import 'regia_agenti_page.dart';
 
 class PlaceholderPage extends StatefulWidget {
@@ -53,6 +54,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   static const double _honooBottomSpacing = 15;
   static const double _libriTopSpacing = 5;
   static const double _libriBottomSpacing = 30;
+  static const double _laBandaTopSpacing = 5;
+  static const double _laBandaBottomSpacing = 30;
   static const double _regiaAgentiTopSpacing = 18 * 1.3;
   static const double _regiaAgentiBottomSpacing = 30;
   static const double _regiaAgentiIconSizeReduction = 15;
@@ -215,6 +218,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     const String viaggiLine = "Viaggi sull'Isola delle Storie";
     const String podcastLine = 'Podcast e dirette';
     const String libriLine = 'Libri';
+    const String laBandaLine = 'La Banda';
     const String regiaAgentiLine = 'Regia degli Agenti';
     const String venceslaoLine = 'Venceslao Cembalo';
     final String text1First = Utility().text1First;
@@ -427,6 +431,28 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           Navigator.of(
             context,
           ).push(MaterialPageRoute(builder: (_) => const ViaggiIsolaPage()));
+        },
+      ),
+      _linkTextBlock(
+        context,
+        laBandaLine,
+        baseTextStyle,
+        onTap: () {
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const LaBandaPage()));
+        },
+      ),
+      ..._materialIconBlockWithSpacing(
+        Icons.groups,
+        inlineIconHeight,
+        topSpacing: _laBandaTopSpacing,
+        bottomSpacing: _laBandaBottomSpacing,
+        color: _linkIconColor,
+        onTap: () {
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const LaBandaPage()));
         },
       ),
       _linkTextBlock(
