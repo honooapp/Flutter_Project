@@ -51,7 +51,7 @@ class LaBandaPage extends StatelessWidget {
       'che ha il compito\n'
       'di assicurarsi\n'
       'che queste tre regole\n'
-      'vengano rispettate';
+      'vengano rispettate\n\n';
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +66,7 @@ class LaBandaPage extends StatelessWidget {
       contentWidthFactor: 0.45,
       child: Text(
         laBandaText,
-        key: const Key('la_banda_text'),
+        key: const Key('section_text'),
         style: bodyStyle,
         textAlign: TextAlign.center,
       ),

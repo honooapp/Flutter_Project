@@ -107,9 +107,7 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: RegiaAgentiPage()));
     await tester.pumpAndSettle();
 
-    final text = tester.widget<Text>(
-      find.byKey(const Key('regia_agenti_text')),
-    );
+    final text = tester.widget<Text>(find.byKey(const Key('section_text')));
     expect(text.textSpan?.toPlainText(), RegiaAgentiPage.regiaAgentiText);
     expect(text.textAlign, TextAlign.center);
     expect(text.textSpan?.toPlainText(), contains('Alessandro Molina'));
@@ -120,7 +118,7 @@ void main() {
     expect(text.textSpan?.toPlainText(), isNot(contains('a tessere idee')));
     expect(
       text.textSpan?.toPlainText(),
-      endsWith('E dirigere\ngli agenti\nsignifica\nimparare\na tessere'),
+      endsWith('E dirigere\ngli agenti\nsignifica\nimparare\na tessere\n\n'),
     );
 
     final rootSpan = text.textSpan! as TextSpan;

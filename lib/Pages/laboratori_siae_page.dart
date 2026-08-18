@@ -44,7 +44,7 @@ class LaboratoriSiaePage extends StatelessWidget {
       "nel 2025\n"
       "honoo ha partecipato\n"
       "a un Bando Siae\n"
-      "E ha vinto\n";
+      "E ha vinto\n\n";
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +91,7 @@ class LaboratoriSiaePage extends StatelessWidget {
     );
 
     final List<InlineSpan> spans = [
+      TextSpan(text: 'Laboratori teatrali\n\n', style: baseTextStyle),
       TextSpan(text: 'honoo e ', style: baseTextStyle),
       TextSpan(
         text: 'Crocopie',
@@ -138,6 +139,7 @@ class LaboratoriSiaePage extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: RichText(
+                    key: const Key('section_text'),
                     textAlign: TextAlign.center,
                     text: TextSpan(children: spans),
                   ),

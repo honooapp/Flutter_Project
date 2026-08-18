@@ -18,6 +18,7 @@ class PodcastDirettePage extends StatelessWidget {
     );
 
     final List<InlineSpan> spans = [
+      TextSpan(text: 'Podcast e dirette\n\n', style: style),
       TextSpan(text: 'honoo\nsi ascolta\ne si guarda\n\n', style: style),
       TextSpan(text: 'È voce\nÈ immagine\n\n', style: style),
       TextSpan(
@@ -86,6 +87,7 @@ class PodcastDirettePage extends StatelessWidget {
     return HonooStandardPage(
       contentWidthFactor: 0.45,
       child: RichText(
+        key: const Key('section_text'),
         textAlign: TextAlign.center,
         text: TextSpan(children: spans),
       ),
