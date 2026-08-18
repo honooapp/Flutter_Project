@@ -70,16 +70,19 @@ void main() {
         'Esplorazioni lunari',
         'Feste',
         "Viaggi sull'Isola delle Storie",
+        'La Banda',
         'Regia degli Agenti',
         'Podcast e dirette',
         'Libri',
       ]),
     );
     final viaggiIndex = visibleTexts.indexOf("Viaggi sull'Isola delle Storie");
+    final laBandaIndex = visibleTexts.indexOf('La Banda');
     final regiaIndex = visibleTexts.indexOf('Regia degli Agenti');
     final podcastIndex = visibleTexts.indexOf('Podcast e dirette');
     final libriIndex = visibleTexts.indexOf('Libri');
-    expect(regiaIndex, viaggiIndex + 1);
+    expect(laBandaIndex, viaggiIndex + 1);
+    expect(regiaIndex, laBandaIndex + 1);
     expect(regiaIndex, lessThan(podcastIndex));
     expect(libriIndex, podcastIndex + 1);
 
