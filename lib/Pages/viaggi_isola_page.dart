@@ -8,6 +8,7 @@ class ViaggiIsolaPage extends StatelessWidget {
   const ViaggiIsolaPage({super.key});
 
   static const String _textAboveMap =
+      "Viaggi sull'Isola delle Storie\n\n"
       "Apri gli occhi,\n"
       "c’è l’Isola\n"
       "davanti a te\n\n"
@@ -32,7 +33,7 @@ class ViaggiIsolaPage extends StatelessWidget {
       "i leoni,\n"
       "ma questo\n"
       "lo scoprirai,\n"
-      "se ne avrai voglia\n";
+      "se ne avrai voglia\n\n";
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +48,7 @@ class ViaggiIsolaPage extends StatelessWidget {
     return HonooStandardPage(
       contentWidthFactor: 0.45,
       child: Column(
+        key: const Key('section_text'),
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(_textAboveMap, style: bodyStyle, textAlign: TextAlign.center),

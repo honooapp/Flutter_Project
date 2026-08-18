@@ -7,6 +7,7 @@ class PerformancePage extends StatelessWidget {
   const PerformancePage({super.key});
 
   static const String performanceText =
+      "Performance\n\n"
       "Venceslao Cembalo,\n"
       "Antonio Della Guardia\n"
       "e Sira Sebastianelli\n"
@@ -26,7 +27,7 @@ class PerformancePage extends StatelessWidget {
       "progettata da Ettore Sottsass\n\n"
       "Sì,\n"
       "honoo è stato invitato\n"
-      "alla Triennale\n";
+      "alla Triennale\n\n";
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +41,7 @@ class PerformancePage extends StatelessWidget {
       contentWidthFactor: 0.45,
       child: Text(
         performanceText,
+        key: const Key('section_text'),
         style: bodyStyle,
         textAlign: TextAlign.center,
       ),

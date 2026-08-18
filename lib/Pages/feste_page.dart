@@ -7,6 +7,7 @@ class FestePage extends StatelessWidget {
   const FestePage({super.key});
 
   static const String festeText =
+      "Feste\n\n"
       "Una festa di honoo\n"
       "si svolge\n"
       "in uno spazio\n"
@@ -27,7 +28,7 @@ class FestePage extends StatelessWidget {
       "il gusto della sorpresa,\n"
       "quando sarai invitato\n"
       "alla tua prima\n"
-      "festa di honoo\n";
+      "festa di honoo\n\n";
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +40,12 @@ class FestePage extends StatelessWidget {
     );
     return HonooStandardPage(
       contentWidthFactor: 0.45,
-      child: Text(festeText, style: bodyStyle, textAlign: TextAlign.center),
+      child: Text(
+        festeText,
+        key: const Key('section_text'),
+        style: bodyStyle,
+        textAlign: TextAlign.center,
+      ),
     );
   }
 }

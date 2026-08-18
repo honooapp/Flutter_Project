@@ -9,6 +9,7 @@ class LunaPage extends StatelessWidget {
   const LunaPage({super.key});
 
   static const String lunaText =
+      "Esplorazioni lunari\n\n"
       "Cosa c’è\n"
       "oggi\n"
       "sulla Luna?\n\n"
@@ -48,7 +49,7 @@ class LunaPage extends StatelessWidget {
       "se l’incantesimo del Mago\n"
       "li avesse fatti riapparire\n"
       "dalle nostre parti,\n"
-      "in questi giorni\n";
+      "in questi giorni\n\n";
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +68,12 @@ class LunaPage extends StatelessWidget {
           (route) => false,
         );
       },
-      child: Text(lunaText, style: baseTextStyle, textAlign: TextAlign.center),
+      child: Text(
+        lunaText,
+        key: const Key('section_text'),
+        style: baseTextStyle,
+        textAlign: TextAlign.center,
+      ),
     );
   }
 }

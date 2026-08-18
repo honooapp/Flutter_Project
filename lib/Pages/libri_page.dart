@@ -26,6 +26,7 @@ class LibriPage extends StatelessWidget {
     String headerText(String text) => text.replaceAll('\n', ' ').trim();
 
     final spans = <InlineSpan>[
+      TextSpan(text: 'Libri\n\n', style: style),
       TextSpan(text: intro, style: style),
       TextSpan(
         text: 'Isola delle Storie\n\n',
@@ -58,7 +59,8 @@ class LibriPage extends StatelessWidget {
               MaterialPageRoute(
                 builder: (_) => ComingSoonPage(
                   header: headerText(
-                      'Isole delle Storie\n(con illustrazioni di Joel Folda)'),
+                    'Isole delle Storie\n(con illustrazioni di Joel Folda)',
+                  ),
                   quote: '',
                   bibliography: '',
                 ),
@@ -124,7 +126,7 @@ class LibriPage extends StatelessWidget {
           },
       ),
       TextSpan(
-        text: 'Papà,\nma tu mi vuoi bene?\n',
+        text: 'Papà,\nma tu mi vuoi bene?\n\n',
         style: style.copyWith(
           decoration: TextDecoration.underline,
           fontWeight: FontWeight.w700,
@@ -147,6 +149,7 @@ class LibriPage extends StatelessWidget {
     return HonooStandardPage(
       contentWidthFactor: 0.45,
       child: RichText(
+        key: const Key('section_text'),
         textAlign: TextAlign.center,
         text: TextSpan(children: spans),
       ),

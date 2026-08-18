@@ -41,13 +41,16 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: LaBandaPage()));
     await tester.pumpAndSettle();
 
-    final text = tester.widget<Text>(find.byKey(const Key('la_banda_text')));
+    final text = tester.widget<Text>(find.byKey(const Key('section_text')));
     expect(text.data, LaBandaPage.laBandaText);
     expect(text.textAlign, TextAlign.center);
     expect(text.style?.fontSize, 18);
     expect(text.style?.height, 1.3);
     expect(text.data, startsWith('La Banda\n\nImmagina un gruppo'));
     expect(text.data, contains('Prima regola:\nparlano tutti,\na turno'));
-    expect(text.data, endsWith('che queste tre regole\nvengano rispettate'));
+    expect(
+      text.data,
+      endsWith('che queste tre regole\nvengano rispettate\n\n'),
+    );
   });
 }
