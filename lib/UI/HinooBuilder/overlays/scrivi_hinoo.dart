@@ -72,6 +72,7 @@ class _ScriviHinooOverlayState extends State<ScriviHinooOverlay> {
               cursorWidth: 3,
               cursorRadius: const Radius.circular(0),
               centerTextVertically: widget.centerTextVertically,
+              enableInlineFormatting: true,
             ),
           );
         },

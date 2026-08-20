@@ -18,6 +18,7 @@ import 'package:honoo/Utility/typographic_substitutions_formatter.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Widgets/loading_spinner.dart';
 import 'package:honoo/Widgets/gallery_save_dialog.dart';
+import 'package:honoo/Utility/inline_text_formatting.dart';
 import 'package:honoo/Widgets/cover_transform_image.dart';
 import 'package:honoo/UI/HinooBuilder/services/download_saver.dart';
 import 'package:honoo/Widgets/width_limited_multiline_field.dart';
@@ -53,6 +54,7 @@ class HonooBuilder extends StatefulWidget {
   final double? imageConfirmIconDisplaySize;
   final Future<bool> Function()? onImageConfirmed;
   final ValueChanged<bool>? onImageEditorVisibilityChanged;
+  final bool requireExplicitConfirmation;
 
   const HonooBuilder({
     super.key,
@@ -67,6 +69,7 @@ class HonooBuilder extends StatefulWidget {
     this.imageConfirmIconDisplaySize,
     this.onImageConfirmed,
     this.onImageEditorVisibilityChanged,
+    this.requireExplicitConfirmation = false,
   });
 
   @override
@@ -76,7 +79,8 @@ class HonooBuilder extends StatefulWidget {
 class HonooBuilderState extends State<HonooBuilder> {
   static const double framePadding = 12.0;
 
-  final TextEditingController _textCtrl = TextEditingController();
+  final FormattedTextEditingController _textCtrl =
+      FormattedTextEditingController();
   final FocusNode _textFocus = FocusNode();
 
   Uint8List? _imageBytes;
@@ -97,7 +101,8 @@ class HonooBuilderState extends State<HonooBuilder> {
   bool _isEditingText = false;
 
   bool get hasImage => _imageBytes != null;
-  bool get _showImageEditingToolbar => hasImage && !_imageConfirmed;
+  bool get _showImageEditingToolbar =>
+      !_imageConfirmed && (hasImage || widget.requireExplicitConfirmation);
 
   @visibleForTesting
   void setImageBytesForTesting(Uint8List bytes) {
@@ -131,7 +136,7 @@ class HonooBuilderState extends State<HonooBuilder> {
       _textCtrl.text = widget.initialText!;
     }
 
-    _textCtrl.addListener(_emitChange);
+    _textCtrl.addListener(_handleTextChanged);
     _textFocus.addListener(_handleFocusChange);
     _imageController.addListener(_handleImageTransform);
 
@@ -143,7 +148,7 @@ class HonooBuilderState extends State<HonooBuilder> {
 
   @override
   void dispose() {
-    _textCtrl.removeListener(_emitChange);
+    _textCtrl.removeListener(_handleTextChanged);
     _textCtrl.dispose();
 
     _textFocus.removeListener(_handleFocusChange);
@@ -157,6 +162,13 @@ class HonooBuilderState extends State<HonooBuilder> {
 
   void _emitChange() {
     widget.onHonooChanged?.call(_textCtrl.text, _publicImageUrl);
+  }
+
+  void _handleTextChanged() {
+    if (widget.requireExplicitConfirmation && _imageConfirmed && mounted) {
+      setState(() => _imageConfirmed = false);
+    }
+    _emitChange();
   }
 
   void _handleFocusChange() {
@@ -387,7 +399,15 @@ class HonooBuilderState extends State<HonooBuilder> {
   Future<void> _saveEditedTextAndHonoo() async {
     _textFocus.unfocus();
     _emitChange();
-    await _confirmImage();
+    if (hasImage) {
+      await _confirmImage();
+      return;
+    }
+
+    final bool saved = await widget.onImageConfirmed?.call() ?? true;
+    if (!mounted) return;
+    setState(() => _imageConfirmed = saved);
+    widget.onImageEditorVisibilityChanged?.call(!saved);
   }
 
   Future<Uint8List?> _captureHonooAsPng() async {
@@ -647,8 +667,8 @@ class HonooBuilderState extends State<HonooBuilder> {
                   preInputFormatters: const [
                     TypographicSubstitutionsFormatter(),
                   ],
-                  additionalInputFormatters: [
-                    LengthLimitingTextInputFormatter(
+                  additionalInputFormatters: const [
+                    VisibleLengthLimitingTextInputFormatter(
                       HonooBuilder.maxTextCharacters,
                     ),
                   ],
@@ -673,6 +693,7 @@ class HonooBuilderState extends State<HonooBuilder> {
                   cursorColor: Colors.black,
                   cursorWidth: 3,
                   cursorRadius: const Radius.circular(0),
+                  enableInlineFormatting: true,
                 ),
               ),
               if (widget.showCharacterCounter)
@@ -683,7 +704,9 @@ class HonooBuilderState extends State<HonooBuilder> {
                   child: IgnorePointer(
                     child: Builder(
                       builder: (_) {
-                        final int used = _textCtrl.text.characters.length;
+                        final int used = InlineTextFormatting.visibleLength(
+                          _textCtrl.text,
+                        );
                         final Color color =
                             used >= HonooBuilder.maxTextCharacters
                             ? HonooColor.secondary

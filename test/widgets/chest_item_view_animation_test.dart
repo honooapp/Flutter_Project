@@ -7,6 +7,7 @@ import 'package:honoo/UI/honoo_card.dart';
 import 'package:honoo/UI/honoo_thread_view.dart';
 import 'package:honoo/UI/unified_thread_view.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
+import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/chest_item_view.dart';
 
 import '../test_supabase_helper.dart';
@@ -37,6 +38,7 @@ void main() {
     )..dbId = 'honoo-single';
     final item = ChestItem.honoo(honoo, DateTime.parse('2026-07-25T10:00:00Z'));
 
+    final repaintKey = GlobalKey();
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -49,7 +51,7 @@ void main() {
               maxWidth: 390,
               mode: ResponsiveLayoutMode.mobile,
             ),
-            repaintKey: GlobalKey(),
+            repaintKey: repaintKey,
             hinooRepliesByRoot: const {},
             isNormalMode: true,
             isActive: true,
@@ -68,6 +70,11 @@ void main() {
     expect(find.byType(HonooCard), findsOneWidget);
     expect(find.byType(HonooThreadView), findsNothing);
     expect(find.byType(UnifiedThreadView), findsNothing);
+    final captureBoundary = tester.widget<RepaintBoundary>(
+      find.byKey(repaintKey),
+    );
+    final captureBackground = captureBoundary.child! as ColoredBox;
+    expect(captureBackground.color, HonooColor.background);
     final chestItem = find.byType(ChestItemView);
     expect(
       find.descendant(of: chestItem, matching: find.byType(AnimatedSwitcher)),

@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../Entities/campanelli_view_data.dart';
 import '../UI/hinoo_typography.dart';
 import '../Utility/honoo_colors.dart';
+import '../Utility/inline_text_formatting.dart';
 import 'cover_transform_image.dart';
 import 'text_box_download_button.dart';
 
@@ -128,7 +129,7 @@ class CampanelloCard extends StatelessWidget {
     final String raw = data.text;
     final idx = raw.toLowerCase().lastIndexOf('clicca qui');
     if (idx < 0 || onRequestTap == null) {
-      return Text(
+      return FormattedText(
         raw,
         style: textStyle,
         textAlign: TextAlign.center,

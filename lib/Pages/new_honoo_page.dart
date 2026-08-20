@@ -21,6 +21,7 @@ import '../Widgets/honoo_app_title.dart';
 import '../UI/HonooBuilder/dialogs/name_honoo_dialog.dart';
 import 'placeholder_page.dart';
 import '../Utility/responsive_layout.dart';
+import '../Utility/inline_text_formatting.dart';
 import '../Widgets/responsive_footer_bar.dart';
 import '../Widgets/conversation_notification_prompt.dart';
 import '../Widgets/repeated_reply_prompt.dart';
@@ -81,7 +82,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
       _text = text;
       _imageUrl = imageUrl;
 
-      _hasMinTextForDownload = text.trim().isNotEmpty;
+      _hasMinTextForDownload = InlineTextFormatting.hasVisibleText(text);
 
       // resetta eventuali indicatori se il contenuto è DIVERSO da quello salvato
 
@@ -103,7 +104,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
     }
 
     // 2) Validazioni minime (testo + immagine)
-    if (_text.trim().isEmpty) {
+    if (!InlineTextFormatting.hasVisibleText(_text)) {
       if (!mounted) return false;
       showHonooToast(context, message: 'Scrivi qualcosa prima di salvare.');
       return false;

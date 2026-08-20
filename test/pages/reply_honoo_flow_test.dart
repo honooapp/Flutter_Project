@@ -69,6 +69,18 @@ void main() {
       );
 
       final sendButton = find.bySemanticsLabel('Invia risposta');
+      expect(sendButton, findsNothing);
+      expect(find.byKey(const Key('honoo-save')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('honoo-save')));
+      await tester.pump();
+      expect(sendButton, findsOneWidget);
+
+      await tester.enterText(tf, 'risposta modificata');
+      await tester.pump();
+      expect(sendButton, findsNothing);
+      expect(find.byKey(const Key('honoo-save')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('honoo-save')));
+      await tester.pump();
       expect(sendButton, findsOneWidget);
 
       await tester.tap(sendButton);
@@ -141,6 +153,9 @@ void main() {
       await tester.tap(find.text('Rispondi'));
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField).first, 'risposta');
+      expect(find.bySemanticsLabel('Invia risposta'), findsNothing);
+      await tester.tap(find.byKey(const Key('honoo-save')));
+      await tester.pump();
       await tester.tap(find.bySemanticsLabel('Invia risposta'));
       await tester.pump();
       await tester.pump();

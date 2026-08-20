@@ -14,6 +14,7 @@ import '../Widgets/repeated_reply_prompt.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:honoo/Controller/honoo_controller.dart';
 import 'chest_page.dart';
+import '../Utility/inline_text_formatting.dart';
 
 class ReplyHonooPage extends StatefulWidget {
   final Honoo originalHonoo;
@@ -43,12 +44,28 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
 
   bool _isSending = false;
   bool _sentOnce = false;
+  bool _isReplyConfirmed = false;
 
   void _onHonooChanged(String text, String? imageUrl) {
     setState(() {
       _text = text;
       _imageUrl = imageUrl;
+      _isReplyConfirmed = false;
     });
+  }
+
+  Future<bool> _confirmReply() async {
+    if (!InlineTextFormatting.hasVisibleText(_text)) {
+      if (mounted) {
+        showHonooToast(
+          context,
+          message: 'Scrivi qualcosa prima di confermare.',
+        );
+      }
+      return false;
+    }
+    if (mounted) setState(() => _isReplyConfirmed = true);
+    return true;
   }
 
   Future<void> _sendReply() async {
@@ -61,7 +78,7 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
       );
       return;
     }
-    if (_text.trim().isEmpty) return;
+    if (!InlineTextFormatting.hasVisibleText(_text)) return;
 
     setState(() => _isSending = true);
 
@@ -170,6 +187,8 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
                 initialText: null,
                 textHint: widget.initialHintText,
                 imageHint: widget.initialImageHint,
+                onImageConfirmed: _confirmReply,
+                requireExplicitConfirmation: true,
               ),
             ),
             SizedBox(height: 2.h),
@@ -188,18 +207,19 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
                   tooltip: 'Indietro',
                   onPressed: () => Navigator.pop(context, false),
                 ),
-                ResponsiveFooterAction(
-                  asset: "assets/icons/reply.svg",
-                  semanticsLabel: 'Invia risposta',
-                  size: 44,
-                  splashRadius: 28,
-                  tooltip: 'Invia risposta',
-                  colorFilter: const ColorFilter.mode(
-                    Colors.white,
-                    BlendMode.srcIn,
+                if (_isReplyConfirmed)
+                  ResponsiveFooterAction(
+                    asset: "assets/icons/reply.svg",
+                    semanticsLabel: 'Invia risposta',
+                    size: 44,
+                    splashRadius: 28,
+                    tooltip: 'Invia risposta',
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
+                    onPressed: _isSending ? null : _sendReply,
                   ),
-                  onPressed: _isSending ? null : _sendReply,
-                ),
               ],
             ),
             if (_isSending)

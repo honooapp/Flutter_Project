@@ -7,6 +7,7 @@ import 'package:honoo/Services/hinoo_storage_uploader.dart';
 import 'package:honoo/Services/duplication_result.dart';
 
 import '../Entities/hinoo.dart';
+import '../Utility/inline_text_formatting.dart';
 
 enum HinooMoonResult { published, alreadyPresent }
 
@@ -26,8 +27,7 @@ class HinooController {
       if (bg.isEmpty) {
         errors.add('$subject deve avere uno sfondo caricato.');
       }
-      final text = slide.text.trim();
-      if (text.isEmpty) {
+      if (!InlineTextFormatting.hasVisibleText(slide.text)) {
         errors.add('$subject deve avere un testo.');
       }
     }
@@ -45,12 +45,17 @@ class HinooController {
       fingerprint(draft) != lastSavedFingerprint;
 
   /// Caricamento sfondo a storage (builder chiama questo con i bytes scelti)
-  Future<String> uploadBackgroundBytes(Uint8List bytes,
-      {required String ext}) async {
+  Future<String> uploadBackgroundBytes(
+    Uint8List bytes, {
+    required String ext,
+  }) async {
     _ensureLoggedIn();
     final userId = SupabaseProvider.client.auth.currentUser!.id;
     return HinooStorageUploader.uploadBytes(
-        bytes: bytes, filenameExt: ext, userId: userId);
+      bytes: bytes,
+      filenameExt: ext,
+      userId: userId,
+    );
   }
 
   /// Salvataggio nello scrigno (type personal/answer)

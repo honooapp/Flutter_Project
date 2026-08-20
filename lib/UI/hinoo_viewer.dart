@@ -7,6 +7,7 @@ import 'package:honoo/Services/supabase_provider.dart';
 import '../Entities/hinoo.dart';
 import 'hinoo_typography.dart';
 import '../Utility/honoo_colors.dart';
+import '../Utility/inline_text_formatting.dart';
 import '../Utility/network_image_prefetch.dart';
 import '../Widgets/smooth_image.dart';
 import '../Widgets/cover_transform_image.dart';
@@ -318,7 +319,7 @@ class HinooSlideView extends StatelessWidget {
     final Widget? downloadOverlay = onDownloadTap == null
         ? null
         : TextBoxDownloadButton(onPressed: onDownloadTap!, tooltip: 'download');
-    final Widget text = Text(
+    final Widget text = FormattedText(
       slide.text,
       textAlign: TextAlign.center,
       style: effectiveStyle,

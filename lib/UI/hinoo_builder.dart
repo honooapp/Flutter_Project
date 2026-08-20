@@ -10,6 +10,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:honoo/Utility/inline_text_formatting.dart';
 import 'package:flutter/rendering.dart';
 
 import 'HinooBuilder/overlays/cambia_sfondo.dart';
@@ -75,7 +76,8 @@ class _HinooBuilderState extends State<HinooBuilder> {
   // Core
   final GlobalKey _captureKey =
       GlobalKey(); // SOLO il canvas è sotto questa key
-  final TextEditingController _textController = TextEditingController();
+  final FormattedTextEditingController _textController =
+      FormattedTextEditingController();
   final FocusNode _textFocus = FocusNode();
 
   // Modello semplificato (sostituisci "dynamic" con il tuo tipo Slide/Page)
@@ -468,7 +470,9 @@ class _HinooBuilderState extends State<HinooBuilder> {
       'pages': _pages, // sostituisci col tuo tipo slide/pagina
       'currentIndex': _current,
       'text': _textController.text,
-      'textLength': _textController.text.trim().length,
+      'textLength': InlineTextFormatting.visibleText(
+        _textController.text,
+      ).trim().length,
       'textColor': _txtColor.toARGB32(),
       'hasBg': _localBgPreviewBytes != null || _bgPublicUrl != null,
       'bgUrl': _bgPublicUrl,

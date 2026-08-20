@@ -7,6 +7,7 @@ import '../Entities/honoo.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import '../Utility/chest_content_style.dart';
 import '../Utility/honoo_colors.dart';
+import '../Utility/inline_text_formatting.dart';
 import '../Widgets/smooth_image.dart';
 import '../Widgets/text_box_download_button.dart';
 
@@ -125,7 +126,7 @@ class HonooCard extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.all(8),
                           child: Center(
-                            child: Text(
+                            child: FormattedText(
                               honoo.text,
                               textAlign: TextAlign.center,
                               style: GoogleFonts.arvo(
@@ -136,6 +137,7 @@ class HonooCard extends StatelessWidget {
                               ),
                               maxLines: 5,
                               overflow: TextOverflow.visible,
+                              softWrap: false,
                             ),
                           ),
                         ),

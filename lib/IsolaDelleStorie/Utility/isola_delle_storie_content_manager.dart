@@ -160,6 +160,7 @@ ogni settimana ti assegnerò\nun esercizio,\nda svolgere nelle tre fasi,\n<b>scr
   static const String fullIslandHeadDescription = "Isola delle Storie";
 
   static RichText getRichText(String text) {
+    text = withoutParagraphTrailingPeriods(text);
     List<String> splitted = text.split("<b>");
     List<TextSpan> textSpans = [];
     for (int i = 0; i < splitted.length; i++) {
@@ -191,5 +192,12 @@ ogni settimana ti assegnerò\nun esercizio,\nda svolgere nelle tre fasi,\n<b>scr
       text: TextSpan(children: textSpans),
       textAlign: TextAlign.center,
     );
+  }
+
+  static String withoutParagraphTrailingPeriods(String text) {
+    return text.replaceAllMapped(RegExp(r'\.(\n\n|$)'), (match) {
+      final isEllipsis = match.start > 0 && text[match.start - 1] == '.';
+      return isEllipsis ? match.group(0)! : match.group(1)!;
+    });
   }
 }

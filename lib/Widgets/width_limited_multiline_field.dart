@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../Utility/inline_text_formatting.dart';
+
 class WidthLimitedMultilineField extends StatefulWidget {
   const WidthLimitedMultilineField({
     super.key,
@@ -37,6 +39,7 @@ class WidthLimitedMultilineField extends StatefulWidget {
     this.scrollPadding,
     this.allowFontShrink = false,
     this.centerTextVertically = true,
+    this.enableInlineFormatting = false,
   });
 
   final TextEditingController controller;
@@ -70,6 +73,7 @@ class WidthLimitedMultilineField extends StatefulWidget {
   final EdgeInsets? scrollPadding;
   final bool allowFontShrink;
   final bool centerTextVertically;
+  final bool enableInlineFormatting;
 
   @override
   State<WidthLimitedMultilineField> createState() =>
@@ -150,6 +154,7 @@ class _WidthLimitedMultilineFieldState
 
   /// misura la larghezza di UNA riga con il font corrente
   double _measureLineWidth(String line) {
+    line = InlineTextFormatting.visibleText(line);
     if (line.isEmpty) return 0.0;
 
     final painter = TextPainter(
@@ -176,7 +181,8 @@ class _WidthLimitedMultilineFieldState
     }
 
     // se il testo è molto sotto al limite caratteri → torna al font base
-    if (fullText.length < widget.maxCharsPerLine ~/ 2 &&
+    if (InlineTextFormatting.visibleLength(fullText) <
+            widget.maxCharsPerLine ~/ 2 &&
         _currentFontSize < _baseFontSize) {
       setState(() => _currentFontSize = _baseFontSize);
     }
@@ -207,7 +213,7 @@ class _WidthLimitedMultilineFieldState
 
       for (final line in lines) {
         // 1) limite caratteri rigido (conta i caratteri visivi)
-        if (line.characters.length > widget.maxCharsPerLine) {
+        if (InlineTextFormatting.visibleLength(line) > widget.maxCharsPerLine) {
           return oldValue;
         }
 
@@ -219,8 +225,10 @@ class _WidthLimitedMultilineFieldState
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!mounted) return;
               setState(() {
-                _currentFontSize =
-                    (_currentFontSize - 1).clamp(_minFontSize, _baseFontSize);
+                _currentFontSize = (_currentFontSize - 1).clamp(
+                  _minFontSize,
+                  _baseFontSize,
+                );
               });
             });
             return newValue; // permetti il carattere, poi ridisegni più piccolo
@@ -239,15 +247,20 @@ class _WidthLimitedMultilineFieldState
   Widget build(BuildContext context) {
     Widget field = LayoutBuilder(
       builder: (context, constraints) {
-        final double maxWidth =
-            constraints.maxWidth.isFinite ? constraints.maxWidth : 0;
-        final double maxHeight =
-            constraints.maxHeight.isFinite ? constraints.maxHeight : 0;
+        final double maxWidth = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : 0;
+        final double maxHeight = constraints.maxHeight.isFinite
+            ? constraints.maxHeight
+            : 0;
 
-        final String textForLayout =
-            widget.controller.text.isEmpty ? ' ' : widget.controller.text;
-        final double usableWidth =
-            math.max(1, maxWidth - widget.horizontalPadding.horizontal);
+        final String textForLayout = widget.controller.text.isEmpty
+            ? ' '
+            : InlineTextFormatting.visibleText(widget.controller.text);
+        final double usableWidth = math.max(
+          1,
+          maxWidth - widget.horizontalPadding.horizontal,
+        );
 
         final textStyle = widget.style.copyWith(fontSize: _currentFontSize);
 
@@ -272,7 +285,8 @@ class _WidthLimitedMultilineFieldState
           padTop = math.max(0, (maxHeight - textHeight) / 2);
         }
 
-        final bool shouldAdjust = _pendingScroll ||
+        final bool shouldAdjust =
+            _pendingScroll ||
             _lastPadTop == null ||
             (padTop - _lastPadTop!).abs() > 0.5;
         if (shouldAdjust) {
@@ -305,7 +319,7 @@ class _WidthLimitedMultilineFieldState
           ...?widget.additionalInputFormatters,
         ];
 
-        return TextField(
+        final textField = TextField(
           controller: widget.controller,
           focusNode: widget.focusNode,
           style: textStyle,
@@ -335,14 +349,55 @@ class _WidthLimitedMultilineFieldState
           onSubmitted: widget.onSubmitted,
           autofillHints: widget.autofillHints,
         );
+        if (!widget.enableInlineFormatting ||
+            widget.readOnly ||
+            widget.enabled == false) {
+          return textField;
+        }
+        return Focus(
+          canRequestFocus: false,
+          skipTraversal: true,
+          onKeyEvent: _handleFormattingKey,
+          child: textField,
+        );
       },
     );
 
     if (widget.hardConstraints != null) {
-      field =
-          ConstrainedBox(constraints: widget.hardConstraints!, child: field);
+      field = ConstrainedBox(
+        constraints: widget.hardConstraints!,
+        child: field,
+      );
     }
 
     return field;
+  }
+
+  KeyEventResult _handleFormattingKey(FocusNode node, KeyEvent event) {
+    final keyboard = HardwareKeyboard.instance;
+    if (keyboard.isControlPressed ||
+        keyboard.isMetaPressed ||
+        keyboard.isAltPressed) {
+      return KeyEventResult.ignored;
+    }
+
+    final style = switch (event.logicalKey) {
+      LogicalKeyboardKey.keyC => InlineTextStyle.italic,
+      LogicalKeyboardKey.keyB => InlineTextStyle.bold,
+      _ => null,
+    };
+    if (style == null || widget.controller.selection.isCollapsed) {
+      return KeyEventResult.ignored;
+    }
+
+    if (event is KeyDownEvent) _toggleFormat(style);
+    return KeyEventResult.handled;
+  }
+
+  void _toggleFormat(InlineTextStyle style) {
+    final updated = InlineTextFormatting.toggle(widget.controller.value, style);
+    if (updated == widget.controller.value) return;
+    widget.controller.value = updated;
+    widget.focusNode?.requestFocus();
   }
 }

@@ -23,6 +23,7 @@ import '../Entities/chest_item.dart';
 import '../Entities/hinoo_thread_entry.dart';
 import '../Entities/reply_navigation_result.dart';
 import '../Entities/casa_share_mode.dart';
+import '../Utility/inline_text_formatting.dart';
 
 import '../Utility/honoo_colors.dart';
 import '../Utility/chest_content_style.dart';
@@ -1026,7 +1027,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
       honoo: (_) => true,
       hinoo: (row) {
         final int totalChars = row.draft.pages
-            .map((p) => p.text.trim().length)
+            .map((p) => InlineTextFormatting.visibleText(p.text).trim().length)
             .fold<int>(0, (a, b) => a + b);
         return totalChars >= 1;
       },

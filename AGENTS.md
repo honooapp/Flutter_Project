@@ -120,9 +120,10 @@ Golden tests rely on `test/test_config.dart` (fixes DPI). If fonts cause 400s, p
 
 * **GitHub Pages** is the hosting surface.
   - Workflow: `.github/workflows/deploy-gh-pages.yml`.
-  - Trigger: manual dispatch only, with `DEPLOY` confirmation and a commit reachable from `main`.
-  - Optional database migration gate runs before the web build; publishing starts only after it succeeds.
-  - Steps: validate release → optional Supabase migrations → Flutter web release build → upload native Pages artifact → deploy via `actions/deploy-pages`.
+  - Primary trigger: a direct push to `main` through `bash tool/deploy_main.sh`; manual dispatch remains available for re-releases.
+  - Required gate: migration validation → Flutter analysis → unit/widget tests → read-only Supabase staging tests. Publishing starts only after every check succeeds.
+  - Production migrations are detected from the pushed diff and applied before the frontend. The protected `production` environment is involved only when migrations are present.
+  - Steps: validate release → analyze and test → optional Supabase migrations → Flutter web release build → upload native Pages artifact → deploy via `actions/deploy-pages`.
   - Environments: `production` for migrations and `github-pages` for the native Pages deployment; required reviewers are recommended.
   - Repository setting: **Settings → Pages → Build and deployment → Source** must be set to **GitHub Actions** once after migration from branch publishing.
   - Secrets needed for every release: `PROD_SUPABASE_URL`, `PROD_SUPABASE_ANON_KEY`. Migration releases also need `SUPABASE_ACCESS_TOKEN`, `PROD_SUPABASE_PROJECT_REF`, `PROD_SUPABASE_DB_PASSWORD`.
@@ -134,10 +135,10 @@ Golden tests rely on `test/test_config.dart` (fixes DPI). If fonts cause 400s, p
 ## 9. CI Workflows
 
 * **Supabase Tests (`supabase-tests.yml`)**
-  - `push` to `main` and every PR.
+  - Every PR and manual dispatch. The direct-main release workflow runs the required checks itself to avoid duplicate CI jobs.
   - Jobs: analysis + staging read-only suite, optional CRUD (manual).
 * **Deploy to Pages (`deploy-gh-pages.yml`)**
-  - Manual only; validates the selected `main` commit and gates build/deploy on optional production migrations.
+  - Runs automatically on `main`; validates the immutable commit and gates build/deploy on analysis, tests and optional production migrations.
   - Publishes `build/web` through the native GitHub Pages artifact and deployment actions; it does not write a `gh-pages` branch.
 * **Live Supabase E2E (`live-supabase-e2e.yml`)**
   - Scheduled daily and manually dispatchable against staging.
@@ -175,9 +176,11 @@ Keep workflows in sync with Flutter version upgrades — all install Flutter 3.4
 5. Launch web app with correct `--dart-define` values.
 6. Implement feature / fix, keeping builders’ validation intact.
 7. Add / update tests where applicable.
-8. `flutter test` and (if relevant) run Supabase smoke suite.
-9. Commit with clear message; open PR targeting `main`.
-10. Merge to `main`, then manually dispatch `Deploy to GitHub Pages` with the target commit and `DEPLOY` confirmation.
+8. During development, run only the targeted tests needed by the change.
+9. Stage only task-related files and create one clear commit. Do not open a PR unless direct push is rejected, history is not a fast-forward, or the user explicitly requests review.
+10. Run `bash tool/deploy_main.sh`. The script pushes the exact clean commit to `main`; CI performs the full analysis/test gate and deploys automatically only when green. Monitor that single workflow through completion.
+
+This is the default implementation workflow because it minimizes agent/tool turns: targeted local checks while editing, one commit, one deploy command, one CI watch. Do not repeat the complete test suite locally unless diagnosing a failure or the change is high-risk.
 
 ---
 
@@ -199,7 +202,10 @@ flutter build web --release \
   --dart-define=SUPABASE_URL=... \
   --dart-define=SUPABASE_ANON_KEY=...
 
-# Safe production release (prefer the GitHub UI when approvals are enabled)
+# Primary verified release: clean commit -> main -> tests -> deploy
+bash tool/deploy_main.sh
+
+# Manual re-release of a commit already on main
 gh workflow run deploy-gh-pages.yml \
   -f release_ref=<main-commit> \
   -f confirm_production=DEPLOY \

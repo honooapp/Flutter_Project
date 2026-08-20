@@ -51,7 +51,9 @@ I test live leggono variabili d'ambiente o il file JSON locale `live.env`; le va
 
 ## Build e rilascio
 
-Il deploy GitHub Pages è esclusivamente manuale tramite il workflow `Deploy to GitHub Pages`. Richiede la conferma `DEPLOY`, valida che il commit scelto appartenga a `main`, applica opzionalmente le migrazioni Supabase e pubblica solo dopo il loro successo. Il workflow usa l'environment GitHub `production`, che deve avere approvazioni e secret configurati.
+Il flusso principale di rilascio è diretto: dopo avere creato un commit pulito e aggiornato rispetto a `origin/main`, eseguire `bash tool/deploy_main.sh`. Lo script pubblica quel commit su `main`; il workflow `Safe production release` esegue analisi statica, test unitari/widget e test Supabase in sola lettura, quindi pubblica GitHub Pages soltanto se tutti i controlli sono verdi. Le migrazioni vengono rilevate e applicate automaticamente; solo in quel caso interviene l'environment protetto `production`.
+
+Il trigger manuale resta disponibile per ripubblicare un commit già presente su `main`, con conferma `DEPLOY`.
 
 ```bash
 fvm flutter build web --release \

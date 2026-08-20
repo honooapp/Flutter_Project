@@ -11,6 +11,7 @@ import '../UI/hinoo_viewer.dart';
 import '../UI/honoo_card.dart';
 import '../UI/unified_thread_view.dart';
 import '../Utility/chest_content_style.dart';
+import '../Utility/honoo_colors.dart';
 import '../Utility/responsive_layout.dart';
 
 class ChestItemView extends StatelessWidget {
@@ -96,7 +97,13 @@ class ChestItemView extends StatelessWidget {
             child: SizedBox(
               width: cardWidth,
               child: isHonoo
-                  ? RepaintBoundary(key: repaintKey, child: content)
+                  ? RepaintBoundary(
+                      key: repaintKey,
+                      child: ColoredBox(
+                        color: HonooColor.background,
+                        child: content,
+                      ),
+                    )
                   : content,
             ),
           );

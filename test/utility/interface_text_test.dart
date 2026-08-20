@@ -35,6 +35,15 @@ void main() {
     },
   );
 
+  test('le descrizioni dell’Isola non mostrano punti a fine paragrafo', () {
+    const source = 'Primo paragrafo.\n\nSecondo paragrafo.\n\nAttendi...';
+
+    expect(
+      IsolaDelleStoreContentManager.withoutParagraphTrailingPeriods(source),
+      'Primo paragrafo\n\nSecondo paragrafo\n\nAttendi...',
+    );
+  });
+
   test('il testo di sostegno mantiene uno spazio finale', () {
     expect(Utility().sostieniText, endsWith('li consiglio bene\n\n'));
   });
