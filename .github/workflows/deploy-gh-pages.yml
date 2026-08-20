@@ -222,6 +222,7 @@ jobs:
   deploy-pages:
     name: Deploy GitHub Pages
     needs: build-pages
+    if: ${{ always() && needs.build-pages.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       pages: write
