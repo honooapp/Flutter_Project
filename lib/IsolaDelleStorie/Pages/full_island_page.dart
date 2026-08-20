@@ -49,10 +49,13 @@ class _FullIslandPageState extends State<FullIslandPage> {
                     color: HonooColor.wave1.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(8.0),
                   ),
-                  child: const SingleChildScrollView(
-                    physics: BouncingScrollPhysics(),
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
                     child: FormattedText(
-                      inputText: IsolaDelleStoreContentManager.e00,
+                      inputText:
+                          IsolaDelleStoreContentManager.withoutParagraphTrailingPeriods(
+                            IsolaDelleStoreContentManager.e00,
+                          ),
                       color: HonooColor.onBackground,
                       fontSize: 18,
                     ),

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:honoo/IsolaDelleStorie/Controller/exercise_controller.dart';
 import 'package:honoo/IsolaDelleStorie/Entities/exercise.dart';
+import 'package:honoo/IsolaDelleStorie/Utility/isola_delle_storie_content_manager.dart';
 import 'package:honoo/Utility/formatted_text.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -232,7 +233,10 @@ class _ExercisePageState extends State<ExercisePage> {
         physics: const BouncingScrollPhysics(),
         children: [
           FormattedText(
-            inputText: _exercise.exerciseDescription,
+            inputText: IsolaDelleStoreContentManager
+                .withoutParagraphTrailingPeriods(
+                  _exercise.exerciseDescription,
+                ),
             color: HonooColor.onBackground,
             fontSize: 18,
           ),
@@ -344,7 +348,10 @@ class _ExercisePageState extends State<ExercisePage> {
           // }),
           if (_exercise.exerciseDescriptionMore != null)
             FormattedText(
-              inputText: _exercise.exerciseDescriptionMore ?? "",
+              inputText: IsolaDelleStoreContentManager
+                  .withoutParagraphTrailingPeriods(
+                    _exercise.exerciseDescriptionMore ?? "",
+                  ),
               color: HonooColor.onBackground,
               fontSize: 18,
             ),

@@ -36,11 +36,29 @@ void main() {
   );
 
   test('le descrizioni dell’Isola non mostrano punti a fine paragrafo', () {
-    const source = 'Primo paragrafo.\n\nSecondo paragrafo.\n\nAttendi...';
+    const source = 'Primo paragrafo.\n\n<b>Secondo paragrafo.<b>\n\nAttendi...';
 
     expect(
       IsolaDelleStoreContentManager.withoutParagraphTrailingPeriods(source),
-      'Primo paragrafo\n\nSecondo paragrafo\n\nAttendi...',
+      'Primo paragrafo\n\n<b>Secondo paragrafo<b>\n\nAttendi...',
+    );
+  });
+
+  test('preserva i puntini di sospensione prima della chiusura di stile', () {
+    expect(
+      IsolaDelleStoreContentManager.withoutParagraphTrailingPeriods(
+        '<b>Attendi...<b>\n\nPoi continua.',
+      ),
+      '<b>Attendi...<b>\n\nPoi continua',
+    );
+  });
+
+  test('rimuove il punto dall’ultimo paragrafo prima della riga finale', () {
+    expect(
+      IsolaDelleStoreContentManager.withoutParagraphTrailingPeriods(
+        'Ultimo paragrafo.\n',
+      ),
+      'Ultimo paragrafo\n',
     );
   });
 

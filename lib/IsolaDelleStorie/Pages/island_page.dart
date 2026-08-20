@@ -56,8 +56,10 @@ class _IslandPageState extends State<IslandPage> {
                       builder: (context) {
                         const String firstMarker = 'in forme più complesse';
                         const String secondMarker = '<b>bianco<b> o <b>nero<b>';
-                        final String full = IsolaDelleStoreContentManager.e00
-                            .replaceAll('.', '');
+                        final String full =
+                            IsolaDelleStoreContentManager.withoutParagraphTrailingPeriods(
+                              IsolaDelleStoreContentManager.e00,
+                            );
                         final int firstMarkerIndex = full.indexOf(firstMarker);
                         final int secondMarkerIndex = full.indexOf(
                           secondMarker,

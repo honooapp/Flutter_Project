@@ -195,9 +195,14 @@ ogni settimana ti assegnerò\nun esercizio,\nda svolgere nelle tre fasi,\n<b>scr
   }
 
   static String withoutParagraphTrailingPeriods(String text) {
-    return text.replaceAllMapped(RegExp(r'\.(\n\n|$)'), (match) {
-      final isEllipsis = match.start > 0 && text[match.start - 1] == '.';
-      return isEllipsis ? match.group(0)! : match.group(1)!;
-    });
+    return text.replaceAllMapped(
+      RegExp(
+        r'\.(?=(?:<(?:b|i|l|lb)>)*[ \t]*(?:(?:\r?\n[ \t]*){2,}|(?:\r?\n[ \t]*)?$))',
+      ),
+      (match) {
+        final isEllipsis = match.start > 0 && text[match.start - 1] == '.';
+        return isEllipsis ? match.group(0)! : '';
+      },
+    );
   }
 }

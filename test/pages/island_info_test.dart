@@ -52,7 +52,19 @@ void main() {
     expect(textParts.first.trimRight(), endsWith('in forme più complesse'));
     expect(textParts[1].trimRight(), endsWith('<b>bianco<b> o <b>nero<b>'));
     expect(textParts.last.trim(), isNotEmpty);
-    expect(textParts.join(), isNot(contains('.')));
+    final fullText = textParts.join();
+    expect(fullText, contains('— Hai il presente. Non ti basta?'));
+    expect(fullText, contains('18.00'));
+    expect(
+      fullText,
+      isNot(
+        matches(
+          RegExp(
+            r'(?<!\.)\.(?=(?:<(?:b|i|l|lb)>)*[ \t]*(?:(?:\r?\n[ \t]*){2,}|(?:\r?\n[ \t]*)?$))',
+          ),
+        ),
+      ),
+    );
 
     final infoColumn = tester.widget<Column>(infoContent);
     final hinooExampleIndex = infoColumn.children.indexWhere(
