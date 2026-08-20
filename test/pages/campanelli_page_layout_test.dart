@@ -5,6 +5,7 @@ import 'package:honoo/Widgets/campanelli_footer.dart';
 import 'package:honoo/Widgets/campanello_card.dart';
 import 'package:honoo/Widgets/casa_section.dart';
 import 'package:honoo/Widgets/desktop_carousel_arrows.dart';
+import 'package:mocktail/mocktail.dart';
 
 import '../test_supabase_helper.dart';
 
@@ -73,7 +74,52 @@ void main() {
   testWidgets('Campanelli mantiene la struttura su viewport desktop', (
     tester,
   ) async {
+    harness.disableOverrides();
+    harness = SupabaseTestHarness(withAuthenticatedUser: true);
+    harness.enableOverrides();
+    final houses = harness.stubTable('case');
+    final settings = harness.stubTable('house_share_settings');
+    final hinoo = harness.stubTable('hinoo');
+    final houseAccess = harness.stubTable('house_access');
+    final houseInvites = harness.stubTable('house_invites');
+    when(() => harness.user.email).thenReturn('utente@example.com');
+    when(
+      () => houseAccess.not('granted_at', 'is', null),
+    ).thenAnswer((_) => houseAccess);
+    houses.queueResponse(const [
+      {
+        'campanello_hinoo_id': 'owned',
+        'owner_id': 'test_user',
+        'created_at': '2026-08-20T10:00:00Z',
+      },
+      {
+        'campanello_hinoo_id': 'other',
+        'owner_id': 'other_user',
+        'created_at': '2026-08-19T10:00:00Z',
+      },
+    ]);
+    settings.queueResponse(const []);
+    hinoo.queueResponse(const [
+      {
+        'id': 'owned',
+        'pages': [
+          {'text': 'Il mio campanello'},
+        ],
+      },
+      {
+        'id': 'other',
+        'pages': [
+          {'text': 'Un altro campanello'},
+        ],
+      },
+    ]);
+    houseAccess
+      ..queueResponse(const [])
+      ..queueResponse(const []);
+    houseInvites.queueResponse(const []);
+
     await pumpAtSize(tester, const Size(1200, 900));
+    await tester.pumpAndSettle();
 
     expect(find.byType(CampanelloCard), findsOneWidget);
     expect(find.byType(CampanelliFooter), findsOneWidget);

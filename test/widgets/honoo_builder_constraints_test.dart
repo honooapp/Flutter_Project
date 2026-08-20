@@ -21,10 +21,14 @@ void main() {
 
     final field = find.byType(EditableText);
     expect(field, findsOneWidget);
-    final line = List.filled(28, 'a').join();
+    // Usa glifi stretti: il test isola il limite totale senza superare prima
+    // il vincolo fisico di larghezza applicato a ogni riga.
+    final line = List.filled(28, 'i').join();
     final accepted = List.filled(5, line).join('\n');
     expect(accepted.characters.length, HonooBuilder.maxTextCharacters);
 
+    await tester.enterText(field, accepted);
+    await tester.pump();
     await tester.enterText(field, '${accepted}x');
     await tester.pump();
 
