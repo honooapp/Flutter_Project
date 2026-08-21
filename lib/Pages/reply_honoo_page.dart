@@ -176,8 +176,10 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: HonooColor.background,
       body: SafeArea(
+        maintainBottomViewPadding: true,
         child: Column(
           children: [
             const SizedBox(height: 52, child: Center(child: HonooAppTitle())),

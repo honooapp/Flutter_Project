@@ -314,6 +314,8 @@ class _WidthLimitedMultilineFieldState
         final int? effectiveMinLines = expands ? null : widget.minLines;
 
         final List<TextInputFormatter> allFormatters = [
+          if (widget.enableInlineFormatting)
+            const InlineFormattingShortcutTextInputFormatter(),
           ...?widget.preInputFormatters,
           _createWidthLimitFormatter(usableWidth),
           ...?widget.additionalInputFormatters,

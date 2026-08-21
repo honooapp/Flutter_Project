@@ -69,6 +69,39 @@ void main() {
     );
   });
 
+  test('la tastiera virtuale interpreta C e B sulla selezione', () {
+    const formatter = InlineFormattingShortcutTextInputFormatter();
+    const selected = TextEditingValue(
+      text: 'Una parola',
+      selection: TextSelection(baseOffset: 4, extentOffset: 10),
+    );
+
+    final italic = formatter.formatEditUpdate(
+      selected,
+      const TextEditingValue(
+        text: 'Una c',
+        selection: TextSelection.collapsed(offset: 5),
+      ),
+    );
+    expect(italic.text, contains(InlineTextFormatting.italicMarker));
+    expect(InlineTextFormatting.visibleText(italic.text), selected.text);
+
+    final replacement = italic.text.replaceRange(
+      italic.selection.start,
+      italic.selection.end,
+      'B',
+    );
+    final both = formatter.formatEditUpdate(
+      italic,
+      TextEditingValue(
+        text: replacement,
+        selection: TextSelection.collapsed(offset: italic.selection.start + 1),
+      ),
+    );
+    expect(both.text, contains(InlineTextFormatting.boldMarker));
+    expect(InlineTextFormatting.visibleText(both.text), selected.text);
+  });
+
   testWidgets('i tasti C e B formattano la selezione', (tester) async {
     final controller = FormattedTextEditingController(text: 'Una parola');
     final focusNode = FocusNode();
@@ -104,6 +137,48 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.keyB);
     await tester.pump();
     expect(controller.text, contains(InlineTextFormatting.boldMarker));
+    expect(InlineTextFormatting.visibleText(controller.text), 'Una parola');
+  });
+
+  testWidgets('l input della tastiera virtuale formatta la selezione', (
+    tester,
+  ) async {
+    final controller = FormattedTextEditingController(text: 'Una parola');
+    final focusNode = FocusNode();
+    addTearDown(controller.dispose);
+    addTearDown(focusNode.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 320,
+            height: 160,
+            child: WidthLimitedMultilineField(
+              controller: controller,
+              focusNode: focusNode,
+              style: const TextStyle(fontSize: 18),
+              maxLines: 5,
+              maxCharsPerLine: 32,
+              enableInlineFormatting: true,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    focusNode.requestFocus();
+    await tester.pump();
+    controller.selection = const TextSelection(baseOffset: 4, extentOffset: 10);
+    tester.testTextInput.updateEditingValue(
+      const TextEditingValue(
+        text: 'Una C',
+        selection: TextSelection.collapsed(offset: 5),
+      ),
+    );
+    await tester.pump();
+
+    expect(controller.text, contains(InlineTextFormatting.italicMarker));
     expect(InlineTextFormatting.visibleText(controller.text), 'Una parola');
   });
 }

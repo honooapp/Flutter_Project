@@ -5,6 +5,7 @@ import 'package:honoo/Pages/chest_page.dart';
 import 'package:honoo/Pages/reply_honoo_page.dart';
 import 'package:honoo/Entities/honoo.dart';
 import 'package:honoo/Entities/reply_navigation_result.dart';
+import 'package:honoo/UI/honoo_builder.dart';
 import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:sizer/sizer.dart';
@@ -34,6 +35,39 @@ void main() {
   tearDown(() {
     harness.disableOverrides();
   });
+
+  testWidgets(
+    'ReplyHonooPage mantiene le dimensioni quando si apre la tastiera',
+    (tester) async {
+      final original = Honoo(
+        1,
+        '“Testo origine”',
+        '',
+        '2024-01-01T00:00:00Z',
+        '2024-01-01T00:00:00Z',
+        'user_1',
+        HonooType.moon,
+      );
+
+      await tester.pumpWidget(
+        Sizer(
+          builder: (context, orientation, deviceType) {
+            return MaterialApp(home: ReplyHonooPage(originalHonoo: original));
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final builder = find.byType(HonooBuilder);
+      final sizeBeforeKeyboard = tester.getSize(builder);
+
+      await tester.tap(find.byType(TextField).first);
+      tester.view.viewInsets = const FakeViewPadding(bottom: 320);
+      await tester.pump();
+
+      expect(tester.getSize(builder), sizeBeforeKeyboard);
+    },
+  );
 
   testWidgets(
     'ReplyHonooPage: dopo la conferma apre la conversazione nello Scrigno',

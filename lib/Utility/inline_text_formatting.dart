@@ -145,6 +145,42 @@ class VisibleLengthLimitingTextInputFormatter extends TextInputFormatter {
       : oldValue;
 }
 
+/// Interpreta C e B inserite dalla tastiera virtuale come comandi di
+/// formattazione quando sostituiscono una selezione non vuota.
+class InlineFormattingShortcutTextInputFormatter extends TextInputFormatter {
+  const InlineFormattingShortcutTextInputFormatter();
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final selection = oldValue.selection;
+    if (!selection.isValid || selection.isCollapsed) return newValue;
+
+    final start = selection.start;
+    final end = selection.end;
+    if (start < 0 || end > oldValue.text.length) return newValue;
+
+    final insertedLength =
+        newValue.text.length - (oldValue.text.length - (end - start));
+    if (insertedLength != 1) return newValue;
+
+    final inserted = newValue.text.substring(start, start + 1);
+    final style = switch (inserted.toLowerCase()) {
+      'c' => InlineTextStyle.italic,
+      'b' => InlineTextStyle.bold,
+      _ => null,
+    };
+    if (style == null ||
+        oldValue.text.replaceRange(start, end, inserted) != newValue.text) {
+      return newValue;
+    }
+
+    return InlineTextFormatting.toggle(oldValue, style);
+  }
+}
+
 class FormattedText extends StatelessWidget {
   const FormattedText(
     this.text, {
