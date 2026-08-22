@@ -41,7 +41,7 @@ class BandoHonooFrancolisePage extends StatelessWidget {
       'perché la maggior parte\n'
       'dei 4.618 abitanti\n'
       'attribuiti a Francolise\n'
-      'abitano\n'
+      'abita\n'
       'a vari chilometri di distanza\n'
       'dalla Torre,\n'
       'a Sant’Andrea del Pizzone\n\n'
