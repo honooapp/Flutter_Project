@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:honoo/Pages/bando_honoo_francolise_page.dart';
 import 'package:honoo/Pages/feste_page.dart';
 import 'package:honoo/Pages/la_banda_page.dart';
 import 'package:honoo/Pages/laboratori_siae_page.dart';
@@ -9,6 +10,15 @@ import 'package:honoo/Pages/performance_page.dart';
 import 'package:honoo/Pages/podcast_dirette_page.dart';
 import 'package:honoo/Pages/regia_agenti_page.dart';
 import 'package:honoo/Pages/viaggi_isola_page.dart';
+
+Iterable<TextSpan> _allTextSpans(InlineSpan span) sync* {
+  if (span is! TextSpan) return;
+
+  yield span;
+  for (final child in span.children ?? const <InlineSpan>[]) {
+    yield* _allTextSpans(child);
+  }
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -20,39 +30,47 @@ void main() {
     ('Feste', const FestePage()),
     ("Viaggi sull'Isola delle Storie", const ViaggiIsolaPage()),
     ('La Banda', const LaBandaPage()),
+    ('Bando honoo\nper Francolise', const BandoHonooFrancolisePage()),
     ('Regia degli Agenti', const RegiaAgentiPage()),
     ('Podcast e dirette', const PodcastDirettePage()),
     ('Libri', const LibriPage()),
   ];
 
   for (final (title, page) in sections) {
-    testWidgets('$title inizia col titolo del link e termina con due a capo', (
-      tester,
-    ) async {
-      await tester.pumpWidget(MaterialApp(home: page));
-      await tester.pumpAndSettle();
+    testWidgets(
+      '$title ha il titolo iniziale in grassetto e due a capo finali',
+      (tester) async {
+        await tester.pumpWidget(MaterialApp(home: page));
+        await tester.pumpAndSettle();
 
-      final contentFinder = find.byKey(const Key('section_text'));
-      expect(contentFinder, findsOneWidget);
+        final contentFinder = find.byKey(const Key('section_text'));
+        expect(contentFinder, findsOneWidget);
 
-      final Widget content = tester.widget(contentFinder);
-      final String plainText;
-      if (content is Text) {
-        plainText = content.data ?? content.textSpan!.toPlainText();
-      } else if (content is RichText) {
-        plainText = content.text.toPlainText();
-      } else {
-        final textWidgets = tester.widgetList<Text>(
-          find.descendant(of: contentFinder, matching: find.byType(Text)),
-        );
-        plainText = textWidgets
-            .map((text) => text.data ?? text.textSpan!.toPlainText())
-            .join();
-      }
+        final Widget content = tester.widget(contentFinder);
+        final String plainText;
+        if (content is Text) {
+          plainText = content.data ?? content.textSpan!.toPlainText();
+        } else if (content is RichText) {
+          plainText = content.text.toPlainText();
+        } else {
+          final textWidgets = tester.widgetList<Text>(
+            find.descendant(of: contentFinder, matching: find.byType(Text)),
+          );
+          plainText = textWidgets
+              .map((text) => text.data ?? text.textSpan!.toPlainText())
+              .join();
+        }
 
-      expect(plainText, startsWith('$title\n\n'));
-      expect(plainText, endsWith('\n\n'));
-      expect(plainText, isNot(endsWith('\n\n\n')));
-    });
+        expect(plainText, startsWith('$title\n\n'));
+        expect(plainText, endsWith('\n\n'));
+        expect(plainText, isNot(endsWith('\n\n\n')));
+
+        final titleSpan = tester
+            .widgetList<RichText>(find.byType(RichText))
+            .expand((richText) => _allTextSpans(richText.text))
+            .firstWhere((span) => span.text?.startsWith('$title\n\n') ?? false);
+        expect(titleSpan.style?.fontWeight, FontWeight.w700);
+      },
+    );
   }
 }

@@ -91,7 +91,10 @@ class LaboratoriSiaePage extends StatelessWidget {
     );
 
     final List<InlineSpan> spans = [
-      TextSpan(text: 'Laboratori teatrali\n\n', style: baseTextStyle),
+      TextSpan(
+        text: 'Laboratori teatrali\n\n',
+        style: baseTextStyle.copyWith(fontWeight: FontWeight.w700),
+      ),
       TextSpan(text: 'honoo e ', style: baseTextStyle),
       TextSpan(
         text: 'Crocopie',

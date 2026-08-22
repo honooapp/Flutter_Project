@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/honoo_standard_page.dart';
+import 'package:honoo/Widgets/section_text.dart';
 
 class FestePage extends StatelessWidget {
   const FestePage({super.key});
@@ -40,11 +41,10 @@ class FestePage extends StatelessWidget {
     );
     return HonooStandardPage(
       contentWidthFactor: 0.45,
-      child: Text(
-        festeText,
+      child: SectionText(
         key: const Key('section_text'),
+        text: festeText,
         style: bodyStyle,
-        textAlign: TextAlign.center,
       ),
     );
   }

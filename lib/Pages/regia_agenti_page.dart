@@ -11,8 +11,9 @@ class RegiaAgentiPage extends StatelessWidget {
   static const String alessandroMolinaUrl =
       'https://www.linkedin.com/authwall?trk=gf&trkInfo=AQEKiDvNCY9k5wAAAZ_TKfSQOVjSt8GjBHYntEjt-HPxCMb7xQr32j-xeaqLUkZnvfqrUpn83qHvXKKKYHIKY1acgmDf7htNSAFpkUS9bOm7DEa8a16eUbCCpTlD4T-EdrqpifM=&original_referer=&sessionRedirect=https%3A%2F%2Fwww.linkedin.com%2Fin%2Falessandro-molina1%3Futm_source%3Dshare_via%26utm_content%3Dprofile%26utm_medium%3Dmember_ios';
 
+  static const String _title = 'Regia degli Agenti\n\n';
+
   static const String _textBeforeAlessandro =
-      'Regia degli Agenti\n\n'
       '“Regia degli Agenti”\n'
       'non è una mia espressione,\n'
       'ma del mio amico\n';
@@ -69,7 +70,7 @@ class RegiaAgentiPage extends StatelessWidget {
       'a tessere\n\n';
 
   static const String regiaAgentiText =
-      '${_textBeforeAlessandro}Alessandro Molina$_textAfterAlessandro';
+      '$_title${_textBeforeAlessandro}Alessandro Molina$_textAfterAlessandro';
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +87,10 @@ class RegiaAgentiPage extends StatelessWidget {
         TextSpan(
           style: bodyStyle,
           children: [
+            TextSpan(
+              text: _title,
+              style: bodyStyle.copyWith(fontWeight: FontWeight.w700),
+            ),
             const TextSpan(text: _textBeforeAlessandro),
             TextSpan(
               text: 'Alessandro Molina',

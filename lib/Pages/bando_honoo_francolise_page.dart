@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/honoo_standard_page.dart';
+import 'package:honoo/Widgets/section_text.dart';
 
 class BandoHonooFrancolisePage extends StatelessWidget {
   const BandoHonooFrancolisePage({super.key});
@@ -217,7 +218,7 @@ class BandoHonooFrancolisePage extends StatelessWidget {
       'eventuali nuove adesioni,\n'
       'e i link\n'
       'ai nomi delle persone\n'
-      'che ho citato\n';
+      'che ho citato\n\n';
 
   @override
   Widget build(BuildContext context) {
@@ -230,11 +231,10 @@ class BandoHonooFrancolisePage extends StatelessWidget {
 
     return HonooStandardPage(
       contentWidthFactor: 0.45,
-      child: Text(
-        bandoText,
+      child: SectionText(
         key: const Key('section_text'),
+        text: bandoText,
         style: bodyStyle,
-        textAlign: TextAlign.center,
       ),
     );
   }

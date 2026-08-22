@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/honoo_standard_page.dart';
+import 'package:honoo/Widgets/section_text.dart';
 
 import 'home_page.dart';
 
@@ -68,11 +69,10 @@ class LunaPage extends StatelessWidget {
           (route) => false,
         );
       },
-      child: Text(
-        lunaText,
+      child: SectionText(
         key: const Key('section_text'),
+        text: lunaText,
         style: baseTextStyle,
-        textAlign: TextAlign.center,
       ),
     );
   }

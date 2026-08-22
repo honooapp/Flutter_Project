@@ -18,7 +18,10 @@ class PodcastDirettePage extends StatelessWidget {
     );
 
     final List<InlineSpan> spans = [
-      TextSpan(text: 'Podcast e dirette\n\n', style: style),
+      TextSpan(
+        text: 'Podcast e dirette\n\n',
+        style: style.copyWith(fontWeight: FontWeight.w700),
+      ),
       TextSpan(text: 'honoo\nsi ascolta\ne si guarda\n\n', style: style),
       TextSpan(text: 'È voce\nÈ immagine\n\n', style: style),
       TextSpan(

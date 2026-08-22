@@ -44,15 +44,24 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final text = tester.widget<Text>(find.byKey(const Key('section_text')));
-    expect(text.data, BandoHonooFrancolisePage.bandoText);
+    final section = find.byKey(const Key('section_text'));
+    final text = tester.widget<Text>(
+      find.descendant(of: section, matching: find.byType(Text)),
+    );
+    expect(text.textSpan?.toPlainText(), BandoHonooFrancolisePage.bandoText);
     expect(text.textAlign, TextAlign.center);
-    expect(text.style?.fontSize, 18);
-    expect(text.style?.height, 1.3);
-    expect(text.data, startsWith('Bando honoo\nper Francolise\n\n'));
-    expect(text.data, contains('del 31 agosto 2026'));
-    expect(text.data, contains('Behavior-Driven Development'));
-    expect(text.data, contains('che ho citato'));
-    expect(text.data, isNot(contains('&#x20;')));
+    expect(text.textSpan?.style?.fontSize, 18);
+    expect(text.textSpan?.style?.height, 1.3);
+    expect(
+      text.textSpan?.toPlainText(),
+      startsWith('Bando honoo\nper Francolise\n\n'),
+    );
+    expect(text.textSpan?.toPlainText(), contains('del 31 agosto 2026'));
+    expect(
+      text.textSpan?.toPlainText(),
+      contains('Behavior-Driven Development'),
+    );
+    expect(text.textSpan?.toPlainText(), contains('che ho citato'));
+    expect(text.textSpan?.toPlainText(), isNot(contains('&#x20;')));
   });
 }

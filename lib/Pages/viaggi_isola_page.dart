@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/honoo_standard_page.dart';
+import 'package:honoo/Widgets/section_text.dart';
 // import 'package:honoo/Utility/responsive_layout.dart';
 
 class ViaggiIsolaPage extends StatelessWidget {
@@ -51,7 +52,7 @@ class ViaggiIsolaPage extends StatelessWidget {
         key: const Key('section_text'),
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(_textAboveMap, style: bodyStyle, textAlign: TextAlign.center),
+          SectionText(text: _textAboveMap, style: bodyStyle),
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 16.0,

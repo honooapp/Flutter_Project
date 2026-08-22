@@ -26,7 +26,10 @@ class LibriPage extends StatelessWidget {
     String headerText(String text) => text.replaceAll('\n', ' ').trim();
 
     final spans = <InlineSpan>[
-      TextSpan(text: 'Libri\n\n', style: style),
+      TextSpan(
+        text: 'Libri\n\n',
+        style: style.copyWith(fontWeight: FontWeight.w700),
+      ),
       TextSpan(text: intro, style: style),
       TextSpan(
         text: 'Isola delle Storie\n\n',
