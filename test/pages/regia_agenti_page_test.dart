@@ -71,6 +71,7 @@ void main() {
         'Feste',
         "Viaggi sull'Isola delle Storie",
         'La Banda',
+        'Bando honoo\nper Francolise',
         'Regia degli Agenti',
         'Podcast e dirette',
         'Libri',
@@ -78,11 +79,15 @@ void main() {
     );
     final viaggiIndex = visibleTexts.indexOf("Viaggi sull'Isola delle Storie");
     final laBandaIndex = visibleTexts.indexOf('La Banda');
+    final bandoFrancoliseIndex = visibleTexts.indexOf(
+      'Bando honoo\nper Francolise',
+    );
     final regiaIndex = visibleTexts.indexOf('Regia degli Agenti');
     final podcastIndex = visibleTexts.indexOf('Podcast e dirette');
     final libriIndex = visibleTexts.indexOf('Libri');
     expect(laBandaIndex, viaggiIndex + 1);
-    expect(regiaIndex, laBandaIndex + 1);
+    expect(bandoFrancoliseIndex, laBandaIndex + 1);
+    expect(regiaIndex, bandoFrancoliseIndex + 1);
     expect(regiaIndex, lessThan(podcastIndex));
     expect(libriIndex, podcastIndex + 1);
 

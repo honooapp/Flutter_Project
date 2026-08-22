@@ -21,6 +21,7 @@ import 'podcast_dirette_page.dart';
 import 'libri_page.dart';
 import 'la_banda_page.dart';
 import 'regia_agenti_page.dart';
+import 'bando_honoo_francolise_page.dart';
 
 class PlaceholderPage extends StatefulWidget {
   const PlaceholderPage({super.key});
@@ -56,6 +57,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   static const double _libriBottomSpacing = 30;
   static const double _laBandaTopSpacing = 5;
   static const double _laBandaBottomSpacing = 30;
+  static const double _bandoFrancoliseTopSpacing = 5;
+  static const double _bandoFrancoliseBottomSpacing = 30;
   static const double _regiaAgentiTopSpacing = 18 * 1.3;
   static const double _regiaAgentiBottomSpacing = 30;
   static const double _regiaAgentiIconSizeReduction = 15;
@@ -219,6 +222,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     const String podcastLine = 'Podcast e dirette';
     const String libriLine = 'Libri';
     const String laBandaLine = 'La Banda';
+    const String bandoFrancoliseLine = 'Bando honoo\nper Francolise';
     const String regiaAgentiLine = 'Regia degli Agenti';
     const String venceslaoLine = 'Venceslao Cembalo';
     final String text1First = Utility().text1First;
@@ -453,6 +457,29 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           Navigator.of(
             context,
           ).push(MaterialPageRoute(builder: (_) => const LaBandaPage()));
+        },
+      ),
+      _linkTextBlock(
+        context,
+        bandoFrancoliseLine,
+        baseTextStyle,
+        height: 0.9,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const BandoHonooFrancolisePage()),
+          );
+        },
+      ),
+      ..._materialIconBlockWithSpacing(
+        Icons.castle,
+        inlineIconHeight,
+        topSpacing: _bandoFrancoliseTopSpacing,
+        bottomSpacing: _bandoFrancoliseBottomSpacing,
+        color: _linkIconColor,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const BandoHonooFrancolisePage()),
+          );
         },
       ),
       _linkTextBlock(
