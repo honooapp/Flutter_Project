@@ -9,6 +9,7 @@ import 'package:honoo/Pages/luna_page.dart';
 import 'package:honoo/Pages/performance_page.dart';
 import 'package:honoo/Pages/podcast_dirette_page.dart';
 import 'package:honoo/Pages/regia_agenti_page.dart';
+import 'package:honoo/Pages/storiestorie_page.dart';
 import 'package:honoo/Pages/viaggi_isola_page.dart';
 
 Iterable<TextSpan> _allTextSpans(InlineSpan span) sync* {
@@ -34,6 +35,7 @@ void main() {
     ('Regia degli Agenti', const RegiaAgentiPage()),
     ('Podcast e dirette', const PodcastDirettePage()),
     ('Libri', const LibriPage()),
+    ('storiestorie.it', const StoriestoriePage()),
   ];
 
   for (final (title, page) in sections) {

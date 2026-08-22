@@ -22,6 +22,7 @@ import 'libri_page.dart';
 import 'la_banda_page.dart';
 import 'regia_agenti_page.dart';
 import 'bando_honoo_francolise_page.dart';
+import 'storiestorie_page.dart';
 
 class PlaceholderPage extends StatefulWidget {
   const PlaceholderPage({super.key});
@@ -55,6 +56,8 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   static const double _honooBottomSpacing = 15;
   static const double _libriTopSpacing = 5;
   static const double _libriBottomSpacing = 30;
+  static const double _storiestorieTopSpacing = 5;
+  static const double _storiestorieBottomSpacing = 30;
   static const double _laBandaTopSpacing = 5;
   static const double _laBandaBottomSpacing = 30;
   static const double _bandoFrancoliseTopSpacing = 5;
@@ -97,12 +100,18 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     double bottomSpacing = 0,
     VoidCallback? onTap,
     Color? color,
+    Key? iconKey,
   }) {
     return [
       if (topSpacing > 0) SizedBox(height: topSpacing),
       GestureDetector(
         onTap: onTap,
-        child: Icon(icon, size: size, color: color ?? HonooColor.onBackground),
+        child: Icon(
+          icon,
+          key: iconKey,
+          size: size,
+          color: color ?? HonooColor.onBackground,
+        ),
       ),
       if (bottomSpacing > 0) SizedBox(height: bottomSpacing),
     ];
@@ -221,6 +230,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     const String viaggiLine = "Viaggi sull'Isola delle Storie";
     const String podcastLine = 'Podcast e dirette';
     const String libriLine = 'Libri';
+    const String storiestorieLine = 'Storiestorie.it';
     const String laBandaLine = 'La Banda';
     const String bandoFrancoliseLine = 'Bando honoo\nper Francolise';
     const String regiaAgentiLine = 'Regia degli Agenti';
@@ -552,6 +562,29 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           Navigator.of(
             context,
           ).push(MaterialPageRoute(builder: (_) => const LibriPage()));
+        },
+      ),
+      _linkTextBlock(
+        context,
+        storiestorieLine,
+        baseTextStyle,
+        onTap: () {
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const StoriestoriePage()));
+        },
+      ),
+      ..._materialIconBlockWithSpacing(
+        Icons.public,
+        inlineIconHeight,
+        topSpacing: _storiestorieTopSpacing,
+        bottomSpacing: _storiestorieBottomSpacing,
+        color: _linkIconColor,
+        iconKey: const Key('storiestorie_icon'),
+        onTap: () {
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const StoriestoriePage()));
         },
       ),
       _textBlock(textBeforePerformanceMarkerDisplay, baseTextStyle),
