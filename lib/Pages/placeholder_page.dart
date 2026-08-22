@@ -32,6 +32,13 @@ class PlaceholderPage extends StatefulWidget {
 }
 
 class _PlaceholderPageState extends State<PlaceholderPage> {
+  // La pagina resta disponibile; imposta il define a true per mostrare di nuovo
+  // link, icona e relativa spaziatura nella PlaceholderPage.
+  static const bool _showStoriestorieSection = bool.fromEnvironment(
+    'SHOW_STORIESTORIE_SECTION',
+    defaultValue: false,
+  );
+
   // Regola qui gli spazi sopra/sotto le icone (valori in pixel).
   static const double _performanceTopSpacing = 5;
   static const double _performanceBottomSpacing = 30;
@@ -564,29 +571,31 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           ).push(MaterialPageRoute(builder: (_) => const LibriPage()));
         },
       ),
-      _linkTextBlock(
-        context,
-        storiestorieLine,
-        baseTextStyle,
-        onTap: () {
-          Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => const StoriestoriePage()));
-        },
-      ),
-      ..._materialIconBlockWithSpacing(
-        Icons.public,
-        inlineIconHeight,
-        topSpacing: _storiestorieTopSpacing,
-        bottomSpacing: _storiestorieBottomSpacing,
-        color: _linkIconColor,
-        iconKey: const Key('storiestorie_icon'),
-        onTap: () {
-          Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => const StoriestoriePage()));
-        },
-      ),
+      if (_showStoriestorieSection)
+        _linkTextBlock(
+          context,
+          storiestorieLine,
+          baseTextStyle,
+          onTap: () {
+            Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const StoriestoriePage()));
+          },
+        ),
+      if (_showStoriestorieSection)
+        ..._materialIconBlockWithSpacing(
+          Icons.public,
+          inlineIconHeight,
+          topSpacing: _storiestorieTopSpacing,
+          bottomSpacing: _storiestorieBottomSpacing,
+          color: _linkIconColor,
+          iconKey: const Key('storiestorie_icon'),
+          onTap: () {
+            Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const StoriestoriePage()));
+          },
+        ),
       _textBlock(textBeforePerformanceMarkerDisplay, baseTextStyle),
       if (performanceMarkerIndex != -1)
         ..._iconBlockWithSpacing(

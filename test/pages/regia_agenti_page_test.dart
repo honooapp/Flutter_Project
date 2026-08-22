@@ -75,9 +75,10 @@ void main() {
         'Regia degli Agenti',
         'Podcast e dirette',
         'Libri',
-        'Storiestorie.it',
       ]),
     );
+    expect(find.text('Storiestorie.it'), findsNothing);
+    expect(find.byKey(const Key('storiestorie_icon')), findsNothing);
     final viaggiIndex = visibleTexts.indexOf("Viaggi sull'Isola delle Storie");
     final laBandaIndex = visibleTexts.indexOf('La Banda');
     final bandoFrancoliseIndex = visibleTexts.indexOf(
@@ -86,13 +87,11 @@ void main() {
     final regiaIndex = visibleTexts.indexOf('Regia degli Agenti');
     final podcastIndex = visibleTexts.indexOf('Podcast e dirette');
     final libriIndex = visibleTexts.indexOf('Libri');
-    final storiestorieIndex = visibleTexts.indexOf('Storiestorie.it');
     expect(laBandaIndex, viaggiIndex + 1);
     expect(bandoFrancoliseIndex, laBandaIndex + 1);
     expect(regiaIndex, bandoFrancoliseIndex + 1);
     expect(regiaIndex, lessThan(podcastIndex));
     expect(libriIndex, podcastIndex + 1);
-    expect(storiestorieIndex, libriIndex + 1);
 
     await tester.ensureVisible(link);
     await tester.tap(link);

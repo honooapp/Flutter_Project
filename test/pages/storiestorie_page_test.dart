@@ -7,7 +7,9 @@ import 'package:honoo/Pages/storiestorie_page.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('la landing apre Storiestorie dopo Libri', (tester) async {
+  testWidgets('la landing nasconde Storiestorie senza rimuovere la pagina', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -17,23 +19,9 @@ void main() {
     await tester.pumpAndSettle();
 
     final libri = find.text('Libri');
-    final link = find.text('Storiestorie.it');
     expect(libri, findsOneWidget);
-    expect(link, findsOneWidget);
-    expect(find.byKey(const Key('storiestorie_icon')), findsOneWidget);
-
-    final texts = tester
-        .widgetList<Text>(find.byType(Text))
-        .map((text) => text.data)
-        .whereType<String>()
-        .toList();
-    expect(texts.indexOf('Storiestorie.it'), texts.indexOf('Libri') + 1);
-
-    await tester.ensureVisible(link);
-    await tester.tap(link);
-    await tester.pumpAndSettle();
-
-    expect(find.byType(StoriestoriePage), findsOneWidget);
+    expect(find.text('Storiestorie.it'), findsNothing);
+    expect(find.byKey(const Key('storiestorie_icon')), findsNothing);
   });
 
   testWidgets('la pagina mostra il testo e il collegamento al sito', (
