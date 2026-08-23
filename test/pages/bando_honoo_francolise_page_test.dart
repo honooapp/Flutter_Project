@@ -62,6 +62,21 @@ void main() {
       contains('Behavior-Driven Development'),
     );
     expect(text.textSpan?.toPlainText(), contains('che ho citato'));
+    expect(
+      'Nei prossimi giorni'.allMatches(text.textSpan!.toPlainText()).length,
+      1,
+    );
+    expect(
+      text.textSpan?.toPlainText(),
+      contains('Questo è l’aggiornamento\ndi oggi\ndomenica 23 agosto'),
+    );
+    expect(text.textSpan?.toPlainText(), contains('Carolina Franco'));
+    expect(text.textSpan?.toPlainText(), contains('Giovanni Vanacore'));
+    expect(text.textSpan?.toPlainText(), contains('Massimiliano Corrente'));
+    expect(
+      text.textSpan?.toPlainText(),
+      endsWith('Grazie, Massimiliano\nBenvenuto nella Banda\n\n'),
+    );
     expect(text.textSpan?.toPlainText(), isNot(contains('&#x20;')));
   });
 }
