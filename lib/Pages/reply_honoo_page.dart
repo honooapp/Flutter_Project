@@ -201,14 +201,6 @@ class _ReplyHonooPageState extends State<ReplyHonooPage> {
               minGap: 16,
               height: 44,
               actions: [
-                ResponsiveFooterAction(
-                  asset: "assets/icons/honoo_logo.svg",
-                  semanticsLabel: 'Indietro',
-                  size: 44,
-                  splashRadius: 28,
-                  tooltip: 'Indietro',
-                  onPressed: () => Navigator.pop(context, false),
-                ),
                 if (_isReplyConfirmed)
                   ResponsiveFooterAction(
                     asset: "assets/icons/reply.svg",
