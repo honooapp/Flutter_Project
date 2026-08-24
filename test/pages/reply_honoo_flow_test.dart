@@ -59,6 +59,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final builder = find.byType(HonooBuilder);
+      expect(find.bySemanticsLabel('Indietro'), findsNothing);
       final sizeBeforeKeyboard = tester.getSize(builder);
 
       await tester.tap(find.byType(TextField).first);

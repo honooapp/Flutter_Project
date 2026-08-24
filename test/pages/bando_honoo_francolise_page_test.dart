@@ -75,7 +75,11 @@ void main() {
     expect(text.textSpan?.toPlainText(), contains('Massimiliano Corrente'));
     expect(
       text.textSpan?.toPlainText(),
-      endsWith('Grazie, Massimiliano\nBenvenuto nella Banda\n\n'),
+      contains('Questo è l’aggiornamento\ndi oggi\nlunedì 24 agosto'),
+    );
+    expect(
+      text.textSpan?.toPlainText(),
+      endsWith('un laboratorio\ndi trampoli.\n\nChe ne dici?\n\n'),
     );
     expect(text.textSpan?.toPlainText(), isNot(contains('&#x20;')));
   });
