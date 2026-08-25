@@ -610,7 +610,7 @@ class BandoHonooFrancolisePage extends StatelessWidget {
       'con una delibera\n\n'
       'Una precisazione:\n'
       'se non vinciamo il bando,\n'
-      'io la festa di honoo\n'
+      'io la Festa di honoo\n'
       'la faccio comunque\n\n'
       'Cioè\n'
       'dal 7 dicembre 2026\n'
