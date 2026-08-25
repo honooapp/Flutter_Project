@@ -83,7 +83,7 @@ void main() {
     );
     expect(
       text.textSpan?.toPlainText(),
-      endsWith('come potrebbe testimoniare\nLuca Cacciapuoti,\nArsenyco\n'),
+      endsWith('come potrebbe testimoniare\nLuca Cacciapuoti,\nArsenyco\n\n'),
     );
     expect(text.textSpan?.toPlainText(), isNot(contains('&#x20;')));
   });

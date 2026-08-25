@@ -631,7 +631,7 @@ class BandoHonooFrancolisePage extends StatelessWidget {
       'da molto,\n'
       'come potrebbe testimoniare\n'
       'Luca Cacciapuoti,\n'
-      'Arsenyco\n';
+      'Arsenyco\n\n';
 
   @override
   Widget build(BuildContext context) {
