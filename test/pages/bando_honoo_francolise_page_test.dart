@@ -79,7 +79,11 @@ void main() {
     );
     expect(
       text.textSpan?.toPlainText(),
-      endsWith('un laboratorio\ndi trampoli.\n\nChe ne dici?\n\n'),
+      contains('Questo è l’aggiornamento\ndi oggi\nmartedì 25 agosto'),
+    );
+    expect(
+      text.textSpan?.toPlainText(),
+      endsWith('come potrebbe testimoniare\nLuca Cacciapuoti,\nArsenyco\n'),
     );
     expect(text.textSpan?.toPlainText(), isNot(contains('&#x20;')));
   });
