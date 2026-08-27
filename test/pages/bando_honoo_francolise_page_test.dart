@@ -87,6 +87,18 @@ void main() {
     );
     expect(
       text.textSpan?.toPlainText(),
+      contains('Luca Cacciapuoti,\nArsenyco\n\n\n\nQuesto è l’aggiornamento'),
+    );
+    expect(
+      text.textSpan?.toPlainText(),
+      contains('sulla piattaforma ministeriale'),
+    );
+    expect(
+      text.textSpan?.toPlainText(),
+      contains('durante le feste di honoo,\nnella Stanza del Grafico'),
+    );
+    expect(
+      text.textSpan?.toPlainText(),
       endsWith('honoo ha bisogno di te\n\nviva honoo\nviva la Banda\n\n'),
     );
     expect(text.textSpan?.toPlainText(), isNot(contains('&#x20;')));
