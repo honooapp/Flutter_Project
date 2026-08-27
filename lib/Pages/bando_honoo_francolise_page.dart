@@ -675,7 +675,7 @@ class BandoHonooFrancolisePage extends StatelessWidget {
       'con Luca Cacciapuoti,\n'
       'Arsenyco,\n'
       'e Giovanni Vanacore,\n'
-      'Feritoie.\n\n'
+      'Feritoie\n\n'
       'Ne approfitto per ringraziare\n'
       'Marwa Abouamr\n\n'
       'Hai notato che appena apri\n'
