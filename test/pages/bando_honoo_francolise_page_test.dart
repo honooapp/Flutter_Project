@@ -83,7 +83,11 @@ void main() {
     );
     expect(
       text.textSpan?.toPlainText(),
-      endsWith('come potrebbe testimoniare\nLuca Cacciapuoti,\nArsenyco\n\n'),
+      contains('Questo è l’aggiornamento\ndi oggi\ngiovedì 27 agosto 2026'),
+    );
+    expect(
+      text.textSpan?.toPlainText(),
+      endsWith('honoo ha bisogno di te\n\nviva honoo\nviva la Banda\n\n'),
     );
     expect(text.textSpan?.toPlainText(), isNot(contains('&#x20;')));
   });
