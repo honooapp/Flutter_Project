@@ -104,9 +104,11 @@ void main() {
       'Apri gli occhi:\nc’è Dugenta davanti a te',
       '2076. Apri gli occhi:\nc’è Dugenta davanti a te',
       'Dugenta Settanta: 1956 — 2026 — 2076',
+      'Bando honoo\nper Francolise\n\n',
     ]);
+    expect(spans[spans.length - 3].text, endsWith('come archivio\n\n'));
     expect(spans.last.style, isNull);
-    expect(spans.last.text, contains('Bando honoo\nper Francolise'));
+    expect(spans.last.text, startsWith('Ho proposto\n'));
     expect(
       dugentaText,
       contains('Te lo racconto,\nma prima\nun ringraziamento'),

@@ -1137,7 +1137,7 @@ class BandoHonooFrancolisePage extends StatelessWidget {
     );
   }
 
-  // Apply emphasis only to the new proposal, leaving the archive untouched.
+  // Emphasize the new proposal and archive title, keeping the archive body plain.
   static List<TextSpan> _styledText() {
     const passages = [
       'Bando honoo per Dugenta\n\n',
@@ -1172,7 +1172,17 @@ class BandoHonooFrancolisePage extends StatelessWidget {
       );
       cursor = match.end;
     }
-    spans.add(TextSpan(text: bandoText.substring(cursor)));
+    spans.add(TextSpan(text: bandoText.substring(cursor, archiveStart)));
+    const archiveTitle = 'Bando honoo\nper Francolise\n\n';
+    spans.add(
+      const TextSpan(
+        text: archiveTitle,
+        style: TextStyle(fontWeight: FontWeight.w700),
+      ),
+    );
+    spans.add(
+      TextSpan(text: bandoText.substring(archiveStart + archiveTitle.length)),
+    );
     return spans;
   }
 }
