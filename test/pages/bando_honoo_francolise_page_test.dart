@@ -53,11 +53,11 @@ void main() {
     expect(text.textSpan?.style?.height, 1.3);
     expect(
       text.textSpan?.toPlainText(),
-      startsWith('Bando honoo per Dugenta\n\n\nSì, hai letto bene\n\n\n'),
+      startsWith('Bando honoo per Dugenta\n\nSì, hai letto bene\n\n'),
     );
     expect(
       text.textSpan?.toPlainText(),
-      contains('“per Dugenta”,\n\nin provincia di Benevento'),
+      contains('“per Dugenta”,\nin provincia di Benevento'),
     );
     expect(
       text.textSpan?.toPlainText(),
@@ -65,7 +65,16 @@ void main() {
     );
     expect(
       text.textSpan?.toPlainText(),
-      contains('come archivio\n\n\nBando honoo\nper Francolise\n\nHo proposto'),
+      contains('come archivio\n\nBando honoo\nper Francolise\n\nHo proposto'),
+    );
+    final dugentaText = text.textSpan!
+        .toPlainText()
+        .split('Bando honoo\n')
+        .first;
+    expect(dugentaText, isNot(contains('\n\n\n')));
+    expect(
+      dugentaText,
+      contains('Te lo racconto,\nma prima\nun ringraziamento'),
     );
     expect(text.textSpan?.toPlainText(), contains('del 31 agosto 2026'));
     expect(
