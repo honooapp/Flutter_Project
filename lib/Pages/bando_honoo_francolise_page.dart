@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/honoo_standard_page.dart';
-import 'package:honoo/Widgets/section_text.dart';
 
 class BandoHonooFrancolisePage extends StatelessWidget {
   const BandoHonooFrancolisePage({super.key});
@@ -235,7 +234,7 @@ class BandoHonooFrancolisePage extends StatelessWidget {
       'di partire\n'
       'da quei nomi,\n'
       'perché dietro la Legge\n'
-      '1° dicembre 1956 n. 1398\n'
+      '1° dicembre 1956, n. 1398\n'
       'ci sono persone\n'
       '\n'
       'Nomi,\n'
@@ -249,7 +248,7 @@ class BandoHonooFrancolisePage extends StatelessWidget {
       'di Dugenta\n'
       'attraverso nomi,\n'
       'visi\n'
-      'e pensieri.\n'
+      'pensieri.\n'
       '\n'
       'I nomi:\n'
       'immagina\n'
@@ -309,7 +308,7 @@ class BandoHonooFrancolisePage extends StatelessWidget {
       'Dugenta 70,\n'
       'contenente la foto attuale\n'
       'dell’abitante,\n'
-      'il nome dell’eventuale parente\n'
+      'il nome dell’eventuale antenato\n'
       'presente nella lista dei 560 firmatari,\n'
       'e, se possibile,\n'
       'una foto dell’antenato,\n'
@@ -337,7 +336,7 @@ class BandoHonooFrancolisePage extends StatelessWidget {
       '\n'
       'Il secondo honoo\n'
       'sarà dedicato\n'
-      'a cosa l’abitante\n'
+      'a ciò che l’abitante\n'
       'si augura per la Dugenta del futuro,\n'
       'fra settanta anni\n'
       '\n'
@@ -362,15 +361,15 @@ class BandoHonooFrancolisePage extends StatelessWidget {
       'chiede\n'
       'a quella comunità\n'
       'di raccontare\n'
-      'come vorrebbe\n'
-      'che Dugenta diventasse\n'
-      'fra settant’anni,\n'
+      'che cosa vorrebbe\n'
+      'per Dugenta\n'
+      'tra settant’anni,\n'
       'attraverso una composizione poetica,\n'
       'l’honoo,\n'
       'e noi assisteremo\n'
-      'ognuno dei cittadini\n'
-      'nella realizzazione\n'
-      'di questa composizione poetica\n'
+      'ciascun cittadino\n'
+      'a realizzare\n'
+      'questa composizione poetica\n'
       '\n'
       'I due honoo\n'
       'saranno riprodotti\n'
@@ -378,7 +377,7 @@ class BandoHonooFrancolisePage extends StatelessWidget {
       'e tutti i passaporti\n'
       'saranno caricati\n'
       'su un sito online:\n'
-      'Dugenta Settanta: 1956 - 2026 - 2076\n'
+      'Dugenta Settanta: 1956 — 2026 — 2076\n'
       '\n'
       'La partecipazione al Bando\n'
       'in tempi così stretti\n'
@@ -1128,11 +1127,52 @@ class BandoHonooFrancolisePage extends StatelessWidget {
 
     return HonooStandardPage(
       contentWidthFactor: 0.45,
-      child: SectionText(
+      child: KeyedSubtree(
         key: const Key('section_text'),
-        text: bandoText,
-        style: bodyStyle,
+        child: Text.rich(
+          TextSpan(style: bodyStyle, children: _styledText()),
+          textAlign: TextAlign.center,
+        ),
       ),
     );
+  }
+
+  // Apply emphasis only to the new proposal, leaving the archive untouched.
+  static List<TextSpan> _styledText() {
+    const passages = [
+      'Bando honoo per Dugenta\n\n',
+      'il passato,\nil presente\ne il futuro',
+      'nomi,\nvisi\npensieri.',
+      'I nomi:',
+      'performance',
+      'I visi:',
+      'installazione',
+      'Passaporto',
+      'Dugenta 70',
+      'I pensieri:',
+      '2076. Apri gli occhi:\nc’è Dugenta davanti a te',
+      'Apri gli occhi:\nc’è Dugenta davanti a te',
+      'Dugenta Settanta: 1956 — 2026 — 2076',
+    ];
+    final archiveStart =
+        bandoText.indexOf('\n\nBando honoo\nper Francolise') + 2;
+    final proposal = bandoText.substring(0, archiveStart);
+    final pattern = RegExp(passages.map(RegExp.escape).join('|'));
+    final spans = <TextSpan>[];
+    var cursor = 0;
+    for (final match in pattern.allMatches(proposal)) {
+      if (match.start > cursor) {
+        spans.add(TextSpan(text: proposal.substring(cursor, match.start)));
+      }
+      spans.add(
+        TextSpan(
+          text: match.group(0),
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+      );
+      cursor = match.end;
+    }
+    spans.add(TextSpan(text: bandoText.substring(cursor)));
+    return spans;
   }
 }

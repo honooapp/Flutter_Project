@@ -61,7 +61,7 @@ void main() {
     );
     expect(
       text.textSpan?.toPlainText(),
-      contains('Dugenta Settanta: 1956 - 2026 - 2076'),
+      contains('Dugenta Settanta: 1956 — 2026 — 2076'),
     );
     expect(
       text.textSpan?.toPlainText(),
@@ -69,9 +69,44 @@ void main() {
     );
     final dugentaText = text.textSpan!
         .toPlainText()
-        .split('Bando honoo\n')
+        .split('\n\nBando honoo\nper Francolise')
         .first;
     expect(dugentaText, isNot(contains('\n\n\n')));
+    expect(dugentaText, contains('attraverso nomi,\nvisi\npensieri.'));
+    expect(dugentaText, contains('1° dicembre 1956, n. 1398'));
+    expect(dugentaText, contains('il nome dell’eventuale antenato'));
+    expect(dugentaText, contains('a ciò che l’abitante'));
+    expect(
+      dugentaText,
+      contains('che cosa vorrebbe\nper Dugenta\ntra settant’anni,'),
+    );
+    expect(
+      dugentaText,
+      contains('ciascun cittadino\na realizzare\nquesta composizione poetica'),
+    );
+    final spans = (text.textSpan! as TextSpan).children!.cast<TextSpan>();
+    final boldPassages = spans
+        .where((span) => span.style?.fontWeight == FontWeight.w700)
+        .map((span) => span.text)
+        .toList();
+    expect(boldPassages, [
+      'Bando honoo per Dugenta\n\n',
+      'il passato,\nil presente\ne il futuro',
+      'nomi,\nvisi\npensieri.',
+      'I nomi:',
+      'performance',
+      'I visi:',
+      'installazione',
+      'Passaporto',
+      'Dugenta 70',
+      'Dugenta 70',
+      'I pensieri:',
+      'Apri gli occhi:\nc’è Dugenta davanti a te',
+      '2076. Apri gli occhi:\nc’è Dugenta davanti a te',
+      'Dugenta Settanta: 1956 — 2026 — 2076',
+    ]);
+    expect(spans.last.style, isNull);
+    expect(spans.last.text, contains('Bando honoo\nper Francolise'));
     expect(
       dugentaText,
       contains('Te lo racconto,\nma prima\nun ringraziamento'),
