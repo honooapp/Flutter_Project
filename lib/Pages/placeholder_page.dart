@@ -239,7 +239,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     const String libriLine = 'Libri';
     const String storiestorieLine = 'Storiestorie.it';
     const String laBandaLine = 'La Banda';
-    const String bandoFrancoliseLine = 'Bando honoo\nper Francolise';
+    const String bandoFrancoliseLine = 'Bando honoo\nper Dugenta';
     const String regiaAgentiLine = 'Regia degli Agenti';
     const String venceslaoLine = 'Venceslao Cembalo';
     final String text1First = Utility().text1First;

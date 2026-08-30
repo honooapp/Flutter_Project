@@ -31,7 +31,7 @@ void main() {
     ('Feste', const FestePage()),
     ("Viaggi sull'Isola delle Storie", const ViaggiIsolaPage()),
     ('La Banda', const LaBandaPage()),
-    ('Bando honoo\nper Francolise', const BandoHonooFrancolisePage()),
+    ('Bando honoo per Dugenta', const BandoHonooFrancolisePage()),
     ('Regia degli Agenti', const RegiaAgentiPage()),
     ('Podcast e dirette', const PodcastDirettePage()),
     ('Libri', const LibriPage()),

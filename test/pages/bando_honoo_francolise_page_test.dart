@@ -6,37 +6,36 @@ import 'package:honoo/Pages/placeholder_page.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets(
-    'la landing apre il Bando Francolise dal link e dalla sua icona',
-    (tester) async {
-      tester.view.physicalSize = const Size(390, 844);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+  testWidgets('la landing apre il Bando Dugenta dal link e dalla sua icona', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(const MaterialApp(home: PlaceholderPage()));
-      await tester.pumpAndSettle();
+    await tester.pumpWidget(const MaterialApp(home: PlaceholderPage()));
+    await tester.pumpAndSettle();
 
-      final link = find.text('Bando honoo\nper Francolise');
-      final icon = find.byIcon(Icons.castle);
-      expect(link, findsOneWidget);
-      expect(icon, findsOneWidget);
+    final link = find.text('Bando honoo\nper Dugenta');
+    final icon = find.byIcon(Icons.castle);
+    expect(link, findsOneWidget);
+    expect(icon, findsOneWidget);
 
-      await tester.ensureVisible(link);
-      await tester.tap(link);
-      await tester.pumpAndSettle();
-      expect(find.byType(BandoHonooFrancolisePage), findsOneWidget);
+    await tester.ensureVisible(link);
+    await tester.tap(link);
+    await tester.pumpAndSettle();
+    expect(find.byType(BandoHonooFrancolisePage), findsOneWidget);
 
-      tester.state<NavigatorState>(find.byType(Navigator)).pop();
-      await tester.pumpAndSettle();
-      await tester.ensureVisible(icon);
-      await tester.tap(icon);
-      await tester.pumpAndSettle();
-      expect(find.byType(BandoHonooFrancolisePage), findsOneWidget);
-    },
-  );
+    tester.state<NavigatorState>(find.byType(Navigator)).pop();
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(icon);
+    await tester.tap(icon);
+    await tester.pumpAndSettle();
+    expect(find.byType(BandoHonooFrancolisePage), findsOneWidget);
+  });
 
-  testWidgets('il Bando Francolise mostra il testo completo nello stile app', (
+  testWidgets('il Bando Dugenta conserva anche l’archivio Francolise', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -54,7 +53,19 @@ void main() {
     expect(text.textSpan?.style?.height, 1.3);
     expect(
       text.textSpan?.toPlainText(),
-      startsWith('Bando honoo\nper Francolise\n\n'),
+      startsWith('Bando honoo per Dugenta\n\n\nSì, hai letto bene\n\n\n'),
+    );
+    expect(
+      text.textSpan?.toPlainText(),
+      contains('“per Dugenta”,\n\nin provincia di Benevento'),
+    );
+    expect(
+      text.textSpan?.toPlainText(),
+      contains('Dugenta Settanta: 1956 - 2026 - 2076'),
+    );
+    expect(
+      text.textSpan?.toPlainText(),
+      contains('come archivio\n\n\nBando honoo\nper Francolise\n\nHo proposto'),
     );
     expect(text.textSpan?.toPlainText(), contains('del 31 agosto 2026'));
     expect(
