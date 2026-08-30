@@ -71,7 +71,7 @@ void main() {
         'Feste',
         "Viaggi sull'Isola delle Storie",
         'La Banda',
-        'Bando honoo\nper Francolise',
+        'Bando honoo\nper Dugenta',
         'Regia degli Agenti',
         'Podcast e dirette',
         'Libri',
@@ -82,7 +82,7 @@ void main() {
     final viaggiIndex = visibleTexts.indexOf("Viaggi sull'Isola delle Storie");
     final laBandaIndex = visibleTexts.indexOf('La Banda');
     final bandoFrancoliseIndex = visibleTexts.indexOf(
-      'Bando honoo\nper Francolise',
+      'Bando honoo\nper Dugenta',
     );
     final regiaIndex = visibleTexts.indexOf('Regia degli Agenti');
     final podcastIndex = visibleTexts.indexOf('Podcast e dirette');
