@@ -9,6 +9,14 @@
     <meta name="description" content="Apri gli occhi: c’è l’Isola davanti a te.">
 
     <style>
+      @font-face {
+        font-family: 'Arvo';
+        src: url('assets/assets/google_fonts/Arvo-Regular.ttf') format('truetype');
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+
       html, body {
         width: 100%;
         height: 100%;
@@ -29,6 +37,54 @@
 
       #landing-background.is-loaded {
         opacity: 1;
+      }
+
+      #landing-loader {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        color: #fff;
+        pointer-events: none;
+        transition: opacity 180ms ease-out;
+      }
+
+      #landing-loader.is-complete {
+        opacity: 0;
+      }
+
+      #landing-loader-icon {
+        width: 44px;
+        height: 44px;
+        filter: brightness(0) invert(1);
+        animation: landing-loader-rotation 900ms linear infinite;
+      }
+
+      #landing-loader-progress {
+        min-width: 4ch;
+        font-family: 'Arvo', serif;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1;
+        text-align: center;
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+      }
+
+      @keyframes landing-loader-rotation {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #landing-loader-icon {
+          animation-duration: 1800ms;
+        }
       }
     </style>
 
@@ -106,14 +162,71 @@
       alt=""
       aria-hidden="true"
       decoding="sync"
-      fetchpriority="high"
-      onload="this.classList.add('is-loaded')">
+      fetchpriority="high">
+    <div id="landing-loader" role="status" aria-live="polite">
+      <img
+        id="landing-loader-icon"
+        src="assets/assets/icons/load.svg"
+        alt=""
+        aria-hidden="true">
+      <div id="landing-loader-progress">0%</div>
+    </div>
     <script>
-      document.getElementById('landing-background').src =
-        window.honooLandingBackground;
+      const landingBackground = document.getElementById('landing-background');
+      const landingLoader = document.getElementById('landing-loader');
+      const landingProgress = document.getElementById(
+        'landing-loader-progress',
+      );
+      let displayedProgress = 0;
+      let targetProgress = 8;
+
+      const setLandingProgress = (value, immediate = false) => {
+        targetProgress = Math.max(
+          targetProgress,
+          Math.min(100, Math.round(value)),
+        );
+        if (immediate) {
+          displayedProgress = targetProgress;
+          landingProgress.textContent = `${displayedProgress}%`;
+        }
+      };
+
+      const progressTimer = window.setInterval(() => {
+        if (displayedProgress < targetProgress) {
+          displayedProgress += Math.max(
+            1,
+            Math.ceil((targetProgress - displayedProgress) * 0.12),
+          );
+          displayedProgress = Math.min(displayedProgress, targetProgress);
+          landingProgress.textContent = `${displayedProgress}%`;
+        } else if (targetProgress < 92) {
+          targetProgress += 1;
+        }
+      }, 45);
+
+      landingBackground.addEventListener(
+        'load',
+        () => {
+          landingBackground.classList.add('is-loaded');
+          setLandingProgress(24);
+        },
+        { once: true },
+      );
+      landingBackground.src = window.honooLandingBackground;
+
+      window.honooSetLandingProgress = setLandingProgress;
       window.addEventListener(
         'flutter-first-frame',
-        () => document.getElementById('landing-background')?.remove(),
+        () => {
+          window.clearInterval(progressTimer);
+          setLandingProgress(100, true);
+          window.setTimeout(() => landingLoader.classList.add('is-complete'), 90);
+          window.setTimeout(() => {
+            landingBackground.remove();
+            landingLoader.remove();
+            delete window.honooSetLandingProgress;
+          }, 280);
+        },
         { once: true },
       );
     </script>
@@ -129,10 +242,16 @@
         const startFlutter = () => {
           if (flutterStarted) return;
           flutterStarted = true;
+          window.honooSetLandingProgress?.(36);
 
           const script = document.createElement('script');
           script.src = 'flutter_bootstrap.js';
           script.async = true;
+          script.addEventListener(
+            'load',
+            () => window.honooSetLandingProgress?.(58),
+            { once: true },
+          );
           document.body.appendChild(script);
         };
 
@@ -156,6 +275,8 @@
               cacheNames.map((cacheName) => caches.delete(cacheName)),
             );
           }
+
+          window.honooSetLandingProgress?.(30);
 
           if (shouldReload && sessionStorage.getItem(reloadGuard) !== 'true') {
             sessionStorage.setItem(reloadGuard, 'true');
