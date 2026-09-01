@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:honoo/Pages/storiestorie_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:honoo/Controller/device_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -594,8 +595,11 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           topSpacing: _storiestorieTopSpacing,
           bottomSpacing: _storiestorieBottomSpacing,
           color: _linkIconColor,
-          iconKey: const Key('storiestorie_icon'),
-          onTap: _openStoriestorie,
+          onTap: () {
+            Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const StoriestoriePage()));
+          },
         ),
       _textBlock(textBeforePerformanceMarkerDisplay, baseTextStyle),
       if (performanceMarkerIndex != -1)
