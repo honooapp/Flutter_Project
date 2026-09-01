@@ -32,11 +32,11 @@ class PlaceholderPage extends StatefulWidget {
 }
 
 class _PlaceholderPageState extends State<PlaceholderPage> {
-  // La pagina resta disponibile; imposta il define a true per mostrare di nuovo
-  // link, icona e relativa spaziatura nella PlaceholderPage.
+  // La sezione e il relativo collegamento sono visibili per impostazione
+  // predefinita; il define permette di nasconderli temporaneamente.
   static const bool _showStoriestorieSection = bool.fromEnvironment(
     'SHOW_STORIESTORIE_SECTION',
-    defaultValue: false,
+    defaultValue: true,
   );
 
   // Regola qui gli spazi sopra/sotto le icone (valori in pixel).
