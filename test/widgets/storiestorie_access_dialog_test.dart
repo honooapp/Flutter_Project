@@ -14,7 +14,7 @@ void main() {
     expect(isStorieStorieContinuation(Uri.parse('https://honoo.it/')), isFalse);
   });
 
-  testWidgets('mostra il dialogo Honoo con azione principale sopra Annulla', (
+  testWidgets('mostra il dialogo honoo con azione principale sopra Annulla', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -22,6 +22,8 @@ void main() {
     );
 
     expect(find.byType(HonooDialogShell), findsOneWidget);
+    expect(find.textContaining('entrato in honoo'), findsOneWidget);
+    expect(find.textContaining('entrato in Honoo'), findsNothing);
 
     final title = tester.widget<Text>(find.text('Prima di entrare'));
     final continueText = tester.widget<Text>(
