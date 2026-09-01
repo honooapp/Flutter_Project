@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:honoo/Controller/device_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
@@ -22,10 +23,11 @@ import 'libri_page.dart';
 import 'la_banda_page.dart';
 import 'regia_agenti_page.dart';
 import 'bando_honoo_francolise_page.dart';
-import 'storiestorie_page.dart';
 
 class PlaceholderPage extends StatefulWidget {
   const PlaceholderPage({super.key});
+
+  static final Uri storiestorieUri = Uri.parse('https://storiestorie.it');
 
   @override
   State<PlaceholderPage> createState() => _PlaceholderPageState();
@@ -74,6 +76,13 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
   static const double _regiaAgentiIconSizeReduction = 15;
   static const double _regiaAgentiIconVerticalOffset = -2;
   static const Color _linkIconColor = Color.fromRGBO(183, 183, 206, 1);
+
+  Future<void> _openStoriestorie() async {
+    await launchUrl(
+      PlaceholderPage.storiestorieUri,
+      mode: LaunchMode.externalApplication,
+    );
+  }
 
   List<Widget> _iconBlockWithSpacing(
     String asset,
@@ -576,11 +585,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           context,
           storiestorieLine,
           baseTextStyle,
-          onTap: () {
-            Navigator.of(
-              context,
-            ).push(MaterialPageRoute(builder: (_) => const StoriestoriePage()));
-          },
+          onTap: _openStoriestorie,
         ),
       if (_showStoriestorieSection)
         ..._materialIconBlockWithSpacing(
@@ -590,11 +595,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
           bottomSpacing: _storiestorieBottomSpacing,
           color: _linkIconColor,
           iconKey: const Key('storiestorie_icon'),
-          onTap: () {
-            Navigator.of(
-              context,
-            ).push(MaterialPageRoute(builder: (_) => const StoriestoriePage()));
-          },
+          onTap: _openStoriestorie,
         ),
       _textBlock(textBeforePerformanceMarkerDisplay, baseTextStyle),
       if (performanceMarkerIndex != -1)

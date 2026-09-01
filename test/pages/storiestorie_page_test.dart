@@ -7,7 +7,7 @@ import 'package:honoo/Pages/storiestorie_page.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('la landing mostra Storiestorie e apre la pagina dedicata', (
+  testWidgets('la landing collega direttamente al sito Storiestorie', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(390, 844);
@@ -23,12 +23,10 @@ void main() {
     final storiestorie = find.text('Storiestorie.it');
     expect(storiestorie, findsOneWidget);
     expect(find.byKey(const Key('storiestorie_icon')), findsOneWidget);
-
-    await tester.ensureVisible(storiestorie);
-    await tester.tap(storiestorie);
-    await tester.pumpAndSettle();
-
-    expect(find.byType(StoriestoriePage), findsOneWidget);
+    expect(
+      PlaceholderPage.storiestorieUri,
+      Uri.parse('https://storiestorie.it'),
+    );
   });
 
   testWidgets('la pagina mostra il testo e il collegamento al sito', (
@@ -40,7 +38,7 @@ void main() {
     final text = tester.widget<Text>(find.byKey(const Key('section_text')));
     expect(text.textSpan?.toPlainText(), StoriestoriePage.pageText);
     expect(text.textAlign, TextAlign.center);
-    expect(StoriestoriePage.siteUri, Uri.parse('https://www.storiestorie.it'));
+    expect(StoriestoriePage.siteUri, Uri.parse('https://storiestorie.it'));
 
     final rootSpan = text.textSpan! as TextSpan;
     final linkSpan = rootSpan.children!.whereType<TextSpan>().first;
