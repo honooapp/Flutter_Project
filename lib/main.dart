@@ -14,6 +14,7 @@ import 'Pages/email_login_page.dart';
 import 'Utility/honoo_colors.dart';
 import 'Widgets/global_invite_listener.dart';
 import 'Widgets/global_reply_notification_listener.dart';
+import 'Widgets/storiestorie_access_dialog.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -93,7 +94,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _continueToStorieStorieNovel() async {
     if (_handledStorieStorieContinuation ||
-        Uri.base.queryParameters['continue'] != 'storiestorie-romanzo') {
+        !isStorieStorieContinuation(Uri.base)) {
       return;
     }
     _handledStorieStorieContinuation = true;
@@ -113,24 +114,7 @@ class _MyAppState extends State<MyApp> {
     if (context == null || !context.mounted) return;
     final continueToDrive = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Prima di entrare'),
-        content: const Text(
-          'Su Google usa la stessa email con cui sei entrato in Honoo. '
-          'Nella pagina del documento premi “Richiedi accesso”: '
-          'Venceslao riceverà la richiesta e potrà autorizzarti come visualizzatore.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Annulla'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Continua su Google Drive'),
-          ),
-        ],
-      ),
+      builder: (_) => const StorieStorieAccessDialog(),
     );
     if (continueToDrive != true) return;
 
@@ -169,6 +153,7 @@ class _MyAppState extends State<MyApp> {
         );
         return GlobalReplyNotificationListener(
           navigatorKey: _navigatorKey,
+          enabled: !isStorieStorieContinuation(Uri.base),
           child: SafeArea(
             child: GlobalInviteListener(
               navigatorKey: _navigatorKey,
