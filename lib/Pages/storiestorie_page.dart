@@ -8,7 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 class StoriestoriePage extends StatelessWidget {
   const StoriestoriePage({super.key});
 
-  static final Uri siteUri = Uri.parse('https://storiestorie.it');
+  static final Uri siteUri = Uri.parse('http://storiestorie.it');
 
   static const String pageText =
       'storiestorie.it\n\n'

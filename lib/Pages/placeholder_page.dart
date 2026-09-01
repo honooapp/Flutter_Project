@@ -27,7 +27,7 @@ import 'bando_honoo_francolise_page.dart';
 class PlaceholderPage extends StatefulWidget {
   const PlaceholderPage({super.key});
 
-  static final Uri storiestorieUri = Uri.parse('https://storiestorie.it');
+  static final Uri storiestorieUri = Uri.parse('http://storiestorie.it');
 
   @override
   State<PlaceholderPage> createState() => _PlaceholderPageState();

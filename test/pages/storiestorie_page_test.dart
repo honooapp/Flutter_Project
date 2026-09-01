@@ -25,7 +25,7 @@ void main() {
     expect(find.byKey(const Key('storiestorie_icon')), findsOneWidget);
     expect(
       PlaceholderPage.storiestorieUri,
-      Uri.parse('https://storiestorie.it'),
+      Uri.parse('http://storiestorie.it'),
     );
   });
 
@@ -38,7 +38,7 @@ void main() {
     final text = tester.widget<Text>(find.byKey(const Key('section_text')));
     expect(text.textSpan?.toPlainText(), StoriestoriePage.pageText);
     expect(text.textAlign, TextAlign.center);
-    expect(StoriestoriePage.siteUri, Uri.parse('https://storiestorie.it'));
+    expect(StoriestoriePage.siteUri, Uri.parse('http://storiestorie.it'));
 
     final rootSpan = text.textSpan! as TextSpan;
     final linkSpan = rootSpan.children!.whereType<TextSpan>().first;
