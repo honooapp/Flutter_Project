@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:honoo/IsolaDelleStorie/Controller/exercise_controller.dart';
 import 'package:sizer/sizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'env/env.dart';
 import 'Utility/app_logger.dart';
 import 'Utility/app_diagnostics.dart';
 
 import 'Pages/auth_gate.dart';
 import 'Pages/chest_page.dart';
+import 'Pages/email_login_page.dart';
 import 'Utility/honoo_colors.dart';
 import 'Widgets/global_invite_listener.dart';
 import 'Widgets/global_reply_notification_listener.dart';
@@ -62,8 +64,13 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  static final Uri _storieStorieNovelUri = Uri.parse(
+    'https://docs.google.com/document/d/1JdXAggCLLIMFZBo_lD80JD7IoQpAXEQQdtiSOVKnrJA/edit?usp=drive_link',
+  );
+
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   StreamSubscription<AuthState>? _authSub;
+  bool _handledStorieStorieContinuation = false;
 
   @override
   void initState() {
@@ -79,6 +86,55 @@ class _MyAppState extends State<MyApp> {
         );
       }
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_continueToStorieStorieNovel());
+    });
+  }
+
+  Future<void> _continueToStorieStorieNovel() async {
+    if (_handledStorieStorieContinuation ||
+        Uri.base.queryParameters['continue'] != 'storiestorie-romanzo') {
+      return;
+    }
+    _handledStorieStorieContinuation = true;
+
+    if (Supabase.instance.client.auth.currentUser == null) {
+      final loggedIn = await _navigatorKey.currentState?.push<bool>(
+        MaterialPageRoute(builder: (_) => const EmailLoginPage()),
+      );
+      if (loggedIn != true ||
+          Supabase.instance.client.auth.currentUser == null) {
+        return;
+      }
+    }
+
+    if (!mounted) return;
+    final context = _navigatorKey.currentContext;
+    if (context == null || !context.mounted) return;
+    final continueToDrive = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Prima di entrare'),
+        content: const Text(
+          'Su Google usa la stessa email con cui sei entrato in Honoo. '
+          'Nella pagina del documento premi “Richiedi accesso”: '
+          'Venceslao riceverà la richiesta e potrà autorizzarti come visualizzatore.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Annulla'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Continua su Google Drive'),
+          ),
+        ],
+      ),
+    );
+    if (continueToDrive != true) return;
+
+    await launchUrl(_storieStorieNovelUri, webOnlyWindowName: '_self');
   }
 
   @override
