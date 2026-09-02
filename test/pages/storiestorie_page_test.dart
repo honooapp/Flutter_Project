@@ -7,7 +7,7 @@ import 'package:honoo/Pages/storiestorie_page.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('la landing collega direttamente al sito Storiestorie', (
+  testWidgets('la landing collega direttamente al sito storiestorie', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(390, 844);
@@ -20,7 +20,7 @@ void main() {
 
     final libri = find.text('Libri');
     expect(libri, findsOneWidget);
-    final storiestorie = find.text('Storiestorie.it');
+    final storiestorie = find.text('storiestorie.it');
     expect(storiestorie, findsOneWidget);
     expect(find.byKey(const Key('storiestorie_icon')), findsOneWidget);
     expect(

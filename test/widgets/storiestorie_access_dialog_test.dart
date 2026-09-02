@@ -17,6 +17,11 @@ void main() {
   testWidgets('mostra il dialogo honoo con azione principale sopra Annulla', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     await tester.pumpWidget(
       const MaterialApp(home: Scaffold(body: StorieStorieAccessDialog())),
     );
@@ -24,6 +29,8 @@ void main() {
     expect(find.byType(HonooDialogShell), findsOneWidget);
     expect(find.textContaining('entrato in honoo'), findsOneWidget);
     expect(find.textContaining('entrato in Honoo'), findsNothing);
+    expect(find.textContaining('come visualizzatore.'), findsNothing);
+    expect(find.textContaining('come visualizzatore'), findsOneWidget);
 
     final title = tester.widget<Text>(find.text('Prima di entrare'));
     final continueText = tester.widget<Text>(
@@ -42,5 +49,6 @@ void main() {
       find.widgetWithText(TextButton, 'Annulla'),
     );
     expect(continueTop.dy, lessThan(cancelTop.dy));
+    expect(tester.takeException(), isNull);
   });
 }

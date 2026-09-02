@@ -75,7 +75,7 @@ void main() {
         'Regia degli Agenti',
         'Podcast e dirette',
         'Libri',
-        'Storiestorie.it',
+        'storiestorie.it',
       ]),
     );
     expect(find.byKey(const Key('storiestorie_icon')), findsOneWidget);
@@ -87,7 +87,7 @@ void main() {
     final regiaIndex = visibleTexts.indexOf('Regia degli Agenti');
     final podcastIndex = visibleTexts.indexOf('Podcast e dirette');
     final libriIndex = visibleTexts.indexOf('Libri');
-    final storiestorieIndex = visibleTexts.indexOf('Storiestorie.it');
+    final storiestorieIndex = visibleTexts.indexOf('storiestorie.it');
     expect(laBandaIndex, viaggiIndex + 1);
     expect(bandoFrancoliseIndex, laBandaIndex + 1);
     expect(regiaIndex, bandoFrancoliseIndex + 1);

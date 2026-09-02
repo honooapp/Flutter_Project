@@ -246,7 +246,7 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     const String viaggiLine = "Viaggi sull'Isola delle Storie";
     const String podcastLine = 'Podcast e dirette';
     const String libriLine = 'Libri';
-    const String storiestorieLine = 'Storiestorie.it';
+    const String storiestorieLine = 'storiestorie.it';
     const String laBandaLine = 'La Banda';
     const String bandoFrancoliseLine = 'Bando honoo\nper Dugenta';
     const String regiaAgentiLine = 'Regia degli Agenti';
