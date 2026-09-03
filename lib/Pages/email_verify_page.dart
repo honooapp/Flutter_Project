@@ -11,6 +11,7 @@ import 'package:honoo/Services/supabase_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Utility/honoo_link_style.dart';
 
 class EmailVerifyPage extends StatefulWidget {
   final String email;
@@ -40,8 +41,9 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
     super.initState();
 
     // 🎯 Ascolta magic link / cambi di stato
-    _authSub =
-        SupabaseProvider.client.auth.onAuthStateChange.listen((data) async {
+    _authSub = SupabaseProvider.client.auth.onAuthStateChange.listen((
+      data,
+    ) async {
       final event = data.event;
       final session = data.session;
 
@@ -75,17 +77,16 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
           } catch (e) {
             // Non bloccare il flusso di login; mostra feedback opzionale
             if (mounted) {
-              showHonooToast(
-                context,
-                message: 'Errore salvataggio hinoo: $e',
-              );
+              showHonooToast(context, message: 'Errore salvataggio hinoo: $e');
             }
           }
         }
 
         if (!mounted) return;
         Navigator.pop(
-            context, true); // torna alla pagina precedente e segnala "success"
+          context,
+          true,
+        ); // torna alla pagina precedente e segnala "success"
       }
     });
   }
@@ -110,17 +111,11 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
 
       // Se la verifica va a buon fine, onAuthStateChange scatterà.
       if (response.user == null && mounted) {
-        showHonooToast(
-          context,
-          message: 'Codice non valido',
-        );
+        showHonooToast(context, message: 'Codice non valido');
       }
     } catch (e) {
       if (mounted) {
-        showHonooToast(
-          context,
-          message: 'Errore verifica: $e',
-        );
+        showHonooToast(context, message: 'Errore verifica: $e');
       }
     } finally {
       if (mounted) setState(() => _isVerifying = false);
@@ -211,9 +206,7 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
               ),
               const SizedBox(height: 24),
               _isVerifying
-                  ? const Center(
-                      child: LoadingSpinner(color: Colors.white),
-                    )
+                  ? const Center(child: LoadingSpinner(color: Colors.white))
                   : button,
               const SizedBox(height: 8),
               InkWell(
@@ -223,10 +216,11 @@ class _EmailVerifyPageState extends State<EmailVerifyPage> {
                 child: Text(
                   'Email sbagliata? Modificala',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.lora(
-                    color: HonooColor.onBackground.withValues(alpha: 0.8),
-                    fontSize: 14,
-                    decoration: TextDecoration.underline,
+                  style: HonooLinkStyle.from(
+                    GoogleFonts.lora(
+                      color: HonooColor.onBackground.withValues(alpha: 0.8),
+                      fontSize: 14,
+                    ),
                   ),
                 ),
               ),

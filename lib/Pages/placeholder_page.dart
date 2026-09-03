@@ -7,6 +7,7 @@ import 'package:honoo/Widgets/responsive_footer_bar.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
 
 import '../Utility/honoo_colors.dart';
+import '../Utility/honoo_link_style.dart';
 import '../Utility/utility.dart';
 import '../Widgets/background.dart';
 import '../Widgets/honoo_app_title.dart';
@@ -185,12 +186,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
     double? height,
     VoidCallback? onTap,
   }) {
-    final linkStyle = (height == null ? style : style.copyWith(height: height))
-        .copyWith(
-          decoration: TextDecoration.underline,
-          decorationColor: style.color,
-          decorationThickness: 3.0,
-        );
+    final linkStyle = HonooLinkStyle.from(
+      height == null ? style : style.copyWith(height: height),
+    );
     return InkWell(
       onTap:
           onTap ??
@@ -217,12 +215,9 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
       },
       child: Text(
         text,
-        style: (height == null ? style : style.copyWith(height: height))
-            .copyWith(
-              decoration: TextDecoration.underline,
-              decorationColor: style.color,
-              decorationThickness: 3.0,
-            ),
+        style: HonooLinkStyle.from(
+          height == null ? style : style.copyWith(height: height),
+        ),
         textAlign: TextAlign.center,
       ),
     );
@@ -635,7 +630,6 @@ class _PlaceholderPageState extends State<PlaceholderPage> {
         color: HonooColor.onBackground,
         fontSize: 18,
         fontWeight: FontWeight.w200,
-        linkFontWeight: FontWeight.w700,
       ),
     ];
 

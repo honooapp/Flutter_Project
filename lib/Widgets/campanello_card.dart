@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../Entities/campanelli_view_data.dart';
 import '../UI/hinoo_typography.dart';
 import '../Utility/honoo_colors.dart';
+import '../Utility/honoo_link_style.dart';
 import '../Utility/inline_text_formatting.dart';
 import 'cover_transform_image.dart';
 import 'text_box_download_button.dart';
@@ -151,14 +152,7 @@ class CampanelloCard extends StatelessWidget {
             baseline: TextBaseline.alphabetic,
             child: InkWell(
               onTap: onRequestTap,
-              child: Text(
-                link,
-                style: textStyle.copyWith(
-                  decoration: TextDecoration.underline,
-                  decorationColor: textStyle.color,
-                  decorationThickness: 2.5,
-                ),
-              ),
+              child: Text(link, style: HonooLinkStyle.from(textStyle)),
             ),
           ),
           TextSpan(text: after),

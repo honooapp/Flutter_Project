@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Utility/honoo_link_style.dart';
 import 'package:honoo/Widgets/honoo_standard_page.dart';
 import 'coming_soon_page.dart';
 
@@ -26,10 +27,7 @@ class PodcastDirettePage extends StatelessWidget {
       TextSpan(text: 'È voce\nÈ immagine\n\n', style: style),
       TextSpan(
         text: 'Un canale YouTube\n',
-        style: style.copyWith(
-          fontWeight: FontWeight.w700,
-          decoration: TextDecoration.underline,
-        ),
+        style: HonooLinkStyle.from(style),
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).push(
@@ -45,10 +43,7 @@ class PodcastDirettePage extends StatelessWidget {
       ),
       TextSpan(
         text: 'Un podcast\n',
-        style: style.copyWith(
-          fontWeight: FontWeight.w700,
-          decoration: TextDecoration.underline,
-        ),
+        style: HonooLinkStyle.from(style),
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).push(
@@ -64,10 +59,7 @@ class PodcastDirettePage extends StatelessWidget {
       ),
       TextSpan(
         text: 'Un account Twitch\n\n',
-        style: style.copyWith(
-          fontWeight: FontWeight.w700,
-          decoration: TextDecoration.underline,
-        ),
+        style: HonooLinkStyle.from(style),
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).push(

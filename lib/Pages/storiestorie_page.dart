@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Utility/honoo_link_style.dart';
 import 'package:honoo/Widgets/honoo_standard_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -45,12 +46,7 @@ class StoriestoriePage extends StatelessWidget {
           children: [
             TextSpan(
               text: 'storiestorie.it\n\n',
-              style: style.copyWith(
-                fontWeight: FontWeight.w700,
-                decoration: TextDecoration.underline,
-                decorationColor: style.color,
-                decorationThickness: 3,
-              ),
+              style: HonooLinkStyle.from(style),
               recognizer: TapGestureRecognizer()
                 ..onTap = () async {
                   await launchUrl(

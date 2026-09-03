@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Controller/device_controller.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Utility/honoo_link_style.dart';
 import 'package:honoo/Utility/responsive_layout.dart';
 import 'package:honoo/Widgets/honoo_app_title.dart';
 import 'package:honoo/Widgets/responsive_footer_bar.dart';
@@ -98,10 +99,7 @@ class LaboratoriSiaePage extends StatelessWidget {
       TextSpan(text: 'honoo e ', style: baseTextStyle),
       TextSpan(
         text: 'Crocopie',
-        style: baseTextStyle.copyWith(
-          fontWeight: FontWeight.w700,
-          decoration: TextDecoration.underline,
-        ),
+        style: HonooLinkStyle.from(baseTextStyle),
         recognizer: TapGestureRecognizer()
           ..onTap = () async {
             final uri = Uri.parse('https://crocopie.com');
@@ -115,10 +113,7 @@ class LaboratoriSiaePage extends StatelessWidget {
       ),
       TextSpan(
         text: 'Noi e loro',
-        style: baseTextStyle.copyWith(
-          fontWeight: FontWeight.w700,
-          decoration: TextDecoration.underline,
-        ),
+        style: HonooLinkStyle.from(baseTextStyle),
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).push(

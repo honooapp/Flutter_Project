@@ -5,6 +5,7 @@ import 'package:honoo/Widgets/honoo_dialogs.dart';
 import 'package:honoo/Services/supabase_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Utility/honoo_link_style.dart';
 
 import '../Widgets/honoo_scaffold.dart';
 import 'email_verify_page.dart';
@@ -36,17 +37,12 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
     if (email.isEmpty) {
       setState(() => _isLoading = false);
       if (!mounted) return;
-      showHonooToast(
-        context,
-        message: 'Inserisci prima la tua email',
-      );
+      showHonooToast(context, message: 'Inserisci prima la tua email');
       return;
     }
 
     try {
-      await SupabaseProvider.client.auth.signInWithOtp(
-        email: email,
-      );
+      await SupabaseProvider.client.auth.signInWithOtp(email: email);
 
       if (!mounted) return;
 
@@ -70,10 +66,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
       }
     } catch (e) {
       if (!mounted) return;
-      showHonooToast(
-        context,
-        message: 'Errore invio OTP: $e',
-      );
+      showHonooToast(context, message: 'Errore invio OTP: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -89,10 +82,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
   Widget build(BuildContext context) {
     final inputDecoration = InputDecoration(
       hintText: 'Email',
-      hintStyle: GoogleFonts.lora(
-        color: Colors.white70,
-        fontSize: 16,
-      ),
+      hintStyle: GoogleFonts.lora(color: Colors.white70, fontSize: 16),
       filled: true,
       fillColor: Colors.white.withValues(alpha: 0.08),
       border: OutlineInputBorder(
@@ -107,10 +97,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
         borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: Colors.white60),
       ),
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 18,
-      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
     );
 
     final button = ElevatedButton(
@@ -119,16 +106,12 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 0,
       ),
       child: Text(
         _isLoading ? 'Invio in corso…' : 'Invia codice',
-        style: GoogleFonts.libreFranklin(
-          fontWeight: FontWeight.w600,
-        ),
+        style: GoogleFonts.libreFranklin(fontWeight: FontWeight.w600),
       ),
     );
 
@@ -168,19 +151,14 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.lora(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
+                  style: GoogleFonts.lora(color: Colors.white, fontSize: 16),
                   cursorColor: Colors.white,
                   decoration: inputDecoration,
                 ),
 
                 const SizedBox(height: 24),
                 _isLoading
-                    ? const Center(
-                        child: LoadingSpinner(color: Colors.white),
-                      )
+                    ? const Center(child: LoadingSpinner(color: Colors.white))
                     : button,
                 const SizedBox(height: 8),
                 Text(
@@ -200,9 +178,10 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
                   child: Text(
                     'torna indietro',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.lora(
-                      color: HonooColor.onBackground.withValues(alpha: 0.8),
-                      decoration: TextDecoration.underline,
+                    style: HonooLinkStyle.from(
+                      GoogleFonts.lora(
+                        color: HonooColor.onBackground.withValues(alpha: 0.8),
+                      ),
                     ),
                   ),
                 ),

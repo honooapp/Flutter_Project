@@ -111,6 +111,8 @@ void main() {
       expect(linkText.data, 'Vieni a vedere\n\n\n\n');
       expect(linkText.style?.fontWeight, FontWeight.w700);
       expect(linkText.style?.decoration, TextDecoration.underline);
+      expect(linkText.style?.decorationColor, linkText.style?.color);
+      expect(linkText.style?.decorationThickness, 3);
 
       await tester.ensureVisible(linkFinder);
       await tester.tap(linkFinder);

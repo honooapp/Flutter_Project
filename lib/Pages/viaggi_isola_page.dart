@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/campanelli_page.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Utility/honoo_link_style.dart';
 import 'package:honoo/Widgets/honoo_standard_page.dart';
 import 'package:honoo/Widgets/section_text.dart';
 // import 'package:honoo/Utility/responsive_layout.dart';
@@ -86,10 +87,7 @@ class ViaggiIsolaPage extends StatelessWidget {
             },
             child: Text(
               _campanelliLinkText,
-              style: bodyStyle.copyWith(
-                fontWeight: FontWeight.w700,
-                decoration: TextDecoration.underline,
-              ),
+              style: HonooLinkStyle.from(bodyStyle),
               textAlign: TextAlign.center,
             ),
           ),

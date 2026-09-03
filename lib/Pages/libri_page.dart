@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Utility/honoo_link_style.dart';
 import 'package:honoo/Utility/utility.dart';
 import 'package:honoo/Widgets/honoo_standard_page.dart';
 import 'coming_soon_page.dart';
@@ -33,10 +34,7 @@ class LibriPage extends StatelessWidget {
       TextSpan(text: intro, style: style),
       TextSpan(
         text: 'Isola delle Storie\n\n',
-        style: style.copyWith(
-          decoration: TextDecoration.underline,
-          fontWeight: FontWeight.w700,
-        ),
+        style: HonooLinkStyle.from(style),
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).push(
@@ -52,10 +50,7 @@ class LibriPage extends StatelessWidget {
       ),
       TextSpan(
         text: 'Isole delle Storie\n(con illustrazioni di Joel Folda)\n\n',
-        style: style.copyWith(
-          decoration: TextDecoration.underline,
-          fontWeight: FontWeight.w700,
-        ),
+        style: HonooLinkStyle.from(style),
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).push(
@@ -73,10 +68,7 @@ class LibriPage extends StatelessWidget {
       ),
       TextSpan(
         text: 'Immacolato\n\n',
-        style: style.copyWith(
-          decoration: TextDecoration.underline,
-          fontWeight: FontWeight.w700,
-        ),
+        style: HonooLinkStyle.from(style),
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).push(
@@ -92,10 +84,7 @@ class LibriPage extends StatelessWidget {
       ),
       TextSpan(
         text: 'I limoni sono finiti\n\n',
-        style: style.copyWith(
-          decoration: TextDecoration.underline,
-          fontWeight: FontWeight.w700,
-        ),
+        style: HonooLinkStyle.from(style),
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).push(
@@ -111,10 +100,7 @@ class LibriPage extends StatelessWidget {
       ),
       TextSpan(
         text: 'Almeno\navresti potuto\ncambiare i nomi\n\n',
-        style: style.copyWith(
-          decoration: TextDecoration.underline,
-          fontWeight: FontWeight.w700,
-        ),
+        style: HonooLinkStyle.from(style),
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).push(
@@ -130,10 +116,7 @@ class LibriPage extends StatelessWidget {
       ),
       TextSpan(
         text: 'Papà,\nma tu mi vuoi bene?\n\n',
-        style: style.copyWith(
-          decoration: TextDecoration.underline,
-          fontWeight: FontWeight.w700,
-        ),
+        style: HonooLinkStyle.from(style),
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             Navigator.of(context).push(

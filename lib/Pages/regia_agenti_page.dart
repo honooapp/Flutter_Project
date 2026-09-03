@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
+import 'package:honoo/Utility/honoo_link_style.dart';
 import 'package:honoo/Widgets/honoo_standard_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -94,11 +95,7 @@ class RegiaAgentiPage extends StatelessWidget {
             const TextSpan(text: _textBeforeAlessandro),
             TextSpan(
               text: 'Alessandro Molina',
-              style: bodyStyle.copyWith(
-                decoration: TextDecoration.underline,
-                decorationColor: bodyStyle.color,
-                decorationThickness: 3,
-              ),
+              style: HonooLinkStyle.from(bodyStyle),
               recognizer: TapGestureRecognizer()
                 ..onTap = () async {
                   await launchUrl(
