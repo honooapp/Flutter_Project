@@ -24,6 +24,25 @@ void main() {
   tearDown(() => harness.disableOverrides());
 
   Future<void> pumpAtSize(WidgetTester tester, Size size) async {
+    final rpc = MockQueryChain();
+    rpc.queueResponse(const [
+      {
+        'admin_email': 'venceslao.cembalo@gmail.com',
+        'campanello_hinoo_id': 'hinoo-venceslao',
+        'owner_id': 'admin-venceslao',
+        'house_image_url': null,
+        'pages': [
+          {
+            'backgroundImage': null,
+            'text': 'Campanello di Venceslao',
+            'isTextWhite': true,
+          },
+        ],
+      },
+    ]);
+    when(
+      () => harness.client.rpc('get_public_admin_campanelli'),
+    ).thenAnswer((_) => rpc);
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
