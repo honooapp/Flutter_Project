@@ -56,9 +56,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
   );
   // Animations: centralize durations/curves to avoid magic numbers
   static const Duration _kAnimFast = Duration(milliseconds: 220);
-  static const Duration _kAnimMed = Duration(milliseconds: 240);
-  static const Duration _kBounceIn = Duration(milliseconds: 180);
-  static const Duration _kBounceOut = Duration(milliseconds: 200);
+  static const Duration _kBounceIn = Duration(milliseconds: 650);
+  static const Duration _kBounceOut = Duration(milliseconds: 750);
+  static const Duration _kHouseSlideDuration = Duration(milliseconds: 800);
   static const Duration _kCarouselHintDuration = Duration(seconds: 4);
   static const Curve _kCurve = Curves.easeOutCubic;
   int _campanelloIndex = 0;
@@ -256,25 +256,16 @@ class _CampanelliPageState extends State<CampanelliPage> {
     if (confirmed != true || !mounted) return;
 
     setState(() => _unlockedCampanelli.add(campanelloId));
-    await _hintSwipeUp();
+    await _slideToHouse();
   }
 
-  Future<void> _hintSwipeUp() async {
+  Future<void> _slideToHouse() async {
     if (!_pageController.hasClients) return;
-    final position = _pageController.position;
-    final double bump = position.viewportDimension * 0.5;
-    final double start = position.pixels;
-    final double target = (start + bump).clamp(
-      position.minScrollExtent,
-      position.maxScrollExtent,
-    );
-
-    await _pageController.animateTo(
-      target,
-      duration: _kAnimFast,
+    await _pageController.animateToPage(
+      1,
+      duration: _kHouseSlideDuration,
       curve: _kCurve,
     );
-    await _pageController.animateTo(start, duration: _kAnimMed, curve: _kCurve);
   }
 
   Future<void> _handleScrigno(CampanelloData campanello) async {
@@ -841,9 +832,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
   Future<void> _hintCampanelloBounce() async {
     if (!_campanelloPageController.hasClients) return;
     final position = _campanelloPageController.position;
-    final double bump = (position.viewportDimension * 0.08).clamp(6.0, 60.0);
+    final double bump = position.viewportDimension * 0.5;
     final double start = position.pixels;
-    final double target = (start + bump).clamp(
+    final bool hasRoomAfter = start + bump <= position.maxScrollExtent;
+    final double target = (start + (hasRoomAfter ? bump : -bump)).clamp(
       position.minScrollExtent,
       position.maxScrollExtent,
     );
@@ -1334,50 +1326,21 @@ class _CampanelliPageState extends State<CampanelliPage> {
                           if (houseEntry == null)
                             const SizedBox.expand()
                           else if (casaUnlocked)
-                            AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 480),
-                              switchInCurve: Curves.easeOutCubic,
-                              switchOutCurve: Curves.easeOutCubic,
-                              transitionBuilder: (child, animation) {
-                                final curved = CurvedAnimation(
-                                  parent: animation,
-                                  curve: Curves.elasticOut,
-                                );
-                                final offsetAnimation = Tween<Offset>(
-                                  begin: const Offset(0, 0.28),
-                                  end: Offset.zero,
-                                ).animate(curved);
-                                final scale = Tween<double>(
-                                  begin: 0.97,
-                                  end: 1.0,
-                                ).animate(curved);
-                                return SlideTransition(
-                                  position: offsetAnimation,
-                                  child: ScaleTransition(
-                                    scale: scale,
-                                    child: FadeTransition(
-                                      opacity: animation,
-                                      child: child,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Center(
-                                child: CasaSection(
-                                  key: ValueKey('${houseEntry.casa.id}_open'),
-                                  casa: houseEntry.casa,
-                                  isUnlocked: casaUnlocked,
-                                  scrignoAsset: scrignoOverlay,
-                                  onScrignoTap: scrignoTap,
-                                  footerIconSize: footerIconSize,
-                                  scrignoSize: scrignoSize,
-                                  footerBottomSpacing: footerBottomSpacing,
-                                  width: casaWidth,
-                                  height: casaHeight,
-                                  onEditTap: isOwnCampanello
-                                      ? () => _editCasa(houseEntry)
-                                      : null,
-                                ),
+                            Center(
+                              child: CasaSection(
+                                key: ValueKey('${houseEntry.casa.id}_open'),
+                                casa: houseEntry.casa,
+                                isUnlocked: casaUnlocked,
+                                scrignoAsset: scrignoOverlay,
+                                onScrignoTap: scrignoTap,
+                                footerIconSize: footerIconSize,
+                                scrignoSize: scrignoSize,
+                                footerBottomSpacing: footerBottomSpacing,
+                                width: casaWidth,
+                                height: casaHeight,
+                                onEditTap: isOwnCampanello
+                                    ? () => _editCasa(houseEntry)
+                                    : null,
                               ),
                             )
                           else

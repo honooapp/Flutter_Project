@@ -90,6 +90,32 @@ void main() {
     expect(arrows.opacity, 0);
   });
 
+  testWidgets('Entra fa scorrere la casa dal basso fino a riempire la pagina', (
+    tester,
+  ) async {
+    await pumpAtSize(tester, const Size(390, 844));
+    await tester.pumpAndSettle();
+
+    await tester.drag(find.byType(CampanelloCard), const Offset(-500, 0));
+    await tester.pumpAndSettle();
+    final CampanelloCard card = tester.widget(find.byType(CampanelloCard));
+    expect(card.data.isIntro, isFalse);
+    await tester.tap(find.byTooltip('Campanello'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Entra pure a casa mia'), findsOneWidget);
+    await tester.tap(find.text('Entra'));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump(const Duration(milliseconds: 400));
+    final double movingTop = tester.getTopLeft(find.byType(CasaSection)).dy;
+    expect(movingTop, greaterThan(0));
+    expect(movingTop, lessThan(844));
+
+    await tester.pumpAndSettle();
+    expect(tester.getTopLeft(find.byType(CasaSection)).dy, closeTo(0, 0.1));
+    expect(find.byType(CampanelliFooter), findsNothing);
+  });
+
   testWidgets('Campanelli mantiene la struttura su viewport desktop', (
     tester,
   ) async {
