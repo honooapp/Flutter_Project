@@ -39,6 +39,37 @@ void main() {
     expect(requested, isTrue);
   });
 
+  testWidgets('il link della presentazione lunga resta visibile e cliccabile', (
+    tester,
+  ) async {
+    var requested = false;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: CampanelloCard(
+            data: CampanelloPageData.intro(
+              'In questa parte dell’Isola\nci sono case\n\n'
+              'Vuoi scoprire chi ci abita?\n\n'
+              'Scorrendo verso destra\npuoi leggere\nciò che ogni abitante\n'
+              'ha scelto di raccontarti\n\nSe vuoi,\nprova a bussare:\n'
+              'magari ti fa entrare\n\nVuoi anche tu\n'
+              'la tua casa sull’Isola?\n\n\nClicca qui',
+            ),
+            width: 338,
+            height: 600,
+            onRequestTap: () => requested = true,
+          ),
+        ),
+      ),
+    );
+
+    final link = find.text('Clicca qui');
+    expect(tester.getBottomRight(link).dy, lessThanOrEqualTo(600));
+    await tester.tap(link);
+    expect(requested, isTrue);
+  });
+
   testWidgets('campanello reale conserva sfondo e testo', (tester) async {
     const campanello = CampanelloData(
       id: 'campanello-1',

@@ -73,4 +73,16 @@ void main() {
     expect(text, contains('Questo è il campanello\ndi casa mia'));
     expect(text.split('\n'), hasLength(13));
   });
+
+  test('la presentazione dei campanelli include la richiesta casa', () {
+    expect(
+      Utility().campanelliText,
+      endsWith(
+        'magari ti fa entrare\n\n'
+        'Vuoi anche tu\n'
+        'la tua casa sull’Isola?\n\n\n'
+        'Clicca qui',
+      ),
+    );
+  });
 }

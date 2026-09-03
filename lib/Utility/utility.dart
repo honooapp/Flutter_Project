@@ -31,7 +31,7 @@ class Utility {
   final String libriText =
       'Sto preparando\nle versioni cartacee\ndei miei libri\n\nHo acquistato\ni codici ISBN\ne una licenza\nInDesign\n\nÈ un lavoro lento\nArtigianale\n\nQui troverai la notizia,\nquando saranno pronti:\n\nIsola delle Storie\n\nIsole delle Storie\n(con illustrazioni di Joel Folda)\n\nImmacolato\n\nI limoni sono finiti\n\nAlmeno\navresti potuto\ncambiare i nomi\n\nPapà,\nma tu mi vuoi bene?\n';
   final String campanelliText =
-      'In questa parte dell’Isola\nci sono case\n\nVuoi scoprire chi ci abita?\n\nScorrendo verso destra\npuoi leggere\nciò che ogni abitante\nha scelto di raccontarti\n\nSe vuoi,\nprova a bussare:\nmagari ti fa entrare';
+      'In questa parte dell’Isola\nci sono case\n\nVuoi scoprire chi ci abita?\n\nScorrendo verso destra\npuoi leggere\nciò che ogni abitante\nha scelto di raccontarti\n\nSe vuoi,\nprova a bussare:\nmagari ti fa entrare\n\nVuoi anche tu\nla tua casa sull’Isola?\n\n\nClicca qui';
   final String campanelloExample1Text =
       'Ti piace\nascoltare musica\nin compagnia?\n\nE ballare in casa,\ncome si fa alle feste?\n\nQuesto è il campanello\ndi casa mia\n\nPuoi bussare,\nse vuoi\n\nMagari sono a casa\nMagari sto ascoltando musica\nMagari è musica che ti piace';
   final String campanelloExample2Text =

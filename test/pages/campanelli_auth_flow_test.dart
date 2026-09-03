@@ -21,7 +21,7 @@ void main() {
   tearDown(() => harness.disableOverrides());
 
   testWidgets(
-    'un ospite vede presentazione, i due admin in ordine e poi il login',
+    'un ospite vede il link nella presentazione e i due admin in ordine',
     (tester) async {
       final rpc = MockQueryChain();
       rpc.queueResponse(const [
@@ -61,6 +61,16 @@ void main() {
 
       CampanelloCard card = tester.widget(find.byType(CampanelloCard));
       expect(card.data.isIntro, isTrue);
+      expect(
+        card.data.text,
+        contains('Vuoi anche tu\nla tua casa sull’Isola?\n\n\nClicca qui'),
+      );
+
+      await tester.tap(find.text('Clicca qui'));
+      await tester.pumpAndSettle();
+      expect(find.byType(EmailLoginPage), findsOneWidget);
+      Navigator.of(tester.element(find.byType(EmailLoginPage))).pop();
+      await tester.pumpAndSettle();
 
       await tester.drag(find.byType(CampanelloCard), const Offset(-500, 0));
       await tester.pumpAndSettle();
@@ -75,16 +85,6 @@ void main() {
       expect(card.data.campanello?.campanelloHinooId, 'hinoo-mariandreea');
       expect(card.data.text, 'Campanello di Mari Andreea');
       expect(card.data.text, isNot(contains('Magari sono sul terrazzo')));
-
-      await tester.drag(find.byType(CampanelloCard), const Offset(-500, 0));
-      await tester.pumpAndSettle();
-      card = tester.widget(find.byType(CampanelloCard));
-      expect(card.data.text, contains('una casa'));
-
-      await tester.tap(find.text('Clicca qui'));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(EmailLoginPage), findsOneWidget);
     },
   );
 

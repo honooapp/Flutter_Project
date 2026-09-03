@@ -46,11 +46,21 @@ class CampanelloCard extends StatelessWidget {
     );
 
     final Widget introText = Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: HinooTypography.horizontalPadding,
-        vertical: verticalPadding,
+      padding: EdgeInsets.fromLTRB(
+        HinooTypography.horizontalPadding,
+        verticalPadding,
+        HinooTypography.horizontalPadding,
+        verticalPadding + 96,
       ),
-      child: Center(child: _buildText(textStyle)),
+      child: Center(
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: SizedBox(
+            width: math.max(1, width - (HinooTypography.horizontalPadding * 2)),
+            child: _buildText(textStyle),
+          ),
+        ),
+      ),
     );
 
     if (data.isIntro) {

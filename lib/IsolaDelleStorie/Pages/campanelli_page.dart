@@ -496,15 +496,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
         CampanelloPageData.campanello(campanello.campanello),
     ];
 
-    // Se l'utente non ha ancora una casa/campanello e non ha inviti pendenti, aggiungi pagina CTA
-    if (!_hasOwnHouse && !_hasPendingOrAcceptedInvite) {
-      pages.add(
-        CampanelloPageData.intro(
-          'Vuoi\n anche tu\n una casa\n sull\'Isola?\n\nClicca qui',
-        ),
-      );
-    }
-
     if (pages.isEmpty) {
       pages.add(CampanelloPageData.intro('Nessun campanello disponibile'));
     }
