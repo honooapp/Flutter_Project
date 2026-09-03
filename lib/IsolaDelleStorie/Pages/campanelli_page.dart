@@ -490,9 +490,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
   List<CampanelloPageData> _buildCampanelloPages(
     List<_CampanelloEntry> campanelli,
   ) {
-    final isGuest = SupabaseProvider.client.auth.currentUser == null;
     final pages = <CampanelloPageData>[
-      if (isGuest) CampanelloPageData.intro(Utility().campanelliText),
+      CampanelloPageData.intro(Utility().campanelliText),
       for (final campanello in campanelli)
         CampanelloPageData.campanello(campanello.campanello),
     ];
@@ -828,8 +827,8 @@ class _CampanelliPageState extends State<CampanelliPage> {
       (e) => e.campanello.campanelloHinooId == tag,
     );
     if (idx < 0) return;
-    final bool hasIntro = SupabaseProvider.client.auth.currentUser == null;
-    final int pageIndex = idx + (hasIntro ? 1 : 0);
+    const int introPageCount = 1;
+    final int pageIndex = idx + introPageCount;
     // Ensure we are on the campanelli layer (vertical page 0)
     if (_pageController.hasClients) {
       await _pageController.animateToPage(

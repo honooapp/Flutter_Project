@@ -89,7 +89,7 @@ void main() {
   );
 
   testWidgets(
-    'un utente autenticato entra sul proprio campanello e poi vede gli altri',
+    'un utente autenticato vede prima la presentazione e poi i campanelli',
     (tester) async {
       harness.disableOverrides();
       harness = SupabaseTestHarness(withAuthenticatedUser: true);
@@ -152,6 +152,11 @@ void main() {
       await tester.pumpAndSettle();
 
       CampanelloCard card = tester.widget(find.byType(CampanelloCard));
+      expect(card.data.isIntro, isTrue);
+
+      await tester.drag(find.byType(CampanelloCard), const Offset(-500, 0));
+      await tester.pumpAndSettle();
+      card = tester.widget(find.byType(CampanelloCard));
       expect(card.data.text, 'Il mio campanello');
 
       await tester.drag(find.byType(CampanelloCard), const Offset(-500, 0));

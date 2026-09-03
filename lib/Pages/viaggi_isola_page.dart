@@ -86,7 +86,10 @@ class ViaggiIsolaPage extends StatelessWidget {
             },
             child: Text(
               _campanelliLinkText,
-              style: bodyStyle.copyWith(fontWeight: FontWeight.w700),
+              style: bodyStyle.copyWith(
+                fontWeight: FontWeight.w700,
+                decoration: TextDecoration.underline,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
