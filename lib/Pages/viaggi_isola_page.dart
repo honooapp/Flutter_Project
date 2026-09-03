@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:honoo/IsolaDelleStorie/Pages/campanelli_page.dart';
 import 'package:honoo/Utility/honoo_colors.dart';
 import 'package:honoo/Widgets/honoo_standard_page.dart';
 import 'package:honoo/Widgets/section_text.dart';
@@ -31,10 +32,11 @@ class ViaggiIsolaPage extends StatelessWidget {
       "E nella parte occidentale\n"
       "non ci sono\n"
       "veramente\n"
-      "i leoni,\n"
-      "ma questo\n"
-      "lo scoprirai,\n"
-      "se ne avrai voglia\n\n";
+      "i leoni\n\n"
+      "Vuoi scoprire\n"
+      "che c’è?\n\n";
+
+  static const String _campanelliLinkText = "Vieni a vedere\n\n\n\n";
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +76,20 @@ class ViaggiIsolaPage extends StatelessWidget {
             ),
           ),
           Text(_textBelowMap, style: bodyStyle, textAlign: TextAlign.center),
+          InkWell(
+            key: const Key('campanelli_link'),
+            onTap: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const CampanelliPage()),
+                (route) => false,
+              );
+            },
+            child: Text(
+              _campanelliLinkText,
+              style: bodyStyle.copyWith(fontWeight: FontWeight.w700),
+              textAlign: TextAlign.center,
+            ),
+          ),
         ],
       ),
     );

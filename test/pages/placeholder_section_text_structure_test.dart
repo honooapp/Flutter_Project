@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:honoo/IsolaDelleStorie/Pages/campanelli_page.dart';
 import 'package:honoo/Pages/bando_honoo_francolise_page.dart';
 import 'package:honoo/Pages/feste_page.dart';
 import 'package:honoo/Pages/la_banda_page.dart';
@@ -11,6 +12,9 @@ import 'package:honoo/Pages/podcast_dirette_page.dart';
 import 'package:honoo/Pages/regia_agenti_page.dart';
 import 'package:honoo/Pages/storiestorie_page.dart';
 import 'package:honoo/Pages/viaggi_isola_page.dart';
+import 'package:mocktail/mocktail.dart';
+
+import '../test_supabase_helper.dart';
 
 Iterable<TextSpan> _allTextSpans(InlineSpan span) sync* {
   if (span is! TextSpan) return;
@@ -23,6 +27,7 @@ Iterable<TextSpan> _allTextSpans(InlineSpan span) sync* {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  registerSupabaseFallbacks();
 
   final sections = <(String, Widget)>[
     ('Performance', const PerformancePage()),
@@ -64,8 +69,12 @@ void main() {
         }
 
         expect(plainText, startsWith('$title\n\n'));
-        expect(plainText, endsWith('\n\n'));
-        expect(plainText, isNot(endsWith('\n\n\n')));
+        if (page is ViaggiIsolaPage) {
+          expect(plainText, endsWith('\n\n\n\n'));
+        } else {
+          expect(plainText, endsWith('\n\n'));
+          expect(plainText, isNot(endsWith('\n\n\n')));
+        }
 
         final titleSpan = tester
             .widgetList<RichText>(find.byType(RichText))
@@ -75,4 +84,38 @@ void main() {
       },
     );
   }
+
+  testWidgets(
+    'Viaggi Isola mostra il collegamento in grassetto verso i Campanelli',
+    (tester) async {
+      final harness = SupabaseTestHarness()..enableOverrides();
+      addTearDown(harness.disableOverrides);
+      final publicCampanelliQuery = MockQueryChain()
+        ..queueResponse(<dynamic>[]);
+      when(
+        () => harness.client.rpc('get_public_admin_campanelli'),
+      ).thenAnswer((_) => publicCampanelliQuery);
+
+      await tester.pumpWidget(const MaterialApp(home: ViaggiIsolaPage()));
+      await tester.pumpAndSettle();
+
+      final linkFinder = find.byKey(const Key('campanelli_link'));
+      expect(linkFinder, findsOneWidget);
+      expect(find.textContaining('i leoni,'), findsNothing);
+      expect(find.textContaining('ma questo'), findsNothing);
+      expect(find.textContaining('Vuoi scoprire\nche c’è?'), findsOneWidget);
+
+      final linkText = tester.widget<Text>(
+        find.descendant(of: linkFinder, matching: find.byType(Text)),
+      );
+      expect(linkText.data, 'Vieni a vedere\n\n\n\n');
+      expect(linkText.style?.fontWeight, FontWeight.w700);
+
+      await tester.ensureVisible(linkFinder);
+      await tester.tap(linkFinder);
+      await tester.pumpAndSettle(const Duration(milliseconds: 50));
+
+      expect(find.byType(CampanelliPage), findsOneWidget);
+    },
+  );
 }
