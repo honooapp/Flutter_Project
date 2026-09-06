@@ -1,3 +1,4 @@
+import '../Services/hinoo_service.dart';
 // lib/Pages/new_hinoo_page.dart
 import 'dart:typed_data';
 
@@ -45,6 +46,7 @@ class NewHinooPage extends StatefulWidget {
     this.targetContentName = 'hinoo',
     this.initialDraft,
     this.editingCampanelloId,
+    this.editingHinooId,
     this.campanelloEditMode,
   });
 
@@ -59,6 +61,7 @@ class NewHinooPage extends StatefulWidget {
   final String targetContentName;
   final HinooDraft? initialDraft;
   final String? editingCampanelloId;
+  final String? editingHinooId;
   final CampanelloEditMode? campanelloEditMode;
 
   @override
@@ -71,6 +74,7 @@ class _NewHinooPageState extends State<NewHinooPage>
 
   final _controller = HinooController();
   bool _savedToChest = false;
+  String? _savedHinooId;
   late final AnimationController _chestBounceController;
   late final Animation<double> _chestBounce;
 
@@ -299,6 +303,8 @@ class _NewHinooPageState extends State<NewHinooPage>
       hinooDraft = hinooDraft.copyWith(conversationId: selectedConversationId);
     }
     final bool shouldOfferNotifications =
+        _savedHinooId == null &&
+        widget.editingHinooId == null &&
         userId != null &&
         hinooDraft.type == HinooType.personal &&
         await ConversationNotificationPrompt.shouldOfferForFirstConversation(
@@ -346,9 +352,20 @@ class _NewHinooPageState extends State<NewHinooPage>
 
       final bool isAnswer =
           (hinooDraft.type == HinooType.answer) || widget.isReply;
-      final savedHinooId = isAnswer
-          ? await _controller.saveToChestAndReturnId(hinooDraft)
-          : await _controller.saveToChest(hinooDraft);
+      final existingId = _savedHinooId ?? widget.editingHinooId;
+      final String savedHinooId;
+      if (existingId != null) {
+        await HinooService.updateContent(
+          id: existingId,
+          draft:
+              widget.initialDraft?.copyWith(pages: hinooDraft.pages) ??
+              hinooDraft,
+        );
+        savedHinooId = existingId;
+      } else {
+        savedHinooId = await _controller.saveToChestAndReturnId(hinooDraft);
+        if (!isAnswer) _savedHinooId = savedHinooId;
+      }
       if (!mounted) return;
       setState(() => _savedToChest = true);
       _chestBounceController.forward(from: 0);
@@ -401,10 +418,6 @@ class _NewHinooPageState extends State<NewHinooPage>
                 ? "L'hinoo è anche sulla Luna."
                 : 'hinoo già presente sulla Luna.';
             showHonooToast(context, message: text);
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const HomePage()),
-              (route) => false,
-            );
           } catch (e) {
             if (!mounted) return;
             showHonooToast(context, message: 'Errore: $e');
@@ -643,19 +656,36 @@ class _NewHinooPageState extends State<NewHinooPage>
               ),
             ),
             Expanded(
+              child: IconButton(
+                key: const Key('hinoo-delete-editing-content'),
+                tooltip: 'Cancella hinoo',
+                onPressed: _deleteEditorContent,
+                padding: EdgeInsets.zero,
+                icon: SvgPicture.asset(
+                  'assets/Cestino.svg',
+                  width: secondaryActionIconSize,
+                  height: secondaryActionIconSize,
+                  colorFilter: const ColorFilter.mode(
+                    HonooColor.onBackground,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
               child: Align(
                 alignment: Alignment.centerRight,
                 child: Tooltip(
-                  message: 'Cancella hinoo',
+                  message: 'Modifica testo',
                   preferBelow: false,
                   child: IconButton(
-                    key: const Key('hinoo-delete-editing-content'),
-                    onPressed: _deleteEditorContent,
+                    key: const Key('hinoo-edit-text'),
+                    onPressed: _beginCampanelloTextEdit,
                     padding: EdgeInsets.zero,
                     iconSize: secondaryActionIconSize,
                     color: HonooColor.onBackground,
                     icon: SvgPicture.asset(
-                      'assets/Cestino.svg',
+                      'assets/icons/modifica testo.svg',
                       width: secondaryActionIconSize,
                       height: secondaryActionIconSize,
                       colorFilter: const ColorFilter.mode(
@@ -721,7 +751,23 @@ class _NewHinooPageState extends State<NewHinooPage>
       height: 40,
       child: _builderStep == 'changeBg' && _hasBackground
           ? _buildImageEditingControls()
-          : const SizedBox.shrink(),
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextBoxDownloadButton(
+                  key: const Key('hinoo-edit-image'),
+                  onPressed: _replaceEditorImage,
+                  tooltip: 'Modifica immagine',
+                  asset: 'assets/icons/immagine.svg',
+                ),
+                TextBoxDownloadButton(
+                  key: const Key('hinoo-edit-text'),
+                  onPressed: _beginCampanelloTextEdit,
+                  tooltip: 'Modifica testo',
+                  asset: 'assets/icons/modifica testo.svg',
+                ),
+              ],
+            ),
     );
   }
 

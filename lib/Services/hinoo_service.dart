@@ -39,6 +39,26 @@ class HinooService {
     }
   }
 
+  static Future<void> updateContent({
+    required String id,
+    required HinooDraft draft,
+  }) async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) throw StateError('Utente non autenticato');
+    await _client
+        .from(_table)
+        .update({
+          'pages': draft.toJson()['pages'],
+          'fingerprint': draft.type == HinooType.moon
+              ? fingerprint(draft)
+              : null,
+        })
+        .eq('id', id)
+        .eq('user_id', userId)
+        .select('id')
+        .single();
+  }
+
   static Future<void> publishHinoo(HinooDraft draft) async {
     _validateConversationLink(draft);
     final userId = _client.auth.currentUser?.id;

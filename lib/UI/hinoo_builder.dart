@@ -123,7 +123,24 @@ class _HinooBuilderState extends State<HinooBuilder> {
             'textColor': (slide.isTextWhite ? Colors.white : Colors.black)
                 .toARGB32(),
             if (slide.bgTransform != null)
-              'bgTransform': List<double>.from(slide.bgTransform!),
+              'bgTransform': List<double>.from(slide.bgTransform!)
+            else
+              'bgTransform':
+                  (Matrix4.identity()
+                        ..translateByDouble(
+                          slide.bgOffsetX,
+                          slide.bgOffsetY,
+                          0,
+                          1,
+                        )
+                        ..scaleByDouble(
+                          slide.bgScale,
+                          slide.bgScale,
+                          slide.bgScale,
+                          1,
+                        ))
+                      .storage
+                      .toList(),
           },
         ),
       );
@@ -866,6 +883,7 @@ class _HinooBuilderState extends State<HinooBuilder> {
       final Matrix4 initialMatrix = await _fitBackgroundToCanvas(bytes);
       final double initialScale = _extractScaleFromMatrix(initialMatrix);
       setState(() {
+        _step = _WizardStep.changeBg;
         _localBgPreviewBytes = bytes;
         _bgChosen = true; // abilita OK per procedere
         _bgLockedMatrix = null;

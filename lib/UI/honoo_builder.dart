@@ -1,3 +1,4 @@
+import '../Widgets/content_edit_frame.dart';
 // lib/UI/honoo_builder.dart
 import 'dart:math' as math;
 import 'dart:typed_data';
@@ -46,6 +47,7 @@ class HonooBuilder extends StatefulWidget {
   final void Function(String text, String imageUrl)? onHonooChanged;
   final ValueChanged<bool>? onFocusChanged;
   final String? initialText;
+  final String? initialImageUrl;
   final String? textHint;
   final String? imageHint;
   final VoidCallback? onDownloadTap;
@@ -61,6 +63,7 @@ class HonooBuilder extends StatefulWidget {
     this.onHonooChanged,
     this.onFocusChanged,
     this.initialText,
+    this.initialImageUrl,
     this.textHint,
     this.imageHint,
     this.onDownloadTap,
@@ -135,6 +138,9 @@ class HonooBuilderState extends State<HonooBuilder> {
     if (widget.initialText != null && widget.initialText!.isNotEmpty) {
       _textCtrl.text = widget.initialText!;
     }
+
+    _publicImageUrl = widget.initialImageUrl ?? '';
+    _imageConfirmed = _publicImageUrl.isNotEmpty;
 
     _textCtrl.addListener(_handleTextChanged);
     _textFocus.addListener(_handleFocusChange);
@@ -384,6 +390,9 @@ class HonooBuilderState extends State<HonooBuilder> {
     widget.onImageEditorVisibilityChanged?.call(!saved);
   }
 
+  void editTextPublic() => _editText();
+  Future<void> editImagePublic() => _pickImage();
+
   void _editText() {
     setState(() => _isEditingText = true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -399,7 +408,7 @@ class HonooBuilderState extends State<HonooBuilder> {
   Future<void> _saveEditedTextAndHonoo() async {
     _textFocus.unfocus();
     _emitChange();
-    if (hasImage) {
+    if (hasImage && !_imageConfirmed) {
       await _confirmImage();
       return;
     }
@@ -578,7 +587,7 @@ class HonooBuilderState extends State<HonooBuilder> {
         final double displayW = HonooBuilder.baselineImageSize * scale;
         final double displayH = baselineTotalHeight * scale;
 
-        return Center(
+        final content = Center(
           child: SizedBox(
             width: displayW,
             height: displayH,
@@ -625,6 +634,15 @@ class HonooBuilderState extends State<HonooBuilder> {
               ),
             ),
           ),
+        );
+        if (_showImageEditingToolbar) return content;
+        return ContentEditFrame(
+          width: displayW,
+          height: displayH,
+          onImage: _pickImage,
+          onText: _editText,
+          onSave: _publicImageUrl.isNotEmpty ? _saveEditedTextAndHonoo : null,
+          child: content,
         );
       },
     );
@@ -860,7 +878,9 @@ class HonooBuilderState extends State<HonooBuilder> {
         borderRadius: BorderRadius.circular(5),
         child: Container(
           color: HonooColor.tertiary,
-          child: _imageBytes == null
+          child: _imageBytes == null && _publicImageUrl.isNotEmpty
+              ? Image.network(_publicImageUrl, fit: BoxFit.cover)
+              : _imageBytes == null
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

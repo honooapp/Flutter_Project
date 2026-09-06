@@ -19,6 +19,26 @@ class HonooService {
   /// TEST-ONLY: abilita injection del client mock
   static void $setTestClient(SupabaseClient? c) => _overrideClient = c;
 
+  static Future<void> updateContent({
+    required String id,
+    required String text,
+    required String imageUrl,
+  }) async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) throw StateError('Utente non autenticato');
+    await _client
+        .from('honoo')
+        .update({
+          'text': text,
+          'image_url': imageUrl,
+          'fingerprint': '$text\u001f$imageUrl',
+        })
+        .eq('id', id)
+        .eq('user_id', userId)
+        .select('id')
+        .single();
+  }
+
   /// Honoo pubblici (Luna)
   static Future<List<Honoo>> fetchPublicHonoo() async {
     final response = await _reliability.read(

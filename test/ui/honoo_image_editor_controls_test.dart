@@ -25,7 +25,12 @@ void main() {
       ),
     );
 
-    final emptyImageIcon = tester.widget<SvgPicture>(find.byType(SvgPicture));
+    final emptyImageIcon = tester.widget<SvgPicture>(
+      find.descendant(
+        of: find.byKey(const Key('honoo-image-area')),
+        matching: find.byType(SvgPicture),
+      ),
+    );
     expect(
       (emptyImageIcon.bytesLoader as SvgAssetLoader).assetName,
       'assets/icons/immagine.svg',

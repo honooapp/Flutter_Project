@@ -1089,6 +1089,7 @@ class _ChestPageState extends State<ChestPage> with WidgetsBindingObserver {
 
     final GlobalKey repaintKey = _keyFor(identity);
     return ChestItemView(
+      onSaved: _loadAll,
       item: item,
       availableHeight: availableCenterH,
       maxWidth: targetMaxW,

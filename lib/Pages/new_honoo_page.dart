@@ -37,8 +37,12 @@ class NewHonooPage extends StatefulWidget {
     this.replyTo,
     this.returnToPreviousOnAnswer = false,
     this.targetContentName = 'honoo',
+    this.editingHonoo,
+    this.editImage = false,
   });
 
+  final Honoo? editingHonoo;
+  final bool editImage;
   final HonooType? forcedType;
   final String? recipientTag;
   final bool returnSavedId;
@@ -68,6 +72,25 @@ class _NewHonooPageState extends State<NewHonooPage> {
   bool _hasMinTextForDownload = false;
   bool _isImageEditorVisible = false;
 
+  @override
+  void initState() {
+    super.initState();
+    final original = widget.editingHonoo;
+    if (original != null) {
+      _text = original.text;
+      _imageUrl = original.image;
+      _hasMinTextForDownload = InlineTextFormatting.hasVisibleText(_text);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (widget.editImage) {
+          _builderKey.currentState?.editImagePublic();
+        } else {
+          _builderKey.currentState?.editTextPublic();
+        }
+      });
+    }
+  }
+
   void _onImageEditorVisibilityChanged(bool isVisible) {
     if (_isImageEditorVisible == isVisible) return;
     setState(() => _isImageEditorVisible = isVisible);
@@ -93,7 +116,22 @@ class _NewHonooPageState extends State<NewHonooPage> {
     });
   }
 
-  Future<bool> _submitHonoo({bool openChestAfterSave = false}) async {
+  String? _savedHonooId;
+
+  Future<void> _offerMoonAfterSave() async {
+    final send = await showDialog<bool>(
+      context: context,
+      builder: (_) => const HonooConfirmDialog(
+        title: "L'honoo è stato salvato nel tuo Scrigno.",
+        message: "Vuoi spedirlo anche sulla Luna, per mostrarlo a tutti?",
+        confirmLabel: "Sì",
+        cancelLabel: "No",
+      ),
+    );
+    if (send == true && mounted) await _submitToMoon();
+  }
+
+  Future<bool> _submitHonoo() async {
     final user = SupabaseProvider.client.auth.currentUser;
 
     // Se la sessione scade, apri direttamente il login e conserva l'editor.
@@ -127,6 +165,28 @@ class _NewHonooPageState extends State<NewHonooPage> {
         message: 'Immagine non valida. Ricaricala e riprova.',
       );
       return false;
+    }
+
+    final original = widget.editingHonoo;
+    final savedId = _savedHonooId ?? original?.dbId;
+    if (savedId != null) {
+      try {
+        await HonooService.updateContent(
+          id: savedId,
+          text: _text,
+          imageUrl: finalImageUrl,
+        );
+        if (!mounted) return false;
+        _finalImageUrlCache = finalImageUrl;
+        _lastSavedRawImage = _imageUrl;
+        await _offerMoonAfterSave();
+        return true;
+      } catch (error) {
+        if (mounted) {
+          showHonooToast(context, message: 'Modifica non salvata: $error');
+        }
+        return false;
+      }
     }
 
     // 4) Crea e salva
@@ -169,7 +229,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
           ? await HonooService.publishHonooAndReturnId(newHonoo)
           : null;
       if (savedReplyId == null) {
-        await HonooService.publishHonoo(newHonoo);
+        _savedHonooId = await HonooService.publishHonooAndReturnId(newHonoo);
       }
 
       if (!mounted) return false;
@@ -216,35 +276,8 @@ class _NewHonooPageState extends State<NewHonooPage> {
         return true;
       }
 
-      if (openChestAfterSave) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const ChestPage()),
-          (route) => false,
-        );
-        return true;
-      } else {
-        final bool? sendToMoon = await showDialog<bool>(
-          context: context,
-          barrierDismissible: true,
-          builder: (_) => const HonooConfirmDialog(
-            title: "L'honoo è stato salvato nel tuo Scrigno.",
-            message: 'Vuoi spedirlo anche sulla Luna, per mostrarlo a tutti?',
-            confirmLabel: 'Sì',
-            cancelLabel: 'No',
-          ),
-        );
-        if (sendToMoon == true && mounted) {
-          final sent = await _submitToMoon();
-          if (sent && mounted) {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const HomePage()),
-              (route) => false,
-            );
-            return true;
-          }
-        }
-        return true;
-      }
+      await _offerMoonAfterSave();
+      return true;
     } catch (e, st) {
       debugPrint('publishHonoo failed: $e\n$st');
       if (!mounted) return false;
@@ -504,14 +537,15 @@ class _NewHonooPageState extends State<NewHonooPage> {
                                   child: ClipRect(
                                     child: HonooBuilder(
                                       key: _builderKey,
+                                      initialText: widget.editingHonoo?.text,
+                                      initialImageUrl:
+                                          widget.editingHonoo?.image,
                                       onHonooChanged: _onHonooChanged,
                                       onFocusChanged: _onBuilderFocusChanged,
                                       showCharacterCounter: true,
                                       imageConfirmIconDisplaySize:
                                           footerIconSize,
-                                      onImageConfirmed: () => _submitHonoo(
-                                        openChestAfterSave: true,
-                                      ),
+                                      onImageConfirmed: () => _submitHonoo(),
                                       onImageEditorVisibilityChanged:
                                           _onImageEditorVisibilityChanged,
                                     ),

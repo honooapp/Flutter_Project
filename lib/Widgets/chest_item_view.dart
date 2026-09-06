@@ -1,3 +1,4 @@
+import 'saved_content_edit_frame.dart';
 import 'package:flutter/material.dart';
 
 import '../Entities/chest_item.dart';
@@ -31,8 +32,10 @@ class ChestItemView extends StatelessWidget {
     required this.onSelectConversationEntry,
     required this.onDownload,
     required this.conversationRefreshToken,
+    this.onSaved,
   });
 
+  final VoidCallback? onSaved;
   final ChestItem item;
   final double availableHeight;
   final double maxWidth;
@@ -114,7 +117,18 @@ class ChestItemView extends StatelessWidget {
         child: SizedBox(width: maxWidth, height: availableHeight, child: card),
       ),
     );
-    if (!isConversation) return keyedCard;
+    if (!isConversation) {
+      return SavedContentEditFrame(
+        width: cardWidth,
+        height: cardHeight,
+        honoo: item.honoo,
+        hinoo: item.hinoo?.draft,
+        hinooId: item.hinoo?.id,
+        ownerId: item.hinoo?.ownerId,
+        onSaved: onSaved ?? () {},
+        child: keyedCard,
+      );
+    }
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 250),
       child: keyedCard,

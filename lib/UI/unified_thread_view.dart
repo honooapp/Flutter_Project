@@ -1,4 +1,6 @@
+import '../Widgets/saved_content_edit_frame.dart';
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -507,7 +509,20 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
     return ColoredBox(
       key: keyName == null ? null : Key(keyName),
       color: style.backgroundColor,
-      child: SizedBox.expand(child: card),
+      child: SizedBox.expand(
+        child: SavedContentEditFrame(
+          width: entry.honoo != null
+              ? math.min(widget.maxWidth, (widget.maxHeight - 9.5) / 1.5)
+              : math.min(widget.maxWidth, widget.maxHeight * 9 / 16),
+          height: widget.maxHeight,
+          honoo: entry.honoo,
+          hinoo: entry.hinoo,
+          hinooId: entry.id,
+          ownerId: entry.ownerId,
+          onSaved: _load,
+          child: card,
+        ),
+      ),
     );
   }
 
