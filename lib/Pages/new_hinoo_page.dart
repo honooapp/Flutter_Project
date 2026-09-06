@@ -25,7 +25,6 @@ import 'placeholder_page.dart';
 import '../Entities/hinoo.dart';
 import '../Entities/reply_navigation_result.dart';
 import 'casa_builder_page.dart';
-import '../IsolaDelleStorie/Pages/campanelli_page.dart';
 import '../Widgets/conversation_notification_prompt.dart';
 import '../Widgets/repeated_reply_prompt.dart';
 import '../Widgets/text_box_download_button.dart';
@@ -537,15 +536,7 @@ class _NewHinooPageState extends State<NewHinooPage>
       return;
     }
 
-    final bool saved = await _triggerDownloadFromBuilder();
-    if (!saved || !mounted) return;
-    final Widget destination = widget.isCampanello
-        ? const CampanelliPage()
-        : const ChestPage();
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => destination),
-      (route) => false,
-    );
+    await _triggerDownloadFromBuilder();
   }
 
   void _warnMissingApi(String what) {

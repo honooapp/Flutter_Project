@@ -361,15 +361,7 @@ class _NewHonooPageState extends State<NewHonooPage> {
     }
 
     if (!mounted) return;
-    final bool saved = await state.downloadHonooPublic(
-      context,
-      fileName: trimmed,
-    );
-    if (!saved || !mounted) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const ChestPage()),
-      (route) => false,
-    );
+    await state.downloadHonooPublic(context, fileName: trimmed);
   }
 
   void _onBuilderFocusChanged(bool hasFocus) {
