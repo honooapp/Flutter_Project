@@ -48,7 +48,8 @@ class CampanelliPage extends StatefulWidget {
   State<CampanelliPage> createState() => _CampanelliPageState();
 }
 
-class _CampanelliPageState extends State<CampanelliPage> {
+class _CampanelliPageState extends State<CampanelliPage>
+    with WidgetsBindingObserver {
   final CampanelliDataRepository _campanelliRepository =
       CampanelliDataRepository();
   late final CampanelliController _campanelliController = CampanelliController(
@@ -56,8 +57,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
   );
   // Animations: centralize durations/curves to avoid magic numbers
   static const Duration _kAnimFast = Duration(milliseconds: 220);
-  static const Duration _kBounceIn = Duration(milliseconds: 650);
-  static const Duration _kBounceOut = Duration(milliseconds: 750);
   static const Duration _kHouseSlideDuration = Duration(milliseconds: 800);
   static const Duration _kCarouselHintDuration = Duration(seconds: 4);
   static const Curve _kCurve = Curves.easeOutCubic;
@@ -72,9 +71,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
   bool _showCarouselArrows = true;
   Timer? _carouselHintTimer;
   bool _isKnocking = false;
-  bool _knockOverlayVisible = false;
-  final Map<String, Completer<void>> _knockWaiters =
-      <String, Completer<void>>{};
+  DialogRoute<void>? _busyRoute;
+  Timer? _accessRefreshTimer;
+  bool _refreshingAccess = false;
   bool _isShowingKnockRequest = false;
   final Set<String> _shownKnockRequestIds = <String>{};
   bool get _hasOwnHouse => _campanelliController.state.hasOwnHouse;
@@ -93,25 +92,68 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
   void _showBusyOverlay(String message) {
     if (!mounted) return;
-    _knockOverlayVisible = true;
-    unawaited(
-      showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => BusyOverlay(message: message),
-      ),
+    if (_busyRoute != null) return;
+    final route = DialogRoute<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => BusyOverlay(message: message),
     );
+    _busyRoute = route;
+    unawaited(Navigator.of(context, rootNavigator: true).push(route));
   }
 
   void _hideBusyOverlay() {
-    if (!mounted || !_knockOverlayVisible) return;
-    _knockOverlayVisible = false;
-    Navigator.of(context, rootNavigator: true).maybePop();
+    final route = _busyRoute;
+    _busyRoute = null;
+    if (route != null && route.isActive) route.navigator?.removeRoute(route);
+  }
+
+  Future<void> _refreshAccess() async {
+    final user = SupabaseProvider.client.auth.currentUser;
+    if (!mounted || user == null || _refreshingAccess) return;
+    _refreshingAccess = true;
+    try {
+      final tags = await _campanelliController.loadGrantedHouseTags(user.id);
+      if (!mounted) return;
+      setState(() {
+        _unlockedCampanelli.addAll(
+          _userEntries
+              .where(
+                (entry) => tags.contains(entry.campanello.campanelloHinooId),
+              )
+              .map((entry) => entry.campanello.id),
+        );
+      });
+    } catch (error) {
+      debugPrint('[Campanelli] access refresh failed: $error');
+    } finally {
+      _refreshingAccess = false;
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(_refreshAccess());
+      unawaited(
+        _campanelliController.refreshPendingKnocks(
+          _ownedHinooIds,
+          onChanged: () {
+            if (mounted) setState(() {});
+          },
+        ),
+      );
+    }
   }
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _accessRefreshTimer = Timer.periodic(
+      const Duration(seconds: 15),
+      (_) => unawaited(_refreshAccess()),
+    );
     _scheduleCarouselArrowsHide();
     _realtimeEventsSubscription = _campanelliController.realtimeEvents.listen(
       _handleRealtimeEvent,
@@ -206,21 +248,25 @@ class _CampanelliPageState extends State<CampanelliPage> {
           _hideBusyOverlay();
           return;
         }
-        final waiter = Completer<void>();
-        _knockWaiters[targetTag] = waiter;
         await _campanelliController.sendHouseKnock(
           targetHouseTag: targetTag,
           visitorId: user.id,
         );
-        await waiter.future.timeout(const Duration(seconds: 12));
         _hideBusyOverlay();
+        if (mounted) {
+          showHonooToast(
+            context,
+            message:
+                'Bussata inviata. Il proprietario la troverà anche quando torna online.',
+          );
+        }
       } on TimeoutException {
         _hideBusyOverlay();
         if (mounted) {
-          await showHonooMessageDialog(
+          showHonooToast(
             context,
-            message: 'Il proprietario non è in casa\nProva più tardi',
-            duration: const Duration(seconds: 3),
+            message:
+                'Il server non risponde. Non posso confermare l’invio della bussata.',
           );
         }
       } catch (e) {
@@ -233,13 +279,11 @@ class _CampanelliPageState extends State<CampanelliPage> {
           );
         }
       } finally {
-        final targetTag = campanello.campanelloHinooId;
-        if (targetTag != null) _knockWaiters.remove(targetTag);
+        _hideBusyOverlay();
       }
     } finally {
       if (mounted) setState(() => _isKnocking = false);
     }
-    // waiting realtime approval update
   }
 
   Future<void> _showEnterDialog(String campanelloId) async {
@@ -415,7 +459,10 @@ class _CampanelliPageState extends State<CampanelliPage> {
 
       final String email =
           SupabaseProvider.client.auth.currentUser?.email ?? '';
-      final result = await _campanelliController.requestHouseInvite();
+      final result = await _campanelliController.requestHouseInvite().timeout(
+        const Duration(seconds: 15),
+        onTimeout: () => CasaRequestResult.backendUnavailable,
+      );
       if (!mounted) return;
       switch (result) {
         case CasaRequestResult.success:
@@ -431,7 +478,12 @@ class _CampanelliPageState extends State<CampanelliPage> {
             builder: (_) => HouseRequestReceivedDialog(email: email),
           );
           if (invite == true && mounted) {
-            final inviteResult = await _campanelliController.sendAdminInvite();
+            final inviteResult = await _campanelliController
+                .sendAdminInvite()
+                .timeout(
+                  const Duration(seconds: 15),
+                  onTimeout: () => CasaAdminInviteResult.backendUnavailable,
+                );
             if (mounted) {
               showHonooToast(
                 context,
@@ -761,9 +813,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
       case CampanelliPendingKnockRemoved():
         setState(() {});
       case CampanelliAccessGranted(:final targetTag):
-        final waiter = _knockWaiters[targetTag];
-        if (waiter != null && !waiter.isCompleted) waiter.complete();
-        _hideBusyOverlay();
         showHonooToast(context, message: 'La casa è stata aperta');
         try {
           HapticFeedback.lightImpact();
@@ -772,19 +821,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
             '[Campanelli] haptic failed: ${AppFailure.from(error, stackTrace)}',
           );
         }
-        await _goToCampanelloByTag(targetTag);
-        await _hintCampanelloBounce();
         final entry = _entryForTag(targetTag);
-        if (entry != null && mounted) {
+        if (entry != null) {
           setState(() => _unlockedCampanelli.add(entry.campanello.id));
-          final ownerId = entry.campanello.ownerId;
-          if (ownerId != null && ownerId.isNotEmpty) {
-            await Navigator.of(context).push<void>(
-              MaterialPageRoute(
-                builder: (_) => SharedHouseChestPage(ownerId: ownerId),
-              ),
-            );
-          }
         }
     }
   }
@@ -800,60 +839,6 @@ class _CampanelliPageState extends State<CampanelliPage> {
       await _openPendingKnock(knock);
     } finally {
       _isShowingKnockRequest = false;
-    }
-  }
-
-  Future<void> _goToCampanelloByTag(String tag) async {
-    final List<_CampanelloEntry> campanelli = _buildCampanelli();
-    final int idx = campanelli.indexWhere(
-      (e) => e.campanello.campanelloHinooId == tag,
-    );
-    if (idx < 0) return;
-    const int introPageCount = 1;
-    final int pageIndex = idx + introPageCount;
-    // Ensure we are on the campanelli layer (vertical page 0)
-    if (_pageController.hasClients) {
-      await _pageController.animateToPage(
-        0,
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
-      );
-    }
-    if (_campanelloPageController.hasClients) {
-      await _campanelloPageController.animateToPage(
-        pageIndex,
-        duration: const Duration(milliseconds: 240),
-        curve: Curves.easeOutCubic,
-      );
-      if (mounted) setState(() => _campanelloIndex = pageIndex);
-    }
-  }
-
-  Future<void> _hintCampanelloBounce() async {
-    if (!_campanelloPageController.hasClients) return;
-    final position = _campanelloPageController.position;
-    final double bump = position.viewportDimension * 0.5;
-    final double start = position.pixels;
-    final bool hasRoomAfter = start + bump <= position.maxScrollExtent;
-    final double target = (start + (hasRoomAfter ? bump : -bump)).clamp(
-      position.minScrollExtent,
-      position.maxScrollExtent,
-    );
-    try {
-      await _campanelloPageController.animateTo(
-        target,
-        duration: _kBounceIn,
-        curve: _kCurve,
-      );
-      await _campanelloPageController.animateTo(
-        start,
-        duration: _kBounceOut,
-        curve: _kCurve,
-      );
-    } catch (error, stackTrace) {
-      debugPrint(
-        '[Campanelli] bounce animation failed: ${AppFailure.from(error, stackTrace)}',
-      );
     }
   }
 
@@ -1020,9 +1005,9 @@ class _CampanelliPageState extends State<CampanelliPage> {
   void dispose() {
     _carouselHintTimer?.cancel();
     _realtimeEventsSubscription.cancel();
-    for (final waiter in _knockWaiters.values) {
-      if (!waiter.isCompleted) waiter.complete();
-    }
+    WidgetsBinding.instance.removeObserver(this);
+    _accessRefreshTimer?.cancel();
+    _hideBusyOverlay();
     _pageController.dispose();
     _campanelloPageController.dispose();
     _campanelliController.dispose();

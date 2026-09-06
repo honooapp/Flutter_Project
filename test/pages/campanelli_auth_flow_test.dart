@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/IsolaDelleStorie/Pages/campanelli_page.dart';
 import 'package:honoo/Pages/email_login_page.dart';
 import 'package:honoo/Widgets/campanello_card.dart';
+import 'package:honoo/Widgets/campanelli_footer.dart';
+import 'package:honoo/Widgets/busy_overlay.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../test_supabase_helper.dart';
@@ -163,6 +165,27 @@ void main() {
       await tester.pumpAndSettle();
       card = tester.widget(find.byType(CampanelloCard));
       expect(card.data.text, 'Campanello più vecchio');
+
+      // Nessun evento realtime: il proprietario può essere offline.
+      tester.widget<CampanelliFooter>(find.byType(CampanelliFooter)).onKnock();
+      await tester.pumpAndSettle();
+      expect(find.byType(BusyOverlay), findsNothing);
+      expect(find.textContaining('Bussata inviata.'), findsOneWidget);
+      verify(() => houseAccess.insert(any())).called(1);
+
+      // Recupera anche un permesso concesso mentre realtime era assente.
+      houseAccess.queueResponse(const [
+        {
+          'target_house_tag': 'older',
+          'share_modes': ['honoo'],
+        },
+      ]);
+      await tester.pump(const Duration(seconds: 15));
+      await tester.pumpAndSettle();
+      tester.widget<CampanelliFooter>(find.byType(CampanelliFooter)).onKnock();
+      await tester.pumpAndSettle();
+      expect(find.text('Entra pure a casa mia'), findsOneWidget);
+      await tester.pumpWidget(const SizedBox.shrink());
     },
   );
 }

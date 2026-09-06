@@ -10,35 +10,45 @@ class CampanelliDataRepository {
 
   final SupabaseClient _client;
 
+  static const requestTimeout = Duration(seconds: 12);
+
+  Future<T> _request<T>(Future<T> Function() operation) =>
+      (() async => await operation())().timeout(requestTimeout);
+
   Future<List<dynamic>> fetchPublicAdminCampanelli() async {
-    final rows = await _client.rpc('get_public_admin_campanelli');
+    final rows = await _request(
+      () => _client.rpc('get_public_admin_campanelli'),
+    );
     return _asList(rows);
   }
 
   Future<List<dynamic>> fetchHouseRows() async {
-    final rows = await _client
-        .from('case')
-        .select(
-          'campanello_hinoo_id,owner_id,house_image_url,bg_transform,created_at',
-        );
+    final rows = await _request(
+      () => _client
+          .from('case')
+          .select(
+            'campanello_hinoo_id,owner_id,house_image_url,bg_transform,created_at',
+          ),
+    );
     return _asList(rows);
   }
 
   Future<List<dynamic>> fetchShareSettingsRows(List<String> hinooIds) async {
     if (hinooIds.isEmpty) return const [];
-    final rows = await _client
-        .from('house_share_settings')
-        .select('campanello_hinoo_id,share_mode,share_modes')
-        .in_('campanello_hinoo_id', hinooIds);
+    final rows = await _request(
+      () => _client
+          .from('house_share_settings')
+          .select('campanello_hinoo_id,share_mode,share_modes')
+          .in_('campanello_hinoo_id', hinooIds),
+    );
     return _asList(rows);
   }
 
   Future<List<dynamic>> fetchHinooRows(List<String> hinooIds) async {
     if (hinooIds.isEmpty) return const [];
-    final rows = await _client
-        .from('hinoo')
-        .select('id,pages')
-        .in_('id', hinooIds);
+    final rows = await _request(
+      () => _client.from('hinoo').select('id,pages').in_('id', hinooIds),
+    );
     return _asList(rows);
   }
 
@@ -46,31 +56,37 @@ class CampanelliDataRepository {
     List<String> targetHouseTags,
   ) async {
     if (targetHouseTags.isEmpty) return const [];
-    final rows = await _client
-        .from('house_access')
-        .select('id,target_house_tag,created_at,hinoo_id,honoo_id')
-        .in_('target_house_tag', targetHouseTags)
-        .is_('granted_at', null);
+    final rows = await _request(
+      () => _client
+          .from('house_access')
+          .select('id,target_house_tag,created_at,hinoo_id,honoo_id')
+          .in_('target_house_tag', targetHouseTags)
+          .is_('granted_at', null),
+    );
     return _asList(rows);
   }
 
   Future<Map<String, dynamic>?> fetchHinooForKnock(String hinooId) async {
-    final row = await _client
-        .from('hinoo')
-        .select('pages,type,recipient_tag,created_at')
-        .eq('id', hinooId)
-        .maybeSingle();
+    final row = await _request(
+      () => _client
+          .from('hinoo')
+          .select('pages,type,recipient_tag,created_at')
+          .eq('id', hinooId)
+          .maybeSingle(),
+    );
     return _asMap(row);
   }
 
   Future<Map<String, dynamic>?> fetchHonooForKnock(String honooId) async {
-    final row = await _client
-        .from('honoo')
-        .select(
-          'id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id',
-        )
-        .eq('id', honooId)
-        .maybeSingle();
+    final row = await _request(
+      () => _client
+          .from('honoo')
+          .select(
+            'id,text,image_url,destination,reply_to,recipient_tag,created_at,updated_at,user_id',
+          )
+          .eq('id', honooId)
+          .maybeSingle(),
+    );
     return _asMap(row);
   }
 
@@ -78,10 +94,12 @@ class CampanelliDataRepository {
     required String knockId,
     required DateTime grantedAt,
   }) async {
-    await _client
-        .from('house_access')
-        .update({'granted_at': grantedAt.toIso8601String()})
-        .eq('id', knockId);
+    await _request(
+      () => _client
+          .from('house_access')
+          .update({'granted_at': grantedAt.toIso8601String()})
+          .eq('id', knockId),
+    );
   }
 
   Future<void> approveHouseKnock({
@@ -89,18 +107,22 @@ class CampanelliDataRepository {
     required List<String> shareModes,
   }) async {
     final parsedKnockId = int.parse(knockId);
-    await _client.rpc(
-      'approve_house_knock',
-      params: {'p_knock_id': parsedKnockId, 'p_share_modes': shareModes},
+    await _request(
+      () => _client.rpc(
+        'approve_house_knock',
+        params: {'p_knock_id': parsedKnockId, 'p_share_modes': shareModes},
+      ),
     );
   }
 
   Future<List<String>> fetchGrantedHouseTags(String visitorId) async {
-    final rows = await _client
-        .from('house_access')
-        .select('target_house_tag,share_modes')
-        .eq('visitor_id', visitorId)
-        .not('granted_at', 'is', null);
+    final rows = await _request(
+      () => _client
+          .from('house_access')
+          .select('target_house_tag,share_modes')
+          .eq('visitor_id', visitorId)
+          .not('granted_at', 'is', null),
+    );
     return _asList(rows)
         .whereType<Map>()
         .where(
@@ -119,12 +141,14 @@ class CampanelliDataRepository {
     String? hinooId,
     String? honooId,
   }) async {
-    await _client.from('house_access').insert({
-      'target_house_tag': targetHouseTag,
-      'visitor_id': visitorId,
-      if (hinooId != null && hinooId.isNotEmpty) 'hinoo_id': hinooId,
-      if (honooId != null && honooId.isNotEmpty) 'honoo_id': honooId,
-    });
+    await _request(
+      () => _client.from('house_access').insert({
+        'target_house_tag': targetHouseTag,
+        'visitor_id': visitorId,
+        if (hinooId != null && hinooId.isNotEmpty) 'hinoo_id': hinooId,
+        if (honooId != null && honooId.isNotEmpty) 'honoo_id': honooId,
+      }),
+    );
   }
 
   Future<void> saveShareModes({
@@ -133,13 +157,15 @@ class CampanelliDataRepository {
     required List<String> modes,
     required DateTime updatedAt,
   }) async {
-    await _client.from('house_share_settings').upsert({
-      'owner_id': ownerId,
-      'campanello_hinoo_id': campanelloHinooId,
-      'share_mode': modes.isEmpty ? null : modes.first,
-      'share_modes': modes,
-      'updated_at': updatedAt.toIso8601String(),
-    }, onConflict: 'campanello_hinoo_id');
+    await _request(
+      () => _client.from('house_share_settings').upsert({
+        'owner_id': ownerId,
+        'campanello_hinoo_id': campanelloHinooId,
+        'share_mode': modes.isEmpty ? null : modes.first,
+        'share_modes': modes,
+        'updated_at': updatedAt.toIso8601String(),
+      }, onConflict: 'campanello_hinoo_id'),
+    );
   }
 
   static List<dynamic> _asList(dynamic rows) {

@@ -1,8 +1,18 @@
+import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:honoo/Services/campanelli_repository.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../test_supabase_helper.dart';
+
+class _HangingQuery extends MockQueryChain {
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
+    // ignore: prefer_void_to_null, matches Future.then<R=Null> in await.
+    if (invocation.memberName == #then) return Completer<Null>().future;
+    return super.noSuchMethod(invocation);
+  }
+}
 
 void main() {
   setUpAll(registerSupabaseFallbacks);
@@ -26,6 +36,22 @@ void main() {
   });
 
   tearDown(resetMocktailState);
+
+  testWidgets(
+    'una bussata senza risposta del server termina entro il timeout',
+    (tester) async {
+      when(() => houseAccess.insert(any())).thenAnswer((_) => _HangingQuery());
+      final result = expectLater(
+        repository.sendHouseKnock(
+          targetHouseTag: 'house',
+          visitorId: 'visitor',
+        ),
+        throwsA(isA<TimeoutException>()),
+      );
+      await tester.pump(CampanelliDataRepository.requestTimeout);
+      await result;
+    },
+  );
 
   test('fetchPublicAdminCampanelli usa la RPC pubblica dedicata', () async {
     final rpc = MockQueryChain();
