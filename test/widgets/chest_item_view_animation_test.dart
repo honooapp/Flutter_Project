@@ -73,7 +73,7 @@ void main() {
     final captureBoundary = tester.widget<RepaintBoundary>(
       find.byKey(repaintKey),
     );
-    final captureBackground = captureBoundary.child! as ColoredBox;
+    final captureBackground = captureBoundary.child! as Card;
     expect(captureBackground.color, HonooColor.background);
     final chestItem = find.byType(ChestItemView);
     expect(

@@ -12,7 +12,6 @@ import '../UI/hinoo_viewer.dart';
 import '../UI/honoo_card.dart';
 import '../UI/unified_thread_view.dart';
 import '../Utility/chest_content_style.dart';
-import '../Utility/honoo_colors.dart';
 import '../Utility/responsive_layout.dart';
 
 class ChestItemView extends StatelessWidget {
@@ -97,18 +96,7 @@ class ChestItemView extends StatelessWidget {
         ? content
         : ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: SizedBox(
-              width: cardWidth,
-              child: isHonoo
-                  ? RepaintBoundary(
-                      key: repaintKey,
-                      child: ColoredBox(
-                        color: HonooColor.background,
-                        child: content,
-                      ),
-                    )
-                  : content,
-            ),
+            child: SizedBox(width: cardWidth, child: content),
           );
     final keyedCard = KeyedSubtree(
       key: ValueKey(identity),
@@ -145,6 +133,7 @@ class ChestItemView extends StatelessWidget {
       height: availableHeight,
       child: HonooCard(
         honoo: honoo,
+        downloadBoundaryKey: repaintKey,
         onDownloadTap: () => onDownload(repaintKey),
       ),
     );

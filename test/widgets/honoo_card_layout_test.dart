@@ -21,6 +21,41 @@ void main() {
     harness.disableOverrides();
   });
 
+  testWidgets('download esclude i margini del contenitore largo', (
+    tester,
+  ) async {
+    final captureKey = GlobalKey();
+    final honoo = Honoo(
+      1,
+      'Testo',
+      '',
+      '2026-01-01',
+      '2026-01-01',
+      'user-id',
+      HonooType.personal,
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 800,
+            height: 450,
+            child: HonooCard(honoo: honoo, downloadBoundaryKey: captureKey),
+          ),
+        ),
+      ),
+    );
+    final captureRect = tester.getRect(find.byKey(captureKey));
+    final textRect = tester.getRect(
+      find.byKey(const Key('honoo-card-text-panel')),
+    );
+    expect(captureRect.width, lessThan(300));
+    expect(captureRect.left, textRect.left);
+    expect(captureRect.right, textRect.right);
+    expect(captureRect.top, textRect.top);
+    expect(captureRect.height, closeTo(captureRect.width * 1.5 + 9, 0.01));
+  });
+
   testWidgets('il separatore dell honoo Luna usa il bianco dello sfondo', (
     tester,
   ) async {

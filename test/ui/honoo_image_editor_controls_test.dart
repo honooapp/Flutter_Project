@@ -55,6 +55,14 @@ void main() {
 
     final textArea = find.byKey(const Key('honoo-text-area'));
     final imageArea = find.byKey(const Key('honoo-image-area'));
+    final exportRect = tester.getRect(
+      find.byKey(const Key('honoo-export-content')),
+    );
+    expect(exportRect.left, closeTo(tester.getRect(imageArea).left, 0.01));
+    expect(exportRect.right, closeTo(tester.getRect(imageArea).right, 0.01));
+    expect(exportRect.top, closeTo(tester.getRect(textArea).top, 0.01));
+    expect(exportRect.bottom, closeTo(tester.getRect(imageArea).bottom, 0.01));
+    expect(exportRect.top, greaterThanOrEqualTo(tester.getRect(panel).bottom));
     expect(textArea, findsOneWidget);
     expect(find.text('Testo iniziale'), findsOneWidget);
     expect(replace, findsOneWidget);

@@ -464,20 +464,13 @@ class _UnifiedThreadViewState extends State<UnifiedThreadView>
     final Widget card;
     switch (entry.kind) {
       case ConversationEntryKind.honoo:
-        card = RepaintBoundary(
-          key: repaintKey,
-          child: ColoredBox(
-            color: HonooColor.background,
-            child: HonooCard(
-              honoo: entry.honoo!,
-              viewerUserId: widget.currentUserId,
-              contentStyleOverride: style,
-              onDownloadTap: () => _downloadFromBoundary(
-                repaintKey: repaintKey,
-                baseName: 'honoo',
-              ),
-            ),
-          ),
+        card = HonooCard(
+          downloadBoundaryKey: repaintKey,
+          honoo: entry.honoo!,
+          viewerUserId: widget.currentUserId,
+          contentStyleOverride: style,
+          onDownloadTap: () =>
+              _downloadFromBoundary(repaintKey: repaintKey, baseName: 'honoo'),
         );
         break;
       case ConversationEntryKind.hinoo:

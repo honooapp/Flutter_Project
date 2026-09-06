@@ -13,6 +13,7 @@ import '../Widgets/text_box_download_button.dart';
 
 class HonooCard extends StatelessWidget {
   final Honoo honoo;
+  final GlobalKey? downloadBoundaryKey;
   final VoidCallback? onDownloadTap;
   final String? viewerUserId;
   final ChestContentStyle? contentStyleOverride;
@@ -20,6 +21,7 @@ class HonooCard extends StatelessWidget {
   const HonooCard({
     super.key,
     required this.honoo,
+    this.downloadBoundaryKey,
     this.onDownloadTap,
     this.viewerUserId,
     this.contentStyleOverride,
@@ -220,6 +222,10 @@ class HonooCard extends StatelessWidget {
           ),
         );
 
+        final exportContent = RepaintBoundary(
+          key: downloadBoundaryKey,
+          child: content,
+        );
         final bool isReply = honoo.type == HonooType.answer;
         final bool isOwn =
             currentUserId != null && currentUserId == honoo.userId;
@@ -228,9 +234,9 @@ class HonooCard extends StatelessWidget {
               ? Semantics(
                   container: true,
                   label: isOwn ? 'Risposta inviata' : 'Risposta ricevuta',
-                  child: content,
+                  child: exportContent,
                 )
-              : content,
+              : exportContent,
         );
       },
     );

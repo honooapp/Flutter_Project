@@ -80,8 +80,6 @@ class HonooBuilder extends StatefulWidget {
 }
 
 class HonooBuilderState extends State<HonooBuilder> {
-  static const double framePadding = 12.0;
-
   final FormattedTextEditingController _textCtrl =
       FormattedTextEditingController();
   final FocusNode _textFocus = FocusNode();
@@ -443,36 +441,12 @@ class HonooBuilderState extends State<HonooBuilder> {
         pixelRatio = (maxOut / longEdge).clamp(1.0, deviceRatio);
       }
       final ui.Image base = await boundary.toImage(pixelRatio: pixelRatio);
-      ui.Image? framed;
       try {
-        final int framePx = (framePadding * pixelRatio).round();
-        final int newWidth = base.width + framePx * 2;
-        final int newHeight = base.height + framePx * 2;
-
-        final ui.PictureRecorder recorder = ui.PictureRecorder();
-        final Canvas canvas = Canvas(
-          recorder,
-          Rect.fromLTWH(0, 0, newWidth.toDouble(), newHeight.toDouble()),
-        );
-
-        canvas.drawRect(
-          Rect.fromLTWH(0, 0, newWidth.toDouble(), newHeight.toDouble()),
-          Paint()..color = HonooColor.background,
-        );
-
-        canvas.drawImage(
-          base,
-          Offset(framePx.toDouble(), framePx.toDouble()),
-          Paint(),
-        );
-
-        framed = await recorder.endRecording().toImage(newWidth, newHeight);
-        final ByteData? byteData = await framed.toByteData(
+        final ByteData? byteData = await base.toByteData(
           format: ui.ImageByteFormat.png,
         );
         return byteData?.buffer.asUint8List();
       } finally {
-        framed?.dispose();
         base.dispose();
       }
     } catch (e) {
@@ -485,7 +459,7 @@ class HonooBuilderState extends State<HonooBuilder> {
     BuildContext context, {
     String? fileName,
   }) async {
-    if (!hasImage) {
+    if (!hasImage && _publicImageUrl.isEmpty) {
       showHonooToast(context, message: 'Devi prima caricare un’immagine.');
       return false;
     }
@@ -593,43 +567,55 @@ class HonooBuilderState extends State<HonooBuilder> {
             height: displayH,
             child: FittedBox(
               fit: BoxFit.contain,
-              child: RepaintBoundary(
-                key: _captureKey,
-                child: SizedBox(
-                  width: HonooBuilder.baselineImageSize,
-                  height: baselineTotalHeight,
-                  child: Column(
-                    key: const Key('honoo-composed-content'),
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (_showImageEditingToolbar)
-                        SizedBox(
-                          height: editingToolbarHeight,
-                          width: HonooBuilder.baselineImageSize,
-                          child: _buildImageEditingControls(scale),
-                        ),
-
-                      // ===== TEXT AREA =====
+              child: SizedBox(
+                width: HonooBuilder.baselineImageSize,
+                height: baselineTotalHeight,
+                child: Column(
+                  key: const Key('honoo-composed-content'),
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (_showImageEditingToolbar)
                       SizedBox(
-                        height: baselineTextHeight,
+                        height: editingToolbarHeight,
                         width: HonooBuilder.baselineImageSize,
-                        child: _buildTextArea(HonooBuilder.baselineImageSize),
+                        child: _buildImageEditingControls(scale),
                       ),
 
-                      const SizedBox(height: HonooBuilder.baselineGap),
+                    RepaintBoundary(
+                      key: _captureKey,
+                      child: SizedBox(
+                        key: const Key('honoo-export-content'),
+                        width: HonooBuilder.baselineImageSize,
+                        height: HonooBuilder.baselineTotalHeight,
+                        child: Column(
+                          children: [
+                            // ===== TEXT AREA =====
+                            SizedBox(
+                              height: baselineTextHeight,
+                              width: HonooBuilder.baselineImageSize,
+                              child: _buildTextArea(
+                                HonooBuilder.baselineImageSize,
+                              ),
+                            ),
 
-                      // ===== IMAGE AREA =====
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(5),
-                        child: Container(
-                          width: HonooBuilder.baselineImageSize,
-                          height: HonooBuilder.baselineImageSize,
-                          color: Colors.white, // cornice neutra come “foglio”
-                          child: _buildImageArea(),
+                            const SizedBox(height: HonooBuilder.baselineGap),
+
+                            // ===== IMAGE AREA =====
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(5),
+                              child: Container(
+                                width: HonooBuilder.baselineImageSize,
+                                height: HonooBuilder.baselineImageSize,
+                                color: Colors
+                                    .white, // cornice neutra come “foglio”
+                                child: _buildImageArea(),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
